@@ -1,5 +1,4 @@
-
-#' Baseline Correction of LIBS Spectra With Polynomial Fitting
+#' @title Baseline Correction of LIBS Spectra With Polynomial Fitting
 #' @author Christian L. Goueguel, September 2021
 #' @param data Data frame of LIBS emission spectra
 #' @param .degree Degree of modified polynomial fitting
@@ -10,8 +9,6 @@
 #'                         (2) bkg: data frame of modeled background emission
 #' @export baseline_rmv
 baseline_rmv <- function(data, .degree = 4, .tol = 0.001, .rep = 100) {
-
-
 
   X <- data %>%
     select(where(is.numeric)) %>%
