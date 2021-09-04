@@ -24,18 +24,21 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-`specProc` package, performs a number of pre-processing tasks that
-assist and complement model parameter estimation and uncertainty
-analysis. These include:
+`specProc` package performs a number of pre-processing tasks commonly used in the analysis of laser-induced breakdown spectroscopy (LIBS) spectra. These include:
 
--   Peak and level-crossing detection
--   Fitting multiple or overlapping peaks
 -   Baseline removal
--   Convolution and correlation
+-   Peaks detection
+-   Fitting single, multiple and overlapping peaks
+-   Normalization 
+-   Smoothing and filtering
+-   Robust or classical Box-Cox transformation 
+-   Pearson and Spearman peaks correlation with analyte concentration
 -   Descriptive statistics such as mean, standard deviation and higher
     central moments 
--   Statistical Tests
--   Smoothing and filtering
+-   Statistical tests
+-   Rowwise and cellwise outliers detection
+-   Robust or classical principal component analysis (PCA)
+-   Orthogonal partial-least squares (OPLS)
 
 ## Installation
 
