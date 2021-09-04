@@ -24,6 +24,7 @@ modeling, called chemometrics. These include:
 -   Rowwise and cellwise outliers detection
 -   Robust or classical principal component analysis (PCA)
 -   Orthogonal partial-least squares (OPLS)
+-   PLS-based wavelength selection
 
 ## Installation
 
