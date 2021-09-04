@@ -8,7 +8,8 @@
 
 `specProc` package performs a number of pre-processing tasks commonly
 used in the analysis of laser-induced breakdown spectroscopy (LIBS)
-spectra. These include:
+spectra. Collectively, these are essential tools in LIBS modelling.
+These include:
 
 -   Baseline removal
 -   Peaks detection
