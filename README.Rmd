@@ -24,15 +24,15 @@ knitr::opts_chunk$set(
 
 <!-- badges: end -->
 
-`specProc` package performs a number of pre-processing tasks commonly used in the analysis of laser-induced breakdown spectroscopy (LIBS) spectra. Collectively, these are essential tools in LIBS modelling. These include:
+`specProc` package performs a number of pre-processing tasks commonly used in the analysis of laser-induced breakdown spectroscopy (LIBS) spectra. Collectively, these are essential tools in LIBS calibration modeling, called chemometrics. These include:
 
 -   Baseline removal
 -   Peaks detection
--   Fitting single, multiple and overlapping peaks
+-   Fitting single, multiple or overlapping peaks
 -   Normalization 
 -   Smoothing and filtering
 -   Robust or classical Box-Cox transformation 
--   Pearson and Spearman peaks correlation with analyte concentration
+-   Pearson or Spearman peaks correlation
 -   Descriptive statistics such as mean, standard deviation and higher
     central moments 
 -   Statistical tests
