@@ -7,9 +7,9 @@
 <!-- badges: end -->
 
 `specProc` package performs a number of pre-processing tasks commonly
-used in the analysis of laser-induced breakdown spectroscopy (LIBS)
-spectra. Collectively, these are essential tools in LIBS calibration
-modeling, called chemometrics. These include:
+used in laser-induced breakdown spectroscopy (LIBS). Collectively, these
+are essential tools in LIBS calibration modeling, called chemometrics.
+These include:
 
 -   Baseline removal
 -   Peaks detection
