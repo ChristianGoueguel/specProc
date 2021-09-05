@@ -14,7 +14,7 @@ modeling, called chemometrics. These include:
 -   Baseline removal
 -   Peaks detection
 -   Fitting single, multiple or overlapping peaks
--   Normalization
+-   Spectral-based normalization
 -   Smoothing and filtering
 -   Robust or classical Box-Cox transformation
 -   Pearson or Spearman peaks correlation

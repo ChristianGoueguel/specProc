@@ -1,5 +1,5 @@
 #' @title Baseline Correction of LIBS Spectra With Polynomial Fitting
-#' @author Christian L. Goueguel, September 2021
+#' @author Christian L. Goueguel
 #' @param data Data frame of LIBS emission spectra
 #' @param .degree Degree of modified polynomial fitting
 #' @param .tol Tolerance of difference between iterations
