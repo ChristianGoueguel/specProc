@@ -51,7 +51,6 @@ baseline <- function(data, degree = 4, tol = 0.001, rep = 100) {
         set_colnames(all_of(wlength)) %>%
         map_dfr(., replace_with_zero)
 
-
       # background emission
       bkg <- bc_mod %>%
         pluck("baseline") %>%
