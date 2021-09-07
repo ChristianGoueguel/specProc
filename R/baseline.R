@@ -4,12 +4,12 @@
 #' @details This is a wrapper function implemented on the baseline package.
 #' @param data Data frame of LIBS emission spectra
 #' @param degree Degree of modified polynomial fitting (by default 4)
-#' @param tol Tolerance of difference between iterations (by default 0.001)
+#' @param tol Tolerance of difference between iterations (by default 1e-3)
 #' @param rep Maximum number of iterations (by default 100)
 #' @return A list containing a data frame of baseline corrected spectra (spec), and a data frame of the modeled background emission (bkg).
 #' @export baseline
 #'
-baseline <- function(data, degree = 4, tol = 0.001, rep = 100) {
+baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
 
   if (length(data) == 0) {
      stop("Seems you forgot to provide spectra data.")
