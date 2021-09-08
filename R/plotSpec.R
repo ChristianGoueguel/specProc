@@ -9,11 +9,14 @@
 #' @export plotSpec
 plotSpec <- function(data, id = NULL, colvar = NULL) {
 
-  if (length(data) == 0 | is.null(data) != FALSE) {
+  if (length(data) == 0 | is.null(data) == TRUE) {
     stop("Seems you forgot to provide spectra data.")
   }
 
-  if (is.null(id) != FALSE & is.null(colvar) != FALSE) {
+  if (!require("pacman")) install.packages("pacman")
+  pacman::p_load(magrittr, tidyr, dplyr, purrr, ggplot2)
+
+  if (is.null(id) == TRUE & is.null(colvar) == TRUE) {
     data %>%
       pivot_longer(cols = everything(), names_to = "wavelength", values_to = "intensity") %>%
       modify_at("wavelength", as.numeric) %>%
@@ -24,7 +27,7 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
       theme(legend.position = "none", axis.line = element_line(colour = "grey50", size = 1))
   }
 
-  if (is.null(id) == FALSE & is.null(colvar) != FALSE) {
+  if (is.null(id) == FALSE & is.null(colvar) == TRUE) {
     data %>%
       select(id) %>%
       pivot_longer(cols = !id, names_to = "wavelength", values_to = "intensity") %>%
@@ -37,7 +40,7 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
       theme(legend.position = "none", axis.line = element_line(colour = "grey50", size = 1))
   }
 
-  if (is.null(id) != FALSE & is.null(colvar) == FALSE) {
+  if (is.null(id) == TRUE & is.null(colvar) == FALSE) {
     data %>%
       select(colvar) %>%
       pivot_longer(cols = !colvar, names_to = "wavelength", values_to = "intensity") %>%
