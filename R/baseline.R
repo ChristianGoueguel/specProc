@@ -8,7 +8,6 @@
 #' @param rep Maximum number of iterations (by default 100)
 #' @return A list containing a data frame of baseline corrected spectra (spec), and a data frame of the modeled background emission (bkg).
 #' @export baseline
-#'
 baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
 
   if (length(data) == 0) {
@@ -16,7 +15,7 @@ baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
    }
   else{
     if (is.data.frame(data) == FALSE) {
-      stop("Data must be of class data.frame, tbl_df, or tbl")
+      stop("Data must be of class tbl_df, tbl or data.frame")
     }
     else{
       if (!require(baseline)) install.packages("baseline")
