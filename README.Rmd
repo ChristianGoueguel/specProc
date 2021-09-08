@@ -86,11 +86,11 @@ str(baseline_fit, list.len = 5)
 
 ```{r}
 corrected_spec <- pluck(baseline_fit, "spec")
+background <- pluck(baseline_fit, "bkg")
 ```
 
-```{r}
-background <- baseline_fit %>%
-  pluck("bkg") %>%
+```{r include=FALSE}
+background <- background %>%
   pivot_longer(
     cols = everything(), 
     names_to = "wavelength",
@@ -103,7 +103,6 @@ background <- baseline_fit %>%
 plot1 <- plotSpec(data = LIBS_spec)
 plot2 <- plotSpec(data = corrected_spec)
 ```
-
 
 
 

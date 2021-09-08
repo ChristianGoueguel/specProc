@@ -86,17 +86,7 @@ str(baseline_fit, list.len = 5)
 
 ``` r
 corrected_spec <- pluck(baseline_fit, "spec")
-```
-
-``` r
-background <- baseline_fit %>%
-  pluck("bkg") %>%
-  pivot_longer(
-    cols = everything(), 
-    names_to = "wavelength",
-    values_to = "intensity"
-    ) %>%
-  modify_at("wavelength", as.numeric)
+background <- pluck(baseline_fit, "bkg")
 ```
 
 ``` r
