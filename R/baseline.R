@@ -18,7 +18,7 @@ baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
       stop("Data must be of class tbl_df, tbl or data.frame")
     }
     else{
-      if (!require(baseline)) install.packages("baseline")
+      if (!require("baseline")) install.packages("baseline")
       if (!require("pacman")) install.packages("pacman")
       pacman::p_load(magrittr, dplyr, purrr, tibble)
 
