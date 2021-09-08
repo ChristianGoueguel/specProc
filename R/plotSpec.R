@@ -48,5 +48,17 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
         theme_classic() +
         theme(legend.position = "right", axis.line = element_line(colour = "grey50", size = 1))
       }
+  }
+  if (is.null(id) == TRUE & is.null(colvar) == FALSE) {
+    data %>%
+      select(colvar) %>%
+      pivot_longer(cols = !colvar, names_to = "wavelength", values_to = "intensity") %>%
+      modify_at("wavelength", as.numeric) %>%
+      ggplot(aes(x = wavelength, y = intensity)) +
+      geom_line(aes(colour = colvar, group = colvar)) +
+      scale_colour_gradient(low = "blue", high = "red") +
+      labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+      theme_classic() +
+      theme(legend.position = "none", axis.line = element_line(colour = "grey50", size = 1))
     }
   }
