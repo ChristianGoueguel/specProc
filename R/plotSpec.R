@@ -9,57 +9,58 @@
 #' @export plotSpec
 plotSpec <- function(data, id = NULL, colvar = NULL) {
 
-  if (length(data) == 0) {
+  if (length(data) == 0 | is.null(data) != FALSE) {
     stop("Seems you forgot to provide spectra data.")
   }
-  else{
-    if (is.null(id) == TRUE) {
-      data %>%
-        pivot_longer(cols = everything(), names_to = "wavelength", values_to = "intensity") %>%
-        modify_at("wavelength", as.numeric) %>%
-        ggplot(aes(x = wavelength, y = intensity)) +
-        geom_line(colour = "darkblue") +
-        labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-        theme_classic() +
-        theme(legend.position = "none", axis.line = element_line(colour = "grey50", size = 1))
-    }
-    else {
-      if (is.null(colvar) == TRUE) {
-        data %>%
-          select(id) %>%
-          pivot_longer(cols = !id, names_to = "wavelength", values_to = "intensity") %>%
-          modify_at("wavelength", as.numeric) %>%
-          ggplot(aes(x = wavelength, y = intensity)) +
-          geom_line(aes(colour = id, group = id)) +
-          scale_colour_gradient(low = "blue", high = "red") +
-          labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-          theme_classic() +
-          theme(legend.position = "none", axis.line = element_line(colour = "grey50", size = 1))
-      }
-      else {
-        data %>%
-          select(id, colvar) %>%
-          pivot_longer(cols = !c(id, colvar), names_to = "wavelength", values_to = "intensity") %>%
-          modify_at("wavelength", as.numeric) %>%
-          ggplot(aes(x = wavelength, y = intensity)) +
-          geom_line(aes(colour = colvar, group = id)) +
-          scale_colour_gradient(low = "blue", high = "red") +
-          labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-          theme_classic() +
-          theme(legend.position = "right", axis.line = element_line(colour = "grey50", size = 1))
-      }
-    }
-    if (is.null(id) == TRUE & is.null(colvar) == FALSE) {
-      data %>%
-        select(colvar) %>%
-        pivot_longer(cols = !colvar, names_to = "wavelength", values_to = "intensity") %>%
-        modify_at("wavelength", as.numeric) %>%
-        ggplot(aes(x = wavelength, y = intensity)) +
-        geom_line(aes(colour = colvar, group = colvar)) +
-        scale_colour_gradient(low = "blue", high = "red") +
-        labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-        theme_classic() +
-        theme(legend.position = "none", axis.line = element_line(colour = "grey50", size = 1))
-      }
-    }
+
+  if (is.null(id) != FALSE & is.null(colvar) != FALSE) {
+    data %>%
+      pivot_longer(cols = everything(), names_to = "wavelength", values_to = "intensity") %>%
+      modify_at("wavelength", as.numeric) %>%
+      ggplot(aes(x = wavelength, y = intensity)) +
+      geom_line(colour = "darkblue") +
+      labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+      theme_classic() +
+      theme(legend.position = "none", axis.line = element_line(colour = "grey50", size = 1))
+  }
+
+  if (is.null(id) == FALSE & is.null(colvar) != FALSE) {
+    data %>%
+      select(id) %>%
+      pivot_longer(cols = !id, names_to = "wavelength", values_to = "intensity") %>%
+      modify_at("wavelength", as.numeric) %>%
+      ggplot(aes(x = wavelength, y = intensity)) +
+      geom_line(aes(colour = id, group = id)) +
+      scale_colour_gradient(low = "blue", high = "red") +
+      labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+      theme_classic() +
+      theme(legend.position = "none", axis.line = element_line(colour = "grey50", size = 1))
+  }
+
+  if (is.null(id) != FALSE & is.null(colvar) == FALSE) {
+    data %>%
+      select(colvar) %>%
+      pivot_longer(cols = !colvar, names_to = "wavelength", values_to = "intensity") %>%
+      modify_at("wavelength", as.numeric) %>%
+      ggplot(aes(x = wavelength, y = intensity)) +
+      geom_line(aes(colour = colvar, group = colvar)) +
+      scale_colour_gradient(low = "blue", high = "red") +
+      labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+      theme_classic() +
+      theme(legend.position = "none", axis.line = element_line(colour = "grey50", size = 1))
+  }
+
+  if (is.null(id) == FALSE & is.null(colvar) == FALSE) {
+    data %>%
+      select(id, colvar) %>%
+      pivot_longer(cols = !c(id, colvar), names_to = "wavelength", values_to = "intensity") %>%
+      modify_at("wavelength", as.numeric) %>%
+      ggplot(aes(x = wavelength, y = intensity)) +
+      geom_line(aes(colour = colvar, group = id)) +
+      scale_colour_gradient(low = "blue", high = "red") +
+      labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+      theme_classic() +
+      theme(legend.position = "right", axis.line = element_line(colour = "grey50", size = 1))
+  }
+
   }
