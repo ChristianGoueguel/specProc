@@ -104,5 +104,51 @@ plot1 <- plotSpec(data = LIBS_spec)
 plot2 <- plotSpec(data = corrected_spec)
 ```
 
+```{r echo=FALSE}
+plot1 <- LIBS_spec %>%
+  pivot_longer(
+  cols = everything(),
+  names_to = "wavelength", 
+  values_to = "intensity"
+  ) %>%
+  modify_at("wavelength", as.numeric) %>%
+  ggplot(aes(x = wavelength, y = intensity)) +
+  geom_line(colour = "darkblue") +
+  labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+  theme_classic() +
+  theme(
+    legend.position = "none", 
+    axis.line = element_line(colour = "grey50", size = 1)
+    )
+
+plot2 <- corrected_spec %>%
+  pivot_longer(
+  cols = everything(),
+  names_to = "wavelength", 
+  values_to = "intensity"
+  ) %>%
+  modify_at("wavelength", as.numeric) %>%
+  ggplot(aes(x = wavelength, y = intensity)) +
+  geom_line(colour = "darkblue") +
+  labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+  theme_classic() +
+  theme(
+    legend.position = "none", 
+    axis.line = element_line(colour = "grey50", size = 1)
+    )
+```
+
+```{r echo=FALSE, fig.height=3, fig.width=6}
+plot1 + 
+  geom_line(data = background, aes(x = wavelength, y = intensity), colour = "red") +
+  ylim(0, 1e3) +
+  labs(subtitle = "Before") | 
+  plot2 + 
+  ylim(0, 1e3) + 
+  geom_hline(yintercept = 0, colour = "red") +
+  labs(subtitle = "After") |
+  plot2 + ylim(0, 50e3)
+```
+
 
 

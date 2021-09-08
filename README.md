@@ -93,3 +93,5 @@ background <- pluck(baseline_fit, "bkg")
 plot1 <- plotSpec(data = LIBS_spec)
 plot2 <- plotSpec(data = corrected_spec)
 ```
+
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="90%" height="90%" />
