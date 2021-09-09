@@ -4,16 +4,16 @@
 \alias{baseline}
 \title{Baseline Correction}
 \usage{
-baseline(spectra, degree = 4, tol = 0.001, rep = 100)
+baseline(data, degree = 4, tol = 0.001, rep = 100)
 }
 \arguments{
-\item{spectra}{Data frame of LIBS emission spectra}
-
 \item{degree}{Degree of modified polynomial fitting (by default 4)}
 
 \item{tol}{Tolerance of difference between iterations (by default 1e-3)}
 
 \item{rep}{Maximum number of iterations (by default 100)}
+
+\item{spectra}{Data frame of LIBS emission spectra}
 }
 \value{
 A list containing a data frame of baseline corrected spectra (spec), and a data frame of the modeled background emission (bkg).

@@ -11,19 +11,19 @@
 #' @importFrom tidyselect "vars_select_helpers"
 #' @importFrom utils "globalVariables"
 #' @export baseline
-baseline <- function(spectra, degree = 4, tol = 1e-3, rep = 100) {
+baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
 
   utils::globalVariables("where")
 
-  if (length(spectra) == 0) {
+  if (length(data) == 0) {
      stop("Seems you forgot to provide spectra data.")
    }
   else{
-    if (is.data.frame(spectra) == FALSE) {
+    if (is.data.frame(data) == FALSE) {
       stop("Data must be of class tbl_df, tbl or data.frame")
     }
     else{
-      Xmat <- spectra %>%
+      Xmat <- data %>%
         dplyr::select(tidyselect::vars_select_helpers$where(is.numeric)) %>%
         as.matrix()
 
@@ -45,20 +45,20 @@ baseline <- function(spectra, degree = 4, tol = 1e-3, rep = 100) {
       )
 
       # baseline corrected spectra
-      spec <- bc_mod %>%
+      corrected_spec <- bc_mod %>%
         purrr::pluck("corrected") %>%
         tibble::as_tibble() %>%
         magrittr::set_colnames(all_of(wlength)) %>%
         purrr::map_dfr(replace_with_zero)
 
       # background emission
-      bkg <- bc_mod %>%
+      background <- bc_mod %>%
         purrr::pluck("baseline") %>%
         tibble::as_tibble() %>%
         magrittr::set_colnames(all_of(wlength)) %>%
         purrr::map_dfr(replace_with_zero)
 
-      res <- list("spec" = spec, "bkg" = bkg)
+      res <- list("spectra" = corrected_spec, "background" = background)
       return(res)
     }
   }
