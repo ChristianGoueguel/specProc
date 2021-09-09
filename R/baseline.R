@@ -2,7 +2,7 @@
 #' @description This function perform baseline correction using modified polynomial curve fitting.
 #' @author Christian L. Goueguel
 #' @details This is a wrapper function implemented on the baseline package.
-#' @param data Data frame of LIBS emission spectra
+#' @param spectra Data frame of LIBS emission spectra
 #' @param degree Degree of modified polynomial fitting (by default 4)
 #' @param tol Tolerance of difference between iterations (by default 1e-3)
 #' @param rep Maximum number of iterations (by default 100)
@@ -11,19 +11,19 @@
 #' @importFrom tidyselect "vars_select_helpers"
 #' @importFrom utils "globalVariables"
 #' @export baseline
-baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
+baseline <- function(spectra, degree = 4, tol = 1e-3, rep = 100) {
 
   utils::globalVariables("where")
 
-  if (length(data) == 0) {
+  if (length(spectra) == 0) {
      stop("Seems you forgot to provide spectra data.")
    }
   else{
-    if (is.data.frame(data) == FALSE) {
+    if (is.data.frame(spectra) == FALSE) {
       stop("Data must be of class tbl_df, tbl or data.frame")
     }
     else{
-      Xmat <- data %>%
+      Xmat <- spectra %>%
         dplyr::select(tidyselect::vars_select_helpers$where(is.numeric)) %>%
         as.matrix()
 

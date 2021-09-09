@@ -4,10 +4,10 @@
 \alias{baseline}
 \title{Baseline Correction}
 \usage{
-baseline(data, degree = 4, tol = 0.001, rep = 100)
+baseline(spectra, degree = 4, tol = 0.001, rep = 100)
 }
 \arguments{
-\item{data}{Data frame of LIBS emission spectra}
+\item{spectra}{Data frame of LIBS emission spectra}
 
 \item{degree}{Degree of modified polynomial fitting (by default 4)}
 
