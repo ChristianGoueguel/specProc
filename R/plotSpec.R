@@ -1,5 +1,5 @@
 #' @title Visualization of LIBS Spectra
-#' @description
+#' @description Plot LIBS spectrum, or multiple spectra identified by a sample id column or a target variable.
 #' @author Christian L. Goueguel
 #' @details This function is based on the ggplot2 package, so that users can add or modified its components.
 #' @param data Data frame of LIBS spectra.

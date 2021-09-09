@@ -17,7 +17,7 @@ plotSpec(data, id = NULL, colvar = NULL)
 Plot of LIBS spectrum or spectra.
 }
 \description{
-Visualization of LIBS Spectra
+Plot LIBS spectrum, or multiple spectra identified by a sample id column or a target variable.
 }
 \details{
 This function is based on the ggplot2 package, so that users can add or modified its components.

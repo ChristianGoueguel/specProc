@@ -26,9 +26,9 @@ baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
         select(where(is.numeric)) %>%
         as.matrix()
 
-      degree %<>% as.numeric()
-      tol %<>% as.numeric()
-      rep %<>% as.numeric()
+      degree <- as.numeric(degree)
+      tol <- as.numeric(tol)
+      rep <- as.numeric(rep)
       wlength <- Xmat %>% colnames()
 
       replace_with_zero <- function(x) {
