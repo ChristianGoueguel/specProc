@@ -7,8 +7,12 @@
 #' @param tol Tolerance of difference between iterations (by default 1e-3)
 #' @param rep Maximum number of iterations (by default 100)
 #' @return A list containing a data frame of baseline corrected spectra (spec), and a data frame of the modeled background emission (bkg).
+#' @import tidyselect
+#' @importFrom utils "globalVariables"
 #' @export baseline
 baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
+
+  utils::globalVariables("where")
 
   if (length(data) == 0) {
      stop("Seems you forgot to provide spectra data.")
@@ -19,7 +23,7 @@ baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
     }
     else{
       Xmat <- data %>%
-        select(where(is.numeric)) %>%
+        dplyr::select(where(is.numeric)) %>%
         as.matrix()
 
       degree <- as.numeric(degree)
@@ -41,17 +45,17 @@ baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
 
       # baseline corrected spectra
       spec <- bc_mod %>%
-        pluck("corrected") %>%
-        as_tibble() %>%
-        set_colnames(all_of(wlength)) %>%
-        map_dfr(., replace_with_zero)
+        purrr::pluck("corrected") %>%
+        tibble::as_tibble() %>%
+        magrittr::set_colnames(all_of(wlength)) %>%
+        purrr::map_dfr(replace_with_zero)
 
       # background emission
       bkg <- bc_mod %>%
-        pluck("baseline") %>%
-        as_tibble() %>%
-        set_colnames(all_of(wlength)) %>%
-        map_dfr(., replace_with_zero)
+        purrr::pluck("baseline") %>%
+        tibble::as_tibble() %>%
+        magrittr::set_colnames(all_of(wlength)) %>%
+        purrr::map_dfr(replace_with_zero)
 
       res <- list("spec" = spec, "bkg" = bkg)
       return(res)

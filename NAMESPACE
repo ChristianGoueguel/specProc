@@ -3,4 +3,6 @@
 export("%>%")
 export(baseline)
 export(plotSpec)
+import(tidyselect)
 importFrom(magrittr,"%>%")
+importFrom(utils,"globalVariables")
