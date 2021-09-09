@@ -2,7 +2,7 @@
 #' @description This function perform baseline correction using modified polynomial curve fitting.
 #' @author Christian L. Goueguel
 #' @details This is a wrapper function implemented on the baseline package.
-#' @param spectra Data frame of LIBS emission spectra
+#' @param data Data frame of LIBS emission spectra
 #' @param degree Degree of modified polynomial fitting (by default 4)
 #' @param tol Tolerance of difference between iterations (by default 1e-3)
 #' @param rep Maximum number of iterations (by default 100)
