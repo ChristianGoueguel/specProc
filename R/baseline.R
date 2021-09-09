@@ -8,6 +8,7 @@
 #' @param rep Maximum number of iterations (by default 100)
 #' @return A list containing a data frame of baseline corrected spectra (spec), and a data frame of the modeled background emission (bkg).
 #' @import tidyselect
+#' @importFrom tidyselect "vars_select_helpers"
 #' @importFrom utils "globalVariables"
 #' @export baseline
 baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
@@ -23,7 +24,7 @@ baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
     }
     else{
       Xmat <- data %>%
-        dplyr::select(where(is.numeric)) %>%
+        dplyr::select(tidyselect::vars_select_helpers$where(is.numeric)) %>%
         as.matrix()
 
       degree <- as.numeric(degree)
