@@ -13,4 +13,5 @@ Imports:
     magrittr
 Roxygen: list(markdown = TRUE)
 Depends: 
+    tidyverse,
     R (>= 2.10)

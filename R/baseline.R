@@ -18,10 +18,6 @@ baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
       stop("Data must be of class tbl_df, tbl or data.frame")
     }
     else{
-      if (!require("baseline")) install.packages("baseline")
-      if (!require("pacman")) install.packages("pacman")
-      pacman::p_load(magrittr, dplyr, purrr, tibble)
-
       Xmat <- data %>%
         select(where(is.numeric)) %>%
         as.matrix()
@@ -29,7 +25,7 @@ baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
       degree <- as.numeric(degree)
       tol <- as.numeric(tol)
       rep <- as.numeric(rep)
-      wlength <- Xmat %>% colnames()
+      wlength <- colnames(Xmat)
 
       replace_with_zero <- function(x) {
         ifelse(x < 0, yes = 0, no = x)

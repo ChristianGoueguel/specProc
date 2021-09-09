@@ -13,9 +13,6 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
     stop("Seems you forgot to provide spectra data.")
   }
 
-  if (!require("pacman")) install.packages("pacman")
-  pacman::p_load(magrittr, tidyr, dplyr, purrr, ggplot2)
-
   if (is.null(id) == TRUE & is.null(colvar) == TRUE) {
     data %>%
       pivot_longer(cols = everything(), names_to = "wavelength", values_to = "intensity") %>%
