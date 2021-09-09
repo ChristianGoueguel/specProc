@@ -13,7 +13,7 @@
 #' @export baseline
 baseline <- function(data, degree = 4, tol = 1e-3, rep = 100) {
 
-  utils::globalVariables("where")
+  utils::globalVariables(names = "where", package = "specProc", add = FALSE)
 
   if (length(data) == 0) {
      stop("Seems you forgot to provide spectra data.")

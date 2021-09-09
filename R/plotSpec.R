@@ -14,7 +14,7 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
     stop("Seems you forgot to provide spectra data.")
   }
 
-  globalVariables(c("wavelength", "intensity"))
+  globalVariables(names = c("wavelength", "intensity"), package = "specProc", add = FALSE)
 
   if (is.null(id) == TRUE & is.null(colvar) == TRUE) {
     data %>%
