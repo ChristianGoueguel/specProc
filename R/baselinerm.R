@@ -1,9 +1,10 @@
 #' @title Background Correction
-#' @description This function perform the estimation and removal of the continuous background emission using polynomial curve fitting.
+#' @description This function perform the estimation and removal of the continuous background emission using a polynomial curve fitting function.
 #' @author Christian L. Goueguel
 #' @details This is a wrapper function implemented in the baseline package.
+#' @source Chad A. Lieber, Anita Mahadevan-Jansen, Applied Spectroscopy, 2003, Vol. 57, 11, 1363-1367.
 #' @param data Data frame of emission spectra
-#' @param degree Degree of modified polynomial fitting (by default 4)
+#' @param degree Degree of the polynomial fitting function (by default 4)
 #' @param tol Tolerance of difference between iterations (by default 1e-3)
 #' @param rep Maximum number of iterations (by default 100)
 #' @return List containing a data frame of background subtracted spectra (spec), and a data frame of the modeled background (bkg).

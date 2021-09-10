@@ -3,13 +3,16 @@
 \name{baselinerm}
 \alias{baselinerm}
 \title{Background Correction}
+\source{
+Chad A. Lieber, Anita Mahadevan-Jansen, Applied Spectroscopy, 2003, Vol. 57, 11, 1363-1367.
+}
 \usage{
 baselinerm(data, degree = 4, tol = 0.001, rep = 100)
 }
 \arguments{
 \item{data}{Data frame of emission spectra}
 
-\item{degree}{Degree of modified polynomial fitting (by default 4)}
+\item{degree}{Degree of the polynomial fitting function (by default 4)}
 
 \item{tol}{Tolerance of difference between iterations (by default 1e-3)}
 
@@ -19,7 +22,7 @@ baselinerm(data, degree = 4, tol = 0.001, rep = 100)
 List containing a data frame of background subtracted spectra (spec), and a data frame of the modeled background (bkg).
 }
 \description{
-This function perform the estimation and removal of the continuous background emission using polynomial curve fitting.
+This function perform the estimation and removal of the continuous background emission using a polynomial curve fitting function.
 }
 \details{
 This is a wrapper function implemented in the baseline package.
