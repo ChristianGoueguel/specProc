@@ -1,10 +1,10 @@
 Package: specProc
 Type: Package
-Title: Pre-processing Tools For LIBS Spectra 
+Title: Preprocessing Tools For Laser-Induced Breakdown Spectroscopy (LIBS) Spectra 
 Version: 0.1.0
 Author: Christian L. Goueguel
 Maintainer: Christian L. Goueguel <christian.goueguel@gmail.com>
-Description: A package for the analysis of laser-induced breakdown spectroscopy (LIBS) data.
+Description: A collection of functions for preprocessing spectra in optical emission spectroscopy of laser-induced plasmas, called laser-induced breakdown spectroscopy. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -22,3 +22,9 @@ Imports:
 Roxygen: list(markdown = TRUE)
 Depends: 
     R (>= 2.10)
+Suggests: 
+    testthat,
+    knitr,
+    markdown,
+    rmarkdown,
+    spelling
