@@ -8,9 +8,10 @@
 #' @param tol Tolerance of difference between iterations (by default 1e-3)
 #' @param rep Maximum number of iterations (by default 100)
 #' @return List containing a data frame of background subtracted spectra (spec), and a data frame of the modeled background (bkg).
-#' @import tidyselect
-#' @import magrittr
+#' @importFrom magrittr "set_colnames"
+#' @importFrom magrittr "%<>%"
 #' @importFrom tidyselect "vars_select_helpers"
+#' @importFrom tidyselect "all_of"
 #' @importFrom utils "globalVariables"
 #' @importFrom dplyr "select"
 #' @importFrom purrr "pluck"
