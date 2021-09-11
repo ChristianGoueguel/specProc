@@ -2,25 +2,26 @@
 % Please edit documentation in R/plotSpec.R
 \name{plotSpec}
 \alias{plotSpec}
-\title{Visualization of LIBS Spectra}
+\title{Spectral Data Plot}
 \usage{
 plotSpec(data, id = NULL, colvar = NULL)
 }
 \arguments{
-\item{data}{Data frame of LIBS spectra.}
+\item{data}{Data frame of emission spectra.}
 
-\item{id}{Column of the data frame that identified each spectrum by an unique name (optional).}
+\item{id}{Factor variable that identified each spectrum  (\code{NULL} by default).}
 
-\item{colvar}{Column of the data frame specifying a variable to be display in color scale (optional).}
+\item{colvar}{Numeric variable to be display in color scale (\code{NULL} by default).}
 }
 \value{
-Plot of LIBS spectrum or spectra.
+ggplot object.
 }
 \description{
-Plot LIBS spectrum, or multiple spectra identified by a sample id column or a target variable.
+Spectrum plots are commonly x–y plots in which the x-axis represents the wavelength and the y-axis represents intensity of a spectrum's signal.
+The function allows to plot a spectrum or several spectra in a single plot, identified either by an id (for example, the samples or spectra id) or by a target variable (for example, the concentration of a chemical element) .
 }
 \details{
-This function is based on the ggplot2 package, so that users can add or modified its components.
+This function is based on the ggplot2 package, thus allowing users to easily add or modify different components of the plot.
 }
 \author{
 Christian L. Goueguel

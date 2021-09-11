@@ -1,12 +1,12 @@
-#' @title Visualization of LIBS Spectra
-#' @description Plot LIBS spectrum, or multiple spectra identified by a sample id column or a target variable.
+#' @title Spectral Data Plot
+#' @description Spectrum plots are commonly x–y plots in which the x-axis represents the wavelength and the y-axis represents intensity of a spectrum's signal.
+#'     The function allows to plot a spectrum or several spectra in a single plot, identified either by an id (for example, the samples or spectra id) or by a target variable (for example, the concentration of a chemical element) .
 #' @author Christian L. Goueguel
-#' @details This function is based on the ggplot2 package, so that users can add or modified its components.
-#' @param data Data frame of LIBS spectra.
-#' @param id Column of the data frame that identified each spectrum by an unique name (optional).
-#' @param colvar Column of the data frame specifying a variable to be display in color scale (optional).
-#' @return Plot of LIBS spectrum or spectra.
-#' @importFrom utils "globalVariables"
+#' @details This function is based on the ggplot2 package, thus allowing users to easily add or modify different components of the plot.
+#' @param data Data frame of emission spectra.
+#' @param id Factor variable that identified each spectrum  (`NULL` by default).
+#' @param colvar Numeric variable to be display in color scale (`NULL` by default).
+#' @return ggplot object.
 #' @export plotSpec
 plotSpec <- function(data, id = NULL, colvar = NULL) {
 
@@ -14,7 +14,11 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
     stop("Seems you forgot to provide spectra data.")
   }
 
-  globalVariables(names = c("wavelength", "intensity"), package = "specProc", add = FALSE)
+  if (is.data.frame(data) == FALSE) {
+    stop("Data must be of class tbl_df, tbl or data.frame")
+  }
+
+  globalVariables(names = c("wavelength", "intensity"))
 
   if (is.null(id) == TRUE & is.null(colvar) == TRUE) {
     data %>%
@@ -65,5 +69,4 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
       ggplot2::theme_classic() +
       ggplot2::theme(legend.position = "right", axis.line = ggplot2::element_line(colour = "grey50", size = 1))
   }
-
-  }
+}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/baselinerm.R
 \name{baselinerm}
 \alias{baselinerm}
-\title{Background Correction}
+\title{Baseline Correction}
 \source{
 Chad A. Lieber, Anita Mahadevan-Jansen, Applied Spectroscopy, 2003, Vol. 57, 11, 1363-1367.
 }
