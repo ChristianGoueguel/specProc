@@ -95,6 +95,9 @@ str(baseline_fit, list.len = 5)
 corrected_spec <- pluck(baseline_fit, "spec")
 ```
 
+Note: `plotSpec` is a `ggplot` based function available in the
+`specProc` package to plot spectral data (see documentation).
+
 ``` r
 plot1 <- specData %>% 
   select(where(is.numeric)) %>%

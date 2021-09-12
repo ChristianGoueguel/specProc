@@ -101,6 +101,8 @@ background <- baseline_fit %>%
   modify_at("wavelength", as.numeric)
 ```
 
+Note: `plotSpec` is a `ggplot` based function available in the `specProc` package to plot spectral data (see documentation).  
+
 ```{r message=FALSE, warning=FALSE}
 plot1 <- specData %>% 
   select(where(is.numeric)) %>%
