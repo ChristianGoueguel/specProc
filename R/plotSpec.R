@@ -31,7 +31,7 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
       purrr::modify_at("wavelength", as.numeric)
 
       p <- X %>%
-        ggplot2::ggplot(ggplot2::aes(wavelength, intensity)) +
+        ggplot2::ggplot(ggplot2::aes_string("wavelength", "intensity")) +
         ggplot2::geom_line(colour = "darkblue") +
         ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
         ggplot2::theme_classic() +
@@ -50,7 +50,7 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
       purrr::modify_at("wavelength", as.numeric)
 
     p <- X %>%
-      ggplot2::ggplot(ggplot2::aes(wavelength, intensity)) +
+      ggplot2::ggplot(ggplot2::aes_string("wavelength", "intensity")) +
       ggplot2::geom_line(ggplot2::aes(colour = id, group = id)) +
       ggplot2::scale_colour_gradient(low = "blue", high = "red") +
       ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
@@ -70,7 +70,7 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
       purrr::modify_at("wavelength", as.numeric)
 
     p <- X %>%
-      ggplot2::ggplot(ggplot2::aes(wavelength, intensity)) +
+      ggplot2::ggplot(ggplot2::aes_string("wavelength", "intensity")) +
       ggplot2::geom_line(ggplot2::aes(colour = colvar, group = colvar)) +
       ggplot2::scale_colour_gradient(low = "blue", high = "red") +
       ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
@@ -89,7 +89,7 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
       purrr::modify_at("wavelength", as.numeric)
 
     p <- X %>%
-      ggplot2::ggplot(ggplot2::aes(wavelength, intensity)) +
+      ggplot2::ggplot(ggplot2::aes_string("wavelength", "intensity")) +
       ggplot2::geom_line(ggplot2::aes(colour = colvar, group = id)) +
       ggplot2::scale_colour_gradient(low = "blue", high = "red") +
       ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
