@@ -91,10 +91,6 @@ str(baseline_fit, list.len = 5)
 ```
 
 ```{r}
-corrected_spec <- pluck(baseline_fit, "spec")
-```
-
-```{r include=FALSE}
 background <- baseline_fit %>%
   pluck("bkg") %>%
   pivot_longer(cols = everything(), names_to = "wavelength", values_to = "intensity") %>%
@@ -114,7 +110,8 @@ plot1 <- specData %>%
 ```
 
 ```{r message=FALSE, warning=FALSE}
-plot2 <- corrected_spec %>% 
+plot2 <- baseline_fit %>%
+  pluck("spec") %>% 
   select(where(is.numeric)) %>%
   slice(1L) %>%
   plotSpec() +

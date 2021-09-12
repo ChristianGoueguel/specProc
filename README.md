@@ -92,7 +92,10 @@ str(baseline_fit, list.len = 5)
 ```
 
 ``` r
-corrected_spec <- pluck(baseline_fit, "spec")
+background <- baseline_fit %>%
+  pluck("bkg") %>%
+  pivot_longer(cols = everything(), names_to = "wavelength", values_to = "intensity") %>%
+  modify_at("wavelength", as.numeric)
 ```
 
 Note: `plotSpec` is a `ggplot` based function available in the
@@ -109,7 +112,8 @@ plot1 <- specData %>%
 ```
 
 ``` r
-plot2 <- corrected_spec %>% 
+plot2 <- baseline_fit %>%
+  pluck("spec") %>% 
   select(where(is.numeric)) %>%
   slice(1L) %>%
   plotSpec() +
@@ -122,7 +126,7 @@ plot2 <- corrected_spec %>%
 plot1 | plot2 | plot2 + ylim(0, 50e3) + labs(subtitle = "Zoomed out")
 ```
 
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-11-1.png" width="90%" height="90%" />
 
 #### Peaks detection
 
