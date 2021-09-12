@@ -51,7 +51,24 @@ You can install the development version from
 devtools::install_github("ChristianGoueguel/specProc")
 ```
 
-## Peak analysis
+## Exemples
+
+Loading `specProc` package.
+
+```{r}
+library(specProc)
+```
+
+```{r echo=FALSE}
+devtools::load_all()
+```
+
+```{r}
+library(tidyverse)
+library(patchwork)
+```
+
+### Peak analysis
 
 The package peak analysis capabilities include:
 
@@ -59,29 +76,22 @@ The package peak analysis capabilities include:
 -   Peaks detection
 -   Fitting single, multiple or overlapping peaks
 
-### Baseline removal
+#### Baseline removal
 
 For instance, when analyzing LIBS spectra, it is often more effective to subtract an estimated baseline from the data. The estimate is constructed by fitting a low-order polynomial function to the spectrum baseline. Then the resulting curve fit result is subtracted from the data.
 
 ```{r}
-library(specProc)
-```
-
-```{r include=FALSE}
-library(tidyverse)
-library(patchwork)
-```
-
-```{r}
-avg_spec <- arrow::read_parquet("~/Documents/Laserag/R&D projects/Soil/Eurofins/SOC/processed data/avg_spec")
-LIBS_spec <- avg_spec %>%
-  filter(spectra_id %in% "142146") %>%
-  select(where(is.numeric))
+data(specData)
 ```
 
 ```{r message=FALSE, warning=FALSE}
-baseline_fit <- baseline(data = LIBS_spec)
-str(baseline_fit, list.len = 5)  
+baseline_fit <- specData %>% 
+  slice(1L) %>% 
+  baselinerm(degree = 7)
+```
+
+```{r}
+str(baseline_fit, list.len = 5) 
 ```
 
 ```{r}
@@ -100,55 +110,44 @@ background <- background %>%
 ```
 
 ```{r}
-plot1 <- plotSpec(data = LIBS_spec)
-plot2 <- plotSpec(data = corrected_spec)
+plot1 <- specData %>% 
+  select(where(is.numeric)) %>%
+  slice(1L) %>%
+  plotSpec()
 ```
 
-```{r echo=FALSE}
-plot1 <- LIBS_spec %>%
-  pivot_longer(
-  cols = everything(),
-  names_to = "wavelength", 
-  values_to = "intensity"
-  ) %>%
-  modify_at("wavelength", as.numeric) %>%
-  ggplot(aes(x = wavelength, y = intensity)) +
-  geom_line(colour = "darkblue") +
-  labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-  theme_classic() +
-  theme(
-    legend.position = "none", 
-    axis.line = element_line(colour = "grey50", size = 1)
-    )
-
-plot2 <- corrected_spec %>%
-  pivot_longer(
-  cols = everything(),
-  names_to = "wavelength", 
-  values_to = "intensity"
-  ) %>%
-  modify_at("wavelength", as.numeric) %>%
-  ggplot(aes(x = wavelength, y = intensity)) +
-  geom_line(colour = "darkblue") +
-  labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-  theme_classic() +
-  theme(
-    legend.position = "none", 
-    axis.line = element_line(colour = "grey50", size = 1)
-    )
+```{r}
+plot2 <- corrected_spec %>% 
+  select(where(is.numeric)) %>%
+  slice(1L) %>%
+  plotSpec()
 ```
 
 ```{r echo=FALSE, fig.height=3, fig.width=6}
 plot1 + 
-  geom_line(data = background, aes(x = wavelength, y = intensity), colour = "red") +
-  ylim(0, 1e3) +
+  geom_line(
+    data = background, 
+    aes(x = wavelength, y = intensity), colour = "red"
+    ) +
+  ylim(0, 2e3) +
   labs(subtitle = "Before") | 
   plot2 + 
-  ylim(0, 1e3) + 
+  ylim(0, 2e3) + 
   geom_hline(yintercept = 0, colour = "red") +
   labs(subtitle = "After") |
-  plot2 + ylim(0, 50e3)
+  plot2 + ylim(0, 50e3) + labs(subtitle = "Zoomed out")
 ```
+
+#### Peaks detection
+
+
+
+#### Peaks fitting
+
+The idea of curve fitting is to find a mathematical model that fits your data. We assume that you have theoretical reasons for picking a function of a certain form. The curve fit finds the specific coefficients (parameters) which make that function match your data as closely as possible. For non-linear least-squares data fitting, Igor uses the Levenberg-Marquardt algorithm to search for the minimum value of chisquare. Chi-square defines a surface in a multidimensional error space. The search process involves starting with an initial guess at the coefficient values. Starting from the initial guesses, Igor searches for the minimum value by travelling down hill from the starting point on the chi-square surface.
+
+
+
 
 
 
