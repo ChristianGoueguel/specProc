@@ -41,6 +41,12 @@ Loading `specProc` package.
 library(specProc)
 ```
 
+``` r
+ssh = suppressPackageStartupMessages
+ssh(library(tidyverse))
+library(patchwork)
+```
+
 ### Peak analysis
 
 The package peak analysis capabilities include:
@@ -87,21 +93,30 @@ str(baseline_fit, list.len = 5)
 
 ``` r
 corrected_spec <- pluck(baseline_fit, "spec")
-background <- pluck(baseline_fit, "bkg")
 ```
 
 ``` r
 plot1 <- specData %>% 
   select(where(is.numeric)) %>%
   slice(1L) %>%
-  plotSpec()
+  plotSpec() +
+  geom_line(data = background, aes(x = wavelength, y = intensity), colour = "red") +
+  ylim(0, 2e3) +
+  labs(subtitle = "Before")
 ```
 
 ``` r
 plot2 <- corrected_spec %>% 
   select(where(is.numeric)) %>%
   slice(1L) %>%
-  plotSpec()
+  plotSpec() +
+  ylim(0, 2e3) + 
+  geom_hline(yintercept = 0, colour = "red") +
+  labs(subtitle = "After")
+```
+
+``` r
+plot1 | plot2 | plot2 + ylim(0, 50e3) + labs(subtitle = "Zoomed out")
 ```
 
 <img src="man/figures/README-unnamed-chunk-12-1.png" width="90%" height="90%" />
