@@ -22,10 +22,6 @@ These include:
 -   Descriptive statistics such as mean, standard deviation and higher
     central moments
 -   Statistical tests
--   Rowwise and cellwise outliers detection
--   Robust or classical principal component analysis (PCA)
--   Orthogonal partial-least squares (OPLS)
--   PLS-based wavelength selection
 
 ## Installation
 
@@ -45,21 +41,6 @@ Loading `specProc` package.
 library(specProc)
 ```
 
-    #> ℹ Loading specProc
-
-``` r
-library(tidyverse)
-#> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-#> ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-#> ✓ tibble  3.1.4     ✓ dplyr   1.0.7
-#> ✓ tidyr   1.1.3     ✓ stringr 1.4.0
-#> ✓ readr   2.0.1     ✓ forcats 0.5.1
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> x dplyr::filter() masks stats::filter()
-#> x dplyr::lag()    masks stats::lag()
-library(patchwork)
-```
-
 ### Peak analysis
 
 The package peak analysis capabilities include:
@@ -70,11 +51,10 @@ The package peak analysis capabilities include:
 
 #### Baseline removal
 
-For instance, when analyzing LIBS spectra, it is often more effective to
-subtract an estimated baseline from the data. The estimate is
-constructed by fitting a low-order polynomial function to the spectrum
-baseline. Then the resulting curve fit result is subtracted from the
-data.
+When analyzing LIBS spectra, it is often more effective to subtract an
+estimated baseline from the data. The estimate is constructed by fitting
+a low-order polynomial function to the spectrum baseline. Then the
+resulting curve fit result is subtracted from the data.
 
 ``` r
 data(specData)

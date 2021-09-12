@@ -35,11 +35,6 @@ knitr::opts_chunk$set(
 -   Descriptive statistics such as mean, standard deviation and higher
     central moments 
 -   Statistical tests
--   Rowwise and cellwise outliers detection
--   Robust or classical principal component analysis (PCA)
--   Orthogonal partial-least squares (OPLS)
--   PLS-based wavelength selection
-
 
 ## Installation
 
@@ -59,11 +54,11 @@ Loading `specProc` package.
 library(specProc)
 ```
 
-```{r echo=FALSE}
+```{r include=FALSE}
 devtools::load_all()
 ```
 
-```{r}
+```{r include=FALSE}
 library(tidyverse)
 library(patchwork)
 ```
@@ -78,7 +73,7 @@ The package peak analysis capabilities include:
 
 #### Baseline removal
 
-For instance, when analyzing LIBS spectra, it is often more effective to subtract an estimated baseline from the data. The estimate is constructed by fitting a low-order polynomial function to the spectrum baseline. Then the resulting curve fit result is subtracted from the data.
+When analyzing LIBS spectra, it is often more effective to subtract an estimated baseline from the data. The estimate is constructed by fitting a low-order polynomial function to the spectrum baseline. Then the resulting curve fit result is subtracted from the data.
 
 ```{r}
 data(specData)
