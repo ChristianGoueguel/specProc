@@ -2,6 +2,9 @@
 
 export("%>%")
 export(baselinerm)
+export(gaussian_func)
+export(lorentzian_func)
 export(plotSpec)
+export(voigt_func)
 importFrom(magrittr,"%>%")
 importFrom(utils,"globalVariables")
