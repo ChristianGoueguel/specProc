@@ -17,7 +17,7 @@ These include:
 -   peak analysis
 -   Spectral-based normalization
 -   Smoothing and filtering
--   Robust or classical Box-Cox transformation
+-   Robust Box-Cox and Yeo-Johnson transformation
 -   Pearson or Spearman peaks correlation
 -   Descriptive statistics such as mean, standard deviation and higher
     central moments
