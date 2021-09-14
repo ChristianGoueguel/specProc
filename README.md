@@ -21,6 +21,7 @@ These include:
 -   Pearson or Spearman peaks correlation
 -   Descriptive statistics such as mean, standard deviation and higher
     central moments
+-   Shapiro-Wilks normalization test
 -   Statistical tests
 
 ## Installation
@@ -52,7 +53,6 @@ library(patchwork)
 The package peak analysis capabilities include:
 
 -   Baseline removal
--   Peaks detection
 -   Fitting single, multiple or overlapping peaks
 
 #### Baseline removal
@@ -128,9 +128,12 @@ plot1 | plot2 | plot2 + ylim(0, 50e3) + labs(subtitle = "Zoomed out")
 
 <img src="man/figures/README-unnamed-chunk-11-1.png" width="90%" height="90%" />
 
-#### Peaks detection
-
 #### Peaks fitting
+
+Fitting of laser-induced breakdown spectroscopy (LIBS) spectral line is
+very important for accurate quantitative analysis. As such, the
+Gaussian, the Lorentzian and the Voigt functions are often used to fit
+LIBS spectral lines.
 
 The idea of curve fitting is to find a mathematical model that fits your
 data. We assume that you have theoretical reasons for picking a function
