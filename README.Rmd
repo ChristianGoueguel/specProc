@@ -68,7 +68,6 @@ devtools::load_all()
 ```{r}
 ssh = suppressPackageStartupMessages
 ssh(library(tidyverse))
-library(magrittr)
 library(patchwork)
 ```
 
@@ -93,7 +92,7 @@ plot1 <- plotSpec(Ca_Mn_spec)
 Underwater LIBS spectra in the 375–510 nm wavelength range: 
 Prominent atomic and ionic emission lines of Mg, Ca, Ba and Mn were identified using the NIST atomic lines database. The spectra show emission lines from calcium, Ca II 393.366 nm, Ca II 396.847 nm and Ca I 422.673 nm, unresolved manganese triplet, Mn I403.076 nm, Mn I 403.307 nm and Mn I 403.449 nm, and barium, Ba II 455.403 nm, Ba II 493.408nm.
 
-```{r fig.height=2, fig.width=2.5}
+```{r fig.height=3}
 plot1 + ggtitle("LIBS spectrum")
 ```
 
@@ -126,7 +125,7 @@ plot3 <- baseline_fit %>%
   plotSpec()
 ```
 
-```{r fig.height=2, fig.width=3, message=FALSE, warning=FALSE}
+```{r fig.height=3, message=FALSE, warning=FALSE}
 plot2 | plot3
 ```
 

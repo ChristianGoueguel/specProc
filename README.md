@@ -47,15 +47,6 @@ library(specProc)
 ``` r
 ssh = suppressPackageStartupMessages
 ssh(library(tidyverse))
-library(magrittr)
-#> 
-#> Attaching package: 'magrittr'
-#> The following object is masked from 'package:purrr':
-#> 
-#>     set_names
-#> The following object is masked from 'package:tidyr':
-#> 
-#>     extract
 library(patchwork)
 ```
 
