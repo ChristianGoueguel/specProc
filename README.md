@@ -7,6 +7,7 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+
 <!-- badges: end -->
 
 `specProc` package performs a number of pre-processing tasks commonly
@@ -14,7 +15,8 @@ used in laser-induced breakdown spectroscopy (LIBS). Collectively, these
 are essential tools in LIBS calibration modeling, called chemometrics.
 These include:
 
--   peak analysis
+-   Baseline removal
+-   Fitting single, multiple or overlapping peaks
 -   Spectral-based normalization
 -   Smoothing and filtering
 -   Robust Box-Cox and Yeo-Johnson transformation
@@ -45,90 +47,96 @@ library(specProc)
 ``` r
 ssh = suppressPackageStartupMessages
 ssh(library(tidyverse))
+library(magrittr)
+#> 
+#> Attaching package: 'magrittr'
+#> The following object is masked from 'package:purrr':
+#> 
+#>     set_names
+#> The following object is masked from 'package:tidyr':
+#> 
+#>     extract
 library(patchwork)
 ```
 
-### Peak analysis
-
-The package peak analysis capabilities include:
-
--   Baseline removal
--   Fitting single, multiple or overlapping peaks
-
-#### Baseline removal
+### Baseline removal
 
 When analyzing LIBS spectra, it is often more effective to subtract an
 estimated baseline from the data. The estimate is constructed by fitting
 a low-order polynomial function to the spectrum baseline. Then the
 resulting curve fit result is subtracted from the data.
 
-``` r
-data(specData)
-```
+Note: `plotSpec` is a `ggplot` based function available in this
+`specProc` package to plot spectral data (see the documentation).
 
 ``` r
-baseline_fit <- specData %>% 
-  slice(1L) %>% 
-  baselinerm(degree = 7)
+plot1 <- plotSpec(Ca_Mn_spec)
+```
+
+Underwater LIBS spectra in the 375–510 nm wavelength range: Prominent
+atomic and ionic emission lines of Mg, Ca, Ba and Mn were identified
+using the NIST atomic lines database. The spectra show emission lines
+from calcium, Ca II 393.366 nm, Ca II 396.847 nm and Ca I 422.673 nm,
+unresolved manganese triplet, Mn I403.076 nm, Mn I 403.307 nm and Mn I
+403.449 nm, and barium, Ba II 455.403 nm, Ba II 493.408nm.
+
+``` r
+plot1 + ggtitle("LIBS spectrum")
+```
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
+
+``` r
+baseline_fit <- baselinerm(data = Ca_Mn_spec, degree = 7)
 ```
 
 ``` r
 str(baseline_fit, list.len = 5) 
 #> List of 2
-#>  $ spec: tibble [1 × 15,036] (S3: tbl_df/tbl/data.frame)
-#>   ..$ 240.00205 : num 155
-#>   ..$ 240.010279: num 172
-#>   ..$ 240.018507: num 198
-#>   ..$ 240.026736: num 213
-#>   ..$ 240.034965: num 201
+#>  $ spec: tibble [1 × 1,024] (S3: tbl_df/tbl/data.frame)
+#>   ..$ 373.9455 : num 8529
+#>   ..$ 374.08179: num 8102
+#>   ..$ 374.21811: num 7681
+#>   ..$ 374.35443: num 7266
+#>   ..$ 374.49072: num 6856
 #>   .. [list output truncated]
-#>  $ bkg : tibble [1 × 15,036] (S3: tbl_df/tbl/data.frame)
-#>   ..$ 240.00205 : num 717
-#>   ..$ 240.010279: num 717
-#>   ..$ 240.018507: num 717
-#>   ..$ 240.026736: num 717
-#>   ..$ 240.034965: num 718
+#>  $ bkg : tibble [1 × 1,024] (S3: tbl_df/tbl/data.frame)
+#>   ..$ 373.9455 : num 0
+#>   ..$ 374.08179: num 0
+#>   ..$ 374.21811: num 0
+#>   ..$ 374.35443: num 0
+#>   ..$ 374.49072: num 0
 #>   .. [list output truncated]
 ```
 
 ``` r
 background <- baseline_fit %>%
   pluck("bkg") %>%
-  pivot_longer(cols = everything(), names_to = "wavelength", values_to = "intensity") %>%
+  pivot_longer(
+    cols = everything(), 
+    names_to = "wavelength", 
+    values_to = "intensity"
+    ) %>%
   modify_at("wavelength", as.numeric)
 ```
 
-Note: `plotSpec` is a `ggplot` based function available in this
-`specProc` package to plot spectral data (see the documentation).
-
 ``` r
-plot1 <- specData %>% 
-  select(where(is.numeric)) %>%
-  slice(1L) %>%
+plot2 <- Ca_Mn_spec %>% 
   plotSpec() +
-  geom_line(data = background, aes(x = wavelength, y = intensity), colour = "red") +
-  ylim(0, 2e3) +
-  labs(subtitle = "Before")
-```
+  geom_line(data = background, aes(x = wavelength, y = intensity), colour = "red")
 
-``` r
-plot2 <- baseline_fit %>%
+plot3 <- baseline_fit %>%
   pluck("spec") %>% 
-  select(where(is.numeric)) %>%
-  slice(1L) %>%
-  plotSpec() +
-  ylim(0, 2e3) + 
-  geom_hline(yintercept = 0, colour = "red") +
-  labs(subtitle = "After")
+  plotSpec()
 ```
 
 ``` r
-plot1 | plot2 | plot2 + ylim(0, 50e3) + labs(subtitle = "Zoomed out")
+plot2 | plot3
 ```
 
-<img src="man/figures/README-unnamed-chunk-11-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="90%" height="90%" />
 
-#### Peaks fitting
+### Peaks fitting
 
 Fitting of laser-induced breakdown spectroscopy (LIBS) spectral line is
 very important for accurate quantitative analysis. As such, the

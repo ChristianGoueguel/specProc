@@ -22,15 +22,21 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+
 <!-- badges: end -->
 
-`specProc` package performs a number of pre-processing tasks commonly used in laser-induced breakdown spectroscopy (LIBS). Collectively, these are essential tools in LIBS calibration modeling, called chemometrics. These include:
+`specProc` package performs a number of pre-processing tasks commonly
+used in laser-induced breakdown spectroscopy (LIBS). Collectively, these
+are essential tools in LIBS calibration modeling, called chemometrics.
+These include:
 
--   peak analysis
--   Spectral-based normalization 
+-   Baseline removal
+-   Fitting single, multiple or overlapping peaks
+-   Spectral-based normalization
 -   Smoothing and filtering
--   Robust Box-Cox and Yeo-Johnson transformation 
+-   Robust Box-Cox and Yeo-Johnson transformation
 -   Pearson or Spearman peaks correlation
 -   Descriptive statistics such as mean, standard deviation and higher
     central moments
@@ -62,28 +68,37 @@ devtools::load_all()
 ```{r}
 ssh = suppressPackageStartupMessages
 ssh(library(tidyverse))
+library(magrittr)
 library(patchwork)
 ```
 
-### Peak analysis
+### Baseline removal
 
-The package peak analysis capabilities include:
+When analyzing LIBS spectra, it is often more effective to subtract an
+estimated baseline from the data. The estimate is constructed by fitting
+a low-order polynomial function to the spectrum baseline. Then the
+resulting curve fit result is subtracted from the data.
 
--   Baseline removal
--   Fitting single, multiple or overlapping peaks
+```{r include=FALSE}
+data(Ca_Mn_spec)
+```
 
-#### Baseline removal
-
-When analyzing LIBS spectra, it is often more effective to subtract an estimated baseline from the data. The estimate is constructed by fitting a low-order polynomial function to the spectrum baseline. Then the resulting curve fit result is subtracted from the data.
+Note: `plotSpec` is a `ggplot` based function available in this
+`specProc` package to plot spectral data (see the documentation).
 
 ```{r}
-data(specData)
+plot1 <- plotSpec(Ca_Mn_spec)
+```
+
+Underwater LIBS spectra in the 375–510 nm wavelength range: 
+Prominent atomic and ionic emission lines of Mg, Ca, Ba and Mn were identified using the NIST atomic lines database. The spectra show emission lines from calcium, Ca II 393.366 nm, Ca II 396.847 nm and Ca I 422.673 nm, unresolved manganese triplet, Mn I403.076 nm, Mn I 403.307 nm and Mn I 403.449 nm, and barium, Ba II 455.403 nm, Ba II 493.408nm.
+
+```{r fig.height=2, fig.width=2.5}
+plot1 + ggtitle("LIBS spectrum")
 ```
 
 ```{r message=FALSE, warning=FALSE}
-baseline_fit <- specData %>% 
-  slice(1L) %>% 
-  baselinerm(degree = 7)
+baseline_fit <- baselinerm(data = Ca_Mn_spec, degree = 7)
 ```
 
 ```{r}
@@ -93,45 +108,43 @@ str(baseline_fit, list.len = 5)
 ```{r}
 background <- baseline_fit %>%
   pluck("bkg") %>%
-  pivot_longer(cols = everything(), names_to = "wavelength", values_to = "intensity") %>%
+  pivot_longer(
+    cols = everything(), 
+    names_to = "wavelength", 
+    values_to = "intensity"
+    ) %>%
   modify_at("wavelength", as.numeric)
 ```
 
-Note: `plotSpec` is a `ggplot` based function available in this `specProc` package to plot spectral data (see the documentation).  
-
 ```{r message=FALSE, warning=FALSE}
-plot1 <- specData %>% 
-  select(where(is.numeric)) %>%
-  slice(1L) %>%
+plot2 <- Ca_Mn_spec %>% 
   plotSpec() +
-  geom_line(data = background, aes(x = wavelength, y = intensity), colour = "red") +
-  ylim(0, 2e3) +
-  labs(subtitle = "Before")
-```
+  geom_line(data = background, aes(x = wavelength, y = intensity), colour = "red")
 
-```{r message=FALSE, warning=FALSE}
-plot2 <- baseline_fit %>%
+plot3 <- baseline_fit %>%
   pluck("spec") %>% 
-  select(where(is.numeric)) %>%
-  slice(1L) %>%
-  plotSpec() +
-  ylim(0, 2e3) + 
-  geom_hline(yintercept = 0, colour = "red") +
-  labs(subtitle = "After")
+  plotSpec()
 ```
 
-```{r fig.height=3, fig.width=6, message=FALSE, warning=FALSE}
-plot1 | plot2 | plot2 + ylim(0, 50e3) + labs(subtitle = "Zoomed out")
+```{r fig.height=2, fig.width=3, message=FALSE, warning=FALSE}
+plot2 | plot3
 ```
 
-#### Peaks fitting
+### Peaks fitting
 
-Fitting of laser-induced breakdown spectroscopy (LIBS) spectral line is very important for accurate quantitative analysis. As such, the Gaussian, the Lorentzian and the Voigt functions are often used to fit LIBS spectral lines.
+Fitting of laser-induced breakdown spectroscopy (LIBS) spectral line is
+very important for accurate quantitative analysis. As such, the
+Gaussian, the Lorentzian and the Voigt functions are often used to fit
+LIBS spectral lines.
 
-The idea of curve fitting is to find a mathematical model that fits your data. We assume that you have theoretical reasons for picking a function of a certain form. The curve fit finds the specific coefficients (parameters) which make that function match your data as closely as possible. For non-linear least-squares data fitting, Igor uses the Levenberg-Marquardt algorithm to search for the minimum value of chisquare. Chi-square defines a surface in a multidimensional error space. The search process involves starting with an initial guess at the coefficient values. Starting from the initial guesses, Igor searches for the minimum value by travelling down hill from the starting point on the chi-square surface.
-
-
-
-
-
-
+The idea of curve fitting is to find a mathematical model that fits your
+data. We assume that you have theoretical reasons for picking a function
+of a certain form. The curve fit finds the specific coefficients
+(parameters) which make that function match your data as closely as
+possible. For non-linear least-squares data fitting, Igor uses the
+Levenberg-Marquardt algorithm to search for the minimum value of
+chisquare. Chi-square defines a surface in a multidimensional error
+space. The search process involves starting with an initial guess at the
+coefficient values. Starting from the initial guesses, Igor searches for
+the minimum value by travelling down hill from the starting point on the
+chi-square surface.
