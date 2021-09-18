@@ -10,28 +10,31 @@ peakfit <- function(data, profile = "Voigt", wlgth.min = NULL, wlgth.max = NULL)
 
   if (is.null(wlgth.min) | is.null(wlgth.max)) {
     X <- data %>%
-      pivot_longer(
-        cols = tidyselect::everything(),
+      tidyr::pivot_longer(
+        cols = tidyr::everything(),
         names_to = "x",
         values_to = "y"
       ) %>%
-      modify_at("x", as.numeric)
+      purrr::modify_at("x", as.numeric)
   } else {
+    wlgth.min <- as.numeric(wlgth.min)
+    wlgth.max <- as.numeric(wlgth.max)
+
     X <- data %>%
-      pivot_longer(
-        cols = tidyselect::everything(),
+      tidyr::pivot_longer(
+        cols = tidyr::everything(),
         names_to = "x",
         values_to = "y"
       ) %>%
-      modify_at("x", as.numeric) %>%
-      filter(x >= wlgth.min & x <= wlgth.max)
+      purrr::modify_at("x", as.numeric) %>%
+      dplyr::filter(x >= wlgth.min & x <= wlgth.max)
   }
 
   if(profile == "Lorentzian") {
     fitpeak <- X %>%
-      nest() %>%
-      mutate(
-        fit = map(
+      tidyr::nest() %>%
+      dplyr::mutate(
+        fit = purrr::map(
           data, ~ minpack.lm::nlsLM(
             data = .,
             y ~ lorentzian_func(x, y0, xc, wL, A),
@@ -45,17 +48,17 @@ peakfit <- function(data, profile = "Voigt", wlgth.min = NULL, wlgth.max = NULL)
             lower = c(0, 0, 0, 0)
           )
         ),
-        tidied = map(fit, tidy),
-        augmented = map(fit, augment)
+        tidied = purrr::map(fit, broom::tidy),
+        augmented = purrr::map(fit, broom::augment)
       )
     return(fitpeak)
   }
 
   if(profile == "Gaussian") {
     fitpeak <- X %>%
-      nest() %>%
-      mutate(
-        fit = map(
+      tidyr::nest() %>%
+      dplyr::mutate(
+        fit = purrr::map(
           data, ~ minpack.lm::nlsLM(
             data = .,
             y ~ gaussian_func(x, y0, xc, wG, A),
@@ -69,17 +72,17 @@ peakfit <- function(data, profile = "Voigt", wlgth.min = NULL, wlgth.max = NULL)
             control = minpack.lm::nls.lm.control(maxiter = 200)
           )
         ),
-        tidied = map(fit, tidy),
-        augmented = map(fit, augment)
+        tidied = purrr::map(fit, broom::tidy),
+        augmented = purrr::map(fit, broom::augment)
       )
     return(fitpeak)
   }
 
   if(profile == "Voigt") {
     fitpeak <- X %>%
-      nest() %>%
-      mutate(
-        fit = map(
+      tidyr::nest() %>%
+      dplyr::mutate(
+        fit = purrr::map(
           data, ~ minpack.lm::nlsLM(
             data = .,
             y ~ voigt_func(x, y0, xc, wG, wL, A),
@@ -94,8 +97,8 @@ peakfit <- function(data, profile = "Voigt", wlgth.min = NULL, wlgth.max = NULL)
             lower = c(0, 0, 0, 0, 0)
           )
         ),
-        tidied = map(fit, tidy),
-        augmented = map(fit, augment)
+        tidied = purrr::map(fit, broom::tidy),
+        augmented = purrr::map(fit, broom::augment)
       )
     return(fitpeak)
   }
