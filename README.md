@@ -53,7 +53,7 @@ library(patchwork)
 Prominent atomic and ionic emission lines of Mg, Ca, Ba and Mn were
 identified using the NIST atomic lines database. The spectra show
 emission lines from calcium, Ca II 393.366 nm, Ca II 396.847 nm and Ca I
-422.673 nm, unresolved manganese triplet, Mn I403.076 nm, Mn I 403.307
+422.673 nm, unresolved manganese triplet, Mn I 403.076 nm, Mn I 403.307
 nm and Mn I 403.449 nm, and barium ionic lines, Ba II 455.403 nm and Ba
 II 493.408nm.
 
@@ -66,7 +66,14 @@ plot1 <- plotSpec(Ca_Mn_spec)
 ```
 
 ``` r
-plot1 + ggtitle("LIBS spectrum")
+plot1 +
+  annotate("text", x = 391, y = 4.2e4, angle = 90, label = "Ca II 393.366 nm") +
+  annotate("text", x = 396, y = 3e4, angle = 90, label = "Ca II 396.847 nm") +
+  annotate("text", x = 401, y = 3.8e4, angle = 90, label = "Mn I 403-nm") +
+  annotate("text", x = 420, y = 3.5e4, angle = 90, label = "Ca I 422.673 nm") +
+  annotate("text", x = 453, y = 3e4, angle = 90, label = "Ba II 455.403 nm") +
+  annotate("text", x = 491, y = 1.5e4, angle = 90, label = "Ba II 493.408 nm") +
+  ggtitle("LIBS spectrum")
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
