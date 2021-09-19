@@ -126,13 +126,14 @@ background <- baseline_fit %>%
 ```
 
 ``` r
-plot2 <- 
-  plotSpec(data = Ca_Mn_spec) +
+plot2 <- Ca_Mn_spec %>%
+  plotSpec() +
   geom_line(data = background, aes(x = wavelength, y = intensity), colour = "red")
 
-plot3 <-
-  pluck(baseline_fit, "spec") %>% 
-  plotSpec()
+plot3 <- baseline_fit %>%
+  pluck("spec") %>% 
+  plotSpec() +
+  geom_hline(yintercept = 0, colour = "red")
 ```
 
 ``` r
