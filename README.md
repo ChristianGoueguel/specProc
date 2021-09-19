@@ -58,7 +58,7 @@ and Mn I 403.45 nm, and barium ionic lines, Ba II 455.40 nm and Ba II
 493.41 nm.
 
 ``` r
-data(Ca_Mn_spec)
+data("Ca_Mn_spec")
 ```
 
 ``` r

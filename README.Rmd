@@ -75,7 +75,7 @@ library(patchwork)
 Prominent atomic and ionic emission lines of Mg, Ca, Ba and Mn were identified using the NIST atomic lines database. The spectra show emission lines from calcium, Ca II 393.37 nm, Ca II 396.85 nm and Ca I 422.67 nm, unresolved manganese triplet, Mn I 403.08 nm, Mn I 403.31 nm and Mn I 403.45 nm, and barium ionic lines, Ba II 455.40 nm and Ba II 493.41 nm.
 
 ```{r}
-data(Ca_Mn_spec)
+data("Ca_Mn_spec")
 ```
 
 ```{r}
