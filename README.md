@@ -12,8 +12,7 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 `specProc` package performs a number of pre-processing tasks commonly
 used in laser-induced breakdown spectroscopy (LIBS). Collectively, these
-are essential tools in LIBS calibration modeling, called chemometrics.
-These include:
+are essential tools in LIBS calibration modeling. These include:
 
 -   Baseline removal
 -   Fitting single, multiple or overlapping peaks
@@ -23,7 +22,6 @@ These include:
 -   Pearson or Spearman peaks correlation
 -   Descriptive statistics such as mean, standard deviation and higher
     central moments
--   Shapiro-Wilks normalization test
 -   Statistical tests
 
 ## Installation
@@ -50,32 +48,38 @@ ssh(library(tidyverse))
 library(patchwork)
 ```
 
-### Baseline removal
+### LIBS spectra in the 375–510 nm wavelength range
 
-When analyzing LIBS spectra, it is often more effective to subtract an
-estimated baseline from the data. The estimate is constructed by fitting
-a low-order polynomial function to the spectrum baseline. Then the
-resulting curve fit result is subtracted from the data.
+Prominent atomic and ionic emission lines of Mg, Ca, Ba and Mn were
+identified using the NIST atomic lines database. The spectra show
+emission lines from calcium, Ca II 393.366 nm, Ca II 396.847 nm and Ca I
+422.673 nm, unresolved manganese triplet, Mn I403.076 nm, Mn I 403.307
+nm and Mn I 403.449 nm, and barium ionic lines, Ba II 455.403 nm and Ba
+II 493.408nm.
 
-Note: `plotSpec` is a `ggplot` based function available in this
-`specProc` package to plot spectral data (see the documentation).
+``` r
+data(Ca_Mn_spec)
+```
 
 ``` r
 plot1 <- plotSpec(Ca_Mn_spec)
 ```
-
-Underwater LIBS spectra in the 375–510 nm wavelength range: Prominent
-atomic and ionic emission lines of Mg, Ca, Ba and Mn were identified
-using the NIST atomic lines database. The spectra show emission lines
-from calcium, Ca II 393.366 nm, Ca II 396.847 nm and Ca I 422.673 nm,
-unresolved manganese triplet, Mn I403.076 nm, Mn I 403.307 nm and Mn I
-403.449 nm, and barium, Ba II 455.403 nm, Ba II 493.408nm.
 
 ``` r
 plot1 + ggtitle("LIBS spectrum")
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
+
+Note: `plotSpec` is a `ggplot` based function available in this
+`specProc` package to plot spectral data (see the documentation).
+
+### Baseline removal
+
+When analyzing LIBS spectra, it is often more effective to subtract an
+estimated baseline from the data. The estimate is constructed by fitting
+a low-order polynomial function to the spectrum baseline. Then the
+resulting curve fit result is subtracted from the data.
 
 ``` r
 baseline_fit <- baselinerm(data = Ca_Mn_spec, degree = 7)
