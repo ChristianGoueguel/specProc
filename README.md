@@ -144,19 +144,16 @@ plot2 | plot3
 
 ### Peaks fitting
 
-Fitting of laser-induced breakdown spectroscopy (LIBS) spectral line is
+Fitting of laser-induced breakdown spectroscopy (LIBS) spectral lines is
 very important for accurate quantitative analysis. As such, the
-Gaussian, the Lorentzian and the Voigt functions are often used to fit
-LIBS spectral lines.
+Gaussian, Lorentzian and Voigt profile functions are often used to fit
+the spectral lines. The idea of curve fitting is to find a mathematical
+model that fits your data. It is assumed that you have theoretical or
+experimental reasons for picking a function of a certain profile. The
+`peakfit` function finds the specific parameters which make that
+function match your data as closely as possible.
 
-The idea of curve fitting is to find a mathematical model that fits your
-data. We assume that you have theoretical reasons for picking a function
-of a certain form. The curve fit finds the specific coefficients
-(parameters) which make that function match your data as closely as
-possible. For non-linear least-squares data fitting, Igor uses the
-Levenberg-Marquardt algorithm to search for the minimum value of
-chisquare. Chi-square defines a surface in a multidimensional error
-space. The search process involves starting with an initial guess at the
-coefficient values. Starting from the initial guesses, Igor searches for
-the minimum value by travelling down hill from the starting point on the
-chi-square surface.
+`peakfit` is based on the `minpack.lm::nlsLM` function that uses the
+Levenberg-Marquardt algorithm for searching the minimum value of the
+residuals sum square. The search process involves starting with an
+initial guess at the parameters values.
