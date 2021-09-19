@@ -82,7 +82,7 @@ data(Ca_Mn_spec)
 plot1 <- plotSpec(Ca_Mn_spec)
 ```
 
-```{r fig.height=3}
+```{r}
 plot1 +
   annotate("text", x = 391, y = 4.2e4, angle = 90, label = "Ca II 393.366 nm") +
   annotate("text", x = 396, y = 3e4, angle = 90, label = "Ca II 396.847 nm") +
@@ -93,8 +93,8 @@ plot1 +
   ggtitle("LIBS spectrum")
 ```
 
-Note: `plotSpec` is a `ggplot` based function available in this
-`specProc` package to plot spectral data (see the documentation).
+Note: `plotSpec` is a `ggplot` based function available in the
+`specProc` package to plot spectral data (see the documentation for more details).
 
 ### Baseline removal
 

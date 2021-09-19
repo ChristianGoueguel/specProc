@@ -78,8 +78,9 @@ plot1 +
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
 
-Note: `plotSpec` is a `ggplot` based function available in this
-`specProc` package to plot spectral data (see the documentation).
+Note: `plotSpec` is a `ggplot` based function available in the
+`specProc` package to plot spectral data (see the documentation for more
+details).
 
 ### Baseline removal
 
