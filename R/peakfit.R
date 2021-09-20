@@ -1,14 +1,62 @@
+#' @title Spectral Fitting
+#' @author Christian L. Goueguel
+#' @description Fitting of spectroscopic peak by line shape functions with variable parameters.
+#' @details The function uses `minpack.lm::nlsLM`, which is based on the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals.
+#' @param data Data frame of emission spectra
+#' @param profile Line shape functions (Lorentzian, Gaussian and Voigt)
+#' @param wlgth.min The lower bound of the wavelength subset
+#' @param wlgth.max The upper bound of the wavelength subset
+#' @return Fitted value and estimated parameters
+#' @export peakfit
 peakfit <- function(data, profile = "Voigt", wlgth.min = NULL, wlgth.max = NULL) {
 
   if (length(data) == 0 | is.null(data) == TRUE) {
     stop("Apparently you forgot to provide the spectra.")
   }
 
-  if (is.data.frame(data) == FALSE) {
+  if (is.data.frame(data) == FALSE & tibble::is.tibble(data) == FALSE) {
     stop("Data must be of class tbl_df, tbl or data.frame")
   }
 
-  if (is.null(wlgth.min) | is.null(wlgth.max)) {
+  if (profile != "Lorentzian" || profile != "Gaussian" || profile != "Voigt") {
+    stop("The profile function must be Lorentzian, Gaussian or Voigt")
+  }
+
+  if (is.numeric(wlgth.min) == FALSE | is.numeric(wlgth.min) == FALSE) {
+    stop("When defining a subset of wavelengths, wlgth.min and wlgth.max must be numeric")
+  }
+
+  if (wlgth.min >= wlgth.max) {
+    stop("wlgth.min must be strictly smaller than wlgth.max")
+  }
+
+  if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
+    wlgth.min <- as.numeric(wlgth.min)
+
+    X <- data %>%
+      tidyr::pivot_longer(
+        cols = tidyr::everything(),
+        names_to = "x",
+        values_to = "y"
+      ) %>%
+      purrr::modify_at("x", as.numeric) %>%
+      dplyr::filter(x >= wlgth.min)
+  }
+
+  if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == FALSE) {
+    wlgth.max <- as.numeric(wlgth.max)
+
+    X <- data %>%
+      tidyr::pivot_longer(
+        cols = tidyr::everything(),
+        names_to = "x",
+        values_to = "y"
+      ) %>%
+      purrr::modify_at("x", as.numeric) %>%
+      dplyr::filter(x <= wlgth.max)
+  }
+
+  if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == TRUE) {
     X <- data %>%
       tidyr::pivot_longer(
         cols = tidyr::everything(),
@@ -16,7 +64,9 @@ peakfit <- function(data, profile = "Voigt", wlgth.min = NULL, wlgth.max = NULL)
         values_to = "y"
       ) %>%
       purrr::modify_at("x", as.numeric)
-  } else {
+  }
+
+  if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == FALSE) {
     wlgth.min <- as.numeric(wlgth.min)
     wlgth.max <- as.numeric(wlgth.max)
 

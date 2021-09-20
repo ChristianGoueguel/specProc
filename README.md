@@ -156,5 +156,5 @@ function match your data as closely as possible.
 
 `peakfit` is based on the `minpack.lm::nlsLM` function that uses the
 Levenberg-Marquardt algorithm for searching the minimum value of the
-residuals sum square. The search process involves starting with an
-initial guess at the parameters values.
+square of the sum of the residuals. The search process involves starting
+with an initial guess at the parameters values.

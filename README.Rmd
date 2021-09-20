@@ -147,4 +147,4 @@ very important for accurate quantitative analysis. As such, the
 Gaussian, Lorentzian and Voigt profile functions are often used to fit
 the spectral lines. The idea of curve fitting is to find a mathematical model that fits your data. It is assumed that you have theoretical or experimental reasons for picking a function of a certain profile. The `peakfit` function finds the specific parameters which make that function match your data as closely as possible. 
 
-`peakfit` is based on the `minpack.lm::nlsLM` function that uses the Levenberg-Marquardt algorithm for searching the minimum value of the residuals sum square. The search process involves starting with an initial guess at the parameters values.
+`peakfit` is based on the `minpack.lm::nlsLM` function that uses the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals. The search process involves starting with an initial guess at the parameters values.
