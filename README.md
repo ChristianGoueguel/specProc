@@ -45,6 +45,7 @@ library(specProc)
 ``` r
 ssh = suppressPackageStartupMessages
 ssh(library(tidyverse))
+ssh(library(magrittr))
 library(patchwork)
 ```
 
