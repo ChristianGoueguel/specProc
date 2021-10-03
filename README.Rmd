@@ -81,21 +81,21 @@ data("Ca_Mn_spec")
 ```
 
 ```{r include=FALSE}
-plot1 <- plotSpec(Ca_Mn_spec)
+plot1 <- plotSpec(Ca_Mn_spec) + theme_classic(base_size = 8)
 ```
 
-```{r echo=FALSE}
+```{r echo=FALSE, fig.height=2, fig.width=4}
 plot1 +
-  annotate("text", x = 391, y = 4.2e4, angle = 90, label = "Ca II 393.37 nm") +
-  annotate("text", x = 396, y = 3e4, angle = 90, label = "Ca II 396.85 nm") +
-  annotate("text", x = 401, y = 3.8e4, angle = 90, label = "Mn I 403-nm") +
-  annotate("text", x = 420, y = 3.5e4, angle = 90, label = "Ca I 422.67 nm") +
-  annotate("text", x = 453, y = 3e4, angle = 90, label = "Ba II 455.40 nm") +
-  annotate("text", x = 491, y = 1.5e4, angle = 90, label = "Ba II 493.41 nm")
+  annotate("text", x = 391, y = 4.2e4, angle = 90, size = 2, label = "Ca II 393.37 nm") +
+  annotate("text", x = 396, y = 3e4, angle = 90, size = 2, label = "Ca II 396.85 nm") +
+  annotate("text", x = 401, y = 3.8e4, angle = 90, size = 2, label = "Mn I 403-nm") +
+  annotate("text", x = 420, y = 3.5e4, angle = 90, size = 2, label = "Ca I 422.67 nm") +
+  annotate("text", x = 453, y = 3e4, angle = 90, size = 2, label = "Ba II 455.40 nm") +
+  annotate("text", x = 491, y = 1.5e4, angle = 90, size = 2, label = "Ba II 493.41 nm")
 ```
 
 ### Baseline removal
-
+ooopppp
 When analyzing LIBS spectra, it is often more effective to subtract an
 estimated baseline from the data. The estimate is constructed by fitting
 a low-order polynomial function to the spectrum baseline. Then the
