@@ -19,7 +19,6 @@ are essential tools in LIBS calibration modeling. These include:
 -   Baseline removal
 -   Fitting single, multiple or overlapping peaks
 -   Spectral-based normalization
--   Smoothing and filtering
 -   Robust Box-Cox and Yeo-Johnson transformation
 -   Pearson or Spearman peaks correlation
 -   Descriptive statistics such as mean, standard deviation and higher
