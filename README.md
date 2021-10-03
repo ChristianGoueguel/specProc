@@ -49,7 +49,7 @@ ssh(library(magrittr))
 library(patchwork)
 ```
 
-### LIBS spectra in the 375–510 nm wavelength range
+### LIBS spectrum in the 375–510 nm wavelength range
 
 The plot below shows a typical LIBS spectrum. Prominent atomic and ionic
 emission lines of Ca, Mn and Ba were identified using the [NIST spectral
