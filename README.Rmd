@@ -74,7 +74,7 @@ library(patchwork)
 
 ### LIBS spectra in the 375–510 nm wavelength range
 
-The plot below shows a typical LIBS spectrum. Prominent atomic and ionic emission lines of Ca, Mn and Ba were identified using the [NIST atomic lines database](https://www.nist.gov/pml/atomic-spectra-database). The spectrum show emission lines of Ca II 393.37 nm, Ca II 396.85 nm and Ca I 422.67 nm, unresolved Mn triplet at 403.08, 403.31 and 403.45 nm, and Ba II 455.40 nm and Ba II 493.41 nm.
+The plot below shows a typical LIBS spectrum. Prominent atomic and ionic emission lines of Ca, Mn and Ba were identified using the [NIST spectral lines database](https://www.nist.gov/pml/atomic-spectra-database). The spectrum show emission lines of Ca II 393.37 nm, Ca II 396.85 nm and Ca I 422.67 nm, unresolved Mn triplet at 403.08, 403.31 and 403.45 nm, and Ba II 455.40 nm and Ba II 493.41 nm.
 
 ```{r include=FALSE}
 data("Ca_Mn_spec")
