@@ -62,11 +62,11 @@ Ba II 455.40 nm and Ba II 493.41 nm.
 
 ### Baseline removal
 
-ooopppp When analyzing LIBS spectra, it is often more effective to
-subtract an estimated baseline from the data. The estimate is
-constructed by fitting a low-order polynomial function to the spectrum
-baseline. Then the resulting curve fit is subtracted from the data. Here
-we use the function `baselinerm` to perform such a task.
+When analyzing LIBS spectra, it is often more effective to subtract an
+estimated baseline from the data. The estimate is constructed by fitting
+a low-order polynomial function to the spectrum baseline. Then the
+resulting curve fit is subtracted from the data. Here we use the
+function `baselinerm` to perform such a task.
 
 ``` r
 baseline_fit <- Ca_Mn_spec %>%
