@@ -24,7 +24,6 @@ are essential tools in LIBS calibration modeling. These include:
 -   Pearson or Spearman peaks correlation
 -   Descriptive statistics such as mean, standard deviation and higher
     central moments
--   Statistical tests
 
 ## Installation
 
@@ -53,44 +52,22 @@ library(patchwork)
 
 ### LIBS spectra in the 375–510 nm wavelength range
 
-Prominent atomic and ionic emission lines of Mg, Ca, Ba and Mn were
-identified using the NIST atomic lines database. The spectra show
-emission lines from calcium, Ca II 393.37 nm, Ca II 396.85 nm and Ca I
-422.67 nm, unresolved manganese triplet, Mn I 403.08 nm, Mn I 403.31 nm
-and Mn I 403.45 nm, and barium ionic lines, Ba II 455.40 nm and Ba II
-493.41 nm.
-
-``` r
-data("Ca_Mn_spec")
-```
-
-``` r
-plot1 <- plotSpec(Ca_Mn_spec)
-```
-
-``` r
-plot1 +
-  annotate("text", x = 391, y = 4.2e4, angle = 90, label = "Ca II 393.37 nm") +
-  annotate("text", x = 396, y = 3e4, angle = 90, label = "Ca II 396.85 nm") +
-  annotate("text", x = 401, y = 3.8e4, angle = 90, label = "Mn I 403-nm") +
-  annotate("text", x = 420, y = 3.5e4, angle = 90, label = "Ca I 422.67 nm") +
-  annotate("text", x = 453, y = 3e4, angle = 90, label = "Ba II 455.40 nm") +
-  annotate("text", x = 491, y = 1.5e4, angle = 90, label = "Ba II 493.41 nm") +
-  ggtitle("LIBS spectrum")
-```
+The plot below shows a typical LIBS spectrum. Prominent atomic and ionic
+emission lines of Ca, Mn and Ba were identified using the [NIST atomic
+lines database](https://www.nist.gov/pml/atomic-spectra-database). The
+spectrum show emission lines of Ca II 393.37 nm, Ca II 396.85 nm and Ca
+I 422.67 nm, unresolved Mn triplet at 403.08, 403.31 and 403.45 nm, and
+Ba II 455.40 nm and Ba II 493.41 nm.
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
-
-Note: `plotSpec` is a `ggplot` based function available in the
-`specProc` package to plot spectral data (see the documentation for more
-details).
 
 ### Baseline removal
 
 When analyzing LIBS spectra, it is often more effective to subtract an
 estimated baseline from the data. The estimate is constructed by fitting
 a low-order polynomial function to the spectrum baseline. Then the
-resulting curve fit result is subtracted from the data.
+resulting curve fit is subtracted from the data. Here we use the
+function `baselinerm` to perform such a task.
 
 ``` r
 baseline_fit <- Ca_Mn_spec %>%
@@ -150,11 +127,11 @@ plot2 | plot3
 Fitting of laser-induced breakdown spectroscopy (LIBS) spectral lines is
 very important for accurate quantitative analysis. As such, the
 Gaussian, Lorentzian and Voigt profile functions are often used to fit
-the spectral lines. The idea of curve fitting is to find a mathematical
-model that fits your data. It is assumed that you have theoretical or
-experimental reasons for picking a function of a certain profile. The
-`peakfit` function finds the specific parameters which make that
-function match your data as closely as possible.
+these spectral lines. The idea of curve fitting is to find a
+mathematical model that fits the spectral lines. It is assumed that you
+have theoretical or experimental reasons for picking a function of a
+certain profile. The `peakfit` function finds the specific parameters
+which make that function match your data as closely as possible.
 
 `peakfit` is based on the `minpack.lm::nlsLM` function that uses the
 Levenberg-Marquardt algorithm for searching the minimum value of the
