@@ -33,10 +33,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
     stop("wlgth.min must be strictly smaller than wlgth.max")
   }
 
-  if (wL < 0 | wG < 0 | A < 0) {
-    stop("Initial parameter must be non negative")
-  }
-
   if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
     wlgth.min <- as.numeric(wlgth.min)
     X <- data %>%

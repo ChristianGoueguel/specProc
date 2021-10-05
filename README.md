@@ -12,6 +12,8 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 <!-- badges: end -->
 
+**Pre-release for feedback and experimenting.**
+
 `specProc` package performs a number of pre-processing tasks commonly
 used in laser-induced breakdown spectroscopy (LIBS). Collectively, these
 are essential tools in LIBS calibration modeling. These include:
@@ -136,3 +138,5 @@ which make that function match your data as closely as possible.
 Levenberg-Marquardt algorithm for searching the minimum value of the
 square of the sum of the residuals. The search process involves starting
 with an initial guess at the parameters values.
+
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="90%" height="90%" />
