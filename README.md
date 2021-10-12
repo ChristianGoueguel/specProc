@@ -33,8 +33,8 @@ You can install the development version from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("ChristianGoueguel/specProc")
+# install.packages("remotes")
+remotes::install_github("ChristianGoueguel/specProc")
 ```
 
 ## Exemples
@@ -45,13 +45,6 @@ Loading `specProc` package.
 library(specProc)
 ```
 
-``` r
-ssh = suppressPackageStartupMessages
-ssh(library(tidyverse))
-ssh(library(magrittr))
-library(patchwork)
-```
-
 ### LIBS spectrum in the 375–510 nm wavelength range
 
 The plot below shows a typical LIBS spectrum. Prominent atomic and ionic
@@ -59,7 +52,7 @@ emission lines of Ca, Mn and Ba were identified using the [NIST spectral
 lines database](https://www.nist.gov/pml/atomic-spectra-database). The
 spectrum show emission lines of Ca II 393.37 nm, Ca II 396.85 nm and Ca
 I 422.67 nm, unresolved Mn triplet at 403.08, 403.31 and 403.45 nm, and
-Ba II 455.40 nm and Ba II 493.41 nm.
+Ba ionic lines at 455.40 and 493.41 nm.
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
 
@@ -77,17 +70,21 @@ baseline_fit <- Ca_Mn_spec %>%
   baselinerm(degree = 7)
 ```
 
+As one can see, the `baselinerm` function provides a list containing two
+data frames, one for the baseline-subtracted spectrum or spectra `spec`
+and the other for the fitted baseline `bkg`.
+
 ``` r
 str(baseline_fit, list.len = 5) 
 #> List of 2
-#>  $ spec: tibble [1 × 808] (S3: tbl_df/tbl/data.frame)
+#>  $ spec: tibble [1 x 808] (S3: tbl_df/tbl/data.frame)
 #>   ..$ 390.03027: num 131
 #>   ..$ 390.1666 : num 10.5
 #>   ..$ 390.30292: num 0
 #>   ..$ 390.43921: num 129
 #>   ..$ 390.57553: num 197
 #>   .. [list output truncated]
-#>  $ bkg : tibble [1 × 808] (S3: tbl_df/tbl/data.frame)
+#>  $ bkg : tibble [1 x 808] (S3: tbl_df/tbl/data.frame)
 #>   ..$ 390.03027: num 13831
 #>   ..$ 390.1666 : num 13864
 #>   ..$ 390.30292: num 13897
@@ -96,33 +93,15 @@ str(baseline_fit, list.len = 5)
 #>   .. [list output truncated]
 ```
 
-``` r
-background <- baseline_fit %>%
-  pluck("bkg") %>%
-  pivot_longer(
-    cols = everything(), 
-    names_to = "wavelength", 
-    values_to = "intensity"
-    ) %>%
-  modify_at("wavelength", as.numeric)
-```
+We can then extract each data frame from the list using the
+`purrr::pluck` function.
 
 ``` r
-plot2 <- Ca_Mn_spec %>%
-  plotSpec() +
-  geom_line(data = background, aes(x = wavelength, y = intensity), colour = "red")
-
-plot3 <- baseline_fit %>%
-  pluck("spec") %>% 
-  plotSpec() +
-  geom_hline(yintercept = 0, colour = "red")
+background <- baseline_fit %>% pluck("bkg")
+corrected_spec <- baseline_fit %>% pluck("spec")
 ```
 
-``` r
-plot2 | plot3
-```
-
-<img src="man/figures/README-unnamed-chunk-12-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="90%" height="90%" />
 
 ### Peaks fitting
 
@@ -139,5 +118,27 @@ which make that function match your data as closely as possible.
 Levenberg-Marquardt algorithm for searching the minimum value of the
 square of the sum of the residuals. The search process involves starting
 with an initial guess at the parameters values.
+
+``` r
+Ba_450line <- Ca_Mn_spec %>% select(`454.09686`:`457.09573`)
+```
+
+``` r
+Ba_450line %>% 
+  pivot_longer(
+    cols = everything(),
+    names_to = "wavelength",
+    values_to = "intensity"
+    ) %>%
+  modify_at("wavelength", as.numeric) %>%
+  ggplot(aes(x = wavelength, y = intensity)) +
+  geom_line(colour = "red") +
+  labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+  theme_classic(base_size = 12) +
+  theme(
+    legend.position = "none", 
+    axis.line = element_line(colour = "grey50", size = 1.5)
+    )
+```
 
 <img src="man/figures/README-unnamed-chunk-15-1.png" width="90%" height="90%" />

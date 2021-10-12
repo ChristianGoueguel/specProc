@@ -38,11 +38,11 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
     X <- data %>%
       tidyr::pivot_longer(
         cols = tidyr::everything(),
-        names_to = "x",
-        values_to = "y"
+        names_to = "wavelength",
+        values_to = "intensity"
       ) %>%
-      purrr::modify_at("x", as.numeric) %>%
-      dplyr::filter(x >= wlgth.min)
+      purrr::modify_at("wavelength", as.numeric) %>%
+      dplyr::filter(wavelength >= wlgth.min)
   }
 
   if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == FALSE) {
@@ -50,21 +50,21 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
     X <- data %>%
       tidyr::pivot_longer(
         cols = tidyr::everything(),
-        names_to = "x",
-        values_to = "y"
+        names_to = "wavelength",
+        values_to = "intensity"
       ) %>%
-      purrr::modify_at("x", as.numeric) %>%
-      dplyr::filter(x <= wlgth.max)
+      purrr::modify_at("wavelength", as.numeric) %>%
+      dplyr::filter(wavelength <= wlgth.max)
   }
 
   if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == TRUE) {
     X <- data %>%
       tidyr::pivot_longer(
         cols = tidyr::everything(),
-        names_to = "x",
-        values_to = "y"
+        names_to = "wavelength",
+        values_to = "intensity"
       ) %>%
-      purrr::modify_at("x", as.numeric)
+      purrr::modify_at("wavelength", as.numeric)
   }
 
   if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == FALSE) {
@@ -73,11 +73,11 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
     X <- data %>%
       tidyr::pivot_longer(
         cols = tidyr::everything(),
-        names_to = "x",
-        values_to = "y"
+        names_to = "wavelength",
+        values_to = "intensity"
       ) %>%
-      purrr::modify_at("x", as.numeric) %>%
-      dplyr::filter(x >= wlgth.min & x <= wlgth.max)
+      purrr::modify_at("wavelength", as.numeric) %>%
+      dplyr::filter(wavelength >= wlgth.min & wavelength <= wlgth.max)
   }
 
   if (profile == "Lorentzian") {
@@ -95,8 +95,8 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
             data = .,
             y ~ lorentzian_func(x, y0, xc, wL, A),
             start =  list(
-              y0 = .$y[which.min(.$y)],
-              xc = .$x[which.max(.$y)],
+              y0 = .$intensity[which.min(.$intensity)],
+              xc = .$wavelength[which.max(.$intensity)],
               wL = wL,
               A = A
             ),
@@ -125,8 +125,8 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
             data = .,
             y ~ gaussian_func(x, y0, xc, wG, A),
             start =  list(
-              y0 = .$y[which.min(.$y)],
-              xc = .$x[which.max(.$y)],
+              y0 = .$intensity[which.min(.$intensity)],
+              xc = .$wavelength[which.max(.$intensity)],
               wG = wG,
               A = A
             ),
@@ -156,8 +156,8 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
             data = .,
             y ~ voigt_func(x, y0, xc, wG, wL, A),
             start =  list(
-              y0 = .$y[which.min(.$y)],
-              xc = .$x[which.max(.$y)],
+              y0 = .$intensity[which.min(.$intensity)],
+              xc = .$wavelength[which.max(.$intensity)],
               wL = wL,
               wG = wG,
               A = A

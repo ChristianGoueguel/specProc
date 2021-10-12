@@ -4,19 +4,33 @@
 \alias{peakfit}
 \title{Spectral Fitting}
 \usage{
-peakfit(data, profile = "Voigt", wlgth.min = NULL, wlgth.max = NULL)
+peakfit(
+  data,
+  profile = "Voigt",
+  wL = NULL,
+  wG = NULL,
+  A = NULL,
+  wlgth.min = NULL,
+  wlgth.max = NULL
+)
 }
 \arguments{
 \item{data}{Data frame of emission spectra}
 
-\item{profile}{Line shape functions (Lorentzian, Gaussian and Voigt)}
+\item{profile}{Line shape function: "Lorentzian", "Gaussian" or "Voigt"}
 
-\item{wlgth.min}{The lower bound of the wavelength subset}
+\item{wL}{Lorentzian full width at half maximum (initial guess)}
 
-\item{wlgth.max}{The upper bound of the wavelength subset}
+\item{wG}{Gaussian full width at half maximum (initial guess)}
+
+\item{A}{Area (initial guess)}
+
+\item{wlgth.min}{Lower bound of the wavelength subset}
+
+\item{wlgth.max}{Upper bound of the wavelength subset}
 }
 \value{
-Fitted value and estimated parameters
+Fitted value and the estimated parameters along with the corresponding errors
 }
 \description{
 Fitting of spectroscopic peak by line shape functions with variable parameters.

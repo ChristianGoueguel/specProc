@@ -51,8 +51,8 @@ You can install the development version from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("ChristianGoueguel/specProc")
+# install.packages("remotes")
+remotes::install_github("ChristianGoueguel/specProc")
 ```
 
 ## Exemples
@@ -67,7 +67,7 @@ library(specProc)
 devtools::load_all()
 ```
 
-```{r}
+```{r include=FALSE}
 ssh = suppressPackageStartupMessages
 ssh(library(tidyverse))
 ssh(library(magrittr))
@@ -76,7 +76,7 @@ library(patchwork)
 
 ### LIBS spectrum in the 375–510 nm wavelength range
 
-The plot below shows a typical LIBS spectrum. Prominent atomic and ionic emission lines of Ca, Mn and Ba were identified using the [NIST spectral lines database](https://www.nist.gov/pml/atomic-spectra-database). The spectrum show emission lines of Ca II 393.37 nm, Ca II 396.85 nm and Ca I 422.67 nm, unresolved Mn triplet at 403.08, 403.31 and 403.45 nm, and Ba II 455.40 nm and Ba II 493.41 nm.
+The plot below shows a typical LIBS spectrum. Prominent atomic and ionic emission lines of Ca, Mn and Ba were identified using the [NIST spectral lines database](https://www.nist.gov/pml/atomic-spectra-database). The spectrum show emission lines of Ca II 393.37 nm, Ca II 396.85 nm and Ca I 422.67 nm, unresolved Mn triplet at 403.08, 403.31 and 403.45 nm, and Ba ionic lines at 455.40 and 493.41 nm.
 
 ```{r include=FALSE}
 data("Ca_Mn_spec")
@@ -107,13 +107,21 @@ baseline_fit <- Ca_Mn_spec %>%
   baselinerm(degree = 7)
 ```
 
+As one can see, the `baselinerm` function provides a list containing two data frames, one for the baseline-subtracted spectrum or spectra `spec` and the other for the fitted baseline `bkg`.
+
 ```{r}
 str(baseline_fit, list.len = 5) 
 ```
 
+We can then extract each data frame from the list using the `purrr::pluck` function.
+
 ```{r}
-background <- baseline_fit %>%
-  pluck("bkg") %>%
+background <- baseline_fit %>% pluck("bkg")
+corrected_spec <- baseline_fit %>% pluck("spec")
+```
+
+```{r include=FALSE}
+background %<>% 
   pivot_longer(
     cols = everything(), 
     names_to = "wavelength", 
@@ -122,18 +130,17 @@ background <- baseline_fit %>%
   modify_at("wavelength", as.numeric)
 ```
 
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, include=FALSE}
 plot2 <- Ca_Mn_spec %>%
   plotSpec() +
   geom_line(data = background, aes(x = wavelength, y = intensity), colour = "red")
 
-plot3 <- baseline_fit %>%
-  pluck("spec") %>% 
+plot3 <-corrected_spec %>% 
   plotSpec() +
   geom_hline(yintercept = 0, colour = "red")
 ```
 
-```{r fig.height=3, message=FALSE, warning=FALSE}
+```{r echo=FALSE, fig.height=3, message=FALSE, warning=FALSE}
 plot2 | plot3
 ```
 
@@ -146,38 +153,31 @@ these spectral lines. The idea of curve fitting is to find a mathematical model 
 
 `peakfit` is based on the `minpack.lm::nlsLM` function that uses the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals. The search process involves starting with an initial guess at the parameters values.
 
-```{r include=FALSE}
-bc_spec <- arrow::read_parquet("~/Documents/Laserag/R&D projects/Soil/Eurofins/SOC/processed data/bc_spec")
+```{r}
+Ba_450line <- Ca_Mn_spec %>% select(`454.09686`:`457.09573`)
 ```
 
-```{r include=FALSE}
-carbonLine <- bc_spec %>%
-  select(spectra_id, calibration, `247.700233`:`248.077678`) %>%
-  filter(calibration %in% "terraton")
-```
-
-```{r echo=FALSE}
-carbonLine %>%
-  select(-calibration) %>%
+```{r}
+Ba_450line %>% 
   pivot_longer(
-    cols = !spectra_id,
+    cols = everything(),
     names_to = "wavelength",
     values_to = "intensity"
     ) %>%
   modify_at("wavelength", as.numeric) %>%
   ggplot(aes(x = wavelength, y = intensity)) +
-  geom_line(aes(colour = spectra_id, group = spectra_id)) +
-  scale_color_discrete() +
+  geom_point(shape = 21, size = 3, colour = "red") +
   labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-  theme_classic() +
+  theme_classic(base_size = 12) +
   theme(
     legend.position = "none", 
-    axis.line = element_line(colour = "grey50", size = 1)
+    axis.line = element_line(colour = "grey50", size = 1.5)
     )
 ```
 
+```{r}
 
-
+```
 
 
 
