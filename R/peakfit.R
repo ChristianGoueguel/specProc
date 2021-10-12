@@ -25,14 +25,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
     stop("The profile function must be Lorentzian, Gaussian or Voigt")
   }
 
-  if (is.numeric(wlgth.min) == FALSE | is.numeric(wlgth.min) == FALSE) {
-    stop("When defining a subset of wavelengths, wlgth.min and wlgth.max must be numeric")
-  }
-
-  if (wlgth.min >= wlgth.max) {
-    stop("wlgth.min must be strictly smaller than wlgth.max")
-  }
-
   if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
     wlgth.min <- as.numeric(wlgth.min)
     X <- data %>%
@@ -70,6 +62,9 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
   if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == FALSE) {
     wlgth.min <- as.numeric(wlgth.min)
     wlgth.max <- as.numeric(wlgth.max)
+    if (wlgth.min >= wlgth.max) {
+      stop("wlgth.min must be strictly smaller than wlgth.max")
+    }
     X <- data %>%
       tidyr::pivot_longer(
         cols = tidyr::everything(),
@@ -82,8 +77,8 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
 
   if (profile == "Lorentzian") {
     if (is.null(wL) == FALSE & is.null(A) == FALSE) {
-      wL <- as.numeric(wL)
-      A <- as.numeric(A)
+      param1 <- as.numeric(wL)
+      param2 <- as.numeric(A)
     } else {
       stop("Please provide an initial guess value for the Lorentzian fitting paramters: wL and A")
       }
@@ -97,8 +92,8 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
             start =  list(
               y0 = .$intensity[which.min(.$intensity)],
               xc = .$wavelength[which.max(.$intensity)],
-              wL = wL,
-              A = A
+              wL = param1,
+              A = param2
             ),
             control = minpack.lm::nls.lm.control(maxiter = 200),
             lower = c(0, NULL, 0, 0)
