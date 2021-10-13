@@ -153,29 +153,42 @@ these spectral lines. The idea of curve fitting is to find a mathematical model 
 
 `peakfit` is based on the `minpack.lm::nlsLM` function that uses the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals. The search process involves starting with an initial guess at the parameters values.
 
-```{r include=FALSE}
-Ba455_fit <- 
-  Ca_Mn_spec %>% 
+Let's start with the fit of a single peak first. Here we want to fit separately the Ba II line at 455.40 nm, then the Ca I line at 422.67 nm, using the Gaussian profile `profile = "Gaussian"`.The Gaussian profile was chosen because we expect to have a relatively large spectral linewidth due to the measurement conditions. Moreover, `wG` and `A` are our initial guess and are respectively the Gaussian full width at half maximum (FWHM) and peak area.
+
+```{r message=FALSE, warning=FALSE}
+Ba455_fit <- Ca_Mn_spec %>% 
   select(`454.09686`:`457.09573`) %>% 
-  peakfit(profile = "Gaussian", wG = 1.7, A = 20)
+  peakfit(profile = "Gaussian", wG = 1, A =  15000)
 ```
+
+```{r}
+Ca422_fit <- Ca_Mn_spec %>% 
+  select(`421.65463`:`424.10825`) %>% 
+  peakfit(profile = "Gaussian", wG = 1, A = 15000)
+```
+
+The `peakfit` function returns a list containing data stored in `augmented` and in `tidied`. For instance, using results from the Ba line fitting, we can see that `augmented` contains the original data `x` (wavelength) and `y` (intensity) and the fitted results `.fitted` along with the corresponding residuals `.resid`.  
 
 ```{r}
 Ba455_fit %>% pluck("augmented")
 ```
 
+While `tidied` contains the estimated parameters.
+
 ```{r}
 Ba455_fit %>% pluck("tidied")
 ```
 
-```{r}
+Thus we can plot the obtained results, since a picture is worth a thousand words. 
+
+```{r include=FALSE}
 plot3 <- Ba455_fit %>%
   pluck("augmented") %>%
   as.data.frame() %>%
   ggplot() +
   geom_point(aes(x = x, y = y), size = 3, colour = "black", shape = 21) +
   geom_line(aes(x = x, y = .fitted), size = 1, colour = "red", linetype = "solid") +
-  labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+  labs(subtitle = "Ba II 455.40 nm", x = "Wavelength [nm]", y = "Intensity [arb. units]") +
   theme_bw(base_size = 10)
 
 plot4 <- Ba455_fit %>%
@@ -188,8 +201,29 @@ plot4 <- Ba455_fit %>%
   theme_bw(base_size = 10)
 ```
 
-```{r}
-(plot3 / plot4) + plot_layout(ncol = 1, heights = c(5, 1))
+```{r include=FALSE}
+plot5 <- Ca422_fit %>%
+  pluck("augmented") %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_point(aes(x = x, y = y), size = 3, colour = "black", shape = 21) +
+  geom_line(aes(x = x, y = .fitted), size = 1, colour = "red", linetype = "solid") +
+  labs(subtitle = "Ca I 422.67 nm", x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+  theme_bw(base_size = 10)
+
+plot6 <- Ca422_fit %>%
+  pluck("augmented") %>%
+  as.data.frame() %>%
+  ggplot(aes(x = x, y = .resid)) + 
+  geom_point(shape = 21, size = 2, fill = "blue") +
+  geom_hline(yintercept = 0) +
+  labs(x = "Wavelength [nm]", y = "Residual") +
+  theme_bw(base_size = 10)
+```
+
+```{r echo=FALSE}
+(plot3 / plot4) + plot_layout(ncol = 1, heights = c(5, 1)) |
+  (plot5 / plot6) + plot_layout(ncol = 1, heights = c(5, 1))
 ```
 
 

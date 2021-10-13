@@ -119,6 +119,32 @@ Levenberg-Marquardt algorithm for searching the minimum value of the
 square of the sum of the residuals. The search process involves starting
 with an initial guess at the parameters values.
 
+Let’s start with the fit of a single peak first. Here we want to fit
+separately the Ba II line at 455.40 nm, then the Ca I line at 422.67 nm,
+using the Gaussian profile `profile = "Gaussian"`.The Gaussian profile
+was chosen because we expect to have a relatively large spectral
+linewidth due to the measurement conditions. Moreover, `wG` and `A` are
+our initial guess and are respectively the Gaussian full width at half
+maximum (FWHM) and peak area.
+
+``` r
+Ba455_fit <- Ca_Mn_spec %>% 
+  select(`454.09686`:`457.09573`) %>% 
+  peakfit(profile = "Gaussian", wG = 1, A =  15000)
+```
+
+``` r
+Ca422_fit <- Ca_Mn_spec %>% 
+  select(`421.65463`:`424.10825`) %>% 
+  peakfit(profile = "Gaussian", wG = 1, A = 15000)
+```
+
+The `peakfit` function returns a list containing data stored in
+`augmented` and in `tidied`. For instance, using results from the Ba
+line fitting, we can see that `augmented` contains the original data `x`
+(wavelength) and `y` (intensity) and the fitted results `.fitted` along
+with the corresponding residuals `.resid`.
+
 ``` r
 Ba455_fit %>% pluck("augmented")
 #> [[1]]
@@ -138,6 +164,8 @@ Ba455_fit %>% pluck("augmented")
 #> # ... with 13 more rows
 ```
 
+While `tidied` contains the estimated parameters.
+
 ``` r
 Ba455_fit %>% pluck("tidied")
 #> [[1]]
@@ -150,28 +178,7 @@ Ba455_fit %>% pluck("tidied")
 #> 4 A     29964.    332.           90.1 1.79e-26
 ```
 
-``` r
-plot3 <- Ba455_fit %>%
-  pluck("augmented") %>%
-  as.data.frame() %>%
-  ggplot() +
-  geom_point(aes(x = x, y = y), size = 3, colour = "black", shape = 21) +
-  geom_line(aes(x = x, y = .fitted), size = 1, colour = "red", linetype = "solid") +
-  labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-  theme_bw(base_size = 10)
+Thus we can plot the obtained results, since a picture is worth a
+thousand words.
 
-plot4 <- Ba455_fit %>%
-  pluck("augmented") %>%
-  as.data.frame() %>%
-  ggplot(aes(x = x, y = .resid)) + 
-  geom_point(shape = 21, size = 2, fill = "blue") +
-  geom_hline(yintercept = 0) +
-  labs(x = "Wavelength [nm]", y = "Residual") +
-  theme_bw(base_size = 10)
-```
-
-``` r
-(plot3 / plot4) + plot_layout(ncol = 1, heights = c(5, 1))
-```
-
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-20-1.png" width="90%" height="90%" />
