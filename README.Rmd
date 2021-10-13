@@ -188,7 +188,7 @@ plot4 <- Ba455_fit %>%
   theme_bw(base_size = 10)
 ```
 
-```{r fig.height=3, fig.width=2}
+```{r}
 (plot3 / plot4) + plot_layout(ncol = 1, heights = c(5, 1))
 ```
 
