@@ -27,36 +27,36 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
 
   if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
     wlgth.min <- as.numeric(wlgth.min)
-    X <- data %>%
+    df <- data %>%
       tidyr::pivot_longer(
         cols = tidyr::everything(),
-        names_to = "wavelength",
-        values_to = "intensity"
+        names_to = "x",
+        values_to = "y"
       ) %>%
-      purrr::modify_at("wavelength", as.numeric) %>%
-      dplyr::filter(wavelength >= wlgth.min)
+      purrr::modify_at("x", as.numeric) %>%
+      dplyr::filter(x >= wlgth.min)
   }
 
   if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == FALSE) {
     wlgth.max <- as.numeric(wlgth.max)
-    X <- data %>%
+    df <- data %>%
       tidyr::pivot_longer(
         cols = tidyr::everything(),
-        names_to = "wavelength",
-        values_to = "intensity"
+        names_to = "x",
+        values_to = "y"
       ) %>%
-      purrr::modify_at("wavelength", as.numeric) %>%
-      dplyr::filter(wavelength <= wlgth.max)
+      purrr::modify_at("x", as.numeric) %>%
+      dplyr::filter(x <= wlgth.max)
   }
 
   if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == TRUE) {
-    X <- data %>%
+    df <- data %>%
       tidyr::pivot_longer(
         cols = tidyr::everything(),
-        names_to = "wavelength",
-        values_to = "intensity"
+        names_to = "x",
+        values_to = "y"
       ) %>%
-      purrr::modify_at("wavelength", as.numeric)
+      purrr::modify_at("x", as.numeric)
   }
 
   if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == FALSE) {
@@ -65,14 +65,14 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
     if (wlgth.min >= wlgth.max) {
       stop("wlgth.min must be strictly smaller than wlgth.max")
     }
-    X <- data %>%
+    df <- data %>%
       tidyr::pivot_longer(
         cols = tidyr::everything(),
-        names_to = "wavelength",
-        values_to = "intensity"
+        names_to = "x",
+        values_to = "y"
       ) %>%
-      purrr::modify_at("wavelength", as.numeric) %>%
-      dplyr::filter(wavelength >= wlgth.min & wavelength <= wlgth.max)
+      purrr::modify_at("x", as.numeric) %>%
+      dplyr::filter(x >= wlgth.min & x <= wlgth.max)
   }
 
   if (profile == "Lorentzian") {
@@ -82,21 +82,21 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
     } else {
       stop("Please provide an initial guess value for the Lorentzian fitting paramters: wL and A")
       }
-    fitpeak <- X %>%
-      tidyr::nest() %>%
+    fitpeak <- df %>%
+      tidyr::nest(data = tidyr::everything()) %>%
       dplyr::mutate(
         fit = purrr::map(
           data, ~ minpack.lm::nlsLM(
             data = .,
             y ~ lorentzian_func(x, y0, xc, wL, A),
             start =  list(
-              y0 = .$intensity[which.min(.$intensity)],
-              xc = .$wavelength[which.max(.$intensity)],
+              y0 = .$y[which.min(.$y)],
+              xc = .$x[which.max(.$y)],
               wL = param1,
               A = param2
             ),
             control = minpack.lm::nls.lm.control(maxiter = 200),
-            lower = c(0, NULL, 0, 0)
+            lower = c(0, 0, 0, 0)
           )
         ),
         tidied = purrr::map(fit, broom::tidy),
@@ -107,26 +107,26 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
 
   if(profile == "Gaussian") {
     if (is.null(wG) == FALSE & is.null(A) == FALSE) {
-      wG <- as.numeric(wG)
-      A <- as.numeric(A)
+      param1 <- as.numeric(wG)
+      param2 <- as.numeric(A)
     } else {
       stop("Please provide an initial guess value for the Gaussian fitting paramters: wG and A")
     }
-    fitpeak <- X %>%
-      tidyr::nest() %>%
+    fitpeak <- df %>%
+      tidyr::nest(data = tidyr::everything()) %>%
       dplyr::mutate(
         fit = purrr::map(
           data, ~ minpack.lm::nlsLM(
             data = .,
             y ~ gaussian_func(x, y0, xc, wG, A),
             start =  list(
-              y0 = .$intensity[which.min(.$intensity)],
-              xc = .$wavelength[which.max(.$intensity)],
-              wG = wG,
-              A = A
+              y0 = .$y[which.min(.$y)],
+              xc = .$x[which.max(.$y)],
+              wG = param1,
+              A = param2
             ),
             control = minpack.lm::nls.lm.control(maxiter = 200),
-            lower = c(0, NULL, 0, 0)
+            lower = c(0, 0, 0, 0)
           )
         ),
         tidied = purrr::map(fit, broom::tidy),
@@ -137,28 +137,28 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
 
   if(profile == "Voigt") {
     if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
-      wL <- as.numeric(wL)
-      wG <- as.numeric(wG)
-      A <- as.numeric(A)
+      param1 <- as.numeric(wL)
+      param2 <- as.numeric(wG)
+      param3 <- as.numeric(A)
     } else {
       stop("Please provide an initial guess value for the Voigt fitting paramters: wL, wG and A")
     }
-    fitpeak <- X %>%
-      tidyr::nest() %>%
+    fitpeak <- df %>%
+      tidyr::nest(data = tidyr::everything()) %>%
       dplyr::mutate(
         fit = purrr::map(
           data, ~ minpack.lm::nlsLM(
             data = .,
             y ~ voigt_func(x, y0, xc, wG, wL, A),
             start =  list(
-              y0 = .$intensity[which.min(.$intensity)],
-              xc = .$wavelength[which.max(.$intensity)],
-              wL = wL,
-              wG = wG,
-              A = A
+              y0 = .$y[which.min(.$y)],
+              xc = .$x[which.max(.$y)],
+              wL = param1,
+              wG = param2,
+              A = param3
             ),
             control = minpack.lm::nls.lm.control(maxiter = 200),
-            lower = c(0, NULL, 0, 0, 0)
+            lower = c(0, 0, 0, 0, 0)
           )
         ),
         tidied = purrr::map(fit, broom::tidy),

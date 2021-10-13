@@ -153,33 +153,44 @@ these spectral lines. The idea of curve fitting is to find a mathematical model 
 
 `peakfit` is based on the `minpack.lm::nlsLM` function that uses the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals. The search process involves starting with an initial guess at the parameters values.
 
-```{r}
-Ba_450line <- Ca_Mn_spec %>% select(`454.09686`:`457.09573`)
+```{r include=FALSE}
+Ba455_fit <- 
+  Ca_Mn_spec %>% 
+  select(`454.09686`:`457.09573`) %>% 
+  peakfit(profile = "Gaussian", wG = 1.7, A = 20)
 ```
 
 ```{r}
-Ba_450line %>% 
-  pivot_longer(
-    cols = everything(),
-    names_to = "wavelength",
-    values_to = "intensity"
-    ) %>%
-  modify_at("wavelength", as.numeric) %>%
-  ggplot(aes(x = wavelength, y = intensity)) +
-  geom_point(shape = 21, size = 3, colour = "red") +
+Ba455_fit %>% pluck("augmented")
+```
+
+```{r}
+Ba455_fit %>% pluck("tidied")
+```
+
+```{r}
+plot3 <- Ba455_fit %>%
+  pluck("augmented") %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_point(aes(x = x, y = y), size = 3, colour = "black", shape = 21) +
+  geom_line(aes(x = x, y = .fitted), size = 1, colour = "red", linetype = "solid") +
   labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-  theme_classic(base_size = 12) +
-  theme(
-    legend.position = "none", 
-    axis.line = element_line(colour = "grey50", size = 1.5)
-    )
+  theme_bw(base_size = 10)
+
+plot4 <- Ba455_fit %>%
+  pluck("augmented") %>%
+  as.data.frame() %>%
+  ggplot(aes(x = x, y = .resid)) + 
+  geom_point(shape = 21, size = 2, fill = "blue") +
+  geom_hline(yintercept = 0) +
+  labs(x = "Wavelength [nm]", y = "Residual") +
+  theme_bw(base_size = 10)
 ```
 
-```{r}
-
+```{r fig.height=3, fig.width=2}
+(plot3 / plot4) + plot_layout(ncol = 1, heights = c(5, 1))
 ```
-
-
 
 
 

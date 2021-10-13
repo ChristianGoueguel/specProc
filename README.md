@@ -120,25 +120,58 @@ square of the sum of the residuals. The search process involves starting
 with an initial guess at the parameters values.
 
 ``` r
-Ba_450line <- Ca_Mn_spec %>% select(`454.09686`:`457.09573`)
+Ba455_fit %>% pluck("augmented")
+#> [[1]]
+#> # A tibble: 23 x 4
+#>        x      y .fitted .resid
+#>    <dbl>  <dbl>   <dbl>  <dbl>
+#>  1  454.  9987.  10357. -370. 
+#>  2  454. 10297.  10533. -236. 
+#>  3  454. 10639.  10931. -292. 
+#>  4  455. 11635.  11745. -111. 
+#>  5  455. 13128.  13239. -111. 
+#>  6  455. 15503.  15685. -182. 
+#>  7  455. 18972.  19242. -270. 
+#>  8  455. 23734.  23784.  -50.0
+#>  9  455. 29026.  28779.  247. 
+#> 10  455. 33550.  33326.  224. 
+#> # ... with 13 more rows
 ```
 
 ``` r
-Ba_450line %>% 
-  pivot_longer(
-    cols = everything(),
-    names_to = "wavelength",
-    values_to = "intensity"
-    ) %>%
-  modify_at("wavelength", as.numeric) %>%
-  ggplot(aes(x = wavelength, y = intensity)) +
-  geom_line(colour = "red") +
-  labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-  theme_classic(base_size = 12) +
-  theme(
-    legend.position = "none", 
-    axis.line = element_line(colour = "grey50", size = 1.5)
-    )
+Ba455_fit %>% pluck("tidied")
+#> [[1]]
+#> # A tibble: 4 x 5
+#>   term   estimate std.error statistic  p.value
+#>   <chr>     <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 y0    10251.    122.           83.8 7.14e-26
+#> 2 xc      456.      0.00286  159126.  3.73e-88
+#> 3 wG        0.886   0.00802     110.  3.80e-28
+#> 4 A     29964.    332.           90.1 1.79e-26
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="90%" height="90%" />
+``` r
+plot3 <- Ba455_fit %>%
+  pluck("augmented") %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_point(aes(x = x, y = y), size = 3, colour = "black", shape = 21) +
+  geom_line(aes(x = x, y = .fitted), size = 1, colour = "red", linetype = "solid") +
+  labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+  theme_bw(base_size = 10)
+
+plot4 <- Ba455_fit %>%
+  pluck("augmented") %>%
+  as.data.frame() %>%
+  ggplot(aes(x = x, y = .resid)) + 
+  geom_point(shape = 21, size = 2, fill = "blue") +
+  geom_hline(yintercept = 0) +
+  labs(x = "Wavelength [nm]", y = "Residual") +
+  theme_bw(base_size = 10)
+```
+
+``` r
+(plot3 / plot4) + plot_layout(ncol = 1, heights = c(5, 1))
+```
+
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="90%" height="90%" />
