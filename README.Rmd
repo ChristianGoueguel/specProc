@@ -157,14 +157,12 @@ Let's start with the fit of a single peak first. Here we want to fit separately 
 
 ```{r message=FALSE, warning=FALSE}
 Ba455_fit <- corrected_spec %>% 
-  select(`454.09686`:`457.09573`) %>% 
-  peakfit(profile = "Gaussian", wG = 1, A =  15000)
+  peakfit(profile = "Gaussian", wG = 1, A =  15000, wlgth.min = 454.09, wlgth.max = 457.09)
 ```
 
 ```{r}
 Ca422_fit <- corrected_spec %>% 
-  select(`421.65463`:`424.10825`) %>% 
-  peakfit(profile = "Gaussian", wG = 1, A = 15000)
+  peakfit(profile = "Gaussian", wG = 1, A = 15000, wlgth.min = 421.65, wlgth.max = 424.30)
 ```
 
 The `peakfit` function returns a list containing data stored in `augmented` and in `tidied`. For instance, using results from the Ba line fitting, we can see that `augmented` contains the original data `x` (wavelength) and `y` (intensity) and the fitted results `.fitted` along with the corresponding residuals `.resid`.  
@@ -230,14 +228,12 @@ In fact, we should rather look at the Voigt profile, especially if we want to ha
 
 ```{r message=FALSE, warning=FALSE}
 Ba455_fit2 <- corrected_spec %>% 
-  select(`454.09686`:`457.09573`) %>% 
-  peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A =  15000)
+  peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A =  15000, wlgth.min = 454.09, wlgth.max = 457.09)
 ```
 
 ```{r}
 Ca422_fit2 <- corrected_spec %>% 
-  select(`421.65463`:`424.10825`) %>% 
-  peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A = 15000)
+  peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A = 15000, wlgth.min = 421.65, wlgth.max = 424.30)
 ```
 
 We can see below that, as expected, Gaussian broadening accounts for most of the observed broadening of the 455.50 nm Ba emission line.  

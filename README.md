@@ -129,14 +129,12 @@ maximum (FWHM) and peak area.
 
 ``` r
 Ba455_fit <- corrected_spec %>% 
-  select(`454.09686`:`457.09573`) %>% 
-  peakfit(profile = "Gaussian", wG = 1, A =  15000)
+  peakfit(profile = "Gaussian", wG = 1, A =  15000, wlgth.min = 454.09, wlgth.max = 457.09)
 ```
 
 ``` r
 Ca422_fit <- corrected_spec %>% 
-  select(`421.65463`:`424.10825`) %>% 
-  peakfit(profile = "Gaussian", wG = 1, A = 15000)
+  peakfit(profile = "Gaussian", wG = 1, A = 15000, wlgth.min = 421.65, wlgth.max = 424.30)
 ```
 
 The `peakfit` function returns a list containing data stored in
@@ -148,20 +146,20 @@ with the corresponding residuals `.resid`.
 ``` r
 Ba455_fit %>% pluck("augmented")
 #> [[1]]
-#> # A tibble: 23 x 4
+#> # A tibble: 22 x 4
 #>        x      y .fitted .resid
 #>    <dbl>  <dbl>   <dbl>  <dbl>
-#>  1  454.  3086.   3596. -510. 
-#>  2  454.  3408.   3769. -361. 
-#>  3  454.  3763.   4163. -400. 
-#>  4  455.  4771.   4969. -198. 
-#>  5  455.  6277.   6450. -173. 
-#>  6  455.  8665.   8881. -216. 
-#>  7  455. 12146.  12421. -274. 
-#>  8  455. 16921.  16951.  -30.1
-#>  9  455. 22226.  21945.  281. 
-#> 10  455. 26762.  26506.  256. 
-#> # ... with 13 more rows
+#>  1  454.  3086.   3630. -544. 
+#>  2  454.  3408.   3800. -392. 
+#>  3  454.  3763.   4190. -426. 
+#>  4  455.  4771.   4988. -217. 
+#>  5  455.  6277.   6460. -183. 
+#>  6  455.  8665.   8881. -215. 
+#>  7  455. 12146.  12413. -267. 
+#>  8  455. 16921.  16940.  -19.7
+#>  9  455. 22226.  21939.  287. 
+#> 10  455. 26762.  26507.  256. 
+#> # ... with 12 more rows
 ```
 
 While `tidied` contains the estimated parameters.
@@ -172,10 +170,10 @@ Ba455_fit %>% pluck("tidied")
 #> # A tibble: 4 x 5
 #>   term   estimate std.error statistic  p.value
 #>   <chr>     <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 y0     3492.    145.           24.0 1.10e-15
-#> 2 xc      456.      0.00340  133961.  9.83e-87
-#> 3 wG        0.886   0.00953      93.0 9.97e-27
-#> 4 A     29953.    395.           75.9 4.68e-25
+#> 1 y0     3528.    161.           22.0 1.88e-14
+#> 2 xc      456.      0.00346  131523.  2.65e-82
+#> 3 wG        0.884   0.0101       87.7 3.80e-25
+#> 4 A     29869.    426.           70.1 2.15e-23
 ```
 
 Thus we can plot the obtained results, since a picture is worth a
@@ -190,14 +188,12 @@ while the `wG` estimate provides the instrumental broadening.
 
 ``` r
 Ba455_fit2 <- corrected_spec %>% 
-  select(`454.09686`:`457.09573`) %>% 
-  peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A =  15000)
+  peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A =  15000, wlgth.min = 454.09, wlgth.max = 457.09)
 ```
 
 ``` r
 Ca422_fit2 <- corrected_spec %>% 
-  select(`421.65463`:`424.10825`) %>% 
-  peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A = 15000)
+  peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A = 15000, wlgth.min = 421.65, wlgth.max = 424.30)
 ```
 
 We can see below that, as expected, Gaussian broadening accounts for
@@ -209,11 +205,11 @@ Ba455_fit2 %>% pluck("tidied")
 #> # A tibble: 5 x 5
 #>   term   estimate  std.error statistic  p.value
 #>   <chr>     <dbl>      <dbl>     <dbl>    <dbl>
-#> 1 y0     2718.     624.           4.36 3.79e- 4
-#> 2 xc      456.       0.00334 136491.   1.36e-82
-#> 3 wL        0.103    0.0773       1.33 2.00e- 1
-#> 4 wG        0.400    0.0340      11.8  7.07e-10
-#> 5 A     33906.    3187.          10.6  3.41e- 9
+#> 1 y0     2714.     755.           3.60 2.23e- 3
+#> 2 xc      456.       0.00343 132633.   4.51e-78
+#> 3 wL        0.103    0.0897       1.15 2.65e- 1
+#> 4 wG        0.400    0.0387      10.3  9.64e- 9
+#> 5 A     33924.    3776.           8.98 7.26e- 8
 ```
 
 <img src="man/figures/README-unnamed-chunk-26-1.png" width="90%" height="90%" />
