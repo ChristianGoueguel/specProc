@@ -184,8 +184,8 @@ thousand words.
 <img src="man/figures/README-unnamed-chunk-20-1.png" width="90%" height="90%" />
 
 In fact, we should rather look at the Voigt profile, especially if we
-want to have an accurate measurement of the width of the emission lines.
-In this case, the `wL` estimate provides the width of the spectral lines
+want to have an accurate measurement of the FWHM of the emission lines.
+In this case, the `wL` estimate provides the FWHM of the spectral lines
 while the `wG` estimate provides the instrumental broadening.
 
 ``` r
@@ -200,8 +200,8 @@ Ca422_fit2 <- corrected_spec %>%
   peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A = 15000)
 ```
 
-We see below that, as expected, Gaussian broadening accounts for most of
-the broadening of the barium emission line.
+We can see below that, as expected, Gaussian broadening accounts for
+most of the observed broadening of the 455.50 nm Ba emission line.
 
 ``` r
 Ba455_fit2 %>% pluck("tidied")
@@ -217,3 +217,6 @@ Ba455_fit2 %>% pluck("tidied")
 ```
 
 <img src="man/figures/README-unnamed-chunk-26-1.png" width="90%" height="90%" />
+
+On the other hand, it may sometimes be more advisable to fit multiple
+peaks at the same time. Here, the `multipeakfit` function is used.
