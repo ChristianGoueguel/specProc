@@ -179,7 +179,12 @@ Ba455_fit %>% pluck("tidied")
 Thus we can plot the obtained results, since a picture is worth a
 thousand words.
 
-<img src="man/figures/README-unnamed-chunk-20-1.png" width="90%" height="90%" />
+``` r
+plotFit(data = Ba455_fit, title = "Ba II 455.40 nm") | 
+  plotFit(data = Ca422_fit, title = "Ca I 422.67 nm")
+```
+
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="90%" height="90%" />
 
 In fact, we should rather look at the Voigt profile, especially if we
 want to have an accurate measurement of the FWHM of the emission lines.
@@ -212,7 +217,12 @@ Ba455_fit2 %>% pluck("tidied")
 #> 5 A     33924.    3776.           8.98 7.26e- 8
 ```
 
-<img src="man/figures/README-unnamed-chunk-26-1.png" width="90%" height="90%" />
+``` r
+plotFit(data = Ba455_fit2, title = "Ba II 455.40 nm") | 
+  plotFit(data = Ca422_fit2, title = "Ca I 422.67 nm")
+```
+
+<img src="man/figures/README-unnamed-chunk-22-1.png" width="90%" height="90%" />
 
 On the other hand, it may sometimes be more advisable to fit multiple
 peaks at the same time. Here, the `multipeakfit` function is used.

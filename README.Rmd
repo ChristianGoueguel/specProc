@@ -179,49 +179,9 @@ Ba455_fit %>% pluck("tidied")
 
 Thus we can plot the obtained results, since a picture is worth a thousand words. 
 
-```{r include=FALSE}
-plot4 <- Ba455_fit %>%
-  pluck("augmented") %>%
-  as.data.frame() %>%
-  ggplot() +
-  geom_point(aes(x = x, y = y), size = 3, colour = "black", shape = 21) +
-  geom_line(aes(x = x, y = .fitted), size = 1, colour = "red", linetype = "solid") +
-  labs(subtitle = "Ba II 455.40 nm", x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-  theme_bw(base_size = 10)
-
-plot5 <- Ba455_fit %>%
-  pluck("augmented") %>%
-  as.data.frame() %>%
-  ggplot(aes(x = x, y = .resid)) + 
-  geom_point(shape = 21, size = 2, fill = "blue") +
-  geom_hline(yintercept = 0) +
-  labs(x = "Wavelength [nm]", y = "Residual") +
-  theme_bw(base_size = 10)
-```
-
-```{r include=FALSE}
-plot6 <- Ca422_fit %>%
-  pluck("augmented") %>%
-  as.data.frame() %>%
-  ggplot() +
-  geom_point(aes(x = x, y = y), size = 3, colour = "black", shape = 21) +
-  geom_line(aes(x = x, y = .fitted), size = 1, colour = "red", linetype = "solid") +
-  labs(subtitle = "Ca I 422.67 nm", x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-  theme_bw(base_size = 10)
-
-plot7 <- Ca422_fit %>%
-  pluck("augmented") %>%
-  as.data.frame() %>%
-  ggplot(aes(x = x, y = .resid)) + 
-  geom_point(shape = 21, size = 2, fill = "blue") +
-  geom_hline(yintercept = 0) +
-  labs(x = "Wavelength [nm]", y = "Residual") +
-  theme_bw(base_size = 10)
-```
-
-```{r echo=FALSE}
-(plot4 / plot5) + plot_layout(ncol = 1, heights = c(5, 1)) |
-  (plot6 / plot7) + plot_layout(ncol = 1, heights = c(5, 1))
+```{r}
+plotFit(data = Ba455_fit, title = "Ba II 455.40 nm") | 
+  plotFit(data = Ca422_fit, title = "Ca I 422.67 nm")
 ```
 
 In fact, we should rather look at the Voigt profile, especially if we want to have an accurate measurement of the FWHM of the emission lines. In this case, the `wL` estimate provides the FWHM of the spectral lines while the `wG` estimate provides the instrumental broadening.   
@@ -242,49 +202,9 @@ We can see below that, as expected, Gaussian broadening accounts for most of the
 Ba455_fit2 %>% pluck("tidied")
 ```
 
-```{r include=FALSE}
-plot8 <- Ba455_fit2 %>%
-  pluck("augmented") %>%
-  as.data.frame() %>%
-  ggplot() +
-  geom_point(aes(x = x, y = y), size = 3, colour = "black", shape = 21) +
-  geom_line(aes(x = x, y = .fitted), size = 1, colour = "red", linetype = "solid") +
-  labs(subtitle = "Ba II 455.40 nm", x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-  theme_bw(base_size = 10)
-
-plot9 <- Ba455_fit2 %>%
-  pluck("augmented") %>%
-  as.data.frame() %>%
-  ggplot(aes(x = x, y = .resid)) + 
-  geom_point(shape = 21, size = 2, fill = "blue") +
-  geom_hline(yintercept = 0) +
-  labs(x = "Wavelength [nm]", y = "Residual") +
-  theme_bw(base_size = 10)
-```
-
-```{r include=FALSE}
-plot10 <- Ca422_fit2 %>%
-  pluck("augmented") %>%
-  as.data.frame() %>%
-  ggplot() +
-  geom_point(aes(x = x, y = y), size = 3, colour = "black", shape = 21) +
-  geom_line(aes(x = x, y = .fitted), size = 1, colour = "red", linetype = "solid") +
-  labs(subtitle = "Ca I 422.67 nm", x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-  theme_bw(base_size = 10)
-
-plot11 <- Ca422_fit2 %>%
-  pluck("augmented") %>%
-  as.data.frame() %>%
-  ggplot(aes(x = x, y = .resid)) + 
-  geom_point(shape = 21, size = 2, fill = "blue") +
-  geom_hline(yintercept = 0) +
-  labs(x = "Wavelength [nm]", y = "Residual") +
-  theme_bw(base_size = 10)
-```
-
-```{r echo=FALSE}
-(plot8 / plot9) + plot_layout(ncol = 1, heights = c(5, 1)) |
-  (plot10 / plot11) + plot_layout(ncol = 1, heights = c(5, 1))
+```{r}
+plotFit(data = Ba455_fit2, title = "Ba II 455.40 nm") | 
+  plotFit(data = Ca422_fit2, title = "Ca I 422.67 nm")
 ```
 
 On the other hand, it may sometimes be more advisable to fit multiple peaks at the same time. Here, the `multipeakfit` function is used.
