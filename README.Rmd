@@ -182,7 +182,7 @@ Ba455_fit %>% pluck("tidied")
 Thus we can plot the obtained results, since a picture is worth a thousand words. 
 
 ```{r include=FALSE}
-plot3 <- Ba455_fit %>%
+plot4 <- Ba455_fit %>%
   pluck("augmented") %>%
   as.data.frame() %>%
   ggplot() +
@@ -191,7 +191,7 @@ plot3 <- Ba455_fit %>%
   labs(subtitle = "Ba II 455.40 nm", x = "Wavelength [nm]", y = "Intensity [arb. units]") +
   theme_bw(base_size = 10)
 
-plot4 <- Ba455_fit %>%
+plot5 <- Ba455_fit %>%
   pluck("augmented") %>%
   as.data.frame() %>%
   ggplot(aes(x = x, y = .resid)) + 
@@ -202,7 +202,7 @@ plot4 <- Ba455_fit %>%
 ```
 
 ```{r include=FALSE}
-plot5 <- Ca422_fit %>%
+plot6 <- Ca422_fit %>%
   pluck("augmented") %>%
   as.data.frame() %>%
   ggplot() +
@@ -211,7 +211,7 @@ plot5 <- Ca422_fit %>%
   labs(subtitle = "Ca I 422.67 nm", x = "Wavelength [nm]", y = "Intensity [arb. units]") +
   theme_bw(base_size = 10)
 
-plot6 <- Ca422_fit %>%
+plot7 <- Ca422_fit %>%
   pluck("augmented") %>%
   as.data.frame() %>%
   ggplot(aes(x = x, y = .resid)) + 
@@ -222,9 +222,112 @@ plot6 <- Ca422_fit %>%
 ```
 
 ```{r echo=FALSE}
-(plot3 / plot4) + plot_layout(ncol = 1, heights = c(5, 1)) |
-  (plot5 / plot6) + plot_layout(ncol = 1, heights = c(5, 1))
+(plot4 / plot5) + plot_layout(ncol = 1, heights = c(5, 1)) |
+  (plot6 / plot7) + plot_layout(ncol = 1, heights = c(5, 1))
 ```
+
+In fact, we should rather look at the Voigt profile, especially if we want to have an accurate measurement of the width of the emission lines. In this case, the `wL` estimate provides the width of the spectral lines while the `wG` estimate provides the instrumental broadening.   
+
+```{r message=FALSE, warning=FALSE}
+Ba455_fit2 <- Ca_Mn_spec %>% 
+  select(`454.09686`:`457.09573`) %>% 
+  peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A =  15000)
+```
+
+```{r}
+Ca422_fit2 <- Ca_Mn_spec %>% 
+  select(`421.65463`:`424.10825`) %>% 
+  peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A = 15000)
+```
+
+We see below that, as expected, Gaussian broadening accounts for most of the broadening of the barium emission line.  
+
+```{r}
+Ba455_fit2 %>% pluck("tidied")
+```
+
+```{r include=FALSE}
+plot8 <- Ba455_fit2 %>%
+  pluck("augmented") %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_point(aes(x = x, y = y), size = 3, colour = "black", shape = 21) +
+  geom_line(aes(x = x, y = .fitted), size = 1, colour = "red", linetype = "solid") +
+  labs(subtitle = "Ba II 455.40 nm", x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+  theme_bw(base_size = 10)
+
+plot9 <- Ba455_fit2 %>%
+  pluck("augmented") %>%
+  as.data.frame() %>%
+  ggplot(aes(x = x, y = .resid)) + 
+  geom_point(shape = 21, size = 2, fill = "blue") +
+  geom_hline(yintercept = 0) +
+  labs(x = "Wavelength [nm]", y = "Residual") +
+  theme_bw(base_size = 10)
+```
+
+```{r include=FALSE}
+plot10 <- Ca422_fit2 %>%
+  pluck("augmented") %>%
+  as.data.frame() %>%
+  ggplot() +
+  geom_point(aes(x = x, y = y), size = 3, colour = "black", shape = 21) +
+  geom_line(aes(x = x, y = .fitted), size = 1, colour = "red", linetype = "solid") +
+  labs(subtitle = "Ca I 422.67 nm", x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+  theme_bw(base_size = 10)
+
+plot11 <- Ca422_fit2 %>%
+  pluck("augmented") %>%
+  as.data.frame() %>%
+  ggplot(aes(x = x, y = .resid)) + 
+  geom_point(shape = 21, size = 2, fill = "blue") +
+  geom_hline(yintercept = 0) +
+  labs(x = "Wavelength [nm]", y = "Residual") +
+  theme_bw(base_size = 10)
+```
+
+```{r echo=FALSE}
+(plot8 / plot9) + plot_layout(ncol = 1, heights = c(5, 1)) |
+  (plot10 / plot11) + plot_layout(ncol = 1, heights = c(5, 1))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

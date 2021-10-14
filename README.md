@@ -182,3 +182,38 @@ Thus we can plot the obtained results, since a picture is worth a
 thousand words.
 
 <img src="man/figures/README-unnamed-chunk-20-1.png" width="90%" height="90%" />
+
+In fact, we should rather look at the Voigt profile, especially if we
+want to have an accurate measurement of the width of the emission lines.
+In this case, the `wL` estimate provides the width of the spectral lines
+while the `wG` estimate provides the instrumental broadening.
+
+``` r
+Ba455_fit2 <- Ca_Mn_spec %>% 
+  select(`454.09686`:`457.09573`) %>% 
+  peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A =  15000)
+```
+
+``` r
+Ca422_fit2 <- Ca_Mn_spec %>% 
+  select(`421.65463`:`424.10825`) %>% 
+  peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A = 15000)
+```
+
+We see below that, as expected, Gaussian broadening accounts for most of
+the broadening of the barium emission line.
+
+``` r
+Ba455_fit2 %>% pluck("tidied")
+#> [[1]]
+#> # A tibble: 5 x 5
+#>   term   estimate  std.error statistic  p.value
+#>   <chr>     <dbl>      <dbl>     <dbl>    <dbl>
+#> 1 y0     9441.     511.          18.5  3.72e-13
+#> 2 xc      456.       0.00274 166555.   3.78e-84
+#> 3 wL        0.107    0.0631       1.70 1.05e- 1
+#> 4 wG        0.398    0.0279      14.3  2.94e-11
+#> 5 A     34103.    2614.          13.0  1.30e-10
+```
+
+<img src="man/figures/README-unnamed-chunk-26-1.png" width="90%" height="90%" />
