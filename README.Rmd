@@ -156,13 +156,13 @@ these spectral lines. The idea of curve fitting is to find a mathematical model 
 Let's start with the fit of a single peak first. Here we want to fit separately the Ba II line at 455.40 nm, then the Ca I line at 422.67 nm, using the Gaussian profile `profile = "Gaussian"`.The Gaussian profile was chosen because we expect to have a relatively large spectral linewidth due to the measurement conditions. Moreover, `wG` and `A` are our initial guess and are respectively the Gaussian full width at half maximum (FWHM) and peak area.
 
 ```{r message=FALSE, warning=FALSE}
-Ba455_fit <- Ca_Mn_spec %>% 
+Ba455_fit <- corrected_spec %>% 
   select(`454.09686`:`457.09573`) %>% 
   peakfit(profile = "Gaussian", wG = 1, A =  15000)
 ```
 
 ```{r}
-Ca422_fit <- Ca_Mn_spec %>% 
+Ca422_fit <- corrected_spec %>% 
   select(`421.65463`:`424.10825`) %>% 
   peakfit(profile = "Gaussian", wG = 1, A = 15000)
 ```
@@ -229,13 +229,13 @@ plot7 <- Ca422_fit %>%
 In fact, we should rather look at the Voigt profile, especially if we want to have an accurate measurement of the width of the emission lines. In this case, the `wL` estimate provides the width of the spectral lines while the `wG` estimate provides the instrumental broadening.   
 
 ```{r message=FALSE, warning=FALSE}
-Ba455_fit2 <- Ca_Mn_spec %>% 
+Ba455_fit2 <- corrected_spec %>% 
   select(`454.09686`:`457.09573`) %>% 
   peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A =  15000)
 ```
 
 ```{r}
-Ca422_fit2 <- Ca_Mn_spec %>% 
+Ca422_fit2 <- corrected_spec %>% 
   select(`421.65463`:`424.10825`) %>% 
   peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A = 15000)
 ```

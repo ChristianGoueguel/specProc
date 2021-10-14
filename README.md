@@ -128,13 +128,13 @@ our initial guess and are respectively the Gaussian full width at half
 maximum (FWHM) and peak area.
 
 ``` r
-Ba455_fit <- Ca_Mn_spec %>% 
+Ba455_fit <- corrected_spec %>% 
   select(`454.09686`:`457.09573`) %>% 
   peakfit(profile = "Gaussian", wG = 1, A =  15000)
 ```
 
 ``` r
-Ca422_fit <- Ca_Mn_spec %>% 
+Ca422_fit <- corrected_spec %>% 
   select(`421.65463`:`424.10825`) %>% 
   peakfit(profile = "Gaussian", wG = 1, A = 15000)
 ```
@@ -151,16 +151,16 @@ Ba455_fit %>% pluck("augmented")
 #> # A tibble: 23 x 4
 #>        x      y .fitted .resid
 #>    <dbl>  <dbl>   <dbl>  <dbl>
-#>  1  454.  9987.  10357. -370. 
-#>  2  454. 10297.  10533. -236. 
-#>  3  454. 10639.  10931. -292. 
-#>  4  455. 11635.  11745. -111. 
-#>  5  455. 13128.  13239. -111. 
-#>  6  455. 15503.  15685. -182. 
-#>  7  455. 18972.  19242. -270. 
-#>  8  455. 23734.  23784.  -50.0
-#>  9  455. 29026.  28779.  247. 
-#> 10  455. 33550.  33326.  224. 
+#>  1  454.  3086.   3596. -510. 
+#>  2  454.  3408.   3769. -361. 
+#>  3  454.  3763.   4163. -400. 
+#>  4  455.  4771.   4969. -198. 
+#>  5  455.  6277.   6450. -173. 
+#>  6  455.  8665.   8881. -216. 
+#>  7  455. 12146.  12421. -274. 
+#>  8  455. 16921.  16951.  -30.1
+#>  9  455. 22226.  21945.  281. 
+#> 10  455. 26762.  26506.  256. 
 #> # ... with 13 more rows
 ```
 
@@ -172,10 +172,10 @@ Ba455_fit %>% pluck("tidied")
 #> # A tibble: 4 x 5
 #>   term   estimate std.error statistic  p.value
 #>   <chr>     <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 y0    10251.    122.           83.8 7.14e-26
-#> 2 xc      456.      0.00286  159126.  3.73e-88
-#> 3 wG        0.886   0.00802     110.  3.80e-28
-#> 4 A     29964.    332.           90.1 1.79e-26
+#> 1 y0     3492.    145.           24.0 1.10e-15
+#> 2 xc      456.      0.00340  133961.  9.83e-87
+#> 3 wG        0.886   0.00953      93.0 9.97e-27
+#> 4 A     29953.    395.           75.9 4.68e-25
 ```
 
 Thus we can plot the obtained results, since a picture is worth a
@@ -189,13 +189,13 @@ In this case, the `wL` estimate provides the width of the spectral lines
 while the `wG` estimate provides the instrumental broadening.
 
 ``` r
-Ba455_fit2 <- Ca_Mn_spec %>% 
+Ba455_fit2 <- corrected_spec %>% 
   select(`454.09686`:`457.09573`) %>% 
   peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A =  15000)
 ```
 
 ``` r
-Ca422_fit2 <- Ca_Mn_spec %>% 
+Ca422_fit2 <- corrected_spec %>% 
   select(`421.65463`:`424.10825`) %>% 
   peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A = 15000)
 ```
@@ -209,11 +209,11 @@ Ba455_fit2 %>% pluck("tidied")
 #> # A tibble: 5 x 5
 #>   term   estimate  std.error statistic  p.value
 #>   <chr>     <dbl>      <dbl>     <dbl>    <dbl>
-#> 1 y0     9441.     511.          18.5  3.72e-13
-#> 2 xc      456.       0.00274 166555.   3.78e-84
-#> 3 wL        0.107    0.0631       1.70 1.05e- 1
-#> 4 wG        0.398    0.0279      14.3  2.94e-11
-#> 5 A     34103.    2614.          13.0  1.30e-10
+#> 1 y0     2718.     624.           4.36 3.79e- 4
+#> 2 xc      456.       0.00334 136491.   1.36e-82
+#> 3 wL        0.103    0.0773       1.33 2.00e- 1
+#> 4 wG        0.400    0.0340      11.8  7.07e-10
+#> 5 A     33906.    3187.          10.6  3.41e- 9
 ```
 
 <img src="man/figures/README-unnamed-chunk-26-1.png" width="90%" height="90%" />
