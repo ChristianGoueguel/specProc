@@ -65,6 +65,18 @@ multipeakfit <- function(profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlgt
       dplyr::filter(x >= wlgth.min & x <= wlgth.max)
   }
 
+  if (profile == "Lorentzian") {
+    peakfit(data = df, profile = "Lorentzian", wL = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL)
+  }
+
+  if(profile == "Gaussian") {
+    peakfit(data = df, profile = "Gaussian", wG = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL)
+  }
+
+  if(profile == "Voigt") {
+    peakfit(data = df, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL)
+  }
+
 
 
 

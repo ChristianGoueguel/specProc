@@ -255,12 +255,6 @@ plotFit(data = Ba455_fit2, title = "Ba II 455.40 nm") |
 ### Multi-peak fitting
 
 On the other hand, it may sometimes be more advisable to fit multiple
-peaks at the same time. Here, the `multipeakfit` function is used. You
-can fit all peaks with same fitting function or fit each peak with a
-different peak function.
-
-``` r
-plotSpec(data = corrected_spec)
-```
-
-<img src="man/figures/README-unnamed-chunk-22-1.png" width="90%" height="90%" />
+peaks at the same time, especially when they overlap. Here, the
+`multipeakfit` function is used. You can fit all peaks with same fitting
+function or fit each peak with a different peak function.
