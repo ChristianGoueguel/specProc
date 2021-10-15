@@ -144,7 +144,7 @@ plot3 <-corrected_spec %>%
 plot2 | plot3
 ```
 
-### Peaks fitting
+### Peak fitting
 
 Fitting of laser-induced breakdown spectroscopy (LIBS) spectral lines is
 very important for accurate quantitative analysis. As such, the
@@ -153,7 +153,7 @@ these spectral lines. The idea of curve fitting is to find a mathematical model 
 
 `peakfit` is based on the `minpack.lm::nlsLM` function that uses the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals. The search process involves starting with an initial guess at the parameters values.
 
-Let's start with the fit of a single peak first. Here we want to fit separately the Ba II line at 455.40 nm, then the Ca I line at 422.67 nm, using the Gaussian profile `profile = "Gaussian"`.The Gaussian profile was chosen because we expect to have a relatively large spectral linewidth due to the measurement conditions. Moreover, `wG` and `A` are our initial guess and are respectively the Gaussian full width at half maximum (FWHM) and peak area.
+Let's start with the fit of a single peak first. Here we want to fit separately the Ba II line at 455.40 nm, then the Ca I line at 422.67 nm, using the Gaussian profile `profile = "Gaussian"`.The Gaussian profile was chosen because we expect to have a relatively large spectral linewidth due to the measurement conditions. Moreover, `wG` and `A` are our initial guess and are respectively the Gaussian full width at half maximum (FWHM) and peak area. There are two ways to limit the wavelength range of data for a given fit. You can set the range of data of interest before using the `peakfit` function, or you can use the arguments `wlgth.min` and `wlgth.max` for setting up the wavelength range.
 
 ```{r message=FALSE, warning=FALSE}
 Ba455_fit <- corrected_spec %>% 
@@ -165,13 +165,13 @@ Ca422_fit <- corrected_spec %>%
   peakfit(profile = "Gaussian", wG = 1, A = 15000, wlgth.min = 421.65, wlgth.max = 424.30)
 ```
 
-The `peakfit` function returns a list containing data stored in `augmented` and in `tidied`. For instance, using results from the Ba line fitting, we can see that `augmented` contains the original data `x` (wavelength) and `y` (intensity) and the fitted results `.fitted` along with the corresponding residuals `.resid`.  
+After a successful fit, you can get a variety of results such as the location of the peak, the height, the area and FWHM for each peak, as well as the basic fitted coefficients and estimates of errors for each quantity. The `peakfit` function returns a list containing data stored in `augmented` and in `tidied`. For instance, using results from the Ba line fitting, we can see that `augmented` contains the original data `x` (wavelength) and `y` (intensity) and the fitted results `.fitted` along with the corresponding residuals `.resid`.  
 
 ```{r}
 Ba455_fit %>% pluck("augmented")
 ```
 
-While `tidied` contains the estimated parameters.
+While `tidied` contains the estimated parameters (FWHM, peak height, and area for fitted peak).
 
 ```{r}
 Ba455_fit %>% pluck("tidied")
@@ -206,6 +206,9 @@ Ba455_fit2 %>% pluck("tidied")
 plotFit(data = Ba455_fit2, title = "Ba II 455.40 nm") | 
   plotFit(data = Ca422_fit2, title = "Ca I 422.67 nm")
 ```
+
+
+### Multi-peak fitting
 
 On the other hand, it may sometimes be more advisable to fit multiple peaks at the same time. Here, the `multipeakfit` function is used.
 
