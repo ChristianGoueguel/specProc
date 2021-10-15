@@ -177,7 +177,7 @@ While `tidied` contains the estimated parameters.
 Ba455_fit %>% pluck("tidied")
 ```
 
-Thus we can plot the obtained results, since a picture is worth a thousand words. 
+Thus we can plot the obtained results, since a picture is worth a thousand words. Individual peaks, the overall fit and baseline are included on the plot. The residuals plot (at the bottom) is very handy in deciding whether the fit is good or whether there may be additional peaks lurking in the data. In the result shown below the residuals are just noise indicating a good fit.
 
 ```{r}
 plotFit(data = Ba455_fit, title = "Ba II 455.40 nm") | 
