@@ -54,7 +54,23 @@ spectrum show emission lines of Ca II 393.37 nm, Ca II 396.85 nm and Ca
 I 422.67 nm, unresolved Mn triplet at 403.08, 403.31 and 403.45 nm, and
 Ba ionic lines at 455.40 and 493.41 nm.
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
+``` r
+data("Ca_Mn_spec")
+```
+
+``` r
+Ca_Mn_spec %>% 
+  plotSpec() + 
+  theme_classic(base_size = 8) +
+  annotate("text", x = 391, y = 4.2e4, angle = 90, size = 2, label = "Ca II 393.37 nm") +
+  annotate("text", x = 396, y = 3e4, angle = 90, size = 2, label = "Ca II 396.85 nm") +
+  annotate("text", x = 401, y = 3.8e4, angle = 90, size = 2, label = "Mn I 403-nm") +
+  annotate("text", x = 420, y = 3.5e4, angle = 90, size = 2, label = "Ca I 422.67 nm") +
+  annotate("text", x = 453, y = 3e4, angle = 90, size = 2, label = "Ba II 455.40 nm") +
+  annotate("text", x = 491, y = 1.5e4, angle = 90, size = 2, label = "Ba II 493.41 nm")
+```
+
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="90%" height="90%" />
 
 ### Baseline removal
 
@@ -77,14 +93,14 @@ and the other for the fitted baseline `bkg`.
 ``` r
 str(baseline_fit, list.len = 5) 
 #> List of 2
-#>  $ spec: tibble [1 × 808] (S3: tbl_df/tbl/data.frame)
+#>  $ spec: tibble [1 x 808] (S3: tbl_df/tbl/data.frame)
 #>   ..$ 390.03027: num 131
 #>   ..$ 390.1666 : num 10.5
 #>   ..$ 390.30292: num 0
 #>   ..$ 390.43921: num 129
 #>   ..$ 390.57553: num 197
 #>   .. [list output truncated]
-#>  $ bkg : tibble [1 × 808] (S3: tbl_df/tbl/data.frame)
+#>  $ bkg : tibble [1 x 808] (S3: tbl_df/tbl/data.frame)
 #>   ..$ 390.03027: num 13831
 #>   ..$ 390.1666 : num 13864
 #>   ..$ 390.30292: num 13897
@@ -101,7 +117,7 @@ background <- baseline_fit %>% pluck("bkg")
 corrected_spec <- baseline_fit %>% pluck("spec")
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-12-1.png" width="90%" height="90%" />
 
 ### Peak fitting
 
@@ -128,7 +144,8 @@ our initial guess and are respectively the Gaussian full width at half
 maximum (FWHM) and peak area. There are two ways to limit the wavelength
 range of data for a given fit. You can set the range of data of interest
 before using the `peakfit` function, or you can use the arguments
-`wlgth.min` and `wlgth.max` for setting up the wavelength range.
+`wlgth.min` and `wlgth.max` for setting up the wavelength range. Note
+that you can give a value to one or both of the arguments.
 
 ``` r
 Ba455_fit <- corrected_spec %>% 
@@ -152,7 +169,7 @@ with the corresponding residuals `.resid`.
 ``` r
 Ba455_fit %>% pluck("augmented")
 #> [[1]]
-#> # A tibble: 22 × 4
+#> # A tibble: 22 x 4
 #>        x      y .fitted .resid
 #>    <dbl>  <dbl>   <dbl>  <dbl>
 #>  1  454.  3086.   3630. -544. 
@@ -165,7 +182,7 @@ Ba455_fit %>% pluck("augmented")
 #>  8  455. 16921.  16940.  -19.7
 #>  9  455. 22226.  21939.  287. 
 #> 10  455. 26762.  26507.  256. 
-#> # … with 12 more rows
+#> # ... with 12 more rows
 ```
 
 While `tidied` contains the estimated parameters (FWHM, peak height, and
@@ -174,7 +191,7 @@ area for fitted peak).
 ``` r
 Ba455_fit %>% pluck("tidied")
 #> [[1]]
-#> # A tibble: 4 × 5
+#> # A tibble: 4 x 5
 #>   term   estimate std.error statistic  p.value
 #>   <chr>     <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 y0     3528.    161.           22.0 1.88e-14
@@ -195,7 +212,7 @@ plotFit(data = Ba455_fit, title = "Ba II 455.40 nm") |
   plotFit(data = Ca422_fit, title = "Ca I 422.67 nm")
 ```
 
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-17-1.png" width="90%" height="90%" />
 
 In fact, we should rather look at the Voigt profile, especially if we
 want to have an accurate measurement of the FWHM of the emission lines.
@@ -218,7 +235,7 @@ most of the observed broadening of the 455.50 nm Ba emission line.
 ``` r
 Ba455_fit2 %>% pluck("tidied")
 #> [[1]]
-#> # A tibble: 5 × 5
+#> # A tibble: 5 x 5
 #>   term   estimate  std.error statistic  p.value
 #>   <chr>     <dbl>      <dbl>     <dbl>    <dbl>
 #> 1 y0     2714.     755.           3.60 2.23e- 3
@@ -233,9 +250,17 @@ plotFit(data = Ba455_fit2, title = "Ba II 455.40 nm") |
   plotFit(data = Ca422_fit2, title = "Ca I 422.67 nm")
 ```
 
-<img src="man/figures/README-unnamed-chunk-22-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-21-1.png" width="90%" height="90%" />
 
 ### Multi-peak fitting
 
 On the other hand, it may sometimes be more advisable to fit multiple
-peaks at the same time. Here, the `multipeakfit` function is used.
+peaks at the same time. Here, the `multipeakfit` function is used. You
+can fit all peaks with same fitting function or fit each peak with a
+different peak function.
+
+``` r
+plotSpec(data = corrected_spec)
+```
+
+<img src="man/figures/README-unnamed-chunk-22-1.png" width="90%" height="90%" />
