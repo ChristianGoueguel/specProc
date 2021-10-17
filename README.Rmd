@@ -164,19 +164,19 @@ The `peakfit` function uses the full width at half maximum (FWHM)
 version of the Gaussian function implemented in the `gaussian_func`
 function and is given by the following expression:
 
-![](images/GaussianFun.png)
+<img src="images/GaussianFun.png" width="340"/>
 
 The Lorentzian function implemented in the `lorentzian_func` function
 has a much wider tails than Gaussian function and is given by:
 
-![](images/LorentzianFun.png)
+<img src="images/LorentzianFun.png" width="238"/>
 
 `peakfit` uses the Pseudo-Voigt function, `voigt_func`, which is an
 approximation of the Voigt function, defined as the convolution of
 Gaussian and Lorentzian function. Thus the Pseudo-Voigt function can be
 expressed as:
 
-![](images/VoigtFun.png)
+<img src="images/VoigtFun.png" width="541"/>
 
 `peakfit` is based on the `minpack.lm::nlsLM` function that uses the
 Levenberg-Marquardt algorithm for searching the minimum value of the
