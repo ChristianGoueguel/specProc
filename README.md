@@ -261,8 +261,9 @@ plotFit(data = Ba455_fit, title = "Ba II 455.40 nm") |
 
 In fact, we should rather look at the Voigt profile, especially if we
 want to have an accurate measurement of the FWHM of the emission lines.
-In this case, the `wL` estimate provides the FWHM of the spectral lines
-while the `wG` estimate provides the instrumental broadening.
+Notwithstanding self-absorption effect, the Lorentzian FWHM, `wL`,
+estimate provides the broadening of the spectral lines while the
+Gaussian FWHM, `wG`, estimate provides the instrumental broadening.
 
 ``` r
 Ba455_fit2 <- corrected_spec %>% 
@@ -274,7 +275,16 @@ Ca422_fit2 <- corrected_spec %>%
   peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A = 15000, wlgth.min = 421.65, wlgth.max = 424.30)
 ```
 
-We can see below that, as expected, Gaussian broadening accounts for
+We can compare statistically (p-value) the results obtained using a
+Gaussian profile with those obtained with a Voigt profile, for deciding
+which one of these profiles give the best estimate of the spectra lines
+FWHM. Or we can compute the *k* parameter that describe the “gaussness”
+or “lorentzness” of a Voigt profile. A value of 0 means a pure
+lorentzian profile and of 1 means a pure Gaussian profile.
+
+<img src="images/MixingParam-01.png" width="129"/>
+
+As expected, both methods show that Gaussian broadening accounts for
 most of the observed broadening of the 455.50 nm Ba emission line.
 
 ``` r
