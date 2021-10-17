@@ -161,22 +161,26 @@ certain profile. The `peakfit` function finds the specific parameters
 which make that function match your data as closely as possible.
 
 The `peakfit` function uses the full width at half maximum (FWHM)
-version of the Gaussian function implemented in the `gaussian_func`
-function and is given by the following expression:
+version of the Gaussian function implemented in `gaussian_func` and given by the following expression:
 
+<p align="center">
 <img src="images/GaussianFun.png" width="340"/>
+</p>
 
-The Lorentzian function implemented in the `lorentzian_func` function
-has a much wider tails than Gaussian function and is given by:
+The Lorentzian function implemented in `lorentzian_func` has a much wider tails than the Gaussian function and is given by:
 
+<p align="center">
 <img src="images/LorentzianFun.png" width="238"/>
+</p>
 
 `peakfit` uses the Pseudo-Voigt function, `voigt_func`, which is an
 approximation of the Voigt function, defined as the convolution of
 Gaussian and Lorentzian function. Thus the Pseudo-Voigt function can be
 expressed as:
 
+<p align="center">
 <img src="images/VoigtFun.png" width="541"/>
+</p>
 
 `peakfit` is based on the `minpack.lm::nlsLM` function that uses the
 Levenberg-Marquardt algorithm for searching the minimum value of the
