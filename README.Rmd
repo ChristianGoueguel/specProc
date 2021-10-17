@@ -7,8 +7,7 @@ editor_options:
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-<img src='man/figures/logo.png' align="right" height="250" />
-
+<img src="man/figures/logo.png" align="right" height="250"/>
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -27,15 +26,16 @@ knitr::opts_chunk$set(
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![CRAN status](https://www.r-pkg.org/badges/version/specProc)](https://CRAN.R-project.org/package=specProc)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/specProc)](https://CRAN.R-project.org/package=specProc)
+
 <!-- badges: end -->
 
 **Pre-release for feedback and experimenting.**
 
 `specProc` package performs a number of pre-processing tasks commonly
 used in laser-induced breakdown spectroscopy (LIBS). Collectively, these
-are essential tools in LIBS calibration modeling.
-These include:
+are essential tools in LIBS calibration modeling. These include:
 
 -   Baseline removal
 -   Fitting single, multiple or overlapping peaks
@@ -76,7 +76,12 @@ library(patchwork)
 
 ### LIBS spectrum in the 375–510 nm wavelength range
 
-The plot below shows a typical LIBS spectrum. Prominent atomic and ionic emission lines of Ca, Mn and Ba were identified using the [NIST spectral lines database](https://www.nist.gov/pml/atomic-spectra-database). The spectrum show emission lines of Ca II 393.37 nm, Ca II 396.85 nm and Ca I 422.67 nm, unresolved Mn triplet at 403.08, 403.31 and 403.45 nm, and Ba ionic lines at 455.40 and 493.41 nm.
+The plot below shows a typical LIBS spectrum. Prominent atomic and ionic
+emission lines of Ca, Mn and Ba were identified using the [NIST spectral
+lines database](https://www.nist.gov/pml/atomic-spectra-database). The
+spectrum show emission lines of Ca II 393.37 nm, Ca II 396.85 nm and Ca
+I 422.67 nm, unresolved Mn triplet at 403.08, 403.31 and 403.45 nm, and
+Ba ionic lines at 455.40 and 493.41 nm.
 
 ```{r}
 data("Ca_Mn_spec")
@@ -94,12 +99,16 @@ Ca_Mn_spec %>%
   annotate("text", x = 491, y = 1.5e4, angle = 90, size = 2, label = "Ba II 493.41 nm")
 ```
 
-Note that we used the ggplot-based `plotSpec` function to generate the above plot.
+Note that we used the ggplot-based `plotSpec` function to generate the
+above plot.
 
 ### Baseline removal
 
 When analyzing LIBS spectra, it is often more effective to subtract an
-estimated baseline from the data. The estimate is constructed by fitting a low-order polynomial function to the spectrum baseline. Then the resulting curve fit is subtracted from the data. Here we use the function `baselinerm` to perform such a task.
+estimated baseline from the data. The estimate is constructed by fitting
+a low-order polynomial function to the spectrum baseline. Then the
+resulting curve fit is subtracted from the data. Here we use the
+function `baselinerm` to perform such a task.
 
 ```{r message=FALSE, warning=FALSE}
 baseline_fit <- Ca_Mn_spec %>%
@@ -107,20 +116,23 @@ baseline_fit <- Ca_Mn_spec %>%
   baselinerm(degree = 7)
 ```
 
-As one can see, the `baselinerm` function provides a list containing two data frames, one for the baseline-subtracted spectrum or spectra `spec` and the other for the fitted baseline `bkg`.
+As one can see, the `baselinerm` function provides a list containing two
+data frames, one for the baseline-subtracted spectrum or spectra `spec`
+and the other for the fitted baseline `bkg`.
 
 ```{r}
 str(baseline_fit, list.len = 5) 
 ```
 
-We can then extract each data frame from the list using the `purrr::pluck` function.
+We can then extract each data frame from the list using the
+`purrr::pluck` function.
 
 ```{r}
 background <- baseline_fit %>% pluck("bkg")
 corrected_spec <- baseline_fit %>% pluck("spec")
 ```
 
-And then visualize the spectrum before and after baseline removal. 
+And then visualize the spectrum before and after baseline removal.
 
 ```{r fig.height=3, message=FALSE, warning=FALSE}
 Ca_Mn_spec %>% 
@@ -139,29 +151,49 @@ Ca_Mn_spec %>%
 
 ### Peak fitting
 
-Fitting of laser-induced breakdown spectroscopy (LIBS) spectral lines is very important for accurate quantitative analysis. As such, the Gaussian, Lorentzian and Voigt profile functions are often used to fit these spectral lines. The idea of curve fitting is to find a mathematical model that fits the spectral lines. It is assumed that you have theoretical or experimental reasons for picking a function of a certain profile. The `peakfit` function finds the specific parameters which make that function match your data as closely as possible.
+Fitting of laser-induced breakdown spectroscopy (LIBS) spectral lines is
+very important for accurate quantitative analysis. As such, the
+Gaussian, Lorentzian and Voigt profile functions are often used to fit
+these spectral lines. The idea of curve fitting is to find a
+mathematical model that fits the spectral lines. It is assumed that you
+have theoretical or experimental reasons for picking a function of a
+certain profile. The `peakfit` function finds the specific parameters
+which make that function match your data as closely as possible.
 
-The `peakfit` function uses the full width at half maximum (FWHM) version of the Gaussian function implemented in the `gaussian_func` function and is given by the following expression:
+The `peakfit` function uses the full width at half maximum (FWHM)
+version of the Gaussian function implemented in the `gaussian_func`
+function and is given by the following expression:
 
-`$$
-y = y_{o} + \frac{ A }{ w\sqrt\frac{\pi}{4ln(2)} } e(\frac{ -4ln(2)(x-x_{c})^{2} }{ w^{2} })
-`$$
+![](images/GaussianFun.png)
 
-The Lorentzian function implemented in the `lorentzian_func` function has a much wider tails than Gaussian function and is given by:
+The Lorentzian function implemented in the `lorentzian_func` function
+has a much wider tails than Gaussian function and is given by:
 
-`$$
-y = y_{o} + \frac{ 2A }{ \pi } \frac{ w }{ 4(x-x_{c})^{2} + {w}^{2} }
-`$$
+![](images/LorentzianFun.png)
 
-`peakfit` uses the Pseudo-Voigt function, `voigt_func`, which is an approximation of the Voigt function, defined as the convolution of Gaussian and Lorentzian function. Thus the Pseudo-Voigt function can be expressed as:
+`peakfit` uses the Pseudo-Voigt function, `voigt_func`, which is an
+approximation of the Voigt function, defined as the convolution of
+Gaussian and Lorentzian function. Thus the Pseudo-Voigt function can be
+expressed as:
 
-`$$
-y = y_{o} + (f_{L}*f_{G})(x) = y_{o} + A \frac{ 2ln(2) }{ \pi^{3/2} } \frac{ wL }{ wG } \int_{ -\infty }^{ \infty } \frac{ e^{-t^{2}} }{ (\sqrt ln(2)\frac{ wL }{ wG })^2+(\sqrt 4ln(2)\frac{ x-x_{c} }{ wG }-t)^2 } dt
-`$$
+![](images/VoigtFun.png)
 
-`peakfit` is based on the `minpack.lm::nlsLM` function that uses the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals. The search process involves starting with an initial guess at the parameters values.
+`peakfit` is based on the `minpack.lm::nlsLM` function that uses the
+Levenberg-Marquardt algorithm for searching the minimum value of the
+square of the sum of the residuals. The search process involves starting
+with an initial guess at the parameters values.
 
-Let's start with the fit of a single peak first. Here we want to fit separately the Ba II line at 455.40 nm, then the Ca I line at 422.67 nm, using the Gaussian profile `profile = "Gaussian"`.The Gaussian profile was chosen because we expect to have a relatively large spectral linewidth due to the measurement conditions. Moreover, `wG` and `A` are our initial guess and are respectively the Gaussian FWHM and peak area. There are two ways to limit the wavelength range of data for a given fit. You can set the range of data of interest before using the `peakfit` function, or you can use the arguments `wlgth.min` and `wlgth.max` for setting up the wavelength range. Note that you can give a value to one or both of the arguments.
+Let's start with the fit of a single peak first. Here we want to fit
+separately the Ba II line at 455.40 nm, then the Ca I line at 422.67 nm,
+using the Gaussian profile `profile = "Gaussian"`.The Gaussian profile
+was chosen because we expect to have a relatively large spectral
+linewidth due to the measurement conditions. Moreover, `wG` and `A` are
+our initial guess and are respectively the Gaussian FWHM and peak area.
+There are two ways to limit the wavelength range of data for a given
+fit. You can set the range of data of interest before using the
+`peakfit` function, or you can use the arguments `wlgth.min` and
+`wlgth.max` for setting up the wavelength range. Note that you can give
+a value to one or both of the arguments.
 
 ```{r message=FALSE, warning=FALSE}
 Ba455_fit <- corrected_spec %>% 
@@ -173,26 +205,42 @@ Ca422_fit <- corrected_spec %>%
   peakfit(profile = "Gaussian", wG = 1, A = 15000, wlgth.min = 421.65, wlgth.max = 424.30)
 ```
 
-After a successful fit, you can get a variety of results such as the location of the peak, the height, the area and FWHM for each peak, as well as the basic fitted coefficients and estimates of errors for each quantity. The `peakfit` function returns a list containing data stored in `augmented` and in `tidied`. For instance, using results from the Ba line fitting, we can see that `augmented` contains the original data `x` (wavelength) and `y` (intensity) and the fitted results `.fitted` along with the corresponding residuals `.resid`.  
+After a successful fit, you can get a variety of results such as the
+location of the peak, the height, the area and FWHM for each peak, as
+well as the basic fitted coefficients and estimates of errors for each
+quantity. The `peakfit` function returns a list containing data stored
+in `augmented` and in `tidied`. For instance, using results from the Ba
+line fitting, we can see that `augmented` contains the original data `x`
+(wavelength) and `y` (intensity) and the fitted results `.fitted` along
+with the corresponding residuals `.resid`.
 
 ```{r}
 Ba455_fit %>% pluck("augmented")
 ```
 
-While `tidied` contains the estimated parameters (FWHM, peak height, and area for fitted peak).
+While `tidied` contains the estimated parameters (FWHM, peak height, and
+area for fitted peak).
 
 ```{r}
 Ba455_fit %>% pluck("tidied")
 ```
 
-Thus, using the `plotFit` function, we can plot the obtained results, since a picture is worth a thousand words. Individual peaks, the overall fit and baseline are included on the plot. The residuals plot (at the bottom) is very handy in deciding whether the fit is good or whether there may be additional peaks lurking in the data. In the result shown below the residuals are just noise indicating a good fit.
+Thus, using the `plotFit` function, we can plot the obtained results,
+since a picture is worth a thousand words. Individual peaks, the overall
+fit and baseline are included on the plot. The residuals plot (at the
+bottom) is very handy in deciding whether the fit is good or whether
+there may be additional peaks lurking in the data. In the result shown
+below the residuals are just noise indicating a good fit.
 
 ```{r}
 plotFit(data = Ba455_fit, title = "Ba II 455.40 nm") | 
   plotFit(data = Ca422_fit, title = "Ca I 422.67 nm")
 ```
 
-In fact, we should rather look at the Voigt profile, especially if we want to have an accurate measurement of the FWHM of the emission lines. In this case, the `wL` estimate provides the FWHM of the spectral lines while the `wG` estimate provides the instrumental broadening.   
+In fact, we should rather look at the Voigt profile, especially if we
+want to have an accurate measurement of the FWHM of the emission lines.
+In this case, the `wL` estimate provides the FWHM of the spectral lines
+while the `wG` estimate provides the instrumental broadening.
 
 ```{r message=FALSE, warning=FALSE}
 Ba455_fit2 <- corrected_spec %>% 
@@ -204,7 +252,8 @@ Ca422_fit2 <- corrected_spec %>%
   peakfit(profile = "Voigt", wL = 0.1, wG = 0.9, A = 15000, wlgth.min = 421.65, wlgth.max = 424.30)
 ```
 
-We can see below that, as expected, Gaussian broadening accounts for most of the observed broadening of the 455.50 nm Ba emission line.  
+We can see below that, as expected, Gaussian broadening accounts for
+most of the observed broadening of the 455.50 nm Ba emission line.
 
 ```{r}
 Ba455_fit2 %>% pluck("tidied")
@@ -217,42 +266,7 @@ plotFit(data = Ba455_fit2, title = "Ba II 455.40 nm") |
 
 ### Multi-peak fitting
 
-On the other hand, it may sometimes be more advisable to fit multiple peaks at the same time, especially when they overlap. Here, the `multipeakfit` function is used. You can fit all peaks with same fitting function or fit each peak with a different peak function.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+On the other hand, it may sometimes be more advisable to fit multiple
+peaks at the same time, especially when they overlap. Here, the
+`multipeakfit` function is used. You can fit all peaks with same fitting
+function or fit each peak with a different peak function.

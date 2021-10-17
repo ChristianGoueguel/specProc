@@ -1,0 +1,30 @@
+\documentclass{article}
+\begin{document}
+
+Gaussian function:
+
+\begin{equation}
+  y = y_{o} + \frac{ A }{ w\sqrt\frac{\pi}{4ln(2)} } e(\frac{ -4ln(2)(x-x_{c})^{2} }{ w^{2} })
+\end{equation}
+
+\vspace{3cm}
+
+Lorentzian function:
+
+\begin{equation}
+  y = y_{o} + \frac{ 2A }{ \pi } \frac{ w }{ 4(x-x_{c})^{2} + {w}^{2} }
+\end{equation}
+
+\vspace{3cm}
+
+Pseudo-Voigt function:
+
+\begin{equation}
+  y = y_{o} + (f_{L}*f_{G})(x)
+\end{equation}
+
+\begin{equation}
+  y = y_{o} + A \frac{ 2ln(2) }{ \pi^{3/2} } \frac{ wL }{ wG } \int_{ -\infty }^{ \infty } \frac{ e^{-t^{2}} }{ (\sqrt ln(2)\frac{ wL }{ wG })^2+(\sqrt 4ln(2)\frac{ x-x_{c} }{ wG }-t)^2 } dt
+\end{equation}
+
+\end{document}
