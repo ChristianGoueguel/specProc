@@ -94,6 +94,8 @@ Ca_Mn_spec %>%
   annotate("text", x = 491, y = 1.5e4, angle = 90, size = 2, label = "Ba II 493.41 nm")
 ```
 
+Note that we used the ggplot-based `plotSpec` function to generate the above plot.
+
 ### Baseline removal
 
 When analyzing LIBS spectra, it is often more effective to subtract an
@@ -118,7 +120,8 @@ background <- baseline_fit %>% pluck("bkg")
 corrected_spec <- baseline_fit %>% pluck("spec")
 ```
 
-<<<<<<< HEAD
+And then visualize the spectrum before and after baseline removal. 
+
 ```{r fig.height=3, message=FALSE, warning=FALSE}
 Ca_Mn_spec %>% 
   plotSpec() + 
@@ -134,32 +137,6 @@ Ca_Mn_spec %>%
   geom_hline(yintercept = 0, colour = "red")
 ```
 
-=======
-```{r include=FALSE}
-background %<>% 
-  pivot_longer(
-    cols = everything(), 
-    names_to = "wavelength", 
-    values_to = "intensity"
-    ) %>%
-  modify_at("wavelength", as.numeric)
-```
-
-```{r message=FALSE, warning=FALSE, include=FALSE}
-plot1 <- Ca_Mn_spec %>%
-  plotSpec() +
-  geom_line(data = background, aes(x = wavelength, y = intensity), colour = "red")
-
-plot2 <-corrected_spec %>% 
-  plotSpec() +
-  geom_hline(yintercept = 0, colour = "red")
-```
-
-```{r echo=FALSE, fig.height=3, message=FALSE, warning=FALSE}
-plot1 | plot2
-```
-
->>>>>>> d4dd2d6e82ee3a2cb6b39c7422237ff77284effa
 ### Peak fitting
 
 Fitting of laser-induced breakdown spectroscopy (LIBS) spectral lines is very important for accurate quantitative analysis. As such, the Gaussian, Lorentzian and Voigt profile functions are often used to fit these spectral lines. The idea of curve fitting is to find a mathematical model that fits the spectral lines. It is assumed that you have theoretical or experimental reasons for picking a function of a certain profile. The `peakfit` function finds the specific parameters which make that function match your data as closely as possible. 
@@ -223,11 +200,6 @@ plotFit(data = Ba455_fit2, title = "Ba II 455.40 nm") |
 ### Multi-peak fitting
 
 On the other hand, it may sometimes be more advisable to fit multiple peaks at the same time, especially when they overlap. Here, the `multipeakfit` function is used. You can fit all peaks with same fitting function or fit each peak with a different peak function.
-<<<<<<< HEAD
-
-
-=======
->>>>>>> d4dd2d6e82ee3a2cb6b39c7422237ff77284effa
 
 
 
