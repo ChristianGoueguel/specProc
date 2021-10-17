@@ -150,6 +150,29 @@ have theoretical or experimental reasons for picking a function of a
 certain profile. The `peakfit` function finds the specific parameters
 which make that function match your data as closely as possible.
 
+The `peakfit` function uses the full width at half maximum (FWHM)
+version of the Gaussian function implemented in the `gaussian_func`
+function and is given by the following expression:
+
+$$
+y=y\_{o}+\\frac{A}{w\\sqrt\\frac{\\pi}{4ln(2)}}e(\\frac{-4ln(2)(x-x\_{c})^{2}}{w^{2}})
+$$
+
+The Lorentzian function implemented in the `lorentzian_func` function
+has a much wider tails than Gaussian function and is given by:
+
+$$
+y=y\_{o}+\\frac{2A}{pi}\\frac{w}{4(x-x\_{c})^{2}+{w}^{2}}
+$$
+`peakfit` uses the Pseudo-Voigt function, `voigt_func`, which is an
+approximation of the Voigt function, defined as the convolution of
+Gaussian and Lorentzian function. Thus the Pseudo-Voigt function can be
+expressed as:
+
+$$
+y=y\_{o}+(f\_{L}\*f\_{G})(x)=y\_{o}+A\\frac{2ln(2)}{\\pi^{3/2}}\\frac{wL}{wG}\\int\_{-\\infty}^{\\infty}\\frac{e^{-t^{2}}}{(\\sqrt ln(2)\\frac{wL}{wG})^2+(\\sqrt 4ln(2)\\frac{x-x\_{c}}{wG}-t)^2}dt
+$$
+
 `peakfit` is based on the `minpack.lm::nlsLM` function that uses the
 Levenberg-Marquardt algorithm for searching the minimum value of the
 square of the sum of the residuals. The search process involves starting
@@ -160,12 +183,12 @@ separately the Ba II line at 455.40 nm, then the Ca I line at 422.67 nm,
 using the Gaussian profile `profile = "Gaussian"`.The Gaussian profile
 was chosen because we expect to have a relatively large spectral
 linewidth due to the measurement conditions. Moreover, `wG` and `A` are
-our initial guess and are respectively the Gaussian full width at half
-maximum (FWHM) and peak area. There are two ways to limit the wavelength
-range of data for a given fit. You can set the range of data of interest
-before using the `peakfit` function, or you can use the arguments
-`wlgth.min` and `wlgth.max` for setting up the wavelength range. Note
-that you can give a value to one or both of the arguments.
+our initial guess and are respectively the Gaussian FWHM and peak area.
+There are two ways to limit the wavelength range of data for a given
+fit. You can set the range of data of interest before using the
+`peakfit` function, or you can use the arguments `wlgth.min` and
+`wlgth.max` for setting up the wavelength range. Note that you can give
+a value to one or both of the arguments.
 
 ``` r
 Ba455_fit <- corrected_spec %>% 
@@ -212,12 +235,12 @@ area for fitted peak).
 Ba455_fit %>% pluck("tidied")
 #> [[1]]
 #> # A tibble: 4 × 5
-#>   term   estimate std.error statistic  p.value
-#>   <chr>     <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 y0     3528.    161.           22.0 1.88e-14
-#> 2 xc      456.      0.00346  131523.  2.65e-82
-#> 3 wG        0.884   0.0101       87.7 3.80e-25
-#> 4 A     29869.    426.           70.1 2.15e-23
+#>   term  estimate std.error statistic  p.value
+#>   <chr>    <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 y0     3528.   161.           22.0 1.88e-14
+#> 2 xc      456.     0.00346  131523.  2.65e-82
+#> 3 wG        1.04   0.0119       87.7 3.80e-25
+#> 4 A     29869.   426.           70.1 2.15e-23
 ```
 
 Thus, using the `plotFit` function, we can plot the obtained results,
