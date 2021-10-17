@@ -3,6 +3,12 @@
 
 <img src='man/figures/logo.png' align="right" height="250" />
 
+<script src="//yihui.org/js/math-code.js"></script>
+<!-- Just one possible MathJax CDN below. You may use others. -->
+<script async
+  src="//mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
 # specProc
 
 <!-- badges: start -->
@@ -154,24 +160,19 @@ The `peakfit` function uses the full width at half maximum (FWHM)
 version of the Gaussian function implemented in the `gaussian_func`
 function and is given by the following expression:
 
-$$
-y=y\_{o}+\\frac{A}{w\\sqrt\\frac{\\pi}{4ln(2)}}e(\\frac{-4ln(2)(x-x\_{c})^{2}}{w^{2}})
-$$
+`$$ y = y_{o} + \frac{ A }{ w\sqrt\frac{\pi}{4ln(2)} } e(\frac{ -4ln(2)(x-x_{c})^{2} }{ w^{2} })`$$
 
 The Lorentzian function implemented in the `lorentzian_func` function
 has a much wider tails than Gaussian function and is given by:
 
-$$
-y=y\_{o}+\\frac{2A}{pi}\\frac{w}{4(x-x\_{c})^{2}+{w}^{2}}
-$$
+`$$ y = y_{o} + \frac{ 2A }{ \pi } \frac{ w }{ 4(x-x_{c})^{2} + {w}^{2} }`$$
+
 `peakfit` uses the Pseudo-Voigt function, `voigt_func`, which is an
 approximation of the Voigt function, defined as the convolution of
 Gaussian and Lorentzian function. Thus the Pseudo-Voigt function can be
 expressed as:
 
-$$
-y=y\_{o}+(f\_{L}\*f\_{G})(x)=y\_{o}+A\\frac{2ln(2)}{\\pi^{3/2}}\\frac{wL}{wG}\\int\_{-\\infty}^{\\infty}\\frac{e^{-t^{2}}}{(\\sqrt ln(2)\\frac{wL}{wG})^2+(\\sqrt 4ln(2)\\frac{x-x\_{c}}{wG}-t)^2}dt
-$$
+`$$ y = y_{o} + (f_{L}*f_{G})(x) = y_{o} + A \frac{ 2ln(2) }{ \pi^{3/2} } \frac{ wL }{ wG } \int_{ -\infty }^{ \infty } \frac{ e^{-t^{2}} }{ (\sqrt ln(2)\frac{ wL }{ wG })^2+(\sqrt 4ln(2)\frac{ x-x_{c} }{ wG }-t)^2 } dt`$$
 
 `peakfit` is based on the `minpack.lm::nlsLM` function that uses the
 Levenberg-Marquardt algorithm for searching the minimum value of the
