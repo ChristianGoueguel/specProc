@@ -78,16 +78,14 @@ library(patchwork)
 
 The plot below shows a typical LIBS spectrum. Prominent atomic and ionic emission lines of Ca, Mn and Ba were identified using the [NIST spectral lines database](https://www.nist.gov/pml/atomic-spectra-database). The spectrum show emission lines of Ca II 393.37 nm, Ca II 396.85 nm and Ca I 422.67 nm, unresolved Mn triplet at 403.08, 403.31 and 403.45 nm, and Ba ionic lines at 455.40 and 493.41 nm.
 
-```{r include=FALSE}
+```{r}
 data("Ca_Mn_spec")
 ```
 
-```{r include=FALSE}
-plot1 <- plotSpec(Ca_Mn_spec) + theme_classic(base_size = 8)
-```
-
-```{r echo=FALSE, fig.height=2, fig.width=4}
-plot1 +
+```{r fig.height=2, fig.width=4}
+Ca_Mn_spec %>% 
+  plotSpec() + 
+  theme_classic(base_size = 8) +
   annotate("text", x = 391, y = 4.2e4, angle = 90, size = 2, label = "Ca II 393.37 nm") +
   annotate("text", x = 396, y = 3e4, angle = 90, size = 2, label = "Ca II 396.85 nm") +
   annotate("text", x = 401, y = 3.8e4, angle = 90, size = 2, label = "Mn I 403-nm") +
@@ -120,40 +118,28 @@ background <- baseline_fit %>% pluck("bkg")
 corrected_spec <- baseline_fit %>% pluck("spec")
 ```
 
-```{r include=FALSE}
-background %<>% 
-  pivot_longer(
-    cols = everything(), 
-    names_to = "wavelength", 
-    values_to = "intensity"
-    ) %>%
-  modify_at("wavelength", as.numeric)
-```
-
-```{r message=FALSE, warning=FALSE, include=FALSE}
-plot2 <- Ca_Mn_spec %>%
-  plotSpec() +
-  geom_line(data = background, aes(x = wavelength, y = intensity), colour = "red")
-
-plot3 <-corrected_spec %>% 
-  plotSpec() +
+```{r fig.height=3, message=FALSE, warning=FALSE}
+Ca_Mn_spec %>% 
+  plotSpec() + 
+  geom_line(
+    data = background %>% 
+      pivot_longer(cols = everything(), names_to = "wavelength", values_to = "intensity") %>%
+      modify_at("wavelength", as.numeric), 
+    aes(x = wavelength, y = intensity), 
+    colour = "red"
+    ) | 
+  corrected_spec %>% 
+  plotSpec() + 
   geom_hline(yintercept = 0, colour = "red")
-```
-
-```{r echo=FALSE, fig.height=3, message=FALSE, warning=FALSE}
-plot2 | plot3
 ```
 
 ### Peak fitting
 
-Fitting of laser-induced breakdown spectroscopy (LIBS) spectral lines is
-very important for accurate quantitative analysis. As such, the
-Gaussian, Lorentzian and Voigt profile functions are often used to fit
-these spectral lines. The idea of curve fitting is to find a mathematical model that fits the spectral lines. It is assumed that you have theoretical or experimental reasons for picking a function of a certain profile. The `peakfit` function finds the specific parameters which make that function match your data as closely as possible. 
+Fitting of laser-induced breakdown spectroscopy (LIBS) spectral lines is very important for accurate quantitative analysis. As such, the Gaussian, Lorentzian and Voigt profile functions are often used to fit these spectral lines. The idea of curve fitting is to find a mathematical model that fits the spectral lines. It is assumed that you have theoretical or experimental reasons for picking a function of a certain profile. The `peakfit` function finds the specific parameters which make that function match your data as closely as possible. 
 
 `peakfit` is based on the `minpack.lm::nlsLM` function that uses the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals. The search process involves starting with an initial guess at the parameters values.
 
-Let's start with the fit of a single peak first. Here we want to fit separately the Ba II line at 455.40 nm, then the Ca I line at 422.67 nm, using the Gaussian profile `profile = "Gaussian"`.The Gaussian profile was chosen because we expect to have a relatively large spectral linewidth due to the measurement conditions. Moreover, `wG` and `A` are our initial guess and are respectively the Gaussian full width at half maximum (FWHM) and peak area. There are two ways to limit the wavelength range of data for a given fit. You can set the range of data of interest before using the `peakfit` function, or you can use the arguments `wlgth.min` and `wlgth.max` for setting up the wavelength range.
+Let's start with the fit of a single peak first. Here we want to fit separately the Ba II line at 455.40 nm, then the Ca I line at 422.67 nm, using the Gaussian profile `profile = "Gaussian"`.The Gaussian profile was chosen because we expect to have a relatively large spectral linewidth due to the measurement conditions. Moreover, `wG` and `A` are our initial guess and are respectively the Gaussian full width at half maximum (FWHM) and peak area. There are two ways to limit the wavelength range of data for a given fit. You can set the range of data of interest before using the `peakfit` function, or you can use the arguments `wlgth.min` and `wlgth.max` for setting up the wavelength range. Note that you can give a value to one or both of the arguments.
 
 ```{r message=FALSE, warning=FALSE}
 Ba455_fit <- corrected_spec %>% 
@@ -177,7 +163,7 @@ While `tidied` contains the estimated parameters (FWHM, peak height, and area fo
 Ba455_fit %>% pluck("tidied")
 ```
 
-Thus we can plot the obtained results, since a picture is worth a thousand words. Individual peaks, the overall fit and baseline are included on the plot. The residuals plot (at the bottom) is very handy in deciding whether the fit is good or whether there may be additional peaks lurking in the data. In the result shown below the residuals are just noise indicating a good fit.
+Thus, using the `plotFit` function, we can plot the obtained results, since a picture is worth a thousand words. Individual peaks, the overall fit and baseline are included on the plot. The residuals plot (at the bottom) is very handy in deciding whether the fit is good or whether there may be additional peaks lurking in the data. In the result shown below the residuals are just noise indicating a good fit.
 
 ```{r}
 plotFit(data = Ba455_fit, title = "Ba II 455.40 nm") | 
@@ -210,7 +196,7 @@ plotFit(data = Ba455_fit2, title = "Ba II 455.40 nm") |
 
 ### Multi-peak fitting
 
-On the other hand, it may sometimes be more advisable to fit multiple peaks at the same time. Here, the `multipeakfit` function is used.
+On the other hand, it may sometimes be more advisable to fit multiple peaks at the same time, especially when they overlap. Here, the `multipeakfit` function is used. You can fit all peaks with same fitting function or fit each peak with a different peak function.
 
 
 

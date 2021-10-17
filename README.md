@@ -54,7 +54,23 @@ spectrum show emission lines of Ca II 393.37 nm, Ca II 396.85 nm and Ca
 I 422.67 nm, unresolved Mn triplet at 403.08, 403.31 and 403.45 nm, and
 Ba ionic lines at 455.40 and 493.41 nm.
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
+``` r
+data("Ca_Mn_spec")
+```
+
+``` r
+Ca_Mn_spec %>% 
+  plotSpec() + 
+  theme_classic(base_size = 8) +
+  annotate("text", x = 391, y = 4.2e4, angle = 90, size = 2, label = "Ca II 393.37 nm") +
+  annotate("text", x = 396, y = 3e4, angle = 90, size = 2, label = "Ca II 396.85 nm") +
+  annotate("text", x = 401, y = 3.8e4, angle = 90, size = 2, label = "Mn I 403-nm") +
+  annotate("text", x = 420, y = 3.5e4, angle = 90, size = 2, label = "Ca I 422.67 nm") +
+  annotate("text", x = 453, y = 3e4, angle = 90, size = 2, label = "Ba II 455.40 nm") +
+  annotate("text", x = 491, y = 1.5e4, angle = 90, size = 2, label = "Ba II 493.41 nm")
+```
+
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="90%" height="90%" />
 
 ### Baseline removal
 
@@ -101,7 +117,22 @@ background <- baseline_fit %>% pluck("bkg")
 corrected_spec <- baseline_fit %>% pluck("spec")
 ```
 
-<img src="man/figures/README-unnamed-chunk-13-1.png" width="90%" height="90%" />
+``` r
+Ca_Mn_spec %>% 
+  plotSpec() + 
+  geom_line(
+    data = background %>% 
+      pivot_longer(cols = everything(), names_to = "wavelength", values_to = "intensity") %>%
+      modify_at("wavelength", as.numeric), 
+    aes(x = wavelength, y = intensity), 
+    colour = "red"
+    ) | 
+  corrected_spec %>% 
+  plotSpec() + 
+  geom_hline(yintercept = 0, colour = "red")
+```
+
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="90%" height="90%" />
 
 ### Peak fitting
 
@@ -128,7 +159,8 @@ our initial guess and are respectively the Gaussian full width at half
 maximum (FWHM) and peak area. There are two ways to limit the wavelength
 range of data for a given fit. You can set the range of data of interest
 before using the `peakfit` function, or you can use the arguments
-`wlgth.min` and `wlgth.max` for setting up the wavelength range.
+`wlgth.min` and `wlgth.max` for setting up the wavelength range. Note
+that you can give a value to one or both of the arguments.
 
 ``` r
 Ba455_fit <- corrected_spec %>% 
@@ -183,19 +215,19 @@ Ba455_fit %>% pluck("tidied")
 #> 4 A     29869.    426.           70.1 2.15e-23
 ```
 
-Thus we can plot the obtained results, since a picture is worth a
-thousand words. Individual peaks, the overall fit and baseline are
-included on the plot. The residuals plot (at the bottom) is very handy
-in deciding whether the fit is good or whether there may be additional
-peaks lurking in the data. In the result shown below the residuals are
-just noise indicating a good fit.
+Thus, using the `plotFit` function, we can plot the obtained results,
+since a picture is worth a thousand words. Individual peaks, the overall
+fit and baseline are included on the plot. The residuals plot (at the
+bottom) is very handy in deciding whether the fit is good or whether
+there may be additional peaks lurking in the data. In the result shown
+below the residuals are just noise indicating a good fit.
 
 ``` r
 plotFit(data = Ba455_fit, title = "Ba II 455.40 nm") | 
   plotFit(data = Ca422_fit, title = "Ca I 422.67 nm")
 ```
 
-<img src="man/figures/README-unnamed-chunk-18-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-15-1.png" width="90%" height="90%" />
 
 In fact, we should rather look at the Voigt profile, especially if we
 want to have an accurate measurement of the FWHM of the emission lines.
@@ -233,9 +265,11 @@ plotFit(data = Ba455_fit2, title = "Ba II 455.40 nm") |
   plotFit(data = Ca422_fit2, title = "Ca I 422.67 nm")
 ```
 
-<img src="man/figures/README-unnamed-chunk-22-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-19-1.png" width="90%" height="90%" />
 
 ### Multi-peak fitting
 
 On the other hand, it may sometimes be more advisable to fit multiple
-peaks at the same time. Here, the `multipeakfit` function is used.
+peaks at the same time, especially when they overlap. Here, the
+`multipeakfit` function is used. You can fit all peaks with same fitting
+function or fit each peak with a different peak function.
