@@ -9,15 +9,15 @@ voigt_func(x, y0, xc, wG, wL, A)
 \arguments{
 \item{x}{data}
 
-\item{y0}{offset}
+\item{y0}{baseline offset}
 
-\item{xc}{center}
+\item{xc}{center of the peak}
 
-\item{wG}{Gaussian full width at half maximum (FWHM)}
+\item{wG}{Gaussian FWHM}
 
-\item{wL}{Lorentzian full width at half maximum (FWHM)}
+\item{wL}{Lorentzian FWHM}
 
-\item{A}{area}
+\item{A}{area under the peak}
 }
 \value{
 fitted value
