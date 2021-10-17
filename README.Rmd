@@ -1,6 +1,5 @@
 ---
 output: github_document
-pandoc_args: "--webtex"
 editor_options: 
   markdown: 
     wrap: 72
@@ -9,14 +8,6 @@ editor_options:
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 <img src='man/figures/logo.png' align="right" height="250" />
-
-
-<script src="//yihui.org/js/math-code.js"></script>
-<!-- Just one possible MathJax CDN below. You may use others. -->
-<script async
-  src="//mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
-
 
 
 ```{r, include = FALSE}
