@@ -117,6 +117,8 @@ background <- baseline_fit %>% pluck("bkg")
 corrected_spec <- baseline_fit %>% pluck("spec")
 ```
 
+\<\<\<\<\<\<\< HEAD
+
 ``` r
 Ca_Mn_spec %>% 
   plotSpec() + 
@@ -134,7 +136,11 @@ Ca_Mn_spec %>%
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="90%" height="90%" />
 
-### Peak fitting
+=======
+
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="90%" height="90%" />
+
+> > > > > > > d4dd2d6e82ee3a2cb6b39c7422237ff77284effa ### Peak fitting
 
 Fitting of laser-induced breakdown spectroscopy (LIBS) spectral lines is
 very important for accurate quantitative analysis. As such, the
@@ -227,7 +233,7 @@ plotFit(data = Ba455_fit, title = "Ba II 455.40 nm") |
   plotFit(data = Ca422_fit, title = "Ca I 422.67 nm")
 ```
 
-<img src="man/figures/README-unnamed-chunk-15-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-18-1.png" width="90%" height="90%" />
 
 In fact, we should rather look at the Voigt profile, especially if we
 want to have an accurate measurement of the FWHM of the emission lines.
@@ -265,11 +271,14 @@ plotFit(data = Ba455_fit2, title = "Ba II 455.40 nm") |
   plotFit(data = Ca422_fit2, title = "Ca I 422.67 nm")
 ```
 
-<img src="man/figures/README-unnamed-chunk-19-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-22-1.png" width="90%" height="90%" />
 
 ### Multi-peak fitting
 
 On the other hand, it may sometimes be more advisable to fit multiple
 peaks at the same time, especially when they overlap. Here, the
 `multipeakfit` function is used. You can fit all peaks with same fitting
-function or fit each peak with a different peak function.
+function or fit each peak with a different peak function. \<\<\<\<\<\<\<
+HEAD
+
+======= \>\>\>\>\>\>\> d4dd2d6e82ee3a2cb6b39c7422237ff77284effa
