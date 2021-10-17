@@ -282,7 +282,9 @@ FWHM. Or we can compute the *k* parameter that describe the “gaussness”
 or “lorentzness” of a Voigt profile. A value of 0 means a pure
 lorentzian profile and of 1 means a pure Gaussian profile.
 
+<p align="center">
 <img src="images/MixingParam-01.png" width="129"/>
+</p>
 
 As expected, both methods show that Gaussian broadening accounts for
 most of the observed broadening of the 455.50 nm Ba emission line.
