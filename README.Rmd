@@ -289,3 +289,6 @@ On the other hand, it may sometimes be more advisable to fit multiple
 peaks at the same time, especially when they overlap. Here, the
 `multipeakfit` function is used. You can fit all peaks with same fitting
 function or fit each peak with a different peak function.
+
+
+
