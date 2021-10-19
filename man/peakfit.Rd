@@ -11,7 +11,8 @@ peakfit(
   wG = NULL,
   A = NULL,
   wlgth.min = NULL,
-  wlgth.max = NULL
+  wlgth.max = NULL,
+  id = NULL
 )
 }
 \arguments{
@@ -23,11 +24,13 @@ peakfit(
 
 \item{wG}{Gaussian full width at half maximum (initial guess)}
 
-\item{A}{Area (initial guess)}
+\item{A}{Peak area (initial guess)}
 
 \item{wlgth.min}{Lower bound of the wavelength subset}
 
 \item{wlgth.max}{Upper bound of the wavelength subset}
+
+\item{id}{spectra identification (optional)}
 }
 \value{
 Fitted value and the estimated parameters along with the corresponding errors
