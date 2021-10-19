@@ -283,12 +283,34 @@ given by the following expression:
 As expected, both methods show that Gaussian broadening accounts for
 most of the observed broadening of the 455.50 nm Ba emission line.
 
-### Multi-peak fitting
 
-On the other hand, it may sometimes be more advisable to fit multiple
-peaks at the same time, especially when they overlap. Here, the
-`multipeakfit` function is used. You can fit all peaks with same fitting
-function or fit each peak with a different peak function.
+
+```{r}
+data("cranbSpec")
+```
+
+```{r}
+bc_cranbSpec <- cranbSpec %>%
+  baselinerm(degree = 7) %>%
+  pluck("spec") %>%
+  bind_cols(select(cranbSpec, spectra_id), .)
+```
+
+```{r}
+bc_cranbSpec %>% plotSpec(id = "spectra_id")
+```
+
+
+
+
+### Multiple peaks fitting
+
+On the other hand, it may sometimes be more advisable to fit multiple 
+peaks at the same time, especially when they overlap. The `multipeakfit` 
+function is used. The function has as input a vector of selection of multiple 
+peaks center `peaks.center` from your spectrum data and then fit them with the `peakfit` 
+function. You can fit all peaks with same fitting function or fit each 
+peak with a different profile function.
 
 
 
