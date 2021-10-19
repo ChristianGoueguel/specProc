@@ -156,7 +156,7 @@ version of the Gaussian function implemented in `gaussian_func` and
 given by the following expression:
 
 <p align="center">
-<img src="images/GaussianFun.png" width="340"/>
+<img src="images/GaussianFun.png" width="269"/>
 </p>
 
 The Lorentzian function implemented in `lorentzian_func` has a much
