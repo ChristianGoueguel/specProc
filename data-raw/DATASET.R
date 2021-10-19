@@ -4,10 +4,12 @@ Ca_Mn_spec <-
   dplyr::select(x, y0) %>%
   tidyr::pivot_wider(names_from = x, values_from = y0)
 
-Mg_spec <-
-  readr::read_csv("~/Documents/Packages/LIBSdata/Mg_spec.csv") %>%
-  dplyr::select(x2, y02) %>%
-  tidyr::pivot_wider(names_from = x2, values_from = y02)
+DT <-
+  data.table::fread(input = "~/Documents/GitHub/cranbSpec.csv") %>%
+  select(-c(qr_code:carrousel_id, replicate:timestamp)) %>%
+  modify_at("spectra_id", as_factor)
+
+cranbSpec <- DT[ ,lapply(.SD, mean), by = spectra_id] %>% as_tibble()
 
 usethis::use_data(Ca_Mn_spec, overwrite = TRUE)
-usethis::use_data(Mg_spec, overwrite = TRUE)
+usethis::use_data(cranbSpec, overwrite = TRUE)
