@@ -1,7 +1,7 @@
 
 
 
-multipeakfit <- function(profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL) {
+multipeakfit <- function(peaks.center, profile, wlgth.min = NULL, wlgth.max = NULL) {
 
   if (length(data) == 0 & is.null(data) == TRUE) {
     stop("Apparently you forgot to provide the spectra.")
@@ -64,6 +64,12 @@ multipeakfit <- function(profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlgt
       purrr::modify_at("x", as.numeric) %>%
       dplyr::filter(x >= wlgth.min & x <= wlgth.max)
   }
+
+
+
+
+
+
 
   if (profile == "Lorentzian") {
     peakfit(data = df, profile = "Lorentzian", wL = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL)

@@ -52,7 +52,6 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
     p <- X %>%
       ggplot2::ggplot(ggplot2::aes_string("wavelength", "intensity")) +
       ggplot2::geom_line(ggplot2::aes(colour = id, group = id)) +
-      ggplot2::scale_colour_gradient(low = "blue", high = "red") +
       ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
       ggplot2::theme_classic() +
       ggplot2::theme(legend.position = "none", axis.line = ggplot2::element_line(colour = "grey50", size = 1))
