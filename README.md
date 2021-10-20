@@ -32,6 +32,9 @@ are essential tools in LIBS calibration modeling. These include:
 -   Pearson or Spearman peaks correlation
 -   Descriptive statistics such as mean, standard deviation and higher
     central moments
+-   Skewness-adjusted boxplot
+-   NIST interactive plot of LIBS emission lines
+-   etc.
 
 ## Installation
 
@@ -108,14 +111,14 @@ and the other for the fitted baseline `bkg`.
 ``` r
 str(baseline_fit, list.len = 5) 
 #> List of 2
-#>  $ spec: tibble [1 × 808] (S3: tbl_df/tbl/data.frame)
+#>  $ spec: tibble [1 x 808] (S3: tbl_df/tbl/data.frame)
 #>   ..$ 390.03027: num 131
 #>   ..$ 390.1666 : num 10.5
 #>   ..$ 390.30292: num 0
 #>   ..$ 390.43921: num 129
 #>   ..$ 390.57553: num 197
 #>   .. [list output truncated]
-#>  $ bkg : tibble [1 × 808] (S3: tbl_df/tbl/data.frame)
+#>  $ bkg : tibble [1 x 808] (S3: tbl_df/tbl/data.frame)
 #>   ..$ 390.03027: num 13831
 #>   ..$ 390.1666 : num 13864
 #>   ..$ 390.30292: num 13897
@@ -225,7 +228,7 @@ with the corresponding residuals `.resid`.
 ``` r
 Ba455_fit %>% pluck("augmented")
 #> [[1]]
-#> # A tibble: 22 × 4
+#> # A tibble: 22 x 4
 #>        x      y .fitted .resid
 #>    <dbl>  <dbl>   <dbl>  <dbl>
 #>  1  454.  3086.   3630. -544. 
@@ -238,7 +241,7 @@ Ba455_fit %>% pluck("augmented")
 #>  8  455. 16921.  16940.  -19.7
 #>  9  455. 22226.  21939.  287. 
 #> 10  455. 26762.  26507.  256. 
-#> # … with 12 more rows
+#> # ... with 12 more rows
 ```
 
 While `tidied` contains the estimated parameters (FWHM, peak height, and
@@ -247,7 +250,7 @@ area for fitted peak).
 ``` r
 Ba455_fit %>% pluck("tidied")
 #> [[1]]
-#> # A tibble: 4 × 5
+#> # A tibble: 4 x 5
 #>   term  estimate std.error statistic  p.value
 #>   <chr>    <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 y0     3528.   161.           22.0 1.88e-14
@@ -289,7 +292,7 @@ Ca422_fit2 <- corrected_spec %>%
 ``` r
 Ba455_fit2 %>% pluck("tidied")
 #> [[1]]
-#> # A tibble: 5 × 5
+#> # A tibble: 5 x 5
 #>   term   estimate  std.error statistic  p.value
 #>   <chr>     <dbl>      <dbl>     <dbl>    <dbl>
 #> 1 y0     2714.     755.           3.60 2.23e- 3
@@ -321,23 +324,6 @@ given by the following expression:
 As expected, both methods show that Gaussian broadening accounts for
 most of the observed broadening of the 455.50 nm Ba emission line.
 
-``` r
-data("cranbSpec")
-```
-
-``` r
-bc_cranbSpec <- cranbSpec %>%
-  baselinerm(degree = 7) %>%
-  pluck("spec") %>%
-  bind_cols(select(cranbSpec, spectra_id), .)
-```
-
-``` r
-bc_cranbSpec %>% plotSpec(id = "spectra_id")
-```
-
-<img src="man/figures/README-unnamed-chunk-22-1.png" width="90%" height="90%" />
-
 ### Multiple peaks fitting
 
 On the other hand, it may sometimes be more advisable to fit multiple
@@ -346,3 +332,10 @@ function is used. The function has as input a vector of selection of
 multiple peaks center `peaks.center` from your spectrum data and then
 fit them with the `peakfit` function. You can fit all peaks with same
 fitting function or fit each peak with a different profile function.
+
+#### Exemple
+
+Before going any further, we are going to give here a typical example in
+which we want to fit the Ca II 315.92 nm and Ca II 317.96 nm emission
+lines. These spectral lines were acquired from a hundred samples, and
+were identified by a unique name associated with each of the samples.
