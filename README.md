@@ -51,6 +51,12 @@ Loading `specProc` package.
 library(specProc)
 ```
 
+``` r
+ssh = suppressPackageStartupMessages
+ssh(library(tidyverse))
+library(patchwork)
+```
+
 ### LIBS spectrum in the 375–510 nm wavelength range
 
 The plot below shows a typical LIBS spectrum. Prominent atomic and ionic

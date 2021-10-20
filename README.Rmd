@@ -68,10 +68,9 @@ library(specProc)
 devtools::load_all()
 ```
 
-```{r include=FALSE}
+```{r}
 ssh = suppressPackageStartupMessages
 ssh(library(tidyverse))
-ssh(library(magrittr))
 library(patchwork)
 ```
 
