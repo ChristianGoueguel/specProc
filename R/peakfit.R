@@ -1,18 +1,19 @@
-#' @title Spectral Fitting
+#' @title Peak Fitting
 #' @author Christian L. Goueguel
 #' @description Fitting of spectroscopic peak by line shape functions with variable parameters.
 #' @details The function uses `minpack.lm::nlsLM`, which is based on the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals.
 #' @param data Data frame of emission spectra
-#' @param profile Line shape function: "Lorentzian", "Gaussian" or "Voigt"
-#' @param wL Lorentzian full width at half maximum (initial guess)
-#' @param wG Gaussian full width at half maximum (initial guess)
-#' @param A Peak area (initial guess)
-#' @param wlgth.min Lower bound of the wavelength subset
-#' @param wlgth.max Upper bound of the wavelength subset
-#' @param id spectra identification (optional)
+#' @param profile (character) Line shape function: "Lorentzian", "Gaussian" or "Voigt"
+#' @param wL (numeric) Lorentzian full width at half maximum (initial guess)
+#' @param wG (numeric) Gaussian full width at half maximum (initial guess)
+#' @param A (numeric) Peak area (initial guess)
+#' @param wlgth.min (numeric) Lower bound of the wavelength subset
+#' @param wlgth.max (numeric) Upper bound of the wavelength subset
+#' @param id Spectra name (optional)
+#' @param max.iter (numeric) Maximum number of iteration (200 by default)
 #' @return Fitted value and the estimated parameters along with the corresponding errors
 #' @export peakfit
-peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL, id = NULL) {
+peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL, id = NULL, max.iter = 200) {
 
   if (length(data) == 0 & is.null(data) == TRUE) {
     stop("Apparently you forgot to provide the spectra.")
@@ -24,6 +25,12 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
 
   if (profile != "Lorentzian" & profile != "Gaussian" & profile != "Voigt") {
     stop("The profile function must be Lorentzian, Gaussian or Voigt")
+  }
+
+  if (is.numeric(max.iter) == FALSE) {
+    stop("Maximum number of iteration must be numeric")
+  } else {
+    p <- as.numeric(max.iter)
   }
 
   if (is.null(id) == TRUE) {
@@ -67,15 +74,16 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
       wlgth.max <- as.numeric(wlgth.max)
       if (wlgth.min >= wlgth.max) {
         stop("wlgth.min must be strictly smaller than wlgth.max")
+      } else {
+        df <- data %>%
+          tidyr::pivot_longer(
+            cols = tidyr::everything(),
+            names_to = "x",
+            values_to = "y"
+          ) %>%
+          purrr::modify_at("x", as.numeric) %>%
+          dplyr::filter(x >= wlgth.min & x <= wlgth.max)
       }
-      df <- data %>%
-        tidyr::pivot_longer(
-          cols = tidyr::everything(),
-          names_to = "x",
-          values_to = "y"
-        ) %>%
-        purrr::modify_at("x", as.numeric) %>%
-        dplyr::filter(x >= wlgth.min & x <= wlgth.max)
     }
 
     if (profile == "Lorentzian") {
@@ -98,7 +106,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
                 wL = param1,
                 A = param2
               ),
-              control = minpack.lm::nls.lm.control(maxiter = 200),
+              control = minpack.lm::nls.lm.control(maxiter = p),
               lower = c(0, 0, 0, 0)
             )
           ),
@@ -107,7 +115,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         )
       return(fitpeak)
     }
-
     if(profile == "Gaussian") {
       if (is.null(wG) == FALSE & is.null(A) == FALSE) {
         param1 <- as.numeric(wG)
@@ -128,7 +135,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
                 wG = param1,
                 A = param2
               ),
-              control = minpack.lm::nls.lm.control(maxiter = 200),
+              control = minpack.lm::nls.lm.control(maxiter = p),
               lower = c(0, 0, 0, 0)
             )
           ),
@@ -137,7 +144,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         )
       return(fitpeak)
     }
-
     if(profile == "Voigt") {
       if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
         param1 <- as.numeric(wL)
@@ -160,7 +166,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
                 wG = param2,
                 A = param3
               ),
-              control = minpack.lm::nls.lm.control(maxiter = 200),
+              control = minpack.lm::nls.lm.control(maxiter = p),
               lower = c(0, 0, 0, 0, 0)
             )
           ),
