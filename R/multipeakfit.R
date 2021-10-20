@@ -126,8 +126,6 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
               tidied = purrr::map(fit, broom::tidy),
               augmented = purrr::map(fit, broom::augment)
             )
-          .name <- paste("fitpeak", round(wlgth.center, digits = 2), sep = "_")
-          assign(x = .name, value = .fit)
         }
         if(line.pfl == "Gaussian") {
           if (is.null(wG) == FALSE & is.null(A) == FALSE) {
@@ -156,8 +154,6 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
               tidied = purrr::map(fit, broom::tidy),
               augmented = purrr::map(fit, broom::augment)
             )
-          .name <- paste("fitpeak", round(wlgth.center, digits = 2), sep = "_")
-          assign(x = .name, value = .fit)
         }
         if(line.pfl == "Voigt") {
           if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
@@ -188,10 +184,10 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
               tidied = purrr::map(fit, broom::tidy),
               augmented = purrr::map(fit, broom::augment)
             )
-          .name <- paste("fitpeak", round(wlgth.center, digits = 2), sep = "_")
-          assign(x = .name, value = .fit)
         }
       }
+      .name <- paste("fitpeak", round(wlgth.center, digits = 2), sep = "_")
+      assign(x = .name, value = .fit)
     }
   } else {
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
