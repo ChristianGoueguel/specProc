@@ -39,7 +39,6 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
       return(p)
   }
 
-
   if (is.null(id) == FALSE & is.null(colvar) == TRUE) {
     X <- data %>%
       tidyr::pivot_longer(
@@ -57,7 +56,6 @@ plotSpec <- function(data, id = NULL, colvar = NULL) {
       ggplot2::theme(legend.position = "none", axis.line = ggplot2::element_line(colour = "grey50", size = 1))
     return(p)
   }
-
 
   if (is.null(id) == TRUE & is.null(colvar) == FALSE) {
     X <- data %>%

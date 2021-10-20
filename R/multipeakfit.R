@@ -1,8 +1,9 @@
-#' @title Fitting Multiple Peaks
+#' @title Multiple Peaks Fitting
 #' @author Christian L. Goueguel
-#' @description Fitting of spectroscopic peak by line shape functions with variable parameters.
+#' @description Fitting of multiple spectral lines by the same or different lineshape functions with variable parameters.
 #' @details The function uses `minpack.lm::nlsLM`, which is based on the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals.
-#' @param peaks (vector) center wavelengths of selected peaks
+#' @param data Data frame of emission spectra
+#' @param peaks (vector) Center wavelengths of selected peaks
 #' @param profiles (vector) Lineshape functions
 #' @param wlgth.min (numeric) Lower bound of the wavelength subset
 #' @param wlgth.max (numeric) Upper bound of the wavelength subset
@@ -10,7 +11,15 @@
 #' @param max.iter (numeric) Maximum number of iteration (200 by default)
 #' @return Fitted value for each peak and the estimated parameters along with the corresponding errors
 #' @export multipeakfit
-multipeakfit <- function(peaks, profiles, wlgth.min = NULL, wlgth.max = NULL, id = NULL, max.iter = 200) {
+multipeakfit <- function(data, peaks, profiles, wlgth.min = NULL, wlgth.max = NULL, id = NULL, max.iter = 200) {
+
+  if (length(data) == 0 & is.null(data) == TRUE) {
+    stop("Apparently you forgot to provide the spectra.")
+  }
+
+  if (is.data.frame(data) == FALSE & tibble::is.tibble(data) == FALSE) {
+    stop("Data must be of class tbl_df, tbl or data.frame")
+  }
 
   if (is.numeric(peaks) == FALSE) {
     stop("Please enter a valid vector of wavelengths")

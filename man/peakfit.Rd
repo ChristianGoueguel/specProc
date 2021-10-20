@@ -19,7 +19,7 @@ peakfit(
 \arguments{
 \item{data}{Data frame of emission spectra}
 
-\item{profile}{(character) Line shape function: "Lorentzian", "Gaussian" or "Voigt"}
+\item{profile}{(character) Lineshape function: "Lorentzian", "Gaussian" or "Voigt"}
 
 \item{wL}{(numeric) Lorentzian full width at half maximum (initial guess)}
 
@@ -39,7 +39,7 @@ peakfit(
 Fitted value and the estimated parameters along with the corresponding errors
 }
 \description{
-Fitting of spectroscopic peak by line shape functions with variable parameters.
+Fitting of a single spectral line by lineshape functions with variable parameters.
 }
 \details{
 The function uses \code{minpack.lm::nlsLM}, which is based on the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals.

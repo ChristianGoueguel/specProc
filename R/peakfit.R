@@ -1,9 +1,9 @@
 #' @title Peak Fitting
 #' @author Christian L. Goueguel
-#' @description Fitting of spectroscopic peak by line shape functions with variable parameters.
+#' @description Fitting of a single spectral line by lineshape functions with variable parameters.
 #' @details The function uses `minpack.lm::nlsLM`, which is based on the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals.
 #' @param data Data frame of emission spectra
-#' @param profile (character) Line shape function: "Lorentzian", "Gaussian" or "Voigt"
+#' @param profile (character) Lineshape function: "Lorentzian", "Gaussian" or "Voigt"
 #' @param wL (numeric) Lorentzian full width at half maximum (initial guess)
 #' @param wG (numeric) Gaussian full width at half maximum (initial guess)
 #' @param A (numeric) Peak area (initial guess)
@@ -93,7 +93,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
       } else {
         stop("Please provide an initial guess value for the Lorentzian fitting paramters: wL and A")
       }
-      fitpeak <- df %>%
+      .fit <- df %>%
         tidyr::nest(data = tidyr::everything()) %>%
         dplyr::mutate(
           fit = purrr::map(
@@ -113,7 +113,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
           tidied = purrr::map(fit, broom::tidy),
           augmented = purrr::map(fit, broom::augment)
         )
-      return(fitpeak)
+      return(.fit)
     }
     if(profile == "Gaussian") {
       if (is.null(wG) == FALSE & is.null(A) == FALSE) {
@@ -122,7 +122,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
       } else {
         stop("Please provide an initial guess value for the Gaussian fitting paramters: wG and A")
       }
-      fitpeak <- df %>%
+      .fit <- df %>%
         tidyr::nest(data = tidyr::everything()) %>%
         dplyr::mutate(
           fit = purrr::map(
@@ -142,7 +142,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
           tidied = purrr::map(fit, broom::tidy),
           augmented = purrr::map(fit, broom::augment)
         )
-      return(fitpeak)
+      return(.fit)
     }
     if(profile == "Voigt") {
       if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
@@ -152,7 +152,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
       } else {
         stop("Please provide an initial guess value for the Voigt fitting paramters: wL, wG and A")
       }
-      fitpeak <- df %>%
+      .fit <- df %>%
         tidyr::nest(data = tidyr::everything()) %>%
         dplyr::mutate(
           fit = purrr::map(
@@ -173,7 +173,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
           tidied = purrr::map(fit, broom::tidy),
           augmented = purrr::map(fit, broom::augment)
         )
-      return(fitpeak)
+      return(.fit)
     }
   } else {
 
@@ -234,7 +234,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
       } else {
         stop("Please provide an initial guess value for the Lorentzian fitting paramters: wL and A")
       }
-      fitpeak <- df %>%
+      .fit <- df %>%
         tidyr::nest(data = -id) %>%
         dplyr::mutate(
           fit = purrr::map(
@@ -254,7 +254,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
           tidied = purrr::map(fit, broom::tidy),
           augmented = purrr::map(fit, broom::augment)
         )
-      return(fitpeak)
+      return(.fit)
     }
 
     if(profile == "Gaussian") {
@@ -264,7 +264,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
       } else {
         stop("Please provide an initial guess value for the Gaussian fitting paramters: wG and A")
       }
-      fitpeak <- df %>%
+      .fit <- df %>%
         tidyr::nest(data = -id) %>%
         dplyr::mutate(
           fit = purrr::map(
@@ -284,7 +284,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
           tidied = purrr::map(fit, broom::tidy),
           augmented = purrr::map(fit, broom::augment)
         )
-      return(fitpeak)
+      return(.fit)
     }
 
     if(profile == "Voigt") {
@@ -295,7 +295,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
       } else {
         stop("Please provide an initial guess value for the Voigt fitting paramters: wL, wG and A")
       }
-      fitpeak <- df %>%
+      .fit <- df %>%
         tidyr::nest(data = -id) %>%
         dplyr::mutate(
           fit = purrr::map(
@@ -316,7 +316,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
           tidied = purrr::map(fit, broom::tidy),
           augmented = purrr::map(fit, broom::augment)
         )
-      return(fitpeak)
+      return(.fit)
     }
   }
 }

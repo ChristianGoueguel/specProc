@@ -2,9 +2,10 @@
 % Please edit documentation in R/multipeakfit.R
 \name{multipeakfit}
 \alias{multipeakfit}
-\title{Fitting Multiple Peaks}
+\title{Multiple Peaks Fitting}
 \usage{
 multipeakfit(
+  data,
   peaks,
   profiles,
   wlgth.min = NULL,
@@ -14,7 +15,9 @@ multipeakfit(
 )
 }
 \arguments{
-\item{peaks}{(vector) center wavelengths of selected peaks}
+\item{data}{Data frame of emission spectra}
+
+\item{peaks}{(vector) Center wavelengths of selected peaks}
 
 \item{profiles}{(vector) Lineshape functions}
 
@@ -30,7 +33,7 @@ multipeakfit(
 Fitted value for each peak and the estimated parameters along with the corresponding errors
 }
 \description{
-Fitting of spectroscopic peak by line shape functions with variable parameters.
+Fitting of multiple spectral lines by the same or different lineshape functions with variable parameters.
 }
 \details{
 The function uses \code{minpack.lm::nlsLM}, which is based on the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals.
