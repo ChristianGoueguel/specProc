@@ -8,6 +8,9 @@ multipeakfit(
   data,
   peaks,
   profiles,
+  wL = NULL,
+  wG = NULL,
+  A = NULL,
   wlgth.min = NULL,
   wlgth.max = NULL,
   id = NULL,
@@ -20,6 +23,12 @@ multipeakfit(
 \item{peaks}{(vector) Center wavelengths of selected peaks}
 
 \item{profiles}{(vector) Lineshape functions}
+
+\item{wL}{(numeric) Lorentzian full width at half maximum (overall initial guess)}
+
+\item{wG}{(numeric) Gaussian full width at half maximum (overall initial guess)}
+
+\item{A}{(numeric) Peak area (overall initial guess)}
 
 \item{wlgth.min}{(numeric) Lower bound of the wavelength subset}
 

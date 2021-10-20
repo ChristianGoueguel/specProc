@@ -117,8 +117,8 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
     }
     if(profile == "Gaussian") {
       if (is.null(wG) == FALSE & is.null(A) == FALSE) {
-        param1 <- as.numeric(wG)
-        param2 <- as.numeric(A)
+        param1 <- 1
+        param2 <- 15000
       } else {
         stop("Please provide an initial guess value for the Gaussian fitting paramters: wG and A")
       }

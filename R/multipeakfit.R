@@ -5,13 +5,16 @@
 #' @param data Data frame of emission spectra
 #' @param peaks (vector) Center wavelengths of selected peaks
 #' @param profiles (vector) Lineshape functions
+#' @param wL (numeric) Lorentzian full width at half maximum (overall initial guess)
+#' @param wG (numeric) Gaussian full width at half maximum (overall initial guess)
+#' @param A (numeric) Peak area (overall initial guess)
 #' @param wlgth.min (numeric) Lower bound of the wavelength subset
 #' @param wlgth.max (numeric) Upper bound of the wavelength subset
 #' @param id Spectra name (optional)
 #' @param max.iter (numeric) Maximum number of iteration (200 by default)
 #' @return Fitted value for each peak and the estimated parameters along with the corresponding errors
 #' @export multipeakfit
-multipeakfit <- function(data, peaks, profiles, wlgth.min = NULL, wlgth.max = NULL, id = NULL, max.iter = 200) {
+multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL, id = NULL, max.iter = 200) {
 
   if (length(data) == 0 & is.null(data) == TRUE) {
     stop("Apparently you forgot to provide the spectra.")
@@ -29,20 +32,12 @@ multipeakfit <- function(data, peaks, profiles, wlgth.min = NULL, wlgth.max = NU
     stop("Profiles must be a valid vector of lineshape functions: Lorentzian, Gaussian and Voigt")
   }
 
-  if (profile != "Lorentzian" & profile != "Gaussian" & profile != "Voigt") {
-    stop("The profile function must be Lorentzian, Gaussian or Voigt")
-  }
-
   if (length(peaks) < 2 | length(profiles) < 2) {
     stop("The number of peaks to be fitted must be at least 2 otherwise use the Peakfit function")
   }
 
-  if (is.integer(max.iter) == FALSE | max.iter <= 0) {
-    stop("Maximum number of iterations must be a positive integer")
-  }
-
   lgth.xc <- length(peaks)
-  lgth.pfl <- length(profile)
+  lgth.pfl <- length(profiles)
   p <- max.iter
 
   if (is.null(id) == TRUE) {
@@ -99,10 +94,10 @@ multipeakfit <- function(data, peaks, profiles, wlgth.min = NULL, wlgth.max = NU
     }
 
     for (i in 1:lgth.xc) {
-      wlgth.center <- as.numeric(peaks[i])
+      wlgth.center <- peaks[i]
 
       for (j in 1:lgth.pfl) {
-        line.pfl <- as.character(profile[j])
+        line.pfl <- profiles[j]
 
         if (line.pfl == "Lorentzian") {
           if (is.null(wL) == FALSE & is.null(A) == FALSE) {
@@ -253,7 +248,7 @@ multipeakfit <- function(data, peaks, profiles, wlgth.min = NULL, wlgth.max = NU
       wlgth.center <- as.numeric(peaks[i])
 
       for (j in 1:lgth.pfl) {
-        line.pfl <- as.character(profile[j])
+        line.pfl <- as.character(profiles[j])
 
         if (line.pfl == "Lorentzian") {
           if (is.null(wL) == FALSE & is.null(A) == FALSE) {
