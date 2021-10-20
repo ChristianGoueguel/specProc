@@ -291,7 +291,12 @@ most of the observed broadening of the 455.50 nm Ba emission line.
 On the other hand, it may sometimes be more advisable to fit multiple 
 peaks at the same time, especially when they overlap. The `multipeakfit` 
 function is used. The function has as input a vector of selection of multiple 
-peaks center `peaks.center` from your spectrum data and then fit them with the `peakfit` function. You can fit all peaks with same fitting function or fit each peak with a different profile function.
+peaks center `peaks` from your spectrum data and then fit them with the `peakfit` function. You can fit all peaks with same fitting function or fit each peak with a different profile function.
+
+```{r}
+corrected_spec %>%
+  multipeakfit(peaks = c(393.37, 396.85), profiles = c("Gaussian", "Gaussian"), wG = 0.1, A = 500, wlgth.min = 390.0, wlgth.max = 415.0)
+```
 
 
 
