@@ -329,11 +329,11 @@ most of the observed broadening of the 455.50 nm Ba emission line.
 On the other hand, it may sometimes be more advisable to fit multiple
 peaks at the same time, especially when they overlap. The `multipeakfit`
 function has as input a vector of peaks center, `peaks`, and a vector of
-lineshape function associated to each peak, `profiles`. It worth noting
-that you can fit all peaks with a same fitting function or fit each peak
-with a different function. In the example below, three spectral lines,
-Ca II 393.37 nm, Ca II 396.85 nm and Mn I 403-nm were fitted using the
-Gaussian profile.
+lineshape functions associated with each of the peaks, `profiles`. It
+worth noting that you can fit all peaks with a same fitting function or
+fit each peak with a different function. In the example below, three
+spectral lines, Ca II 393.37 nm, Ca II 396.85 nm and Mn I 403-nm were
+fitted using the Gaussian profile.
 
 ``` r
 mfit <- corrected_spec %>%
