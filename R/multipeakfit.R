@@ -185,10 +185,9 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
               augmented = purrr::map(fit, broom::augment)
             )
         }
+        .name <- paste("fitpeak", round(wlgth.center, digits = 2), sep = "_")
+        return(assign(x = .name, value = .fit))
       }
-      .name <- paste("fitpeak", round(wlgth.center, digits = 2), sep = "_")
-      toto <- assign(x = .name, value = .fit)
-      return(toto)
     }
   } else {
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
