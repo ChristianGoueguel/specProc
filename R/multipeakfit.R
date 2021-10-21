@@ -36,9 +36,9 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
     stop("The number of peaks to be fitted must be at least 2 otherwise use the Peakfit function")
   }
 
-  lgth.xc <- length(peaks)
-  lgth.pfl <- length(profiles)
-  p <- max.iter
+  if (length(peaks) != length(profiles)) {
+    stop("Peaks and profiles must have the same length")
+  }
 
   if (is.null(id) == TRUE) {
 
@@ -93,29 +93,32 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
       }
     }
 
+    lgth.xc <- length(peaks)
+    lgth.pfl <- length(profiles)
+    p <- max.iter
+    .fit <- data.frame()
+
     for (i in 1:lgth.xc) {
-      wlgth.center <- peaks[i]
-
       for (j in 1:lgth.pfl) {
-        line.pfl <- profiles[j]
-
-        if (line.pfl == "Lorentzian") {
+        if (profiles[j] == "Lorentzian") {
           if (is.null(wL) == FALSE & is.null(A) == FALSE) {
             param1 <- as.numeric(wL)
             param2 <- as.numeric(A)
           } else {
             stop("Please provide an initial guess value for the Lorentzian fitting paramters: wL and A")
           }
-          .fit <- df %>%
+          .fit[i, ] <- df %>%
             tidyr::nest(data = tidyr::everything()) %>%
             dplyr::mutate(
+              peak = peaks[i],
+              lineshape = profiles[j],
               fit = purrr::map(
                 data, ~ minpack.lm::nlsLM(
                   data = .,
                   y ~ lorentzian_func(x, y0, xc, wL, A),
                   start =  list(
                     y0 = .$y[which.min(.$y)],
-                    xc = wlgth.center,
+                    xc = peaks[i],
                     wL = param1,
                     A = param2
                   ),
@@ -127,23 +130,25 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
               augmented = purrr::map(fit, broom::augment)
             )
         }
-        if(line.pfl == "Gaussian") {
+        if(profiles[j] == "Gaussian") {
           if (is.null(wG) == FALSE & is.null(A) == FALSE) {
             param1 <- as.numeric(wG)
             param2 <- as.numeric(A)
           } else {
             stop("Please provide an initial guess value for the Gaussian fitting paramters: wG and A")
           }
-          .fit <- df %>%
+          .fit[i,] <- df %>%
             tidyr::nest(data = tidyr::everything()) %>%
             dplyr::mutate(
+              peak = peaks[i],
+              lineshape = profiles[j],
               fit = purrr::map(
                 data, ~ minpack.lm::nlsLM(
                   data = .,
                   y ~ gaussian_func(x, y0, xc, wG, A),
                   start =  list(
                     y0 = .$y[which.min(.$y)],
-                    xc = wlgth.center,
+                    xc = peaks[i],
                     wG = param1,
                     A = param2
                   ),
@@ -155,7 +160,7 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
               augmented = purrr::map(fit, broom::augment)
             )
         }
-        if(line.pfl == "Voigt") {
+        if(profiles[j] == "Voigt") {
           if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
             param1 <- as.numeric(wL)
             param2 <- as.numeric(wG)
@@ -163,16 +168,18 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
           } else {
             stop("Please provide an initial guess value for the Voigt fitting paramters: wL, wG and A")
           }
-          .fit <- df %>%
+          .fit[i, ] <- df %>%
             tidyr::nest(data = tidyr::everything()) %>%
             dplyr::mutate(
+              peak = peaks[i],
+              lineshape = profiles[j],
               fit = purrr::map(
                 data, ~ minpack.lm::nlsLM(
                   data = .,
                   y ~ voigt_func(x, y0, xc, wG, wL, A),
                   start =  list(
                     y0 = .$y[which.min(.$y)],
-                    xc = wlgth.center,
+                    xc = peaks[i],
                     wL = param1,
                     wG = param2,
                     A = param3
@@ -185,9 +192,9 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
               augmented = purrr::map(fit, broom::augment)
             )
         }
-        .name <- paste("fitpeak", round(wlgth.center, digits = 2), sep = "_")
-        return(assign(x = .name, value = .fit))
       }
+      res <- .fit
+      return(res)
     }
   } else {
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
@@ -241,28 +248,26 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
     }
 
     for (i in 1:lgth.xc) {
-      wlgth.center <- as.numeric(peaks[i])
-
       for (j in 1:lgth.pfl) {
-        line.pfl <- as.character(profiles[j])
-
-        if (line.pfl == "Lorentzian") {
+        if (profiles[j] == "Lorentzian") {
           if (is.null(wL) == FALSE & is.null(A) == FALSE) {
             param1 <- as.numeric(wL)
             param2 <- as.numeric(A)
           } else {
             stop("Please provide an initial guess value for the Lorentzian fitting paramters: wL and A")
           }
-          .fit <- df %>%
+          .fit[i, ] <- df %>%
             tidyr::nest(data = tidyr::everything()) %>%
             dplyr::mutate(
+              peak = peaks[i],
+              lineshape = profiles[j],
               fit = purrr::map(
                 data, ~ minpack.lm::nlsLM(
                   data = .,
                   y ~ lorentzian_func(x, y0, xc, wL, A),
                   start =  list(
                     y0 = .$y[which.min(.$y)],
-                    xc = wlgth.center,
+                    xc = peaks[i],
                     wL = param1,
                     A = param2
                   ),
@@ -273,26 +278,26 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
               tidied = purrr::map(fit, broom::tidy),
               augmented = purrr::map(fit, broom::augment)
             )
-          .name <- paste("fitpeak", round(wlgth.center, digits = 2), sep = "_")
-          assign(x = .name, value = .fit)
         }
-        if(line.pfl == "Gaussian") {
+        if(profiles[j] == "Gaussian") {
           if (is.null(wG) == FALSE & is.null(A) == FALSE) {
             param1 <- as.numeric(wG)
             param2 <- as.numeric(A)
           } else {
             stop("Please provide an initial guess value for the Gaussian fitting paramters: wG and A")
           }
-          .fit <- df %>%
+          .fit[i, ] <- df %>%
             tidyr::nest(data = tidyr::everything()) %>%
             dplyr::mutate(
+              peak = peaks[i],
+              lineshape = profiles[j],
               fit = purrr::map(
                 data, ~ minpack.lm::nlsLM(
                   data = .,
                   y ~ gaussian_func(x, y0, xc, wG, A),
                   start =  list(
                     y0 = .$y[which.min(.$y)],
-                    xc = wlgth.center,
+                    xc = peaks[i],
                     wG = param1,
                     A = param2
                   ),
@@ -303,10 +308,8 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
               tidied = purrr::map(fit, broom::tidy),
               augmented = purrr::map(fit, broom::augment)
             )
-          .name <- paste("fitpeak", round(wlgth.center, digits = 2), sep = "_")
-          assign(x = .name, value = .fit)
         }
-        if(line.pfl == "Voigt") {
+        if(profiles[j] == "Voigt") {
           if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
             param1 <- as.numeric(wL)
             param2 <- as.numeric(wG)
@@ -314,16 +317,18 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
           } else {
             stop("Please provide an initial guess value for the Voigt fitting paramters: wL, wG and A")
           }
-          .fit <- df %>%
+          .fit[i, ] <- df %>%
             tidyr::nest(data = tidyr::everything()) %>%
             dplyr::mutate(
+              peak = peaks[i],
+              lineshape = profiles[j],
               fit = purrr::map(
                 data, ~ minpack.lm::nlsLM(
                   data = .,
                   y ~ voigt_func(x, y0, xc, wG, wL, A),
                   start =  list(
                     y0 = .$y[which.min(.$y)],
-                    xc = wlgth.center,
+                    xc = peaks[i],
                     wL = param1,
                     wG = param2,
                     A = param3
@@ -335,10 +340,10 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
               tidied = purrr::map(fit, broom::tidy),
               augmented = purrr::map(fit, broom::augment)
             )
-          .name <- paste("fitpeak", round(wlgth.center, digits = 2), sep = "_")
-          assign(x = .name, value = .fit)
         }
       }
+      res <- .fit
+      return(res)
     }
   }
 }

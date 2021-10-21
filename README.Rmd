@@ -294,12 +294,8 @@ function is used. The function has as input a vector of selection of multiple
 peaks center `peaks` from your spectrum data and then fit them with the `peakfit` function. You can fit all peaks with same fitting function or fit each peak with a different profile function.
 
 ```{r}
-mfit <- corrected_spec %>%
-  multipeakfit(peaks = c(393.37, 396.85), profiles = c("Gaussian", "Gaussian"), wG = 0.1, A = 500, wlgth.min = 390.0, wlgth.max = 415.0)
-```
-
-```{r}
-str(mfit)
+corrected_spec %>%
+  multipeakfit(peaks = c(393.37, 396.85, 403.31), profiles = c("Gaussian", "Gaussian", "Gaussian"), wG = 0.1, A = 500, wlgth.min = 392.0, wlgth.max = 405.5)
 ```
 
 #### Exemple
