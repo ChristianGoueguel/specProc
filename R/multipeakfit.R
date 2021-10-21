@@ -93,109 +93,104 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
       }
     }
 
-    lgth.xc <- length(peaks)
-    lgth.pfl <- length(profiles)
+    lgth <- length(peaks)
     p <- max.iter
-    .fit <- data.frame()
+    .fit <- tibble()
 
-    for (i in 1:lgth.xc) {
-      for (j in 1:lgth.pfl) {
-        if (profiles[j] == "Lorentzian") {
-          if (is.null(wL) == FALSE & is.null(A) == FALSE) {
-            param1 <- as.numeric(wL)
-            param2 <- as.numeric(A)
+    for (i in 1:lgth) {
+      if (profiles[i] == "Lorentzian") {
+        if (is.null(wL) == FALSE & is.null(A) == FALSE) {
+          param1 <- as.numeric(wL)
+          param2 <- as.numeric(A)
           } else {
             stop("Please provide an initial guess value for the Lorentzian fitting paramters: wL and A")
-          }
-          .fit[i, ] <- df %>%
-            tidyr::nest(data = tidyr::everything()) %>%
-            dplyr::mutate(
-              peak = peaks[i],
-              lineshape = profiles[j],
-              fit = purrr::map(
-                data, ~ minpack.lm::nlsLM(
-                  data = .,
-                  y ~ lorentzian_func(x, y0, xc, wL, A),
-                  start =  list(
-                    y0 = .$y[which.min(.$y)],
-                    xc = peaks[i],
-                    wL = param1,
-                    A = param2
+            }
+        .fit[i, 1:6] <- df %>%
+          tidyr::nest(data = tidyr::everything()) %>%
+          dplyr::mutate(
+            peak = peaks[i],
+            lineshape = profiles[i],
+            fit = purrr::map(
+              data, ~ minpack.lm::nlsLM(
+                data = .,
+                y ~ lorentzian_func(x, y0, xc, wL, A),
+                start =  list(
+                  y0 = .$y[which.min(.$y)],
+                  xc = peaks[i],
+                  wL = param1,
+                  A = param2
                   ),
-                  control = minpack.lm::nls.lm.control(maxiter = p),
-                  lower = c(0, 0, 0, 0)
+                control = minpack.lm::nls.lm.control(maxiter = p),
+                lower = c(0, 0, 0, 0)
                 )
               ),
-              tidied = purrr::map(fit, broom::tidy),
-              augmented = purrr::map(fit, broom::augment)
-            )
+            tidied = purrr::map(fit, broom::tidy),
+            augmented = purrr::map(fit, broom::augment)
+          )
         }
-        if(profiles[j] == "Gaussian") {
-          if (is.null(wG) == FALSE & is.null(A) == FALSE) {
-            param1 <- as.numeric(wG)
-            param2 <- as.numeric(A)
+      if(profiles[i] == "Gaussian") {
+        if (is.null(wG) == FALSE & is.null(A) == FALSE) {
+          param1 <- as.numeric(wG)
+          param2 <- as.numeric(A)
           } else {
             stop("Please provide an initial guess value for the Gaussian fitting paramters: wG and A")
-          }
-          .fit[i,] <- df %>%
-            tidyr::nest(data = tidyr::everything()) %>%
-            dplyr::mutate(
-              peak = peaks[i],
-              lineshape = profiles[j],
-              fit = purrr::map(
-                data, ~ minpack.lm::nlsLM(
-                  data = .,
-                  y ~ gaussian_func(x, y0, xc, wG, A),
-                  start =  list(
-                    y0 = .$y[which.min(.$y)],
-                    xc = peaks[i],
-                    wG = param1,
-                    A = param2
+            }
+        .fit[i, 1:6] <- df %>%
+          tidyr::nest(data = tidyr::everything()) %>%
+          dplyr::mutate(
+            peak = peaks[i],
+            lineshape = profiles[i],
+            fit = purrr::map(
+              data, ~ minpack.lm::nlsLM(
+                data = .,
+                y ~ gaussian_func(x, y0, xc, wG, A),
+                start =  list(
+                  y0 = .$y[which.min(.$y)],
+                  xc = peaks[i],
+                  wG = param1,
+                  A = param2
                   ),
-                  control = minpack.lm::nls.lm.control(maxiter = p),
-                  lower = c(0, 0, 0, 0)
+                control = minpack.lm::nls.lm.control(maxiter = p),
+                lower = c(0, 0, 0, 0)
                 )
               ),
-              tidied = purrr::map(fit, broom::tidy),
-              augmented = purrr::map(fit, broom::augment)
-            )
+            tidied = purrr::map(fit, broom::tidy),
+            augmented = purrr::map(fit, broom::augment)
+          )
         }
-        if(profiles[j] == "Voigt") {
-          if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
-            param1 <- as.numeric(wL)
-            param2 <- as.numeric(wG)
-            param3 <- as.numeric(A)
+      if(profiles[i] == "Voigt") {
+        if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
+          param1 <- as.numeric(wL)
+          param2 <- as.numeric(wG)
+          param3 <- as.numeric(A)
           } else {
             stop("Please provide an initial guess value for the Voigt fitting paramters: wL, wG and A")
-          }
-          .fit[i, ] <- df %>%
-            tidyr::nest(data = tidyr::everything()) %>%
-            dplyr::mutate(
-              peak = peaks[i],
-              lineshape = profiles[j],
-              fit = purrr::map(
-                data, ~ minpack.lm::nlsLM(
-                  data = .,
-                  y ~ voigt_func(x, y0, xc, wG, wL, A),
-                  start =  list(
-                    y0 = .$y[which.min(.$y)],
-                    xc = peaks[i],
-                    wL = param1,
-                    wG = param2,
-                    A = param3
+            }
+        .fit[i, 1:6] <- df %>%
+          tidyr::nest(data = tidyr::everything()) %>%
+          dplyr::mutate(
+            peak = peaks[i],
+            lineshape = profiles[i],
+            fit = purrr::map(
+              data, ~ minpack.lm::nlsLM(
+                data = .,
+                y ~ voigt_func(x, y0, xc, wG, wL, A),
+                start =  list(
+                  y0 = .$y[which.min(.$y)],
+                  xc = peaks[i],
+                  wL = param1,
+                  wG = param2,
+                  A = param3
                   ),
-                  control = minpack.lm::nls.lm.control(maxiter = p),
-                  lower = c(0, 0, 0, 0, 0)
+                control = minpack.lm::nls.lm.control(maxiter = p),
+                lower = c(0, 0, 0, 0, 0)
                 )
               ),
-              tidied = purrr::map(fit, broom::tidy),
-              augmented = purrr::map(fit, broom::augment)
-            )
+            tidied = purrr::map(fit, broom::tidy),
+            augmented = purrr::map(fit, broom::augment)
+          )
         }
       }
-      res <- .fit
-      return(res)
-    }
   } else {
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
       wlgth.min <- as.numeric(wlgth.min)
@@ -247,103 +242,103 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
         dplyr::filter(x >= wlgth.min & x <= wlgth.max)
     }
 
-    for (i in 1:lgth.xc) {
-      for (j in 1:lgth.pfl) {
-        if (profiles[j] == "Lorentzian") {
-          if (is.null(wL) == FALSE & is.null(A) == FALSE) {
-            param1 <- as.numeric(wL)
-            param2 <- as.numeric(A)
-          } else {
-            stop("Please provide an initial guess value for the Lorentzian fitting paramters: wL and A")
-          }
-          .fit[i, ] <- df %>%
-            tidyr::nest(data = tidyr::everything()) %>%
-            dplyr::mutate(
-              peak = peaks[i],
-              lineshape = profiles[j],
-              fit = purrr::map(
-                data, ~ minpack.lm::nlsLM(
-                  data = .,
-                  y ~ lorentzian_func(x, y0, xc, wL, A),
-                  start =  list(
-                    y0 = .$y[which.min(.$y)],
-                    xc = peaks[i],
-                    wL = param1,
-                    A = param2
-                  ),
-                  control = minpack.lm::nls.lm.control(maxiter = p),
-                  lower = c(0, 0, 0, 0)
-                )
-              ),
-              tidied = purrr::map(fit, broom::tidy),
-              augmented = purrr::map(fit, broom::augment)
-            )
+    lgth <- length(peaks)
+    p <- max.iter
+
+    for (i in 1:lgth) {
+      if (profiles[i] == "Lorentzian") {
+        if (is.null(wL) == FALSE & is.null(A) == FALSE) {
+          param1 <- as.numeric(wL)
+          param2 <- as.numeric(A)
+        } else {
+          stop("Please provide an initial guess value for the Lorentzian fitting paramters: wL and A")
         }
-        if(profiles[j] == "Gaussian") {
-          if (is.null(wG) == FALSE & is.null(A) == FALSE) {
-            param1 <- as.numeric(wG)
-            param2 <- as.numeric(A)
-          } else {
-            stop("Please provide an initial guess value for the Gaussian fitting paramters: wG and A")
-          }
-          .fit[i, ] <- df %>%
-            tidyr::nest(data = tidyr::everything()) %>%
-            dplyr::mutate(
-              peak = peaks[i],
-              lineshape = profiles[j],
-              fit = purrr::map(
-                data, ~ minpack.lm::nlsLM(
-                  data = .,
-                  y ~ gaussian_func(x, y0, xc, wG, A),
-                  start =  list(
-                    y0 = .$y[which.min(.$y)],
-                    xc = peaks[i],
-                    wG = param1,
-                    A = param2
-                  ),
-                  control = minpack.lm::nls.lm.control(maxiter = p),
-                  lower = c(0, 0, 0, 0)
-                )
-              ),
-              tidied = purrr::map(fit, broom::tidy),
-              augmented = purrr::map(fit, broom::augment)
-            )
-        }
-        if(profiles[j] == "Voigt") {
-          if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
-            param1 <- as.numeric(wL)
-            param2 <- as.numeric(wG)
-            param3 <- as.numeric(A)
-          } else {
-            stop("Please provide an initial guess value for the Voigt fitting paramters: wL, wG and A")
-          }
-          .fit[i, ] <- df %>%
-            tidyr::nest(data = tidyr::everything()) %>%
-            dplyr::mutate(
-              peak = peaks[i],
-              lineshape = profiles[j],
-              fit = purrr::map(
-                data, ~ minpack.lm::nlsLM(
-                  data = .,
-                  y ~ voigt_func(x, y0, xc, wG, wL, A),
-                  start =  list(
-                    y0 = .$y[which.min(.$y)],
-                    xc = peaks[i],
-                    wL = param1,
-                    wG = param2,
-                    A = param3
-                  ),
-                  control = minpack.lm::nls.lm.control(maxiter = p),
-                  lower = c(0, 0, 0, 0, 0)
-                )
-              ),
-              tidied = purrr::map(fit, broom::tidy),
-              augmented = purrr::map(fit, broom::augment)
-            )
-        }
+        .fit[i, 1:6] <- df %>%
+          tidyr::nest(data = tidyr::everything()) %>%
+          dplyr::mutate(
+            peak = peaks[i],
+            lineshape = profiles[i],
+            fit = purrr::map(
+              data, ~ minpack.lm::nlsLM(
+                data = .,
+                y ~ lorentzian_func(x, y0, xc, wL, A),
+                start =  list(
+                  y0 = .$y[which.min(.$y)],
+                  xc = peaks[i],
+                  wL = param1,
+                  A = param2
+                ),
+                control = minpack.lm::nls.lm.control(maxiter = p),
+                lower = c(0, 0, 0, 0)
+              )
+            ),
+            tidied = purrr::map(fit, broom::tidy),
+            augmented = purrr::map(fit, broom::augment)
+          )
       }
-      res <- .fit
-      return(res)
+      if(profiles[i] == "Gaussian") {
+        if (is.null(wG) == FALSE & is.null(A) == FALSE) {
+          param1 <- as.numeric(wG)
+          param2 <- as.numeric(A)
+        } else {
+          stop("Please provide an initial guess value for the Gaussian fitting paramters: wG and A")
+        }
+        .fit[i, 1:6] <- df %>%
+          tidyr::nest(data = tidyr::everything()) %>%
+          dplyr::mutate(
+            peak = peaks[i],
+            lineshape = profiles[i],
+            fit = purrr::map(
+              data, ~ minpack.lm::nlsLM(
+                data = .,
+                y ~ gaussian_func(x, y0, xc, wG, A),
+                start =  list(
+                  y0 = .$y[which.min(.$y)],
+                  xc = peaks[i],
+                  wG = param1,
+                  A = param2
+                ),
+                control = minpack.lm::nls.lm.control(maxiter = p),
+                lower = c(0, 0, 0, 0)
+              )
+            ),
+            tidied = purrr::map(fit, broom::tidy),
+            augmented = purrr::map(fit, broom::augment)
+          )
+      }
+      if(profiles[i] == "Voigt") {
+        if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
+          param1 <- as.numeric(wL)
+          param2 <- as.numeric(wG)
+          param3 <- as.numeric(A)
+        } else {
+          stop("Please provide an initial guess value for the Voigt fitting paramters: wL, wG and A")
+        }
+        .fit[i, 1:6] <- df %>%
+          tidyr::nest(data = tidyr::everything()) %>%
+          dplyr::mutate(
+            peak = peaks[i],
+            lineshape = profiles[i],
+            fit = purrr::map(
+              data, ~ minpack.lm::nlsLM(
+                data = .,
+                y ~ voigt_func(x, y0, xc, wG, wL, A),
+                start =  list(
+                  y0 = .$y[which.min(.$y)],
+                  xc = peaks[i],
+                  wL = param1,
+                  wG = param2,
+                  A = param3
+                ),
+                control = minpack.lm::nls.lm.control(maxiter = p),
+                lower = c(0, 0, 0, 0, 0)
+              )
+            ),
+            tidied = purrr::map(fit, broom::tidy),
+            augmented = purrr::map(fit, broom::augment)
+          )
+      }
     }
   }
-}
+  return(.fit)
+  }

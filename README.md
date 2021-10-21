@@ -328,15 +328,21 @@ most of the observed broadening of the 455.50 nm Ba emission line.
 
 On the other hand, it may sometimes be more advisable to fit multiple
 peaks at the same time, especially when they overlap. The `multipeakfit`
-function is used. The function has as input a vector of selection of
-multiple peaks center `peaks` from your spectrum data and then fit them
-with the `peakfit` function. You can fit all peaks with same fitting
-function or fit each peak with a different profile function.
+function is used. The function has as input a vector of peaks center
+`peaks` and a vector of lineshape function associated to each peak
+`profiles`. It worth noting that you can fit all peaks with a same
+fitting function or fit each peak with a different function. In the
+example below, three spectral lines, Ca II 393.37 nm, Ca II 396.85 nm
+and Mn I 403-nm were fitted using a Gaussian profile.
 
 ``` r
-corrected_spec %>%
-  multipeakfit(peaks = c(393.37, 396.85, 403.31), profiles = c("Gaussian", "Gaussian", "Gaussian"), wG = 0.1, A = 500, wlgth.min = 392.0, wlgth.max = 405.5)
-#> data frame with 0 columns and 1 row
+mfit
+#> # A tibble: 3 x 6
+#>   data               peak lineshape fit    tidied           augmented        
+#>   <list>            <dbl> <chr>     <list> <list>           <list>           
+#> 1 <tibble [99 x 2]>  393. Gaussian  <nls>  <tibble [4 x 5]> <tibble [99 x 4]>
+#> 2 <tibble [99 x 2]>  397. Gaussian  <nls>  <tibble [4 x 5]> <tibble [99 x 4]>
+#> 3 <tibble [99 x 2]>  403. Gaussian  <nls>  <tibble [4 x 5]> <tibble [99 x 4]>
 ```
 
 #### Exemple
