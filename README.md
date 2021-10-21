@@ -336,6 +336,15 @@ example below, three spectral lines, Ca II 393.37 nm, Ca II 396.85 nm
 and Mn I 403-nm were fitted using a Gaussian profile.
 
 ``` r
+mfit <- corrected_spec %>%
+  multipeakfit(
+    peaks = c(393.37, 396.85, 403.31), 
+    profiles = c("Gaussian", "Gaussian", "Gaussian"), 
+    wG = 0.1, A = 500, wlgth.min = 392.0, wlgth.max = 405.5
+    )
+```
+
+``` r
 mfit
 #> # A tibble: 3 x 6
 #>   data               peak lineshape fit    tidied           augmented        
