@@ -187,7 +187,8 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
         }
       }
       .name <- paste("fitpeak", round(wlgth.center, digits = 2), sep = "_")
-      assign(x = .name, value = .fit)
+      toto <- assign(x = .name, value = .fit)
+      return(toto)
     }
   } else {
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {

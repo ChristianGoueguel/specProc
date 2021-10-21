@@ -111,14 +111,14 @@ and the other for the fitted baseline `bkg`.
 ``` r
 str(baseline_fit, list.len = 5) 
 #> List of 2
-#>  $ spec: tibble [1 x 808] (S3: tbl_df/tbl/data.frame)
+#>  $ spec: tibble [1 × 808] (S3: tbl_df/tbl/data.frame)
 #>   ..$ 390.03027: num 131
 #>   ..$ 390.1666 : num 10.5
 #>   ..$ 390.30292: num 0
 #>   ..$ 390.43921: num 129
 #>   ..$ 390.57553: num 197
 #>   .. [list output truncated]
-#>  $ bkg : tibble [1 x 808] (S3: tbl_df/tbl/data.frame)
+#>  $ bkg : tibble [1 × 808] (S3: tbl_df/tbl/data.frame)
 #>   ..$ 390.03027: num 13831
 #>   ..$ 390.1666 : num 13864
 #>   ..$ 390.30292: num 13897
@@ -228,7 +228,7 @@ with the corresponding residuals `.resid`.
 ``` r
 Ba455_fit %>% pluck("augmented")
 #> [[1]]
-#> # A tibble: 22 x 4
+#> # A tibble: 22 × 4
 #>        x      y .fitted .resid
 #>    <dbl>  <dbl>   <dbl>  <dbl>
 #>  1  454.  3086.   3630. -544. 
@@ -241,7 +241,7 @@ Ba455_fit %>% pluck("augmented")
 #>  8  455. 16921.  16940.  -19.7
 #>  9  455. 22226.  21939.  287. 
 #> 10  455. 26762.  26507.  256. 
-#> # ... with 12 more rows
+#> # … with 12 more rows
 ```
 
 While `tidied` contains the estimated parameters (FWHM, peak height, and
@@ -250,7 +250,7 @@ area for fitted peak).
 ``` r
 Ba455_fit %>% pluck("tidied")
 #> [[1]]
-#> # A tibble: 4 x 5
+#> # A tibble: 4 × 5
 #>   term  estimate std.error statistic  p.value
 #>   <chr>    <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 y0     3528.   161.           22.0 1.88e-14
@@ -292,7 +292,7 @@ Ca422_fit2 <- corrected_spec %>%
 ``` r
 Ba455_fit2 %>% pluck("tidied")
 #> [[1]]
-#> # A tibble: 5 x 5
+#> # A tibble: 5 × 5
 #>   term   estimate  std.error statistic  p.value
 #>   <chr>     <dbl>      <dbl>     <dbl>    <dbl>
 #> 1 y0     2714.     755.           3.60 2.23e- 3
@@ -334,8 +334,70 @@ with the `peakfit` function. You can fit all peaks with same fitting
 function or fit each peak with a different profile function.
 
 ``` r
-corrected_spec %>%
+mfit <- corrected_spec %>%
   multipeakfit(peaks = c(393.37, 396.85), profiles = c("Gaussian", "Gaussian"), wG = 0.1, A = 500, wlgth.min = 390.0, wlgth.max = 415.0)
+```
+
+``` r
+str(mfit)
+#> tibble [1 × 4] (S3: tbl_df/tbl/data.frame)
+#>  $ data     :List of 1
+#>   ..$ : tibble [184 × 2] (S3: tbl_df/tbl/data.frame)
+#>   .. ..$ x: num [1:184] 390 390 390 390 391 ...
+#>   .. ..$ y: num [1:184] 131.5 10.5 0 129 197.3 ...
+#>  $ fit      :List of 1
+#>   ..$ :List of 5
+#>   .. ..$ m       :List of 16
+#>   .. .. ..$ resid     :function ()  
+#>   .. .. ..$ fitted    :function ()  
+#>   .. .. ..$ formula   :function ()  
+#>   .. .. ..$ deviance  :function ()  
+#>   .. .. ..$ lhs       :function ()  
+#>   .. .. ..$ gradient  :function ()  
+#>   .. .. ..$ conv      :function ()  
+#>   .. .. ..$ incr      :function ()  
+#>   .. .. ..$ setVarying:function (vary = rep(TRUE, length(useParams)))  
+#>   .. .. ..$ setPars   :function (newPars)  
+#>   .. .. ..$ getPars   :function ()  
+#>   .. .. ..$ getAllPars:function ()  
+#>   .. .. ..$ getEnv    :function ()  
+#>   .. .. ..$ trace     :function ()  
+#>   .. .. ..$ Rmat      :function ()  
+#>   .. .. ..$ predict   :function (newdata = list(), qr = FALSE)  
+#>   .. .. ..- attr(*, "class")= chr "nlsModel"
+#>   .. ..$ convInfo:List of 5
+#>   .. .. ..$ isConv     : logi TRUE
+#>   .. .. ..$ finIter    : int 11
+#>   .. .. ..$ finTol     : num 1.49e-08
+#>   .. .. ..$ stopCode   : int 2
+#>   .. .. ..$ stopMessage: chr "Relative error between `par' and the solution is at most `ptol'."
+#>   .. ..$ data    : symbol .
+#>   .. ..$ call    : language minpack.lm::nlsLM(formula = y ~ gaussian_func(x, y0, xc, wG, A), data = .,      start = list(y0 = .$y[which.min(.| __truncated__ ...
+#>   .. ..$ control :List of 9
+#>   .. .. ..$ ftol   : num 1.49e-08
+#>   .. .. ..$ ptol   : num 1.49e-08
+#>   .. .. ..$ gtol   : num 0
+#>   .. .. ..$ diag   : list()
+#>   .. .. ..$ epsfcn : num 0
+#>   .. .. ..$ factor : num 100
+#>   .. .. ..$ maxfev : int(0) 
+#>   .. .. ..$ maxiter: num 200
+#>   .. .. ..$ nprint : num 0
+#>   .. ..- attr(*, "class")= chr "nls"
+#>  $ tidied   :List of 1
+#>   ..$ : tibble [4 × 5] (S3: tbl_df/tbl/data.frame)
+#>   .. ..$ term     : chr [1:4] "y0" "xc" "wG" "A"
+#>   .. ..$ estimate : num [1:4] 0 0 1647 8773509
+#>   .. ..$ std.error: num [1:4] 4.74e+08 1.49e+07 1.23e+08 1.53e+12
+#>   .. ..$ statistic: num [1:4] 0.00 0.00 1.34e-05 5.75e-06
+#>   .. ..$ p.value  : num [1:4] 1 1 1 1
+#>  $ augmented:List of 1
+#>   ..$ : tibble [184 × 4] (S3: tbl_df/tbl/data.frame)
+#>   .. ..$ x      : num [1:184] 390 390 390 390 391 ...
+#>   .. ..$ y      : num [1:184] 131.5 10.5 0 129 197.3 ...
+#>   .. ..$ .fitted: num [1:184] 4284 4284 4283 4283 4282 ...
+#>   .. ..$ .resid : num [1:184] -4153 -4273 -4283 -4154 -4085 ...
+#>   .. .. ..- attr(*, "label")= chr "Residuals"
 ```
 
 #### Exemple
