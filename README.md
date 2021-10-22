@@ -309,13 +309,13 @@ plotFit(data = Ba455_fit2, title = "Ba II 455.40 nm") |
 
 <img src="man/figures/README-unnamed-chunk-19-1.png" width="90%" height="90%" />
 
-We can statistically compare (p-value) the results obtained with a
-Gaussian profile with those obtained with a Voigt profile, to decide
-which of these profiles gives the best estimate of FWHM of the spectral
-line. Or we can calculate the *k* parameter which describes the
-“Gaussness” or “Lorentzness” of a Voigt profile. A value of 0 means a
-pure Lorentzian profile and of 1 means a pure Gaussian profile. *k* is
-given by the following expression:
+We can statistically compare (p-value) the results obtained with the
+Gaussian profile with those obtained with the pseudo-Voigt profile, to
+decide which of these lineshape functions gives the best estimate of
+FWHM of the spectral line. Or we can calculate the *k* parameter which
+describes the “Gaussness” or “Lorentzness” of a Voigt profile. A value
+of 0 means a pure Lorentzian profile and of 1 means a pure Gaussian
+profile. *k* is given by the following expression:
 
 <p align="center">
 <img src="images/MixingParam-01.png" width="129"/>

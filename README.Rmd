@@ -271,10 +271,8 @@ plotFit(data = Ba455_fit2, title = "Ba II 455.40 nm") |
   plotFit(data = Ca422_fit2, title = "Ca I 422.67 nm")
 ```
 
-We can statistically compare (p-value) the results obtained with a
-Gaussian profile with those obtained with a Voigt profile, to decide
-which of these profiles gives the best estimate of FWHM of the spectral
-line. Or we can calculate the $k$ parameter which describes the
+We can statistically compare (p-value) the results obtained with the
+Gaussian profile with those obtained with the pseudo-Voigt profile, to decide which of these lineshape functions gives the best estimate of FWHM of the spectral line. Or we can calculate the $k$ parameter which describes the
 "Gaussness" or "Lorentzness" of a Voigt profile. A value of 0 means a
 pure Lorentzian profile and of 1 means a pure Gaussian profile. $k$ is
 given by the following expression:
