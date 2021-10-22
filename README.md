@@ -322,7 +322,7 @@ profile. *k* is given by the following expression:
 </p>
 
 As expected, both methods show that Gaussian broadening accounts for
-most of the observed broadening of the 455.50 nm Ba emission line.
+most of the observed broadening of the 455.50 nm Ba II emission line.
 
 ### Multiple peaks fitting
 
