@@ -321,7 +321,42 @@ bc_cranbSpec <- cranbSpec %>%
 ```
 
 ```{r eval=FALSE, include=FALSE}
-bc_cranbSpec %>% plotSpec(id = "spectra_id")
+library(plotly)
+bc_cranbSpec %>%
+  filter(spectra_id %in% "113842") %>%
+  select(-spectra_id) %>%
+  pivot_longer(
+    cols = everything(),
+    names_to = "wavelength",
+    values_to = "intensity"
+    ) %>%
+  modify_at("wavelength", as.numeric) %>%
+  plot_ly(x = ~wavelength, y = ~intensity, type = 'scatter', mode = 'lines')
 ```
 
-
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
