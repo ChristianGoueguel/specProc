@@ -100,8 +100,8 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
     for (i in 1:lgth) {
       if (profiles[i] == "Lorentzian") {
         if (is.null(wL) == FALSE & is.null(A) == FALSE) {
-          param1 <- as.numeric(wL)
-          param2 <- as.numeric(A)
+          param1 <- wL
+          param2 <- A
           } else {
             stop("Please provide an initial guess value for the Lorentzian fitting paramters: wL and A")
             }
@@ -117,8 +117,8 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
                 start =  list(
                   y0 = .$y[which.min(.$y)],
                   xc = peaks[i],
-                  wL = param1,
-                  A = param2
+                  wL = param1[i],
+                  A = param2[i]
                   ),
                 control = minpack.lm::nls.lm.control(maxiter = p),
                 lower = c(0, 0, 0, 0)
@@ -130,8 +130,8 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
         }
       if(profiles[i] == "Gaussian") {
         if (is.null(wG) == FALSE & is.null(A) == FALSE) {
-          param1 <- as.numeric(wG)
-          param2 <- as.numeric(A)
+          param1 <- wG
+          param2 <- A
           } else {
             stop("Please provide an initial guess value for the Gaussian fitting paramters: wG and A")
             }
@@ -147,8 +147,8 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
                 start =  list(
                   y0 = .$y[which.min(.$y)],
                   xc = peaks[i],
-                  wG = param1,
-                  A = param2
+                  wG = param1[i],
+                  A = param2[i]
                   ),
                 control = minpack.lm::nls.lm.control(maxiter = p),
                 lower = c(0, 0, 0, 0)
@@ -160,9 +160,9 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
         }
       if(profiles[i] == "Voigt") {
         if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
-          param1 <- as.numeric(wL)
-          param2 <- as.numeric(wG)
-          param3 <- as.numeric(A)
+          param1 <- wL
+          param2 <- wG
+          param3 <- A
           } else {
             stop("Please provide an initial guess value for the Voigt fitting paramters: wL, wG and A")
             }
@@ -178,9 +178,9 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
                 start =  list(
                   y0 = .$y[which.min(.$y)],
                   xc = peaks[i],
-                  wL = param1,
-                  wG = param2,
-                  A = param3
+                  wL = param1[i],
+                  wG = param2[i],
+                  A = param3[i]
                   ),
                 control = minpack.lm::nls.lm.control(maxiter = p),
                 lower = c(0, 0, 0, 0, 0)
@@ -248,8 +248,8 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
     for (i in 1:lgth) {
       if (profiles[i] == "Lorentzian") {
         if (is.null(wL) == FALSE & is.null(A) == FALSE) {
-          param1 <- as.numeric(wL)
-          param2 <- as.numeric(A)
+          param1 <- wL
+          param2 <- A
         } else {
           stop("Please provide an initial guess value for the Lorentzian fitting paramters: wL and A")
         }
@@ -265,8 +265,8 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
                 start =  list(
                   y0 = .$y[which.min(.$y)],
                   xc = peaks[i],
-                  wL = param1,
-                  A = param2
+                  wL = param1[i],
+                  A = param2[i]
                 ),
                 control = minpack.lm::nls.lm.control(maxiter = p),
                 lower = c(0, 0, 0, 0)
@@ -278,8 +278,8 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
       }
       if(profiles[i] == "Gaussian") {
         if (is.null(wG) == FALSE & is.null(A) == FALSE) {
-          param1 <- as.numeric(wG)
-          param2 <- as.numeric(A)
+          param1 <- wG
+          param2 <- A
         } else {
           stop("Please provide an initial guess value for the Gaussian fitting paramters: wG and A")
         }
@@ -295,8 +295,8 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
                 start =  list(
                   y0 = .$y[which.min(.$y)],
                   xc = peaks[i],
-                  wG = param1,
-                  A = param2
+                  wG = param1[i],
+                  A = param2[i]
                 ),
                 control = minpack.lm::nls.lm.control(maxiter = p),
                 lower = c(0, 0, 0, 0)
@@ -308,9 +308,9 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
       }
       if(profiles[i] == "Voigt") {
         if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
-          param1 <- as.numeric(wL)
-          param2 <- as.numeric(wG)
-          param3 <- as.numeric(A)
+          param1 <- wL
+          param2 <- wG
+          param3 <- A
         } else {
           stop("Please provide an initial guess value for the Voigt fitting paramters: wL, wG and A")
         }
@@ -326,9 +326,9 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
                 start =  list(
                   y0 = .$y[which.min(.$y)],
                   xc = peaks[i],
-                  wL = param1,
-                  wG = param2,
-                  A = param3
+                  wL = param1[i],
+                  wG = param2[i],
+                  A = param3[i]
                 ),
                 control = minpack.lm::nls.lm.control(maxiter = p),
                 lower = c(0, 0, 0, 0, 0)

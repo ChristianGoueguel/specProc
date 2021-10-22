@@ -111,14 +111,14 @@ and the other for the fitted baseline `bkg`.
 ``` r
 str(baseline_fit, list.len = 5) 
 #> List of 2
-#>  $ spec: tibble [1 x 808] (S3: tbl_df/tbl/data.frame)
+#>  $ spec: tibble [1 × 808] (S3: tbl_df/tbl/data.frame)
 #>   ..$ 390.03027: num 131
 #>   ..$ 390.1666 : num 10.5
 #>   ..$ 390.30292: num 0
 #>   ..$ 390.43921: num 129
 #>   ..$ 390.57553: num 197
 #>   .. [list output truncated]
-#>  $ bkg : tibble [1 x 808] (S3: tbl_df/tbl/data.frame)
+#>  $ bkg : tibble [1 × 808] (S3: tbl_df/tbl/data.frame)
 #>   ..$ 390.03027: num 13831
 #>   ..$ 390.1666 : num 13864
 #>   ..$ 390.30292: num 13897
@@ -228,7 +228,7 @@ with the corresponding residuals `.resid`.
 ``` r
 Ba455_fit %>% pluck("augmented")
 #> [[1]]
-#> # A tibble: 22 x 4
+#> # A tibble: 22 × 4
 #>        x      y .fitted .resid
 #>    <dbl>  <dbl>   <dbl>  <dbl>
 #>  1  454.  3086.   3630. -544. 
@@ -241,7 +241,7 @@ Ba455_fit %>% pluck("augmented")
 #>  8  455. 16921.  16940.  -19.7
 #>  9  455. 22226.  21939.  287. 
 #> 10  455. 26762.  26507.  256. 
-#> # ... with 12 more rows
+#> # … with 12 more rows
 ```
 
 While `tidied` contains the estimated parameters (FWHM, peak height, and
@@ -250,7 +250,7 @@ area for fitted peak).
 ``` r
 Ba455_fit %>% pluck("tidied")
 #> [[1]]
-#> # A tibble: 4 x 5
+#> # A tibble: 4 × 5
 #>   term  estimate std.error statistic  p.value
 #>   <chr>    <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 y0     3528.   161.           22.0 1.88e-14
@@ -292,7 +292,7 @@ Ca422_fit2 <- corrected_spec %>%
 ``` r
 Ba455_fit2 %>% pluck("tidied")
 #> [[1]]
-#> # A tibble: 5 x 5
+#> # A tibble: 5 × 5
 #>   term   estimate  std.error statistic  p.value
 #>   <chr>     <dbl>      <dbl>     <dbl>    <dbl>
 #> 1 y0     2714.     755.           3.60 2.23e- 3
@@ -340,18 +340,20 @@ mfit <- corrected_spec %>%
   multipeakfit(
     peaks = c(393.37, 396.85, 403.31), 
     profiles = c("Gaussian", "Gaussian", "Gaussian"), 
-    wG = 0.1, A = 500, wlgth.min = 392.0, wlgth.max = 405.5
+    wG = c(1, 1, 1), 
+    A = c(15000, 8000, 10000), 
+    wlgth.min = 392.0, wlgth.max = 405.5
     )
 ```
 
 ``` r
 mfit
-#> # A tibble: 3 x 6
+#> # A tibble: 3 × 6
 #>   data               peak lineshape fit    tidied           augmented        
 #>   <list>            <dbl> <chr>     <list> <list>           <list>           
-#> 1 <tibble [99 x 2]>  393. Gaussian  <nls>  <tibble [4 x 5]> <tibble [99 x 4]>
-#> 2 <tibble [99 x 2]>  397. Gaussian  <nls>  <tibble [4 x 5]> <tibble [99 x 4]>
-#> 3 <tibble [99 x 2]>  403. Gaussian  <nls>  <tibble [4 x 5]> <tibble [99 x 4]>
+#> 1 <tibble [99 × 2]>  393. Gaussian  <nls>  <tibble [4 × 5]> <tibble [99 × 4]>
+#> 2 <tibble [99 × 2]>  397. Gaussian  <nls>  <tibble [4 × 5]> <tibble [99 × 4]>
+#> 3 <tibble [99 × 2]>  403. Gaussian  <nls>  <tibble [4 × 5]> <tibble [99 × 4]>
 ```
 
 #### Exemple
