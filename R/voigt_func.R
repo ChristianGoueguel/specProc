@@ -1,6 +1,6 @@
-#' @title Voigt Function
+#' @title Voigt Lineshape Function
 #' @author Christian L. Goueguel
-#' @description Convolution of a FWHM-based Gaussian function and a Lorentzian function.
+#' @description Convolution of a full width at half maximum (FWHM) based Gaussian function and a Lorentzian function.
 #' @param x data
 #' @param y0 baseline offset
 #' @param xc center of the peak
@@ -10,7 +10,8 @@
 #' @return fitted value
 #' @export voigt_func
 voigt_func <- function(x, y0, xc, wG, wL, A) {
-  y0 + A* RcppFaddeeva::Voigt(x = x, x0 = xc, sigma = wG, gamma = wL, real = TRUE)
+  s <- wG/(2*sqrt(2*log(2)))
+  y0 + A* RcppFaddeeva::Voigt(x = x, x0 = xc, sigma = s, gamma = wL, real = TRUE)
 }
 
 

@@ -1,4 +1,4 @@
-#' @title Lorentzian Function
+#' @title Lorentzian Lineshape Function
 #' @author Christian L. Goueguel
 #' @description Lorentzian peak function with bell shape and much wider tails than Gaussian function.
 #' @param x data
@@ -9,5 +9,5 @@
 #' @return fitted value
 #' @export lorentzian_func
 lorentzian_func <- function(x, y0, xc, w, A) {
-  y0 + (2*A / pi) * (w / (4*(x - xc)^2 + w^2))
+  y0 + (2*A/pi) * (w/(4*(x - xc)^2 + w^2))
 }

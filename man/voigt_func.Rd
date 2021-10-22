@@ -2,7 +2,7 @@
 % Please edit documentation in R/voigt_func.R
 \name{voigt_func}
 \alias{voigt_func}
-\title{Voigt Function}
+\title{Voigt Lineshape Function}
 \usage{
 voigt_func(x, y0, xc, wG, wL, A)
 }
@@ -23,7 +23,7 @@ voigt_func(x, y0, xc, wG, wL, A)
 fitted value
 }
 \description{
-Convolution of a FWHM-based Gaussian function and a Lorentzian function.
+Convolution of a full width at half maximum (FWHM) based Gaussian function and a Lorentzian function.
 }
 \author{
 Christian L. Goueguel

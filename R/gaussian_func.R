@@ -1,13 +1,13 @@
-#' @title Gaussian Function
+#' @title Gaussian Lineshape Function
 #' @author Christian L. Goueguel
-#' @description Full width at half maximum version of Gaussian Function.
+#' @description Full width at half maximum (FWHM) version of Gaussian Function.
 #' @param x data
 #' @param y0 baseline offset
 #' @param xc center of the peak
-#' @param w full width at half maximum (FWHM)
+#' @param w FWHM
 #' @param A area under the peak
 #' @return fitted value
 #' @export gaussian_func
 gaussian_func <- function(x, y0, xc, w, A) {
-  y0 + A*exp((-4*log(2)*(x - xc)^2)/w^2) / (w*sqrt(pi/(4*log(2))))
+  y0 + A/(w*sqrt(pi/(4*log(2)))) * exp((-4*log(2)*(x - xc)^2)/(w^2))
 }

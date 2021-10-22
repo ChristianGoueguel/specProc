@@ -2,7 +2,7 @@
 % Please edit documentation in R/gaussian_func.R
 \name{gaussian_func}
 \alias{gaussian_func}
-\title{Gaussian Function}
+\title{Gaussian Lineshape Function}
 \usage{
 gaussian_func(x, y0, xc, w, A)
 }
@@ -13,7 +13,7 @@ gaussian_func(x, y0, xc, w, A)
 
 \item{xc}{center of the peak}
 
-\item{w}{full width at half maximum (FWHM)}
+\item{w}{FWHM}
 
 \item{A}{area under the peak}
 }
@@ -21,7 +21,7 @@ gaussian_func(x, y0, xc, w, A)
 fitted value
 }
 \description{
-Full width at half maximum version of Gaussian Function.
+Full width at half maximum (FWHM) version of Gaussian Function.
 }
 \author{
 Christian L. Goueguel
