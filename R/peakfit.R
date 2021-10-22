@@ -34,7 +34,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
   }
 
   if (is.null(id) == TRUE) {
-
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
       wlgth.min <- as.numeric(wlgth.min)
       df <- data %>%
@@ -46,7 +45,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         purrr::modify_at("x", as.numeric) %>%
         dplyr::filter(x >= wlgth.min)
     }
-
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == FALSE) {
       wlgth.max <- as.numeric(wlgth.max)
       df <- data %>%
@@ -58,7 +56,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         purrr::modify_at("x", as.numeric) %>%
         dplyr::filter(x <= wlgth.max)
     }
-
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == TRUE) {
       df <- data %>%
         tidyr::pivot_longer(
@@ -68,7 +65,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         ) %>%
         purrr::modify_at("x", as.numeric)
     }
-
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == FALSE) {
       wlgth.min <- as.numeric(wlgth.min)
       wlgth.max <- as.numeric(wlgth.max)
@@ -85,7 +81,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
           dplyr::filter(x >= wlgth.min & x <= wlgth.max)
       }
     }
-
     if (profile == "Lorentzian") {
       if (is.null(wL) == FALSE & is.null(A) == FALSE) {
         param1 <- as.numeric(wL)
@@ -113,7 +108,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
           tidied = purrr::map(fit, broom::tidy),
           augmented = purrr::map(fit, broom::augment)
         )
-      return(.fit)
     }
     if(profile == "Gaussian") {
       if (is.null(wG) == FALSE & is.null(A) == FALSE) {
@@ -142,7 +136,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
           tidied = purrr::map(fit, broom::tidy),
           augmented = purrr::map(fit, broom::augment)
         )
-      return(.fit)
     }
     if(profile == "Voigt") {
       if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
@@ -173,10 +166,8 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
           tidied = purrr::map(fit, broom::tidy),
           augmented = purrr::map(fit, broom::augment)
         )
-      return(.fit)
     }
   } else {
-
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
       wlgth.min <- as.numeric(wlgth.min)
       df <- data %>%
@@ -188,7 +179,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         purrr::modify_at("x", as.numeric) %>%
         dplyr::filter(x >= wlgth.min)
     }
-
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == FALSE) {
       wlgth.max <- as.numeric(wlgth.max)
       df <- data %>%
@@ -200,7 +190,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         purrr::modify_at("x", as.numeric) %>%
         dplyr::filter(x <= wlgth.max)
     }
-
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == TRUE) {
       df <- data %>%
         tidyr::pivot_longer(
@@ -210,7 +199,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         ) %>%
         purrr::modify_at("x", as.numeric)
     }
-
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == FALSE) {
       wlgth.min <- as.numeric(wlgth.min)
       wlgth.max <- as.numeric(wlgth.max)
@@ -226,7 +214,6 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         purrr::modify_at("x", as.numeric) %>%
         dplyr::filter(x >= wlgth.min & x <= wlgth.max)
     }
-
     if (profile == "Lorentzian") {
       if (is.null(wL) == FALSE & is.null(A) == FALSE) {
         param1 <- as.numeric(wL)
@@ -247,16 +234,14 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
                 wL = param1,
                 A = param2
               ),
-              control = minpack.lm::nls.lm.control(maxiter = 200),
+              control = minpack.lm::nls.lm.control(maxiter = p),
               lower = c(0, 0, 0, 0)
             )
           ),
           tidied = purrr::map(fit, broom::tidy),
           augmented = purrr::map(fit, broom::augment)
         )
-      return(.fit)
     }
-
     if(profile == "Gaussian") {
       if (is.null(wG) == FALSE & is.null(A) == FALSE) {
         param1 <- as.numeric(wG)
@@ -277,16 +262,14 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
                 wG = param1,
                 A = param2
               ),
-              control = minpack.lm::nls.lm.control(maxiter = 200),
+              control = minpack.lm::nls.lm.control(maxiter = p),
               lower = c(0, 0, 0, 0)
             )
           ),
           tidied = purrr::map(fit, broom::tidy),
           augmented = purrr::map(fit, broom::augment)
         )
-      return(.fit)
     }
-
     if(profile == "Voigt") {
       if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
         param1 <- as.numeric(wL)
@@ -309,14 +292,14 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
                 wG = param2,
                 A = param3
               ),
-              control = minpack.lm::nls.lm.control(maxiter = 200),
+              control = minpack.lm::nls.lm.control(maxiter = p),
               lower = c(0, 0, 0, 0, 0)
             )
           ),
           tidied = purrr::map(fit, broom::tidy),
           augmented = purrr::map(fit, broom::augment)
         )
-      return(.fit)
     }
   }
+  return(.fit)
 }
