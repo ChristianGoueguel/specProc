@@ -65,13 +65,6 @@
       "Repository": "CRAN",
       "Hash": "2042cd9759cc89a453c4aefef0ce9aae"
     },
-    "arrow": {
-      "Package": "arrow",
-      "Version": "5.0.0.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "5e634f811bbca399a976807ed93ec80e"
-    },
     "askpass": {
       "Package": "askpass",
       "Version": "1.1",
@@ -550,10 +543,10 @@
     },
     "mgcv": {
       "Package": "mgcv",
-      "Version": "1.8-37",
+      "Version": "1.8-38",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "42ee1ee3259845fd07819f58022a3532"
+      "Hash": "be3c61ffbb1e3d3b3df214d192ac5444"
     },
     "mime": {
       "Package": "mime",
