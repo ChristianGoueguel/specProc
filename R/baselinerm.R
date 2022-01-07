@@ -44,7 +44,7 @@ baselinerm <- function(data, degree = 4, tol = 1e-3, rep = 100) {
   )
 
   # Background subtracted spectra
-  correctedSpec <- bc_mod %>%
+  bc_spec <- bc_mod %>%
     purrr::pluck("corrected") %>%
     tibble::as_tibble() %>%
     magrittr::set_colnames(tidyselect::all_of(wlength)) %>%
@@ -58,7 +58,7 @@ baselinerm <- function(data, degree = 4, tol = 1e-3, rep = 100) {
     purrr::map_dfr(replaceWithZero)
 
   res <- list(
-    "spec" = correctedSpec,
+    "spec" = bc_spec,
     "bkg" = background
   )
 
