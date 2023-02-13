@@ -34,7 +34,10 @@ are essential tools in LIBS calibration modeling. These include:
     central moments
 -   Skewness-adjusted boxplot
 -   NIST interactive plot of LIBS emission lines
--   etc.
+-   Orthogonal Signal Correction (OSC)
+-   Generalized Least Squares Weighting (GLSW)
+-   External Parameter Orthogonalization (EPO)
+
 
 ## Installation
 
