@@ -37,6 +37,7 @@ are essential tools in LIBS calibration modeling. These include:
 -   Orthogonal Signal Correction (OSC)
 -   Generalized Least Squares Weighting (GLSW)
 -   External Parameter Orthogonalization (EPO)
+-   etc.
 
 
 ## Installation
