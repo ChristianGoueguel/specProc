@@ -37,6 +37,9 @@ are essential tools in LIBS calibration modeling. These include:
 -   Orthogonal Signal Correction (OSC)
 -   Generalized Least Squares Weighting (GLSW)
 -   External Parameter Orthogonalization (EPO)
+-   Robust principal component analysis (RPCA)
+-   Robust partial-least squares (RPLS)
+-   Cellwise & Rowwise outliers detection (CROD)
 -   etc.
 
 
