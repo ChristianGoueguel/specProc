@@ -1,8 +1,10 @@
-
-
-
-summary_stats <- function(data, var = NULL) {
-
+#' @title Robust and Non-Robust Descriptive Statistics
+#' @description Function used to produce summary statistics.
+#' @param data Data frame or tibble. Columns are the numeric variables.
+#' @param var Numeric. Selected variable(s).
+#' @return Tibble. Summary statistic that quantitatively describes the variable(s).
+#' @export summaryStat
+summaryStat <- function(data, var = NULL) {
   data %>%
     select(all_of(var)) %>%
     pivot_longer(
@@ -27,8 +29,7 @@ summary_stats <- function(data, var = NULL) {
       kurtosis = round(moments::kurtosis(concentration), 2),
       n = n()
     )
-
-
-
-
 }
+
+
+

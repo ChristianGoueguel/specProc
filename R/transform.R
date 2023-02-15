@@ -1,13 +1,12 @@
-#' @title Function for computing the robust Box-Cox and Yeo-Johnson transformations
-#' @description Perform transformation to normality, without effects of by any outliers that may be present in the data.
-#' @author Christian L. Goueguel
-#' @details Wrapper function implemented in the cellWise package.
-#' @source Raymaekers, J. and Rousseeuw, P. J. Transforming variables to central normality. Mach Learn 1–23 (2021) doi:10.1007/s10994-021-05960-5.
-#' @param data
-#' @param var
-#' @param quant
-#' @param nbsteps
-#' @return Data frame of transformed variable(s).
+#' @title Robust Box-Cox and Yeo-Johnson Transformation
+#' @description The function transforms each variable in a dataset toward central normality using re-weighted maximum likelihood to robustly fit the Box-Cox or Yeo-Johnson transformation.
+#' @details Wrapper of the `transfo` function implemented in the cellWise package.
+#' @source J. Raymaekers and P.J. Rousseeuw, Transforming variables to central normality. Machine Learning, 1–23, 2021, doi:10.1007/s10994-021-05960-5.
+#' @param data Data frame or tibble. Columns are the numeric variables.
+#' @param var Numeric. Selected variable(s).
+#' @param quant Numeric. Quantile for determining the weights in the re-weighting step.
+#' @param nbsteps Integer. Number of re-weighting steps.
+#' @return Tibble of transformed variable(s).
 #' @export transform
 transform <- function(data, var = NULL, quant = 0.99, nbsteps = 2) {
   data %>%
