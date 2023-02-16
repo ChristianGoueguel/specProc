@@ -1,34 +1,80 @@
 #' @title Robust and Non-Robust Descriptive Statistics
 #' @description Function used to produce summary statistics.
-#' @param data Data frame or tibble. Columns are the numeric variables.
+#' @param data frame or tibble. Columns are the numeric variables.
 #' @param var Numeric. Selected variable(s).
 #' @return Tibble. Summary statistic that quantitatively describes the variable(s).
 #' @export summaryStat
-summaryStat <- function(data, var = NULL) {
-  data %>%
-    select(all_of(var)) %>%
-    pivot_longer(
-      cols = everything(),
-      names_to = "variable",
-      values_to = "value"
-    ) %>%
-    drop_na(value) %>%
-    group_by(variable) %>%
-    summarise(
-      mean = round(mean(value), 2),
-      median = round(median(value), 2),
-      mad = round(mad(value), 2),
-      sd = round(sd(value), 3),
-      cv = round((sd/mean)*100, 2),
-      rcv = round((1.4826*(mad/median))*100, 2),
-      IQR = round(IQR(value), 2),
-      min = min(value),
-      max = max(value),
-      skewness = round(moments::skewness(concentration), 2),
-      medcouple = round(robustbase::mc(concentration), 2),
-      kurtosis = round(moments::kurtosis(concentration), 2),
-      n = n()
-    )
+summaryStat <- function(data, var = NULL, remove.na = TRUE, sign.fig = 2) {
+  if (is.null(data) == TRUE) {
+    stop("Data must be provided")
+  }
+  if (is.data.frame(data) == FALSE & tibble::is_tibble(data) == FALSE) {
+    stop("Data must be of class data.frame, tbl_df, or tbl")
+  }
+
+  fct_summary <- function(x) {
+    x %>%
+      group_by(variable) %>%
+      summarise(
+        mean = round(mean(value), sign.fig),
+        median = round(median(value), sign.fig),
+        mad = round(mad(value), sign.fig),
+        sd = round(sd(value), sign.fig),
+        cv = round((sd/mean)*100, sign.fig),
+        rcv = round((1.4826*(mad/median))*100, sign.fig),
+        IQR = round(IQR(value, na.rm = TRUE), sign.fig),
+        min = min(value),
+        max = max(value),
+        skewness = round(moments::skewness(value), sign.fig),
+        medcouple = round(robustbase::mc(value), sign.fig),
+        kurtosis = round(moments::kurtosis(value), sign.fig),
+        n = n()
+      )
+  }
+
+  if (is.null(var) == FALSE) {
+    if (remove.na == TRUE) {
+      data %>%
+        select(where(is.numeric)) %>%
+        pivot_longer(
+          cols = all_of(var),
+          names_to = "variable",
+          values_to = "value"
+          ) %>%
+        drop_na(value) %>%
+        fct_summary()
+    } else {
+      data %>%
+        select(where(is.numeric)) %>%
+        pivot_longer(
+          cols = all_of(var),
+          names_to = "variable",
+          values_to = "value"
+        ) %>%
+        fct_summary()
+    }
+  } else {
+    if (remove.na == TRUE) {
+      data %>%
+        select(where(is.numeric)) %>%
+        pivot_longer(
+          cols = everything(),
+          names_to = "variable",
+          values_to = "value"
+        ) %>%
+        drop_na(value) %>%
+        fct_summary()
+    } else {
+      data %>%
+        select(where(is.numeric)) %>%
+        pivot_longer(
+          cols = everything(),
+          names_to = "variable",
+          values_to = "value"
+        ) %>%
+        fct_summary()
+    }
+  }
 }
 
 
