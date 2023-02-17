@@ -11,5 +11,14 @@ DT <-
 
 cranbSpec <- DT[ ,lapply(.SD, mean), by = spectra_id] %>% as_tibble()
 
+soilParam <-
+  readr::read_csv("~/Documents/Laserag/Data/OMNIA_validation.csv") %>%
+  janitor::remove_empty(which = c("rows", "cols")) %>%
+  janitor::clean_names() %>%
+  purrr::modify_at("id_supplier", as_factor) %>%
+  purrr::modify_at("qr_code", as_factor) %>%
+  purrr::modify_at("carrousel_number", as_factor)
+
 usethis::use_data(Ca_Mn_spec, overwrite = TRUE)
 usethis::use_data(cranbSpec, overwrite = TRUE)
+usethis::use_data(soilParam, overwrite = TRUE)
