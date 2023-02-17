@@ -9,28 +9,61 @@
 #' @return Tibble of transformed variable(s).
 #' @export transform
 transform <- function(data, var = NULL, quant = 0.99, nbsteps = 2) {
-  data %>%
-    select(all_of(var)) %>%
-    na_if(0) %>%
-    cellWise::transfo(
-      type = "bestObj",
-      robust = TRUE,
-      lambdarange = NULL,
-      prestandardize = TRUE,
-      prescaleBC = FALSE,
-      quant = 0.99,
-      nbsteps = 2,
-      checkPars = list(silent = TRUE)
-    ) %T>%
-    {
-      tibble(
-        mineral = vctrs::vec_c(var),
-        lambda_hat = pluck(., "lambdahats"),
-        transform = pluck(., "ttypes"),
-        objective = pluck(., "objective")
-      ) %>%
-        print()
-    } %>%
-    pluck("Xt") %>%
-    as_tibble()
+  if (is.null(data) == TRUE) {
+    stop("Data must be provided")
+  }
+  if (is.data.frame(data) == FALSE & tibble::is_tibble(data) == FALSE) {
+    stop("Data must be of class data.frame, tbl_df, or tbl")
+  }
+
+  if (is.null(var) == FALSE) {
+    data %>%
+      select(where(is.numeric)) %>%
+      select(all_of(var)) %>%
+      cellWise::transfo(
+        type = "bestObj",
+        robust = TRUE,
+        lambdarange = NULL,
+        prestandardize = TRUE,
+        prescaleBC = FALSE,
+        quant = 0.99,
+        nbsteps = 2,
+        checkPars = list(silent = TRUE)
+      ) %T>%
+      {
+        tibble(
+          mineral = vctrs::vec_c(var),
+          lambda_hat = pluck(., "lambdahats"),
+          transform = pluck(., "ttypes"),
+          objective = pluck(., "objective")
+        ) %>%
+          print()
+      } %>%
+      pluck("Xt") %>%
+      as_tibble()
+  } else {
+    data %>%
+      select(where(is.numeric)) %>%
+      cellWise::transfo(
+        type = "bestObj",
+        robust = TRUE,
+        lambdarange = NULL,
+        prestandardize = TRUE,
+        prescaleBC = FALSE,
+        quant = 0.99,
+        nbsteps = 2,
+        checkPars = list(silent = TRUE)
+      ) %T>%
+      {
+        tibble(
+          mineral = vctrs::vec_c(var),
+          lambda_hat = pluck(., "lambdahats"),
+          transform = pluck(., "ttypes"),
+          objective = pluck(., "objective")
+        ) %>%
+          print()
+      } %>%
+      pluck("Xt") %>%
+      as_tibble()
+  }
 }
