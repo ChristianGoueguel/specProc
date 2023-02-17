@@ -32,7 +32,7 @@ transform <- function(data, var = NULL, quant = 0.99, nbsteps = 2) {
       ) %T>%
       {
         tibble(
-          mineral = vctrs::vec_c(var),
+          variable = vctrs::vec_c(var),
           lambda_hat = pluck(., "lambdahats"),
           transform = pluck(., "ttypes"),
           objective = pluck(., "objective")
@@ -56,7 +56,7 @@ transform <- function(data, var = NULL, quant = 0.99, nbsteps = 2) {
       ) %T>%
       {
         tibble(
-          mineral = vctrs::vec_c(var),
+          variable = vctrs::vec_c(var),
           lambda_hat = pluck(., "lambdahats"),
           transform = pluck(., "ttypes"),
           objective = pluck(., "objective")
