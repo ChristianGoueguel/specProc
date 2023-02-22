@@ -33,8 +33,9 @@ opls <- function(x, y, scale = "center", crossval = 7, permutation = 20){
     )
 
   res <- list(
-    model$scoreMN <- scores |> tibble::as_tibble(),
-    model$loadingMN <- loadings |> tibble::as_tibble(),
+    model$scoreMN <- x.scores |> tibble::as_tibble(),
+    model$loadingMN <- x.loadings |> tibble::as_tibble(),
+    model$weightMN <- x.weights |> tibble::as_tibble(),
     model$orthoScoreMN <- orthoScores |> tibble::as_tibble(),
     model$orthoLoadingMN <- orthoLoadings |> tibble::as_tibble(),
     model$orthoWeightMN <- orthoWeights |> tibble::as_tibble(),
