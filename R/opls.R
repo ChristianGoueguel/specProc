@@ -16,7 +16,7 @@ opls <- function(x, y, scale = "center", crossval = 7, permutation = 20){
   x <- as.matrix(x)
   y <- as.matrix(y)
 
-  model <- ropls::opls(
+  modout <- ropls::opls(
     x,
     y,
     predI = 1,
@@ -26,23 +26,19 @@ opls <- function(x, y, scale = "center", crossval = 7, permutation = 20){
     log10L = FALSE,
     permI = permutation,
     scaleC = scale,
-    subset = NULL,
-    printL = FALSE,
-    plotL = FALSE,
-    .sinkC = NULL
+    subset = NULL
     )
 
   res <- list(
-    model$scoreMN <- x.scores |> tibble::as_tibble(),
-    model$loadingMN <- x.loadings |> tibble::as_tibble(),
-    model$weightMN <- x.weights |> tibble::as_tibble(),
-    model$orthoScoreMN <- orthoScores |> tibble::as_tibble(),
-    model$orthoLoadingMN <- orthoLoadings |> tibble::as_tibble(),
-    model$orthoWeightMN <- orthoWeights |> tibble::as_tibble(),
-    model$cMN <- y.weights |> tibble::as_tibble(),
-    model$uMN <- y.orthoWeights |> tibble::as_tibble(),
-    model$weightStarMN <- y.scores |> tibble::as_tibble()
+    x.scores = modout@scoreMN |> tibble::as_tibble(),
+    x.loadings = modout@loadingMN |> tibble::as_tibble(),
+    x.weights = modout@weightMN |> tibble::as_tibble(),
+    orthoScores = modout@orthoScoreMN |> tibble::as_tibble(),
+    orthoLoadings = modout@orthoLoadingMN |> tibble::as_tibble(),
+    orthoWeights = modout@orthoWeightMN |> tibble::as_tibble(),
+    y.weights = modout@cMN |> tibble::as_tibble(),
+    y.orthoWeights = modout@uMN |> tibble::as_tibble(),
+    y.scores = modout@weightStarMN |> tibble::as_tibble()
   )
-
-  res
+  return(res)
 }
