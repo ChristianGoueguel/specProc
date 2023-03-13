@@ -28,19 +28,24 @@ are essential tools in LIBS calibration modeling. These include:
 -   Baseline removal
 -   Fitting single, multiple or overlapping peaks
 -   Spectral-based normalization
--   Robust Box-Cox and Yeo-Johnson transformation
 -   Pearson or Spearman peaks correlation
 -   Descriptive statistics such as mean, standard deviation and higher
     central moments
--   Skewness-adjusted boxplot
 -   NIST interactive plot of LIBS emission lines
 -   Orthogonal Signal Correction (OSC)
 -   Generalized Least Squares Weighting (GLSW)
 -   External Parameter Orthogonalization (EPO)
--   Robust principal component analysis (RPCA)
--   Robust partial-least squares (RPLS)
 -   Cellwise & Rowwise outliers detection (CROD)
--   etc.
+-   Robust skewness estimation (MC)
+-   Robust regression and covariance estimation (LTS, MCD, DetMCD)
+-   Robust PCA methods (RAPCA, ROBPCA)
+-   Robust PCR method (RPCR)
+-   Robust PLS method (RSIMPLS)
+-   Robust classification (RDA, RSIMCA)
+-   Clustering methods
+-   Outlier detection and graphical methods (Skewness-adjusted boxplot, bagplot)
+-   Robust Box-Cox and Yeo-Johnson transformation
+-   Detecting deviating cells (DDC)
 
 
 ## Installation
