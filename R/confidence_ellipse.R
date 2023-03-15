@@ -71,26 +71,25 @@ confidence_ellipse <- function(.data, x = NULL, y = NULL, conf_level = 0.95, by_
     # Get the names of the factor columns in the data frame
     factor_col <- .data %>%
       select(where(is.factor)) %>%
-      names() %>%
-      sym()
+      names()
 
     # Group the data by factor columns and nest the data
-    nested_data<- .data %>%
+    nested_data <- df_tbl %>%
+      select({{factor_col}}, {{x}}, {{y}}) %>%
       group_by(!!sym(factor_col)) %>%
-      select({{x}}, {{y}}) %>%
       nest() %>%
       ungroup()
 
-    Y <- matrix(0, nrow = 361*length(X_nested$.data), ncol = 3)
+    Y <- matrix(0, nrow = 361*length(nested_data$data), ncol = 3)
 
-    for (i in seq_along(X_nested$.data)) {
+    for (i in seq_along(nested_data$data)) {
       group_data <- nested_data%>%
         pluck(2, i) %>%
         select(where(is.numeric)) %>%
         as.matrix()
 
       Y_grp <- transform_data(group_data, conf_level)
-      Y_grp <- cbind(Y_grp, replicate(361, X_nested$group[i]))
+      Y_grp <- cbind(Y_grp, replicate(361, nested_data$group[i]))
       Y[seq(1+(361*(i-1)), 361*i), ] <- Y_grp
     }
     Y %<>%

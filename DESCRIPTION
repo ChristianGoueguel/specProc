@@ -30,3 +30,4 @@ Suggests:
     markdown,
     rmarkdown,
     spelling
+VignetteBuilder: knitr

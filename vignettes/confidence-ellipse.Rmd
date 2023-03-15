@@ -1,0 +1,75 @@
+---
+title: "Confidence Ellipse"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Confidence Ellipse}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(specProc)
+library(tidyverse)
+```
+
+```{r}
+data(glass, package = "chemometrics")
+data(glass.grp, package = "chemometrics")
+```
+
+```{r}
+df_tbl <-
+  cbind(glass.grp, glass) %>%
+  as_tibble() %>%
+  rename(group = glass.grp) %>%
+  modify_at("group", as_factor) %>% 
+  select(group, SiO2, Na2O)
+```
+
+```{r}
+mod <- confidence_ellipse(df_tbl, x = "SiO2", y = "Na2O")
+mod_grouped <- confidence_ellipse(df_tbl, x = "SiO2", y = "Na2O", by_group = TRUE)
+```
+
+```{r}
+str(mod)
+```
+
+```{r}
+str(mod_grouped)
+```
+
+```{r}
+plot1 <- 
+  ggplot() +
+  geom_point(data = df_tbl, aes(SiO2, Na2O), size = 3L) +
+  geom_point(data = mod, aes(x, y), size = .5, color = "red") +
+  labs(x = "SiO2 (wt.%)", y = "Na2O (wt.%)") +
+  theme_bw() +
+  theme(legend.position = "none", panel.grid = element_blank())
+```
+
+```{r}
+plot2 <- 
+  ggplot() +
+  geom_point(data = df_tbl, aes(SiO2, Na2O, colour = group), size = 3L) +
+  geom_point(data = mod_grouped, aes(x, y, colour = group), size = .5) +
+  scale_color_brewer(palette = "Set1", direction = 1) +
+  labs(x = "SiO2 (wt.%)", y = "Na2O (wt.%)") +
+  theme_bw() +
+  theme(legend.position = "none", panel.grid = element_blank())
+```
+
+```{r}
+patchwork::wrap_plots(plot1, plot2)
+```
+
