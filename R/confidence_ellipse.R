@@ -1,14 +1,14 @@
 #' @title A Function that Computes the Confidence Ellipse Coordinates for Bivariate Normal Data (with Optional Grouping)
 #' @author Christian L. Goueguel
 #' @description This function computes a confidence ellipse (assuming bivariate normality) at a specified confidence level.
-#' @param data the data frame or tibble.
+#' @param .data the data frame or tibble.
 #' @param x the x-axis column name.
 #' @param y the y-axis column name.
 #' @param conf_level the confidence level for the ellipse (0.95 by default).
 #' @param by_group for grouping the bivariate data, if it contains a grouping third column (FALSE by default). Note that this third column must be a factor.
 #' @return a data frame of the coordinates points of the ellipse.
 #' @export confidence_ellipse
-confidence_ellipse <- function(data, x = NULL, y = NULL, conf_level = 0.95, by_group = FALSE) {
+confidence_ellipse <- function(.data, x = NULL, y = NULL, conf_level = 0.95, by_group = FALSE) {
 
   require(dplyr)
   require(tidyr)
@@ -16,23 +16,17 @@ confidence_ellipse <- function(data, x = NULL, y = NULL, conf_level = 0.95, by_g
   require(forcats)
   require(magrittr)
 
-  x <- enquo(x)
-  y <- enquo(y)
-
   # check input validity
-  if (missing(data)) {
+  if (missing(.data)) {
     stop("Missing 'data' argument.")
   }
-  if (!is.data.frame(data) && !tibble::is_tibble(data)) {
+  if (!is.data.frame(.data) && !tibble::is_tibble(.data)) {
     stop("Input 'data' must be a data frame or tibble.")
   }
-  # if (sum(map_lgl(data, is.numeric)) != 2) {
-  #   stop("Input 'data' must have exactly two numeric columns.")
-  # }
-  if (quo_is_null(x) && quo_is_null(y)) {
+  if (is.null(x) && is.null(y)) {
     stop("Either 'x' or 'y' argument must be specified.")
   }
-  if (!(x %in% colnames(data) && y %in% colnames(data))) {
+  if (!(x %in% colnames(.data) && y %in% colnames(.data))) {
     stop("x, y or both variables do not exist in the data")
   }
   if (!is.numeric(conf_level)) {
@@ -62,8 +56,8 @@ confidence_ellipse <- function(data, x = NULL, y = NULL, conf_level = 0.95, by_g
   }
 
   if (by_group == FALSE) {
-    X_mat <- data %>%
-      select(!!x, !!y) %>%
+    X_mat <- .data %>%
+      select({{x}}, {{y}}) %>%
       as.matrix()
 
     Y <- transform_data(X_mat, conf_level)
@@ -71,27 +65,25 @@ confidence_ellipse <- function(data, x = NULL, y = NULL, conf_level = 0.95, by_g
       as_tibble() %>%
       rename(x = V1, y = V2)
   } else {
-    if (sum(map_lgl(data, is.factor)) != 1) {
-      stop("Input 'data' must have exactly one factor column and two numeric columns.")
+    if (sum(map_lgl(.data, is.factor)) != 1) {
+      stop("The input 'data' must contain exactly one factor column. Currently, there are ", sum(map_lgl(data, is.factor)), " factor columns. Please modify your input to meet the requirement.")
     }
-    X_tbl <- data
-
     # Get the names of the factor columns in the data frame
-    factor_col <- X_tbl %>%
+    factor_col <- .data %>%
       select(where(is.factor)) %>%
       names() %>%
       sym()
 
     # Group the data by factor columns and nest the data
-    nested_data<- X_tbl %>%
+    nested_data<- .data %>%
       group_by(!!sym(factor_col)) %>%
-      select(!!x, !!y) %>%
+      select({{x}}, {{y}}) %>%
       nest() %>%
       ungroup()
 
-    Y <- matrix(0, nrow = 361*length(X_nested$data), ncol = 3)
+    Y <- matrix(0, nrow = 361*length(X_nested$.data), ncol = 3)
 
-    for (i in seq_along(X_nested$data)) {
+    for (i in seq_along(X_nested$.data)) {
       group_data <- nested_data%>%
         pluck(2, i) %>%
         select(where(is.numeric)) %>%
