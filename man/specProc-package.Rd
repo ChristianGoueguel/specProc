@@ -6,7 +6,7 @@
 \alias{specProc-package}
 \title{specProc: Preprocessing Tools For Laser-Induced Breakdown Spectroscopy (LIBS) Spectra}
 \description{
-\if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
 A collection of functions for preprocessing spectra in optical emission spectroscopy of laser-induced plasmas, called laser-induced breakdown spectroscopy.
 }

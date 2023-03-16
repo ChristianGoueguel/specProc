@@ -2,15 +2,15 @@
 % Please edit documentation in R/baselinerm.R
 \name{baselinerm}
 \alias{baselinerm}
-\title{Baseline Correction}
+\title{Function for Baseline Correction}
 \source{
 Chad A. Lieber, Anita Mahadevan-Jansen, Applied Spectroscopy, 2003, Vol. 57, 11, 1363-1367.
 }
 \usage{
-baselinerm(data, degree = 4, tol = 0.001, rep = 100)
+baselinerm(.data, degree = 4, tol = 0.001, rep = 100)
 }
 \arguments{
-\item{data}{Data frame of emission spectra}
+\item{.data}{Data frame of emission spectra}
 
 \item{degree}{Degree of the polynomial fitting function (by default 4)}
 

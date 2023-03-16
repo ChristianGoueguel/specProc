@@ -5,7 +5,7 @@
 \title{Peak Fitting}
 \usage{
 peakfit(
-  data,
+  .data,
   profile = "Voigt",
   wL = NULL,
   wG = NULL,
@@ -17,7 +17,7 @@ peakfit(
 )
 }
 \arguments{
-\item{data}{Data frame of emission spectra}
+\item{.data}{Data frame of emission spectra}
 
 \item{profile}{(character) Lineshape function: "Lorentzian", "Gaussian" or "Voigt"}
 
