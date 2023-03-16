@@ -79,8 +79,7 @@ confidence_ellipse <- function(.data, x = NULL, y = NULL, conf_level = 0.95, by_
     # Group the data by factor columns and nest the data
     nested_data <- df_tbl %>%
       select({{factor_col}}, {{x}}, {{y}}) %>%
-      group_by(!!sym(factor_col)) %>%
-      nest() %>%
+      nest_by(!!sym(factor_col)) %>%
       ungroup()
 
     Y <- matrix(0, nrow = 361*length(nested_data$data), ncol = 3)
