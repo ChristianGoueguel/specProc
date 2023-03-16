@@ -1,6 +1,6 @@
 #' @title Function to Compute Adjusted Boxplot for Skewed Distribution
 #' @author Christian L. Goueguel
-#' @source M. Hubert and E. Vandervieren, An adjusted boxplot for skewed distributions, Comput. Stat. Data Anal., Vol.52, 12, 2008
+#' @source G. Brys, M. Hubert and A. Struyf, A Robust Measure of Skewness. J. Comput. Graph. Stat. 13 (2004); M. Hubert and E. Vandervieren, An adjusted boxplot for skewed distributions, Comput. Stat. Data Anal., 52 (2008
 #' @param .data data frame or tibble (must contain numeric columns).
 #' @return ggplot2 object.
 #' @export adj_boxplot
@@ -21,14 +21,15 @@ adj_boxplot <- function(.data) {
   # Calculate adjusted boxplot values for each column using tidyverse syntax
   adj_boxplot_vals <- .data %>%
     purrr::map_dfr(
-      function(col) {
-        adj_box <- robustbase::adjboxStats(col)
+      function(.x) {
+        adj_box <- robustbase::adjboxStats(.x)
         tibble::tibble(
           lower = adj_box$stats[1],
           q1 = adj_box$stats[2],
           median = adj_box$stats[3],
           q3 = adj_box$stats[4],
-          upper = adj_box$stats[5]
+          upper = adj_box$stats[5],
+          medcouple = robustbase::mc(.x)
         )
       },
       .id = "variable"
