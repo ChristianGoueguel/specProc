@@ -1,4 +1,4 @@
-#' @title Baseline Correction
+#' @title Function for Baseline Correction
 #' @description This function perform the estimation and removal of the continuous background emission using a polynomial curve fitting function.
 #' @author Christian L. Goueguel
 #' @details This is a wrapper function implemented in the baseline package.
