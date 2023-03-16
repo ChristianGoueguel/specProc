@@ -1,5 +1,5 @@
 ---
-title: "Confidence Ellipse"
+title: "Confidence Ellipse for Bivariate Normal Data"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Confidence Ellipse}
@@ -16,9 +16,17 @@ knitr::opts_chunk$set(
 )
 ```
 
+A confidence ellipse is an ellipse that encloses a specified proportion of the probability distribution of a bivariate normal population, typically specified by a confidence level or a probability level. The shape of the ellipse is based on the covariance matrix of the two variables and is centered at the sample mean. 
+
+The `confidence_ellipse` function computes a confidence ellipse for bivariate input data. By default, the function assumes a confidence level of 0.95, but this can be adjusted as needed. The output is a data frame containing the x and y coordinates of the ellipse. Additionally, data grouping is an optional feature, which is disabled by default.
+
 ```{r setup}
-library(specProc)
-library(tidyverse)
+ssh = suppressPackageStartupMessages
+ssh(library(tidyverse))
+```
+
+```{r}
+source("~/Documents/Packages/specProc/R/confidence_ellipse.R")
 ```
 
 ```{r}
@@ -36,16 +44,20 @@ df_tbl <-
 ```
 
 ```{r}
+df_tbl %>% slice_head(n = 5)
+```
+
+```{r message=FALSE, warning=FALSE}
 mod <- confidence_ellipse(df_tbl, x = "SiO2", y = "Na2O")
 mod_grouped <- confidence_ellipse(df_tbl, x = "SiO2", y = "Na2O", by_group = TRUE)
 ```
 
 ```{r}
-str(mod)
+mod %>% slice_head(n = 5)
 ```
 
 ```{r}
-str(mod_grouped)
+mod_grouped %>% slice_head(n = 5)
 ```
 
 ```{r}
@@ -53,7 +65,7 @@ plot1 <-
   ggplot() +
   geom_point(data = df_tbl, aes(SiO2, Na2O), size = 3L) +
   geom_point(data = mod, aes(x, y), size = .5, color = "red") +
-  labs(x = "SiO2 (wt.%)", y = "Na2O (wt.%)") +
+  labs(title = "Ungrouped", x = "SiO2 (wt.%)", y = "Na2O (wt.%)") +
   theme_bw() +
   theme(legend.position = "none", panel.grid = element_blank())
 ```
@@ -64,12 +76,13 @@ plot2 <-
   geom_point(data = df_tbl, aes(SiO2, Na2O, colour = group), size = 3L) +
   geom_point(data = mod_grouped, aes(x, y, colour = group), size = .5) +
   scale_color_brewer(palette = "Set1", direction = 1) +
-  labs(x = "SiO2 (wt.%)", y = "Na2O (wt.%)") +
+  labs(title = "Grouped data", x = "SiO2 (wt.%)", y = "Na2O (wt.%)") +
   theme_bw() +
   theme(legend.position = "none", panel.grid = element_blank())
 ```
 
-```{r}
-patchwork::wrap_plots(plot1, plot2)
+```{r fig.height=5, fig.width=7}
+design <- "AB"
+patchwork::wrap_plots(A = plot1, B = plot2, design = design)
 ```
 
