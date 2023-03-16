@@ -2,9 +2,10 @@
 #' @author Christian L. Goueguel
 #' @source G. Brys, M. Hubert and A. Struyf, A Robust Measure of Skewness. J. Comput. Graph. Stat. 13 (2004); M. Hubert and E. Vandervieren, An adjusted boxplot for skewed distributions, Comput. Stat. Data Anal., 52 (2008
 #' @param .data data frame or tibble (must contain numeric columns).
-#' @return ggplot2 object.
+#' @param .plot plot the adjusted boxplot (TRUE by default).
+#' @return data frame of the adjusted boxplot statistics and a ggplot2 object (if selected).
 #' @export adj_boxplot
-adj_boxplot <- function(.data) {
+adj_boxplot <- function(.data, .plot = TRUE) {
   requireNamespace("robustbase", quietly = TRUE)
   requireNamespace("ggplot2", quietly = TRUE)
   requireNamespace("dplyr", quietly = TRUE)
@@ -17,8 +18,11 @@ adj_boxplot <- function(.data) {
   if (!all(.data %>% purrr::map_lgl(is.numeric))) {
     stop("Input must be a numeric data frame.")
   }
+  if(!is.logical(.plot)) {
+    stop("Argument '.plot' must be of type boolean (TRUE or FALSE).")
+  }
 
-  # Calculate adjusted boxplot values for each column using tidyverse syntax
+  # Calculate adjusted boxplot values for each column
   adj_boxplot_vals <- .data %>%
     purrr::map_dfr(
       function(.x) {
@@ -58,6 +62,11 @@ adj_boxplot <- function(.data) {
       x = " ",
       y = " "
     )
-  res <- list(adj_box_stat = adj_boxplot_vals, plot = plot)
+
+  if (.plot == TRUE) {
+    res <- list(adj_box_stat = adj_boxplot_vals, plot = plot)
+  } else{
+    res <- list(adj_box_stat = adj_boxplot_vals)
+  }
   return(res)
 }

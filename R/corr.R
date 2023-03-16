@@ -3,7 +3,7 @@
 #' @description This function takes a data frame as input and computes the Pearson, Kendall, or Spearman correlation
 #' for each column with respect to the response variable. The function returns a tibble with the respective
 #' correlation for each column.
-#' @param df A numeric data frame containing the data.
+#' @param .data A numeric data frame containing the data.
 #' @param response_var A character string specifying the name of the response variable column in the data frame.
 #' @param method A character string specifying the correlation method to use. Available methods are "pearson",
 #'               "kendall", and "spearman". Default is "pearson".
@@ -16,18 +16,16 @@ corr <- function(.data, response_var, method = "pearson") {
   if (!is.data.frame(.data) || !all(.data %>% map_lgl(is.numeric))) {
     stop("Input must be a numeric data frame.")
   }
-
   if (!response_var %in% colnames(.data)) {
     stop("Response variable not found in the data frame.")
   }
-
   valid_methods <- c("pearson", "kendall", "spearman")
   if (!method %in% valid_methods) {
     stop("Invalid method specified. Available methods are: pearson, kendall, and spearman.")
   }
 
   correlation <- df %>%
-    correlate(method = ifelse(method == "kendall", "kendall", "pearson")) %>%
+    corrr::correlate(method = ifelse(method == "kendall", "kendall", "pearson")) %>%
     rownames_to_column("variable") %>%
     select(variable, !!response_var) %>%
     rename(correlation = !!response_var) %>%
