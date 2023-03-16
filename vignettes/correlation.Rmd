@@ -1,0 +1,69 @@
+---
+title: "Pearson and Spearman Correlation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Pearson and Spearman Correlation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Pearson and Spearman are common types of correlation coefficients that quantify the degree of association between two variables.
+
+-   **Pearson Correlation:** Pearson correlation is a widely used parametric measure that quantifies the linear relationship between two continuous variables. It ranges from -1 (perfect negative correlation) to 1 (perfect positive correlation), with 0 indicating no linear relationship. Pearson correlation assumes that the two variables have a bivariate normal distribution, and it is sensitive to outliers. It is the most widely used correlation coefficient when the data meets its underlying assumptions.
+
+-   **Spearman Correlation:** Spearman correlation, or Spearman's rank correlation, is a non-parametric measure that quantifies the monotonic relationship between two variables that may not be linear. It assesses the strength and direction of the association based on the ranked values of the variables. Spearman correlation ranges from -1 (perfect negative correlation) to 1 (perfect positive correlation), with 0 indicating no association. Like Kendall correlation, Spearman correlation does not require any distributional assumptions and is less sensitive to outliers.
+
+In summary:
+
+1.  *Assumptions*: Pearson correlation assumes a linear relationship and bivariate normal distribution, while Spearman correlation does not require any distributional assumptions, making it suitable for non-parametric data.
+
+2.  *Sensitivity to outliers*: Pearson correlation is sensitive to outliers, which can have a significant effect on the correlation coefficient. Spearman correlation is more robust to outliers, as it is based on ranks.
+
+3.  *Type of relationship*: Pearson correlation measures linear relationships, while Spearman correlation measures monotonic relationships, which can be linear or nonlinear.
+
+4.  *Computation*: Pearson correlation is based on the covariance between the two variables, whereas Spearman correlation is based on the ranks of the data points.
+
+```{r setup}
+ssh = suppressPackageStartupMessages
+ssh(library(tidyverse))
+```
+
+```{r}
+source("~/Documents/Packages/specProc/R/corr.R")
+```
+
+```{r}
+data(glass, package = "chemometrics")
+data(glass.grp, package = "chemometrics")
+```
+
+```{r}
+df_tbl <-
+  cbind(glass.grp, glass) %>%
+  as_tibble() %>%
+  rename(group = glass.grp) %>%
+  modify_at("group", as_factor)
+```
+
+```{r}
+df_tbl %>% slice_head(n = 5)
+```
+
+```{r}
+df_tbl %>% 
+  select(-group) %>% 
+  corr(response_var = "CaO", method = "spearman")
+```
+
+```{r}
+df_tbl %>% 
+  select(-group) %>% 
+  corr(response_var = "CaO", method = "pearson")
+```

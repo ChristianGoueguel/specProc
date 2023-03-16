@@ -54,7 +54,15 @@ adjBox <- df_tbl %>% select(where(is.numeric)) %>% adj_boxplot()
 adjBox %>% pluck("adj_box_stat")
 ```
 
-```{r fig.height=7, fig.width=9}
+```{r fig.height=5, fig.width=10}
 adjBox %>% pluck("plot")
+```
+
+```{r}
+df_tbl %>%
+  select(Na2O:MnO) %>%
+  as.matrix() %T>%
+  mvoutlier::uni.plot(symb = TRUE, quan = .5, alpha = .025) %>%
+  mvoutlier::uni.plot(symb = FALSE, quan = .5, alpha = .025) 
 ```
 

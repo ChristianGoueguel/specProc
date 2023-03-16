@@ -32,10 +32,10 @@ normalize_spec <- function(.data, method = "min_max") {
           vector = ~ . / sqrt(sum(.^2)),
           area = ~ . / sum(.),
           max_intensity = ~ . / max(.),
-          msc = {
-            H <- qr.solve(t(.data)) %*% .data;
-            ~ . / H[1, ] - H[2, ]
-          },
+          # msc = {
+          #   H <- qr.solve(t(.data)) %*% .data;
+          #   ~ . / H[1, ] - H[2, ]
+          # },
           snv = ~ (. - mean(.)) / sd(.)
         ),
         .names = paste0(method, "_", .col)

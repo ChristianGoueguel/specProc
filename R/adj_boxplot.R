@@ -53,8 +53,15 @@ adj_boxplot <- function(.data, .plot = TRUE) {
       group = variable,
       fill = variable
     ) +
-    ggplot2::geom_boxplot(stat = "identity", width = 0.1, colour = "black") +
-    #ggplot2::facet_wrap(vars(variable), scales = "free") +
+    ggplot2::geom_boxplot(
+      stat = "identity",
+      width = 0.2,
+      colour = "black",
+      outlier.colour = "black",
+      outlier.shape = 21,
+      outlier.size = 1.5
+      ) +
+    ggplot2::stat_boxplot(geom = "errorbar", width = 0.2) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = "none", panel.grid = element_blank()) +
     ggplot2::labs(
