@@ -1,6 +1,6 @@
 #' @title Function to Compute Adjusted Boxplot for Skewed Distribution
 #' @author Christian L. Goueguel
-#' @source M. Hubert and E. Vandervieren, An adjusted boxplot for skewed distributions, Computational Statistics & Data Analysis, Vol.52, 12, 2008
+#' @source M. Hubert and E. Vandervieren, An adjusted boxplot for skewed distributions, Comput. Stat. Data Anal., Vol.52, 12, 2008
 #' @param .data data frame or tibble (must contain numeric columns).
 #' @return ggplot2 object.
 #' @export adj_boxplot
@@ -32,29 +32,31 @@ adj_boxplot <- function(.data) {
         )
       },
       .id = "variable"
-    )
-
-  adj_boxplot_vals$variable <- factor(adj_boxplot_vals$variable, levels = names(.data))
+    ) %>%
+    purrr::modify_at("variable", forcats::as_factor)
 
   # Create ggplot2 object
-  plot <- ggplot2::ggplot(
-    adj_boxplot_vals,
+  plot <- adj_boxplot_vals %>%
+    ggplot2::ggplot() +
     ggplot2::aes(
       x = variable,
       ymin = lower,
       lower = q1,
       middle = median,
       upper = q3,
-      ymax = upper
-    )
-  ) +
-    ggplot2::geom_boxplot(stat = "identity") +
+      ymax = upper,
+      group = variable,
+      fill = variable
+    ) +
+    ggplot2::geom_boxplot(stat = "identity", width = 0.1, colour = "black") +
+    #ggplot2::facet_wrap(vars(variable), scales = "free") +
     ggplot2::theme_bw() +
+    ggplot2::theme(legend.position = "none", panel.grid = element_blank()) +
     ggplot2::labs(
-      title = "Adjusted Boxplots for Skewed Distributions",
-      x = "Variables",
-      y = "Values"
+      title = "Adjusted Boxplots",
+      x = " ",
+      y = " "
     )
-
-  return(plot)
+  res <- list(adj_box_stat = adj_boxplot_vals, plot = plot)
+  return(res)
 }
