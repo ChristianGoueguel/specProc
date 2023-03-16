@@ -9,11 +9,16 @@ normalize_spec <- function(.data, method = "min_max") {
   requireNamespace("dplyr", quietly = TRUE)
   requireNamespace("purrr", quietly = TRUE)
 
+  # Check input validity
   if (missing(.data)) {
     stop("Missing 'data' argument.")
   }
   if (!all(.data %>% purrr::map_lgl(is.numeric))) {
     stop("Input must be a numeric data frame.")
+  }
+  valid_methods <- c("min_max", "mean", "vector", "area", "max_intensity", "msc", "snv")
+  if (!all(method %in% valid_methods)) {
+    stop("Invalid method specified. Available methods are: min_max, mean, vector, area, max_intensity, msc, and snv.")
   }
 
   res <- .data %>%
