@@ -1,11 +1,18 @@
-# Load required packages
-install.packages("tidyverse")
-install.packages("corrr")
-library(tidyverse)
-library(corrr)
-
-# Function to compute correlation with respect to a response variable
+#' @title Compute Correlation for Each Column with Respect to the Response Variable
+#' @author Christian L. Goueguel
+#' @description This function takes a data frame as input and computes the Pearson, Kendall, or Spearman correlation
+#' for each column with respect to the response variable. The function returns a tibble with the respective
+#' correlation for each column.
+#' @param df A numeric data frame containing the data.
+#' @param response_var A character string specifying the name of the response variable column in the data frame.
+#' @param method A character string specifying the correlation method to use. Available methods are "pearson",
+#'               "kendall", and "spearman". Default is "pearson".
+#' @return A tibble containing the variable name, correlation value, and method used.
+#' @export corr
 corr <- function(.data, response_var, method = "pearson") {
+  requireNamespace("dplyr", quietly = TRUE)
+  requireNamespace("corrr", quietly = TRUE)
+
   if (!is.data.frame(.data) || !all(.data %>% map_lgl(is.numeric))) {
     stop("Input must be a numeric data frame.")
   }
@@ -42,9 +49,3 @@ corr <- function(.data, response_var, method = "pearson") {
 
   return(correlation)
 }
-
-# Example usage
-data(iris)
-numeric_iris <- iris %>% dplyr::select(-Species)
-correlation_results <- compute_correlation(numeric_iris, response_var = "Sepal.Length", method = "pearson")
-print(correlation_results)
