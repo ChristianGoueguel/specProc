@@ -1,4 +1,4 @@
-#' @title Compute Correlation for Each Column with Respect to the Response Variable
+#' @title Compute Correlation for Each Column with Respect to a Response Variable
 #' @author Christian L. Goueguel
 #' @description This function takes a data frame as input and computes the Pearson or Spearman correlation
 #' for each column with respect to the response variable. The function returns a tibble with the respective

@@ -2,7 +2,7 @@
 % Please edit documentation in R/corr.R
 \name{corr}
 \alias{corr}
-\title{Compute Correlation for Each Column with Respect to the Response Variable}
+\title{Compute Correlation for Each Column with Respect to a Response Variable}
 \usage{
 corr(.data, response_var, method = "pearson")
 }
