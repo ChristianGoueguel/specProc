@@ -11,14 +11,13 @@ corr(.data, response_var, method = "pearson")
 
 \item{response_var}{A character string specifying the name of the response variable column in the data frame.}
 
-\item{method}{A character string specifying the correlation method to use. Available methods are "pearson",
-"kendall", and "spearman". Default is "pearson".}
+\item{method}{A character string specifying the correlation method to use. Available methods are "pearson" and "spearman". Default is "pearson".}
 }
 \value{
 A tibble containing the variable name, correlation value, and method used.
 }
 \description{
-This function takes a data frame as input and computes the Pearson, Kendall, or Spearman correlation
+This function takes a data frame as input and computes the Pearson or Spearman correlation
 for each column with respect to the response variable. The function returns a tibble with the respective
 correlation for each column.
 }
