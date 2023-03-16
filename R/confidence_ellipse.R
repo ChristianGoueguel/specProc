@@ -23,11 +23,14 @@ confidence_ellipse <- function(.data, x = NULL, y = NULL, conf_level = 0.95, by_
   if (!is.data.frame(.data) && !tibble::is_tibble(.data)) {
     stop("Input 'data' must be a data frame or tibble.")
   }
-  if (is.null(x) && is.null(y)) {
+  if (is.null(x) || is.null(y)) {
     stop("Either 'x' or 'y' argument must be specified.")
   }
-  if (!(x %in% colnames(.data) && y %in% colnames(.data))) {
+  if (!(x %in% colnames(.data) || y %in% colnames(.data))) {
     stop("x, y or both variables do not exist in the input data frame.")
+  }
+  if (x == y) {
+    stop("x and y must be distinct variables.")
   }
   if (!is.numeric(conf_level)) {
     stop("'conf_level' must be numeric.")
