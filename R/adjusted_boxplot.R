@@ -1,9 +1,9 @@
 #' @title Function to Compute Adjusted Boxplots for Skewed Distributions
 #' @author Christian L. Goueguel
 #' @param .data data frame or tibble (must contain numeric columns).
-#' @return ggplot object.
-#' @export adjusted_boxplots
-adjusted_boxplots <- function(.data) {
+#' @return ggplot2 object.
+#' @export adjusted_boxplot
+adjusted_boxplot <- function(.data) {
 
   require(robustbase)
   require(ggplot2)
