@@ -19,23 +19,18 @@ multipeakfit <- function(data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, 
   if (length(data) == 0 & is.null(data) == TRUE) {
     stop("Apparently you forgot to provide the spectra.")
   }
-
   if (is.data.frame(data) == FALSE & tibble::is.tibble(data) == FALSE) {
     stop("Data must be of class tbl_df, tbl or data.frame")
   }
-
   if (is.numeric(peaks) == FALSE) {
     stop("Please enter a valid vector of wavelengths")
   }
-
   if (is.character(profiles) == FALSE) {
     stop("Profiles must be a valid vector of lineshape functions: Lorentzian, Gaussian and Voigt")
   }
-
   if (length(peaks) < 2 | length(profiles) < 2) {
     stop("The number of peaks to be fitted must be at least 2 otherwise use the Peakfit function")
   }
-
   if (length(peaks) != length(profiles)) {
     stop("Peaks and profiles must have the same length")
   }

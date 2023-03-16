@@ -2,7 +2,7 @@
 #' @author Christian L. Goueguel
 #' @description Fitting of a single spectral line by lineshape functions with variable parameters.
 #' @details The function uses `minpack.lm::nlsLM`, which is based on the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals.
-#' @param data Data frame of emission spectra
+#' @param .data Data frame of emission spectra
 #' @param profile (character) Lineshape function: "Lorentzian", "Gaussian" or "Voigt"
 #' @param wL (numeric) Lorentzian full width at half maximum (initial guess)
 #' @param wG (numeric) Gaussian full width at half maximum (initial guess)
@@ -13,20 +13,17 @@
 #' @param max.iter (numeric) Maximum number of iteration (200 by default)
 #' @return Fitted value and the estimated parameters along with the corresponding errors
 #' @export peakfit
-peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL, id = NULL, max.iter = 200) {
+peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL, id = NULL, max.iter = 200) {
 
-  if (length(data) == 0 & is.null(data) == TRUE) {
-    stop("Apparently you forgot to provide the spectra.")
+  if (missing(.data)) {
+    stop("Missing 'data' argument.")
   }
-
-  if (is.data.frame(data) == FALSE & tibble::is.tibble(data) == FALSE) {
-    stop("Data must be of class tbl_df, tbl or data.frame")
+  if (!is.data.frame(.data) && !is_tibble(.data)) {
+    stop("Input 'data' must be a data frame or tibble.")
   }
-
   if (profile != "Lorentzian" & profile != "Gaussian" & profile != "Voigt") {
     stop("The profile function must be Lorentzian, Gaussian or Voigt")
   }
-
   if (is.numeric(max.iter) == FALSE) {
     stop("Maximum number of iteration must be numeric")
   } else {
@@ -36,7 +33,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
   if (is.null(id) == TRUE) {
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
       wlgth.min <- as.numeric(wlgth.min)
-      df <- data %>%
+      df <- .data %>%
         tidyr::pivot_longer(
           cols = tidyr::everything(),
           names_to = "x",
@@ -47,7 +44,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
     }
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == FALSE) {
       wlgth.max <- as.numeric(wlgth.max)
-      df <- data %>%
+      df <- .data %>%
         tidyr::pivot_longer(
           cols = tidyr::everything(),
           names_to = "x",
@@ -57,7 +54,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         dplyr::filter(x <= wlgth.max)
     }
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == TRUE) {
-      df <- data %>%
+      df <- .data %>%
         tidyr::pivot_longer(
           cols = tidyr::everything(),
           names_to = "x",
@@ -71,7 +68,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
       if (wlgth.min >= wlgth.max) {
         stop("wlgth.min must be strictly smaller than wlgth.max")
       } else {
-        df <- data %>%
+        df <- .data %>%
           tidyr::pivot_longer(
             cols = tidyr::everything(),
             names_to = "x",
@@ -92,7 +89,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         tidyr::nest(data = tidyr::everything()) %>%
         dplyr::mutate(
           fit = purrr::map(
-            data, ~ minpack.lm::nlsLM(
+            .data, ~ minpack.lm::nlsLM(
               data = .,
               y ~ lorentzian_func(x, y0, xc, wL, A),
               start =  list(
@@ -120,7 +117,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         tidyr::nest(data = tidyr::everything()) %>%
         dplyr::mutate(
           fit = purrr::map(
-            data, ~ minpack.lm::nlsLM(
+            .data, ~ minpack.lm::nlsLM(
               data = .,
               y ~ gaussian_func(x, y0, xc, wG, A),
               start =  list(
@@ -149,7 +146,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         tidyr::nest(data = tidyr::everything()) %>%
         dplyr::mutate(
           fit = purrr::map(
-            data, ~ minpack.lm::nlsLM(
+            .data, ~ minpack.lm::nlsLM(
               data = .,
               y ~ voigt_func(x, y0, xc, wG, wL, A),
               start =  list(
@@ -170,7 +167,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
   } else {
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
       wlgth.min <- as.numeric(wlgth.min)
-      df <- data %>%
+      df <- .data %>%
         tidyr::pivot_longer(
           cols = !id,
           names_to = "x",
@@ -181,7 +178,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
     }
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == FALSE) {
       wlgth.max <- as.numeric(wlgth.max)
-      df <- data %>%
+      df <- .data %>%
         tidyr::pivot_longer(
           cols = !id,
           names_to = "x",
@@ -191,7 +188,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         dplyr::filter(x <= wlgth.max)
     }
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == TRUE) {
-      df <- data %>%
+      df <- .data %>%
         tidyr::pivot_longer(
           cols = !id,
           names_to = "x",
@@ -205,7 +202,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
       if (wlgth.min >= wlgth.max) {
         stop("wlgth.min must be strictly smaller than wlgth.max")
       }
-      df <- data %>%
+      df <- .data %>%
         tidyr::pivot_longer(
           cols = !id,
           names_to = "x",
@@ -225,7 +222,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         tidyr::nest(data = -id) %>%
         dplyr::mutate(
           fit = purrr::map(
-            data, ~ minpack.lm::nlsLM(
+            .data, ~ minpack.lm::nlsLM(
               data = .,
               y ~ lorentzian_func(x, y0, xc, wL, A),
               start =  list(
@@ -253,7 +250,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         tidyr::nest(data = -id) %>%
         dplyr::mutate(
           fit = purrr::map(
-            data, ~ minpack.lm::nlsLM(
+            .data, ~ minpack.lm::nlsLM(
               data = .,
               y ~ gaussian_func(x, y0, xc, wG, A),
               start =  list(
@@ -282,7 +279,7 @@ peakfit <- function(data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlg
         tidyr::nest(data = -id) %>%
         dplyr::mutate(
           fit = purrr::map(
-            data, ~ minpack.lm::nlsLM(
+            .data, ~ minpack.lm::nlsLM(
               data = .,
               y ~ voigt_func(x, y0, xc, wG, wL, A),
               start =  list(
