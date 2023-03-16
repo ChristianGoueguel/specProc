@@ -8,7 +8,7 @@
 #' @param by_group for grouping the bivariate data, if it contains a grouping third column (FALSE by default). Note that this third column must be a factor.
 #' @return a data frame of the coordinates points of the ellipse.
 #' @export confidence_ellipse
-confidence_ellipse <- function(.data, x = NULL, y = NULL, conf_level = 0.95, by_group = FALSE) {
+confidence_ellipse <- function(.data, x, y, conf_level = 0.95, by_group = FALSE) {
 
   require(dplyr)
   require(tidyr)
@@ -27,7 +27,7 @@ confidence_ellipse <- function(.data, x = NULL, y = NULL, conf_level = 0.95, by_
     stop("Either 'x' or 'y' argument must be specified.")
   }
   if (!(x %in% colnames(.data) && y %in% colnames(.data))) {
-    stop("x, y or both variables do not exist in the data")
+    stop("x, y or both variables do not exist in the input data frame.")
   }
   if (!is.numeric(conf_level)) {
     stop("'conf_level' must be numeric.")
@@ -56,6 +56,9 @@ confidence_ellipse <- function(.data, x = NULL, y = NULL, conf_level = 0.95, by_
   }
 
   if (by_group == FALSE) {
+    x <- enquo(x)
+    y <- enquo(y)
+
     X_mat <- .data %>%
       select({{x}}, {{y}}) %>%
       as.matrix()
@@ -68,6 +71,8 @@ confidence_ellipse <- function(.data, x = NULL, y = NULL, conf_level = 0.95, by_
     if (sum(map_lgl(.data, is.factor)) != 1) {
       stop("The input 'data' must contain exactly one factor column. Currently, there are ", sum(map_lgl(data, is.factor)), " factor columns. Please modify your input to meet the requirement.")
     }
+    x <- enquo(x)
+    y <- enquo(y)
     # Get the names of the factor columns in the data frame
     factor_col <- .data %>%
       select(where(is.factor)) %>%
