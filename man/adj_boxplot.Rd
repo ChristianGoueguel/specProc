@@ -7,13 +7,15 @@
 G. Brys, M. Hubert and A. Struyf, A Robust Measure of Skewness. J. Comput. Graph. Stat. 13 (2004); M. Hubert and E. Vandervieren, An adjusted boxplot for skewed distributions, Comput. Stat. Data Anal., 52 (2008
 }
 \usage{
-adj_boxplot(.data)
+adj_boxplot(.data, .plot = TRUE)
 }
 \arguments{
 \item{.data}{data frame or tibble (must contain numeric columns).}
+
+\item{.plot}{plot the adjusted boxplot (TRUE by default).}
 }
 \value{
-ggplot2 object.
+data frame of the adjusted boxplot statistics and a ggplot2 object (if selected).
 }
 \description{
 Function to Compute Adjusted Boxplot for Skewed Distribution

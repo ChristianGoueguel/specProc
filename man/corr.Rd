@@ -7,12 +7,12 @@
 corr(.data, response_var, method = "pearson")
 }
 \arguments{
+\item{.data}{A numeric data frame containing the data.}
+
 \item{response_var}{A character string specifying the name of the response variable column in the data frame.}
 
 \item{method}{A character string specifying the correlation method to use. Available methods are "pearson",
 "kendall", and "spearman". Default is "pearson".}
-
-\item{df}{A numeric data frame containing the data.}
 }
 \value{
 A tibble containing the variable name, correlation value, and method used.
