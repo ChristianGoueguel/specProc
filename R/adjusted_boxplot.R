@@ -1,5 +1,6 @@
 #' @title Function to Compute Adjusted Boxplots for Skewed Distributions
 #' @author Christian L. Goueguel
+#' @source M. Hubert and E. Vandervieren, An adjusted boxplot for skewed distributions, Computational Statistics & Data Analysis, Vol.52, 12, 2008
 #' @param .data data frame or tibble (must contain numeric columns).
 #' @return ggplot2 object.
 #' @export adjusted_boxplot
