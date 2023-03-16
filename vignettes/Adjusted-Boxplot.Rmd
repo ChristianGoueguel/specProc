@@ -1,0 +1,50 @@
+---
+title: "Adjusted Boxplot for Skewed Distribution"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Adjusted Boxplot for Skewed Distribution}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+ssh = suppressPackageStartupMessages
+ssh(library(tidyverse))
+```
+
+```{r}
+source("~/Documents/Packages/specProc/R/adjusted_boxplot.R")
+```
+
+```{r}
+data(glass, package = "chemometrics")
+data(glass.grp, package = "chemometrics")
+```
+
+```{r}
+df_tbl <-
+  cbind(glass.grp, glass) %>%
+  as_tibble() %>%
+  rename(group = glass.grp) %>%
+  modify_at("group", as_factor) %>% 
+  select(group, SiO2, Na2O)
+```
+
+```{r}
+df_tbl %>% slice_head(n = 5)
+```
+
+```{r}
+df_tbl %>% pull(SiO2) %>% adjusted_boxplot()
+```
+
+

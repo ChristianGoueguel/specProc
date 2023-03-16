@@ -1,7 +1,7 @@
 #' @title A Function that Computes the Confidence Ellipse Coordinates for Bivariate Normal Data (with Optional Grouping)
 #' @author Christian L. Goueguel
 #' @description This function computes a confidence ellipse (assuming bivariate normality) at a specified confidence level.
-#' @param .data the data frame or tibble.
+#' @param .data data frame or tibble.
 #' @param x the x-axis column name.
 #' @param y the y-axis column name.
 #' @param conf_level the confidence level for the ellipse (0.95 by default).

@@ -1,4 +1,4 @@
-#' @title Function to Compute Adjusted Boxplots for Skewed Distributions
+#' @title Function to Compute Adjusted Boxplot for Skewed Distribution
 #' @author Christian L. Goueguel
 #' @source M. Hubert and E. Vandervieren, An adjusted boxplot for skewed distributions, Computational Statistics & Data Analysis, Vol.52, 12, 2008
 #' @param .data data frame or tibble (must contain numeric columns).
@@ -20,20 +20,23 @@ adjusted_boxplot <- function(.data) {
   }
 
   # Calculate adjusted boxplot values for each column using tidyverse syntax
-  adj_boxplot_vals <- .data %>% map(function(col) {
-    adj_box <- robustbase::adjboxStats(col, coef = 2.5, do_conf = FALSE, do_out = FALSE)
-    tibble(
-      lower = adj_box$stats[1],
-      q1 = adj_box$stats[2],
-      median = adj_box$stats[3],
-      q3 = adj_box$stats[4],
-      upper = adj_box$stats[5]
-    )
-  })
+  adj_boxplot_vals <- .data %>%
+    map(
+      function(col) {
+        adj_box <- robustbase::adjboxStats(col)
+        tibble(
+          lower = adj_box$stats[1],
+          q1 = adj_box$stats[2],
+          median = adj_box$stats[3],
+          q3 = adj_box$stats[4],
+          upper = adj_box$stats[5]
+        )
+        }
+      )
 
   # Convert list to data frame
   adj_boxplot_tbl <- bind_rows(adj_boxplot_vals, .id = "variable")
-  adj_boxplot_tbl$variable <- factor(adj_boxplot_df$variable, levels = names(.data))
+  adj_boxplot_tbl$variable <- factor(adj_boxplot_tbl$variable, levels = names(.data))
 
   # Create ggplot2 object
   plot <- ggplot(
