@@ -25,46 +25,31 @@ MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/
 used in laser-induced breakdown spectroscopy (LIBS). Collectively, these
 are essential tools in LIBS calibration modeling. These include:
 
-**Multivariate Filtering**
+**Multivariate Filtering:**
 
 -   Orthogonal Signal Correction (OSC)
-
 -   Orthogonal partial least-squares (OPLS)
-
 -   Generalized Least Squares Weighting (GLSW)
-
 -   External Parameter Orthogonalization (EPO)
 
-**Robust Methods**
+**Robust Methods:**
 
 -   Cellwise & Rowwise outliers detection (CROD)
-
 -   Robust Box-Cox and Yeo-Johnson transformation
-
 -   Skewness-adjusted boxplot
-
 -   Detecting deviating cells (DDC)
-
 -   Robust PCA methods (ROBPCA)
-
 -   Robust PLS method (RSIMPLS)
-
 -   Robust soft independent modelling by class analogy (RSIMCA)
 
-**Miscellaneous**
+**Miscellaneous:**
 
 -   Multivariate Cluster Elastic Net (MCEN)
-
 -   NIST interactive plot of LIBS emission lines
-
 -   Baseline removal
-
 -   Fitting single, multiple or overlapping peaks
-
 -   Spectra normalization
-
 -   Pearson or Spearman peaks correlation
-
 -   Descriptive statistics such as mean, standard deviation and higher
     central moments
 
