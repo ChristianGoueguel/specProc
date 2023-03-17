@@ -42,19 +42,6 @@ MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/
 used in laser-induced breakdown spectroscopy (LIBS). Collectively, these
 are essential tools in LIBS calibration modeling. These include:
 
-**Available Methods**
-
--   Baseline removal
-
--   Fitting single, multiple or overlapping peaks
-
--   Spectra normalization
-
--   Pearson or Spearman peaks correlation
-
--   Descriptive statistics such as mean, standard deviation and higher
-    central moments
-
 **Multivariate Filtering**
 
 -   Orthogonal Signal Correction (OSC)
@@ -86,6 +73,17 @@ are essential tools in LIBS calibration modeling. These include:
 -   Multivariate Cluster Elastic Net (MCEN)
 
 -   NIST interactive plot of LIBS emission lines
+
+-   Baseline removal
+
+-   Fitting single, multiple or overlapping peaks
+
+-   Spectra normalization
+
+-   Pearson or Spearman peaks correlation
+
+-   Descriptive statistics such as mean, standard deviation and higher
+    central moments
 
 ## Installation
 
