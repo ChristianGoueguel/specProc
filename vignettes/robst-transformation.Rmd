@@ -1,0 +1,58 @@
+---
+title: "Robust Box-Cox and Yeo-Johnson Transformation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Robust Box-Cox and Yeo-Johnson Transformation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The Box-Cox transformation is designed for strictly positive data and involves raising the original data to a power lambda (λ). The Yeo-Johnson transformation is an extension of the Box-Cox transformation and can handle both positive and negative values. The optimal value of λ is chosen to maximize the likelihood of the transformed data being normally distributed. 
+
+In the paper "Transforming variables to central normality" by J. Raymaekers and P.J. Rousseeuw (Machine Learning, 1–23, 2021), the authors introduce a robust approach to compute these transformations using re-weighted maximum likelihood. Traditional maximum likelihood estimation can be sensitive to outliers and other data anomalies, which can lead to suboptimal λ values and subsequent transformations. The authors propose a re-weighting process that iteratively updates the weights of the data points based on their influence on the estimation of λ. This approach reduces the impact of outliers and ensures a more robust estimation of the transformation parameters.
+
+```{r setup}
+ssh = suppressPackageStartupMessages
+ssh(library(tidyverse))
+```
+
+```{r}
+source("~/Documents/Packages/specProc/R/robTransform.R")
+```
+
+```{r}
+data(glass, package = "chemometrics")
+data(glass.grp, package = "chemometrics")
+```
+
+```{r}
+df_tbl <-
+  cbind(glass.grp, glass) %>%
+  as_tibble() %>%
+  rename(group = glass.grp) %>%
+  modify_at("group", as_factor)
+```
+
+```{r}
+df_tbl %>% slice_head(n = 5)
+```
+
+```{r}
+df_tf <- df_tbl %>% robTransform(type = "bestObj")
+```
+
+```{r}
+df_tf$summary
+```
+
+```{r}
+df_tf$data
+```
+
