@@ -2,7 +2,7 @@
 title: "Confidence Ellipse for Bivariate Normal Data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Confidence Ellipse}
+  %\VignetteIndexEntry{Confidence Ellipse for Bivariate Normal Data}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
