@@ -1,11 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
-<img src="man/figures/logo.png" align="right" height="139" />
-
-# specProc
-
 <!-- badges: start -->
+
+# specProc <img src="man/figures/logo.png" align="right" height="160" />
 
 [![Project Status: WIP – Initial development is in progress, but there
 has not yet been a stable, usable release suitable for the
