@@ -6,7 +6,6 @@
 #' @param id Factor variable that identified each spectrum  (`NULL` by default).
 #' @param colvar Numeric variable to be display in color scale (`NULL` by default).
 #' @return ggplot2 object.
-#' @importFrom utils "globalVariables"
 #' @export plotSpec
 plotSpec <- function(.data, id = NULL, colvar = NULL) {
 
