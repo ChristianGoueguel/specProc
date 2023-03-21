@@ -1,11 +1,11 @@
 #' @title Compute Correlation for Each Column with Respect to a Response Variable
 #' @author Christian L. Goueguel
-#' @description This function takes a data frame as input and computes the Pearson or Spearman correlation
+#' @description This function takes a data frame as input and computes the Pearson, Spearman or Kendall correlation
 #' for each column with respect to the response variable. The function returns a tibble with the respective
 #' correlation for each column.
 #' @param .data A numeric data frame containing the data.
 #' @param response_var A character string specifying the name of the response variable column in the data frame.
-#' @param method A character string specifying the correlation method to use. Available methods are "pearson" and "spearman". Default is "pearson".
+#' @param method A character string specifying the correlation method to use. Available methods are "pearson", "spearman" and "kendall". Default is "pearson".
 #' @param .plot for a visual representation of the results (FALSE by default).
 #' @return A tibble containing the variable name, correlation value, and method used.
 #' @export corr
