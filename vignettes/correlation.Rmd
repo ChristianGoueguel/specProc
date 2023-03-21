@@ -3,8 +3,10 @@ title: "Pearson and Spearman Correlation"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Pearson and Spearman Correlation}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r, include = FALSE}
@@ -57,13 +59,37 @@ df_tbl %>% slice_head(n = 5)
 ```
 
 ```{r}
-df_tbl %>% 
+df_spearman <- df_tbl %>% 
   select(-group) %>% 
-  corr(response_var = "CaO", method = "spearman")
+  corr(response_var = "CaO", method = "spearman") %>%
+  print()
 ```
 
 ```{r}
-df_tbl %>% 
+df_pearson <- df_tbl %>% 
   select(-group) %>% 
-  corr(response_var = "CaO", method = "pearson")
+  corr(response_var = "CaO", method = "pearson", .plot = TRUE)
 ```
+
+```{r}
+df_pearson$correlation
+```
+
+```{r fig.height=6, fig.width=4}
+df_pearson$plot
+```
+
+
+```{r fig.height=6, fig.width=5}
+ggplot() +
+  geom_bar(data = df_pearson$correlation, aes(x = reorder(variable, -correlation), y = correlation, fill = method), position = "stack", stat = "identity") +
+  geom_bar(data = df_spearman, aes(x = reorder(variable, -correlation), y = correlation, fill = method), position = "stack", stat = "identity") +
+  geom_vline(xintercept = 0, colour = "white", linewidth = 1) +
+  scale_fill_manual(values = c(pearson = "#CE0B0B", spearman = "#111D71")) +
+  ylim(-1,1) +
+  labs(x = " ", y = "Correlation ") +
+  coord_flip() +
+  theme_bw() +
+  theme(legend.position = "top", panel.grid = element_blank())
+```
+

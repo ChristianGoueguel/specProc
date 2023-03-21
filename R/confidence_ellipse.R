@@ -38,7 +38,7 @@ confidence_ellipse <- function(.data, x = NULL, y = NULL, conf_level = 0.95, by_
     stop("'conf_level' must be between 0 and 1.")
   }
   if (!is.logical(by_group)) {
-    stop("'by_group' must be of boolean type (TRUE or FALSE).")
+    stop("'by_group' must be of type boolean (TRUE or FALSE).")
   }
 
   # compute ellipse coordinates
