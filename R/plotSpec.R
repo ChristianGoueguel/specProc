@@ -22,54 +22,56 @@ plotSpec <- function(.data, id = NULL, colvar = NULL) {
   if (!is.null(colvar) && !(colvar %in% colnames(.data))) {
     stop("The 'colvar' column does not exist in the provided data.")
   }
-  if (!is.factor(.data[[id]])) {
+  if (!is.factor(.data$id)) {
     stop("The 'id' column must be a factor.")
   }
-  if (!is.numeric(.data[[colvar]])) {
+  if (!is.numeric(.data$colvar)) {
     stop("The 'colvar' column must be a factor.")
   }
 
-  select_cols <- if (is.null(id) && is.null(colvar)) {
-    tidyselect::everything()
-  } else if (!is.null(id) && is.null(colvar)) {
-    !id
-  } else if (is.null(id) && !is.null(colvar)) {
-    !colvar
-  } else {
-    !c(id, colvar)
+  exclude_cols <- c(id, colvar) %>% discard(is.null)
+
+  aes_params <- list()
+  color_params <- NULL
+
+  if (!is.null(id)) {
+    aes_params$group <- "id"
+  }
+  if (!is.null(colvar)) {
+    aes_params$colour <- "colvar"
+    color_params <- list(ggplot2::aes(colour = colvar), ggplot2::scale_colour_gradient(low = "blue", high = "red"))
   }
 
-  X <- .data %>%
-    tidyr::pivot_longer(
-      cols = select_cols,
-      names_to = "wavelength",
-      values_to = "intensity"
-    ) %>%
-    purrr::modify_at("wavelength", as.numeric)
-
+  if (length(exclude_cols) == 0) {
+    X <- .data %>%
+      tidyr::pivot_longer(
+        cols = tidyselect::everything(),
+        names_to = "wavelength",
+        values_to = "intensity"
+      ) %>%
+      purrr::modify_at("wavelength", as.numeric)
+  } else {
+    X <- .data %>%
+      tidyr::pivot_longer(
+        cols = -dplyr::all_of(exclude_cols),
+        names_to = "wavelength",
+        values_to = "intensity"
+      ) %>%
+      purrr::modify_at("wavelength", as.numeric)
+  }
 
   create_plot <- function(plot_data, aes_params, color_params = NULL) {
-    p <-
-      ggplot2::ggplot(plot_data, ggplot2::aes(.data$wavelength, .data$intensity, !!!aes_params)) +
-      ggplot2::geom_line(!!!color_params) +
+    p <- plot_data %>%
+      ggplot2::ggplot() +
+      ggplot2::aes_string(x = "wavelength", y = "intensity", !!!aes_params) +
+      ggplot2::geom_line(!!color_params) +
       ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
       ggplot2::theme_classic() +
       ggplot2::theme(legend.position = if (is.null(id) && is.null(colvar)) "none" else "right", axis.line = ggplot2::element_line(colour = "grey50", size = 1))
     return(p)
   }
 
-  if (is.null(id) && is.null(colvar)) {
-    .plot <- create_plot(X, list())
-  }
-  else if (!is.null(id) && is.null(colvar)) {
-    .plot <- create_plot(X, list(colour = "id", group = "id"))
-  }
-  else if (is.null(id) && !is.null(colvar)) {
-    .plot <- create_plot(X, list(colour = "colvar", group = "colvar"), list(ggplot2::aes(colour = colvar), ggplot2::scale_colour_gradient(low = "blue", high = "red")))
-  }
-  else {
-    .plot <- create_plot(X, list(colour = "colvar", group = "id"), list(ggplot2::aes(colour = colvar), ggplot2::scale_colour_gradient(low = "blue", high = "red")))
-  }
+  .plot <- create_plot(X, aes_params, color_params)
 
   return(.plot)
 }
