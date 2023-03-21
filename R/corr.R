@@ -22,24 +22,37 @@ corr <- function(.data, response_var, method = "pearson", .plot = FALSE) {
   if (!response_var %in% colnames(.data)) {
     stop("Response variable not found in the data frame")
   }
-  valid_methods <- c("pearson", "spearman")
+  valid_methods <- c("pearson", "spearman", "kendall")
   if (!method %in% valid_methods) {
-    stop("Invalid method specified. Available methods are: pearson and spearman")
+    stop("Invalid method specified. Available methods are: pearson, spearman and kendall")
   }
   if (!is.logical(.plot)) {
     stop("'.plot' must be of type boolean (TRUE or FALSE)")
   }
 
-  tbl_corr <- .data %>%
-    corrr::correlate(
-      method = ifelse(method == "spearman", "spearman", "pearson"),
-      use = "pairwise.complete.obs",
-      quiet = TRUE
-    ) %>%
-    tibble::rownames_to_column("variable") %>%
-    dplyr::select(variable, !!response_var) %>%
-    dplyr::rename(correlation = !!response_var) %>%
-    dplyr::mutate(method = method)
+  if (method != "kendall") {
+    tbl_corr <- .data %>%
+      corrr::correlate(
+        method = ifelse(method == "spearman", "spearman", "pearson"),
+        use = "pairwise.complete.obs",
+        quiet = TRUE
+      ) %>%
+      tibble::rownames_to_column("variable") %>%
+      dplyr::select(variable, !!response_var) %>%
+      dplyr::rename(correlation = !!response_var) %>%
+      dplyr::mutate(method = method)
+  } else {
+    tbl_corr <- .data %>%
+      corrr::correlate(
+        method = "kendall",
+        use = "pairwise.complete.obs",
+        quiet = TRUE
+      ) %>%
+      tibble::rownames_to_column("variable") %>%
+      dplyr::select(variable, !!response_var) %>%
+      dplyr::rename(correlation = !!response_var) %>%
+      dplyr::mutate(method = method)
+  }
 
   tbl_corr$variable <- names(.data)
   tbl_corr <- tbl_corr %>%
