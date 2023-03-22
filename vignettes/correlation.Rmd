@@ -2,7 +2,7 @@
 title: "Pearson, Spearman and Kendall Correlation"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Pearson and Spearman Correlation}
+  %\VignetteIndexEntry{Pearson, Spearman and Kendall Correlation}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 

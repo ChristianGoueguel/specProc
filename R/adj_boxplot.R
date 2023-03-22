@@ -3,7 +3,9 @@
 #' @source G. Brys, M. Hubert and A. Struyf, A Robust Measure of Skewness. J. Comput. Graph. Stat. 13 (2004); M. Hubert and E. Vandervieren, An adjusted boxplot for skewed distributions, Comput. Stat. Data Anal., 52 (2008
 #' @param .data data frame or tibble (must contain numeric columns).
 #' @param .plot plot the adjusted boxplot (TRUE by default).
-#' @return a list that contains: `adj_box_stat` data frame of the adjusted boxplot statistics, `plot` a ggplot2 object (if selected).
+#' @return A list that contains:
+#' @return \item{`adj_box_stat`}{data frame of the adjusted boxplot statistics}
+#' @return \item{`plot`}{ggplot2 object (if `.plot = TRUE`)}
 #' @export adj_boxplot
 adj_boxplot <- function(.data, .plot = TRUE) {
   requireNamespace("robustbase", quietly = TRUE)

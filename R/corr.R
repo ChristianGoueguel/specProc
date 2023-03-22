@@ -7,7 +7,9 @@
 #' @param response_var A character string specifying the name of the response variable column in the data frame.
 #' @param method A character string specifying the correlation method to use. Available methods are "pearson", "spearman" and "kendall". Default is "pearson".
 #' @param .plot for a visual representation of the results (FALSE by default).
-#' @return A tibble containing the variable name, correlation value, and method used.
+#' @return A list that contains:
+#' @return \item{`correlation`}{data frame of the correlation values}
+#' @return \item{`plot`}{ggplot2 object (if `.plot = TRUE`)}
 #' @export corr
 corr <- function(.data, response_var, method = "pearson", .plot = FALSE) {
   requireNamespace("dplyr", quietly = TRUE)

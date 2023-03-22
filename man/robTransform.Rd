@@ -7,12 +7,14 @@
 J. Raymaekers and P.J. Rousseeuw, Transforming variables to central normality, Machine Learning, 1–23 (2021).
 }
 \usage{
-robTransform(.data, var = NULL, quant = 0.99, nbsteps = 2)
+robTransform(.data, var = NULL, type = "bestObj", quant = 0.99, nbsteps = 2)
 }
 \arguments{
 \item{.data}{A data frame or tibble containing numeric columns.}
 
 \item{var}{A vector of character or numeric specifying the selected variable(s). Default is NULL (all columns).}
+
+\item{type}{A character string specifying the transformation method to use. Available methods are "BC" (Box-Cox power transformation, which is for strictly positive values.), "YJ" ( Yeo-Johnson power transformation, which works for positive and negative values.) or "bestObj" (both BC and YJ are run for strictly positive variables, and the solution with lowest objective is kept. Whereas if a variable has negative values YJ is run.). Default is "bestObj".}
 
 \item{quant}{Numeric value for the quantile used in determining the weights in the re-weighting step. Default is 0.99.}
 

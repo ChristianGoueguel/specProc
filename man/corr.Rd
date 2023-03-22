@@ -4,20 +4,26 @@
 \alias{corr}
 \title{Compute Correlation for Each Column with Respect to a Response Variable}
 \usage{
-corr(.data, response_var, method = "pearson")
+corr(.data, response_var, method = "pearson", .plot = FALSE)
 }
 \arguments{
 \item{.data}{A numeric data frame containing the data.}
 
 \item{response_var}{A character string specifying the name of the response variable column in the data frame.}
 
-\item{method}{A character string specifying the correlation method to use. Available methods are "pearson" and "spearman". Default is "pearson".}
+\item{method}{A character string specifying the correlation method to use. Available methods are "pearson", "spearman" and "kendall". Default is "pearson".}
+
+\item{.plot}{for a visual representation of the results (FALSE by default).}
 }
 \value{
-A tibble containing the variable name, correlation value, and method used.
+A list that contains:
+
+\item{\code{correlation}}{data frame of the correlation values}
+
+\item{\code{plot}}{ggplot2 object (if \code{.plot = TRUE})}
 }
 \description{
-This function takes a data frame as input and computes the Pearson or Spearman correlation
+This function takes a data frame as input and computes the Pearson, Spearman or Kendall correlation
 for each column with respect to the response variable. The function returns a tibble with the respective
 correlation for each column.
 }

@@ -15,7 +15,11 @@ adj_boxplot(.data, .plot = TRUE)
 \item{.plot}{plot the adjusted boxplot (TRUE by default).}
 }
 \value{
-a list that contains: \code{adj_box_stat} data frame of the adjusted boxplot statistics, \code{plot} a ggplot2 object (if selected).
+A list that contains:
+
+\item{\code{adj_box_stat}}{data frame of the adjusted boxplot statistics}
+
+\item{\code{plot}}{ggplot2 object (if \code{.plot = TRUE})}
 }
 \description{
 Function to Compute Adjusted Boxplot for Skewed Distribution
