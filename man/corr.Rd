@@ -16,7 +16,7 @@ corr(.data, response_var, method = "pearson", .plot = FALSE)
 \item{.plot}{for a visual representation of the results (FALSE by default).}
 }
 \value{
-A list that contains:
+List containing:
 
 \item{\code{correlation}}{data frame of the correlation values}
 

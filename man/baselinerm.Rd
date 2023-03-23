@@ -21,9 +21,9 @@ baselinerm(.data, degree = 4, tol = 0.001, rep = 100)
 \value{
 List containing:
 
-\iteme{\code{spec}}{data frame of background subtracted spectra}
+\item{\code{spec}}{data frame of background subtracted spectra}
 
-\iteme{\code{bkg}}{data frame of the modeled background}
+\item{\code{bkg}}{data frame of the modeled background}
 }
 \description{
 This function perform the estimation and removal of the continuous background emission using a polynomial curve fitting function.
