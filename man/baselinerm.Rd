@@ -19,13 +19,17 @@ baselinerm(.data, degree = 4, tol = 0.001, rep = 100)
 \item{rep}{Maximum number of iterations (by default 100)}
 }
 \value{
-List containing a data frame of background subtracted spectra (spec), and a data frame of the modeled background (bkg).
+List containing:
+
+\iteme{\code{spec}}{data frame of background subtracted spectra}
+
+\iteme{\code{bkg}}{data frame of the modeled background}
 }
 \description{
 This function perform the estimation and removal of the continuous background emission using a polynomial curve fitting function.
 }
 \details{
-This is a wrapper function implemented in the baseline package.
+Wrapper function from the baseline package.
 }
 \author{
 Christian L. Goueguel
