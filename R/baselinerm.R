@@ -7,7 +7,9 @@
 #' @param degree Degree of the polynomial fitting function (by default 4)
 #' @param tol Tolerance of difference between iterations (by default 1e-3)
 #' @param rep Maximum number of iterations (by default 100)
-#' @return List containing a data frame of background subtracted spectra (spec), and a data frame of the modeled background (bkg).
+#' @return List containing:
+#' @return \iteme{`spec`}{data frame of background subtracted spectra}
+#' @return \iteme{`bkg`}{data frame of the modeled background}
 #' @export baselinerm
 baselinerm <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
 
@@ -21,7 +23,7 @@ baselinerm <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
     stop("Missing 'data' argument.")
   }
   if (!is.data.frame(.data) && !is_tibble(.data)) {
-    stop("Input 'data' must be a data frame or tibble.")
+    stop("data must be a data frame or tibble.")
   }
   if (!is.numeric(degree)) {
     stop("degree must be numeric.")
