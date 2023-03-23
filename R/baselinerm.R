@@ -1,21 +1,20 @@
 #' @title Function for Baseline Correction
 #' @description This function perform the estimation and removal of the continuous background emission using a polynomial curve fitting function.
 #' @author Christian L. Goueguel
-#' @details This is a wrapper function implemented in the baseline package.
+#' @details Wrapper function from the baseline package.
 #' @source Chad A. Lieber, Anita Mahadevan-Jansen, Applied Spectroscopy, 2003, Vol. 57, 11, 1363-1367.
 #' @param .data Data frame of emission spectra
 #' @param degree Degree of the polynomial fitting function (by default 4)
 #' @param tol Tolerance of difference between iterations (by default 1e-3)
 #' @param rep Maximum number of iterations (by default 100)
 #' @return List containing a data frame of background subtracted spectra (spec), and a data frame of the modeled background (bkg).
-#' @importFrom utils "globalVariables"
 #' @export baselinerm
 baselinerm <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
 
-  require(dplyr)
-  require(tibble)
-  require(purrr)
-  require(baseline)
+  requireNamespace("dplyr", quietly = TRUE)
+  requireNamespace("tibble", quietly = TRUE)
+  requireNamespace("purrr", quietly = TRUE)
+  requireNamespace("baseline", quietly = TRUE)
 
   # Check if the input data is provided and is a data frame or tibble
   if (missing(.data)) {
@@ -23,6 +22,15 @@ baselinerm <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
   }
   if (!is.data.frame(.data) && !is_tibble(.data)) {
     stop("Input 'data' must be a data frame or tibble.")
+  }
+  if (!is.numeric(degree)) {
+    stop("degree must be numeric.")
+  }
+  if (!is.numeric(tol)) {
+    stop("tol must be numeric.")
+  }
+  if (!is.numeric(rep)) {
+    stop("rep must be numeric.")
   }
 
   # Select only numeric columns and convert to a matrix
