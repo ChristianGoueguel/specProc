@@ -8,8 +8,8 @@
 #' @param tol Tolerance of difference between iterations (by default 1e-3)
 #' @param rep Maximum number of iterations (by default 100)
 #' @return List containing:
-#' @return \iteme{`spec`}{data frame of background subtracted spectra}
-#' @return \iteme{`bkg`}{data frame of the modeled background}
+#' @return \item{`spec`}{data frame of background subtracted spectra}
+#' @return \item{`bkg`}{data frame of the modeled background}
 #' @export baselinerm
 baselinerm <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
 
