@@ -5,7 +5,7 @@
 \title{Multiple Peaks Fitting}
 \usage{
 multipeakfit(
-  data,
+  .data,
   peaks,
   profiles,
   wL = NULL,
@@ -18,7 +18,7 @@ multipeakfit(
 )
 }
 \arguments{
-\item{data}{Data frame of emission spectra}
+\item{.data}{Data frame of emission spectra}
 
 \item{peaks}{(vector) Center wavelengths of selected peaks}
 
