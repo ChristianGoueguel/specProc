@@ -37,9 +37,10 @@ In summary:
 ```{r setup}
 ssh = suppressPackageStartupMessages
 ssh(library(tidyverse))
+ssh(library(cowplot))
 ```
 
-```{r}
+```{r include=FALSE}
 source("~/Documents/Packages/specProc/R/corr.R")
 ```
 
@@ -77,10 +78,9 @@ df_pearson <- df_tbl %>%
 df_pearson$correlation
 ```
 
-```{r fig.height=6, fig.width=4}
+```{r fig.height=6, fig.width=5}
 df_pearson$plot
 ```
-
 
 ```{r fig.height=6, fig.width=5}
 ggplot() +
@@ -88,10 +88,10 @@ ggplot() +
   geom_bar(data = df_spearman, aes(x = reorder(variable, -correlation), y = correlation, fill = method), position = "stack", stat = "identity") +
   geom_vline(xintercept = 0, colour = "white", linewidth = 1) +
   scale_fill_manual(values = c(pearson = "#CE0B0B", spearman = "#111D71")) +
-  ylim(-1,1) +
+  scale_y_continuous(breaks = c(-1, -.5, 0, .5, 1), limits = c(-1, 1)) +
   labs(x = " ", y = "Correlation ") +
   coord_flip() +
-  theme_bw() +
-  theme(legend.position = "top", panel.grid = element_blank())
+  theme_minimal_vgrid() +
+  theme(legend.position = "top")
 ```
 

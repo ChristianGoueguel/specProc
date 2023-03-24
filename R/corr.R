@@ -17,6 +17,7 @@ corr <- function(.data, response_var, method = "pearson", .plot = FALSE) {
   requireNamespace("tibble", quietly = TRUE)
   requireNamespace("purrr", quietly = TRUE)
   requireNamespace("corrr", quietly = TRUE)
+  requireNamespace("cowplot", quietly = TRUE)
 
   if (!is.data.frame(.data) || !all(.data %>% purrr::map_lgl(is.numeric))) {
     stop("Input must be a numeric data frame")
@@ -67,11 +68,11 @@ corr <- function(.data, response_var, method = "pearson", .plot = FALSE) {
     ggplot2::geom_bar(stat = "identity") +
     ggplot2::geom_vline(xintercept = 0, colour = "white", linewidth = 1) +
     ggplot2::scale_fill_manual(values = "#111D71") +
-    ggplot2::ylim(-1, 1) +
+    ggplot2::scale_y_continuous(breaks = c(-1, -.5, 0, .5, 1), limits = c(-1, 1)) +
     ggplot2::labs(x = " ", y = "Correlation ") +
     ggplot2::coord_flip() +
-    ggplot2::theme_bw() +
-    ggplot2::theme(legend.position = "top", panel.grid = ggplot2::element_blank())
+    cowplot::theme_minimal_vgrid() +
+    ggplot2::theme(legend.position = "top")
 
   if (.plot == FALSE) {
     return(tbl_corr)

@@ -1,0 +1,104 @@
+---
+title: "Polynomial Baseline correction"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Polynomial Baseline correction}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+knitr::opts_chunk$set(include = FALSE)
+source("~/Documents/Packages/specProc/R/baselinerm.R")
+source("~/Documents/Packages/specProc/R/plotSpec.R")
+```
+
+```{r}
+ssh = suppressPackageStartupMessages
+ssh(library(tidyverse))
+ssh(library(magrittr))
+library(patchwork)
+```
+
+## LIBS spectrum in the 375–510 nm wavelength range
+
+The plot below shows a typical LIBS spectrum. Prominent atomic and ionic
+emission lines of Ca, Mn and Ba were identified using the [NIST spectral lines database](https://www.nist.gov/pml/atomic-spectra-database). The
+spectrum show emission lines of Ca II 393.37 nm, Ca II 396.85 nm and Ca
+I 422.67 nm, unresolved Mn triplet at 403.08, 403.31 and 403.45 nm, and
+Ba ionic lines at 455.40 and 493.41 nm.
+
+```{r}
+data("Ca_Mn_spec")
+```
+
+```{r fig.height=2, fig.width=4}
+Ca_Mn_spec %>% 
+  plotSpec() + 
+  theme_classic(base_size = 8) +
+  annotate("text", x = 391, y = 4.2e4, angle = 90, size = 2, label = "Ca II 393.37 nm") +
+  annotate("text", x = 396, y = 3e4, angle = 90, size = 2, label = "Ca II 396.85 nm") +
+  annotate("text", x = 401, y = 3.8e4, angle = 90, size = 2, label = "Mn I 403-nm") +
+  annotate("text", x = 420, y = 3.5e4, angle = 90, size = 2, label = "Ca I 422.67 nm") +
+  annotate("text", x = 453, y = 3e4, angle = 90, size = 2, label = "Ba II 455.40 nm") +
+  annotate("text", x = 491, y = 1.5e4, angle = 90, size = 2, label = "Ba II 493.41 nm")
+```
+
+Note that we used the ggplot-based `plotSpec` function to generate the
+above plot.
+
+## Baseline removal
+
+When analyzing LIBS spectra, it is often more effective to subtract an
+estimated baseline from the data. The estimate is constructed by fitting
+a low-order polynomial function to the spectrum baseline. Then the
+resulting curve fit is subtracted from the data. Here we use the
+function `baselinerm` to perform such a task.
+
+```{r message=FALSE, warning=FALSE}
+baseline_fit <- Ca_Mn_spec %>%
+  select(`390.03027`:`500.03397`) %>%
+  baselinerm(degree = 7)
+```
+
+As one can see, the `baselinerm` function provides a list containing two
+data frames, one for the baseline-subtracted spectrum or spectra `spec`
+and the other for the fitted baseline `bkg`.
+
+```{r}
+str(baseline_fit, list.len = 5) 
+```
+
+We can then extract each data frame from the list using the
+`purrr::pluck` function.
+
+```{r}
+background <- baseline_fit %>% pluck("bkg")
+corrected_spec <- baseline_fit %>% pluck("spec")
+```
+
+And then visualize the spectrum before and after baseline removal.
+
+```{r fig.height=3, message=FALSE, warning=FALSE}
+Ca_Mn_spec %>% 
+  plotSpec() + 
+  geom_line(
+    data = background %>% 
+      pivot_longer(cols = everything(), names_to = "wavelength", values_to = "intensity") %>%
+      modify_at("wavelength", as.numeric), 
+    aes(x = wavelength, y = intensity), 
+    colour = "red"
+  ) | 
+  corrected_spec %>% 
+  plotSpec() + 
+  geom_hline(yintercept = 0, colour = "red")
+```
