@@ -38,19 +38,15 @@ I 422.67 nm, unresolved Mn triplet at 403.08, 403.31 and 403.45 nm, and
 Ba ionic lines at 455.40 and 493.41 nm.
 
 ```{r}
-data("Ca_Mn_spec")
+data("Ca_Mn_spec", package = "specProc")
 ```
 
-```{r fig.height=2, fig.width=4}
-Ca_Mn_spec %>% 
-  plotSpec() + 
-  theme_classic(base_size = 8) +
-  annotate("text", x = 391, y = 4.2e4, angle = 90, size = 2, label = "Ca II 393.37 nm") +
-  annotate("text", x = 396, y = 3e4, angle = 90, size = 2, label = "Ca II 396.85 nm") +
-  annotate("text", x = 401, y = 3.8e4, angle = 90, size = 2, label = "Mn I 403-nm") +
-  annotate("text", x = 420, y = 3.5e4, angle = 90, size = 2, label = "Ca I 422.67 nm") +
-  annotate("text", x = 453, y = 3e4, angle = 90, size = 2, label = "Ba II 455.40 nm") +
-  annotate("text", x = 491, y = 1.5e4, angle = 90, size = 2, label = "Ba II 493.41 nm")
+```{r}
+spec_tbl <- Ca_Mn_spec %>% as_tibble()
+```
+
+```{r fig.height=4, fig.width=6}
+spec_tbl %>% plotSpec()
 ```
 
 Note that we used the ggplot-based `plotSpec` function to generate the
@@ -65,7 +61,7 @@ resulting curve fit is subtracted from the data. Here we use the
 function `baselinerm` to perform such a task.
 
 ```{r message=FALSE, warning=FALSE}
-baseline_fit <- Ca_Mn_spec %>%
+baseline_fit <- spec_tbl %>%
   select(`390.03027`:`500.03397`) %>%
   baselinerm(degree = 7)
 ```
@@ -88,8 +84,8 @@ corrected_spec <- baseline_fit %>% pluck("spec")
 
 And then visualize the spectrum before and after baseline removal.
 
-```{r fig.height=3, message=FALSE, warning=FALSE}
-Ca_Mn_spec %>% 
+```{r}
+plot1 <- spec_tbl %>% 
   plotSpec() + 
   geom_line(
     data = background %>% 
@@ -97,8 +93,15 @@ Ca_Mn_spec %>%
       modify_at("wavelength", as.numeric), 
     aes(x = wavelength, y = intensity), 
     colour = "red"
-  ) | 
-  corrected_spec %>% 
+  )
+```
+
+```{r}
+plot2 <- corrected_spec %>% 
   plotSpec() + 
   geom_hline(yintercept = 0, colour = "red")
+```
+
+```{r fig.height=5, message=FALSE, warning=FALSE}
+plot1 / plot2
 ```

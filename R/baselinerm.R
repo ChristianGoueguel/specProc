@@ -47,7 +47,7 @@ baselinerm <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
 
   wlength <- colnames(X_mat)
 
-  rreplaceWithZero <- function(x) {
+  replaceWithZero <- function(x) {
     ifelse(x < 0, 0, x)
   }
 
