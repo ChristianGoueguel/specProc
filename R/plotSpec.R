@@ -83,5 +83,4 @@ plotSpec <- function(.data, id = NULL, colvar = NULL, .interactive = FALSE) {
     return(plotly::ggplotly(.plot))
   }
 
-
 }
