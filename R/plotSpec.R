@@ -38,7 +38,7 @@ plotSpec <- function(.data, id = NULL, colvar = NULL, .interactive = FALSE) {
   }
   if (!is.null(colvar)) {
     aes_params$colour <- "colvar"
-    color_params <- list(ggplot2::aes(colour = !!colvar), ggplot2::scale_colour_gradient(low = "blue", high = "red"))
+    color_params <- list(ggplot2::aes(colour = !!as.name(colvar)), ggplot2::scale_colour_gradient(low = "blue", high = "red"))
   }
 
   if (length(exclude_cols) == 0) {
