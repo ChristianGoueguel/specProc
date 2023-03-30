@@ -3,11 +3,12 @@
 #' @author Christian L. Goueguel
 #' @details This function is based on the ggplot2 package, thus allowing users to easily add or modify different components of the plot.
 #' @param .data Data frame of emission spectra.
-#' @param id Factor variable that identified each spectrum  (`NULL` by default).
-#' @param colvar Numeric variable to be display in color scale (`NULL` by default).
-#' @return ggplot2 object.
+#' @param id Optional factor variable that identified each spectrum  (`NULL` by default).
+#' @param colvar Optional numeric variable to be display in color scale (`NULL` by default).
+#' @param .interactive Optional interactive plot (`FALSE` by default).
+#' @return ggplot2::ggplot object or a plotly object if `.interactive = TRUE`.
 #' @export plotSpec
-plotSpec <- function(.data, id = NULL, colvar = NULL) {
+plotSpec <- function(.data, id = NULL, colvar = NULL, .interactive = FALSE) {
 
   # check input validity
   if (missing(.data)) {
@@ -22,19 +23,22 @@ plotSpec <- function(.data, id = NULL, colvar = NULL) {
   if (!is.null(colvar) && !(colvar %in% colnames(.data))) {
     stop("The 'colvar' column does not exist in the provided data.")
   }
+  if (!is.logical(.interactive)) {
+    stop("'.interactive' must be of type boolean (TRUE or FALSE)")
+  }
 
-  exclude_cols <- c(id, colvar) %>% discard(is.null)
+  exclude_cols <- c(id, colvar) %>% purrr::discard(is.null)
 
   aes_params <- list()
   color_params <- NULL
 
   if (!is.null(id)) {
     aes_params$group <- "id"
-    color_params <- list(ggplot2::aes(colour = id))
+    color_params <- list(ggplot2::aes(colour = !!as.name(id)))
   }
   if (!is.null(colvar)) {
     aes_params$colour <- "colvar"
-    color_params <- list(ggplot2::aes(colour = colvar), ggplot2::scale_colour_gradient(low = "blue", high = "red"))
+    color_params <- list(ggplot2::aes(colour = !!colvar), ggplot2::scale_colour_gradient(low = "blue", high = "red"))
   }
 
   if (length(exclude_cols) == 0) {
@@ -64,7 +68,7 @@ plotSpec <- function(.data, id = NULL, colvar = NULL) {
       ggplot2::theme(legend.position = if (is.null(id) && is.null(colvar)) "none" else "right", axis.line = ggplot2::element_line(colour = "grey50", linewidth = 1))
 
     if (!is.null(color_params)) {
-      p <- p + ggplot2::geom_line(!!color_params)
+      p <- p + do.call(ggplot2::geom_line, color_params)
     } else {
       p <- p + ggplot2::geom_line()
     }
@@ -73,5 +77,11 @@ plotSpec <- function(.data, id = NULL, colvar = NULL) {
   }
 
   .plot <- create_plot(X, aes_params, color_params)
-  return(.plot)
+  if (.interactive == FALSE) {
+    return(.plot)
+  } else {
+    return(plotly::ggplotly(.plot))
+  }
+
+
 }
