@@ -4,17 +4,19 @@
 \alias{plotSpec}
 \title{Spectral Data Plot}
 \usage{
-plotSpec(.data, id = NULL, colvar = NULL)
+plotSpec(.data, id = NULL, colvar = NULL, .interactive = FALSE)
 }
 \arguments{
 \item{.data}{Data frame of emission spectra.}
 
-\item{id}{Factor variable that identified each spectrum  (\code{NULL} by default).}
+\item{id}{Optional factor variable that identified each spectrum  (\code{NULL} by default).}
 
-\item{colvar}{Numeric variable to be display in color scale (\code{NULL} by default).}
+\item{colvar}{Optional numeric variable to be display in color scale (\code{NULL} by default).}
+
+\item{.interactive}{Optional interactive plot (\code{FALSE} by default).}
 }
 \value{
-ggplot2 object.
+ggplot2::ggplot object or a plotly object if \code{.interactive = TRUE}.
 }
 \description{
 Spectrum plots are commonly x–y plots in which the x-axis represents the wavelength and the y-axis represents intensity of a spectrum's signal. The function allows to plot a spectrum or several spectra in a single plot, identified either by an id (for example, the samples or spectra id) or by a target variable (for example, the concentration of a chemical element) .
