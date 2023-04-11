@@ -6,9 +6,7 @@
 #' @return A data frame containing the original columns and the normalized columns for each specified method with the method name as a prefix.
 #' @export normalize_spec
 normalize_spec <- function(.data, method = "min_max") {
-  requireNamespace("dplyr", quietly = TRUE)
   requireNamespace("purrr", quietly = TRUE)
-  requireNamespace("stats", quietly = TRUE)
 
   # Check input validity
   if (missing(.data)) {

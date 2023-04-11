@@ -9,10 +9,11 @@
 #' @return a data frame of the coordinates points of the ellipse.
 #' @export confidence_ellipse
 confidence_ellipse <- function(.data, x = NULL, y = NULL, conf_level = 0.95, by_group = FALSE) {
-  require(dplyr)
-  require(tidyr)
-  require(purrr)
-  require(forcats)
+  requireNamespace("dplyr", quietly = TRUE)
+  requireNamespace("tidyr", quietly = TRUE)
+  requireNamespace("purrr", quietly = TRUE)
+  requireNamespace("forcats", quietly = TRUE)
+  requireNamespace("tibble", quietly = TRUE)
   require(magrittr)
 
   # check input validity
@@ -59,34 +60,34 @@ confidence_ellipse <- function(.data, x = NULL, y = NULL, conf_level = 0.95, by_
 
   if (by_group == FALSE) {
     X_mat <- .data %>%
-      select({{ x }}, {{ y }}) %>%
+      dplyr::select({{ x }}, {{ y }}) %>%
       as.matrix()
 
     Y <- transform_data(X_mat, conf_level)
     Y %<>%
-      as_tibble() %>%
-      rename(x = V1, y = V2)
+      tibble::as_tibble() %>%
+      dplyr::rename(x = V1, y = V2)
   } else {
-    if (sum(map_lgl(.data, is.factor)) != 1) {
+    if (sum(purrr::map_lgl(.data, is.factor)) != 1) {
       stop("The input 'data' must contain exactly one factor column. Currently, there are ", sum(map_lgl(data, is.factor)), " factor columns. Please modify your input to meet the requirement.")
     }
     # Get the names of the factor columns in the data frame
     factor_col <- .data %>%
-      select(where(is.factor)) %>%
+      dplyr::select(dplyr::where(is.factor)) %>%
       names()
 
     # Group the data by factor columns and nest the data
     nested_data <- df_tbl %>%
-      select({{ factor_col }}, {{ x }}, {{ y }}) %>%
-      nest_by(!!sym(factor_col)) %>%
-      ungroup()
+      dplyr::select({{ factor_col }}, {{ x }}, {{ y }}) %>%
+      dplyr::nest_by(!!rlang::sym(factor_col)) %>%
+      dplyr::ungroup()
 
     Y <- matrix(0, nrow = 361 * length(nested_data$data), ncol = 3)
 
     for (i in seq_along(nested_data$data)) {
       group_data <- nested_data %>%
-        pluck(2, i) %>%
-        select(where(is.numeric)) %>%
+        purrr::pluck(2, i) %>%
+        dplyr::select(dplyr::where(is.numeric)) %>%
         as.matrix()
 
       Y_grp <- transform_data(group_data, conf_level)
@@ -94,9 +95,9 @@ confidence_ellipse <- function(.data, x = NULL, y = NULL, conf_level = 0.95, by_
       Y[seq(1 + (361 * (i - 1)), 361 * i), ] <- Y_grp
     }
     Y %<>%
-      as_tibble() %>%
-      rename(x = V1, y = V2, group = V3) %>%
-      modify_at("group", as_factor)
+      tibble::as_tibble() %>%
+      dplyr::rename(x = V1, y = V2, group = V3) %>%
+      purrr::modify_at("group", as_factor)
   }
   return(Y)
 }

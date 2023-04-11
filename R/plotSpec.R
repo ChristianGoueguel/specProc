@@ -9,6 +9,11 @@
 #' @return ggplot2::ggplot object or a plotly object if `.interactive = TRUE`.
 #' @export plotSpec
 plotSpec <- function(.data, id = NULL, colvar = NULL, .interactive = FALSE) {
+  requireNamespace("ggplot2", quietly = TRUE)
+  requireNamespace("dplyr", quietly = TRUE)
+  requireNamespace("purrr", quietly = TRUE)
+  requireNamespace("tidyr", quietly = TRUE)
+  requireNamespace("plotly", quietly = TRUE)
 
   # check input validity
   if (missing(.data)) {
@@ -44,7 +49,7 @@ plotSpec <- function(.data, id = NULL, colvar = NULL, .interactive = FALSE) {
   if (length(exclude_cols) == 0) {
     X <- .data %>%
       tidyr::pivot_longer(
-        cols = tidyselect::everything(),
+        cols = dplyr::everything(),
         names_to = "wavelength",
         values_to = "intensity"
       ) %>%

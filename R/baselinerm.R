@@ -12,7 +12,6 @@
 #' @return \item{`bkg`}{data frame of the modeled background}
 #' @export baselinerm
 baselinerm <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
-
   requireNamespace("dplyr", quietly = TRUE)
   requireNamespace("tibble", quietly = TRUE)
   requireNamespace("purrr", quietly = TRUE)
@@ -22,7 +21,7 @@ baselinerm <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
   if (missing(.data)) {
     stop("Missing 'data' argument.")
   }
-  if (!is.data.frame(.data) && !is_tibble(.data)) {
+  if (!is.data.frame(.data) && !tibble::is_tibble(.data)) {
     stop("data must be a data frame or tibble.")
   }
   if (!is.numeric(degree)) {
@@ -37,7 +36,7 @@ baselinerm <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
 
   # Select only numeric columns and convert to a matrix
   X_mat <- .data %>%
-    select(where(is.numeric)) %>%
+    dplyr::select(dplyr::where(is.numeric)) %>%
     as.matrix()
 
   # Ensure the input parameters are numeric
@@ -61,17 +60,17 @@ baselinerm <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
 
   # Background subtracted spectra
   bc_spec <- bc_mod %>%
-    pluck("corrected") %>%
-    as_tibble() %>%
-    rename_with(~wlength, everything()) %>%
-    map_dfr(replaceWithZero)
+    purrr::pluck("corrected") %>%
+    tibble::as_tibble() %>%
+    dplyr::rename_with(~wlength, dplyr::everything()) %>%
+    purrr::map_dfr(replaceWithZero)
 
   # Estimated background emission
   background <- bc_mod %>%
-    pluck("baseline") %>%
-    as_tibble() %>%
-    rename_with(~wlength, everything()) %>%
-    map_dfr(replaceWithZero)
+    purrr::pluck("baseline") %>%
+    tibble::as_tibble() %>%
+    dplyr::rename_with(~wlength, dplyr::everything()) %>%
+    purrr::map_dfr(replaceWithZero)
 
   res <- list("spec" = bc_spec, "bkg" = background)
   return(res)
