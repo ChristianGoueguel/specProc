@@ -5,6 +5,13 @@
 #' @return Tibble. Summary statistic that quantitatively describes the variable(s).
 #' @export summaryStat
 summaryStat <- function(data, var = NULL, remove.na = TRUE, sign.fig = 2) {
+  requireNamespace("ggplot2", quietly = TRUE)
+  requireNamespace("dplyr", quietly = TRUE)
+  requireNamespace("tidyr", quietly = TRUE)
+  requireNamespace("tibble", quietly = TRUE)
+  requireNamespace("moments", quietly = TRUE)
+  requireNamespace("robustbase", quietly = TRUE)
+
   if (is.null(data) == TRUE) {
     stop("Data must be provided")
   }
@@ -14,8 +21,8 @@ summaryStat <- function(data, var = NULL, remove.na = TRUE, sign.fig = 2) {
 
   fct_summary <- function(x) {
     x %>%
-      group_by(variable) %>%
-      summarise(
+      dplyr::group_by(variable) %>%
+      dplyr::summarise(
         mean = round(mean(value), sign.fig),
         median = round(median(value), sign.fig),
         mad = round(mad(value), sign.fig),
@@ -35,13 +42,13 @@ summaryStat <- function(data, var = NULL, remove.na = TRUE, sign.fig = 2) {
   if (is.null(var) == FALSE) {
     if (remove.na == TRUE) {
       data %>%
-        select(where(is.numeric)) %>%
-        pivot_longer(
-          cols = all_of(var),
+        dplyr::select(dplyr::where(is.numeric)) %>%
+        tidyr::pivot_longer(
+          cols = dplyr::all_of(var),
           names_to = "variable",
           values_to = "value"
           ) %>%
-        drop_na(value) %>%
+        tidyr::drop_na(value) %>%
         fct_summary()
     } else {
       data %>%
@@ -56,19 +63,19 @@ summaryStat <- function(data, var = NULL, remove.na = TRUE, sign.fig = 2) {
   } else {
     if (remove.na == TRUE) {
       data %>%
-        select(where(is.numeric)) %>%
-        pivot_longer(
-          cols = everything(),
+        dplyr::select(dplyr::where(is.numeric)) %>%
+        tidyr::pivot_longer(
+          cols = dplyr::everything(),
           names_to = "variable",
           values_to = "value"
         ) %>%
-        drop_na(value) %>%
+        tidyr::drop_na(value) %>%
         fct_summary()
     } else {
       data %>%
-        select(where(is.numeric)) %>%
-        pivot_longer(
-          cols = everything(),
+        dplyr::select(dplyr::where(is.numeric)) %>%
+        tidyr::pivot_longer(
+          cols = dplyr::everything(),
           names_to = "variable",
           values_to = "value"
         ) %>%
@@ -76,6 +83,3 @@ summaryStat <- function(data, var = NULL, remove.na = TRUE, sign.fig = 2) {
     }
   }
 }
-
-
-
