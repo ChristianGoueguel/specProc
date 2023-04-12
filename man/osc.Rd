@@ -4,15 +4,15 @@
 \alias{osc}
 \title{Orthogonal Signal Correction (OSC) Function}
 \source{
-\item{Sjoblom. J., Svensson, O., Josefson, M., Kullberg, H., Wold, S. (1998). An evaluation of orthogonal signal correction applied to calibration transfer of near infrared spectra. Chemometrics Intell. Lab. Syst.,44: 229-244.}
+\item{(1)}{Sjoblom. J., Svensson, O., Josefson, M., Kullberg, H., Wold, S. (1998). An evaluation of orthogonal signal correction applied to calibration transfer of near infrared spectra. Chemometrics Intell. Lab. Syst.,44: 229-244.}
 
-\item{Wise, B. M. and Gallagher, N.B. http://www.eigenvector.com/MATLAB/OSC.html.}
+\item{(2)}{Wise, B. M. and Gallagher, N.B. http://www.eigenvector.com/MATLAB/OSC.html.}
 
-\item{Wold, S., Antti, H., Lindgren, F., Ohman, J.(1998). Orthogonal signal correction of nearinfrared spectra. Chemometrics Intell. Lab. Syst., 44: 175-185.}
+\item{(3)}{Wold, S., Antti, H., Lindgren, F., Ohman, J.(1998). Orthogonal signal correction of nearinfrared spectra. Chemometrics Intell. Lab. Syst., 44: 175-185.}
 
-\item{Svensson, O., Kourti, T. and MacGregor, J.F. (2002). An investigation of orthogonal correction algorithms and their characteristics. Journal of Chemometrics, 16:176-188.}
+\item{(4)}{Svensson, O., Kourti, T. and MacGregor, J.F. (2002). An investigation of orthogonal correction algorithms and their characteristics. Journal of Chemometrics, 16:176-188.}
 
-\item{Westerhuis, J. A., de Jong, S., Smilde, A, K. (2001). Direct orthogonal signal correction. Chemo- metrics Intell. Lab. Syst., 56: 13-25.}
+\item{(5)}{Westerhuis, J. A., de Jong, S., Smilde, A, K. (2001). Direct orthogonal signal correction. Chemo- metrics Intell. Lab. Syst., 56: 13-25.}
 }
 \usage{
 osc(
