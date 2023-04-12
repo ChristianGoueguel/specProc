@@ -1,45 +1,83 @@
-
+#' Orthogonal Signal Correction (OSC) Function
+#'
+#' This function applies Orthogonal Signal Correction (OSC) to the provided x and y data using a specified method.
+#'
+#' @author Christian L. Goueguel
+#' @param x A matrix or data.frame containing the X-data (predictors).
+#' @param y A factor or vector containing the Y-data (class labels or continuous response).
+#' @param method A character string indicating the OSC method to use ("wold", "sjoblom", or "wise").
+#' @param center A logical value indicating whether to center the data.
+#' @param osc.ncomp An integer representing the number of OSC components.
+#' @param pls.ncomp An integer representing the number of PLS components.
+#' @param tol A numeric value representing the tolerance for convergence.
+#' @param iter An integer representing the maximum number of iterations.
+#' @param ... Additional arguments to be passed to the OSC algorithm function.
+#'
+#' @return An object of class "osc" containing the results of the OSC algorithm applied to the input data.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' osc_result <- osc(x_data, y_data, method = "wold", center = TRUE, osc.ncomp = 4, pls.ncomp = 10)
+#' }
 osc <- function(x, y, method = "wold", center = TRUE, osc.ncomp = 4, pls.ncomp = 10, tol = 1e-3, iter = 20, ...) {
+  requireNamespace("mt", quietly = TRUE)
+  requireNamespace("tibble", quietly = TRUE)
 
   #' arguments validity checking
   if (missing(x) || missing(y)) {
-    stop("data set or class are missing")
+    stop("data set or response are missing")
   }
-  if (nrow(x) != length(y)) stop("x and y don't match.")
-  if (length(unique(y)) < 2) {
+  if (nrow(x) != length(y)) {
+    stop("x and y don't match.")
+  }
+  if (is.factor(y) && length(unique(y)) < 2) {
     stop("Classification needs at least two classes.")
   }
   if (any(is.na(x)) || any(is.na(y))) {
-    stop("NA is not permitted in data set or class labels.")
+    stop("NA is not permitted in data set or response.")
   }
-
-  method <- match.arg(method, c("wold", "sjoblom", "wise"))
 
   #' initialization
   x <- as.matrix(x)
-  y <- as.factor(y)
+  y <- as.vector(y)
   n <- nrow(x)
   p <- ncol(x)
 
   if (pls.ncomp < 1 || pls.ncomp > min(n - 1, p)) {
     pls.ncomp <- min(n - 1, p)
-    }
+  }
 
-  #' Select OSC algorithm:
-  osc_method <- switch(method, wold = osc_wold, sjoblom = osc_sjoblom, wise = osc_wise)
+  method <- match.arg(method, c("wold", "sjoblom", "wise"))
+
+  osc_method <- switch(
+    method,
+    wold = mt::osc_wold,
+    sjoblom = mt::osc_sjoblom,
+    wise = mt::osc_wise
+  )
 
   #' call OSC algorithm
-  res <- osc_method(x, y, center = center, osc.ncomp = osc.ncomp, pls.ncomp = pls.ncomp, tol = tol, iter = iter, ...)
+  out <- osc_method(
+    x,
+    y,
+    center = center,
+    osc.ncomp = osc.ncomp,
+    pls.ncomp = pls.ncomp,
+    tol = tol,
+    iter = iter,
+    ...
+  )
 
-  #' Build and return the object:
-  res$call <- match.call()
-  res$call[[1]] <- as.name("osc")
-  res$center <- center
-  res$osc.ncomp <- osc.ncomp
-  res$pls.ncomp <- pls.ncomp
-  res$method <- method
-
-  class(res) <- "osc"
+  res <- list(
+    X_corrected = out@X |> tibble::as_tibble(),
+    R2 = out@R2,
+    angle = out@angle,
+    weights = out@W |> tibble::as_tibble(),
+    loadings = out@p |> tibble::as_tibble(),
+    scores = out@t |> tibble::as_tibble(),
+    center = out@center
+  )
   return(res)
 
-  }
+}

@@ -1,4 +1,4 @@
-#' Orthogonal Projections to Latent Structures (OPLS) Model
+#' Orthogonal Projections to Latent Structures (OPLS) Function
 #'
 #' This function fits an OPLS model to provided x and y data.
 #'
