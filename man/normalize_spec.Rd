@@ -9,7 +9,7 @@ normalize_spec(.data, method = "min_max")
 \arguments{
 \item{.data}{A numeric data frame containing the spectra.}
 
-\item{method}{A character vector specifying the normalization method(s) to apply. Available methods are "min_max", "mean", "vector", "area", "max_intensity", "msc", and "snv". Default is "min_max".}
+\item{method}{A character vector specifying the normalization method(s) to apply. Available methods are "min_max", "mean", "vector", "area", "max_intensity", and "snv". Default is "min_max".}
 }
 \value{
 A data frame containing the original columns and the normalized columns for each specified method with the method name as a prefix.

@@ -2,11 +2,18 @@
 % Please edit documentation in R/osc.R
 \name{osc}
 \alias{osc}
-\title{arguments validity checking
-initialization
-Select OSC algorithm:
-call OSC algorithm
-Build and return the object:}
+\title{Orthogonal Signal Correction (OSC) Function}
+\source{
+\item{Sjoblom. J., Svensson, O., Josefson, M., Kullberg, H., Wold, S. (1998). An evaluation of orthogonal signal correction applied to calibration transfer of near infrared spectra. Chemometrics Intell. Lab. Syst.,44: 229-244.}
+
+\item{Wise, B. M. and Gallagher, N.B. http://www.eigenvector.com/MATLAB/OSC.html.}
+
+\item{Wold, S., Antti, H., Lindgren, F., Ohman, J.(1998). Orthogonal signal correction of nearinfrared spectra. Chemometrics Intell. Lab. Syst., 44: 175-185.}
+
+\item{Svensson, O., Kourti, T. and MacGregor, J.F. (2002). An investigation of orthogonal correction algorithms and their characteristics. Journal of Chemometrics, 16:176-188.}
+
+\item{Westerhuis, J. A., de Jong, S., Smilde, A, K. (2001). Direct orthogonal signal correction. Chemo- metrics Intell. Lab. Syst., 56: 13-25.}
+}
 \usage{
 osc(
   x,
@@ -20,10 +27,39 @@ osc(
   ...
 )
 }
+\arguments{
+\item{x}{A matrix or data.frame containing the X-data (predictors).}
+
+\item{y}{A factor or vector containing the Y-data (class labels or continuous response).}
+
+\item{method}{A character string indicating the OSC method to use ("wold", "sjoblom", or "wise").}
+
+\item{center}{A logical value indicating whether to center the data.}
+
+\item{osc.ncomp}{An integer representing the number of OSC components.}
+
+\item{pls.ncomp}{An integer representing the number of PLS components.}
+
+\item{tol}{A numeric value representing the tolerance for convergence.}
+
+\item{iter}{An integer representing the maximum number of iterations.}
+
+\item{...}{Additional arguments to be passed to the OSC algorithm function.}
+}
+\value{
+An object of class "osc" containing the results of the OSC algorithm applied to the input data.
+}
 \description{
+This function applies Orthogonal Signal Correction (OSC) to the provided x and y data using a specified method.
+}
+\examples{
+\dontrun{
+osc_result <- osc(x_data, y_data, method = "wold", center = TRUE, osc.ncomp = 4, pls.ncomp = 10)
+}
 arguments validity checking
 initialization
-Select OSC algorithm:
 call OSC algorithm
-Build and return the object:
+}
+\author{
+Christian L. Goueguel
 }

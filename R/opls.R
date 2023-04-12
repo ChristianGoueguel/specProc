@@ -10,7 +10,7 @@
 #' @param permutation An integer representing the number of permutations for the permutation test.
 #'
 #' @return A list containing matrices of x-scores, x-loadings, x-weights, orthoScores, orthoLoadings, orthoWeights, y-weights, y-orthoWeights, and y-scores.
-#' @export
+#' @export opls
 #'
 #' @examples
 #' \dontrun{
