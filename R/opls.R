@@ -1,5 +1,25 @@
+#' Orthogonal Projections to Latent Structures (OPLS) Model
+#'
+#' This function fits an OPLS model to provided x and y data.
+#'
+#' @author Christian L. Goueguel
+#' @param x A data.frame or tibble containing the X-data (predictors).
+#' @param y A data.frame or tibble containing the Y-data (responses).
+#' @param scale A character string indicating the scaling method for the data ("center" or "pareto").
+#' @param crossval An integer representing the number of cross-validation groups.
+#' @param permutation An integer representing the number of permutations for the permutation test.
+#'
+#' @return A list containing matrices of x-scores, x-loadings, x-weights, orthoScores, orthoLoadings, orthoWeights, y-weights, y-orthoWeights, and y-scores.
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' opls_result <- opls(x_data, y_data, scale = "center", crossval = 7, permutation = 20)
+#' }
+opls <- function(x, y, scale = "center", crossval = 7, permutation = 20) {
+  requireNamespace("ropls", quietly = TRUE)
+  requireNamespace("tibble", quietly = TRUE)
 
-opls <- function(x, y, scale = "center", crossval = 7, permutation = 20){
   if (is.null(x) == TRUE) {
     stop("X-data must be provided")
   }
@@ -27,7 +47,7 @@ opls <- function(x, y, scale = "center", crossval = 7, permutation = 20){
     permI = permutation,
     scaleC = scale,
     subset = NULL
-    )
+  )
 
   res <- list(
     x.scores = modout@scoreMN |> tibble::as_tibble(),
