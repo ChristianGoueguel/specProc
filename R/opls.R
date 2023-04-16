@@ -1,17 +1,13 @@
-#' Orthogonal Projections to Latent Structures (OPLS) Function
-#'
-#' This function fits an OPLS model to provided x and y data.
-#'
+#' @title Orthogonal Projections to Latent Structures (OPLS) Function
+#' @description This function fits an OPLS model to provided x and y data.
 #' @author Christian L. Goueguel
 #' @param x A data.frame or tibble containing the X-data (predictors).
 #' @param y A data.frame or tibble containing the Y-data (responses).
 #' @param scale A character string indicating the scaling method for the data ("center" or "pareto").
 #' @param crossval An integer representing the number of cross-validation groups.
 #' @param permutation An integer representing the number of permutations for the permutation test.
-#'
 #' @return A list containing matrices of x-scores, x-loadings, x-weights, orthoScores, orthoLoadings, orthoWeights, y-weights, y-orthoWeights, and y-scores.
 #' @export opls
-#'
 #' @examples
 #' \dontrun{
 #' opls_result <- opls(x_data, y_data, scale = "center", crossval = 7, permutation = 20)
