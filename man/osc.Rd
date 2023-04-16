@@ -48,9 +48,6 @@ This function applies Orthogonal Signal Correction (OSC) to the provided x and y
 \dontrun{
 osc_result <- osc(x_data, y_data, method = "wold", center = TRUE, osc.ncomp = 4, pls.ncomp = 10)
 }
-arguments validity checking
-initialization
-call OSC algorithm
 }
 \author{
 Christian L. Goueguel
