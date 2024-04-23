@@ -23,6 +23,29 @@ are essential tools in LIBS calibration modeling. Some preprocessing
 methods are solely based on mathematics concepts, others are inspired by
 the chemical-physical background of the data and the problem.
 
+**Multivariate Filtering:**
+
+-   Orthogonal signal correction (OSC)
+-   Orthogonal partial least-squares (OPLS)
+-   Generalized least squares weighting (GLSW)
+-   External parameter orthogonalization (EPO)
+
+**Robust Methods:**
+
+-   Cellwise & rowwise outliers detection (CROD)
+-   Robust Box-Cox and Yeo-Johnson transformation
+-   Skewness-adjusted boxplot
+
+**Miscellaneous:**
+
+-   NIST interactive plot of LIBS emission lines
+-   Baseline removal
+-   Fitting single, multiple or overlapping peaks
+-   Spectra normalization
+-   Pearson, Spearman and Kendall correlation
+-   Descriptive statistics such as mean, standard deviation and higher
+    central moments
+
 ## Installation
 
 You can install the development version from
