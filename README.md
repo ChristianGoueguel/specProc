@@ -18,27 +18,17 @@ coverage](https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/bad
 **Pre-release for feedback and experimenting.**
 
 `specProc` package performs a number of preprocessing tasks commonly
-used in laser-induced breakdown spectroscopy (LIBS). Collectively, these
-are essential tools in LIBS calibration modeling. Some preprocessing
-methods are solely based on mathematics concepts, others are inspired by
-the chemical-physical background of the data and the problem.
+used in spectral data analysis. Some preprocessing methods are solely
+based on mathematics concepts, others are inspired by the
+chemical-physical background of the data and the problem.
 
-**Multivariate Filtering:**
-
--   Orthogonal signal correction (OSC)
--   Orthogonal partial least-squares (OPLS)
--   Generalized least squares weighting (GLSW)
--   External parameter orthogonalization (EPO)
-
-**Robust Methods:**
-
--   Cellwise & rowwise outliers detection (CROD)
+-   Orthogonal signal correction
+-   Orthogonal partial least-squares
+-   Generalized least squares weighting
+-   External parameter orthogonalization
+-   Cellwise & rowwise outliers detection
 -   Robust Box-Cox and Yeo-Johnson transformation
 -   Skewness-adjusted boxplot
-
-**Miscellaneous:**
-
--   NIST interactive plot of LIBS emission lines
 -   Baseline removal
 -   Fitting single, multiple or overlapping peaks
 -   Spectra normalization

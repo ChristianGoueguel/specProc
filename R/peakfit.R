@@ -14,7 +14,6 @@
 #' @return Fitted value and the estimated parameters along with the corresponding errors
 #' @export peakfit
 peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL, id = NULL, max.iter = 200) {
-
   if (missing(.data)) {
     stop("Missing 'data' argument.")
   }
@@ -29,7 +28,6 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
   } else {
     p <- as.numeric(max.iter)
   }
-
   if (is.null(id) == TRUE) {
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
       wlgth.min <- as.numeric(wlgth.min)
