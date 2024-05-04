@@ -1,91 +1,127 @@
 #' @title Spectral Data Plot
 #' @description Spectrum plots are commonly x–y plots in which the x-axis represents the wavelength and the y-axis represents intensity of a spectrum's signal. The function allows to plot a spectrum or several spectra in a single plot, identified either by an id (for example, the samples or spectra id) or by a target variable (for example, the concentration of a chemical element) .
 #' @author Christian L. Goueguel
-#' @details This function is based on the ggplot2 package, thus allowing users to easily add or modify different components of the plot.
-#' @param .data Data frame of emission spectra.
-#' @param id Optional factor variable that identified each spectrum  (`NULL` by default).
-#' @param colvar Optional numeric variable to be display in color scale (`NULL` by default).
-#' @param .interactive Optional interactive plot (`FALSE` by default).
-#' @return ggplot2::ggplot object or a plotly object if `.interactive = TRUE`.
+#' @details This function is based on the {ggplot2} package, thus allowing users to easily add or modify different components of the plot.
+#' @param .data data frame or tibble of the spectra.
+#' @param id optional (`NULL` by default). Column name of a factor variable that identified each spectrum.
+#' @param colvar optional (`NULL` by default). Column name of a numeric variable to be display in color scale.
+#' @param .interactive optional (`FALSE` by default). When set to `TRUE` enables interactive plot.
+#' @param drop_na Optional (`FALSE` by default). Remove rows with NA intensity if drop_na is `TRUE`.
+#' @return Object of class ggplot or of class plotly if `.interactive = TRUE`.
 #' @export plotSpec
-plotSpec <- function(.data, id = NULL, colvar = NULL, .interactive = FALSE) {
-  requireNamespace("ggplot2", quietly = TRUE)
-  requireNamespace("dplyr", quietly = TRUE)
-  requireNamespace("purrr", quietly = TRUE)
-  requireNamespace("tidyr", quietly = TRUE)
-  requireNamespace("plotly", quietly = TRUE)
-
-  # check input validity
+plotSpec <- function(.data, id = NULL, colvar = NULL, .interactive = FALSE, drop_na = FALSE) {
   if (missing(.data)) {
     stop("Missing 'data' argument.")
   }
   if (!is.data.frame(.data) && !tibble::is_tibble(.data)) {
     stop("Input 'data' must be a data frame or tibble.")
   }
-  if (!is.null(id) && !(id %in% colnames(.data))) {
+  if (!rlang::quo_is_null(rlang::enquo(id)) && !(rlang::quo_name(rlang::enquo(id)) %in% colnames(.data))) {
     stop("The 'id' column does not exist in the provided data.")
   }
-  if (!is.null(colvar) && !(colvar %in% colnames(.data))) {
+  if (!rlang::quo_is_null(rlang::enquo(colvar)) && !(rlang::quo_name(rlang::enquo(colvar)) %in% colnames(.data))) {
     stop("The 'colvar' column does not exist in the provided data.")
   }
   if (!is.logical(.interactive)) {
-    stop("'.interactive' must be of type boolean (TRUE or FALSE)")
+    stop("The argument '.interactive' must be of type boolean (TRUE or FALSE)")
   }
-
-  exclude_cols <- c(id, colvar) %>% purrr::discard(is.null)
-
-  aes_params <- list()
-  color_params <- NULL
-
-  if (!is.null(id)) {
-    aes_params$group <- "id"
-    color_params <- list(ggplot2::aes(colour = !!as.name(id)))
+  if (!is.logical(drop_na)) {
+    stop("The argument 'drop_na' must be of type boolean (TRUE or FALSE)")
   }
-  if (!is.null(colvar)) {
-    aes_params$colour <- "colvar"
-    color_params <- list(ggplot2::aes(colour = !!as.name(colvar)), ggplot2::scale_colour_gradient(low = "blue", high = "red"))
-  }
-
-  if (length(exclude_cols) == 0) {
-    X <- .data %>%
+  if (rlang::quo_is_null(rlang::enquo(id)) && rlang::quo_is_null(rlang::enquo(colvar))) {
+    x_long <- .data %>%
       tidyr::pivot_longer(
         cols = dplyr::everything(),
         names_to = "wavelength",
         values_to = "intensity"
       ) %>%
       purrr::modify_at("wavelength", as.numeric)
-  } else {
-    X <- .data %>%
+    if (drop_na) {
+      x_long <- x_long %>% dplyr::filter(!is.na(intensity))
+    }
+    p <- x_long %>%
+      ggplot2::ggplot() +
+      ggplot2::aes(x = wavelength, y = intensity) +
+      ggplot2::geom_line(color = "#002a52") +
+      ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+      ggplot2::theme_classic() +
+      ggplot2::theme(
+        legend.position = "none",
+        axis.line = ggplot2::element_line(color = "#4b4b4b", linewidth = 1)
+        )
+  }
+  if (!rlang::quo_is_null(rlang::enquo(id)) && !rlang::quo_is_null(rlang::enquo(colvar))) {
+    x_long <- .data %>%
       tidyr::pivot_longer(
-        cols = -dplyr::all_of(exclude_cols),
+        cols = -c({{id}}, {{colvar}}),
         names_to = "wavelength",
         values_to = "intensity"
       ) %>%
       purrr::modify_at("wavelength", as.numeric)
-  }
-
-  create_plot <- function(plot_data, aes_params, color_params = NULL) {
-    p <- plot_data %>%
+    if (drop_na) {
+      x_long <- x_long %>% dplyr::filter(!is.na(intensity))
+    }
+    p <- x_long %>%
       ggplot2::ggplot() +
-      ggplot2::aes(x = wavelength, y = intensity, !!!aes_params) +
+      ggplot2::aes(x = wavelength, y = intensity, group = {{id}}, color = {{colvar}}) +
+      ggplot2::geom_line() +
+      ggplot2::scale_color_gradient(low = "darkblue", high = "darkred") +
       ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
       ggplot2::theme_classic() +
-      ggplot2::theme(legend.position = if (is.null(id) && is.null(colvar)) "none" else "right", axis.line = ggplot2::element_line(colour = "grey50", linewidth = 1))
-
-    if (!is.null(color_params)) {
-      p <- p + do.call(ggplot2::geom_line, color_params)
-    } else {
-      p <- p + ggplot2::geom_line()
+      ggplot2::theme(
+        legend.position = "none",
+        axis.line = ggplot2::element_line(color = "#4b4b4b", linewidth = 1)
+      )
+  }
+  if (rlang::quo_is_null(rlang::enquo(id)) && !rlang::quo_is_null(rlang::enquo(colvar))) {
+    x_long <- .data %>%
+      tidyr::pivot_longer(
+        cols = -{{colvar}},
+        names_to = "wavelength",
+        values_to = "intensity"
+      ) %>%
+      purrr::modify_at("wavelength", as.numeric)
+    if (drop_na) {
+      x_long <- x_long %>% dplyr::filter(!is.na(intensity))
     }
-
-    return(p)
+    p <- x_long %>%
+      ggplot2::ggplot() +
+      ggplot2::aes(x = wavelength, y = intensity, color = {{colvar}}) +
+      ggplot2::geom_line() +
+      ggplot2::scale_color_gradient(low = "darkblue", high = "darkred") +
+      ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+      ggplot2::theme_classic() +
+      ggplot2::theme(
+        legend.position = "none",
+        axis.line = ggplot2::element_line(color = "#4b4b4b", linewidth = 1)
+      )
   }
-
-  .plot <- create_plot(X, aes_params, color_params)
+  if (!rlang::quo_is_null(rlang::enquo(id)) && rlang::quo_is_null(rlang::enquo(colvar))) {
+    x_long <- .data %>%
+      tidyr::pivot_longer(
+        cols = -{{id}},
+        names_to = "wavelength",
+        values_to = "intensity"
+      ) %>%
+      purrr::modify_at("wavelength", as.numeric)
+    if (drop_na) {
+      x_long <- x_long %>% dplyr::filter(!is.na(intensity))
+    }
+    p <- x_long %>%
+      ggplot2::ggplot() +
+      ggplot2::aes(x = wavelength, y = intensity, color = {{id}}) +
+      ggplot2::geom_line() +
+      ggplot2::scale_colour_viridis_d(direction = -1) +
+      ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+      ggplot2::theme_classic() +
+      ggplot2::theme(
+        legend.position = "none",
+        axis.line = ggplot2::element_line(color = "#4b4b4b", linewidth = 1)
+      )
+  }
   if (.interactive == FALSE) {
-    return(.plot)
+    return(p)
   } else {
-    return(plotly::ggplotly(.plot))
+    return(plotly::ggplotly(p, tooltip = "all"))
   }
-
 }

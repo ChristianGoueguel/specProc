@@ -1,5 +1,5 @@
-Ca_Mn_spec <-
-  readr::read_csv("~/Documents/Packages/LIBSdata/Ca_Mn_spec.csv") |>
+specLIBS <-
+  readr::read_csv("~/Documents/Projects/Packages/LIBSdata/Ca_Mn_spec.csv") |>
   dplyr::select(x, y0) |>
   tidyr::pivot_wider(names_from = x, values_from = y0)
 #####################################################################
@@ -19,6 +19,6 @@ soilParam <-
   purrr::modify_at("qr_code", forcats::as_factor) |>
   purrr::modify_at("carrousel_number", forcats::as_factor)
 #####################################################################
-usethis::use_data(Ca_Mn_spec, overwrite = TRUE)
+usethis::use_data(specLIBS, overwrite = TRUE)
 usethis::use_data(cranbSpec, overwrite = TRUE)
 usethis::use_data(soilParam, overwrite = TRUE)

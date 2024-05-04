@@ -18,9 +18,11 @@ coverage](https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/bad
 **Pre-release for feedback and experimenting.**
 
 `specProc` package performs a number of preprocessing tasks commonly
-used in spectral data analysis. Some preprocessing methods are solely
-based on mathematics concepts, others are inspired by the
-chemical-physical background of the data and the problem.
+used in laser-induced breakdown spectroscopy (LIBS). Spectral
+preprocessing try to minimise the effect of different types of
+distortions on the data. Some preprocessing methods are solely based on
+mathematics concepts, others are inspired by the chemical-physical
+background of the data and the problem.
 
 -   Orthogonal signal correction
 -   Orthogonal partial least-squares
