@@ -28,97 +28,54 @@ plotSpec <- function(.data, id = NULL, colvar = NULL, .interactive = FALSE, drop
   if (!is.logical(drop_na)) {
     stop("The argument 'drop_na' must be of type boolean (TRUE or FALSE)")
   }
-  if (rlang::quo_is_null(rlang::enquo(id)) && rlang::quo_is_null(rlang::enquo(colvar))) {
-    x_long <- .data %>%
-      tidyr::pivot_longer(
-        cols = dplyr::everything(),
-        names_to = "wavelength",
-        values_to = "intensity"
-      ) %>%
-      purrr::modify_at("wavelength", as.numeric)
-    if (drop_na) {
-      x_long <- x_long %>% dplyr::filter(!is.na(intensity))
-    }
-    p <- x_long %>%
-      ggplot2::ggplot() +
-      ggplot2::aes(x = wavelength, y = intensity) +
-      ggplot2::geom_line(color = "#002a52") +
-      ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-      ggplot2::theme_classic() +
-      ggplot2::theme(
-        legend.position = "none",
-        axis.line = ggplot2::element_line(color = "#4b4b4b", linewidth = 1)
-        )
+
+  id_cols <- c(rlang::quo_name(rlang::enquo(id)), rlang::quo_name(rlang::enquo(colvar)))
+  id_cols <- id_cols[!is.na(id_cols)]
+  id_cols <- tidyselect::all_of(id_cols)
+
+  x_long <- .data %>%
+    tidyr::pivot_longer(
+      cols = setdiff(names(.data), id_cols),
+      names_to = "wavelength",
+      values_to = "intensity"
+    ) %>%
+    purrr::modify_at("wavelength", as.numeric)
+
+  if (drop_na) {
+    x_long <- x_long %>%
+      dplyr::filter(!is.na(intensity)) %>%
+      dplyr::filter(!is.na(wavelength))
   }
+
+  p <- x_long %>%
+    ggplot2::ggplot() +
+    ggplot2::aes(x = wavelength, y = intensity)
+
   if (!rlang::quo_is_null(rlang::enquo(id)) && !rlang::quo_is_null(rlang::enquo(colvar))) {
-    x_long <- .data %>%
-      tidyr::pivot_longer(
-        cols = -c({{id}}, {{colvar}}),
-        names_to = "wavelength",
-        values_to = "intensity"
-      ) %>%
-      purrr::modify_at("wavelength", as.numeric)
-    if (drop_na) {
-      x_long <- x_long %>% dplyr::filter(!is.na(intensity))
-    }
-    p <- x_long %>%
-      ggplot2::ggplot() +
-      ggplot2::aes(x = wavelength, y = intensity, group = {{id}}, color = {{colvar}}) +
-      ggplot2::geom_line() +
-      ggplot2::scale_color_gradient(low = "darkblue", high = "darkred") +
-      ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-      ggplot2::theme_classic() +
-      ggplot2::theme(
-        legend.position = "none",
-        axis.line = ggplot2::element_line(color = "#4b4b4b", linewidth = 1)
-      )
+    p <- p +
+      ggplot2::geom_line(ggplot2::aes(group = {{id}}, color = {{colvar}})) +
+      ggplot2::scale_color_gradient(low = "darkblue", high = "darkred")
+  } else if (!rlang::quo_is_null(rlang::enquo(id))) {
+    p <- p +
+      ggplot2::geom_line(ggplot2::aes(color = {{id}})) +
+      ggplot2::scale_colour_viridis_d(direction = -1)
+  } else if (!rlang::quo_is_null(rlang::enquo(colvar))) {
+    p <- p +
+      ggplot2::geom_line(ggplot2::aes(color = {{colvar}})) +
+      ggplot2::scale_color_gradient(low = "darkblue", high = "darkred")
+  } else {
+    p <- p +
+      ggplot2::geom_line(color = "#002a52")
   }
-  if (rlang::quo_is_null(rlang::enquo(id)) && !rlang::quo_is_null(rlang::enquo(colvar))) {
-    x_long <- .data %>%
-      tidyr::pivot_longer(
-        cols = -{{colvar}},
-        names_to = "wavelength",
-        values_to = "intensity"
-      ) %>%
-      purrr::modify_at("wavelength", as.numeric)
-    if (drop_na) {
-      x_long <- x_long %>% dplyr::filter(!is.na(intensity))
-    }
-    p <- x_long %>%
-      ggplot2::ggplot() +
-      ggplot2::aes(x = wavelength, y = intensity, color = {{colvar}}) +
-      ggplot2::geom_line() +
-      ggplot2::scale_color_gradient(low = "darkblue", high = "darkred") +
-      ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-      ggplot2::theme_classic() +
-      ggplot2::theme(
-        legend.position = "none",
-        axis.line = ggplot2::element_line(color = "#4b4b4b", linewidth = 1)
-      )
-  }
-  if (!rlang::quo_is_null(rlang::enquo(id)) && rlang::quo_is_null(rlang::enquo(colvar))) {
-    x_long <- .data %>%
-      tidyr::pivot_longer(
-        cols = -{{id}},
-        names_to = "wavelength",
-        values_to = "intensity"
-      ) %>%
-      purrr::modify_at("wavelength", as.numeric)
-    if (drop_na) {
-      x_long <- x_long %>% dplyr::filter(!is.na(intensity))
-    }
-    p <- x_long %>%
-      ggplot2::ggplot() +
-      ggplot2::aes(x = wavelength, y = intensity, color = {{id}}) +
-      ggplot2::geom_line() +
-      ggplot2::scale_colour_viridis_d(direction = -1) +
-      ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
-      ggplot2::theme_classic() +
-      ggplot2::theme(
-        legend.position = "none",
-        axis.line = ggplot2::element_line(color = "#4b4b4b", linewidth = 1)
-      )
-  }
+
+  p <- p +
+    ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      legend.position = "none",
+      axis.line = ggplot2::element_line(color = "#4b4b4b", linewidth = 1)
+    )
+
   if (.interactive == FALSE) {
     return(p)
   } else {
