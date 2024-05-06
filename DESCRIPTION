@@ -34,3 +34,5 @@ Suggests:
     rmarkdown,
     spelling
 VignetteBuilder: knitr
+URL: https://github.com/ChristianGoueguel/specProc
+BugReports: https://github.com/ChristianGoueguel/specProc/issues
