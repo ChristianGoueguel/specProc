@@ -43,7 +43,7 @@ distortions on the data. Some preprocessing methods are solely based on
 mathematics concepts, others are inspired by the chemical-physical
 background of the data and the problem.
 
-**Functions avaliable:**
+**Functions currently avaliable:**
 
 | **Function**        | **Description**                                                                   |
 |-----------------|-------------------------------------------------------|
