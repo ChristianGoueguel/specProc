@@ -26,7 +26,7 @@ ssh(library(tidyverse))
 ```
 
 ```{r}
-source("~/Documents/Packages/specProc/R/adj_boxplot.R")
+source("~/Documents/Projects/Packages/specProc/R/adjboxplot.R")
 ```
 
 ```{r}
@@ -47,7 +47,7 @@ df_tbl %>% slice_head(n = 5)
 ```
 
 ```{r message=FALSE, warning=FALSE}
-adjBox <- df_tbl %>% select(where(is.numeric)) %>% adj_boxplot()
+adjBox <- df_tbl %>% select(where(is.numeric)) %>% adjboxplot()
 ```
 
 ```{r}

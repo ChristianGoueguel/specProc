@@ -17,8 +17,8 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-source("~/Documents/Packages/specProc/R/baselinerm.R")
-source("~/Documents/Packages/specProc/R/plotSpec.R")
+source("~/Documents/Projects/Packages/specProc/R/baselineRemoval.R")
+source("~/Documents/Projects/Packages/specProc/R/plotSpec.R")
 ```
 
 ```{r include=FALSE}
@@ -58,15 +58,15 @@ When analyzing LIBS spectra, it is often more effective to subtract an
 estimated baseline from the data. The estimate is constructed by fitting
 a low-order polynomial function to the spectrum baseline. Then the
 resulting curve fit is subtracted from the data. Here we use the
-function `baselinerm` to perform such a task.
+function `baselineRemoval` to perform such a task.
 
 ```{r message=FALSE, warning=FALSE}
 baseline_fit <- spec_tbl %>%
   select(`390.03027`:`500.03397`) %>%
-  baselinerm(degree = 7)
+  baselineRemoval(degree = 7)
 ```
 
-As one can see, the `baselinerm` function provides a list containing two
+As one can see, the `baselineRemoval` function provides a list containing two
 data frames, one for the baseline-subtracted spectrum or spectra `spec`
 and the other for the fitted baseline `bkg`.
 

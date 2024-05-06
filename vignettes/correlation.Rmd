@@ -41,7 +41,7 @@ ssh(library(cowplot))
 ```
 
 ```{r include=FALSE}
-source("~/Documents/Packages/specProc/R/corr.R")
+source("~/Documents/Projects/Packages/specProc/R/corr.R")
 ```
 
 ```{r}

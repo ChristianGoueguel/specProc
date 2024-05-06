@@ -11,10 +11,6 @@
 #' @return A tibble of transformed variable(s), method used ('BC' for Box-Cox and 'YJ' for Yeo-Johnson), objective and lambda.
 #' @export robTransform
 robTransform <- function(.data, var = NULL, type = "bestObj", quant = 0.99, nbsteps = 2) {
-  requireNamespace("dplyr", quietly = TRUE)
-  requireNamespace("tibble", quietly = TRUE)
-  requireNamespace("cellWise", quietly = TRUE)
-
   if (missing(.data)) {
     stop("Missing 'data' argument.")
   }

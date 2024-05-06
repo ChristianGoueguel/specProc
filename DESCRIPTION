@@ -12,6 +12,7 @@ RoxygenNote: 7.3.1
 Imports: 
     baseline,
     broom,
+    cellWise,
     dplyr,
     ggplot2,
     magrittr,

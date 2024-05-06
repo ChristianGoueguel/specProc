@@ -12,12 +12,6 @@
 #' @return \item{`bkg`}{data frame of the modeled background}
 #' @export baselineRemoval
 baselineRemoval <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
-  requireNamespace("dplyr", quietly = TRUE)
-  requireNamespace("tibble", quietly = TRUE)
-  requireNamespace("purrr", quietly = TRUE)
-  requireNamespace("baseline", quietly = TRUE)
-
-  # Check if the input data is provided and is a data frame or tibble
   if (missing(.data)) {
     stop("Missing 'data' argument.")
   }
@@ -34,16 +28,13 @@ baselineRemoval <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
     stop("rep must be numeric.")
   }
 
-  # Select only numeric columns and convert to a matrix
   X_mat <- .data %>%
     dplyr::select(dplyr::where(is.numeric)) %>%
     as.matrix()
 
-  # Ensure the input parameters are numeric
   degree <- as.numeric(degree)
   tol <- as.numeric(tol)
   rep <- as.numeric(rep)
-
   wlength <- colnames(X_mat)
 
   replaceWithZero <- function(x) {
