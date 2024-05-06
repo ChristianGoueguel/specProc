@@ -6,14 +6,8 @@
 #' @return A list that contains:
 #' @return \item{`adj_box_stat`}{data frame of the adjusted boxplot statistics}
 #' @return \item{`plot`}{ggplot2 object (if `.plot = TRUE`)}
-#' @export adj_boxplot
-adj_boxplot <- function(.data, .plot = TRUE) {
-  requireNamespace("robustbase", quietly = TRUE)
-  requireNamespace("ggplot2", quietly = TRUE)
-  requireNamespace("dplyr", quietly = TRUE)
-  requireNamespace("purrr", quietly = TRUE)
-
-  # Check input validity
+#' @export adjboxplot
+adjboxplot <- function(.data, .plot = TRUE) {
   if (missing(.data)) {
     stop("Missing 'data' argument.")
   }
@@ -24,7 +18,6 @@ adj_boxplot <- function(.data, .plot = TRUE) {
     stop("Argument '.plot' must be of type boolean (TRUE or FALSE).")
   }
 
-  # Calculate adjusted boxplot values for each column
   adj_boxplot_vals <- .data %>%
     purrr::map_dfr(
       function(.x) {
@@ -42,7 +35,6 @@ adj_boxplot <- function(.data, .plot = TRUE) {
     ) %>%
     purrr::modify_at("variable", forcats::as_factor)
 
-  # Create ggplot2 object
   plot <- adj_boxplot_vals %>%
     ggplot2::ggplot() +
     ggplot2::aes(

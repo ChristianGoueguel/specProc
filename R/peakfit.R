@@ -89,7 +89,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           fit = purrr::map(
             .data, ~ minpack.lm::nlsLM(
               data = .,
-              y ~ lorentzian_func(x, y0, xc, wL, A),
+              y ~ lorentzianfun(x, y0, xc, wL, A),
               start =  list(
                 y0 = .$y[which.min(.$y)],
                 xc = .$x[which.max(.$y)],
@@ -117,7 +117,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           fit = purrr::map(
             .data, ~ minpack.lm::nlsLM(
               data = .,
-              y ~ gaussian_func(x, y0, xc, wG, A),
+              y ~ gaussianfun(x, y0, xc, wG, A),
               start =  list(
                 y0 = .$y[which.min(.$y)],
                 xc = .$x[which.max(.$y)],
@@ -146,7 +146,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           fit = purrr::map(
             .data, ~ minpack.lm::nlsLM(
               data = .,
-              y ~ voigt_func(x, y0, xc, wG, wL, A),
+              y ~ voigtfun(x, y0, xc, wG, wL, A),
               start =  list(
                 y0 = .$y[which.min(.$y)],
                 xc = .$x[which.max(.$y)],
@@ -222,7 +222,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           fit = purrr::map(
             .data, ~ minpack.lm::nlsLM(
               data = .,
-              y ~ lorentzian_func(x, y0, xc, wL, A),
+              y ~ lorentzianfun(x, y0, xc, wL, A),
               start =  list(
                 y0 = .$y[which.min(.$y)],
                 xc = .$x[which.max(.$y)],
@@ -250,7 +250,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           fit = purrr::map(
             .data, ~ minpack.lm::nlsLM(
               data = .,
-              y ~ gaussian_func(x, y0, xc, wG, A),
+              y ~ gaussianfun(x, y0, xc, wG, A),
               start =  list(
                 y0 = .$y[which.min(.$y)],
                 xc = .$x[which.max(.$y)],
@@ -279,7 +279,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           fit = purrr::map(
             .data, ~ minpack.lm::nlsLM(
               data = .,
-              y ~ voigt_func(x, y0, xc, wG, wL, A),
+              y ~ voigtfun(x, y0, xc, wG, wL, A),
               start =  list(
                 y0 = .$y[which.min(.$y)],
                 xc = .$x[which.max(.$y)],

@@ -15,13 +15,6 @@
 #' @return Fitted value for each peak and the estimated parameters along with the corresponding errors
 #' @export multipeakfit
 multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL, id = NULL, max.iter = 200) {
-
-  requireNamespace("dplyr", quietly = TRUE)
-  requireNamespace("tidyr", quietly = TRUE)
-  requireNamespace("purrr", quietly = TRUE)
-  requireNamespace("broom", quietly = TRUE)
-  requireNamespace("minpack.lm", quietly = TRUE)
-
   if (length(.data) == 0 & is.null(.data) == TRUE) {
     stop("Apparently you forgot to provide the spectra.")
   }
@@ -42,7 +35,6 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
   }
 
   if (is.null(id) == TRUE) {
-
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
       wlgth.min <- as.numeric(wlgth.min)
       df <- .data %>%
@@ -54,7 +46,6 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
         purrr::modify_at("x", as.numeric) %>%
         dplyr::filter(x >= wlgth.min)
     }
-
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == FALSE) {
       wlgth.max <- as.numeric(wlgth.max)
       df <- .data %>%
@@ -66,7 +57,6 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
         purrr::modify_at("x", as.numeric) %>%
         dplyr::filter(x <= wlgth.max)
     }
-
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == TRUE) {
       df <- .data %>%
         tidyr::pivot_longer(
@@ -76,7 +66,6 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
         ) %>%
         purrr::modify_at("x", as.numeric)
     }
-
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == FALSE) {
       wlgth.min <- as.numeric(wlgth.min)
       wlgth.max <- as.numeric(wlgth.max)
@@ -114,7 +103,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
             fit = purrr::map(
               .data, ~ minpack.lm::nlsLM(
                 data = .,
-                y ~ lorentzian_func(x, y0, xc, wL, A),
+                y ~ lorentzianfun(x, y0, xc, wL, A),
                 start =  list(
                   y0 = .$y[which.min(.$y)],
                   xc = peaks[i],
@@ -144,7 +133,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
             fit = purrr::map(
               .data, ~ minpack.lm::nlsLM(
                 data = .,
-                y ~ gaussian_func(x, y0, xc, wG, A),
+                y ~ gaussianfun(x, y0, xc, wG, A),
                 start =  list(
                   y0 = .$y[which.min(.$y)],
                   xc = peaks[i],
@@ -175,7 +164,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
             fit = purrr::map(
               .data, ~ minpack.lm::nlsLM(
                 data = .,
-                y ~ voigt_func(x, y0, xc, wG, wL, A),
+                y ~ voigtfun(x, y0, xc, wG, wL, A),
                 start =  list(
                   y0 = .$y[which.min(.$y)],
                   xc = peaks[i],
@@ -262,7 +251,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
             fit = purrr::map(
               .data, ~ minpack.lm::nlsLM(
                 data = .,
-                y ~ lorentzian_func(x, y0, xc, wL, A),
+                y ~ lorentzianfun(x, y0, xc, wL, A),
                 start =  list(
                   y0 = .$y[which.min(.$y)],
                   xc = peaks[i],
@@ -292,7 +281,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
             fit = purrr::map(
               .data, ~ minpack.lm::nlsLM(
                 data = .,
-                y ~ gaussian_func(x, y0, xc, wG, A),
+                y ~ gaussianfun(x, y0, xc, wG, A),
                 start =  list(
                   y0 = .$y[which.min(.$y)],
                   xc = peaks[i],
@@ -323,7 +312,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
             fit = purrr::map(
               .data, ~ minpack.lm::nlsLM(
                 data = .,
-                y ~ voigt_func(x, y0, xc, wG, wL, A),
+                y ~ voigtfun(x, y0, xc, wG, wL, A),
                 start =  list(
                   y0 = .$y[which.min(.$y)],
                   xc = peaks[i],

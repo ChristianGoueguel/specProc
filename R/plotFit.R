@@ -14,17 +14,14 @@
 #' @param resid.fill Colour fill of the residuals data points
 #' @param resid.colour Colour of the residuals data points
 #' @return ggplot2 object
-#' @export plotFit
-plotFit <- function(data, title = NULL, pt.size = 3, pt.colour = "black", pt.shape = 21, pt.fill = "black", line.size = 1, line.colour = "red", linetype = "solid", resid.shape = 21, resid.size = 2, resid.fill = "blue", resid.colour = "black") {
-
+#' @export plotfit
+plotfit <- function(data, title = NULL, pt.size = 3, pt.colour = "black", pt.shape = 21, pt.fill = "black", line.size = 1, line.colour = "red", linetype = "solid", resid.shape = 21, resid.size = 2, resid.fill = "blue", resid.colour = "black") {
   if (length(data) == 0 | is.null(data) == TRUE) {
     stop("Seems you forgot to provide spectra data.")
   }
-
   if (is.data.frame(data) == FALSE) {
     stop("Data must be of class tbl_df, tbl or data.frame")
   }
-
   plot1 <- data %>%
     purrr::pluck("augmented") %>%
     as.data.frame() %>%
@@ -33,7 +30,6 @@ plotFit <- function(data, title = NULL, pt.size = 3, pt.colour = "black", pt.sha
     ggplot2::geom_line(ggplot2::aes(x = x, y = .fitted), size = line.size, colour = line.colour, linetype = linetype) +
     ggplot2::labs(subtitle = title, x = "Wavelength [nm]", y = "Intensity [arb. units]") +
     ggplot2::theme_bw(base_size = 10)
-
   plot2 <- data %>%
     purrr::pluck("augmented") %>%
     as.data.frame() %>%
@@ -42,7 +38,5 @@ plotFit <- function(data, title = NULL, pt.size = 3, pt.colour = "black", pt.sha
     ggplot2::geom_hline(yintercept = 0) +
     ggplot2::labs(x = "Wavelength [nm]", y = "Residual") +
     ggplot2::theme_bw(base_size = 10)
-
   (plot1 / plot2) + patchwork::plot_layout(ncol = 1, heights = c(5, 1))
-
 }
