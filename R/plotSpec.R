@@ -54,7 +54,7 @@ plotSpec <- function(.data, id = NULL, colvar = NULL, .interactive = FALSE, drop
   if (!rlang::quo_is_null(rlang::enquo(id)) && !rlang::quo_is_null(rlang::enquo(colvar))) {
     p <- p +
       ggplot2::geom_line(ggplot2::aes(group = {{id}}, color = {{colvar}})) +
-      ggplot2::scale_color_gradient(low = "darkblue", high = "darkred")
+      ggplot2::scale_color_gradient(low = "blue", high = "red")
   } else if (!rlang::quo_is_null(rlang::enquo(id))) {
     p <- p +
       ggplot2::geom_line(ggplot2::aes(color = {{id}})) +
@@ -62,7 +62,7 @@ plotSpec <- function(.data, id = NULL, colvar = NULL, .interactive = FALSE, drop
   } else if (!rlang::quo_is_null(rlang::enquo(colvar))) {
     p <- p +
       ggplot2::geom_line(ggplot2::aes(color = {{colvar}})) +
-      ggplot2::scale_color_gradient(low = "darkblue", high = "darkred")
+      ggplot2::scale_color_gradient(low = "blue", high = "red")
   } else {
     p <- p +
       ggplot2::geom_line(color = "#002a52")

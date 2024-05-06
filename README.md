@@ -13,6 +13,7 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Codecov test
 coverage](https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ChristianGoueguel/specProc?branch=main)
+
 <!-- badges: end -->
 
 **Pre-release for feedback and experimenting.**
@@ -24,19 +25,25 @@ distortions on the data. Some preprocessing methods are solely based on
 mathematics concepts, others are inspired by the chemical-physical
 background of the data and the problem.
 
--   Orthogonal signal correction
--   Orthogonal partial least-squares
--   Generalized least squares weighting
--   External parameter orthogonalization
--   Cellwise & rowwise outliers detection
--   Robust Box-Cox and Yeo-Johnson transformation
--   Skewness-adjusted boxplot
--   Baseline removal
--   Fitting single, multiple or overlapping peaks
--   Spectra normalization
--   Pearson, Spearman and Kendall correlation
--   Descriptive statistics such as mean, standard deviation and higher
-    central moments
+**Functions avaliable:**
+
+| **Function**        | **Description**                                                                    |
+|---------------------|------------------------------------------------------------------------------------|
+| `adj_boxplot()`     | Adjusted boxplot for skewed distribution.                                          |
+| `baselinerm()`      | Baseline correction.                                                               |
+| `corr()`            | Correlation for each column in a data frame with respect to a response variable.   |
+| `gaussian_func()`   | Gaussian lineshape.                                                                |
+| `lorentzian_func()` | Lorentzian lineshape.                                                              |
+| `voigt_func()`      | Voigt lineshape.                                                                   |
+| `multipeakfit()`    | Multiple peaks fitting.                                                            |
+| `normalize_spec()`  | Normalize spectra with different normalization methods.                            |
+| `opls()`            | Orthogonal projections to latent structures.                                       |
+| `osc()`             | Orthogonal signal correction.                                                      |
+| `peakFit`           | Fitting of a single spectral line by lineshape functions with variable parameters. |
+| `plotFit()`         | Plotting of spectral line fitting.                                                 |
+| `plotspec()`        | Spectral data plot.                                                                |
+| `robTransform()`    | Robust Box-Cox and Yeo-Johnson transformation.                                     |
+| `summaryStat()`     | Descriptive Statistics.                                                            |
 
 ## Installation
 
