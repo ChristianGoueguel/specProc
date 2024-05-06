@@ -36,7 +36,7 @@ coverage](https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/bad
 
 **Testing and experimenting.**
 
-`specProc` package performs a number of preprocessing tasks commonly
+The `specProc` package performs a number of preprocessing tasks commonly
 used in laser-induced breakdown spectroscopy (LIBS). Spectral
 preprocessing try to minimise the effect of different types of
 distortions on the data. Some preprocessing methods are solely based on
