@@ -8,8 +8,8 @@
 #' @param wL Lorentzian FWHM
 #' @param A area under the peak
 #' @return fitted value
-#' @export voigt_func
-voigt_func <- function(x, y0, xc, wG, wL, A) {
+#' @export voigtfun
+voigtfun <- function(x, y0, xc, wG, wL, A) {
   s <- wG/(2*sqrt(2*log(2)))
   y0 + A* RcppFaddeeva::Voigt(x = x, x0 = xc, sigma = s, gamma = wL, real = TRUE)
 }

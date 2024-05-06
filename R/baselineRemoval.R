@@ -10,8 +10,8 @@
 #' @return List containing:
 #' @return \item{`spec`}{data frame of background subtracted spectra}
 #' @return \item{`bkg`}{data frame of the modeled background}
-#' @export baselinerm
-baselinerm <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
+#' @export baselineRemoval
+baselineRemoval <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
   requireNamespace("dplyr", quietly = TRUE)
   requireNamespace("tibble", quietly = TRUE)
   requireNamespace("purrr", quietly = TRUE)

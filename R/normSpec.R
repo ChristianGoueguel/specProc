@@ -4,11 +4,8 @@
 #' @param .data A numeric data frame containing the spectra.
 #' @param method A character vector specifying the normalization method(s) to apply. Available methods are "min_max", "mean", "vector", "area", "max_intensity", and "snv". Default is "min_max".
 #' @return A data frame containing the original columns and the normalized columns for each specified method with the method name as a prefix.
-#' @export normalize_spec
-normalize_spec <- function(.data, method = "min_max") {
-  requireNamespace("purrr", quietly = TRUE)
-
-  # Check input validity
+#' @export normSpec
+normSpec <- function(.data, method = "min_max") {
   if (missing(.data)) {
     stop("Missing 'data' argument.")
   }

@@ -7,7 +7,7 @@
 #' @param w full width at half maximum (FWHM)
 #' @param A area under the peak
 #' @return fitted value
-#' @export lorentzian_func
-lorentzian_func <- function(x, y0, xc, w, A) {
+#' @export lorentzianfun
+lorentzianfun <- function(x, y0, xc, w, A) {
   y0 + (2*A/pi) * (w/(4*(x - xc)^2 + w^2))
 }

@@ -3,15 +3,8 @@
 #' @param data frame or tibble. Columns are the numeric variables.
 #' @param var Numeric. Selected variable(s).
 #' @return Tibble. Summary statistic that quantitatively describes the variable(s).
-#' @export summaryStat
-summaryStat <- function(data, var = NULL, remove.na = TRUE, sign.fig = 2) {
-  requireNamespace("ggplot2", quietly = TRUE)
-  requireNamespace("dplyr", quietly = TRUE)
-  requireNamespace("tidyr", quietly = TRUE)
-  requireNamespace("tibble", quietly = TRUE)
-  requireNamespace("moments", quietly = TRUE)
-  requireNamespace("robustbase", quietly = TRUE)
-
+#' @export summaryStats
+summaryStats <- function(data, var = NULL, remove.na = TRUE, sign.fig = 2) {
   if (is.null(data) == TRUE) {
     stop("Data must be provided")
   }
