@@ -27,23 +27,23 @@ background of the data and the problem.
 
 **Functions avaliable:**
 
-| **Function**        | **Description**                                                                    |
-|---------------------|------------------------------------------------------------------------------------|
-| `adj_boxplot()`     | Adjusted boxplot for skewed distribution.                                          |
-| `baselinerm()`      | Baseline correction.                                                               |
-| `corr()`            | Correlation for each column in a data frame with respect to a response variable.   |
-| `gaussian_func()`   | Gaussian lineshape.                                                                |
-| `lorentzian_func()` | Lorentzian lineshape.                                                              |
-| `voigt_func()`      | Voigt lineshape.                                                                   |
-| `multipeakfit()`    | Multiple peaks fitting.                                                            |
-| `normalize_spec()`  | Normalize spectra with different normalization methods.                            |
-| `opls()`            | Orthogonal projections to latent structures.                                       |
-| `osc()`             | Orthogonal signal correction.                                                      |
-| `peakFit`           | Fitting of a single spectral line by lineshape functions with variable parameters. |
-| `plotFit()`         | Plotting of spectral line fitting.                                                 |
-| `plotspec()`        | Spectral data plot.                                                                |
-| `robTransform()`    | Robust Box-Cox and Yeo-Johnson transformation.                                     |
-| `summaryStat()`     | Descriptive Statistics.                                                            |
+| **Function**        | **Description**                                                                   |
+|---------------------|-----------------------------------------------------------------------------------|
+| `adjboxplot()`      | Adjusted boxplot for skewed distribution                                          |
+| `baselineRemoval()` | Baseline removal                                                                  |
+| `corr()`            | Correlation for each column in a data frame with respect to a response variable   |
+| `gaussianfun()`     | Gaussian lineshape                                                                |
+| `lorentzianfun()`   | Lorentzian lineshape                                                              |
+| `voigtfun()`        | Voigt lineshape                                                                   |
+| `plotSpec()`        | Spectral data plot                                                                |
+| `normSpec()`        | Normalize spectra with different normalization methods                            |
+| `opls()`            | Orthogonal projections to latent structures                                       |
+| `osc()`             | Orthogonal signal correction                                                      |
+| `peakfit()`         | Fitting of a single spectral line by lineshape functions with variable parameters |
+| `plotfit()`         | Plotting of spectral line fitting                                                 |
+| `multipeakfit()`    | Multiple peaks fitting                                                            |
+| `robTransform()`    | Robust Box-Cox and Yeo-Johnson transformation                                     |
+| `summaryStats()`    | Descriptive Statistics                                                            |
 
 ## Installation
 
