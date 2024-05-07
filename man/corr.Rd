@@ -2,29 +2,41 @@
 % Please edit documentation in R/corr.R
 \name{corr}
 \alias{corr}
-\title{Compute Correlation for Each Column with Respect to a Response Variable}
+\title{Correlation Coefficients: Pearson, Spearman, Kendall and Chatterjee}
+\source{
+Chatterjee (2021), Journal of the American Statistical Association, 116(536). https://doi.org/10.1080/01621459.2020.1758115
+}
 \usage{
-corr(.data, response_var, method = "pearson", .plot = FALSE)
+corr(
+  .data,
+  response_var,
+  method = "pearson",
+  .plot = FALSE,
+  .color = "#111D71",
+  .interactive = FALSE
+)
 }
 \arguments{
-\item{.data}{A numeric data frame containing the data.}
+\item{.data}{data frame or tibble.}
 
-\item{response_var}{A character string specifying the name of the response variable column in the data frame.}
+\item{response_var}{column name of the response variable.}
 
-\item{method}{A character string specifying the correlation method to use. Available methods are "pearson", "spearman", "kendall" and "chatterjee". Default is "pearson".}
+\item{method}{character string specifying the correlation method. Available methods are "pearson", "spearman", "kendall" and "chatterjee". Default is "pearson".}
 
-\item{.plot}{for a visual representation of the results (FALSE by default).}
+\item{.plot}{optional (\code{FALSE} by default). Visual representation.}
+
+\item{.color}{optional. Sets the color of the plot.}
+
+\item{.interactive}{optional (\code{FALSE} by default). When set to \code{TRUE} enables interactive plot.}
 }
 \value{
-List containing:
+A list containing:\code{correlation} - data frame of the correlation values. \code{plot} - ggplot2 object, if \code{.plot = TRUE}.
 
-\item{\code{correlation}}{data frame of the correlation values}
-
-\item{\code{plot}}{ggplot2 object (if \code{.plot = TRUE})}
+Or a plotly object, if \code{.interactive = TRUE}.
 }
 \description{
-This function takes a data frame as input and computes the Pearson, Spearman or Kendall correlation
-for each column with respect to the response variable. The function returns a tibble with the respective
+This function takes a data frame as input and computes the Pearson's, Spearman's, Kendall's or Chatterjee's correlation coefficient
+for each column with respect to a response variable. The function returns a tibble with the respective
 correlation for each column.
 }
 \author{

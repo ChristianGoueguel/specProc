@@ -1,17 +1,19 @@
-#' @title Compute Correlation for Each Column with Respect to a Response Variable
+#' @title Correlation Coefficients: Pearson, Spearman, Kendall and Chatterjee
 #' @author Christian L. Goueguel
-#' @description This function takes a data frame as input and computes the Pearson, Spearman or Kendall correlation
-#' for each column with respect to the response variable. The function returns a tibble with the respective
+#' @description This function takes a data frame as input and computes the Pearson's, Spearman's, Kendall's or Chatterjee's correlation coefficient
+#' for each column with respect to a response variable. The function returns a tibble with the respective
 #' correlation for each column.
-#' @param .data A numeric data frame containing the data.
-#' @param response_var A character string specifying the name of the response variable column in the data frame.
-#' @param method A character string specifying the correlation method to use. Available methods are "pearson", "spearman", "kendall" and "chatterjee". Default is "pearson".
-#' @param .plot for a visual representation of the results (FALSE by default).
-#' @return List containing:
-#' @return \item{`correlation`}{data frame of the correlation values}
-#' @return \item{`plot`}{ggplot2 object (if `.plot = TRUE`)}
+#' @param .data data frame or tibble.
+#' @param response_var column name of the response variable.
+#' @param method character string specifying the correlation method. Available methods are "pearson", "spearman", "kendall" and "chatterjee". Default is "pearson".
+#' @param .plot optional (`FALSE` by default). Visual representation.
+#' @param .color optional. Sets the color of the plot.
+#' @param .interactive optional (`FALSE` by default). When set to `TRUE` enables interactive plot.
+#' @source Chatterjee (2021), Journal of the American Statistical Association, 116(536). https://doi.org/10.1080/01621459.2020.1758115
+#' @return A list containing:`correlation` - data frame of the correlation values. `plot` - ggplot2 object, if `.plot = TRUE`.
+#' @return Or a plotly object, if `.interactive = TRUE`.
 #' @export corr
-corr <- function(.data, response_var, method = "pearson", .plot = FALSE) {
+corr <- function(.data, response_var, method = "pearson", .plot = FALSE, .color = "#111D71", .interactive = FALSE) {
   if (!is.data.frame(.data) || !all(.data %>% purrr::map_lgl(is.numeric))) {
     stop("Input must be a numeric data frame")
   }
@@ -79,7 +81,7 @@ corr <- function(.data, response_var, method = "pearson", .plot = FALSE) {
     ggplot2::aes(x = reorder(variable, -correlation), y = correlation, fill = method) +
     ggplot2::geom_bar(stat = "identity") +
     ggplot2::geom_vline(xintercept = 0, colour = "white", linewidth = 1) +
-    ggplot2::scale_fill_manual(values = "#111D71") +
+    ggplot2::scale_fill_manual(values = .color) +
     ggplot2::scale_y_continuous(breaks = c(-1, -.5, 0, .5, 1), limits = c(-1, 1)) +
     ggplot2::labs(x = " ", y = paste0(rlang::quo_name(rlang::enquo(response_var)), " ", "correlation")) +
     ggplot2::coord_flip() +
@@ -89,6 +91,10 @@ corr <- function(.data, response_var, method = "pearson", .plot = FALSE) {
   if (.plot == FALSE) {
     return(tbl_corr)
   } else {
-    return(list(correlation = tbl_corr, plot = p))
+    if (.interactive == FALSE) {
+      return(list(correlation = tbl_corr, plot = p))
+    } else {
+      return(plotly::ggplotly(p, tooltip = "y"))
+    }
   }
 }
