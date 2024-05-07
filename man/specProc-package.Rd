@@ -10,4 +10,12 @@
 
 A collection of functions for preprocessing spectra in optical emission spectroscopy of laser-induced plasmas, called laser-induced breakdown spectroscopy.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/ChristianGoueguel/specProc}
+  \item Report bugs at \url{https://github.com/ChristianGoueguel/specProc/issues}
+}
+
+}
 \keyword{internal}

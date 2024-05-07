@@ -11,7 +11,7 @@ corr(.data, response_var, method = "pearson", .plot = FALSE)
 
 \item{response_var}{A character string specifying the name of the response variable column in the data frame.}
 
-\item{method}{A character string specifying the correlation method to use. Available methods are "pearson", "spearman" and "kendall". Default is "pearson".}
+\item{method}{A character string specifying the correlation method to use. Available methods are "pearson", "spearman", "kendall" and "chatterjee". Default is "pearson".}
 
 \item{.plot}{for a visual representation of the results (FALSE by default).}
 }

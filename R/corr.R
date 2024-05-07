@@ -5,29 +5,22 @@
 #' correlation for each column.
 #' @param .data A numeric data frame containing the data.
 #' @param response_var A character string specifying the name of the response variable column in the data frame.
-#' @param method A character string specifying the correlation method to use. Available methods are "pearson", "spearman" and "kendall". Default is "pearson".
+#' @param method A character string specifying the correlation method to use. Available methods are "pearson", "spearman", "kendall" and "chatterjee". Default is "pearson".
 #' @param .plot for a visual representation of the results (FALSE by default).
 #' @return List containing:
 #' @return \item{`correlation`}{data frame of the correlation values}
 #' @return \item{`plot`}{ggplot2 object (if `.plot = TRUE`)}
 #' @export corr
 corr <- function(.data, response_var, method = "pearson", .plot = FALSE) {
-  requireNamespace("dplyr", quietly = TRUE)
-  requireNamespace("tidyr", quietly = TRUE)
-  requireNamespace("tibble", quietly = TRUE)
-  requireNamespace("purrr", quietly = TRUE)
-  requireNamespace("corrr", quietly = TRUE)
-  requireNamespace("cowplot", quietly = TRUE)
-
   if (!is.data.frame(.data) || !all(.data %>% purrr::map_lgl(is.numeric))) {
     stop("Input must be a numeric data frame")
   }
-  if (!response_var %in% colnames(.data)) {
+  if (!rlang::quo_name(rlang::enquo(response_var)) %in% colnames(.data)) {
     stop("Response variable not found in the data frame")
   }
-  valid_methods <- c("pearson", "spearman", "kendall")
+  valid_methods <- c("pearson", "spearman", "kendall", "chatterjee")
   if (!method %in% valid_methods) {
-    stop("Invalid method specified. Available methods are: pearson, spearman and kendall")
+    stop("Invalid method specified. Available methods are: pearson, spearman, kendall and chatterjee")
   }
   if (!is.logical(.plot)) {
     stop("'.plot' must be of type boolean (TRUE or FALSE)")
@@ -41,8 +34,8 @@ corr <- function(.data, response_var, method = "pearson", .plot = FALSE) {
         quiet = TRUE
       ) %>%
       tibble::rownames_to_column("variable") %>%
-      dplyr::select(variable, !!response_var) %>%
-      dplyr::rename(correlation = !!response_var) %>%
+      dplyr::select(variable, {{response_var}}) %>%
+      dplyr::rename(correlation = {{response_var}}) %>%
       dplyr::mutate(method = method)
   } else {
     tbl_corr <- .data %>%
@@ -52,15 +45,34 @@ corr <- function(.data, response_var, method = "pearson", .plot = FALSE) {
         quiet = TRUE
       ) %>%
       tibble::rownames_to_column("variable") %>%
-      dplyr::select(variable, !!response_var) %>%
-      dplyr::rename(correlation = !!response_var) %>%
+      dplyr::select(variable, {{response_var}}) %>%
+      dplyr::rename(correlation = {{response_var}}) %>%
+      dplyr::mutate(method = method)
+  }
+  if (method == "chatterjee") {
+    tbl_corr <- .data %>%
+      as.matrix() %>%
+      XICOR::xicor(pvalue = FALSE, ties = TRUE) %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("variable") %>%
+      tibble::as_tibble() %>%
+      dplyr::select(variable, {{response_var}}) %>%
+      dplyr::rename(correlation = {{response_var}}) %>%
       dplyr::mutate(method = method)
   }
 
-  tbl_corr$variable <- names(.data)
-  tbl_corr <- tbl_corr %>%
-    tidyr::drop_na() %>%
-    dplyr::arrange(desc(correlation))
+  if (method != "chatterjee") {
+    tbl_corr$variable <- names(.data)
+    tbl_corr <- tbl_corr %>%
+      tidyr::drop_na() %>%
+      dplyr::arrange(desc(correlation))
+  } else {
+    tbl_corr$variable <- names(.data)
+    tbl_corr <- tbl_corr %>%
+      dplyr::filter(variable != rlang::quo_name(rlang::enquo(response_var))) %>%
+      tidyr::drop_na() %>%
+      dplyr::arrange(desc(correlation))
+  }
 
   p <- tbl_corr %>%
     ggplot2::ggplot() +
@@ -69,7 +81,7 @@ corr <- function(.data, response_var, method = "pearson", .plot = FALSE) {
     ggplot2::geom_vline(xintercept = 0, colour = "white", linewidth = 1) +
     ggplot2::scale_fill_manual(values = "#111D71") +
     ggplot2::scale_y_continuous(breaks = c(-1, -.5, 0, .5, 1), limits = c(-1, 1)) +
-    ggplot2::labs(x = " ", y = "Correlation ") +
+    ggplot2::labs(x = " ", y = paste0(rlang::quo_name(rlang::enquo(response_var)), " ", "correlation")) +
     ggplot2::coord_flip() +
     cowplot::theme_minimal_vgrid() +
     ggplot2::theme(legend.position = "top")
