@@ -3,7 +3,7 @@
 #' @description Fitting of a single spectral line by lineshape functions with variable parameters.
 #' @details The function uses `minpack.lm::nlsLM`, which is based on the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals.
 #' @param .data Data frame of emission spectra
-#' @param profile (character) Lineshape function: "Lorentzian", "Gaussian" or "Voigt"
+#' @param profile (character) Lineshape function: "lorentzian", "gaussian" or "voigt"
 #' @param wL (numeric) Lorentzian full width at half maximum (initial guess)
 #' @param wG (numeric) Gaussian full width at half maximum (initial guess)
 #' @param A (numeric) Peak area (initial guess)
@@ -13,15 +13,15 @@
 #' @param max.iter (numeric) Maximum number of iteration (200 by default)
 #' @return Fitted value and the estimated parameters along with the corresponding errors
 #' @export peakfit
-peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL, id = NULL, max.iter = 200) {
+peakfit <- function(.data, profile = "voigt", wL = NULL, wG = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL, id = NULL, max.iter = 200) {
   if (missing(.data)) {
     stop("Missing 'data' argument.")
   }
   if (!is.data.frame(.data) && !is_tibble(.data)) {
     stop("Input 'data' must be a data frame or tibble.")
   }
-  if (profile != "Lorentzian" & profile != "Gaussian" & profile != "Voigt") {
-    stop("The profile function must be Lorentzian, Gaussian or Voigt")
+  if (profile != "lorentzian" & profile != "gaussian" & profile != "voigt") {
+    stop("The profile function must be: 'lorentzian', 'gaussian' or 'voigt'")
   }
   if (is.numeric(max.iter) == FALSE) {
     stop("Maximum number of iteration must be numeric")
@@ -76,7 +76,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           dplyr::filter(x >= wlgth.min & x <= wlgth.max)
       }
     }
-    if (profile == "Lorentzian") {
+    if (profile == "lorentzian") {
       if (is.null(wL) == FALSE & is.null(A) == FALSE) {
         param1 <- as.numeric(wL)
         param2 <- as.numeric(A)
@@ -89,7 +89,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           fit = purrr::map(
             .data, ~ minpack.lm::nlsLM(
               data = .,
-              y ~ lorentzianfun(x, y0, xc, wL, A),
+              y ~ lorentzian(x, y0, xc, wL, A),
               start =  list(
                 y0 = .$y[which.min(.$y)],
                 xc = .$x[which.max(.$y)],
@@ -104,7 +104,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           augmented = purrr::map(fit, broom::augment)
         )
     }
-    if(profile == "Gaussian") {
+    if(profile == "gaussian") {
       if (is.null(wG) == FALSE & is.null(A) == FALSE) {
         param1 <- 1
         param2 <- 15000
@@ -117,7 +117,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           fit = purrr::map(
             .data, ~ minpack.lm::nlsLM(
               data = .,
-              y ~ gaussianfun(x, y0, xc, wG, A),
+              y ~ gaussian(x, y0, xc, wG, A),
               start =  list(
                 y0 = .$y[which.min(.$y)],
                 xc = .$x[which.max(.$y)],
@@ -132,7 +132,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           augmented = purrr::map(fit, broom::augment)
         )
     }
-    if(profile == "Voigt") {
+    if(profile == "voigt") {
       if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
         param1 <- as.numeric(wL)
         param2 <- as.numeric(wG)
@@ -146,7 +146,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           fit = purrr::map(
             .data, ~ minpack.lm::nlsLM(
               data = .,
-              y ~ voigtfun(x, y0, xc, wG, wL, A),
+              y ~ voigt(x, y0, xc, wG, wL, A),
               start =  list(
                 y0 = .$y[which.min(.$y)],
                 xc = .$x[which.max(.$y)],
@@ -209,7 +209,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
         purrr::modify_at("x", as.numeric) %>%
         dplyr::filter(x >= wlgth.min & x <= wlgth.max)
     }
-    if (profile == "Lorentzian") {
+    if (profile == "lorentzian") {
       if (is.null(wL) == FALSE & is.null(A) == FALSE) {
         param1 <- as.numeric(wL)
         param2 <- as.numeric(A)
@@ -222,7 +222,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           fit = purrr::map(
             .data, ~ minpack.lm::nlsLM(
               data = .,
-              y ~ lorentzianfun(x, y0, xc, wL, A),
+              y ~ lorentzian(x, y0, xc, wL, A),
               start =  list(
                 y0 = .$y[which.min(.$y)],
                 xc = .$x[which.max(.$y)],
@@ -237,7 +237,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           augmented = purrr::map(fit, broom::augment)
         )
     }
-    if(profile == "Gaussian") {
+    if(profile == "gaussian") {
       if (is.null(wG) == FALSE & is.null(A) == FALSE) {
         param1 <- as.numeric(wG)
         param2 <- as.numeric(A)
@@ -250,7 +250,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           fit = purrr::map(
             .data, ~ minpack.lm::nlsLM(
               data = .,
-              y ~ gaussianfun(x, y0, xc, wG, A),
+              y ~ gaussian(x, y0, xc, wG, A),
               start =  list(
                 y0 = .$y[which.min(.$y)],
                 xc = .$x[which.max(.$y)],
@@ -265,7 +265,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           augmented = purrr::map(fit, broom::augment)
         )
     }
-    if(profile == "Voigt") {
+    if(profile == "voigt") {
       if (is.null(wL) == FALSE & is.null(wG) == FALSE & is.null(A) == FALSE) {
         param1 <- as.numeric(wL)
         param2 <- as.numeric(wG)
@@ -279,7 +279,7 @@ peakfit <- function(.data, profile = "Voigt", wL = NULL, wG = NULL, A = NULL, wl
           fit = purrr::map(
             .data, ~ minpack.lm::nlsLM(
               data = .,
-              y ~ voigtfun(x, y0, xc, wG, wL, A),
+              y ~ voigt(x, y0, xc, wG, wL, A),
               start =  list(
                 y0 = .$y[which.min(.$y)],
                 xc = .$x[which.max(.$y)],
