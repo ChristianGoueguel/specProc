@@ -30,7 +30,7 @@ background of the data and the problem.
 | **Function**        | **Description**                                                                   |
 |---------------------|-----------------------------------------------------------------------------------|
 | `adjboxplot()`      | Adjusted boxplot for skewed distribution                                          |
-| `baselineRemoval()` | Baseline removal                                                                  |
+| `baselineRemoval()` | Baseline/continuum removal                                                        |
 | `corr()`            | Correlation for each column in a data frame with respect to a response variable   |
 | `gaussian()`        | Gaussian lineshape function                                                       |
 | `lorentzian()`      | Lorentzian lineshape function                                                     |
