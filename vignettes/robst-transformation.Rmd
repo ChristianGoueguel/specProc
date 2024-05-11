@@ -45,14 +45,14 @@ df_tbl %>% slice_head(n = 5)
 ```
 
 ```{r}
-#df_tf <- df_tbl %>% robTransform(type = "bestObj")
+df_tf <- df_tbl %>% robTransform(type = "bestObj")
 ```
 
 ```{r}
-#df_tf$summary
+df_tf$summary
 ```
 
 ```{r}
-#df_tf$data
+df_tf$transformation
 ```
 

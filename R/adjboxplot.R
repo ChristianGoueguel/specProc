@@ -1,8 +1,8 @@
-#' @title Function to Compute Adjusted Boxplot for Skewed Distribution
+#' @title Adjusted Boxplot for Skewed Distribution
 #' @author Christian L. Goueguel
 #' @source G. Brys, M. Hubert and A. Struyf, A Robust Measure of Skewness. J. Comput. Graph. Stat. 13 (2004); M. Hubert and E. Vandervieren, An adjusted boxplot for skewed distributions, Comput. Stat. Data Anal., 52 (2008
-#' @param .data data frame or tibble (must contain numeric columns).
-#' @param .plot plot the adjusted boxplot (TRUE by default).
+#' @param .data data frame or tibble.
+#' @param .plot plot the adjusted boxplot (`TRUE` by default).
 #' @return A list that contains:
 #' @return \item{`adj_box_stat`}{data frame of the adjusted boxplot statistics}
 #' @return \item{`plot`}{ggplot2 object (if `.plot = TRUE`)}
@@ -12,7 +12,7 @@ adjboxplot <- function(.data, .plot = TRUE) {
     stop("Missing 'data' argument.")
   }
   if (!all(.data %>% purrr::map_lgl(is.numeric))) {
-    stop("Input must be a numeric data frame.")
+    stop("Input data must be a numeric data frame.")
   }
   if(!is.logical(.plot)) {
     stop("Argument '.plot' must be of type boolean (TRUE or FALSE).")

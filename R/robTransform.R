@@ -1,14 +1,14 @@
 #' @title Robust Box-Cox and Yeo-Johnson Transformation
 #' @author Christian L. Goueguel
-#' @description The function transforms each variable in a dataset toward central normality using re-weighted maximum likelihood to robustly fit the Box-Cox or Yeo-Johnson transformation.
+#' @description Transforms each variable in a dataset toward central normality using re-weighted maximum likelihood to robustly fit the Box-Cox or Yeo-Johnson transformation.
 #' @details Wrapper of the `transfo` function from the cellWise package.
-#' @source J. Raymaekers and P.J. Rousseeuw, Transforming variables to central normality, Machine Learning, 1–23 (2021).
-#' @param .data A data frame or tibble containing numeric columns.
-#' @param var A vector of character or numeric specifying the selected variable(s). Default is NULL (all columns).
-#' @param type A character string specifying the transformation method to use. Available methods are "BC" (Box-Cox power transformation, which is for strictly positive values.), "YJ" ( Yeo-Johnson power transformation, which works for positive and negative values.) or "bestObj" (both BC and YJ are run for strictly positive variables, and the solution with lowest objective is kept. Whereas if a variable has negative values YJ is run.). Default is "bestObj".
-#' @param quant Numeric value for the quantile used in determining the weights in the re-weighting step. Default is 0.99.
-#' @param nbsteps Integer value for the number of re-weighting steps. Default is 2.
-#' @return A tibble of transformed variable(s), method used ('BC' for Box-Cox and 'YJ' for Yeo-Johnson), objective and lambda.
+#' @source Raymaekers and Rousseeuw (2021), Machine Learning, https://doi.org/10.1007/s10994-021-05960-5.
+#' @param .data data frame or tibble.
+#' @param var vector of selected character or numeric variable(s). Default is `NULL` (all columns are selected).
+#' @param type transformation method to use. Available methods are "BC" (Box-Cox power transformation, which is for strictly positive values.), "YJ" ( Yeo-Johnson power transformation, which works for positive and negative values.) or "bestObj" (both BC and YJ are run for strictly positive variables, and the solution with lowest objective is kept. Whereas if a variable has negative values YJ is run.). Default is "bestObj".
+#' @param quant numeric value for the quantile used in determining the weights in the re-weighting step (default is 0.99).
+#' @param nbsteps number of re-weighting steps (2 by default).
+#' @return tibble of transformed variable(s), method used ('BC' for Box-Cox and 'YJ' for Yeo-Johnson), objective and lambda.
 #' @export robTransform
 robTransform <- function(.data, var = NULL, type = "bestObj", quant = 0.99, nbsteps = 2) {
   if (missing(.data)) {
@@ -22,36 +22,36 @@ robTransform <- function(.data, var = NULL, type = "bestObj", quant = 0.99, nbst
     stop("Invalid type of transformation. Available method types are: BC, YJ and bestObj.")
   }
   if (!is.character(type)) {
-    stop("'type' must be a character.")
+    stop("The argument 'type' must be a character.")
   }
-
-  selected_data <- .data %>%
+  s_tbl <- .data %>%
     dplyr::select(dplyr::where(is.numeric)) %>%
     { if (!is.null(var)) dplyr::select(., dplyr::all_of(var)) else . }
 
-  transformation_result <- cellWise::transfo(
-    selected_data,
-    type = type,
-    robust = TRUE,
-    lambdarange = NULL,
-    prestandardize = TRUE,
-    prescaleBC = FALSE,
-    quant = quant,
-    nbsteps = nbsteps,
-    checkPars = list(silent = TRUE)
-  )
-
+  tf_out <- s_tbl %>%
+    as.matrix() %>%
+    cellWise::transfo(
+      type = type,
+      robust = TRUE,
+      standardize = TRUE,
+      quant = quant,
+      nbsteps = nbsteps,
+      checkPars = list(silent = TRUE)
+    )
   summary_tbl <- tibble::tibble(
-    variable = colnames(selected_data),
-    lambda_hat = transformation_result$lambdahats,
-    transform = transformation_result$ttypes,
-    objective = transformation_result$objective
+    variable = colnames(s_tbl),
+    lambda_hat = tf_out$lambdahats,
+    transform = tf_out$ttypes,
+    objective = tf_out$objective
   )
+  transfo_tbl <- s_tbl %>%
+    as.matrix() %>%
+    cellWise::transfo_newdata(tf_out) %>%
+    tibble::as_tibble()
 
-  transformed_data <- transformation_result$Xt %>% dplyr::as_tibble()
-  res <- list(
+  result <- list(
     summary = summary_tbl,
-    data = transformed_data
+    transformation = transfo_tbl
   )
-  return(res)
+  return(result)
 }

@@ -4,27 +4,27 @@
 \alias{robTransform}
 \title{Robust Box-Cox and Yeo-Johnson Transformation}
 \source{
-J. Raymaekers and P.J. Rousseeuw, Transforming variables to central normality, Machine Learning, 1–23 (2021).
+Raymaekers and Rousseeuw (2021), Machine Learning, https://doi.org/10.1007/s10994-021-05960-5.
 }
 \usage{
 robTransform(.data, var = NULL, type = "bestObj", quant = 0.99, nbsteps = 2)
 }
 \arguments{
-\item{.data}{A data frame or tibble containing numeric columns.}
+\item{.data}{data frame or tibble.}
 
-\item{var}{A vector of character or numeric specifying the selected variable(s). Default is NULL (all columns).}
+\item{var}{vector of selected character or numeric variable(s). Default is \code{NULL} (all columns are selected).}
 
-\item{type}{A character string specifying the transformation method to use. Available methods are "BC" (Box-Cox power transformation, which is for strictly positive values.), "YJ" ( Yeo-Johnson power transformation, which works for positive and negative values.) or "bestObj" (both BC and YJ are run for strictly positive variables, and the solution with lowest objective is kept. Whereas if a variable has negative values YJ is run.). Default is "bestObj".}
+\item{type}{transformation method to use. Available methods are "BC" (Box-Cox power transformation, which is for strictly positive values.), "YJ" ( Yeo-Johnson power transformation, which works for positive and negative values.) or "bestObj" (both BC and YJ are run for strictly positive variables, and the solution with lowest objective is kept. Whereas if a variable has negative values YJ is run.). Default is "bestObj".}
 
-\item{quant}{Numeric value for the quantile used in determining the weights in the re-weighting step. Default is 0.99.}
+\item{quant}{numeric value for the quantile used in determining the weights in the re-weighting step (default is 0.99).}
 
-\item{nbsteps}{Integer value for the number of re-weighting steps. Default is 2.}
+\item{nbsteps}{number of re-weighting steps (2 by default).}
 }
 \value{
-A tibble of transformed variable(s), method used ('BC' for Box-Cox and 'YJ' for Yeo-Johnson), objective and lambda.
+tibble of transformed variable(s), method used ('BC' for Box-Cox and 'YJ' for Yeo-Johnson), objective and lambda.
 }
 \description{
-The function transforms each variable in a dataset toward central normality using re-weighted maximum likelihood to robustly fit the Box-Cox or Yeo-Johnson transformation.
+Transforms each variable in a dataset toward central normality using re-weighted maximum likelihood to robustly fit the Box-Cox or Yeo-Johnson transformation.
 }
 \details{
 Wrapper of the \code{transfo} function from the cellWise package.

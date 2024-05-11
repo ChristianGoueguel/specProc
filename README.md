@@ -32,15 +32,15 @@ background of the data and the problem.
 | `adjboxplot()`      | Adjusted boxplot for skewed distribution                                          |
 | `baselineRemoval()` | Baseline removal                                                                  |
 | `corr()`            | Correlation for each column in a data frame with respect to a response variable   |
-| `gaussianfun()`     | Gaussian lineshape                                                                |
-| `lorentzianfun()`   | Lorentzian lineshape                                                              |
-| `voigtfun()`        | Voigt lineshape                                                                   |
+| `gaussian()`        | Gaussian lineshape function                                                       |
+| `lorentzian()`      | Lorentzian lineshape function                                                     |
+| `voigt()`           | Pseudo-Voigt lineshape function                                                   |
 | `plotSpec()`        | Spectral data plot                                                                |
 | `normSpec()`        | Normalize spectra with different normalization methods                            |
 | `opls()`            | Orthogonal projections to latent structures                                       |
 | `osc()`             | Orthogonal signal correction                                                      |
 | `peakfit()`         | Fitting of a single spectral line by lineshape functions with variable parameters |
-| `plotfit()`         | Plotting of spectral line fitting                                                 |
+| `plotfit()`         | Plotting of spectral line fitting and residuals                                   |
 | `multipeakfit()`    | Multiple peaks fitting                                                            |
 | `robTransform()`    | Robust Box-Cox and Yeo-Johnson transformation                                     |
 | `summaryStats()`    | Descriptive Statistics                                                            |
