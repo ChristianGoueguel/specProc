@@ -2,7 +2,7 @@
 % Please edit documentation in R/adjboxplot.R
 \name{adjboxplot}
 \alias{adjboxplot}
-\title{Function to Compute Adjusted Boxplot for Skewed Distribution}
+\title{Adjusted Boxplot for Skewed Distribution}
 \source{
 G. Brys, M. Hubert and A. Struyf, A Robust Measure of Skewness. J. Comput. Graph. Stat. 13 (2004); M. Hubert and E. Vandervieren, An adjusted boxplot for skewed distributions, Comput. Stat. Data Anal., 52 (2008
 }
@@ -10,9 +10,9 @@ G. Brys, M. Hubert and A. Struyf, A Robust Measure of Skewness. J. Comput. Graph
 adjboxplot(.data, .plot = TRUE)
 }
 \arguments{
-\item{.data}{data frame or tibble (must contain numeric columns).}
+\item{.data}{data frame or tibble.}
 
-\item{.plot}{plot the adjusted boxplot (TRUE by default).}
+\item{.plot}{plot the adjusted boxplot (\code{TRUE} by default).}
 }
 \value{
 A list that contains:
@@ -22,7 +22,7 @@ A list that contains:
 \item{\code{plot}}{ggplot2 object (if \code{.plot = TRUE})}
 }
 \description{
-Function to Compute Adjusted Boxplot for Skewed Distribution
+Adjusted Boxplot for Skewed Distribution
 }
 \author{
 Christian L. Goueguel

@@ -72,3 +72,23 @@ You can install the development version from
 install.packages("devtools")
 devtools::install_github("ChristianGoueguel/specProc")
 ```
+
+## Exemples
+
+### Adjusted boxplot
+
+```{r}
+
+```
+
+### Baseline correction
+
+```{r}
+
+```
+
+
+
+
+
+

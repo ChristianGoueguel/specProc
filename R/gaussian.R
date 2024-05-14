@@ -7,7 +7,7 @@
 #' @param w FWHM
 #' @param A area under the peak
 #' @return fitted value
-#' @export gaussianfun
-gaussianfun <- function(x, y0, xc, w, A) {
+#' @export gaussian
+gaussian <- function(x, y0, xc, w, A) {
   y0 + A/(w*sqrt(pi/(4*log(2)))) * exp((-4*log(2)*(x - xc)^2)/(w^2))
 }
