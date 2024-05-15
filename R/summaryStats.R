@@ -1,10 +1,29 @@
 #' @title Robust and Non-Robust Descriptive Statistics
-#' @description Function used to produce summary statistics.
-#' @param data frame or tibble. Columns are the numeric variables.
-#' @param var Numeric. Selected variable(s).
-#' @return Tibble. Summary statistic that quantitatively describes the variable(s).
+#' @description This function calculates various descriptive statistics (robust and non-robust)
+#'   for a specified variable or all variables in a given data frame or tibble.
+#' @param data A data frame or tibble containing the variable(s) of interest.
+#' @param var A character vector specifying the variable(s) for which to calculate the
+#'   summary statistics. If left as \code{NULL} (the default), summary statistics will
+#'   be calculated for all variables in the data frame/tibble.
+#' @param drop.na A logical value indicating whether to remove missing values (\code{NA})
+#'   from the calculations. If \code{TRUE} (the default), missing values will be removed.
+#'   If \code{FALSE}, missing values will be included in the calculations.
+#' @param digits An integer specifying the number of significant digits to display after
+#'   the decimal point in the output.
+#' @return A data frame containing the summary statistics for the specified variable(s),
+#'   including count, mean, standard deviation, cv (coefficient of variation), rcv (robust coefficient of variation), median, mad (median absolute
+#'   deviation), minimum, maximum, range, IQR (interquartile range), skewness, medcouple and kurtosis.
 #' @export summaryStats
-summaryStats <- function(data, var = NULL, remove.na = TRUE, sign.fig = 2) {
+#' @examples
+#' # Load the iris dataset
+#' data(iris)
+#'
+#' # Calculate summary statistics for all variables in the iris dataset
+#' summary_stats <- summaryStats(iris)
+#'
+#' # Calculate summary statistics for the 'Sepal.Length' and 'Petal.Length' variables
+#' sepal_length_stats <- summaryStats(iris, var = c("Sepal.Length", "Petal.Length"))
+summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2) {
   if (is.null(data) == TRUE) {
     stop("Data must be provided")
   }
@@ -16,26 +35,29 @@ summaryStats <- function(data, var = NULL, remove.na = TRUE, sign.fig = 2) {
     x %>%
       dplyr::group_by(variable) %>%
       dplyr::summarise(
-        mean = round(mean(value), sign.fig),
-        median = round(median(value), sign.fig),
-        mad = round(mad(value), sign.fig),
-        sd = round(sd(value), sign.fig),
-        cv = round((sd/mean)*100, sign.fig),
-        rcv = round((1.4826*(mad/median))*100, sign.fig),
-        IQR = round(IQR(value, na.rm = TRUE), sign.fig),
+        mean = round(mean(value), digits),
+        median = round(median(value), digits),
+        mad = round(mad(value), digits),
+        sd = round(sd(value), digits),
+        cv = round((sd/mean)*100, digits),
+        rcv = round((1.4826*(mad/median))*100, digits),
+        IQR = round(IQR(value, na.rm = TRUE), digits),
         min = min(value),
         max = max(value),
-        skewness = round(moments::skewness(value), sign.fig),
-        medcouple = round(robustbase::mc(value), sign.fig),
-        kurtosis = round(moments::kurtosis(value), sign.fig),
-        n = n()
-      )
+        range = max - min,
+        skewness = round(moments::skewness(value), digits),
+        medcouple = round(robustbase::mc(value), digits),
+        kurtosis = round(moments::kurtosis(value), digits),
+        count = n()
+      ) %>%
+      dplyr::ungroup() %>%
+      dplyr::distinct()
   }
 
   if (is.null(var) == FALSE) {
-    if (remove.na == TRUE) {
+    if (drop.na == TRUE) {
       data %>%
-        dplyr::select(dplyr::where(is.numeric)) %>%
+        dplyr::select(tidyselect::where(is.numeric)) %>%
         tidyr::pivot_longer(
           cols = dplyr::all_of(var),
           names_to = "variable",
@@ -45,8 +67,8 @@ summaryStats <- function(data, var = NULL, remove.na = TRUE, sign.fig = 2) {
         fct_summary()
     } else {
       data %>%
-        select(where(is.numeric)) %>%
-        pivot_longer(
+        dplyr::select(tidyselect::where(is.numeric)) %>%
+        tidyr::pivot_longer(
           cols = all_of(var),
           names_to = "variable",
           values_to = "value"
@@ -54,11 +76,11 @@ summaryStats <- function(data, var = NULL, remove.na = TRUE, sign.fig = 2) {
         fct_summary()
     }
   } else {
-    if (remove.na == TRUE) {
+    if (drop.na == TRUE) {
       data %>%
         dplyr::select(dplyr::where(is.numeric)) %>%
         tidyr::pivot_longer(
-          cols = dplyr::everything(),
+          cols = tidyselect::everything(),
           names_to = "variable",
           values_to = "value"
         ) %>%
@@ -66,9 +88,9 @@ summaryStats <- function(data, var = NULL, remove.na = TRUE, sign.fig = 2) {
         fct_summary()
     } else {
       data %>%
-        dplyr::select(dplyr::where(is.numeric)) %>%
+        dplyr::select(tidyselect::where(is.numeric)) %>%
         tidyr::pivot_longer(
-          cols = dplyr::everything(),
+          cols = tidyselect::everything(),
           names_to = "variable",
           values_to = "value"
         ) %>%

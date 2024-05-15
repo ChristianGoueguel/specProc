@@ -2,27 +2,47 @@
 % Please edit documentation in R/adjboxplot.R
 \name{adjboxplot}
 \alias{adjboxplot}
-\title{Adjusted Boxplot for Skewed Distribution}
-\source{
-G. Brys, M. Hubert and A. Struyf, A Robust Measure of Skewness. J. Comput. Graph. Stat. 13 (2004); M. Hubert and E. Vandervieren, An adjusted boxplot for skewed distributions, Comput. Stat. Data Anal., 52 (2008
-}
+\title{Adjusted Boxplot for Skewed Distributions}
 \usage{
 adjboxplot(.data, .plot = TRUE)
 }
 \arguments{
-\item{.data}{data frame or tibble.}
+\item{.data}{A data frame or tibble containing the variables to be plotted.}
 
-\item{.plot}{plot the adjusted boxplot (\code{TRUE} by default).}
+\item{.plot}{Logical value indicating whether to plot the adjusted boxplot (default is TRUE).}
 }
 \value{
-A list that contains:
-
-\item{\code{adj_box_stat}}{data frame of the adjusted boxplot statistics}
-
-\item{\code{plot}}{ggplot2 object (if \code{.plot = TRUE})}
+If \code{.plot = TRUE}, returns a \code{ggplot2} object containing the adjusted boxplot.
+If \code{.plot = FALSE}, returns a data frame with the adjusted boxplot statistics.
 }
 \description{
-Adjusted Boxplot for Skewed Distribution
+This function generates an adjusted boxplot, which is a robust graphical method
+for visualizing skewed data distributions. It provides a more accurate representation
+of the data's spread and skewness compared to traditional boxplots, especially
+in the presence of outliers or heavy-tailed distributions.
+}
+\details{
+The adjusted boxplot is based on the methodology described in:
+\itemize{
+\item G. Brys, M. Hubert, and A. Struyf, "A Robust Measure of Skewness," Journal of Computational and Graphical Statistics, 13 (2004)
+\item M. Hubert and E. Vandervieren, "An adjusted boxplot for skewed distributions," Computational Statistics & Data Analysis, 52 (2008)
+}
+}
+\examples{
+# Generate some skewed data
+set.seed(123)
+data <- data.frame(
+  normal = rnorm(100),
+  skewed = rexp(100, rate = 0.5),
+  heavy_tailed = rt(100, df = 3)
+)
+
+# Plot the adjusted boxplot
+adjboxplot(data)
+
+# Retrieve the adjusted boxplot statistics
+stats <- adjboxplot(data, .plot = FALSE)
+
 }
 \author{
 Christian L. Goueguel

@@ -4,16 +4,38 @@
 \alias{summaryStats}
 \title{Robust and Non-Robust Descriptive Statistics}
 \usage{
-summaryStats(data, var = NULL, remove.na = TRUE, sign.fig = 2)
+summaryStats(data, var = NULL, drop.na = TRUE, digits = 2)
 }
 \arguments{
-\item{data}{frame or tibble. Columns are the numeric variables.}
+\item{data}{A data frame or tibble containing the variable(s) of interest.}
 
-\item{var}{Numeric. Selected variable(s).}
+\item{var}{A character vector specifying the variable(s) for which to calculate the
+summary statistics. If left as \code{NULL} (the default), summary statistics will
+be calculated for all variables in the data frame/tibble.}
+
+\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA})
+from the calculations. If \code{TRUE} (the default), missing values will be removed.
+If \code{FALSE}, missing values will be included in the calculations.}
+
+\item{digits}{An integer specifying the number of significant digits to display after
+the decimal point in the output.}
 }
 \value{
-Tibble. Summary statistic that quantitatively describes the variable(s).
+A data frame containing the summary statistics for the specified variable(s),
+including count, mean, standard deviation, cv (coefficient of variation), rcv (robust coefficient of variation), median, mad (median absolute
+deviation), minimum, maximum, range, IQR (interquartile range), skewness, medcouple and kurtosis.
 }
 \description{
-Function used to produce summary statistics.
+This function calculates various descriptive statistics (robust and non-robust)
+for a specified variable or all variables in a given data frame or tibble.
+}
+\examples{
+# Load the iris dataset
+data(iris)
+
+# Calculate summary statistics for all variables in the iris dataset
+summary_stats <- summaryStats(iris)
+
+# Calculate summary statistics for the 'Sepal.Length' and 'Petal.Length' variables
+sepal_length_stats <- summaryStats(iris, var = c("Sepal.Length", "Petal.Length"))
 }
