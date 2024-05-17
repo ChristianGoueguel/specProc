@@ -9,7 +9,7 @@
 #' - G. Brys, M. Hubert, and A. Struyf, "A Robust Measure of Skewness," Journal of Computational and Graphical Statistics, 13 (2004)
 #' - M. Hubert and E. Vandervieren, "An adjusted boxplot for skewed distributions," Computational Statistics & Data Analysis, 52 (2008)
 #'
-#' #' @author Christian L. Goueguel
+#' @author Christian L. Goueguel
 #' @param .data numeric data frame or tibble containing the variables to be plotted.
 #' @param .plot logical value indicating whether to plot the adjusted boxplot (default is TRUE).
 #' @param xlabels.angle numeric value specifying the angle (in degrees) for x-axis labels (default is 90).
