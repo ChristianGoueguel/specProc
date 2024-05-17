@@ -12,6 +12,8 @@
 #' @author Christian L. Goueguel
 #' @param .data A data frame or tibble containing the variables to be plotted.
 #' @param .plot Logical value indicating whether to plot the adjusted boxplot (default is TRUE).
+#' @param notch Logical value indicating whether to display a notched boxplot (default is FALSE).
+#' @param xlabels.angle Numeric value specifying the angle (in degrees) for x-axis labels (default is 90).
 #' @return If `.plot = TRUE`, returns a `ggplot2` object containing the adjusted boxplot.
 #'         If `.plot = FALSE`, returns a data frame with the adjusted boxplot statistics.
 #' @export adjboxplot
@@ -30,7 +32,7 @@
 #' # Retrieve the adjusted boxplot statistics
 #' stats <- adjboxplot(data, .plot = FALSE)
 #'
-adjboxplot <- function(.data, .plot = TRUE) {
+adjboxplot <- function(.data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, xlabels.hjust = 1, box.width = .5, notch = FALSE, notchwidth = 0.5, staplewidth = 0) {
   if (missing(.data)) {
     stop("Missing 'data' argument.")
   }
@@ -40,12 +42,18 @@ adjboxplot <- function(.data, .plot = TRUE) {
   if(!is.logical(.plot)) {
     stop("Argument '.plot' must be of type boolean (TRUE or FALSE).")
   }
+  if (!is.logical(notch)) {
+    stop("Argument 'notch' must be of type boolean (TRUE or FALSE).")
+  }
+  if (!is.numeric(xlabels.angle) || xlabels.angle < 0 || xlabels.angle > 360) {
+    stop("Argument 'x_axis_angle' must be a numeric value between 0 and 360.")
+  }
 
   adjBoxplot_stats <- .data %>%
-    purrr::map_dfr(
+    map(
       function(.x) {
         adj_box <- robustbase::adjboxStats(.x)
-        tibble::tibble(
+        tibble(
           lower = adj_box$stats[1],
           q1 = adj_box$stats[2],
           median = adj_box$stats[3],
@@ -53,32 +61,23 @@ adjboxplot <- function(.data, .plot = TRUE) {
           upper = adj_box$stats[5],
           medcouple = robustbase::mc(.x)
         )
-      },
-      .id = "variable"
+      }
     ) %>%
+    dplyr::bind_rows(.id = "variable") %>%
     purrr::modify_at("variable", forcats::as_factor)
 
   outlier_tbl <- .data %>%
-    purrr::map_dfr(
+    purrr::map(
       function(.x) {
         out_tbl <- robustbase::adjboxStats(.x)
         tibble::tibble(value = out_tbl$out)
-      },
-      .id = "variable"
+      }
     ) %>%
+    dplyr::bind_rows(.id = "variable") %>%
     purrr::modify_at("variable", forcats::as_factor)
 
   p <-
     ggplot2::ggplot() +
-    ggplot2::geom_errorbar(
-      data = adjBoxplot_stats,
-      ggplot2::aes(
-        x = variable,
-        xmax = variable,
-        xmin = variable,
-        ymin = lower,
-        ymax = upper),
-      width = .5) +
     ggplot2::geom_boxplot(
       data = adjBoxplot_stats,
       ggplot2::aes(
@@ -91,10 +90,13 @@ adjboxplot <- function(.data, .plot = TRUE) {
         group = variable,
         fill = variable),
       stat = "identity",
-      width = 0.5,
+      width = box.width,
       colour = "black",
       outlier.colour = NA,
-      outlier.shape = NA) +
+      outlier.shape = NA,
+      notch = notch,
+      notchwidth = notchwidth,
+      staplewidth = staplewidth) +
     ggplot2::geom_point(
       data = outlier_tbl,
       ggplot2::aes(
@@ -111,7 +113,7 @@ adjboxplot <- function(.data, .plot = TRUE) {
     ggplot2::theme(
       legend.position = "none",
       panel.grid = ggplot2::element_blank(),
-      axis.text.x = ggplot2::element_text(angle = 90, vjust = 1, hjust = 1)) +
+      axis.text.x = ggplot2::element_text(angle = xlabels.angle, vjust = xlabels.vjust, hjust = xlabels.hjust)) +
     ggplot2::labs(x = " ", y = " ")
 
   if (.plot == TRUE) {
