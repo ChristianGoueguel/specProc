@@ -9,11 +9,19 @@
 #' - G. Brys, M. Hubert, and A. Struyf, "A Robust Measure of Skewness," Journal of Computational and Graphical Statistics, 13 (2004)
 #' - M. Hubert and E. Vandervieren, "An adjusted boxplot for skewed distributions," Computational Statistics & Data Analysis, 52 (2008)
 #'
-#' @author Christian L. Goueguel
-#' @param .data A data frame or tibble containing the variables to be plotted.
-#' @param .plot Logical value indicating whether to plot the adjusted boxplot (default is TRUE).
-#' @param notch Logical value indicating whether to display a notched boxplot (default is FALSE).
-#' @param xlabels.angle Numeric value specifying the angle (in degrees) for x-axis labels (default is 90).
+#' #' @author Christian L. Goueguel
+#' @param .data numeric data frame or tibble containing the variables to be plotted.
+#' @param .plot logical value indicating whether to plot the adjusted boxplot (default is TRUE).
+#' @param xlabels.angle numeric value specifying the angle (in degrees) for x-axis labels (default is 90).
+#' @param xlabels.vjust numeric value specifying the vertical justification of x-axis labels (default is 1).
+#'        A value of 0 means the labels are aligned to the bottom of the viewport,
+#'        0.5 means they are vertically centered, and 1 means they are aligned to the top of the viewport.
+#' @param xlabels.hjust numeric value specifying the horizontal justification of x-axis labels (default is 1).
+#'        A value of 0 means the labels are aligned to the left of the viewport,
+#'        0.5 means they are horizontally centered, and 1 means they are aligned to the right of the viewport.
+#' @param box.width numeric value specifying the width of the boxplot (default is 0.5).
+#' @param notch logical value indicating whether to display a notched boxplot (default is FALSE).
+#' @param notchwidth numeric value specifying the width of the notch relative to the body of the boxplot (default is 0.5).
 #' @return If `.plot = TRUE`, returns a `ggplot2` object containing the adjusted boxplot.
 #'         If `.plot = FALSE`, returns a data frame with the adjusted boxplot statistics.
 #' @export adjboxplot
@@ -47,6 +55,24 @@ adjboxplot <- function(.data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 
   }
   if (!is.numeric(xlabels.angle) || xlabels.angle < 0 || xlabels.angle > 360) {
     stop("Argument 'x_axis_angle' must be a numeric value between 0 and 360.")
+  }
+  if (!is.numeric(xlabels.vjust) || xlabels.vjust < 0 || xlabels.vjust > 1) {
+    stop("Argument 'xlabels.vjust' must be a numeric value between 0 and 1.")
+  }
+  if (!is.numeric(xlabels.hjust) || xlabels.hjust < 0 || xlabels.hjust > 1) {
+    stop("Argument 'xlabels.hjust' must be a numeric value between 0 and 1.")
+  }
+  if (!is.numeric(box.width) || box.width <= 0) {
+    stop("Argument 'box.width' must be a positive numeric value.")
+  }
+  if (!is.logical(notch)) {
+    stop("Argument 'notch' must be of type boolean (TRUE or FALSE).")
+  }
+  if (!is.numeric(notchwidth) || notchwidth < 0 || notchwidth > 1) {
+    stop("Argument 'notchwidth' must be a numeric value between 0 and 1.")
+  }
+  if (!is.numeric(staplewidth) || staplewidth < 0) {
+    stop("Argument 'staplewidth' must be a positive numeric value.")
   }
 
   adjBoxplot_stats <- .data %>%
