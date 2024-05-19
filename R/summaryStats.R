@@ -48,7 +48,7 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2) {
         skewness = round(moments::skewness(value), digits),
         medcouple = round(robustbase::mc(value), digits),
         kurtosis = round(moments::kurtosis(value), digits),
-        count = n()
+        count = dplyr::n()
       ) %>%
       dplyr::ungroup() %>%
       dplyr::distinct()
