@@ -79,7 +79,7 @@ adjboxplot <- function(.data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 
     purrr::map(
       function(.x) {
         adj_box <- robustbase::adjboxStats(.x)
-        tibble(
+        tibble::tibble(
           lower = adj_box$stats[1],
           q1 = adj_box$stats[2],
           median = adj_box$stats[3],
