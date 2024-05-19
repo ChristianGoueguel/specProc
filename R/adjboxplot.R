@@ -76,7 +76,7 @@ adjboxplot <- function(.data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 
   }
 
   adjBoxplot_stats <- .data %>%
-    map(
+    purrr::map(
       function(.x) {
         adj_box <- robustbase::adjboxStats(.x)
         tibble(
