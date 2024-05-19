@@ -22,6 +22,7 @@
 #' @param box.width numeric value specifying the width of the boxplot (default is 0.5).
 #' @param notch logical value indicating whether to display a notched boxplot (default is FALSE).
 #' @param notchwidth numeric value specifying the width of the notch relative to the body of the boxplot (default is 0.5).
+#' @param staplewidth numeric value specifying the width of staples at the ends of the whiskers.
 #' @return If `.plot = TRUE`, returns a `ggplot2` object containing the adjusted boxplot.
 #'         If `.plot = FALSE`, returns a data frame with the adjusted boxplot statistics.
 #' @export adjboxplot
