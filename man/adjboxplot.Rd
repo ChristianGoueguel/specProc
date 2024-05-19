@@ -4,12 +4,38 @@
 \alias{adjboxplot}
 \title{Adjusted Boxplot for Skewed Distributions}
 \usage{
-adjboxplot(.data, .plot = TRUE)
+adjboxplot(
+  .data,
+  .plot = TRUE,
+  xlabels.angle = 90,
+  xlabels.vjust = 1,
+  xlabels.hjust = 1,
+  box.width = 0.5,
+  notch = FALSE,
+  notchwidth = 0.5,
+  staplewidth = 0
+)
 }
 \arguments{
-\item{.data}{A data frame or tibble containing the variables to be plotted.}
+\item{.data}{numeric data frame or tibble containing the variables to be plotted.}
 
-\item{.plot}{Logical value indicating whether to plot the adjusted boxplot (default is TRUE).}
+\item{.plot}{logical value indicating whether to plot the adjusted boxplot (default is TRUE).}
+
+\item{xlabels.angle}{numeric value specifying the angle (in degrees) for x-axis labels (default is 90).}
+
+\item{xlabels.vjust}{numeric value specifying the vertical justification of x-axis labels (default is 1).
+A value of 0 means the labels are aligned to the bottom of the viewport,
+0.5 means they are vertically centered, and 1 means they are aligned to the top of the viewport.}
+
+\item{xlabels.hjust}{numeric value specifying the horizontal justification of x-axis labels (default is 1).
+A value of 0 means the labels are aligned to the left of the viewport,
+0.5 means they are horizontally centered, and 1 means they are aligned to the right of the viewport.}
+
+\item{box.width}{numeric value specifying the width of the boxplot (default is 0.5).}
+
+\item{notch}{logical value indicating whether to display a notched boxplot (default is FALSE).}
+
+\item{notchwidth}{numeric value specifying the width of the notch relative to the body of the boxplot (default is 0.5).}
 }
 \value{
 If \code{.plot = TRUE}, returns a \code{ggplot2} object containing the adjusted boxplot.
