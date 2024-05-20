@@ -33,7 +33,7 @@ normSpec <- function(.data, method = "min_max") {
     res <- .data / max(.data)
   }
   if (method == "snv") {
-    res <- (.data - mean(.data)) / sd(.data)
+    res <- (.data - mean(.data)) / stats::sd(.data)
   }
 
   return(res)

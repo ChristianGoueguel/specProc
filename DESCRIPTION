@@ -11,39 +11,43 @@ LazyData: true
 RoxygenNote: 7.3.1
 Imports: 
     baseline,
-    broom,
     cellWise,
     corrr,
     cowplot,
-    dplyr,
     forcats,
-    ggplot2,
     ggsci,
     magrittr,
     minpack.lm,
     moments,
     mt,
-    patchwork,
-    plotly,
-    purrr,
     RcppFaddeeva,
-    rlang,
     robustbase,
     ropls,
-    tibble,
-    tidyr,
-    tidyselect,
     XICOR
 Roxygen: list(markdown = TRUE)
 Depends: 
     R (>= 2.10)
 Suggests: 
-    testthat,
+    testthat (>= 3.0.0),
     knitr,
     markdown,
     rmarkdown,
-    spelling
+    spelling,
+    mvoutlier,
+    chemometrics,
+    stats,
+    broom,
+    dplyr,
+    ggplot2,
+    tibble,
+    tidyr,
+    tidyselect,
+    plotly,
+    rlang,
+    purrr,
+    patchwork
 VignetteBuilder: knitr
 URL: https://github.com/ChristianGoueguel/specProc
 BugReports: https://github.com/ChristianGoueguel/specProc/issues
 Language: en-US
+Config/testthat/edition: 3

@@ -28,6 +28,11 @@ corr <- function(.data, response_var, method = "pearson", .plot = FALSE, .color 
     stop("'.plot' must be of type boolean (TRUE or FALSE)")
   }
 
+  variable <- NULL
+  desc <- NULL
+  correlation <- NULL
+  reorder <- NULL
+
   if (method != "kendall") {
     tbl_corr <- .data %>%
       corrr::correlate(

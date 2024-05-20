@@ -30,7 +30,7 @@ Object of class ggplot or of class plotly if \code{.interactive = TRUE}.
 Spectrum plots are commonly x–y plots in which the x-axis represents the wavelength and the y-axis represents intensity of a spectrum's signal. The function allows to plot a spectrum or several spectra in a single plot, identified either by an id (for example, the samples or spectra id) or by a target variable (for example, the concentration of a chemical element) .
 }
 \details{
-This function is based on the {ggplot2} package, thus allowing users to easily add or modify different components of the plot.
+This function is based on the ggplot2 package, thus allowing users to easily add or modify different components of the plot.
 }
 \author{
 Christian L. Goueguel

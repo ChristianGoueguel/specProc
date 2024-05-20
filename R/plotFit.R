@@ -22,6 +22,12 @@ plotfit <- function(data, title = NULL, pt.size = 3, pt.colour = "black", pt.sha
   if (is.data.frame(data) == FALSE) {
     stop("Data must be of class tbl_df, tbl or data.frame")
   }
+
+  x <- NULL
+  y <- NULL
+  .fitted <- NULL
+  .resid <- NULL
+
   plot1 <- data %>%
     purrr::pluck("augmented") %>%
     as.data.frame() %>%

@@ -34,6 +34,11 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
     stop("Peaks and profiles must have the same length")
   }
 
+  x <- NULL
+  fit <- NULL
+
+
+  rlang::check_installed("broom")
   if (is.null(id) == TRUE) {
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
       wlgth.min <- as.numeric(wlgth.min)
@@ -85,7 +90,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
 
     lgth <- length(peaks)
     p <- max.iter
-    .fit <- tibble()
+    .fit <- tibble::tibble()
 
     for (i in 1:lgth) {
       if (profiles[i] == "Lorentzian") {

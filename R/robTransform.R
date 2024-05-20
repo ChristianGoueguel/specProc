@@ -24,6 +24,7 @@ robTransform <- function(.data, var = NULL, type = "bestObj", quant = 0.99, nbst
   if (!is.character(type)) {
     stop("The argument 'type' must be a character.")
   }
+  . <- NULL
   s_tbl <- .data %>%
     dplyr::select(dplyr::where(is.numeric)) %>%
     { if (!is.null(var)) dplyr::select(., dplyr::all_of(var)) else . }

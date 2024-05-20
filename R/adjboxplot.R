@@ -103,6 +103,14 @@ adjboxplot <- function(.data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 
     dplyr::bind_rows(.id = "variable") %>%
     purrr::modify_at("variable", forcats::as_factor)
 
+  variable <- NULL
+  lower <- NULL
+  q1 <- NULL
+  median <- NULL
+  q3 <- NULL
+  upper <- NULL
+  value <- NULL
+
   p <-
     ggplot2::ggplot() +
     ggplot2::geom_boxplot(

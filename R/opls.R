@@ -13,9 +13,6 @@
 #' opls_result <- opls(x_data, y_data, scale = "center", crossval = 7, permutation = 20)
 #' }
 opls <- function(x, y, scale = "center", crossval = 7, permutation = 20) {
-  requireNamespace("ropls", quietly = TRUE)
-  requireNamespace("tibble", quietly = TRUE)
-
   if (is.null(x) == TRUE) {
     stop("X-data must be provided")
   }

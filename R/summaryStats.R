@@ -31,17 +31,23 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2) {
     stop("Data must be of class data.frame, tbl_df, or tbl")
   }
 
+  variable <- NULL
+  value <- NULL
+  sd <- NULL
+  mad <- NULL
+  median <- NULL
+
   fct_summary <- function(x) {
     x %>%
       dplyr::group_by(variable) %>%
       dplyr::summarise(
         mean = round(mean(value), digits),
-        median = round(median(value), digits),
-        mad = round(mad(value), digits),
-        sd = round(sd(value), digits),
+        median = round(stats::median(value), digits),
+        mad = round(stats::mad(value), digits),
+        sd = round(stats::sd(value), digits),
         cv = round((sd/mean)*100, digits),
         rcv = round((1.4826*(mad/median))*100, digits),
-        IQR = round(IQR(value, na.rm = TRUE), digits),
+        IQR = round(stats::IQR(value, na.rm = TRUE), digits),
         min = min(value),
         max = max(value),
         range = max - min,
@@ -69,7 +75,7 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2) {
       data %>%
         dplyr::select(tidyselect::where(is.numeric)) %>%
         tidyr::pivot_longer(
-          cols = all_of(var),
+          cols = dplyr::all_of(var),
           names_to = "variable",
           values_to = "value"
         ) %>%

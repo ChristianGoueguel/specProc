@@ -17,7 +17,7 @@ peakfit <- function(.data, profile = "voigt", wL = NULL, wG = NULL, A = NULL, wl
   if (missing(.data)) {
     stop("Missing 'data' argument.")
   }
-  if (!is.data.frame(.data) && !is_tibble(.data)) {
+  if (!is.data.frame(.data) && !tibble::is_tibble(.data)) {
     stop("Input 'data' must be a data frame or tibble.")
   }
   if (profile != "lorentzian" & profile != "gaussian" & profile != "voigt") {
@@ -28,6 +28,11 @@ peakfit <- function(.data, profile = "voigt", wL = NULL, wG = NULL, A = NULL, wl
   } else {
     p <- as.numeric(max.iter)
   }
+
+  rlang::check_installed("broom")
+  x <- NULL
+  fit <- NULL
+
   if (is.null(id) == TRUE) {
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
       wlgth.min <- as.numeric(wlgth.min)

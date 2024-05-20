@@ -19,8 +19,10 @@ The Box-Cox transformation is designed for strictly positive data and involves r
 In the paper "Transforming variables to central normality" by J. Raymaekers and P.J. Rousseeuw (Machine Learning, 1–23, 2021), the authors introduce a robust approach to compute these transformations using re-weighted maximum likelihood. Traditional maximum likelihood estimation can be sensitive to outliers and other data anomalies, which can lead to suboptimal λ values and subsequent transformations. The authors propose a re-weighting process that iteratively updates the weights of the data points based on their influence on the estimation of λ. This approach reduces the impact of outliers and ensures a more robust estimation of the transformation parameters.
 
 ```{r setup}
-ssh = suppressPackageStartupMessages
-ssh(library(tidyverse))
+library(dplyr)
+library(tibble)
+library(forcats)
+library(purrr)
 ```
 
 ```{r include=FALSE}

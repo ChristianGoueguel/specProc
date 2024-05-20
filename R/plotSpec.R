@@ -1,7 +1,7 @@
 #' @title Spectral Data Plot
 #' @description Spectrum plots are commonly x–y plots in which the x-axis represents the wavelength and the y-axis represents intensity of a spectrum's signal. The function allows to plot a spectrum or several spectra in a single plot, identified either by an id (for example, the samples or spectra id) or by a target variable (for example, the concentration of a chemical element) .
 #' @author Christian L. Goueguel
-#' @details This function is based on the {ggplot2} package, thus allowing users to easily add or modify different components of the plot.
+#' @details This function is based on the ggplot2 package, thus allowing users to easily add or modify different components of the plot.
 #' @param .data data frame or tibble of the spectra.
 #' @param id optional (`NULL` by default). Column name of a factor variable that identified each spectrum.
 #' @param colvar optional (`NULL` by default). Column name of a numeric variable to be display in color scale.
@@ -32,6 +32,8 @@ plotSpec <- function(.data, id = NULL, colvar = NULL, .interactive = FALSE, drop
   id_cols <- c(rlang::quo_name(rlang::enquo(id)), rlang::quo_name(rlang::enquo(colvar)))
   id_cols <- id_cols[!is.na(id_cols)]
   id_cols <- tidyselect::all_of(id_cols)
+  intensity <- NULL
+  wavelength <- NULL
 
   x_long <- .data %>%
     tidyr::pivot_longer(

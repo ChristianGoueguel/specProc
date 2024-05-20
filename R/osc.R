@@ -18,8 +18,6 @@
 #' osc_result <- osc(x_data, y_data, method = "wold", center = TRUE, osc.ncomp = 4, pls.ncomp = 10)
 #' }
 osc <- function(x, y, method = "wold", center = TRUE, osc.ncomp = 4, pls.ncomp = 10, tol = 1e-3, iter = 20, ...) {
-  requireNamespace("mt", quietly = TRUE)
-  requireNamespace("tibble", quietly = TRUE)
 
   # arguments validity checking
   if (missing(x) || missing(y)) {
