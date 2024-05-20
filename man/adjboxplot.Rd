@@ -36,6 +36,8 @@ A value of 0 means the labels are aligned to the left of the viewport,
 \item{notch}{logical value indicating whether to display a notched boxplot (default is FALSE).}
 
 \item{notchwidth}{numeric value specifying the width of the notch relative to the body of the boxplot (default is 0.5).}
+
+\item{staplewidth}{numeric value specifying the width of staples at the ends of the whiskers.}
 }
 \value{
 If \code{.plot = TRUE}, returns a \code{ggplot2} object containing the adjusted boxplot.

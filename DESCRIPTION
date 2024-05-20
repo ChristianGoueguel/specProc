@@ -27,7 +27,6 @@ Imports:
     plotly,
     purrr,
     RcppFaddeeva,
-    readr,
     rlang,
     robustbase,
     ropls,

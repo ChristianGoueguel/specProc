@@ -73,41 +73,5 @@ install.packages("devtools")
 devtools::install_github("ChristianGoueguel/specProc")
 ```
 
-## Exemples
-
-```{r include=FALSE}
-library(specProc)
-library(tidyverse)
-conflicted::conflict_prefer("filter", "dplyr")
-conflicted::conflict_prefer("lag", "dplyr")
-options(mc_doScale_quiet = TRUE)
-```
-
-```{r include=FALSE}
-data(glass, package = "chemometrics")
-data(glass.grp, package = "chemometrics")
-```
-
-```{r include=FALSE}
-oxide_tbl <-
-  cbind(glass.grp, glass) %>%
-  as_tibble() %>%
-  rename(glass = glass.grp) %>%
-  modify_at("glass", as_factor)
-```
-
-### Descriptive statistics
-
-```{r}
-oxide_tbl %>% summaryStats()
-```
-
-### Adjusted boxplot
-
-```{r}
-oxide_tbl %>% select(where(is.numeric)) %>% adjboxplot()
-```
-
-
 
 
