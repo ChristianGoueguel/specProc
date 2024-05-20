@@ -37,7 +37,6 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
   x <- NULL
   fit <- NULL
 
-
   rlang::check_installed("broom")
   if (is.null(id) == TRUE) {
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {

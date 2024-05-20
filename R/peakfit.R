@@ -29,7 +29,7 @@ peakfit <- function(.data, profile = "voigt", wL = NULL, wG = NULL, A = NULL, wl
     p <- as.numeric(max.iter)
   }
 
-  rlang::check_installed("broom")
+  #rlang::check_installed("broom")
   x <- NULL
   fit <- NULL
 
