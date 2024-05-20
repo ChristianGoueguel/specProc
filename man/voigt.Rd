@@ -4,7 +4,7 @@
 \alias{voigt}
 \title{Voigt Lineshape Function}
 \usage{
-voigt(x, y0, xc, wG, wL, A)
+voigt(x, y0, xc, wG, wL, A, real = TRUE)
 }
 \arguments{
 \item{x}{data}
@@ -18,6 +18,8 @@ voigt(x, y0, xc, wG, wL, A)
 \item{wL}{Lorentzian FWHM}
 
 \item{A}{area under the peak}
+
+\item{real}{logical, return only the real part of the complex Faddeeva}
 }
 \value{
 fitted value

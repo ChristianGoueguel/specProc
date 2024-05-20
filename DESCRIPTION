@@ -20,7 +20,7 @@ Imports:
     minpack.lm,
     moments,
     mt,
-    RcppFaddeeva,
+    pracma,
     robustbase,
     ropls,
     XICOR
