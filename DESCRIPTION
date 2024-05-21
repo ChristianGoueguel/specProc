@@ -47,7 +47,7 @@ Suggests:
     purrr,
     patchwork
 VignetteBuilder: knitr
-URL: https://github.com/ChristianGoueguel/specProc
+URL: https://github.com/ChristianGoueguel/specProc, https://christiangoueguel.github.io/specProc/
 BugReports: https://github.com/ChristianGoueguel/specProc/issues
 Language: en-US
 Config/testthat/edition: 3
