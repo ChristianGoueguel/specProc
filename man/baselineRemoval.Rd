@@ -2,34 +2,31 @@
 % Please edit documentation in R/baselineRemoval.R
 \name{baselineRemoval}
 \alias{baselineRemoval}
-\title{Function for Baseline Correction}
-\source{
-Chad A. Lieber, Anita Mahadevan-Jansen, Applied Spectroscopy, 2003, Vol. 57, 11, 1363-1367.
-}
+\title{Baseline Correction for Emission Spectra}
 \usage{
 baselineRemoval(.data, degree = 4, tol = 0.001, rep = 100)
 }
 \arguments{
-\item{.data}{Data frame of emission spectra}
+\item{.data}{A data frame or tibble containing the emission spectra data. Each column should represent a separate emission spectrum.}
 
-\item{degree}{Degree of the polynomial fitting function (by default 4)}
+\item{degree}{An integer specifying the degree of the polynomial fitting function. The default value is 4.}
 
-\item{tol}{Tolerance of difference between iterations (by default 1e-3)}
+\item{tol}{A numeric value representing the tolerance for the difference between iterations. The default value is 1e-3.}
 
-\item{rep}{Maximum number of iterations (by default 100)}
+\item{rep}{An integer specifying the maximum number of iterations for the algorithm. The default value is 100.}
 }
 \value{
-List containing:
-
-\item{\code{spec}}{data frame of background subtracted spectra}
-
-\item{\code{bkg}}{data frame of the modeled background}
+A list with two elements:
+\itemize{
+\item \code{spec}: A data frame containing the baseline-corrected emission spectra.
+\item \code{bkg}: A data frame containing the estimated background emission.
+}
 }
 \description{
-This function perform the estimation and removal of the continuous background emission using a polynomial curve fitting function.
+This function performs baseline correction on emission spectra data by estimating and removing the continuous background emission using a polynomial curve fitting approach.
 }
 \details{
-Wrapper function from the baseline package.
+This function is a wrapper around the \code{baseline.modpolyfit} function from the \code{baseline} package, which implements the algorithm described in Chad A. Lieber, Anita Mahadevan-Jansen. (2003). "Automated method for subtraction of fluorescence from biological Raman spectra." Applied Spectroscopy, 57(11), 1363-1367. https://doi.org/10.1366/000370203322554518
 }
 \author{
 Christian L. Goueguel

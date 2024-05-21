@@ -41,7 +41,7 @@
 #' # Retrieve the adjusted boxplot statistics
 #' stats <- adjboxplot(data, .plot = FALSE)
 #'
-adjboxplot <- function(.data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, xlabels.hjust = 1, box.width = .5, notch = FALSE, notchwidth = 0.5, staplewidth = 0) {
+adjboxplot <- function(.data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, xlabels.hjust = 1, box.width = .5, notch = FALSE, notchwidth = 0.5, staplewidth = 0.5) {
   if (missing(.data)) {
     stop("Missing 'data' argument.")
   }

@@ -14,6 +14,7 @@ A collection of functions for preprocessing spectra in optical emission spectros
 Useful links:
 \itemize{
   \item \url{https://github.com/ChristianGoueguel/specProc}
+  \item \url{https://christiangoueguel.github.io/specProc/}
   \item Report bugs at \url{https://github.com/ChristianGoueguel/specProc/issues}
 }
 

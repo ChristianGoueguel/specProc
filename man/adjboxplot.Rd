@@ -13,7 +13,7 @@ adjboxplot(
   box.width = 0.5,
   notch = FALSE,
   notchwidth = 0.5,
-  staplewidth = 0
+  staplewidth = 0.5
 )
 }
 \arguments{
