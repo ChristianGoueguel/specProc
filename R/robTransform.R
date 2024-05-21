@@ -17,12 +17,27 @@ robTransform <- function(.data, var = NULL, type = "bestObj", quant = 0.99, nbst
   if (!is.data.frame(.data) && !tibble::is_tibble(.data)) {
     stop("Input 'data' must be a data frame or tibble.")
   }
-  valid_methods <- c("BC", "YJ", "bestObj")
-  if (!type %in% valid_methods) {
+  if (!is.null(var)) {
+    if (is.character(var)) {
+      not_found <- var[!var %in% names(.data)]
+      if (length(not_found) > 0) {
+        stop("The following variable(s) are not present in the data: ", paste(not_found, collapse = ", "))
+      }
+    } else {
+      stop("The 'var' argument must be a character vector or NULL.")
+    }
+  }
+  if (!type %in% c("BC", "YJ", "bestObj")) {
     stop("Invalid type of transformation. Available method types are: BC, YJ and bestObj.")
   }
   if (!is.character(type)) {
     stop("The argument 'type' must be a character.")
+  }
+  if (quant < 0 || quant > 1) {
+    stop("'quant' must be a numeric value between 0 and 1.")
+  }
+  if (nbsteps <= 0) {
+    stop("'nbsteps' must be a positive integer")
   }
   . <- NULL
   s_tbl <- .data %>%

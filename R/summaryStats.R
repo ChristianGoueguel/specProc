@@ -30,6 +30,20 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2) {
   if (is.data.frame(data) == FALSE & tibble::is_tibble(data) == FALSE) {
     stop("Data must be of class data.frame, tbl_df, or tbl")
   }
+  if (!is.null(var)) {
+    if (!is.character(var) && !is.numeric(var)) {
+      stop("'var' must be either a character vector or a numeric vector")
+    }
+    if (is.character(var) && !all(var %in% names(data))) {
+      stop("One or more variables specified in 'var' are not present in the data")
+    }
+  }
+  if (!is.logical(drop.na)) {
+    stop("'drop.na' must be a logical value (TRUE or FALSE)")
+  }
+  if (!is.numeric(digits) || digits < 0 || digits %% 1 != 0) {
+    stop("'digits' must be a non-negative integer")
+  }
 
   variable <- NULL
   value <- NULL
