@@ -11,9 +11,9 @@ test_that("corr function works as expected", {
   expect_equal(ncol(result), 3)
   expect_equal(result$method, rep("pearson", 2))
 
-  expect_error(corr(list(1, 2, 3), y), "Input must be a numeric data frame")
-  expect_error(corr(test_data, w), "Response variable not found in the data frame")
-  expect_error(corr(test_data, y, method = "invalid"), "Invalid method specified. Available methods are: pearson, spearman, kendall and chatterjee")
+  expect_error(corr(list(1, 2, 3), y), "Input '.data' must be a numeric data frame")
+  expect_error(corr(test_data, w), "'response_var' not found in the data frame")
+  expect_error(corr(test_data, y, method = "invalid"), "Invalid method specified.")
   expect_error(corr(test_data, y, .plot = 1), "'.plot' must be of type boolean \\(TRUE or FALSE\\)")
 
   result_spearman <- corr(test_data, y, method = "spearman")

@@ -1,28 +1,27 @@
-#' @title Correlation Coefficients: Pearson, Spearman, Kendall and Chatterjee
+#' @title Correlation Coefficients: Pearson, Spearman, Kendall, Chatterjee and Biweight Midcorrelation
 #' @author Christian L. Goueguel
-#' @description This function takes a data frame as input and computes the Pearson's, Spearman's, Kendall's or Chatterjee's correlation coefficient
+#' @description This function takes a data frame as input and computes the Pearson's, Spearman's, Kendall's,  Chatterjee's or the biweight midcorrelation correlation coefficient
 #' for each column with respect to a response variable. The function returns a tibble with the respective
-#' correlation for each column.
+#' correlation for each column. Chatterjee (2021), Journal of the American Statistical Association, 116(536).
 #' @param .data data frame or tibble.
 #' @param response_var column name of the response variable.
 #' @param method character string specifying the correlation method. Available methods are "pearson", "spearman", "kendall" and "chatterjee". Default is "pearson".
 #' @param .plot optional (`FALSE` by default). Visual representation.
 #' @param .color optional. Sets the color of the plot.
 #' @param .interactive optional (`FALSE` by default). When set to `TRUE` enables interactive plot.
-#' @source Chatterjee (2021), Journal of the American Statistical Association, 116(536). https://doi.org/10.1080/01621459.2020.1758115
 #' @return A list containing:`correlation` - data frame of the correlation values. `plot` - ggplot2 object, if `.plot = TRUE`.
 #' @return Or a plotly object, if `.interactive = TRUE`.
 #' @export corr
 corr <- function(.data, response_var, method = "pearson", .plot = FALSE, .color = "#111D71", .interactive = FALSE) {
   if (!is.data.frame(.data) || !all(.data %>% purrr::map_lgl(is.numeric))) {
-    stop("Input must be a numeric data frame")
+    stop("Input '.data' must be a numeric data frame")
   }
   if (!rlang::quo_name(rlang::enquo(response_var)) %in% colnames(.data)) {
-    stop("Response variable not found in the data frame")
+    stop("'response_var' not found in the data frame")
   }
-  valid_methods <- c("pearson", "spearman", "kendall", "chatterjee")
+  valid_methods <- c("pearson", "spearman", "kendall", "chatterjee", "bicor")
   if (!method %in% valid_methods) {
-    stop("Invalid method specified. Available methods are: pearson, spearman, kendall and chatterjee")
+    stop("Invalid method specified.")
   }
   if (!is.logical(.plot)) {
     stop("'.plot' must be of type boolean (TRUE or FALSE)")
@@ -67,16 +66,30 @@ corr <- function(.data, response_var, method = "pearson", .plot = FALSE, .color 
       dplyr::rename(correlation = {{response_var}}) %>%
       dplyr::mutate(method = method)
   }
+  if (method == "bicor") {
+    tbl_corr <- .data %>%
+      dplyr::select(-{{response_var}}) %>%
+      purrr::map_dbl(~ biweight_midcorrelation(X = ., Y = .data[[ rlang::ensym(response_var) ]])) %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("variable") %>%
+      tibble::as_tibble() %>%
+      dplyr::mutate(method = method)
+    colnames(tbl_corr) <- c("variable", "correlation", "method")
+  }
 
-  if (method != "chatterjee") {
+  if (method != "chatterjee" && method != "bicor") {
     tbl_corr$variable <- names(.data)
     tbl_corr <- tbl_corr %>%
       tidyr::drop_na() %>%
       dplyr::arrange(desc(correlation))
-  } else {
+  } else if (method == "chatterjee") {
     tbl_corr$variable <- names(.data)
     tbl_corr <- tbl_corr %>%
       dplyr::filter(variable != rlang::quo_name(rlang::enquo(response_var))) %>%
+      tidyr::drop_na() %>%
+      dplyr::arrange(desc(correlation))
+  } else {
+    tbl_corr <- tbl_corr %>%
       tidyr::drop_na() %>%
       dplyr::arrange(desc(correlation))
   }

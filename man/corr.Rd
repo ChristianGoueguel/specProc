@@ -2,10 +2,7 @@
 % Please edit documentation in R/corr.R
 \name{corr}
 \alias{corr}
-\title{Correlation Coefficients: Pearson, Spearman, Kendall and Chatterjee}
-\source{
-Chatterjee (2021), Journal of the American Statistical Association, 116(536). https://doi.org/10.1080/01621459.2020.1758115
-}
+\title{Correlation Coefficients: Pearson, Spearman, Kendall, Chatterjee and Biweight Midcorrelation}
 \usage{
 corr(
   .data,
@@ -35,9 +32,9 @@ A list containing:\code{correlation} - data frame of the correlation values. \co
 Or a plotly object, if \code{.interactive = TRUE}.
 }
 \description{
-This function takes a data frame as input and computes the Pearson's, Spearman's, Kendall's or Chatterjee's correlation coefficient
+This function takes a data frame as input and computes the Pearson's, Spearman's, Kendall's,  Chatterjee's or the biweight midcorrelation correlation coefficient
 for each column with respect to a response variable. The function returns a tibble with the respective
-correlation for each column.
+correlation for each column. Chatterjee (2021), Journal of the American Statistical Association, 116(536).
 }
 \author{
 Christian L. Goueguel

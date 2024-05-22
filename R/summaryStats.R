@@ -21,7 +21,7 @@
 #' summary_stats <- summaryStats(iris)
 #'
 #' # Calculate summary statistics for the 'Sepal.Length' and 'Petal.Length' variables
-#' sepal_length_stats <- summaryStats(iris, var = c("Sepal.Length", "Petal.Length"))
+#' sepal_length_stats <- summaryStats(iris, var = c("Sepal.Length", "Petal.Length"), robust = TRUE)
 summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = FALSE) {
   if (is.null(data) == TRUE) {
     stop("Data must be provided")
@@ -49,9 +49,15 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = 
 
   variable <- NULL
   value <- NULL
-  sd <- NULL
+  std <- NULL
   mad <- NULL
   median <- NULL
+  rstd <- NULL
+
+  getmode <- function(vec) {
+    unique_x <- unique(vec)
+    unique_x[which.max(tabulate(match(vec, unique_x)))]
+  }
 
   if (robust == FALSE) {
     fct_summary <- function(x) {
@@ -59,9 +65,11 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = 
         dplyr::group_by(variable) %>%
         dplyr::summarise(
           mean = round(mean(value), digits),
+          mode = round(getmode(value), digits),
           median = round(stats::median(value), digits),
-          sd = round(stats::sd(value), digits),
-          cv = round((sd/mean)*100, digits),
+          std = round(stats::sd(value), digits),
+          variance = stats::var(value),
+          cv = round((std / mean) * 100, digits),
           min = min(value),
           max = max(value),
           range = max - min,
@@ -79,8 +87,9 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = 
         dplyr::summarise(
           median = round(stats::median(value), digits),
           mad = round(stats::mad(value), digits),
-          biweight_midvariance = round(biweight_midvariance(value), digits),
-          rcv = round((1.4826*(mad/median))*100, digits),
+          rstd = 1.4826 * mad,
+          bivar = round(biweight_midvariance(value), digits),
+          rcv = round((rstd / median) * 100, digits),
           IQR = round(stats::IQR(value, na.rm = TRUE), digits),
           min = min(value),
           max = max(value),

@@ -37,5 +37,5 @@ data(iris)
 summary_stats <- summaryStats(iris)
 
 # Calculate summary statistics for the 'Sepal.Length' and 'Petal.Length' variables
-sepal_length_stats <- summaryStats(iris, var = c("Sepal.Length", "Petal.Length"))
+sepal_length_stats <- summaryStats(iris, var = c("Sepal.Length", "Petal.Length"), robust = TRUE)
 }
