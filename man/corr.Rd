@@ -18,7 +18,7 @@ corr(
 
 \item{response_var}{column name of the response variable.}
 
-\item{method}{character string specifying the correlation method. Available methods are "pearson", "spearman", "kendall" and "chatterjee". Default is "pearson".}
+\item{method}{character string specifying the correlation method. Available methods are "pearson", "spearman", "kendall", "chatterjee" and "bicor" (i.e., biweight midcorrelation). Default is "pearson".}
 
 \item{.plot}{optional (\code{FALSE} by default). Visual representation.}
 

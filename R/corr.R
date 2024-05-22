@@ -5,7 +5,7 @@
 #' correlation for each column. Chatterjee (2021), Journal of the American Statistical Association, 116(536).
 #' @param .data data frame or tibble.
 #' @param response_var column name of the response variable.
-#' @param method character string specifying the correlation method. Available methods are "pearson", "spearman", "kendall" and "chatterjee". Default is "pearson".
+#' @param method character string specifying the correlation method. Available methods are "pearson", "spearman", "kendall", "chatterjee" and "bicor" (i.e., biweight midcorrelation). Default is "pearson".
 #' @param .plot optional (`FALSE` by default). Visual representation.
 #' @param .color optional. Sets the color of the plot.
 #' @param .interactive optional (`FALSE` by default). When set to `TRUE` enables interactive plot.
