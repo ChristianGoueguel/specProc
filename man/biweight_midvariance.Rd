@@ -17,8 +17,9 @@ This function calculates the biweight midvariance of a numeric vector,
 which is a robust measure of scale that can be used to estimate the variability of the data while being resistant to the influence of outliers.
 }
 \details{
-For scale estimators, the standard deviation (or variance) is the optimal estimator for Gaussian data. However, it is not resistant and it does not have robustness of efficiency. The median absolute deviation (MAD) is a resistant estimate, but it has only modest robustness of efficiency.
-The biweight midvariance estimator is both resistant and robust of efficiency. Wilcox (1997), "Introduction to Robust Estimation and Hypothesis Testing," Academic Press.
+For scale estimators, the standard deviation (or variance) is the optimal estimator for Gaussian data. However, it is not resistant and it does not have robustness of efficiency.
+In robust statistics, the median absolute deviation (MAD) is a resistant estimate, but it has only modest robustness of efficiency, while the biweight midvariance estimator is both resistant and robust of efficiency.
+Wilcox (1997), "Introduction to Robust Estimation and Hypothesis Testing," Academic Press.
 }
 \examples{
 vec <- c(1, 2, 3, 4, 5, 100)
