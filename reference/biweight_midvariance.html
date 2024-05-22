@@ -71,8 +71,9 @@ which is a robust measure of scale that can be used to estimate the variability 
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>For scale estimators, the standard deviation (or variance) is the optimal estimator for Gaussian data. However, it is not resistant and it does not have robustness of efficiency. The median absolute deviation (MAD) is a resistant estimate, but it has only modest robustness of efficiency.
-The biweight midvariance estimator is both resistant and robust of efficiency. Wilcox (1997), "Introduction to Robust Estimation and Hypothesis Testing," Academic Press.</p>
+    <p>For scale estimators, the standard deviation (or variance) is the optimal estimator for Gaussian data. However, it is not resistant and it does not have robustness of efficiency.
+In robust statistics, the median absolute deviation (MAD) is a resistant estimate, but it has only modest robustness of efficiency, while the biweight midvariance estimator is both resistant and robust of efficiency.
+Wilcox (1997), "Introduction to Robust Estimation and Hypothesis Testing," Academic Press.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -83,8 +84,7 @@ The biweight midvariance estimator is both resistant and robust of efficiency. W
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">100</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">biweight_midvariance</span><span class="op">(</span>X <span class="op">=</span> <span class="va">vec</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in dplyr::n():</span> Must only be used inside data-masking verbs like `mutate()`, `filter()`,</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> and `group_by()`.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2.850366</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
