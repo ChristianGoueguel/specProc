@@ -4,7 +4,7 @@
 \alias{summaryStats}
 \title{Robust and Non-Robust Descriptive Statistics}
 \usage{
-summaryStats(data, var = NULL, drop.na = TRUE, digits = 2)
+summaryStats(data, var = NULL, drop.na = TRUE, digits = 2, robust = FALSE)
 }
 \arguments{
 \item{data}{A data frame or tibble containing the variable(s) of interest.}
@@ -19,11 +19,11 @@ If \code{FALSE}, missing values will be included in the calculations.}
 
 \item{digits}{An integer specifying the number of significant digits to display after
 the decimal point in the output.}
+
+\item{robust}{A logical value indicating whether to compute robust descriptive statistics. If \code{FALSE} (the default), computes the classical descriptive statistics for describing the distribution of a univariate variable.}
 }
 \value{
-A data frame containing the summary statistics for the specified variable(s),
-including count, mean, standard deviation, cv (coefficient of variation), rcv (robust coefficient of variation), median, mad (median absolute
-deviation), minimum, maximum, range, IQR (interquartile range), skewness, medcouple and kurtosis.
+A data frame containing the summary statistics for the specified variable(s).
 }
 \description{
 This function calculates various descriptive statistics (robust and non-robust)

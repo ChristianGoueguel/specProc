@@ -10,9 +10,8 @@
 #'   If \code{FALSE}, missing values will be included in the calculations.
 #' @param digits An integer specifying the number of significant digits to display after
 #'   the decimal point in the output.
-#' @return A data frame containing the summary statistics for the specified variable(s),
-#'   including count, mean, standard deviation, cv (coefficient of variation), rcv (robust coefficient of variation), median, mad (median absolute
-#'   deviation), minimum, maximum, range, IQR (interquartile range), skewness, medcouple and kurtosis.
+#' @param robust A logical value indicating whether to compute robust descriptive statistics. If \code{FALSE} (the default), computes the classical descriptive statistics for describing the distribution of a univariate variable.
+#' @return A data frame containing the summary statistics for the specified variable(s).
 #' @export summaryStats
 #' @examples
 #' # Load the iris dataset
@@ -23,7 +22,7 @@
 #'
 #' # Calculate summary statistics for the 'Sepal.Length' and 'Petal.Length' variables
 #' sepal_length_stats <- summaryStats(iris, var = c("Sepal.Length", "Petal.Length"))
-summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2) {
+summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = FALSE) {
   if (is.null(data) == TRUE) {
     stop("Data must be provided")
   }
@@ -44,6 +43,9 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2) {
   if (!is.numeric(digits) || digits < 0 || digits %% 1 != 0) {
     stop("'digits' must be a non-negative integer")
   }
+  if (!is.logical(robust)) {
+    stop("'robust' must be a logical value (TRUE or FALSE)")
+  }
 
   variable <- NULL
   value <- NULL
@@ -51,27 +53,43 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2) {
   mad <- NULL
   median <- NULL
 
-  fct_summary <- function(x) {
-    x %>%
-      dplyr::group_by(variable) %>%
-      dplyr::summarise(
-        mean = round(mean(value), digits),
-        median = round(stats::median(value), digits),
-        mad = round(stats::mad(value), digits),
-        sd = round(stats::sd(value), digits),
-        cv = round((sd/mean)*100, digits),
-        rcv = round((1.4826*(mad/median))*100, digits),
-        IQR = round(stats::IQR(value, na.rm = TRUE), digits),
-        min = min(value),
-        max = max(value),
-        range = max - min,
-        skewness = round(moments::skewness(value), digits),
-        medcouple = round(robustbase::mc(value), digits),
-        kurtosis = round(moments::kurtosis(value), digits),
-        count = dplyr::n()
-      ) %>%
-      dplyr::ungroup() %>%
-      dplyr::distinct()
+  if (robust == FALSE) {
+    fct_summary <- function(x) {
+      x %>%
+        dplyr::group_by(variable) %>%
+        dplyr::summarise(
+          mean = round(mean(value), digits),
+          median = round(stats::median(value), digits),
+          sd = round(stats::sd(value), digits),
+          cv = round((sd/mean)*100, digits),
+          min = min(value),
+          max = max(value),
+          range = max - min,
+          skewness = round(moments::skewness(value), digits),
+          kurtosis = round(moments::kurtosis(value), digits),
+          count = dplyr::n()
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::distinct()
+    }
+  } else {
+    fct_summary <- function(x) {
+      x %>%
+        dplyr::group_by(variable) %>%
+        dplyr::summarise(
+          median = round(stats::median(value), digits),
+          mad = round(stats::mad(value), digits),
+          biweight_midvariance = round(biweight_midvariance(value), digits),
+          rcv = round((1.4826*(mad/median))*100, digits),
+          IQR = round(stats::IQR(value, na.rm = TRUE), digits),
+          min = min(value),
+          max = max(value),
+          medcouple = round(robustbase::mc(value), digits),
+          count = dplyr::n()
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::distinct()
+    }
   }
 
   if (is.null(var) == FALSE) {
