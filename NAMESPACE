@@ -3,6 +3,7 @@
 export("%>%")
 export(adjboxplot)
 export(baselineRemoval)
+export(biweight_midvariance)
 export(corr)
 export(gaussian)
 export(lorentzian)
