@@ -4,26 +4,25 @@
 \alias{biweight_midvariance}
 \title{Biweight Midvariance}
 \usage{
-biweight_midvariance(x)
+biweight_midvariance(X)
 }
 \arguments{
-\item{x}{A numeric vector.}
+\item{X}{A numeric vector.}
 }
 \value{
 The biweight midvariance of the input vector.
 }
 \description{
 This function calculates the biweight midvariance of a numeric vector,
-which is a robust measure of scale that can be used to estimate the variability while being resistant to the influence of outliers.
+which is a robust measure of scale that can be used to estimate the variability of the data while being resistant to the influence of outliers.
 }
 \details{
 For scale estimators, the standard deviation (or variance) is the optimal estimator for Gaussian data. However, it is not resistant and it does not have robustness of efficiency. The median absolute deviation (MAD) is a resistant estimate, but it has only modest robustness of efficiency.
-The biweight midvariance estimator is both resistant and robust of efficiency. Mosteller and Tukey (1977) recommend using the MAD or interquartile range for exploratory work where moderate efficiency in a variety of situations is adequate. The biweight midvariance estimator can be considered for situations where high performance is needed.
-Reference: Wilcox (1997), "Introduction to Robust Estimation and Hypothesis Testing," Academic Press.
+The biweight midvariance estimator is both resistant and robust of efficiency. Wilcox (1997), "Introduction to Robust Estimation and Hypothesis Testing," Academic Press.
 }
 \examples{
 vec <- c(1, 2, 3, 4, 5, 100)
-biweight_midvariance(x = vec)
+biweight_midvariance(X = vec)
 }
 \author{
 Christian L. Goueguel

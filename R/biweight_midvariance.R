@@ -1,36 +1,35 @@
 #' @title Biweight Midvariance
 #' @description This function calculates the biweight midvariance of a numeric vector,
-#'   which is a robust measure of scale that can be used to estimate the variability while being resistant to the influence of outliers.
+#'   which is a robust measure of scale that can be used to estimate the variability of the data while being resistant to the influence of outliers.
 #' @details
 #' For scale estimators, the standard deviation (or variance) is the optimal estimator for Gaussian data. However, it is not resistant and it does not have robustness of efficiency. The median absolute deviation (MAD) is a resistant estimate, but it has only modest robustness of efficiency.
-#' The biweight midvariance estimator is both resistant and robust of efficiency. Mosteller and Tukey (1977) recommend using the MAD or interquartile range for exploratory work where moderate efficiency in a variety of situations is adequate. The biweight midvariance estimator can be considered for situations where high performance is needed.
-#' Reference: Wilcox (1997), "Introduction to Robust Estimation and Hypothesis Testing," Academic Press.
+#' The biweight midvariance estimator is both resistant and robust of efficiency. Wilcox (1997), "Introduction to Robust Estimation and Hypothesis Testing," Academic Press.
 #'
 #' @author Christian L. Goueguel
-#' @param x A numeric vector.
+#' @param X A numeric vector.
 #' @return The biweight midvariance of the input vector.
 #' @examples
 #' vec <- c(1, 2, 3, 4, 5, 100)
-#' biweight_midvariance(x = vec)
+#' biweight_midvariance(X = vec)
 #' @export biweight_midvariance
-biweight_midvariance <- function(x) {
+biweight_midvariance <- function(X) {
   value <- NULL
-  if (!rlang::is_null(x)) {
-    if (!is.numeric(x)) {
-      stop("Input 'x' must be a numeric vector.")
+  if (!rlang::is_null(X)) {
+    if (!is.numeric(X)) {
+      stop("Input 'X' must be a numeric vector.")
     }
 
-    X <- dplyr::as_tibble(x) %>% dplyr::pull(value)
+    tbl <- dplyr::as_tibble(X) %>% dplyr::pull(value)
 
-    beta <- (X - stats::median(X)) / (9 * stats::qnorm(0.75) * stats::mad(X))
+    beta <- (tbl - stats::median(tbl)) / (9 * stats::qnorm(0.75) * stats::mad(tbl))
     alpha <- dplyr::if_else(beta <= -1 | beta >= 1, 0, 1)
     n <- dplyr::n()
-    nx <- sqrt(n) * sqrt(sum(alpha * (X - stats::median(X))^2 * (1 - beta^2)^4))
+    nx <- sqrt(n) * sqrt(sum(alpha * (tbl - stats::median(tbl))^2 * (1 - beta^2)^4))
     dx <- abs(sum(alpha * (1 - beta^2) * (1 - 5 * beta^2)))
     res <- (nx / dx)^2
 
     return(res)
   } else {
-    stop("Input 'x' must be provided.")
+    stop("Input 'X' must be provided.")
   }
 }
