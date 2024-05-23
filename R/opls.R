@@ -1,4 +1,4 @@
-#' @title Orthogonal Projections to Latent Structures (OPLS) Function
+#' @title Orthogonal Projections to Latent Structures
 #' @description This function fits an OPLS model to provided x and y data.
 #' @author Christian L. Goueguel
 #' @param x A data.frame or tibble containing the X-data (predictors).

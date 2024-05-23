@@ -2,7 +2,7 @@
 % Please edit documentation in R/normSpec.R
 \name{normSpec}
 \alias{normSpec}
-\title{Normalize Spectra with Different Normalization Methods}
+\title{Spectra Normalization}
 \usage{
 normSpec(.data, method = "min_max")
 }

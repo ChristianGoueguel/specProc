@@ -1,4 +1,4 @@
-#' @title Gaussian Lineshape Function
+#' @title Gaussian Function
 #' @author Christian L. Goueguel
 #' @description Full width at half maximum (FWHM) version of Gaussian Function.
 #' @param x data

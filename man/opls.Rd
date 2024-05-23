@@ -2,7 +2,7 @@
 % Please edit documentation in R/opls.R
 \name{opls}
 \alias{opls}
-\title{Orthogonal Projections to Latent Structures (OPLS) Function}
+\title{Orthogonal Projections to Latent Structures}
 \usage{
 opls(x, y, scale = "center", crossval = 7, permutation = 20)
 }

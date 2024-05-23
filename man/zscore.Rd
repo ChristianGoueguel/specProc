@@ -15,7 +15,7 @@ zscore(x, robust = FALSE)
 A tibble with the the input numeric vector and the calculated z-scores arranged in descending order.
 }
 \description{
-This function is a wrapper around the {robustHD} package and calculates classical or robust z-score (standardization) for a numeric vector.
+This function is a wrapper around the \code{robustHD} package and calculates classical or robust z-score (standardization) for a numeric vector.
 }
 \details{
 Z-scores are useful for comparing data points from different distributions because they are

@@ -1,6 +1,6 @@
 #' Classical or Robust Z-Score
 #'
-#' This function is a wrapper around the {robustHD} package and calculates classical or robust z-score (standardization) for a numeric vector.
+#' This function is a wrapper around the `robustHD` package and calculates classical or robust z-score (standardization) for a numeric vector.
 #'
 #' Z-scores are useful for comparing data points from different distributions because they are
 #' dimensionless and standardized. A positive z-score indicates that the data point is above the
@@ -31,16 +31,21 @@ zscore <- function(x, robust = FALSE) {
     stop("The input 'robust' must be a logical value (TRUE or FALSE).")
   }
   requireNamespace("robustHD", quietly = TRUE)
+
+  value <- NULL
+  score <- NULL
+  name <- NULL
   x <- tibble::enframe(x)
   if (robust) {
-    z <- dplyr::mutate(x, score = robustHD::robStandardize(value, centerFun = median, scaleFun = mad))
+    z <- dplyr::mutate(x, score = robustHD::robStandardize(value))
   } else {
-    z <- dplyr::mutate(x, score = robustHD::standardize(value, centerFun = mean, scaleFun = sd))
+    z <- dplyr::mutate(x, score = robustHD::standardize(value))
   }
+
   z <- z %>%
     dplyr::select(-name) %>%
     dplyr::rename(data = value) %>%
-    dplyr::arrange(desc(score))
+    dplyr::arrange(dplyr::desc(score))
 
   return(z)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotSpec.R
 \name{plotSpec}
 \alias{plotSpec}
-\title{Spectral Data Plot}
+\title{Plotting of Spectra}
 \usage{
 plotSpec(
   .data,

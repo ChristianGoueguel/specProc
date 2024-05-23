@@ -2,7 +2,7 @@
 % Please edit documentation in R/summaryStats.R
 \name{summaryStats}
 \alias{summaryStats}
-\title{Robust and Non-Robust Descriptive Statistics}
+\title{Classical or Robust Descriptive Statistics}
 \usage{
 summaryStats(data, var = NULL, drop.na = TRUE, digits = 2, robust = FALSE)
 }

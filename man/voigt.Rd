@@ -2,7 +2,7 @@
 % Please edit documentation in R/voigt.R
 \name{voigt}
 \alias{voigt}
-\title{Voigt Lineshape Function}
+\title{Voigt Function}
 \usage{
 voigt(x, y0, xc, wG, wL, A, real = TRUE)
 }

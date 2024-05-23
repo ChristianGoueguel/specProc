@@ -2,7 +2,7 @@
 % Please edit documentation in R/gaussian.R
 \name{gaussian}
 \alias{gaussian}
-\title{Gaussian Lineshape Function}
+\title{Gaussian Function}
 \usage{
 gaussian(x, y0, xc, w, A)
 }

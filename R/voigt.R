@@ -1,4 +1,4 @@
-#' @title Voigt Lineshape Function
+#' @title Voigt Function
 #' @author Christian L. Goueguel
 #' @description Convolution of a full width at half maximum (FWHM) based Gaussian function and a Lorentzian function.
 #' @param x data

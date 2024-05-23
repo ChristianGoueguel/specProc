@@ -1,4 +1,4 @@
-#' @title Robust and Non-Robust Descriptive Statistics
+#' @title Classical or Robust Descriptive Statistics
 #' @description This function calculates various descriptive statistics (robust and non-robust)
 #'   for a specified variable or all variables in a given data frame or tibble.
 #' @param data A data frame or tibble containing the variable(s) of interest.

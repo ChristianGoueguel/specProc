@@ -1,4 +1,4 @@
-#' @title Normalize Spectra with Different Normalization Methods
+#' @title Spectra Normalization
 #' @author Christian L. Goueguel
 #' @description This function takes a data frame (spectra) as input and normalizes it using one or more specified normalization methods.
 #' @param .data A numeric data frame containing the spectra.

@@ -1,4 +1,4 @@
-#' @title Baseline Correction for Emission Spectra
+#' @title Polynomial Baseline Correction
 #'
 #' @description This function performs baseline correction on emission spectra data by estimating and removing the continuous background emission using a polynomial curve fitting approach.
 #'

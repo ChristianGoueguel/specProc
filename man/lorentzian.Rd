@@ -2,7 +2,7 @@
 % Please edit documentation in R/lorentzian.R
 \name{lorentzian}
 \alias{lorentzian}
-\title{Lorentzian Lineshape Function}
+\title{Lorentzian Function}
 \usage{
 lorentzian(x, y0, xc, w, A)
 }

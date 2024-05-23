@@ -1,4 +1,4 @@
-#' @title Lorentzian Lineshape Function
+#' @title Lorentzian Function
 #' @author Christian L. Goueguel
 #' @description Lorentzian peak function with bell shape and much wider tails than Gaussian function.
 #' @param x data

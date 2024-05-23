@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotfit.R
 \name{plotfit}
 \alias{plotfit}
-\title{Plotting Of Spectral Line Fitting}
+\title{Plotting of Fitted Spectral Line}
 \usage{
 plotfit(
   data,
@@ -51,7 +51,7 @@ plotfit(
 ggplot2 object
 }
 \description{
-Plotting Of Spectral Line Fitting
+Plotting of Fitted Spectral Line
 }
 \author{
 Christian L. Goueguel

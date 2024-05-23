@@ -1,4 +1,4 @@
-#' @title Orthogonal Signal Correction (OSC) Function
+#' @title Orthogonal Signal Correction
 #' @description This function applies Orthogonal Signal Correction (OSC) to the provided x and y data using a specified method.
 #' @author Christian L. Goueguel
 #' @param x A matrix or data.frame containing the X-data (predictors).

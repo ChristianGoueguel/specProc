@@ -5,6 +5,7 @@ reference:
 - title: Univariate filtering
   contents:
   - zscore
+  - iqrOut
 
 - title: Multivariate filtering
   contents:

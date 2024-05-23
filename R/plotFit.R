@@ -1,4 +1,4 @@
-#' @title Plotting Of Spectral Line Fitting
+#' @title Plotting of Fitted Spectral Line
 #' @author Christian L. Goueguel
 #' @param data Data to be displayed from the `peakfit` function
 #' @param title Plot title

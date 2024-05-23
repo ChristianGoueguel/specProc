@@ -2,7 +2,7 @@
 % Please edit documentation in R/baselineRemoval.R
 \name{baselineRemoval}
 \alias{baselineRemoval}
-\title{Baseline Correction for Emission Spectra}
+\title{Polynomial Baseline Correction}
 \usage{
 baselineRemoval(.data, degree = 4, tol = 0.001, rep = 100)
 }
