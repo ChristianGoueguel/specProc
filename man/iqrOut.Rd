@@ -2,7 +2,7 @@
 % Please edit documentation in R/iqrOut.R
 \name{iqrOut}
 \alias{iqrOut}
-\title{Detect Outliers Using the IQR Method}
+\title{Outliers Detection Using the IQR Method}
 \usage{
 iqrOut(x, k = 1.5)
 }

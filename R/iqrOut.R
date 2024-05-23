@@ -1,4 +1,4 @@
-#' Detect Outliers Using the IQR Method
+#' Outliers Detection Using the IQR Method
 #'
 #' This function identifies potential outliers in a numeric vector using the
 #' interquartile range (IQR) method.
