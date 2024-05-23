@@ -20,7 +20,7 @@ This function is a wrapper around the {robustHD} package and calculates classica
 \details{
 Z-scores are useful for comparing data points from different distributions because they are
 dimensionless and standardized. A positive z-score indicates that the data point is above the
-mean, while a negative z-score indicates that the data point is below the mean. One common rule
+mean (or the median in the robust approach), while a negative z-score indicates that the data point is below the mean (or the median). One common rule
 to detect outliers using z-scores is the "three-sigma rule", in which data points with an absolute
 z-score greater than 3 (|z| > 3) can be considered potential outliers, as they fall outside the range
 that covers 99.7\% of the data points in a normal distribution. (Note that a cutoff of |z| > 2.5 is also often used).
