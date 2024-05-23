@@ -49,10 +49,10 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = 
 
   variable <- NULL
   value <- NULL
-  std <- NULL
+  sd <- NULL
   mad <- NULL
   median <- NULL
-  rstd <- NULL
+  rsd <- NULL
 
   getmode <- function(vec) {
     unique_x <- unique(vec)
@@ -67,9 +67,9 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = 
           mean = round(mean(value), digits),
           mode = round(getmode(value), digits),
           median = round(stats::median(value), digits),
-          std = round(stats::sd(value), digits),
+          sd = round(stats::sd(value), digits),
           variance = stats::var(value),
-          cv = round((std / mean) * 100, digits),
+          cv = round((sd / mean) * 100, digits),
           min = min(value),
           max = max(value),
           range = max - min,
@@ -87,9 +87,11 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = 
         dplyr::summarise(
           median = round(stats::median(value), digits),
           mad = round(stats::mad(value), digits),
-          rstd = 1.4826 * mad,
+          Qn = round(robustbase::Qn(value), digits),
+          Sn = round(robustbase::Sn(value), digits),
+          rsd = 1.4826 * mad,
           bivar = round(biweight_midvariance(value), digits),
-          rcv = round((rstd / median) * 100, digits),
+          rcv = round((rsd / median) * 100, digits),
           IQR = round(stats::IQR(value, na.rm = TRUE), digits),
           min = min(value),
           max = max(value),

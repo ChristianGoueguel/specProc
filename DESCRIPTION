@@ -45,7 +45,8 @@ Suggests:
     plotly,
     rlang,
     purrr,
-    patchwork
+    patchwork,
+    robustHD
 VignetteBuilder: knitr
 URL: https://github.com/ChristianGoueguel/specProc, https://christiangoueguel.github.io/specProc/
 BugReports: https://github.com/ChristianGoueguel/specProc/issues
