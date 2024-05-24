@@ -9,7 +9,7 @@ iqrMethod(x, k = 1.5)
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{k}{A scalar value specifying the fence factor. \code{k = 1.5} is the default and is often considered a conservative choice for identifying outliers.
+\item{k}{A numeric value specifying the fence factor. \code{k = 1.5} is the default and is often considered a conservative choice for identifying outliers.
 \code{k = 3} is more lenient and is sometimes used when a higher tolerance for outliers is desired.}
 }
 \value{

@@ -12,7 +12,7 @@
 #'
 #' @author Christian L. Goueguel
 #' @param x A numeric vector.
-#' @param k A scalar value specifying the fence factor. `k = 1.5` is the default and is often considered a conservative choice for identifying outliers.
+#' @param k A numeric value specifying the fence factor. `k = 1.5` is the default and is often considered a conservative choice for identifying outliers.
 #' `k = 3` is more lenient and is sometimes used when a higher tolerance for outliers is desired.
 #' @return A tibble with two columns:
 #'   - `data`: The original numeric values.
