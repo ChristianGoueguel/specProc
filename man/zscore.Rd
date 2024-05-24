@@ -29,9 +29,9 @@ to detect outliers using z-scores is the "three-sigma rule", in which data point
 z-score greater than 3 (|z| > 3) can be considered potential outliers, as they fall outside the range
 that covers 99.7\% of the data points in a normal distribution. (Note that a cutoff of |z| > 2.5 is also often used).
 \itemize{
-\item Rousseeuw, P. J., & Croux, C. (1993). Alternatives to the median absolute deviation.
+\item Rousseeuw, P. J., and Croux, C. (1993). Alternatives to the median absolute deviation.
 Journal of the American Statistical Association, 88(424), 1273-1283.
-\item Rousseeuw, P. J., & Hubert, M. (2011). Robust statistics for outlier detection.
+\item Rousseeuw, P. J., and Hubert, M. (2011). Robust statistics for outlier detection.
 Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 1(1), 73-79.
 }
 }

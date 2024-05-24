@@ -4,13 +4,21 @@
 \alias{iqrMethod}
 \title{Interquartile Range Method}
 \usage{
-iqrMethod(x, k = 1.5)
+iqrMethod(x, k = 1.5, skew = FALSE)
 }
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{k}{A numeric value specifying the fence factor. \code{k = 1.5} is the default and is often considered a conservative choice for identifying outliers.
-\code{k = 3} is more lenient and is sometimes used when a higher tolerance for outliers is desired.}
+\item{k}{A numeric value specifying the fence factor. \code{k = 1.5} is the default
+and is often considered a conservative choice for identifying outliers.
+\code{k = 3} is more lenient and is sometimes used when a higher tolerance for
+outliers is desired.}
+
+\item{skew}{A logical value indicating whether to calculate the version of
+the fences that accounts for skewness in the underlying data distribution.
+By default, \code{skew = FALSE}, which calculates the fences assuming a symmetric distribution.
+However, if \code{skew = TRUE}, the lower and upper fences are expressed as f
+unctions of the medcouple (Hubert and Vandervieren, 2008).}
 }
 \value{
 A tibble with two columns:
@@ -24,12 +32,25 @@ This function identifies potential outliers in a numeric vector using the
 interquartile range (IQR) method.
 }
 \details{
-This method is robust to the presence of outliers and is suitable for skewed distributions.
-Any data points that fall outside the range defined by the lower (Q1 - k × IQR) and upper (Q3 + k × IQR) fences is considered an outlier, where Q1 and Q3 are the 25th and 75th percentiles, respectively.
-The fence factor, k, can be adjusted to make the method more or less robust (often 1.5 or 3).
+For symmetric distributions, observations that fall outside the range defined
+by the lower fence (Q1 - k × IQR) and upper fence (Q3 + k × IQR) are considered as
+potential outliers, where Q1 and Q3 are the 25th and 75th percentiles, respectively.
+The fence factor, k, can be adjusted to make the method more or less robust
+(often 1.5 or 3). Optionally, the method can account for skewness in data
+distributions by incorporating the medcouple. In this case, the lower and
+upper fences are expressed as functions of the medcouple, adjusting the
+fences asymmetrically to better accommodate skewed distributions.
+Note that the implemented method does not explicitly account for tail heaviness.
+While the medcouple can provide some robustness against heavy tails, the method
+may still struggle to accurately identify outliers in distributions with extreme
+kurtosis or long-tailed behavior.
 \itemize{
-\item Everitt, B. S.; Skrondal, A. (2010), The Cambridge Dictionary of Statistics, Cambridge University Press.
-\item Tukey, J. (1977). Exploratory Data Analysis, Addison-Wesley
+\item Everitt, B. S., and Skrondal, A. (2010). The Cambridge Dictionary of Statistics.
+Cambridge University Press.
+\item Tukey, J. (1977). Exploratory Data Analysis.
+Addison-Wesley
+\item Hubert M., and Vandervieren E. (2008). An Adjusted Boxplot for Skewed Distributions.
+Computational Statistics & Data Analysis, 52(12):5186-5201
 }
 }
 \examples{
