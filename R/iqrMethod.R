@@ -8,12 +8,12 @@
 #' potential outliers, where Q1 and Q3 are the 25th and 75th percentiles, respectively.
 #' The fence factor, k, can be adjusted to make the method more or less robust
 #' (often 1.5 or 3). Optionally, the method can account for skewness in data
-#' distributions by incorporating the medcouple. In this case, the lower and
+#' distributions by incorporating the medcouple. In such case, the lower and
 #' upper fences are expressed as functions of the medcouple, adjusting the
 #' fences asymmetrically to better accommodate skewed distributions.
 #' Note that the implemented method does not explicitly account for tail heaviness.
 #' While the medcouple can provide some robustness against heavy tails, the method
-#' may still struggle to accurately identify outliers in distributions with extreme
+#' may still struggle to accurately identify potential outliers in distributions with extreme
 #' kurtosis or long-tailed behavior.
 #'
 #'  - Everitt, B. S., and Skrondal, A. (2010). The Cambridge Dictionary of Statistics.
