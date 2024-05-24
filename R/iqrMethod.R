@@ -77,7 +77,7 @@ iqrMethod <- function(x, k = 1.5, skew = FALSE) {
     }
 
     lower_fence <- q1 - k * exp(-alpha * medcouple) * iqr
-    upper_fence <- q3 - k * exp(beta * medcouple) * iqr
+    upper_fence <- q3 + k * exp(beta * medcouple) * iqr
   }
 
   x_tbl <- x_tbl %>%
