@@ -16,14 +16,16 @@
 #'
 #' @author Christian L. Goueguel
 #' @param x A numeric vector.
-#' @param robust A logical value indicating whether to calculate classical (default) or robust z-score.
-#' @return A tibble with the the input numeric vector and the calculated z-scores arranged in descending order.
+#' @param robust A logical value indicating whether to calculate classical or robust (default) z-score.
+#' @return A tibble with two columns:
+#'   - `data`: The original numeric values.
+#'   - `score`: The calculated z-scores arranged in descending order.
 #' @examples
 #' vec <- c(1, 2, 3, 4, 5, 100)
 #' zscore(vec)
-#' zscore(vec, robust = TRUE)
+#' zscore(vec, robust = FALSE)
 #' @export zscore
-zscore <- function(x, robust = FALSE) {
+zscore <- function(x, robust = TRUE) {
   if (!is.numeric(x)) {
     stop("The input 'x' must be a numeric vector.")
   }

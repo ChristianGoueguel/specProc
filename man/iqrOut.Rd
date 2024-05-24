@@ -2,7 +2,7 @@
 % Please edit documentation in R/iqrOut.R
 \name{iqrOut}
 \alias{iqrOut}
-\title{Outliers Detection Using the IQR Method}
+\title{Interquartile Range Method}
 \usage{
 iqrOut(x, k = 1.5)
 }
@@ -10,13 +10,13 @@ iqrOut(x, k = 1.5)
 \item{x}{A numeric vector.}
 
 \item{k}{A scalar value specifying the fence factor. \code{k = 1.5} is the default and is often considered a conservative choice for identifying outliers.
-\code{k = 3.0} is more lenient and is sometimes used when a higher tolerance for outliers is desired.}
+\code{k = 3} is more lenient and is sometimes used when a higher tolerance for outliers is desired.}
 }
 \value{
 A tibble with two columns:
 \itemize{
-\item 'value': The original numeric values.
-\item 'outlier': A logical vector indicating whether each value is an outlier or not.
+\item \code{data}: The original numeric values.
+\item \code{outlier}: A logical vector indicating whether each value is an outlier or not.
 }
 }
 \description{

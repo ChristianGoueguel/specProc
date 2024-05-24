@@ -1,4 +1,4 @@
-#' Outliers Detection Using the IQR Method
+#' Interquartile Range Method
 #'
 #' This function identifies potential outliers in a numeric vector using the
 #' interquartile range (IQR) method.
@@ -13,10 +13,10 @@
 #' @author Christian L. Goueguel
 #' @param x A numeric vector.
 #' @param k A scalar value specifying the fence factor. `k = 1.5` is the default and is often considered a conservative choice for identifying outliers.
-#' `k = 3.0` is more lenient and is sometimes used when a higher tolerance for outliers is desired.
+#' `k = 3` is more lenient and is sometimes used when a higher tolerance for outliers is desired.
 #' @return A tibble with two columns:
-#'   - 'value': The original numeric values.
-#'   - 'outlier': A logical vector indicating whether each value is an outlier or not.
+#'   - `data`: The original numeric values.
+#'   - `outlier`: A logical vector indicating whether each value is an outlier or not.
 #' @examples
 #' iqrOut(c(1, 2, 3, 4, 5, 100))
 #' iqrOut(c(1, 2, 3, 4, 5, 100), k = 3)

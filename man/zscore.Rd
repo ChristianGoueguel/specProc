@@ -4,15 +4,19 @@
 \alias{zscore}
 \title{Classical or Robust Z-Score}
 \usage{
-zscore(x, robust = FALSE)
+zscore(x, robust = TRUE)
 }
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{robust}{A logical value indicating whether to calculate classical (default) or robust z-score.}
+\item{robust}{A logical value indicating whether to calculate classical or robust (default) z-score.}
 }
 \value{
-A tibble with the the input numeric vector and the calculated z-scores arranged in descending order.
+A tibble with two columns:
+\itemize{
+\item \code{data}: The original numeric values.
+\item \code{score}: The calculated z-scores arranged in descending order.
+}
 }
 \description{
 This function is a wrapper around the \code{robustHD} package and calculates classical or robust z-score (standardization) for a numeric vector.
@@ -34,7 +38,7 @@ Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 1(1), 73-7
 \examples{
 vec <- c(1, 2, 3, 4, 5, 100)
 zscore(vec)
-zscore(vec, robust = TRUE)
+zscore(vec, robust = FALSE)
 }
 \author{
 Christian L. Goueguel
