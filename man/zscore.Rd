@@ -28,17 +28,19 @@ mean (or the median in the robust approach), while a negative z-score indicates 
 to detect outliers using z-scores is the "three-sigma rule", in which data points with an absolute
 z-score greater than 3 (|z| > 3) can be considered potential outliers, as they fall outside the range
 that covers 99.7\% of the data points in a normal distribution. (Note that a cutoff of |z| > 2.5 is also often used).
+}
+\examples{
+vec <- c(1, 2, 3, 4, 5, 100)
+zscore(vec)
+zscore(vec, robust = FALSE)
+}
+\references{
 \itemize{
 \item Rousseeuw, P. J., and Croux, C. (1993). Alternatives to the median absolute deviation.
 Journal of the American Statistical Association, 88(424), 1273-1283.
 \item Rousseeuw, P. J., and Hubert, M. (2011). Robust statistics for outlier detection.
 Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 1(1), 73-79.
 }
-}
-\examples{
-vec <- c(1, 2, 3, 4, 5, 100)
-zscore(vec)
-zscore(vec, robust = FALSE)
 }
 \author{
 Christian L. Goueguel
