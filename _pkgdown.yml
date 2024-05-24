@@ -4,7 +4,7 @@ template:
 reference:
 - title: Univariate filtering
   desc: >
-    Univariate filters are used in preprocessing to assess individual variables
+    Functions used to assess individual variables
     or features independently.
   contents:
   - zscore
@@ -13,16 +13,15 @@ reference:
 
 - title: Multivariate filtering
   desc: >
-    Multivariate filters are used to identify and remove unwanted covariance
-    structures and sources of variance from the data. The resulting data retains
-    only the covariance patterns deemed useful or interesting for modeling purposes.
+    Functions used to identify and remove unwanted covariance
+    structures and sources of variance from the multivariate data.
   contents:
   - opls
   - osc
 
 - title: Peak fitting
   desc: >
-    Peak fitting is employed to characterize spectral lines.
+    Functions used to characterize spectral lines.
     The choice of the fitting function depends on the specific broadening
     mechanisms and physical conditions of the emitting environment.
   contents:
