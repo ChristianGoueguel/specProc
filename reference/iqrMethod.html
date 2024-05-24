@@ -74,8 +74,11 @@ outliers is desired.</p></dd>
 <dd><p>A logical value indicating whether to calculate the version of
 the fences that accounts for skewness in the underlying data distribution.
 By default, <code>skew = FALSE</code>, which calculates the fences assuming a symmetric distribution.
-However, if <code>skew = TRUE</code>, the lower and upper fences are expressed as f
-unctions of the medcouple (Hubert and Vandervieren, 2008).</p></dd>
+However, if <code>skew = TRUE</code>, the formulas used to calculate the lower and upper fences incorporate the medcouple,
+to account for potential asymmetry in the underlying data distribution.
+These formulas are explicitly derived and optimized for the scenario where <code>k = 1.5</code> (Hubert and Vandervieren, 2008).
+Consequently, if the user attempts to use a value of <code>k</code> other than 1.5, the code will issue a warning message indicating that the formula is only defined for <code>k = 1.5</code>.
+In such cases, the code will automatically reset <code>k</code> to 1.5 and proceed with the calculations using the appropriate formulas and constants.</p></dd>
 
 </dl></div>
     <div class="section level2">
