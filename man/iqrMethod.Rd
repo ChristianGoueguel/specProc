@@ -10,9 +10,8 @@ iqrMethod(x, k = 1.5, skew = FALSE)
 \item{x}{A numeric vector.}
 
 \item{k}{A numeric value specifying the fence factor. \code{k = 1.5} is the default
-and is often considered a conservative choice for identifying outliers.
-\code{k = 3} is more lenient and is sometimes used when a higher tolerance for
-outliers is desired.}
+as it strikes a balance between sensitivity to mild outliers and robustness against extreme outliers.
+\code{k = 3} is more lenient and is sometimes used when a higher tolerance for outliers is desired.}
 
 \item{skew}{A logical value indicating whether to calculate the version of
 the fences that accounts for skewness in the underlying data distribution.
@@ -20,6 +19,7 @@ By default, \code{skew = FALSE}, which calculates the fences assuming a symmetri
 However, if \code{skew = TRUE}, the formulas used to calculate the lower and upper fences incorporate the medcouple,
 to account for potential asymmetry in the underlying data distribution.
 These formulas are explicitly derived and optimized for the scenario where \code{k = 1.5} (Hubert and Vandervieren, 2008).
+The choice of \code{k = 1.5} offers some robustness against non-normal distributions, including moderate skewness and heavy-tailed behavior.
 Consequently, if the user attempts to use a value of \code{k} other than 1.5, the code will issue a warning message indicating that the formula is only defined for \code{k = 1.5}.
 In such cases, the code will automatically reset \code{k} to 1.5 and proceed with the calculations using the appropriate formulas and constants.}
 }
@@ -38,7 +38,7 @@ interquartile range (IQR) method.
 For symmetric distributions, observations that fall outside the range defined
 by the lower fence (Q1 - k × IQR) and upper fence (Q3 + k × IQR) are considered as
 potential outliers, where Q1 and Q3 are the 25th and 75th percentiles, respectively.
-The fence factor, k, can be adjusted to make the method more or less robust
+The fence factor can be adjusted to make the method more or less robust
 (often 1.5 or 3). Optionally, the method can account for skewness in data
 distributions by incorporating the medcouple. In such case, the lower and
 upper fences are expressed as functions of the medcouple, adjusting the
