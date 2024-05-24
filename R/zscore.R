@@ -19,7 +19,7 @@
 #' @param robust A logical value indicating whether to calculate classical or robust (default) z-score.
 #' @return A tibble with two columns:
 #'   - `data`: The original numeric values.
-#'   - `score`: The calculated z-scores arranged in descending order.
+#'   - `score`: The calculated z-scores.
 #' @examples
 #' vec <- c(1, 2, 3, 4, 5, 100)
 #' zscore(vec)

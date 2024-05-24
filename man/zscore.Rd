@@ -15,7 +15,7 @@ zscore(x, robust = TRUE)
 A tibble with two columns:
 \itemize{
 \item \code{data}: The original numeric values.
-\item \code{score}: The calculated z-scores arranged in descending order.
+\item \code{score}: The calculated z-scores.
 }
 }
 \description{
