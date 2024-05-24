@@ -71,12 +71,11 @@ as it strikes a balance between sensitivity to mild outliers and robustness agai
 
 <dt>skew</dt>
 <dd><p>A logical value indicating whether to calculate the version of
-the fences that accounts for skewness in the underlying data distribution.
+the fences that accounts for moderate skewness in the underlying data distribution.
 By default, <code>skew = FALSE</code>, which calculates the fences assuming a symmetric distribution.
 However, if <code>skew = TRUE</code>, the formulas used to calculate the lower and upper fences incorporate the medcouple,
 to account for potential asymmetry in the underlying data distribution.
 These formulas are explicitly derived and optimized for the scenario where <code>k = 1.5</code> (Hubert and Vandervieren, 2008).
-The choice of <code>k = 1.5</code> offers some robustness against non-normal distributions, including moderate skewness and heavy-tailed behavior.
 Consequently, if the user attempts to use a value of <code>k</code> other than 1.5, the code will issue a warning message indicating that the formula is only defined for <code>k = 1.5</code>.
 In such cases, the code will automatically reset <code>k</code> to 1.5 and proceed with the calculations using the appropriate formulas and constants.</p></dd>
 
@@ -94,17 +93,21 @@ In such cases, the code will automatically reset <code>k</code> to 1.5 and proce
 by the lower fence (Q1 - k × IQR) and upper fence (Q3 + k × IQR) are considered as
 potential outliers, where Q1 and Q3 are the 25th and 75th percentiles, respectively.
 The fence factor can be adjusted to make the method more or less robust
-(often 1.5 or 3). Optionally, the method can account for skewness in data
+(often 1.5 or 3). Optionally, the method can account for moderate skewness in data
 distributions by incorporating the medcouple. In such case, the lower and
 upper fences are expressed as functions of the medcouple, adjusting the
 fences asymmetrically to better accommodate skewed distributions.
 Note that the implemented method does not explicitly account for tail heaviness.
 While the medcouple can provide some robustness against heavy tails, the method
 may still struggle to accurately identify potential outliers in distributions with extreme
-kurtosis or long-tailed behavior.</p><ul><li><p>Everitt, B. S., and Skrondal, A. (2010). The Cambridge Dictionary of Statistics.
+kurtosis or long-tailed behavior.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    
+<ul><li><p>Everitt, B. S., and Skrondal, A. (2010). The Cambridge Dictionary of Statistics.
 Cambridge University Press.</p></li>
-<li><p>Tukey, J. (1977). Exploratory Data Analysis.
-Addison-Wesley</p></li>
+<li><p>Tukey, J. (1977). Exploratory Data Analysis. Addison-Wesley</p></li>
 <li><p>Hubert M., and Vandervieren E. (2008). An Adjusted Boxplot for Skewed Distributions.
 Computational Statistics &amp; Data Analysis, 52(12):5186-5201</p></li>
 </ul></div>
