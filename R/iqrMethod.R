@@ -10,8 +10,8 @@
 #' potential outliers, where Q1 and Q3 are the 25th and 75th percentiles, respectively.
 #' The fence factor can be adjusted to make the method more or less robust
 #' (often 1.5 or 3). Optionally, the method can account for moderate skewness in data
-#' distributions by incorporating the medcouple. In such case, the lower and
-#' upper fences are expressed as functions of the medcouple, adjusting the
+#' distributions by incorporating the medcouple. In such a case, the lower and upper
+#' fences are expressed in terms of the medcouple, adjusting the
 #' fences asymmetrically to better accommodate skewed distributions.
 #' Note that the implemented method does not explicitly account for tail heaviness.
 #' While the medcouple can provide some robustness against heavy tails, the method
@@ -33,7 +33,7 @@
 #' @param skew A logical value indicating whether to calculate the version of
 #' the fences that accounts for moderate skewness in the underlying data distribution.
 #' By default, `skew = FALSE`, which calculates the fences assuming a symmetric distribution.
-#' However, if `skew = TRUE`, the formulas used to calculate the lower and upper fences incorporate the medcouple,
+#' However, if `skew = TRUE`, the lower and upper fences incorporate the medcouple,
 #' to account for potential asymmetry in the underlying data distribution.
 #' These formulas are explicitly derived and optimized for the scenario where `k = 1.5` (Hubert and Vandervieren, 2008).
 #' Consequently, if the user attempts to use a value of `k` other than 1.5, the code will issue a warning message indicating that the formula is only defined for `k = 1.5`.
