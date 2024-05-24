@@ -29,6 +29,9 @@
 #' zscore(vec, robust = FALSE)
 #' @export zscore
 zscore <- function(x, robust = TRUE) {
+  if (missing(x)) {
+    stop("Missing 'x' argument.")
+  }
   if (!is.numeric(x)) {
     stop("The input 'x' must be a numeric vector.")
   }

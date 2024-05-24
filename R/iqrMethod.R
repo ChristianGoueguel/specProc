@@ -46,6 +46,9 @@
 #' iqrMethod(c(1, 2, 3, 4, 5, 10), k = 3)
 #' @export iqrMethod
 iqrMethod <- function(x, k = 1.5, skew = FALSE) {
+  if (missing(x)) {
+    stop("Missing 'x' argument.")
+  }
   if (!is.numeric(x)) {
     stop("The input 'x' must be a numeric vector.")
   }
@@ -73,7 +76,7 @@ iqrMethod <- function(x, k = 1.5, skew = FALSE) {
     beta <- dplyr::if_else(medcouple >= 0, 3, 4)
 
     if (k != 1.5) {
-      cat("Warning: The formula is only defined for k = 1.5. Resetting k to 1.5.\n")
+      message("Warning: The formula is only defined for k = 1.5. Resetting k to 1.5.\n")
       k <- 1.5
     }
 

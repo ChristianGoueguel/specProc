@@ -14,36 +14,22 @@ MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/
 [![Codecov test
 coverage](https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ChristianGoueguel/specProc?branch=main)
 [![R-CMD-check](https://github.com/ChristianGoueguel/specProc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ChristianGoueguel/specProc/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
 **Testing and experimenting.**
 
-The `specProc` package performs a number of preprocessing tasks commonly
-used in laser-induced breakdown spectroscopy (LIBS). Spectral
-preprocessing tries to minimize the effect of different types of
-distortions on the data. Some preprocessing methods are solely based on
-mathematics concepts, others are inspired by the chemical-physical
-background of the dataset.
-
-**Functions currently available:**
-
-| **Function**        | **Description**                                                                   |
-|---------------------|-----------------------------------------------------------------------------------|
-| `adjboxplot()`      | Adjusted boxplot for skewed distribution                                          |
-| `baselineRemoval()` | Baseline/continuum removal                                                        |
-| `corr()`            | Correlation for each column in a data frame with respect to a response variable   |
-| `gaussian()`        | Gaussian lineshape function                                                       |
-| `lorentzian()`      | Lorentzian lineshape function                                                     |
-| `voigt()`           | Pseudo-Voigt lineshape function                                                   |
-| `plotSpec()`        | Spectral data plot                                                                |
-| `normSpec()`        | Normalize spectra with different normalization methods                            |
-| `opls()`            | Orthogonal projections to latent structures                                       |
-| `osc()`             | Orthogonal signal correction                                                      |
-| `peakfit()`         | Fitting of a single spectral line by lineshape functions with variable parameters |
-| `plotfit()`         | Plotting of spectral line fitting and residuals                                   |
-| `multipeakfit()`    | Multiple peaks fitting                                                            |
-| `robTransform()`    | Robust Box-Cox and Yeo-Johnson transformation                                     |
-| `summaryStats()`    | Descriptive Statistics                                                            |
+The `specProc` package performs a wide range of preprocessing tasks
+essential for spectroscopic data analysis. Spectral preprocessing is
+essential in ensuring accurate and reliable results by minimizing the
+impact of various distortions and artifacts that can arise during data
+acquisition or due to inherent characteristics of the sample or
+instrument. Some of the techniques are purely based on mathematical
+concepts, leveraging robust statistics and signal processing techniques.
+Additionally, `specProc` incorporates preprocessing methods inspired by
+the chemical-physical background of the dataset. These techniques
+leverage domain knowledge and exploit the fundamental principles
+governing the spectroscopic phenomenon under investigation.
 
 ## Installation
 

@@ -13,6 +13,9 @@
 #' @return Or a plotly object, if `.interactive = TRUE`.
 #' @export corr
 corr <- function(.data, response_var, method = "pearson", .plot = FALSE, .color = "#111D71", .interactive = FALSE) {
+  if (missing(.data)) {
+    stop("Missing '.data' argument.")
+  }
   if (!is.data.frame(.data) || !all(.data %>% purrr::map_lgl(is.numeric))) {
     stop("Input '.data' must be a numeric data frame")
   }

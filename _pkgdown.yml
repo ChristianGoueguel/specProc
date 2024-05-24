@@ -4,20 +4,18 @@ template:
 reference:
 - title: Univariate filtering
   desc: >
-    Univariate filters are used in data preprocessing to handle individual variables
-    or features independently. Univariate filters can be employed to explore issues
-    such as outliers and missing values.
+    Univariate filters are used in preprocessing to assess individual variables
+    or features independently.
   contents:
   - zscore
   - iqrMethod
+  - medcouple_weight
 
 - title: Multivariate filtering
   desc: >
-    Multivariate filters play a crucial role in data preprocessing by helping
-    identify and remove unwanted covariance structures and sources of variance
-    from the data. These filters can be conceptualized as pattern filters, where
-    the resulting data retains only the covariance patterns deemed useful or
-    interesting for modeling purposes.
+    Multivariate filters are used to identify and remove unwanted covariance
+    structures and sources of variance from the data. The resulting data retains
+    only the covariance patterns deemed useful or interesting for modeling purposes.
   contents:
   - opls
   - osc
@@ -25,9 +23,8 @@ reference:
 - title: Peak fitting
   desc: >
     Peak fitting is employed to characterize spectral lines.
-    The choice of the fitting function (e.g., Gaussian, Lorentzian or Voigt) depends
-    on the specific broadening mechanisms and physical conditions of the emitting
-    environment.
+    The choice of the fitting function depends on the specific broadening
+    mechanisms and physical conditions of the emitting environment.
   contents:
   - peakfit
   - multipeakfit
@@ -35,7 +32,9 @@ reference:
   - lorentzian
   - voigt
 
-- title: Plotting
+- title: Data visualization
+  desc: >
+    Functions that help visualize the state of the data.
   contents:
   - adjboxplot
   - plotfit
