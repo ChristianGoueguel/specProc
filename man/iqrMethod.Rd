@@ -17,8 +17,11 @@ outliers is desired.}
 \item{skew}{A logical value indicating whether to calculate the version of
 the fences that accounts for skewness in the underlying data distribution.
 By default, \code{skew = FALSE}, which calculates the fences assuming a symmetric distribution.
-However, if \code{skew = TRUE}, the lower and upper fences are expressed as f
-unctions of the medcouple (Hubert and Vandervieren, 2008).}
+However, if \code{skew = TRUE}, the formulas used to calculate the lower and upper fences incorporate the medcouple,
+to account for potential asymmetry in the underlying data distribution.
+These formulas are explicitly derived and optimized for the scenario where \code{k = 1.5} (Hubert and Vandervieren, 2008).
+Consequently, if the user attempts to use a value of \code{k} other than 1.5, the code will issue a warning message indicating that the formula is only defined for \code{k = 1.5}.
+In such cases, the code will automatically reset \code{k} to 1.5 and proceed with the calculations using the appropriate formulas and constants.}
 }
 \value{
 A tibble with two columns:
