@@ -39,7 +39,7 @@
 #' In such cases, the code will automatically reset `k` to 1.5 and proceed with the calculations using the appropriate formulas and constants.
 #' @return A tibble with two columns:
 #'   - `data`: The original numeric values.
-#'   - `outlier`: A logical vector indicating whether each value is an outlier or not.
+#'   - `outlier`: A logical vector indicating whether each value is a potential outlier or not.
 #' @examples
 #' iqrMethod(c(1, 2, 3, 4, 5, 10))
 #' iqrMethod(c(1, 2, 3, 4, 5, 10), k = 3)
