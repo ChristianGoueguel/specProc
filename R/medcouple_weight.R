@@ -25,26 +25,21 @@
 #' medcouple_weight(x)
 #' @export medcouple_weight
 medcouple_weight <- function(x, drop.na = FALSE) {
-
-  # Check if 'x' argument is missing
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-
-  # Check if 'x' is a numeric vector
   if (!is.numeric(x)) {
     stop("The input 'x' must be a numeric vector.")
   }
-
-  # Check if 'drop.na' is a logical value
   if (!is.logical(drop.na)) {
     stop("The input 'drop.na' must be a logical value (TRUE or FALSE).")
   }
 
-  # Calculate median
+  value <- NULL
+  below_med <- NULL
+  above_med <- NULL
   med <- stats::median(x, na.rm = drop.na)
 
-  # Split data into values below and above median
   left <- tibble::enframe(x) %>%
     dplyr::mutate(below_med = value <= med) %>%
     dplyr::filter(below_med) %>%
@@ -55,8 +50,7 @@ medcouple_weight <- function(x, drop.na = FALSE) {
     dplyr::filter(above_med) %>%
     dplyr::pull(value)
 
-  # Calculate medcouple weights
-  w_tbl <- tibble(
+  w_tbl <- tibble::tibble(
     LMC = (-1) * robustbase::mc(left, na.rm = drop.na),
     RMC = robustbase::mc(right, na.rm = drop.na)
   )
