@@ -33,8 +33,8 @@ The fence factor, k, can be adjusted to make the method more or less robust (oft
 }
 }
 \examples{
-iqrMethod(c(1, 2, 3, 4, 5, 100))
-iqrMethod(c(1, 2, 3, 4, 5, 100), k = 3)
+iqrMethod(c(1, 2, 3, 4, 5, 10))
+iqrMethod(c(1, 2, 3, 4, 5, 10), k = 3)
 }
 \author{
 Christian L. Goueguel
