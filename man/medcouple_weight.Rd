@@ -39,3 +39,6 @@ Computational Statistics & Data Analysis, 50(3):733-759
 Journal of Computational and Graphical Statistics, 13(4):996-1017
 }
 }
+\author{
+Christian L. Goueguel
+}

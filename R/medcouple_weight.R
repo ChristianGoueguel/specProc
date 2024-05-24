@@ -15,6 +15,7 @@
 #'  - Brys, G., Hubert, M., and Struyf, A. (2004). A robust measure of skewness.
 #'    Journal of Computational and Graphical Statistics, 13(4):996-1017
 #'
+#' @author Christian L. Goueguel
 #' @param x A numeric vector.
 #' @param drop.na Logical value indicating whether to remove missing values (NA) or not.
 #' @return A tibble with two numeric columns:
