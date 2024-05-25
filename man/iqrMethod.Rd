@@ -48,8 +48,15 @@ may still struggle to accurately identify potential outliers in distributions wi
 kurtosis or long-tailed behavior.
 }
 \examples{
-iqrMethod(c(1, 2, 3, 4, 5, 10))
-iqrMethod(c(1, 2, 3, 4, 5, 10), k = 3)
+vec1 <- c(1, 2, 3, 4, 5, 10)
+iqrMethod(vec1)
+
+iqrMethod(vec1, k = 3)
+
+vec2 <- c(1, 2, 3, 4, 5, seq(10,100, 25))
+iqrMethod(vec2)
+
+iqrMethod(vec2, skew = TRUE)
 }
 \references{
 \itemize{

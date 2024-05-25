@@ -42,8 +42,15 @@
 #'   - `data`: The original numeric values.
 #'   - `outlier`: A logical vector indicating whether each value is a potential outlier or not.
 #' @examples
-#' iqrMethod(c(1, 2, 3, 4, 5, 10))
-#' iqrMethod(c(1, 2, 3, 4, 5, 10), k = 3)
+#' vec1 <- c(1, 2, 3, 4, 5, 10)
+#' iqrMethod(vec1)
+#'
+#' iqrMethod(vec1, k = 3)
+#'
+#' vec2 <- c(1, 2, 3, 4, 5, seq(10,100, 25))
+#' iqrMethod(vec2)
+#'
+#' iqrMethod(vec2, skew = TRUE)
 #' @export iqrMethod
 iqrMethod <- function(x, k = 1.5, skew = FALSE) {
   if (missing(x)) {

@@ -22,8 +22,12 @@
 #'  - `LMC`: Left medcouple.
 #'  - `RMC`: Right medcouple.
 #' @examples
-#' x <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100)
-#' medcouple_weight(x)
+#' vec <- c(-100, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100)
+#' # non-robust approach
+#' moments::kurtosis(vec)
+#'
+#' #robust approach
+#' medcouple_weight(vec)
 #' @export medcouple_weight
 medcouple_weight <- function(x, drop.na = FALSE) {
   if (missing(x)) {

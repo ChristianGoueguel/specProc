@@ -32,6 +32,7 @@ that covers 99.7\% of the data points in a normal distribution. (Note that a cut
 \examples{
 vec <- c(1, 2, 3, 4, 5, 100)
 zscore(vec)
+
 zscore(vec, robust = FALSE)
 }
 \references{

@@ -26,6 +26,7 @@
 #' @examples
 #' vec <- c(1, 2, 3, 4, 5, 100)
 #' zscore(vec)
+#'
 #' zscore(vec, robust = FALSE)
 #' @export zscore
 zscore <- function(x, robust = TRUE) {
