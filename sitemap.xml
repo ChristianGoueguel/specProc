@@ -22,9 +22,6 @@
     <loc>https://christiangoueguel.github.io/specProc/reference/average.html</loc>
   </url>
   <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/baselineRemoval.html</loc>
-  </url>
-  <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/biweight_midcorrelation.html</loc>
   </url>
   <url>
@@ -71,6 +68,9 @@
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/plotfit.html</loc>
+  </url>
+  <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/polyBaselineFit.html</loc>
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/robTransform.html</loc>
