@@ -26,7 +26,7 @@
 #' # non-robust approach
 #' moments::kurtosis(vec)
 #'
-#' #robust approach
+#' # robust approach
 #' medcouple_weight(vec)
 #' @export medcouple_weight
 medcouple_weight <- function(x, drop.na = FALSE) {

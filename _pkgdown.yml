@@ -10,6 +10,7 @@ reference:
   - zscore
   - iqrMethod
   - medcouple_weight
+  - quantile_weight
 
 - title: Multivariate filtering
   desc: >
