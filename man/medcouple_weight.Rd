@@ -19,13 +19,17 @@ A tibble with two numeric columns:
 }
 }
 \description{
-This function calculates the left medcouple (LMC) and the right medcouple (RMC) for a given numeric vector.
+This function calculates the left medcouple (LMC) and the right medcouple (RMC)
+for a given numeric vector, which provides a robust measure of the distribution
+tail in the presence of outliers or contamination.
 }
 \details{
 The medcouple weights are calculated by splitting the data into two parts: values below
-the median (left) and values above the median (right). The medcouple weights are then
-computed as a robust measure of heavy-tailed distributions, where traditional
-measure of kurtosis may be distorted by outliers.
+the median (left) and values above the median (right). By partitioning the data
+into lower and upper tails and using median and quantiles, the medcouple weights
+can effectively capture the tail behavior of heavy-tailed distributions, while
+maintaining a high degree of robustness against outliers and contamination, up
+to the specified breakdown value of 12.5\%.
 }
 \examples{
 vec <- c(-100, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100)

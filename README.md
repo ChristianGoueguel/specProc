@@ -1,11 +1,5 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
 <!-- badges: start -->
 
 # specProc <img src="man/figures/logo.png" align="right" height="160"/>
@@ -46,4 +40,3 @@ You can install the development version from
 install.packages("devtools")
 devtools::install_github("ChristianGoueguel/specProc")
 ```
-
