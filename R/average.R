@@ -40,7 +40,7 @@ average <- function(.data, .group_by = NULL) {
       stop("The input '.data' must be numeric")
     } else {
       Xmat <- .data %>% as.matrix()
-      Rcpp::sourceCpp("computeMeans.cpp")
+      Rcpp::sourceCpp("./src/computeMeans.cpp")
       avg <- computeMeans(Xmat)
     }
   } else {
@@ -51,7 +51,7 @@ average <- function(.data, .group_by = NULL) {
     if (!is.factor(grp_vec)) {
       grp_vec <- forcats::as_factor(grp_vec)
     }
-    Rcpp::sourceCpp("computeGroupedMeans.cpp")
+    Rcpp::sourceCpp("./src/computeGroupedMeans.cpp")
     avg <- computeGroupedMeans(grp_vec, Xmat)
   }
   return(tibble::as_tibble(avg))

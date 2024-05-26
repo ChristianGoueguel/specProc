@@ -39,12 +39,22 @@ reference:
   - plotfit
   - plotSpec
 
-- title: Spectral preprocessing
+- title: Smoothing
   desc: >
     Functions used to increase the signal-to-noise ratio.
   contents:
   - average
-  - baselineRemoval
+
+- title: Baseline correction
+  desc: >
+    Functions used to fit and remove the baseline (or continuum emission).
+  contents:
+  - polyBaselineFit
+
+- title: Normalization
+  desc: >
+    Function that perform normalization of the spectra.
+  contents:
   - normSpec
 
 - title: Miscellaneous

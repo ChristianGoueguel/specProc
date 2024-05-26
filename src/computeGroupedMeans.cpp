@@ -1,8 +1,10 @@
 #include <Rcpp.h>
-using namespace Rcpp;
 #include <map>
 #include <vector>
 #include <numeric> // For std::accumulate
+
+using namespace Rcpp;
+using namespace std;
 
 // Enable C++11
 // [[Rcpp::plugins(cpp11)]]

@@ -14,8 +14,8 @@
 #'   \item \code{spec}: A data frame containing the baseline-corrected emission spectra.
 #'   \item \code{bkg}: A data frame containing the estimated background emission.
 #' }
-#' @export baselineRemoval
-baselineRemoval <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
+#' @export polyBaselineFit
+polyBaselineFit <- function(.data, degree = 4, tol = 1e-3, rep = 100) {
   if (missing(.data)) {
     stop("Missing 'data' argument.")
   }
