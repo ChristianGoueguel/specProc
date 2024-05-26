@@ -21,6 +21,7 @@ Imports:
     moments,
     mt,
     pracma,
+    Rcpp,
     robustbase,
     ropls,
     XICOR
@@ -52,3 +53,5 @@ URL: https://github.com/ChristianGoueguel/specProc, https://christiangoueguel.gi
 BugReports: https://github.com/ChristianGoueguel/specProc/issues
 Language: en-US
 Config/testthat/edition: 3
+LinkingTo: 
+    Rcpp

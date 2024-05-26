@@ -39,12 +39,18 @@ reference:
   - plotfit
   - plotSpec
 
+- title: Spectral preprocessing
+  desc: >
+    Functions used to increase the signal-to-noise ratio.
+  contents:
+  - average
+  - baselineRemoval
+  - normSpec
+
 - title: Miscellaneous
   contents:
-  - baselineRemoval
   - biweight_midcorrelation
   - biweight_midvariance
   - corr
-  - normSpec
   - robTransform
   - summaryStats
