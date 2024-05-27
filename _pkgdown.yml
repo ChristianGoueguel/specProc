@@ -63,6 +63,7 @@ reference:
   - biweight_midcorrelation
   - biweight_midvariance
   - biweight_midcovariance
+  - biweight_location
   - corr
   - robTransform
   - summaryStats
