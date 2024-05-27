@@ -30,7 +30,9 @@ Mahadevan
 Marquardt
 Medcouple
 Midcorrelation
+Midcovariance
 Midvariance
+Mosteller
 OPLS
 OSC
 Ohman
@@ -61,6 +63,7 @@ doi
 ggplot
 http
 https
+iteratively
 kendall
 lineshape
 loadings

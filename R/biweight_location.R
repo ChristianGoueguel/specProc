@@ -28,25 +28,25 @@
 #' @export biweight_location
 biweight_location <- function(X, tol = 1e-6, max_iter = 50) {
   if (missing(X)) {
-    stop("Input 'x' must be provided.")
+    stop("Input 'X' must be provided.")
   }
   if (!is.numeric(X)) {
-    stop("'x' must be a numeric vector.")
+    stop("'X' must be a numeric vector.")
   }
   if (length(unique(X)) == 1) {
-    stop("'x' cannot be a constant vector.")
+    stop("'X' cannot be a constant vector.")
   }
   if (length(X) < 2) {
-    stop("'x' must have at least two elements.")
+    stop("'X' must have at least two elements.")
   }
 
-  biweight_loc <- stats::median(x)
+  biweight_loc <- stats::median(X)
 
   for (iter in 1:max_iter) {
-    mad <- stats::mad(x, center = biweight_loc)
-    u <- (x - biweight_loc) / (9 * stats::qnorm(0.75) * mad)
+    mad <- stats::mad(X, center = biweight_loc)
+    u <- (X - biweight_loc) / (9 * stats::qnorm(0.75) * mad)
     w <- dplyr::if_else(abs(u) <= 1, (1 - u^2)^2, 0)
-    new_biweight_loc <- sum(x * w) / sum(w)
+    new_biweight_loc <- sum(X * w) / sum(w)
 
     if (abs(new_biweight_loc - biweight_loc) < tol) {
       break
