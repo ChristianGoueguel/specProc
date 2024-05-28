@@ -4,16 +4,20 @@
 \alias{biweight_scale}
 \title{Biweight Scale}
 \usage{
-biweight_scale(X, loc = biweight_location(X), tol = 1e-06, max_iter = 50)
+biweight_scale(X, loc = stats::median(X), c = 9, reduced = FALSE)
 }
 \arguments{
 \item{X}{A numeric vector.}
 
-\item{loc}{Location estimate to use (default: biweight location of \code{X}).}
+\item{loc}{Location estimate to use (default: median of \code{X}).}
 
-\item{tol}{Convergence tolerance for the iterative computation (default: 1e-6).}
+\item{c}{A numeric value specifying the tuning constant for the biweight estimator
+(\code{c = 9} by default).}
 
-\item{max_iter}{Maximum number of iterations (default: 50).}
+\item{reduced}{A logical value specifying whether the sample size, \emph{n},
+should be reduced to the number of non-rejected values. If \code{TRUE}, \emph{n} is
+reduced to the number of observations that pass a rejection criteria.
+If \code{FALSE} (default), \emph{n} is equal to length of \code{X} (the input data).}
 }
 \value{
 The biweight scale of \code{X}.
@@ -21,22 +25,24 @@ The biweight scale of \code{X}.
 \description{
 This function computes the biweight scale, a robust measure of scale or dispersion
 for a numeric vector. The biweight scale is less sensitive to outliers
-than the sample standard deviation. The computation is done iteratively,
-following the algorithm described in Mosteller and Tukey (1977).
+than the sample standard deviation.
 }
 \examples{
 # Example 1: Compute biweight scale for a vector
-x <- c(1, 2, 3, 4, 5)
-stats::sd(x)
-stats::mad(x)
-biweight_scale(x)
+x <- c(seq(1,100))
+tibble::tibble(
+sd = stats::sd(x),
+mad = stats::mad(x),
+biscale = biweight_scale(x)
+)
 
 # Example 2: Biweight scale is robust to outliers
-x <- c(1, 2, 3, 4, 100)  # An outlier at 100
-stats::sd(x)
-stats::mad(x)
-biweight_scale(x)
-
+x <- c(seq(1,99), 1e3) # An outlier at 1000
+tibble::tibble(
+sd = stats::sd(x),
+mad = stats::mad(x),
+biscale = biweight_scale(x)
+)
 }
 \references{
 \itemize{

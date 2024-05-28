@@ -9,8 +9,6 @@ reference:
   contents:
   - zscore
   - iqrMethod
-  - medcouple_weight
-  - quantile_weight
 
 - title: Multivariate filtering
   desc: >
@@ -58,13 +56,27 @@ reference:
   contents:
   - normSpec
 
-- title: Miscellaneous
+- title: Robust statistical estimators
+
+- subtitle: Biweight estimators
+  desc: >
+    Functions that use Tukey’s biweight formalism.
   contents:
   - biweight_midcorrelation
   - biweight_midvariance
   - biweight_midcovariance
   - biweight_location
   - biweight_scale
+
+- subtitle: Tail weight
+  desc: >
+    Functions used to measure the tail weight of a distribution.
+  contents:
+  - medcouple_weight
+  - quantile_weight
+
+- title: Miscellaneous
+  contents:
   - corr
   - robTransform
   - summaryStats
