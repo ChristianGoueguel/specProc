@@ -58,7 +58,7 @@ reference:
 
 - title: Robust statistical estimators
 
-- subtitle: Biweight
+- subtitle: biweight
   desc: >
     Functions that use Tukey’s biweight formalism.
   contents:
@@ -68,14 +68,14 @@ reference:
   - biweight_location
   - biweight_scale
 
-- subtitle: Robust tail weight measures
+- subtitle: tail weight measures
   desc: >
     Functions used to measure the tail weight of a distribution.
   contents:
   - medcouple_weight
   - quantile_weight
 
-- subtitle: Robust scale measures
+- subtitle: scale measures
   desc: >
     Functions used to compute highly robust estimators for scale (or dispersion).
   contents:
