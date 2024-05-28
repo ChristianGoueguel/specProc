@@ -79,8 +79,7 @@ reference:
   desc: >
     Functions used to compute highly robust estimators for scale (or dispersion).
   contents:
-  - Sn
-  - Qn
+  - rousseeuwCroux
 
 - title: Miscellaneous
   contents:
