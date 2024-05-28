@@ -12,7 +12,7 @@
 #' @param reduced A logical value specifying whether the sample size, *n*,
 #' should be reduced to the number of non-rejected values. If `TRUE`, *n* is
 #' reduced to the number of observations that pass a rejection criteria.
-#' If `FALSE` (default), *n* is equal to length of `X` (the input data).
+#' If `FALSE` (default), *n* is equal to the length of `X` (the input data).
 #' @param tol Convergence tolerance for the iterative computation (default: 1e-6).
 #' @param max_iter Maximum number of iterations (default: 50).
 #' @return The biweight scale of `X`.

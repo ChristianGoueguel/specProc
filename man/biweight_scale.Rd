@@ -24,7 +24,7 @@ biweight_scale(
 \item{reduced}{A logical value specifying whether the sample size, \emph{n},
 should be reduced to the number of non-rejected values. If \code{TRUE}, \emph{n} is
 reduced to the number of observations that pass a rejection criteria.
-If \code{FALSE} (default), \emph{n} is equal to length of \code{X} (the input data).}
+If \code{FALSE} (default), \emph{n} is equal to the length of \code{X} (the input data).}
 
 \item{tol}{Convergence tolerance for the iterative computation (default: 1e-6).}
 
