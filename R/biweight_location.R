@@ -7,6 +7,9 @@
 #' algorithm described in Mosteller and Tukey (1977).
 #'
 #' @param X A numeric vector.
+#' @param loc Initial guess for the location (default: median of `X`).
+#' @param c A numeric value specifying the tuning constant for the biweight estimator
+#' (`c = 6` by default).
 #' @param tol Convergence tolerance for the iterative computation (default: 1e-6).
 #' @param max_iter Maximum number of iterations (default: 50).
 #' @return The biweight location of `X`.
@@ -16,21 +19,23 @@
 #'    Course in Statistics. Addison-Wesley, pp. 203-209.
 #' @examples
 #' # Example 1: Compute biweight location for a vector
-#' x <- c(seq(1,10))
+#' x <- c(seq(1,100))
 #' tibble::tibble(
 #' mean = mean(x),
+#' med = stats::median(x),
 #' biloc = biweight_location(x)
 #' )
 #'
 #' # Example 2: Biweight location is robust to outliers
-#' x <- c(seq(1,9), 100)  # An outlier at 100
+#' x <- c(seq(1,99), 1e3)  # An outlier at 1000
 #' tibble::tibble(
 #' mean = mean(x),
+#' med = stats::median(x),
 #' biloc = biweight_location(x)
 #' )
 #'
 #' @export biweight_location
-biweight_location <- function(X, tol = 1e-6, max_iter = 50) {
+biweight_location <- function(X, loc = stats::median(X), c = 6, tol = 1e-6, max_iter = 50) {
   if (missing(X)) {
     stop("Input 'X' must be provided.")
   }
@@ -44,20 +49,26 @@ biweight_location <- function(X, tol = 1e-6, max_iter = 50) {
     stop("'X' must have at least two elements.")
   }
 
-  biweight_loc <- stats::median(X)
+  biloc <- loc
+  mad_x <- stats::mad(X, center = loc)
 
   for (iter in 1:max_iter) {
-    mad <- stats::mad(X, center = biweight_loc)
-    u <- (X - biweight_loc) / (9 * stats::qnorm(0.75) * mad)
-    w <- dplyr::if_else(abs(u) <= 1, (1 - u^2)^2, 0)
-    new_biweight_loc <- sum(X * w) / sum(w)
+    if (mad_x == 0) {
+      biloc <- stats::median(X)
+    } else {
+      u <- (X - loc) / (c * mad_x)
+      u_mask <- abs(u) < 1
 
-    if (abs(new_biweight_loc - biweight_loc) < tol) {
-      break
+      p <- sum((X[u_mask] - loc) * (1 - u[u_mask]^2)^2)
+      q <- sum((1 - u[u_mask]^2)^2)
+
+      new_biloc <- loc + (p / q)
+
+      if (abs(new_biloc - biloc) < tol) {
+        break
+      }
+      biloc <- new_biloc
     }
-
-    biweight_loc <- new_biweight_loc
   }
-
-  return(biweight_loc)
-}
+  return(biloc)
+  }

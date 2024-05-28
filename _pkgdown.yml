@@ -58,7 +58,7 @@ reference:
 
 - title: Robust statistical estimators
 
-- subtitle: Biweight estimators
+- subtitle: Biweight
   desc: >
     Functions that use Tukey’s biweight formalism.
   contents:

@@ -4,12 +4,19 @@
 \alias{biweight_scale}
 \title{Biweight Scale}
 \usage{
-biweight_scale(X, loc = stats::median(X), c = 9, reduced = FALSE)
+biweight_scale(
+  X,
+  loc = stats::median(X),
+  c = 9,
+  reduced = FALSE,
+  tol = 1e-06,
+  max_iter = 50
+)
 }
 \arguments{
 \item{X}{A numeric vector.}
 
-\item{loc}{Location estimate to use (default: median of \code{X}).}
+\item{loc}{Initial guess for the location (default: median of \code{X}).}
 
 \item{c}{A numeric value specifying the tuning constant for the biweight estimator
 (\code{c = 9} by default).}
@@ -18,6 +25,10 @@ biweight_scale(X, loc = stats::median(X), c = 9, reduced = FALSE)
 should be reduced to the number of non-rejected values. If \code{TRUE}, \emph{n} is
 reduced to the number of observations that pass a rejection criteria.
 If \code{FALSE} (default), \emph{n} is equal to length of \code{X} (the input data).}
+
+\item{tol}{Convergence tolerance for the iterative computation (default: 1e-6).}
+
+\item{max_iter}{Maximum number of iterations (default: 50).}
 }
 \value{
 The biweight scale of \code{X}.

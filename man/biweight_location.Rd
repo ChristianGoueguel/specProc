@@ -4,10 +4,15 @@
 \alias{biweight_location}
 \title{Biweight Location}
 \usage{
-biweight_location(X, tol = 1e-06, max_iter = 50)
+biweight_location(X, loc = stats::median(X), c = 6, tol = 1e-06, max_iter = 50)
 }
 \arguments{
 \item{X}{A numeric vector.}
+
+\item{loc}{Initial guess for the location (default: median of \code{X}).}
+
+\item{c}{A numeric value specifying the tuning constant for the biweight estimator
+(\code{c = 6} by default).}
 
 \item{tol}{Convergence tolerance for the iterative computation (default: 1e-6).}
 
@@ -24,16 +29,18 @@ algorithm described in Mosteller and Tukey (1977).
 }
 \examples{
 # Example 1: Compute biweight location for a vector
-x <- c(seq(1,10))
+x <- c(seq(1,100))
 tibble::tibble(
 mean = mean(x),
+med = stats::median(x),
 biloc = biweight_location(x)
 )
 
 # Example 2: Biweight location is robust to outliers
-x <- c(seq(1,9), 100)  # An outlier at 100
+x <- c(seq(1,99), 1e3)  # An outlier at 1000
 tibble::tibble(
 mean = mean(x),
+med = stats::median(x),
 biloc = biweight_location(x)
 )
 
