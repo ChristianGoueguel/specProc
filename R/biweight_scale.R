@@ -14,7 +14,7 @@
 #' reduced to the number of observations that pass a rejection criteria.
 #' If `FALSE` (default), *n* is equal to length of `X` (the input data).
 #' @return The biweight scale of `X`.
-#'
+#' @author Christian L. Goueguel
 #' @references
 #'  - Mosteller, F., and Tukey, J. W. (1977). Data Analysis and Regression: A Second
 #'    Course in Statistics. Addison-Wesley, pp. 203-209.

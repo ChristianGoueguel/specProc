@@ -24,14 +24,18 @@ algorithm described in Mosteller and Tukey (1977).
 }
 \examples{
 # Example 1: Compute biweight location for a vector
-x <- c(1, 2, 3, 4, 5)
-mean(x)
-biweight_location(x)
+x <- c(seq(1,10))
+tibble::tibble(
+mean = mean(x),
+biloc = biweight_location(x)
+)
 
 # Example 2: Biweight location is robust to outliers
-x <- c(1, 2, 3, 4, 100)  # An outlier at 100
-mean(x)
-biweight_location(x)
+x <- c(seq(1,9), 100)  # An outlier at 100
+tibble::tibble(
+mean = mean(x),
+biloc = biweight_location(x)
+)
 
 }
 \references{

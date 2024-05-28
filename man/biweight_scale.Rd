@@ -50,3 +50,6 @@ biscale = biweight_scale(x)
 Course in Statistics. Addison-Wesley, pp. 203-209.
 }
 }
+\author{
+Christian L. Goueguel
+}
