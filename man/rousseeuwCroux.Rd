@@ -27,6 +27,16 @@ The functions are built around the package \code{robustbase} and the bias-correc
 are refined according to Akinshin, A., (2022).
 }
 \examples{
+# Example 1:
+x <- c(seq(1,100))
+tibble::tibble(
+sd = stats::sd(x),
+mad = stats::mad(x),
+Sn = rousseeuwCroux(x, estimator = "Sn"),
+Qn = rousseeuwCroux(x, estimator = "Qn")
+)
+
+# Example 2:
 x <- c(seq(1,99), 1e3) # An outlier at 1000
 tibble::tibble(
 sd = stats::sd(x),

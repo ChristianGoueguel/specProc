@@ -4,10 +4,10 @@
 \alias{iqrMethod}
 \title{Interquartile Range Method}
 \usage{
-iqrMethod(x, k = 1.5, skew = FALSE)
+iqrMethod(X, k = 1.5, skew = FALSE)
 }
 \arguments{
-\item{x}{A numeric vector.}
+\item{X}{A numeric vector.}
 
 \item{k}{A numeric value specifying the fence factor. \code{k = 1.5} is the default
 as it strikes a balance between sensitivity to mild outliers and robustness against extreme outliers.
@@ -48,15 +48,10 @@ may still struggle to accurately identify potential outliers in distributions wi
 kurtosis or long-tailed behavior.
 }
 \examples{
-vec1 <- c(1, 2, 3, 4, 5, 10)
-iqrMethod(vec1)
+x <- rexp(7, rate = 0.5)
+iqrMethod(x)
 
-iqrMethod(vec1, k = 3)
-
-vec2 <- c(1, 2, 3, 4, 5, seq(10,100, 25))
-iqrMethod(vec2)
-
-iqrMethod(vec2, skew = TRUE)
+iqrMethod(x, skew = TRUE)
 }
 \references{
 \itemize{

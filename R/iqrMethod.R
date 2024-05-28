@@ -26,7 +26,7 @@
 #'    Computational Statistics & Data Analysis, 52(12):5186-5201
 #'
 #' @author Christian L. Goueguel
-#' @param x A numeric vector.
+#' @param X A numeric vector.
 #' @param k A numeric value specifying the fence factor. `k = 1.5` is the default
 #' as it strikes a balance between sensitivity to mild outliers and robustness against extreme outliers.
 #' `k = 3` is more lenient and is sometimes used when a higher tolerance for outliers is desired.
@@ -42,22 +42,17 @@
 #'   - `data`: The original numeric values.
 #'   - `outlier`: A logical vector indicating whether each value is a potential outlier or not.
 #' @examples
-#' vec1 <- c(1, 2, 3, 4, 5, 10)
-#' iqrMethod(vec1)
+#' x <- rexp(7, rate = 0.5)
+#' iqrMethod(x)
 #'
-#' iqrMethod(vec1, k = 3)
-#'
-#' vec2 <- c(1, 2, 3, 4, 5, seq(10,100, 25))
-#' iqrMethod(vec2)
-#'
-#' iqrMethod(vec2, skew = TRUE)
+#' iqrMethod(x, skew = TRUE)
 #' @export iqrMethod
-iqrMethod <- function(x, k = 1.5, skew = FALSE) {
-  if (missing(x)) {
-    stop("Missing 'x' argument.")
+iqrMethod <- function(X, k = 1.5, skew = FALSE) {
+  if (missing(X)) {
+    stop("Missing 'X' argument.")
   }
-  if (!is.numeric(x)) {
-    stop("The input 'x' must be a numeric vector.")
+  if (!is.numeric(X)) {
+    stop("The input 'X' must be a numeric vector.")
   }
   if (!is.numeric(k) || k <= 0) {
     stop("The input 'k' must be a positive numeric scalar.")
@@ -65,20 +60,20 @@ iqrMethod <- function(x, k = 1.5, skew = FALSE) {
   if (!is.logical(skew)) {
     stop("'skew' must be of type boolean (TRUE or FALSE)")
   }
-  q1 <- stats::quantile(x, 0.25)
-  q3 <- stats::quantile(x, 0.75)
+  q1 <- stats::quantile(X, 0.25)
+  q3 <- stats::quantile(X, 0.75)
   iqr <- q3 - q1
 
   value <- NULL
   outlier <- NULL
   name <- NULL
-  x_tbl <- tibble::enframe(x)
+  x_tbl <- tibble::enframe(X)
 
   if (skew == FALSE) {
     lower_fence <- q1 - k * iqr
     upper_fence <- q3 + k * iqr
   } else {
-    medcouple <- robustbase::mc(x)
+    medcouple <- robustbase::mc(X)
     alpha <- dplyr::if_else(medcouple >= 0, 4, 3)
     beta <- dplyr::if_else(medcouple >= 0, 3, 4)
 

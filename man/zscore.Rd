@@ -4,10 +4,10 @@
 \alias{zscore}
 \title{Classical or Robust Z-Score}
 \usage{
-zscore(x, robust = TRUE)
+zscore(X, robust = TRUE)
 }
 \arguments{
-\item{x}{A numeric vector.}
+\item{X}{A numeric vector.}
 
 \item{robust}{A logical value indicating whether to calculate classical or robust (default) z-score.}
 }
@@ -30,10 +30,12 @@ z-score greater than 3 (|z| > 3) can be considered potential outliers, as they f
 that covers 99.7\% of the data points in a normal distribution. (Note that a cutoff of |z| > 2.5 is also often used).
 }
 \examples{
-vec <- c(1, 2, 3, 4, 5, 100)
-zscore(vec)
+x <- c(1:5, 100)
+# Non-robust approach
+zscore(x, robust = FALSE)
 
-zscore(vec, robust = FALSE)
+# Robust approach
+zscore(x)
 }
 \references{
 \itemize{

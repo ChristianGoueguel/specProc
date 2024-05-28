@@ -18,23 +18,25 @@
 #'   Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 1(1), 73-79.
 #'
 #' @author Christian L. Goueguel
-#' @param x A numeric vector.
+#' @param X A numeric vector.
 #' @param robust A logical value indicating whether to calculate classical or robust (default) z-score.
 #' @return A tibble with two columns:
 #'   - `data`: The original numeric values.
 #'   - `score`: The calculated z-scores.
 #' @examples
-#' vec <- c(1, 2, 3, 4, 5, 100)
-#' zscore(vec)
+#' x <- c(1:5, 100)
+#' # Non-robust approach
+#' zscore(x, robust = FALSE)
 #'
-#' zscore(vec, robust = FALSE)
+#' # Robust approach
+#' zscore(x)
 #' @export zscore
-zscore <- function(x, robust = TRUE) {
-  if (missing(x)) {
-    stop("Missing 'x' argument.")
+zscore <- function(X, robust = TRUE) {
+  if (missing(X)) {
+    stop("Missing 'X' argument.")
   }
-  if (!is.numeric(x)) {
-    stop("The input 'x' must be a numeric vector.")
+  if (!is.numeric(X)) {
+    stop("The input 'X' must be a numeric vector.")
   }
   if (!is.logical(robust)) {
     stop("The input 'robust' must be a logical value (TRUE or FALSE).")
@@ -44,11 +46,12 @@ zscore <- function(x, robust = TRUE) {
   value <- NULL
   score <- NULL
   name <- NULL
-  x <- tibble::enframe(x)
+  X <- tibble::enframe(X)
+
   if (robust) {
-    z <- dplyr::mutate(x, score = robustHD::robStandardize(value))
+    z <- dplyr::mutate(X, score = robustHD::robStandardize(value))
   } else {
-    z <- dplyr::mutate(x, score = robustHD::standardize(value))
+    z <- dplyr::mutate(X, score = robustHD::standardize(value))
   }
 
   z <- z %>%
