@@ -81,7 +81,9 @@ the decimal point in the output.</p></dd>
 
 
 <dt>robust</dt>
-<dd><p>A logical value indicating whether to compute robust descriptive statistics. If <code>FALSE</code> (the default), computes the classical descriptive statistics for describing the distribution of a univariate variable.</p></dd>
+<dd><p>A logical value indicating whether to compute robust descriptive
+statistics. If <code>FALSE</code> (the default), computes the classical descriptive
+statistics for describing the distribution of a univariate variable.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -90,18 +92,14 @@ the decimal point in the output.</p></dd>
 
 <p>A data frame containing the summary statistics for the specified variable(s).</p>
     </div>
+    <div class="section level2">
+    <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
+    <p>Christian L. Goueguel</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Load the iris dataset</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Calculate summary statistics for all variables in the iris dataset</span></span></span>
-<span class="r-in"><span><span class="va">summary_stats</span> <span class="op">&lt;-</span> <span class="fu">summaryStats</span><span class="op">(</span><span class="va">iris</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Calculate summary statistics for the 'Sepal.Length' and 'Petal.Length' variables</span></span></span>
-<span class="r-in"><span><span class="va">sepal_length_stats</span> <span class="op">&lt;-</span> <span class="fu">summaryStats</span><span class="op">(</span><span class="va">iris</span>, var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sepal.Length"</span>, <span class="st">"Petal.Length"</span><span class="op">)</span>, robust <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-</code></pre></div>
+    
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
