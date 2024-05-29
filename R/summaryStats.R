@@ -25,11 +25,10 @@
 #' # Load the iris dataset
 #' data(iris)
 #'
-#' # Calculate summary statistics for all variables in the iris dataset
+#' # Example1:
 #' iris |> summaryStats()
 #'
-#' # Calculate summary statistics for the 'Sepal.Length' and
-#'   'Petal.Length' variables
+#' # Example2:
 #' iris |> summaryStats(
 #'   var = c("Sepal.Length", "Petal.Length"),
 #'   robust = TRUE
@@ -79,7 +78,7 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = 
           mean = round(mean(value), digits),
           mode = round(getmode(value), digits),
           median = round(stats::median(value), digits),
-          IQR = round(IQR(value), digits),
+          IQR = round(stats::IQR(value), digits),
           sd = round(stats::sd(value), digits),
           variance = stats::var(value),
           cv = round((sd / mean) * 100, digits),

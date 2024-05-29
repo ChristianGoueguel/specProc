@@ -35,11 +35,10 @@ for a specified variable or all variables in a given data frame or tibble.
 # Load the iris dataset
 data(iris)
 
-# Calculate summary statistics for all variables in the iris dataset
+# Example1:
 iris |> summaryStats()
 
-# Calculate summary statistics for the 'Sepal.Length' and
-  'Petal.Length' variables
+# Example2:
 iris |> summaryStats(
   var = c("Sepal.Length", "Petal.Length"),
   robust = TRUE
