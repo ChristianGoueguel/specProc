@@ -42,9 +42,7 @@ Computes various correlation coefficients between a specified response variable
 and each of the remaining variables in a given data frame or tibble. The available correlation
 methods are Pearson's product-moment correlation (parametric), Spearman's rank correlation,
 Kendall's tau correlation (non-parametric), Chatterjee's new correlation coefficient, and
-the biweight midcorrelation (a robust correlation measure). The Pearson's, Spearman's,
-and Kendall's coefficients are a wrapper around the \code{corrr} package, whilst
-the Chatterjee's coefficient is a wrapper around the \code{XICOR} package.
+the biweight midcorrelation (a robust correlation measure).
 }
 \details{
 The Pearson correlation coefficient measures the linear relationship between two continuous

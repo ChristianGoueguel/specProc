@@ -14,7 +14,6 @@
 #' @importFrom mt osc_wise
 #' @importFrom mt osc_wold
 #' @importFrom Rcpp sourceCpp
-#' @importFrom RcppFaddeeva Voigt
 #' @importFrom ropls opls
 #' @useDynLib specProc, .registration = TRUE
 ## usethis namespace: end
