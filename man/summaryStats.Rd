@@ -20,7 +20,9 @@ If \code{FALSE}, missing values will be included in the calculations.}
 \item{digits}{An integer specifying the number of significant digits to display after
 the decimal point in the output.}
 
-\item{robust}{A logical value indicating whether to compute robust descriptive statistics. If \code{FALSE} (the default), computes the classical descriptive statistics for describing the distribution of a univariate variable.}
+\item{robust}{A logical value indicating whether to compute robust descriptive
+statistics. If \code{FALSE} (the default), computes the classical descriptive
+statistics for describing the distribution of a univariate variable.}
 }
 \value{
 A data frame containing the summary statistics for the specified variable(s).
@@ -34,8 +36,15 @@ for a specified variable or all variables in a given data frame or tibble.
 data(iris)
 
 # Calculate summary statistics for all variables in the iris dataset
-summary_stats <- summaryStats(iris)
+iris |> summaryStats()
 
-# Calculate summary statistics for the 'Sepal.Length' and 'Petal.Length' variables
-sepal_length_stats <- summaryStats(iris, var = c("Sepal.Length", "Petal.Length"), robust = TRUE)
+# Calculate summary statistics for the 'Sepal.Length' and
+  'Petal.Length' variables
+iris |> summaryStats(
+  var = c("Sepal.Length", "Petal.Length"),
+  robust = TRUE
+  )
+}
+\author{
+Christian L. Goueguel
 }

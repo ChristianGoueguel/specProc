@@ -1,6 +1,9 @@
 #' @title Classical or Robust Descriptive Statistics
-#' @description This function calculates various descriptive statistics (robust and non-robust)
-#'   for a specified variable or all variables in a given data frame or tibble.
+#'
+#' @description
+#' This function calculates various descriptive statistics (robust and non-robust)
+#' for a specified variable or all variables in a given data frame or tibble.
+#'
 #' @param data A data frame or tibble containing the variable(s) of interest.
 #' @param var A character vector specifying the variable(s) for which to calculate the
 #'   summary statistics. If left as \code{NULL} (the default), summary statistics will
@@ -10,18 +13,27 @@
 #'   If \code{FALSE}, missing values will be included in the calculations.
 #' @param digits An integer specifying the number of significant digits to display after
 #'   the decimal point in the output.
-#' @param robust A logical value indicating whether to compute robust descriptive statistics. If \code{FALSE} (the default), computes the classical descriptive statistics for describing the distribution of a univariate variable.
+#' @param robust A logical value indicating whether to compute robust descriptive
+#' statistics. If \code{FALSE} (the default), computes the classical descriptive
+#' statistics for describing the distribution of a univariate variable.
 #' @return A data frame containing the summary statistics for the specified variable(s).
+#'
+#' @author Christian L. Goueguel
+#'
 #' @export summaryStats
 #' @examples
 #' # Load the iris dataset
 #' data(iris)
 #'
 #' # Calculate summary statistics for all variables in the iris dataset
-#' summary_stats <- summaryStats(iris)
+#' iris |> summaryStats()
 #'
-#' # Calculate summary statistics for the 'Sepal.Length' and 'Petal.Length' variables
-#' sepal_length_stats <- summaryStats(iris, var = c("Sepal.Length", "Petal.Length"), robust = TRUE)
+#' # Calculate summary statistics for the 'Sepal.Length' and
+#'   'Petal.Length' variables
+#' iris |> summaryStats(
+#'   var = c("Sepal.Length", "Petal.Length"),
+#'   robust = TRUE
+#'   )
 summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = FALSE) {
   if (is.null(data) == TRUE) {
     stop("Data must be provided")
@@ -67,6 +79,7 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = 
           mean = round(mean(value), digits),
           mode = round(getmode(value), digits),
           median = round(stats::median(value), digits),
+          IQR = round(IQR(value), digits),
           sd = round(stats::sd(value), digits),
           variance = stats::var(value),
           cv = round((sd / mean) * 100, digits),
@@ -87,15 +100,16 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = 
         dplyr::summarise(
           median = round(stats::median(value), digits),
           mad = round(stats::mad(value), digits),
-          Qn = round(robustbase::Qn(value), digits),
-          Sn = round(robustbase::Sn(value), digits),
+          Qn = round(rousseeuwCroux(value, estimator = "Qn"), digits),
+          Sn = round(rousseeuwCroux(value, estimator = "Sn"), digits),
+          medcouple = round(robustbase::mc(value), digits),
+          LMC = round(medcouple_weight(value)$LMC, digits),
+          RMC = round(medcouple_weight(value)$RMC, digits),
           rsd = 1.4826 * mad,
+          biloc = round(biweight_location(value), digits),
+          biscale = round(biweight_scale(value), digits),
           bivar = round(biweight_midvariance(value), digits),
           rcv = round((rsd / median) * 100, digits),
-          IQR = round(stats::IQR(value, na.rm = TRUE), digits),
-          min = min(value),
-          max = max(value),
-          medcouple = round(robustbase::mc(value), digits),
           count = dplyr::n()
         ) %>%
         dplyr::ungroup() %>%
