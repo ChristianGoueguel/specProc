@@ -2,7 +2,7 @@
 % Please edit documentation in R/average.R
 \name{average}
 \alias{average}
-\title{Fast Column-wise Averaging for Large Datasets}
+\title{Fast Column-wise Average for Large Datasets}
 \usage{
 average(.data, .group_by = NULL)
 }

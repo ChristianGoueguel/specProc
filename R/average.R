@@ -1,4 +1,4 @@
-#' @title Fast Column-wise Averaging for Large Datasets
+#' @title Fast Column-wise Average for Large Datasets
 #'
 #' @description
 #' This function calculates the column-wise average values of numeric
@@ -40,7 +40,7 @@ average <- function(.data, .group_by = NULL) {
       stop("The input '.data' must be numeric")
     } else {
       Xmat <- .data %>% as.matrix()
-      Rcpp::sourceCpp("/src/computeMeans.cpp")
+      Rcpp::sourceCpp("~/Documents/Projects/Packages/specProc/src/computeMeans.cpp")
       avg <- computeMeans(Xmat)
     }
   } else {
@@ -51,7 +51,7 @@ average <- function(.data, .group_by = NULL) {
     if (!is.factor(grp_vec)) {
       grp_vec <- forcats::as_factor(grp_vec)
     }
-    Rcpp::sourceCpp("/src/computeGroupedMeans.cpp")
+    Rcpp::sourceCpp("~/Documents/Projects/Packages/specProc/src/computeGroupedMeans.cpp")
     avg <- computeGroupedMeans(grp_vec, Xmat)
   }
   return(tibble::as_tibble(avg))

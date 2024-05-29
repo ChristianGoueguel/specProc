@@ -68,21 +68,26 @@ reference:
   - biweight_location
   - biweight_scale
 
-- subtitle: tail weight measures
+- subtitle: tail weight
   desc: >
     Functions used to measure the tail weight of a distribution.
   contents:
   - medcouple_weight
   - quantile_weight
 
-- subtitle: scale measures
+- subtitle: scale
   desc: >
-    Functions used to compute highly robust estimators for scale (or dispersion).
+    Function used to compute highly robust estimators for scale (or dispersion).
   contents:
   - rousseeuwCroux
+
+- subtitle: transformation
+  desc: >
+    Function used to robustly transform variable(s) toward central normality.
+  contents:
+  - robustBCYJ
 
 - title: Miscellaneous
   contents:
   - corr
-  - robTransform
   - summaryStats
