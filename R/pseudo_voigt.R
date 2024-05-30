@@ -26,7 +26,7 @@
 #' }
 #'
 #' The Olivero and Longbothum (1977) approximation, and its subsequent refinements
-#' (Belafhal 2000; Zdunkowski et al. 2007), offer a efficient and accurate way (accuracy of 0.02%)
+#' (Belafhal 2000; Zdunkowski et al. 2007), offer an efficient and accurate way (accuracy of 0.02%)
 #' to estimate the half-width of a Voigt line, which is given by:
 #'
 #' \deqn{w_v = \frac{1}{2} \cdot [c_1 \cdot w_L + \sqrt(c_2 \cdot w_L^2 + 4 \cdot w_G^2)]}
@@ -46,7 +46,12 @@
 #' is useful when the precise value of `eta` is unknown.
 #'
 #' @return A numeric vector of the same length as `x`, containing the
-#' computed pseudo-Voigt function values.
+#' computed pseudo-Voigt function values. If `eta = NULL`, the function returns
+#' a list with the following components:
+#'    - `$y`: A numeric vector of the same length as `x`, containing the computed
+#'    pseudo-Voigt function values using the approximated mixing parameter.
+#'    - `$eta`: The approximate mixing parameter calculated using the polynomial
+#'     approximation based on the `wG` and `wL` values.
 #'
 #' @references
 #'  - Zdunkowski, W., Trautmann, T., Bott, A., (2007). Radiation in the Atmosphere — A Course in Theoretical Meteorology.
@@ -68,9 +73,12 @@
 #' plot(x, y1, type = "l", col = "red", main = "Pseudo-Voigt Profile", ylim = c(0, 5.5))
 #' lines(x, y2, col = "blue")
 #' lines(x, y3, col = "green")
-#' lines(x, y4, col = "black")
+#' lines(x, y4$y, col = "black")
 #' legend("topright", legend = c("eta = 1", "eta = 0.5", "eta = 0", "eta = NULL"),
 #' col = c("red", "blue", "green", "black"), lty = 1)
+#'
+#' # The approximated mixing parameter:
+#' y4$eta
 #'
 pseudo_voigt <- function(x, y0, xc, wG, wL, A, eta = NULL) {
   if (!is.numeric(x) || !is.vector(x)) {
@@ -96,11 +104,14 @@ pseudo_voigt <- function(x, y0, xc, wG, wL, A, eta = NULL) {
     wT <- (wG^5 + 2.69269 * wG^4 * wL + 2.42843 * wG^3 * wL^2 + 4.47163 * wG^2 * wL^3 + 0.07842 * wG * wL^4 + wL^5)^( 1 / 5)
     eta_approx <- 1.36603 * (wL / wT) - 0.47719 * (wL / wT)^2 + 0.11116 * (wL / wT)^3
     y <- y0 + A * (eta_approx * lorentzian(x, y0, xc, wL, A) + (1 - eta_approx) * gaussian(x, y0, xc, wG, A))
+    return(list(y = y, eta = eta_approx))
+
   } else {
     if (!is.numeric(eta) || length(eta) != 1 || eta < 0 || eta > 1) {
       stop("'eta' must be a numeric value between 0 and 1.")
     }
     y <- y0 + A * (eta * lorentzian(x, y0, xc, wL, A) + (1 - eta) * gaussian(x, y0, xc, wG, A))
+    return(y)
+
   }
-  return(y)
 }

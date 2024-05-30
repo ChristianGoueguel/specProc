@@ -28,7 +28,14 @@ is useful when the precise value of \code{eta} is unknown.}
 }
 \value{
 A numeric vector of the same length as \code{x}, containing the
-computed pseudo-Voigt function values.
+computed pseudo-Voigt function values. If \code{eta = NULL}, the function returns
+a list with the following components:
+\itemize{
+\item \verb{$y}: A numeric vector of the same length as \code{x}, containing the computed
+pseudo-Voigt function values using the approximated mixing parameter.
+\item \verb{$eta}: The approximate mixing parameter calculated using the polynomial
+approximation based on the \code{wG} and \code{wL} values.
+}
 }
 \description{
 The Pseudo-Voigt function is an approximation for the Voigt function.
@@ -56,7 +63,7 @@ and various intermediate shapes in between.
 }
 
 The Olivero and Longbothum (1977) approximation, and its subsequent refinements
-(Belafhal 2000; Zdunkowski et al. 2007), offer a efficient and accurate way (accuracy of 0.02\%)
+(Belafhal 2000; Zdunkowski et al. 2007), offer an efficient and accurate way (accuracy of 0.02\%)
 to estimate the half-width of a Voigt line, which is given by:
 
 \deqn{w_v = \frac{1}{2} \cdot [c_1 \cdot w_L + \sqrt(c_2 \cdot w_L^2 + 4 \cdot w_G^2)]}
@@ -71,9 +78,12 @@ y4 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2)
 plot(x, y1, type = "l", col = "red", main = "Pseudo-Voigt Profile", ylim = c(0, 5.5))
 lines(x, y2, col = "blue")
 lines(x, y3, col = "green")
-lines(x, y4, col = "black")
+lines(x, y4$y, col = "black")
 legend("topright", legend = c("eta = 1", "eta = 0.5", "eta = 0", "eta = NULL"),
 col = c("red", "blue", "green", "black"), lty = 1)
+
+# The approximated mixing parameter:
+y4$eta
 
 }
 \references{
