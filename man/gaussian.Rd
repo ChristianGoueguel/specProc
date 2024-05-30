@@ -4,24 +4,57 @@
 \alias{gaussian}
 \title{Gaussian Function}
 \usage{
-gaussian(x, y0, xc, w, A)
+gaussian(x, y0, xc, wG, A)
 }
 \arguments{
-\item{x}{data}
+\item{x}{A numeric vector representing the independent variable (e.g., wavelength, frequency).}
 
-\item{y0}{baseline offset}
+\item{y0}{A numeric value specifying the baseline offset.}
 
-\item{xc}{center of the peak}
+\item{xc}{A numeric value representing the center of the peak.}
 
-\item{w}{FWHM}
+\item{wG}{A numeric value specifying the full width at half maximum (FWHM) of the Gaussian curve.}
 
-\item{A}{area under the peak}
+\item{A}{A numeric value representing the peak area.}
 }
 \value{
-fitted value
+A numeric vector containing the values of the Gaussian function evaluated
+at the provided \code{x} values.
 }
 \description{
-Full width at half maximum (FWHM) version of Gaussian Function.
+Computes the values of a Gaussian function (also known as the normal distribution) given specific parameters.
+The Gaussian profile is a bell-shaped curve that is symmetric around its center, making it distinct
+from other profiles like the Lorentzian profile, which has heavier tails.
+}
+\details{
+The Gaussian function is defined as:
+
+\deqn{f(x) = y_{0} + \frac{A}{w_{G} \sqrt{\pi / (4 \log(2))}} \exp \left( -\frac{4 \log(2) (x - x_{c})^2}{w_{G}^2} \right)}
+
+where:
+\itemize{
+\item \eqn{A} is the peak area (maximum height of the Gaussian curve)
+\item \eqn{x_{c}} is the center of the peak (the x-value where the Gaussian curve is at its maximum)
+\item \eqn{w_{G}} is the full width at half maximum (FWHM), which represents the width of the Gaussian curve at half of its maximum height
+\item \eqn{y_{0}} is the baseline offset (the y-value where the Gaussian curve starts)
+}
+
+In spectroscopy, the Gaussian function is widely used to model the shape of spectral lines broadened
+by Doppler broadening, which arises from the thermal motion of atoms or molecules emitting or absorbing
+the radiation. However, in some cases, other broadening mechanisms, such as
+pressure broadening or natural broadening, may contribute to the overall line shape, leading to
+deviations from a pure Gaussian profile. In these situations, more complex line shape models,
+such as the Voigt profile (a convolution of Gaussian and Lorentzian profiles), may be required.
+
+Additionally, instrumental broadening, caused by the finite resolution of the spectrometer or other
+experimental apparatus, is another important factor that can contribute to the
+observed spectral line shape, and it's often modeled using a Gaussian profile as well.
+}
+\examples{
+x <- seq(-10, 10, length.out = 100)
+y <- gaussian(x, y0 = 0, xc = 0, wG = 2, A = 1)
+plot(x, y, type = "l", col = "red", main = "Gaussian Profile")
+
 }
 \author{
 Christian L. Goueguel
