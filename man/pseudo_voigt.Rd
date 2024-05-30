@@ -27,10 +27,11 @@ computed pseudo-Voigt function values.
 }
 \description{
 The pseudo-Voigt function is a linear combination of the Gaussian and Lorentzian functions,
-with a mixing parameter \code{eta} that determines the relative contribution of each component.
+weighted by a mixing parameter \eqn{\eta} (\code{eta}) that determines the relative
+contribution of each component.
 }
 \details{
-Mathematically, the Pseudo-Voigt function is given by:
+The Pseudo-Voigt function is given by:
 
 \deqn{f(x) = y_0 + A \cdot [ \eta \cdot L(x, x_c, w_L) + (1 - \eta) \cdot G(x, x_c, w_G)]}
 
@@ -42,12 +43,21 @@ where:
 and the full width at half maximum \eqn{w_G}
 \item \eqn{L(x, x_0, w_G)} is the Lorentzian component with center \eqn{x_c}
 and the full width at half maximum \eqn{w_L}
-\item \eqn{\eta} is the mixing parameter, with \eqn{0 < \eta < 1} (\eqn{\eta = 0}
-corresponds to a pure Gaussian, \eqn{\eta = 1} to a pure Lorentzian)
+\item \eqn{\eta} is the mixing parameter, with \eqn{0 < \eta < 1}. The
+mixing parameter \eqn{\eta} allows the pseudo-Voigt function to describe a wide
+range of line shapes, from pure Gaussian (\eqn{\eta = 0}) to pure Lorentzian (\eqn{\eta = 1}),
+and various intermediate shapes in between.
 }
 }
 \examples{
-x <- seq(-10, 10, length.out = 100)
-y <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 0.5)
-plot(x, y, type = "l", col = "red", main = "Pseudo-Voigt Profile")
+x <- seq(-2, 2, length.out = 100)
+y1 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 0)
+y2 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 0.5)
+y3 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 1)
+plot(x, y1, type = "l", col = "red", main = "Pseudo-Voigt Profile", ylim = c(0, 2.5))
+lines(x, y2, col = "blue")
+lines(x, y3, col = "green")
+legend("topright", legend = c("eta = 1", "eta = 0.5", "eta = 0"),
+col = c("red", "blue", "green"), lty = 1)
+
 }
