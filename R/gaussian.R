@@ -34,7 +34,7 @@
 #' @param x A numeric vector representing the independent variable (e.g., wavelength, frequency).
 #' @param y0 A numeric value specifying the baseline offset.
 #' @param xc A numeric value representing the center of the peak.
-#' @param wG A numeric value specifying the full width at half maximum (FWHM) of the Gaussian curve.
+#' @param wG A numeric value specifying the full width at half maximum (FWHM).
 #' @param A A numeric value representing the peak area.
 #'
 #' @return A numeric vector containing the values of the Gaussian function evaluated

@@ -26,7 +26,6 @@
 #'   \item \eqn{x_c} is the center of the peak
 #' }
 #'
-#'
 #' @param x A numeric vector representing the independent variable (e.g., wavelength or frequency).
 #' @param y0 A numeric value specifying the baseline offset.
 #' @param xc A numeric value representing the center of the peak.
@@ -67,7 +66,7 @@ voigt <- function(x, y0, xc, wG, wL, A, real = TRUE) {
 
   pVoigt <- function(x, x0, sigma, gamma, real) {
     z <- (x - x0 + gamma * 1i) / (sigma * sqrt(2))
-    #w <- exp(-z^2) * Faddeeva::faddeeva(1i * z)
+    w <- exp(-z^2) * Faddeeva::faddeeva(1i * z)
     if (real) {
       w <- Re(w)
     }

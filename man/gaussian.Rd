@@ -13,7 +13,7 @@ gaussian(x, y0, xc, wG, A)
 
 \item{xc}{A numeric value representing the center of the peak.}
 
-\item{wG}{A numeric value specifying the full width at half maximum (FWHM) of the Gaussian curve.}
+\item{wG}{A numeric value specifying the full width at half maximum (FWHM).}
 
 \item{A}{A numeric value representing the peak area.}
 }
