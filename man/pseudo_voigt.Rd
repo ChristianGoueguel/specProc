@@ -62,7 +62,7 @@ x <- seq(-2, 2, length.out = 100)
 y1 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 0)
 y2 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 0.5)
 y3 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 1)
-plot(x, y1, type = "l", col = "red", main = "Pseudo-Voigt Profile", ylim = c(0, 4.5))
+plot(x, y1, type = "l", col = "red", main = "Pseudo-Voigt Profile", ylim = c(0, 5.5))
 lines(x, y2, col = "blue")
 lines(x, y3, col = "green")
 legend("topright", legend = c("eta = 1", "eta = 0.5", "eta = 0"),
