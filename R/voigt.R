@@ -66,7 +66,7 @@ voigt <- function(x, y0, xc, wG, wL, A, real = TRUE) {
 
   pVoigt <- function(x, x0, sigma, gamma, real) {
     z <- (x - x0 + gamma * 1i) / (sigma * sqrt(2))
-    w <- exp(-z^2) * Faddeeva::faddeeva(1i * z)
+    #w <- exp(-z^2) * Faddeeva::faddeeva(1i * z)
     if (real) {
       w <- Re(w)
     }
