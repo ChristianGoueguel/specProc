@@ -1,7 +1,8 @@
 #' @title Pseudo-Voigt Function
 #'
 #' @description
-#' The pseudo-Voigt function is a linear combination of the Gaussian and Lorentzian functions,
+#' The Pseudo-Voigt function is an approximation for the Voigt function.
+#' It is defined as a linear combination of the Gaussian and Lorentzian functions,
 #' weighted by a mixing parameter \eqn{\eta} (`eta`) that determines the relative
 #' contribution of each component.
 #'
@@ -24,6 +25,13 @@
 #'   and various intermediate shapes in between.
 #' }
 #'
+#' The Olivero and Longbothum (1977) approximation, and its subsequent refinements
+#' (Belafhal 2000; Zdunkowski et al. 2007), offer a efficient and accurate way (accuracy of 0.02%)
+#' to estimate the half-width of a Voigt line, which is given by:
+#'
+#' \deqn{w_v = \frac{1}{2} \cdot [c_1 \cdot w_L + \sqrt(c_2 \cdot w_L^2 + 4 \cdot w_G^2)]}
+#' with \eqn{c_1 = 1.0692}, \eqn{c_2 = 0.86639}
+#'
 #' @param x A numeric vector representing the independent variable (e.g., wavelength or frequency).
 #' @param y0 A numeric value specifying the baseline offset.
 #' @param xc A numeric value representing the center of the peak.
@@ -34,6 +42,14 @@
 #'
 #' @return A numeric vector of the same length as `x`, containing the
 #' computed pseudo-Voigt function values.
+#'
+#' @references
+#'  - Zdunkowski, W., Trautmann, T., Bott, A., (2007). Radiation in the Atmosphere — A Course in Theoretical Meteorology.
+#'    Cambridge University Press.
+#'  - Belafhal, A., (2000). The shape of spectral lines: Widths and equivalent widths of the Voigt profile.
+#'    Opt. Commun., 177(1-6):111–118.
+#'  - Olivero, J., Longbothum, R., (1977). Empirical fits to the Voigt line width: A brief review.
+#'    J. Quant. Spectrosc. Radiat. Transfer, 17(2):233–236.
 #'
 #' @export pseudo_voigt
 #' @examples
@@ -70,6 +86,6 @@ pseudo_voigt <- function(x, y0, xc, wG, wL, A, eta) {
     stop("'y0' must be a single numeric value.")
   }
 
-  y <- y0 + A * ((1 - eta) * gaussian(x, y0, xc, wG, A = 1) + eta * lorentzian(x, y0, xc, wL, A = 1))
+  y <- y0 + A * ((1 - eta) * gaussian(x, y0, xc, wG, A) + eta * lorentzian(x, y0, xc, wL, A))
 
 }
