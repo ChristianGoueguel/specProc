@@ -4,7 +4,7 @@
 \alias{pseudo_voigt}
 \title{Pseudo-Voigt Function}
 \usage{
-pseudo_voigt(x, y0, xc, wG, wL, A, eta)
+pseudo_voigt(x, y0, xc, wG, wL, A, eta = NULL)
 }
 \arguments{
 \item{x}{A numeric vector representing the independent variable (e.g., wavelength or frequency).}
@@ -19,7 +19,12 @@ pseudo_voigt(x, y0, xc, wG, wL, A, eta)
 
 \item{A}{A numeric value representing the peak area.}
 
-\item{eta}{A numeric value between 0 and 1, representing the mixing parameter.}
+\item{eta}{A numeric value between 0 and 1, representing the mixing parameter.
+If \code{eta = NULL} (default), the mixing parameter is approximated by a polynomial
+function of \code{wG} and \code{wL}. This approximation (accuracy of 1\%), proposed by Ida et al. (2000),
+provides an analytical expression for the mixing parameter based on the relative
+FWHM of the Gaussian and Lorentzian components. The polynomial approximation
+is useful when the precise value of \code{eta} is unknown.}
 }
 \value{
 A numeric vector of the same length as \code{x}, containing the
@@ -62,11 +67,13 @@ x <- seq(-2, 2, length.out = 100)
 y1 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 0)
 y2 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 0.5)
 y3 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 1)
+y4 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2)
 plot(x, y1, type = "l", col = "red", main = "Pseudo-Voigt Profile", ylim = c(0, 5.5))
 lines(x, y2, col = "blue")
 lines(x, y3, col = "green")
-legend("topright", legend = c("eta = 1", "eta = 0.5", "eta = 0"),
-col = c("red", "blue", "green"), lty = 1)
+lines(x, y4, col = "black")
+legend("topright", legend = c("eta = 1", "eta = 0.5", "eta = 0", "eta = NULL"),
+col = c("red", "blue", "green", "black"), lty = 1)
 
 }
 \references{
@@ -77,5 +84,7 @@ Cambridge University Press.
 Opt. Commun., 177(1-6):111–118.
 \item Olivero, J., Longbothum, R., (1977). Empirical fits to the Voigt line width: A brief review.
 J. Quant. Spectrosc. Radiat. Transfer, 17(2):233–236.
+\item Ida, T., Ando, M., Toraya, H., (2000). Extended pseudo-Voigt function
+for approximating the Voigt profile. Journal of Applied Crystallography. 33(6):1311–1316.
 }
 }

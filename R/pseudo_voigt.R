@@ -39,6 +39,11 @@
 #' @param wL A numeric value specifying the Lorentzian FWHM.
 #' @param A A numeric value representing the peak area.
 #' @param eta A numeric value between 0 and 1, representing the mixing parameter.
+#' If `eta = NULL` (default), the mixing parameter is approximated by a polynomial
+#' function of `wG` and `wL`. This approximation (accuracy of 1%), proposed by Ida et al. (2000),
+#' provides an analytical expression for the mixing parameter based on the relative
+#' FWHM of the Gaussian and Lorentzian components. The polynomial approximation
+#' is useful when the precise value of `eta` is unknown.
 #'
 #' @return A numeric vector of the same length as `x`, containing the
 #' computed pseudo-Voigt function values.
@@ -50,6 +55,8 @@
 #'    Opt. Commun., 177(1-6):111–118.
 #'  - Olivero, J., Longbothum, R., (1977). Empirical fits to the Voigt line width: A brief review.
 #'    J. Quant. Spectrosc. Radiat. Transfer, 17(2):233–236.
+#'  - Ida, T., Ando, M., Toraya, H., (2000). Extended pseudo-Voigt function
+#'    for approximating the Voigt profile. Journal of Applied Crystallography. 33(6):1311–1316.
 #'
 #' @export pseudo_voigt
 #' @examples
@@ -57,13 +64,15 @@
 #' y1 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 0)
 #' y2 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 0.5)
 #' y3 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 1)
+#' y4 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2)
 #' plot(x, y1, type = "l", col = "red", main = "Pseudo-Voigt Profile", ylim = c(0, 5.5))
 #' lines(x, y2, col = "blue")
 #' lines(x, y3, col = "green")
-#' legend("topright", legend = c("eta = 1", "eta = 0.5", "eta = 0"),
-#' col = c("red", "blue", "green"), lty = 1)
+#' lines(x, y4, col = "black")
+#' legend("topright", legend = c("eta = 1", "eta = 0.5", "eta = 0", "eta = NULL"),
+#' col = c("red", "blue", "green", "black"), lty = 1)
 #'
-pseudo_voigt <- function(x, y0, xc, wG, wL, A, eta) {
+pseudo_voigt <- function(x, y0, xc, wG, wL, A, eta = NULL) {
   if (!is.numeric(x) || !is.vector(x)) {
     stop("'x' must be a numeric vector.")
   }
@@ -76,9 +85,6 @@ pseudo_voigt <- function(x, y0, xc, wG, wL, A, eta) {
   if (!is.numeric(wL) || length(wL) != 1 || wL <= 0) {
     stop("'wL' must be a positive numeric value.")
   }
-  if (!is.numeric(eta) || length(eta) != 1 || eta < 0 || eta > 1) {
-    stop("'eta' must be a numeric value between 0 and 1.")
-  }
   if (!is.numeric(A) || length(A) != 1 || A <= 0) {
     stop("'A' must be a positive numeric value.")
   }
@@ -86,6 +92,15 @@ pseudo_voigt <- function(x, y0, xc, wG, wL, A, eta) {
     stop("'y0' must be a single numeric value.")
   }
 
-  y <- y0 + A * ((1 - eta) * gaussian(x, y0, xc, wG, A) + eta * lorentzian(x, y0, xc, wL, A))
-
+  if (is.null(eta)) {
+    wT <- (wG^5 + 2.69269 * wG^4 * wL + 2.42843 * wG^3 * wL^2 + 4.47163 * wG^2 * wL^3 + 0.07842 * wG * wL^4 + wL^5)^( 1 / 5)
+    eta_approx <- 1.36603 * (wL / wT) - 0.47719 * (wL / wT)^2 + 0.11116 * (wL / wT)^3
+    y <- y0 + A * (eta_approx * lorentzian(x, y0, xc, wL, A) + (1 - eta_approx) * gaussian(x, y0, xc, wG, A))
+  } else {
+    if (!is.numeric(eta) || length(eta) != 1 || eta < 0 || eta > 1) {
+      stop("'eta' must be a numeric value between 0 and 1.")
+    }
+    y <- y0 + A * (eta * lorentzian(x, y0, xc, wL, A) + (1 - eta) * gaussian(x, y0, xc, wG, A))
+  }
+  return(y)
 }
