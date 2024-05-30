@@ -17,6 +17,7 @@
 #'   \item \eqn{A} is the peak area
 #'   \item \eqn{x_c} is the center of the peak
 #'   \item \eqn{\gamma = w_{L} / 2} is the half-width at half maximum (HWHM)
+#'   \item \eqn{y_0} is the baseline offset
 #' }
 #'
 #' The Lorentzian function arises naturally in various physical processes,

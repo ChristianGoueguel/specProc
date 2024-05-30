@@ -33,10 +33,10 @@ The Gaussian function is defined as:
 
 where:
 \itemize{
-\item \eqn{A} is the peak area (maximum height of the Gaussian curve)
-\item \eqn{x_{c}} is the center of the peak (the x-value where the Gaussian curve is at its maximum)
-\item \eqn{w_{G}} is the full width at half maximum (FWHM), which represents the width of the Gaussian curve at half of its maximum height
-\item \eqn{y_{0}} is the baseline offset (the y-value where the Gaussian curve starts)
+\item \eqn{A} is the peak area
+\item \eqn{x_c} is the center of the peak
+\item \eqn{w_G} is the full width at half maximum (FWHM)
+\item \eqn{y_0} is the baseline offset
 }
 
 In spectroscopy, the Gaussian function is widely used to model the shape of spectral lines broadened

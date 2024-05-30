@@ -7,25 +7,50 @@
 voigt(x, y0, xc, wG, wL, A, real = TRUE)
 }
 \arguments{
-\item{x}{data}
+\item{x}{A numeric vector representing the independent variable (e.g., wavelength or frequency).}
 
-\item{y0}{baseline offset}
+\item{y0}{A numeric value specifying the baseline offset.}
 
-\item{xc}{center of the peak}
+\item{xc}{A numeric value representing the center of the peak.}
 
-\item{wG}{Gaussian FWHM}
+\item{wG}{A numeric value specifying the Gaussian full width at half maximum (FWHM).}
 
-\item{wL}{Lorentzian FWHM}
+\item{wL}{A numeric value specifying the Lorentzian FWHM.}
 
-\item{A}{area under the peak}
+\item{A}{A numeric value representing the peak area.}
 
-\item{real}{logical, return only the real part of the complex Faddeeva}
+\item{real}{A logical value indicating whether to return only the real part
+of the Faddeeva function (default is \code{TRUE}).}
 }
 \value{
-fitted value
+A numeric vector containing the values of the Voigt function evaluated
+at the provided \code{x} values.
 }
 \description{
-Convolution of a full width at half maximum (FWHM) based Gaussian function and a Lorentzian function.
+Computes the Voigt function, which is the convolution of a Gaussian function
+with a Lorentzian function. This function is commonly used in spectroscopy
+to model the line shape of spectral peaks, which often exhibit a combined
+Gaussian-Lorentzian profile due to various broadening effects.
+}
+\details{
+The Voigt function is the convolution of a Gaussian function with a Lorentzian
+function. It is based on the Faddeeva function, which is the complex convolution
+of the two component functions. The Voigt function accurately describes the
+line shape resulting from the combined effects of Doppler broadening
+(modeled by the Gaussian component) and pressure or natural broadening
+(modeled by the Lorentzian component).
+
+Mathematically, the Voigt function is given by:
+
+\deqn{V(x, \sigma_G, \gamma_L) = \frac{A}{\sigma_G \sqrt{2\pi}} \int_{-\infty}^{\infty} \exp\left(-\frac{(x-x')^2}{2\sigma_G^2}\right) \frac{\gamma_L}{\pi((x'-x_c)^2 + \gamma_L^2)} dx'}
+
+where:
+\itemize{
+\item \eqn{A} is the peak area
+\item \eqn{\sigma_G} is the standard deviation of the Gaussian component
+\item \eqn{\gamma_L} is the half-width at half maximum (HWHM) of the Lorentzian component
+\item \eqn{x_c} is the center of the peak
+}
 }
 \author{
 Christian L. Goueguel
