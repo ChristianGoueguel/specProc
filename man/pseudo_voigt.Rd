@@ -46,7 +46,7 @@ contribution of each component.
 \details{
 The Pseudo-Voigt function is given by:
 
-\deqn{f(x) = y_0 + A \cdot [ \eta \cdot L(x, x_c, w_L) + (1 - \eta) \cdot G(x, x_c, w_G)]}
+\deqn{y = y_0 + A \cdot [ \eta \cdot L(x, x_c, w_L) + (1 - \eta) \cdot G(x, x_c, w_G)]}
 
 where:
 \itemize{

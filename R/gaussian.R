@@ -10,7 +10,7 @@
 #' @details
 #' The Gaussian function is defined as:
 #'
-#' \deqn{f(x) = y_{0} + \frac{A}{w_{G} \sqrt{\pi / (4 \log(2))}} \exp \left( -\frac{4 \log(2) (x - x_{c})^2}{w_{G}^2} \right)}
+#' \deqn{y = y_{0} + \frac{A}{w_{G} \sqrt{\pi / (4 \log(2))}} \exp \left( -\frac{4 \log(2) (x - x_{c})^2}{w_{G}^2} \right)}
 #'
 #' where:
 #' \itemize{

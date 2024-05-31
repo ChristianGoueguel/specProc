@@ -42,7 +42,7 @@ line shape resulting from the combined effects of Doppler broadening
 
 Mathematically, the Voigt function is given by:
 
-\deqn{V(x, x_c, \sigma, \gamma, A) = \frac{A}{\sigma \sqrt{2\pi}} \int_{-\infty}^{\infty} \exp\left(-\frac{(x-x_c)^2}{2\sigma^2}\right) \frac{\gamma_L}{\pi((x-x_c)^2 + \gamma^2)} dx}
+\deqn{y = y_0 + A \frac{1}{\sigma \sqrt{2\pi}} \int_{-\infty}^{\infty} \exp\left(-\frac{(x-x_c)^2}{2\sigma^2}\right) \frac{\gamma_L}{\pi((x-x_c)^2 + \gamma^2)} dx}
 
 where:
 \itemize{
@@ -50,6 +50,7 @@ where:
 \item \eqn{\sigma} is the standard deviation of the Gaussian component
 \item \eqn{\gamma} is the half-width at half maximum (HWHM) of the Lorentzian component
 \item \eqn{x_c} is the center of the peak
+item \eqn{y_0} is the baseline offset
 }
 }
 \examples{

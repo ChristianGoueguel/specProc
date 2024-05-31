@@ -10,7 +10,7 @@
 #' @details
 #' The Lorentzian function is defined as:
 #'
-#' \deqn{f(x) = y_{0} + \frac{A}{\pi} \frac{\gamma}{(x - x_c)^2 + \gamma^2}}
+#' \deqn{y = y_{0} + \frac{A}{\pi} \frac{\gamma}{(x - x_c)^2 + \gamma^2}}
 #'
 #' where:
 #' \itemize{
