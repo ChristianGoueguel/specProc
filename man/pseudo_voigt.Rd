@@ -52,11 +52,11 @@ where:
 \itemize{
 \item \eqn{A} is the peak area
 \item \eqn{y_0} is the baseline offset
-\item \eqn{G(x, x_0, w_G)} is the Gaussian component with center \eqn{x_c}
+\item \eqn{G(x, x_c, w_G)} is the Gaussian component with center \eqn{x_c}
 and the full width at half maximum \eqn{w_G}
-\item \eqn{L(x, x_0, w_G)} is the Lorentzian component with center \eqn{x_c}
+\item \eqn{L(x, x_c, w_G)} is the Lorentzian component with center \eqn{x_c}
 and the full width at half maximum \eqn{w_L}
-\item \eqn{\eta} is the mixing parameter, with \eqn{0 < \eta < 1}. The
+\item \eqn{\eta} is the mixing parameter, with \eqn{0 \leq \eta \leq 1}. The
 mixing parameter \eqn{\eta} allows the pseudo-Voigt function to describe a wide
 range of line shapes, from pure Gaussian (\eqn{\eta = 0}) to pure Lorentzian (\eqn{\eta = 1}),
 and various intermediate shapes in between.
