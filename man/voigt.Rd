@@ -19,8 +19,8 @@ voigt(x, y0, xc, wG, wL, A, real = TRUE)
 
 \item{A}{A numeric value representing the peak area.}
 
-\item{real}{A logical value indicating whether to return only the real part
-of the Faddeeva function (default is \code{TRUE}).}
+\item{real}{A logical value indicating whether to return the real or
+imaginary Voigt function. If \code{TRUE} (default) returns the real part.}
 }
 \value{
 A numeric vector containing the values of the Voigt function evaluated
@@ -42,15 +42,25 @@ line shape resulting from the combined effects of Doppler broadening
 
 Mathematically, the Voigt function is given by:
 
-\deqn{V(x, \sigma_G, \gamma_L) = \frac{A}{\sigma_G \sqrt{2\pi}} \int_{-\infty}^{\infty} \exp\left(-\frac{(x-x')^2}{2\sigma_G^2}\right) \frac{\gamma_L}{\pi((x'-x_c)^2 + \gamma_L^2)} dx'}
+\deqn{V(x, x_c, \sigma, \gamma, A) = \frac{A}{\sigma \sqrt{2\pi}} \int_{-\infty}^{\infty} \exp\left(-\frac{(x-x_c)^2}{2\sigma^2}\right) \frac{\gamma_L}{\pi((x-x_c)^2 + \gamma^2)} dx}
 
 where:
 \itemize{
 \item \eqn{A} is the peak area
-\item \eqn{\sigma_G} is the standard deviation of the Gaussian component
-\item \eqn{\gamma_L} is the half-width at half maximum (HWHM) of the Lorentzian component
+\item \eqn{\sigma} is the standard deviation of the Gaussian component
+\item \eqn{\gamma} is the half-width at half maximum (HWHM) of the Lorentzian component
 \item \eqn{x_c} is the center of the peak
 }
+}
+\examples{
+# x <- seq(-2, 2, length.out = 100)
+# y1 <- voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2)
+# y2 <- voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, real = FALSE)
+# plot(x, y1, type = "l", col = "red", main = "Voigt Profile")
+# lines(x, y2, col = "blue")
+# legend("topright", legend = c("Real", "Imag"),
+# col = c("red", "blue"), lty = 1)
+
 }
 \author{
 Christian L. Goueguel

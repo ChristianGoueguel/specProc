@@ -1,5 +1,7 @@
 #' @title Voigt Function
 #'
+#' @author Christian L. Goueguel
+#'
 #' @description
 #' Computes the Voigt function, which is the convolution of a Gaussian function
 #' with a Lorentzian function. This function is commonly used in spectroscopy
@@ -16,13 +18,13 @@
 #'
 #' Mathematically, the Voigt function is given by:
 #'
-#' \deqn{V(x, \sigma_G, \gamma_L) = \frac{A}{\sigma_G \sqrt{2\pi}} \int_{-\infty}^{\infty} \exp\left(-\frac{(x-x')^2}{2\sigma_G^2}\right) \frac{\gamma_L}{\pi((x'-x_c)^2 + \gamma_L^2)} dx'}
+#' \deqn{V(x, x_c, \sigma, \gamma, A) = \frac{A}{\sigma \sqrt{2\pi}} \int_{-\infty}^{\infty} \exp\left(-\frac{(x-x_c)^2}{2\sigma^2}\right) \frac{\gamma_L}{\pi((x-x_c)^2 + \gamma^2)} dx}
 #'
 #' where:
 #' \itemize{
 #'   \item \eqn{A} is the peak area
-#'   \item \eqn{\sigma_G} is the standard deviation of the Gaussian component
-#'   \item \eqn{\gamma_L} is the half-width at half maximum (HWHM) of the Lorentzian component
+#'   \item \eqn{\sigma} is the standard deviation of the Gaussian component
+#'   \item \eqn{\gamma} is the half-width at half maximum (HWHM) of the Lorentzian component
 #'   \item \eqn{x_c} is the center of the peak
 #' }
 #'
@@ -32,13 +34,20 @@
 #' @param wG A numeric value specifying the Gaussian full width at half maximum (FWHM).
 #' @param wL A numeric value specifying the Lorentzian FWHM.
 #' @param A A numeric value representing the peak area.
-#' @param real A logical value indicating whether to return only the real part
-#' of the Faddeeva function (default is `TRUE`).
+#' @param real A logical value indicating whether to return the real or
+#' imaginary Voigt function. If `TRUE` (default) returns the real part.
 #'
 #' @return A numeric vector containing the values of the Voigt function evaluated
 #' at the provided `x` values.
 #'
-#' @author Christian L. Goueguel
+#' @examples
+#' # x <- seq(-2, 2, length.out = 100)
+#' # y1 <- voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2)
+#' # y2 <- voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, real = FALSE)
+#' # plot(x, y1, type = "l", col = "red", main = "Voigt Profile")
+#' # lines(x, y2, col = "blue")
+#' # legend("topright", legend = c("Real", "Imag"),
+#' # col = c("red", "blue"), lty = 1)
 #'
 #' @export voigt
 voigt <- function(x, y0, xc, wG, wL, A, real = TRUE) {
@@ -64,18 +73,16 @@ voigt <- function(x, y0, xc, wG, wL, A, real = TRUE) {
     stop("'real' must be a logical value (TRUE or FALSE).")
   }
 
-  pVoigt <- function(x, x0, sigma, gamma, real) {
-    z <- (x - x0 + gamma * 1i) / (sigma * sqrt(2))
-    #w <- exp(-z^2) * Faddeeva::faddeeva(1i * z)
-    if (real) {
-      w <- Re(w)
-    }
-    w / (sigma * sqrt(2 * pi))
-  }
-
   s <- wG / (2 * sqrt(2 * log(2)))
-  y0 + A * pVoigt(x = x, x0 = xc, sigma = s, gamma = wL, real = real)
+  # Issues in RcppFaddeeva not yet resolved
+  #w <- RcppFaddeeva::Voigt(x, x0 = xc, sigma = s, gamma = wL, real = real)
 
+  if (real) {
+    result <- A * Re(w)
+  } else {
+    result <- A * Im(w)
+  }
+  return(result)
 }
 
 
