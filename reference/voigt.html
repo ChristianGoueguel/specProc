@@ -110,11 +110,12 @@ line shape resulting from the combined effects of Doppler broadening
 (modeled by the Gaussian component) and pressure or natural broadening
 (modeled by the Lorentzian component).</p>
 <p>Mathematically, the Voigt function is given by:</p>
-<p>$$V(x, x_c, \sigma, \gamma, A) = \frac{A}{\sigma \sqrt{2\pi}} \int_{-\infty}^{\infty} \exp\left(-\frac{(x-x_c)^2}{2\sigma^2}\right) \frac{\gamma_L}{\pi((x-x_c)^2 + \gamma^2)} dx$$</p>
+<p>$$y = y_0 + A \frac{1}{\sigma \sqrt{2\pi}} \int_{-\infty}^{\infty} \exp\left(-\frac{(x-x_c)^2}{2\sigma^2}\right) \frac{\gamma_L}{\pi((x-x_c)^2 + \gamma^2)} dx$$</p>
 <p>where:</p><ul><li><p>\(A\) is the peak area</p></li>
 <li><p>\(\sigma\) is the standard deviation of the Gaussian component</p></li>
 <li><p>\(\gamma\) is the half-width at half maximum (HWHM) of the Lorentzian component</p></li>
-<li><p>\(x_c\) is the center of the peak</p></li>
+<li><p>\(x_c\) is the center of the peak
+item \(y_0\) is the baseline offset</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
