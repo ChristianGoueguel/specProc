@@ -115,11 +115,11 @@ approximation based on the <code>wG</code> and <code>wL</code> values.</p></li>
 <p>$$f(x) = y_0 + A \cdot [ \eta \cdot L(x, x_c, w_L) + (1 - \eta) \cdot G(x, x_c, w_G)]$$</p>
 <p>where:</p><ul><li><p>\(A\) is the peak area</p></li>
 <li><p>\(y_0\) is the baseline offset</p></li>
-<li><p>\(G(x, x_0, w_G)\) is the Gaussian component with center \(x_c\)
+<li><p>\(G(x, x_c, w_G)\) is the Gaussian component with center \(x_c\)
 and the full width at half maximum \(w_G\)</p></li>
-<li><p>\(L(x, x_0, w_G)\) is the Lorentzian component with center \(x_c\)
+<li><p>\(L(x, x_c, w_G)\) is the Lorentzian component with center \(x_c\)
 and the full width at half maximum \(w_L\)</p></li>
-<li><p>\(\eta\) is the mixing parameter, with \(0 &lt; \eta &lt; 1\). The
+<li><p>\(\eta\) is the mixing parameter, with \(0 \leq \eta \leq 1\). The
 mixing parameter \(\eta\) allows the pseudo-Voigt function to describe a wide
 range of line shapes, from pure Gaussian (\(\eta = 0\)) to pure Lorentzian (\(\eta = 1\)),
 and various intermediate shapes in between.</p></li>
