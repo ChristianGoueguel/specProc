@@ -90,8 +90,8 @@ Gaussian-Lorentzian profile due to various broadening effects.</p>
 
 
 <dt>real</dt>
-<dd><p>A logical value indicating whether to return only the real part
-of the Faddeeva function (default is <code>TRUE</code>).</p></dd>
+<dd><p>A logical value indicating whether to return the real or
+imaginary Voigt function. If <code>TRUE</code> (default) returns the real part.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -110,10 +110,10 @@ line shape resulting from the combined effects of Doppler broadening
 (modeled by the Gaussian component) and pressure or natural broadening
 (modeled by the Lorentzian component).</p>
 <p>Mathematically, the Voigt function is given by:</p>
-<p>$$V(x, \sigma_G, \gamma_L) = \frac{A}{\sigma_G \sqrt{2\pi}} \int_{-\infty}^{\infty} \exp\left(-\frac{(x-x')^2}{2\sigma_G^2}\right) \frac{\gamma_L}{\pi((x'-x_c)^2 + \gamma_L^2)} dx'$$</p>
+<p>$$V(x, x_c, \sigma, \gamma, A) = \frac{A}{\sigma \sqrt{2\pi}} \int_{-\infty}^{\infty} \exp\left(-\frac{(x-x_c)^2}{2\sigma^2}\right) \frac{\gamma_L}{\pi((x-x_c)^2 + \gamma^2)} dx$$</p>
 <p>where:</p><ul><li><p>\(A\) is the peak area</p></li>
-<li><p>\(\sigma_G\) is the standard deviation of the Gaussian component</p></li>
-<li><p>\(\gamma_L\) is the half-width at half maximum (HWHM) of the Lorentzian component</p></li>
+<li><p>\(\sigma\) is the standard deviation of the Gaussian component</p></li>
+<li><p>\(\gamma\) is the half-width at half maximum (HWHM) of the Lorentzian component</p></li>
 <li><p>\(x_c\) is the center of the peak</p></li>
 </ul></div>
     <div class="section level2">
@@ -121,6 +121,19 @@ line shape resulting from the combined effects of Doppler broadening
     <p>Christian L. Goueguel</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># x &lt;- seq(-2, 2, length.out = 100)</span></span></span>
+<span class="r-in"><span><span class="co"># y1 &lt;- voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2)</span></span></span>
+<span class="r-in"><span><span class="co"># y2 &lt;- voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, real = FALSE)</span></span></span>
+<span class="r-in"><span><span class="co"># plot(x, y1, type = "l", col = "red", main = "Voigt Profile")</span></span></span>
+<span class="r-in"><span><span class="co"># lines(x, y2, col = "blue")</span></span></span>
+<span class="r-in"><span><span class="co"># legend("topright", legend = c("Real", "Imag"),</span></span></span>
+<span class="r-in"><span><span class="co"># col = c("red", "blue"), lty = 1)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
