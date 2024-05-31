@@ -5,7 +5,7 @@ using namespace Rcpp;
 NumericMatrix computeGroupedMeans(NumericMatrix data, IntegerVector group) {
   int nrows = data.nrow();
   int ncols = data.ncol();
-  int ngroups = Rcpp::max(group) + 1;  // Number of unique groups
+  int ngroups = Rcpp::unique(group).size();  // Number of unique groups
 
   NumericVector group_means(ncols * ngroups);  // Initialize vector to store group means
   IntegerVector group_counts(ncols * ngroups); // Initialize vector to store group counts

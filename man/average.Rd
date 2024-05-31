@@ -2,35 +2,41 @@
 % Please edit documentation in R/average.R
 \name{average}
 \alias{average}
-\title{Fast Column-wise Average for Large Datasets}
+\title{Fast Average for Large Dataset}
 \usage{
-average(.data, .group_by = NULL)
+average(data, .group_by = NULL)
 }
 \arguments{
-\item{.data}{A data frame or tibble.}
+\item{data}{A data frame or tibble.}
 
 \item{.group_by}{The column name to group the data by (optional).
 If not provided, the average of the overall data will be computed.}
 }
 \value{
-A tibble of the computed averages, with one row for each group
-(if grouped) or a single row with the overall column averages (if not grouped).
+\itemize{
+\item If \code{.group_by = NULL}, the function returns a numeric vector containing the
+mean of each column across all spectra.
+\item If \code{.group_by} is provided, the function returns a data frame with columns corresponding
+to the unique values in the grouping column. Each cell contains the mean of the corresponding
+column for that group.
+}
 }
 \description{
-This function calculates the column-wise average values of numeric
-columns in a data frame or tibble. It provides flexibility by allowing users
-to compute either the overall column means or group-wise column means based
-on the values of a specified grouping column.
+This function efficiently averages the spectra (or observations) in a large
+dataset. It provides flexibility by computing either the overall
+mean across all spectra or group-wise means based on the values of a
+specified grouping column.
 }
 \details{
-The function uses the package \code{Rcpp} to perform the mean calculations efficiently in C++.
-The underlying C++ function has a time complexity of \emph{O(n × m)}, where \emph{n} is the number
-of rows and \emph{m} is the number of columns in the data. This efficient
-implementation ensures that the function can handle reasonably large datasets
-without significant performance overhead. While the R wrapper function adds
-some minimal overhead for argument checking and data manipulation,
-the overall time complexity remains \emph{O(n × m)}, ensuring scalability and
-efficient computation even for large datasets.
+The function leverages the power of \code{Rcpp} to perform the mean calculations
+in C++. The underlying C++ implementation has a time complexity of
+\emph{O(n × m)}, where \emph{n} is the number of rows and \emph{m} is
+the number of columns in the data. This efficient implementation ensures that
+the function can handle large datasets without significant performance overhead.
+
+The R wrapper function adds minimal overhead for argument checking and data manipulation,
+while leveraging the efficient C++ implementation for the core computations. The overall
+time complexity remains \emph{O(n × m)}.
 }
 \author{
 Christian L. Goueguel
