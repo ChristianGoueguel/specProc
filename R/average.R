@@ -44,13 +44,13 @@ average <- function(.data, .group_by = NULL) {
       avg <- computeMeans(Xmat)
     }
   } else {
-    Xmat <- .data %>%
-      dplyr::select(-{{ .group_by }}) %>%
-      as.matrix()
+    Xmat <- .data %>% dplyr::select(-{{ .group_by }}) %>% as.matrix()
     grp_vec <- .data[[rlang::ensym(.group_by)]]
+
     if (!is.factor(grp_vec)) {
       grp_vec <- forcats::as_factor(grp_vec)
     }
+
     Rcpp::sourceCpp("~/Documents/Projects/Packages/specProc/src/computeGroupedMeans.cpp")
     avg <- computeGroupedMeans(grp_vec, Xmat)
   }

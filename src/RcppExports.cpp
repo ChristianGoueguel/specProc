@@ -11,25 +11,25 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // computeGroupedMeans
-Rcpp::DataFrame computeGroupedMeans(Rcpp::CharacterVector groups, Rcpp::NumericMatrix values);
-RcppExport SEXP _specProc_computeGroupedMeans(SEXP groupsSEXP, SEXP valuesSEXP) {
+NumericMatrix computeGroupedMeans(NumericMatrix data, IntegerVector group);
+RcppExport SEXP _specProc_computeGroupedMeans(SEXP dataSEXP, SEXP groupSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::CharacterVector >::type groups(groupsSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type values(valuesSEXP);
-    rcpp_result_gen = Rcpp::wrap(computeGroupedMeans(groups, values));
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type group(groupSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeGroupedMeans(data, group));
     return rcpp_result_gen;
 END_RCPP
 }
 // computeMeans
-double computeMeans(Rcpp::NumericMatrix values);
-RcppExport SEXP _specProc_computeMeans(SEXP valuesSEXP) {
+NumericMatrix computeMeans(NumericMatrix data);
+RcppExport SEXP _specProc_computeMeans(SEXP dataSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type values(valuesSEXP);
-    rcpp_result_gen = Rcpp::wrap(computeMeans(values));
+    Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeMeans(data));
     return rcpp_result_gen;
 END_RCPP
 }

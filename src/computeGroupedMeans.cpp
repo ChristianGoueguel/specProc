@@ -1,47 +1,41 @@
 #include <Rcpp.h>
-#include <map>
-#include <vector>
-#include <numeric> // For std::accumulate
-
 using namespace Rcpp;
-using namespace std;
-
-// Enable C++11
-// [[Rcpp::plugins(cpp11)]]
 
 // [[Rcpp::export]]
-Rcpp::DataFrame computeGroupedMeans(Rcpp::CharacterVector groups, Rcpp::NumericMatrix values) {
-  int nrows = values.nrow();
-  int ncols = values.ncol();
+NumericMatrix computeGroupedMeans(NumericMatrix data, IntegerVector group) {
+  int nrows = data.nrow();
+  int ncols = data.ncol();
+  int ngroups = Rcpp::max(group) + 1;  // Number of unique groups
 
-  // Create a map to store sum and count for each group
-  std::map<std::string, std::pair<double, int > > groupSums;
+  NumericVector group_means(ncols * ngroups);  // Initialize vector to store group means
+  IntegerVector group_counts(ncols * ngroups); // Initialize vector to store group counts
 
-  // Initialize the map
   for (int i = 0; i < nrows; ++i) {
-    std::string group = Rcpp::as<std::string>(groups[i]);
-    if (groupSums.find(group) == groupSums.end()) {
-      groupSums[group] = std::make_pair(0.0, 0);
-    }
-    double rowSum = 0.0;
+    int g = group[i] - 1;  // Adjust for 1-based indexing in R
     for (int j = 0; j < ncols; ++j) {
-      rowSum += values(i, j);
+      int idx = g * ncols + j;
+      double value = data(i, j);
+      if (!NumericVector::is_na(value)) {
+        group_means[idx] += value;
+        group_counts[idx]++;
+      }
     }
-    groupSums[group].first += rowSum;
-    groupSums[group].second += 1;
   }
 
-  // Prepare vectors for the output data frame
-  std::vector<std::string> uniqueGroups;
-  std::vector<double> means;
-
-  for (std::map<std::string, std::pair<double, int > >::iterator it = groupSums.begin(); it != groupSums.end(); ++it) {
-    uniqueGroups.push_back(it->first);
-    means.push_back(it->second.first / it->second.second);
+  for (int i = 0; i < ngroups * ncols; ++i) {
+    if (group_counts[i] > 0) {
+      group_means[i] /= group_counts[i];
+    } else {
+      group_means[i] = NA_REAL;
+    }
   }
 
-  // Return as a data frame
-  return Rcpp::DataFrame::create(
-    Rcpp::Named("group") = uniqueGroups,
-    Rcpp::Named("mean") = means);
+  NumericMatrix result(ngroups, ncols);
+  for (int i = 0; i < ngroups; ++i) {
+    for (int j = 0; j < ncols; ++j) {
+      result(i, j) = group_means[i * ncols + j];
+    }
+  }
+
+  return result;
 }

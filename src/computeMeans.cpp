@@ -1,26 +1,18 @@
 #include <Rcpp.h>
-#include <numeric> // For std::accumulate
-
 using namespace Rcpp;
 
-// Enable C++11
-// [[Rcpp::plugins(cpp11)]]
-
 // [[Rcpp::export]]
-double computeMeans(Rcpp::NumericMatrix values) {
-  int nrows = values.nrow();
-  int ncols = values.ncol();
-  double sum = 0.0;
-  int count = nrows * ncols;
+NumericMatrix computeMeans(NumericMatrix data) {
+  int ncols = data.ncol();
+  NumericMatrix result(1, ncols);
 
-  // Sum all values in the matrix
-  for (int i = 0; i < nrows; ++i) {
-    for (int j = 0; j < ncols; ++j) {
-      sum += values(i, j);
-    }
+  for (int j = 0; j < ncols; ++j) {
+    NumericVector col = data(_, j);
+    NumericVector::iterator it = std::remove(col.begin(), col.end(), NA_REAL);
+    col.erase(it, col.end());
+    double mean = Rcpp::mean(col);
+    result(0, j) = mean;
   }
 
-  // Calculate the mean
-  double mean = sum / count;
-  return mean;
+  return result;
 }
