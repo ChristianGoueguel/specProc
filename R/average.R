@@ -52,7 +52,7 @@ average <- function(.data, .group_by = NULL) {
     }
 
     Rcpp::sourceCpp("~/Documents/Projects/Packages/specProc/src/computeGroupedMeans.cpp")
-    avg <- computeGroupedMeans(grp_vec, Xmat)
+    avg <- computeGroupedMeans(Xmat, grp_vec)
   }
   return(tibble::as_tibble(avg))
 }
