@@ -5,7 +5,7 @@
 \title{Adjusted Boxplot for Skewed Distributions}
 \usage{
 adjboxplot(
-  .data,
+  data,
   .plot = TRUE,
   xlabels.angle = 90,
   xlabels.vjust = 1,
@@ -17,44 +17,43 @@ adjboxplot(
 )
 }
 \arguments{
-\item{.data}{numeric data frame or tibble containing the variables to be plotted.}
+\item{data}{A numeric data frame or tibble.}
 
-\item{.plot}{logical value indicating whether to plot the adjusted boxplot (default is TRUE).}
+\item{.plot}{A logical value indicating whether to plot the adjusted boxplot (default is \code{TRUE}).}
 
-\item{xlabels.angle}{numeric value specifying the angle (in degrees) for x-axis labels (default is 90).}
+\item{xlabels.angle}{A numeric value specifying the angle (in degrees) for x-axis labels (default is 90).}
 
-\item{xlabels.vjust}{numeric value specifying the vertical justification of x-axis labels (default is 1).
-A value of 0 means the labels are aligned to the bottom of the viewport,
-0.5 means they are vertically centered, and 1 means they are aligned to the top of the viewport.}
+\item{xlabels.vjust}{A numeric value specifying the vertical justification of x-axis labels (default is 1).}
 
-\item{xlabels.hjust}{numeric value specifying the horizontal justification of x-axis labels (default is 1).
-A value of 0 means the labels are aligned to the left of the viewport,
-0.5 means they are horizontally centered, and 1 means they are aligned to the right of the viewport.}
+\item{xlabels.hjust}{A numeric value specifying the horizontal justification of x-axis labels (default is 1).}
 
-\item{box.width}{numeric value specifying the width of the boxplot (default is 0.5).}
+\item{box.width}{A numeric value specifying the width of the boxplot (default is 0.5).}
 
-\item{notch}{logical value indicating whether to display a notched boxplot (default is FALSE).}
+\item{notch}{A logical value indicating whether to display a notched boxplot (default is \code{FALSE}).}
 
-\item{notchwidth}{numeric value specifying the width of the notch relative to the body of the boxplot (default is 0.5).}
+\item{notchwidth}{A numeric value specifying the width of the notch relative to the body of the boxplot (default is 0.5).}
 
-\item{staplewidth}{numeric value specifying the width of staples at the ends of the whiskers.}
+\item{staplewidth}{A numeric value specifying the width of staples at the ends of the whiskers.}
 }
 \value{
-If \code{.plot = TRUE}, returns a \code{ggplot2} object containing the adjusted boxplot.
-If \code{.plot = FALSE}, returns a data frame with the adjusted boxplot statistics.
+\itemize{
+\item If \code{.plot = TRUE}, returns a \code{ggplot2} object containing the adjusted boxplot.
+\item If \code{.plot = FALSE}, returns a data frame with the adjusted boxplot statistics.
+}
 }
 \description{
 This function generates an adjusted boxplot, which is a robust graphical method
 for visualizing skewed data distributions. It provides a more accurate representation
-of the data's spread and skewness compared to traditional boxplots, especially
-in the presence of outliers or heavy-tailed distributions.
+of the data's spread and skewness compared to traditional boxplot, especially
+in the presence of outliers.
 }
 \details{
-The adjusted boxplot is based on the methodology described in:
-\itemize{
-\item G. Brys, M. Hubert, and A. Struyf, "A Robust Measure of Skewness," Journal of Computational and Graphical Statistics, 13 (2004)
-\item M. Hubert and E. Vandervieren, "An adjusted boxplot for skewed distributions," Computational Statistics & Data Analysis, 52 (2008)
-}
+The function is based on the medcouple (MC) measure computed on the data and which
+robustly measures skewness. This measure is bounded between −1 and 1. The
+medcouple is equal to zero when the observed distribution is symmetric,
+whereas a positive (resp. negative) value of MC corresponds to a right
+(resp. left) tailed distribution. It worth noting that this method is more appropriate for distributions
+that are not excessively skewed i.e., for \eqn{|\text{MC}| \leq 0.6}.
 }
 \examples{
 # Generate some skewed data
@@ -71,6 +70,15 @@ adjboxplot(data)
 # Retrieve the adjusted boxplot statistics
 stats <- adjboxplot(data, .plot = FALSE)
 
+}
+\references{
+The adjusted boxplot is based on the methodology described in:
+\itemize{
+\item Brys, G., Hubert, M., Struyf, A., (2004). A Robust Measure of Skewness.
+Journal of Computational and Graphical Statistics, 13(4):996-1017
+\item Hubert, M., Vandervieren, E., (2008). An adjusted boxplot for skewed distributions.
+Computational Statistics and Data Analysis, 52(12):5186-5201
+}
 }
 \author{
 Christian L. Goueguel

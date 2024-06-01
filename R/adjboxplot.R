@@ -1,30 +1,40 @@
-#' Adjusted Boxplot for Skewed Distributions
-#'
-#' This function generates an adjusted boxplot, which is a robust graphical method
-#' for visualizing skewed data distributions. It provides a more accurate representation
-#' of the data's spread and skewness compared to traditional boxplots, especially
-#' in the presence of outliers or heavy-tailed distributions.
-#'
-#' The adjusted boxplot is based on the methodology described in:
-#' - G. Brys, M. Hubert, and A. Struyf, "A Robust Measure of Skewness," Journal of Computational and Graphical Statistics, 13 (2004)
-#' - M. Hubert and E. Vandervieren, "An adjusted boxplot for skewed distributions," Computational Statistics & Data Analysis, 52 (2008)
+#' @title Adjusted Boxplot for Skewed Distributions
 #'
 #' @author Christian L. Goueguel
-#' @param .data numeric data frame or tibble containing the variables to be plotted.
-#' @param .plot logical value indicating whether to plot the adjusted boxplot (default is TRUE).
-#' @param xlabels.angle numeric value specifying the angle (in degrees) for x-axis labels (default is 90).
-#' @param xlabels.vjust numeric value specifying the vertical justification of x-axis labels (default is 1).
-#'        A value of 0 means the labels are aligned to the bottom of the viewport,
-#'        0.5 means they are vertically centered, and 1 means they are aligned to the top of the viewport.
-#' @param xlabels.hjust numeric value specifying the horizontal justification of x-axis labels (default is 1).
-#'        A value of 0 means the labels are aligned to the left of the viewport,
-#'        0.5 means they are horizontally centered, and 1 means they are aligned to the right of the viewport.
-#' @param box.width numeric value specifying the width of the boxplot (default is 0.5).
-#' @param notch logical value indicating whether to display a notched boxplot (default is FALSE).
-#' @param notchwidth numeric value specifying the width of the notch relative to the body of the boxplot (default is 0.5).
-#' @param staplewidth numeric value specifying the width of staples at the ends of the whiskers.
-#' @return If `.plot = TRUE`, returns a `ggplot2` object containing the adjusted boxplot.
-#'         If `.plot = FALSE`, returns a data frame with the adjusted boxplot statistics.
+#'
+#' @description
+#' This function generates an adjusted boxplot, which is a robust graphical method
+#' for visualizing skewed data distributions. It provides a more accurate representation
+#' of the data's spread and skewness compared to traditional boxplot, especially
+#' in the presence of outliers.
+#'
+#' @details
+#' The function is based on the medcouple (MC) measure computed on the data and which
+#' robustly measures skewness. This measure is bounded between −1 and 1. The
+#' medcouple is equal to zero when the observed distribution is symmetric,
+#' whereas a positive (resp. negative) value of MC corresponds to a right
+#' (resp. left) tailed distribution. It worth noting that this method is more appropriate for distributions
+#' that are not excessively skewed i.e., for \eqn{|\text{MC}| \leq 0.6}.
+#'
+#' @references
+#' The adjusted boxplot is based on the methodology described in:
+#' - Brys, G., Hubert, M., Struyf, A., (2004). A Robust Measure of Skewness.
+#'   Journal of Computational and Graphical Statistics, 13(4):996-1017
+#' - Hubert, M., Vandervieren, E., (2008). An adjusted boxplot for skewed distributions.
+#'   Computational Statistics and Data Analysis, 52(12):5186-5201
+#'
+#' @param data A numeric data frame or tibble.
+#' @param .plot A logical value indicating whether to plot the adjusted boxplot (default is `TRUE`).
+#' @param xlabels.angle A numeric value specifying the angle (in degrees) for x-axis labels (default is 90).
+#' @param xlabels.vjust A numeric value specifying the vertical justification of x-axis labels (default is 1).
+#' @param xlabels.hjust A numeric value specifying the horizontal justification of x-axis labels (default is 1).
+#' @param box.width A numeric value specifying the width of the boxplot (default is 0.5).
+#' @param notch A logical value indicating whether to display a notched boxplot (default is `FALSE`).
+#' @param notchwidth A numeric value specifying the width of the notch relative to the body of the boxplot (default is 0.5).
+#' @param staplewidth A numeric value specifying the width of staples at the ends of the whiskers.
+#' @return
+#'    - If `.plot = TRUE`, returns a `ggplot2` object containing the adjusted boxplot.
+#'    - If `.plot = FALSE`, returns a data frame with the adjusted boxplot statistics.
 #' @export adjboxplot
 #' @examples
 #' # Generate some skewed data
@@ -41,11 +51,11 @@
 #' # Retrieve the adjusted boxplot statistics
 #' stats <- adjboxplot(data, .plot = FALSE)
 #'
-adjboxplot <- function(.data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, xlabels.hjust = 1, box.width = .5, notch = FALSE, notchwidth = 0.5, staplewidth = 0.5) {
-  if (missing(.data)) {
+adjboxplot <- function(data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, xlabels.hjust = 1, box.width = .5, notch = FALSE, notchwidth = 0.5, staplewidth = 0.5) {
+  if (missing(data)) {
     stop("Missing 'data' argument.")
   }
-  if (!all(.data %>% purrr::map_lgl(is.numeric))) {
+  if (!all(data %>% purrr::map_lgl(is.numeric))) {
     stop("Input data must be a numeric data frame.")
   }
   if(!is.logical(.plot)) {
@@ -76,7 +86,7 @@ adjboxplot <- function(.data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 
     stop("Argument 'staplewidth' must be a positive numeric value.")
   }
 
-  adjBoxplot_stats <- .data %>%
+  adjBoxplot_stats <- data %>%
     purrr::map(
       function(.x) {
         adj_box <- robustbase::adjboxStats(.x)
@@ -93,7 +103,7 @@ adjboxplot <- function(.data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 
     dplyr::bind_rows(.id = "variable") %>%
     purrr::modify_at("variable", forcats::as_factor)
 
-  outlier_tbl <- .data %>%
+  outlier_tbl <- data %>%
     purrr::map(
       function(.x) {
         out_tbl <- robustbase::adjboxStats(.x)
