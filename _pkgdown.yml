@@ -9,6 +9,7 @@ reference:
   contents:
   - zscore
   - iqrMethod
+  - generalized_boxplot
 
 - title: Multivariate filtering
   desc: >
@@ -18,6 +19,8 @@ reference:
   - opls
   - osc
   - epo
+  - glsw
+  - yGradient_glsw
 
 - title: Peak fitting
   desc: >
