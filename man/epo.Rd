@@ -15,9 +15,9 @@ orthogonalize against. If not provided, the default value is 2.}
 \value{
 The function returns three components:
 \itemize{
-\item \code{correction}: The input data after orthogonalization, representing the signal of interest (\eqn{\textbf{XP}}).
-\item \code{perturbation}: The perturbation filtered out (\eqn{\textbf{XQ}}).
-\item \code{loadings}: The loadings (singular vectors) of the input data used for the orthogonalization.
+\item \code{correction}: The orthogonalized data, representing the signal of interest.
+\item \code{perturbation}: The perturbation data filtered out.
+\item \code{loadings}: The singular vectors (loadings of the input data) used for the orthogonalization.
 }
 }
 \description{
@@ -43,7 +43,7 @@ matrices of \eqn{\textbf{X}} onto the useful and perturbation subspaces.
 \references{
 \itemize{
 \item Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003). EPO-PLS external
-parameter orthogonalisation of PLS application to temperature-independent
+parameter orthogonalization of PLS application to temperature-independent
 measurement of sugar content of intact fruits.
 Chemometrics and Intelligent Laboratory Systems, 66(2):191-204.
 }

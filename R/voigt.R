@@ -78,12 +78,12 @@ voigt <- function(x, y0, xc, wG, wL, A, real = TRUE) {
   # Issues in RcppFaddeeva not yet resolved
   #w <- RcppFaddeeva::Voigt(x, x0 = xc, sigma = s, gamma = wL, real = real)
 
-  if (real) {
-    result <- A * Re(w)
-  } else {
-    result <- A * Im(w)
-  }
-  return(result)
+  # if (real) {
+  #   result <- A * Re(w)
+  # } else {
+  #   result <- A * Im(w)
+  # }
+  # return(result)
 }
 
 

@@ -2,6 +2,7 @@
 "_PACKAGE"
 
 ## usethis namespace: start
+#' @import RcppEigen
 #' @importFrom corrr correlate
 #' @importFrom cowplot theme_minimal_vgrid
 #' @importFrom forcats as_factor

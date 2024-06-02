@@ -28,14 +28,14 @@
 #'
 #' @return The function returns three components:
 #' \itemize{
-#'   \item \code{correction}: The input data after orthogonalization, representing the signal of interest (\eqn{\textbf{XP}}).
-#'   \item \code{perturbation}: The perturbation filtered out (\eqn{\textbf{XQ}}).
-#'   \item \code{loadings}: The loadings (singular vectors) of the input data used for the orthogonalization.
+#'   \item \code{correction}: The orthogonalized data, representing the signal of interest.
+#'   \item \code{perturbation}: The perturbation data filtered out.
+#'   \item \code{loadings}: The singular vectors (loadings of the input data) used for the orthogonalization.
 #' }
 #'
 #' @references
 #'  - Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003). EPO-PLS external
-#'    parameter orthogonalisation of PLS application to temperature-independent
+#'    parameter orthogonalization of PLS application to temperature-independent
 #'    measurement of sugar content of intact fruits.
 #'    Chemometrics and Intelligent Laboratory Systems, 66(2):191-204.
 #'
@@ -45,12 +45,6 @@ epo <- function(data, ncomp = 2) {
   if (missing(data)) {
     stop("Missing 'data' argument.")
   }
-  if (!is.numeric(data)) {
-    stop("The input data must be numeric.")
-  }
-  if (!is.integer(ncomp) | ncomp <= 0) {
-    stop("'ncomp' must be a positive integer greater than 0.")
-  }
 
   if (is.data.frame(data) || tibble::is_tibble(data)) {
     X <- as.matrix(data)
@@ -58,22 +52,25 @@ epo <- function(data, ncomp = 2) {
     X <- data
   }
 
-  ncomp <- min(ncomp, dim(X)[1], dim(X)[2])
+  if (dim(X)[1] == 1 || dim(X)[2] == 1) {
+    stop("The dimensions of the input data must be at least 2 x 2")
+  } else {
+    ncomp <- min(ncomp, dim(X)[1], dim(X)[2])
+  }
 
-  decomp <- svd(X)
-  perturbation_direction <- decomp$v[, 1:ncomp, drop = FALSE]
+  if (ncomp %% 1 != 0 | ncomp <= 0) {
+    stop("'ncomp' must be a positive integer greater than 0.")
+  }
 
-  I <- diag(1, nrow = dim(X)[2], ncol = dim(X)[2])
-  Q <- tcrossprod(parasitic_direction)
+  result <- epo_cpp(X, ncomp)
 
-  X_corrected <- X %*% (I - Q)
-  X_perturbation <- X %*% Q
+  result$correction <- tibble::as_tibble(result$correction)
+  colnames(result$correction) <- colnames(X)
 
-  result <- list(
-    correction = X_corrected %>% tibble::as_tibble(),
-    perturbation = X_perturbation %>% tibble::as_tibble(),
-    loadings = perturbation_direction %>% tibble::as_tibble()
-    )
+  result$perturbation <- tibble::as_tibble(result$perturbation)
+  colnames(result$perturbation) <- colnames(X)
+
+  result$loadings <- tibble::as_tibble(result$loadings)
 
   return(result)
 }

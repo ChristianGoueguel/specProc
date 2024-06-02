@@ -9,3 +9,7 @@ computeMeans <- function(data) {
     .Call(`_specProc_computeMeans`, data)
 }
 
+epo_cpp <- function(X, ncomp) {
+    .Call(`_specProc_epo_cpp`, X, ncomp)
+}
+

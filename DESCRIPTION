@@ -20,8 +20,8 @@ Imports:
     minpack.lm,
     moments,
     mt,
-    pracma,
     Rcpp,
+    RcppEigen,
     robustbase,
     ropls,
     XICOR
@@ -47,11 +47,13 @@ Suggests:
     rlang,
     purrr,
     patchwork,
-    robustHD
+    robustHD,
+    TukeyGH77
 VignetteBuilder: knitr
 URL: https://github.com/ChristianGoueguel/specProc, https://christiangoueguel.github.io/specProc/
 BugReports: https://github.com/ChristianGoueguel/specProc/issues
 Language: en-US
 Config/testthat/edition: 3
 LinkingTo: 
-    Rcpp
+    Rcpp,
+    RcppEigen
