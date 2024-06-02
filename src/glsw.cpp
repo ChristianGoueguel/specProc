@@ -1,11 +1,9 @@
 #include <Rcpp.h>
+using namespace Rcpp;
+// [[Rcpp::depends(RcppEigen)]]
 #include <RcppEigen.h>
 
-using namespace Rcpp;
-
-// [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::export]]
-
 Rcpp::NumericMatrix glsw_cpp(Rcpp::NumericMatrix X_diff, double alpha) {
   Eigen::Map<Eigen::MatrixXd> X_diff_map(as<Eigen::Map<Eigen::MatrixXd> >(X_diff));
 

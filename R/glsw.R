@@ -59,8 +59,9 @@ glsw <- function(data1, data2 = NULL, alpha = 0.01) {
     X_diff <- X1c
   }
 
-  G <- glsw_cpp(X_diff, alpha)
+  G <- glsw_cpp(as.matrix(X_diff), alpha)
 
+  colnames(G) <- colnames(X1)
   return(tibble::as_tibble(G))
 }
 
