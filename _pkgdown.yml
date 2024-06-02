@@ -17,6 +17,7 @@ reference:
   contents:
   - opls
   - osc
+  - epo
 
 - title: Peak fitting
   desc: >
