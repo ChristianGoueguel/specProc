@@ -48,7 +48,6 @@ average <- function(data, .group_by = NULL) {
       stop("The input 'data' must be numeric")
     } else {
       Xmat <- data %>% as.matrix()
-      Rcpp::sourceCpp("~/Documents/Projects/Packages/specProc/src/computeMeans.cpp")
       avg <- computeMeans(Xmat)
       colnames(avg) <- names(data)
     }
@@ -62,7 +61,6 @@ average <- function(data, .group_by = NULL) {
 
     data_name <- data %>% dplyr::select(-{{ .group_by }}) %>% names()
 
-    Rcpp::sourceCpp("~/Documents/Projects/Packages/specProc/src/computeGroupedMeans.cpp")
     avg <- computeGroupedMeans(Xmat, grp_vec)
     colnames(avg) <- data_name
   }

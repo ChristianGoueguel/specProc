@@ -46,11 +46,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// glsw_cpp
+Rcpp::NumericMatrix glsw_cpp(Rcpp::NumericMatrix X_diff, double alpha);
+RcppExport SEXP _specProc_glsw_cpp(SEXP X_diffSEXP, SEXP alphaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type X_diff(X_diffSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    rcpp_result_gen = Rcpp::wrap(glsw_cpp(X_diff, alpha));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_specProc_computeGroupedMeans", (DL_FUNC) &_specProc_computeGroupedMeans, 2},
     {"_specProc_computeMeans", (DL_FUNC) &_specProc_computeMeans, 1},
     {"_specProc_epo_cpp", (DL_FUNC) &_specProc_epo_cpp, 2},
+    {"_specProc_glsw_cpp", (DL_FUNC) &_specProc_glsw_cpp, 2},
     {NULL, NULL, 0}
 };
 

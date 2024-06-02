@@ -13,3 +13,7 @@ epo_cpp <- function(X, ncomp) {
     .Call(`_specProc_epo_cpp`, X, ncomp)
 }
 
+glsw_cpp <- function(X_diff, alpha) {
+    .Call(`_specProc_glsw_cpp`, X_diff, alpha)
+}
+
