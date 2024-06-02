@@ -78,9 +78,9 @@ orthogonalize against. If not provided, the default value is 2.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>The function returns three components:</p><ul><li><p><code>correction</code>: The input data after orthogonalization, representing the signal of interest (\(\textbf{XP}\)).</p></li>
-<li><p><code>perturbation</code>: The perturbation filtered out (\(\textbf{XQ}\)).</p></li>
-<li><p><code>loadings</code>: The loadings (singular vectors) of the input data used for the orthogonalization.</p></li>
+<p>The function returns three components:</p><ul><li><p><code>correction</code>: The orthogonalized data, representing the signal of interest.</p></li>
+<li><p><code>perturbation</code>: The perturbation data filtered out.</p></li>
+<li><p><code>loadings</code>: The singular vectors (loadings of the input data) used for the orthogonalization.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -98,7 +98,7 @@ matrices of \(\textbf{X}\) onto the useful and perturbation subspaces.
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     
 <ul><li><p>Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003). EPO-PLS external
-parameter orthogonalisation of PLS application to temperature-independent
+parameter orthogonalization of PLS application to temperature-independent
 measurement of sugar content of intact fruits.
 Chemometrics and Intelligent Laboratory Systems, 66(2):191-204.</p></li>
 </ul></div>

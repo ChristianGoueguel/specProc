@@ -46,6 +46,12 @@
     <loc>https://christiangoueguel.github.io/specProc/reference/gaussian.html</loc>
   </url>
   <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/generalized_boxplot.html</loc>
+  </url>
+  <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/glsw.html</loc>
+  </url>
+  <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/index.html</loc>
   </url>
   <url>
@@ -104,6 +110,9 @@
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/voigt.html</loc>
+  </url>
+  <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/yGradient_glsw.html</loc>
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/zscore.html</loc>
