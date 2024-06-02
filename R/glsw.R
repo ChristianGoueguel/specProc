@@ -6,8 +6,8 @@
 #' This function implements the Generalized Least Squares Weighting (GLSW) algorithm
 #' proposed by Geladi and Kowalski (1986). The GLSW algorithm calculates a covariance
 #' matrix from the differences between similar samples and applies a filtering matrix
-#' to down-weight correlations present in the original covariance matrix. A weighting parameter,
-#' \eqn{\alpha}, defines how strongly GLSW down weights interferences. The choice of \eqn{\alpha}
+#' to down-weight correlations present in the original covariance matrix. A regularization parameter,
+#' \eqn{\alpha}, defines how strongly GLSW down-weights interferences. The choice of \eqn{\alpha}
 #' depends on the scale of the original values and the similarity between the interferences
 #' and the net analyte signal.
 #'
@@ -16,20 +16,19 @@
 #' covariance matrix, effectively reducing the impact of interferences on the data.
 #'
 #' @param data1 A numeric matrix, data frame or tibble representing the first set of data.
-#' @param data2 A numeric matrix, data frame or tibble representing the second set of data (`NULL` by default).
+#' @param data2 A numeric matrix, data frame or tibble representing the second set of data.
+#' If `NULL` (default), interferences variance found in `data1` is down-weighted.
 #' @param alpha A numeric value specifying the weighting parameter. Typical values
 #' range from 1 to 0.0001. Default is 0.01.
 #'
-#' @return The filtering matrix.
+#' @return A tibble containing the filtering matrix.
 #' @references
 #'    - Geladi, P., & Kowalski, B. R. (1986). Partial least-squares regression: a tutorial.
 #'      Analytica Chimica Acta, 185, 1-17.
 #'
 #' @export glsw
 glsw <- function(data1, data2 = NULL, alpha = 0.01) {
-  if (nrow(data1) != nrow(data2)) {
-    stop("'X1' and 'X2' must have the same number of rows.")
-  }
+
   if (alpha <= 0) {
     stop("'alpha' must be a positive value.")
   }
@@ -48,6 +47,9 @@ glsw <- function(data1, data2 = NULL, alpha = 0.01) {
   X1c <- center_colmeans(X1)
 
   if (!is.null(data2)) {
+    if (nrow(data1) != nrow(data2)) {
+      stop("'X1' and 'X2' must have the same number of rows.")
+    }
     if (is.data.frame(data2) || tibble::is_tibble(data2)) {
       X2 <- as.matrix(data2)
     } else {

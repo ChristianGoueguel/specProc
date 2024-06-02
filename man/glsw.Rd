@@ -9,20 +9,21 @@ glsw(data1, data2 = NULL, alpha = 0.01)
 \arguments{
 \item{data1}{A numeric matrix, data frame or tibble representing the first set of data.}
 
-\item{data2}{A numeric matrix, data frame or tibble representing the second set of data (\code{NULL} by default).}
+\item{data2}{A numeric matrix, data frame or tibble representing the second set of data.
+If \code{NULL} (default), interferences variance found in \code{data1} is down-weighted.}
 
 \item{alpha}{A numeric value specifying the weighting parameter. Typical values
 range from 1 to 0.0001. Default is 0.01.}
 }
 \value{
-The filtering matrix.
+A tibble containing the filtering matrix.
 }
 \description{
 This function implements the Generalized Least Squares Weighting (GLSW) algorithm
 proposed by Geladi and Kowalski (1986). The GLSW algorithm calculates a covariance
 matrix from the differences between similar samples and applies a filtering matrix
-to down-weight correlations present in the original covariance matrix. A weighting parameter,
-\eqn{\alpha}, defines how strongly GLSW down weights interferences. The choice of \eqn{\alpha}
+to down-weight correlations present in the original covariance matrix. A regularization parameter,
+\eqn{\alpha}, defines how strongly GLSW down-weights interferences. The choice of \eqn{\alpha}
 depends on the scale of the original values and the similarity between the interferences
 and the net analyte signal.
 }
