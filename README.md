@@ -92,7 +92,7 @@ specProc::adjboxplot(tbl) +
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
 
-## Correlation
+## correlation
 
 ``` r
 data("glass", package = "chemometrics")

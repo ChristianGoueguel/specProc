@@ -94,7 +94,7 @@ specProc::adjboxplot(tbl) +
   ggplot2::coord_flip()
 ```
 
-## Correlation
+## correlation
 
 ```{r}
 data("glass", package = "chemometrics")
