@@ -9,7 +9,6 @@ reference:
   contents:
   - zscore
   - iqrMethod
-  - generalized_boxplot
 
 - title: Multivariate filtering
   desc: >
@@ -40,6 +39,7 @@ reference:
     Functions that help visualize the state of the data.
   contents:
   - adjboxplot
+  - genboxplot
   - plotfit
   - plotSpec
 

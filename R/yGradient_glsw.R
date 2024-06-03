@@ -33,10 +33,7 @@
 #'
 #' @export yGradient_glsw
 yGradient_glsw <- function(X, Y, alpha = 0.01) {
-  # Input validation
-  if (!is.numeric(X) || !is.matrix(X)) {
-    stop("'X' must be a numeric matrix.")
-  }
+
   if (!is.numeric(Y) || length(Y) != nrow(X)) {
     stop("'Y' must be a numeric vector with the same length as the number of rows in 'X'.")
   }
@@ -54,7 +51,12 @@ yGradient_glsw <- function(X, Y, alpha = 0.01) {
   Y_diff <- stats::filter(Y_sorted, rep(1/5, 5), sides = 2)
 
   # Calculate re-weighting matrix W
-  W <- diag(1 / (Y_diff^2 + 1e-10))  # Add small constant to avoid division by zero
+
+
+  s_yd <- stats::sd(Y_diff)
+  W <- exp(-(Y_diff / s_yd))
+
+  #W <- diag(1 / ((Y_diff / s_yd)^2 + 1e-10))
 
   # Compute covariance matrix and perform SVD
   C <- t(X_diff) %*% W %*% X_diff

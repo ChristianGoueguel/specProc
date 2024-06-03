@@ -48,3 +48,40 @@ You can install the development version from
 install.packages("devtools")
 devtools::install_github("ChristianGoueguel/specProc")
 ```
+
+## Examples
+```{r}
+tbl <- data.frame(
+  normal = rnorm(100),
+  skewed = rexp(100, rate = 0.5),
+  heavy_tailed = rt(100, df = 3)
+  )
+```
+
+### adjusted boxplot
+
+```{r}
+specProc::adjboxplot(tbl)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

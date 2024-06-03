@@ -40,3 +40,23 @@ You can install the development version from
 install.packages("devtools")
 devtools::install_github("ChristianGoueguel/specProc")
 ```
+
+## Examples
+
+``` r
+tbl <- data.frame(
+  normal = rnorm(100),
+  skewed = rexp(100, rate = 0.5),
+  heavy_tailed = rt(100, df = 3)
+  )
+```
+
+### adjusted boxplot
+
+``` r
+specProc::adjboxplot(tbl)
+#> The default of 'doScale' is FALSE now for stability;
+#>   set options(mc_doScale_quiet=TRUE) to suppress this (once per session) message
+```
+
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="90%" height="90%" />
