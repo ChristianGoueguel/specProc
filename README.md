@@ -86,7 +86,8 @@ specProc::summaryStats(tbl, robust = TRUE)
 
 ``` r
 specProc::adjboxplot(tbl) +
-  ggplot2::geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.1)
+  ggplot2::geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.1) +
+  ggplot2::coord_flip()
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
