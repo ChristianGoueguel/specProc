@@ -71,9 +71,20 @@ ggplot2::ggplot(tbl) +
   ggplot2::xlim(-10,10) +
   ggplot2::labs(x = "x", fill = "Distribution") +
   ggplot2::theme_light() +
-  ggplot2::theme(legend.position = "left", panel.grid = ggplot2::element_blank())
+  ggplot2::theme(legend.position = "right", panel.grid = ggplot2::element_blank())
 ```
 
+### descriptive statistics
+
+#### classical approach
+```{r}
+specProc::summaryStats(tbl)
+```
+
+#### robust approach
+```{r}
+specProc::summaryStats(tbl, robust = TRUE)
+```
 
 ### adjusted boxplot
 
