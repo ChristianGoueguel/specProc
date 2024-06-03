@@ -19,7 +19,6 @@ reference:
   - osc
   - epo
   - glsw
-  - yGradient_glsw
 
 - title: Peak fitting
   desc: >
@@ -31,7 +30,6 @@ reference:
   - multipeakfit
   - gaussian
   - lorentzian
-  - voigt
   - pseudo_voigt
 
 - title: Data visualization
@@ -39,7 +37,6 @@ reference:
     Functions that help visualize the state of the data.
   contents:
   - adjboxplot
-  - genboxplot
   - plotfit
   - plotSpec
 
