@@ -135,6 +135,34 @@
 <p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%"></p>
 </div>
 </div>
+<div class="section level2">
+<h2 id="correlation">Correlation<a class="anchor" aria-label="anchor" href="#correlation"></a>
+</h2>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"glass"</span>, package <span class="op">=</span> <span class="st">"chemometrics"</span><span class="op">)</span></span>
+<span><span class="va">glass</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">glass</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">glass</span> <span class="op">|&gt;</span> <span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/correlation.html">correlation</a></span><span class="op">(</span><span class="va">Na2O</span>, method <span class="op">=</span> <span class="st">"spearman"</span>, .plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $.correlation</span></span>
+<span><span class="co">#&gt; # A tibble: 12 × 3</span></span>
+<span><span class="co">#&gt;    variable .correlation method  </span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;           &lt;dbl&gt; &lt;chr&gt;   </span></span>
+<span><span class="co">#&gt;  1 Cl              0.601 spearman</span></span>
+<span><span class="co">#&gt;  2 SO3             0.406 spearman</span></span>
+<span><span class="co">#&gt;  3 SiO2            0.244 spearman</span></span>
+<span><span class="co">#&gt;  4 P2O5           -0.115 spearman</span></span>
+<span><span class="co">#&gt;  5 BaO            -0.144 spearman</span></span>
+<span><span class="co">#&gt;  6 MgO            -0.234 spearman</span></span>
+<span><span class="co">#&gt;  7 MnO            -0.241 spearman</span></span>
+<span><span class="co">#&gt;  8 Al2O3          -0.267 spearman</span></span>
+<span><span class="co">#&gt;  9 Fe2O3          -0.281 spearman</span></span>
+<span><span class="co">#&gt; 10 CaO            -0.316 spearman</span></span>
+<span><span class="co">#&gt; 11 PbO            -0.356 spearman</span></span>
+<span><span class="co">#&gt; 12 K2O            -0.571 spearman</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $.plot</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="90%" height="90%"></p>
+</div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
