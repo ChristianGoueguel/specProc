@@ -88,19 +88,50 @@
 <h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
+<span><span class="va">tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  normal <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>,</span>
-<span>  skewed <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fl">100</span>, shape <span class="op">=</span> <span class="fl">1</span>, scale <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  skewed <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fl">100</span>, shape <span class="op">=</span> <span class="fl">2</span>, scale <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
 <span>  heavy_tailed <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Cauchy.html" class="external-link">rcauchy</a></span><span class="op">(</span><span class="fl">100</span>, location <span class="op">=</span> <span class="fl">0</span>, scale <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-4-1.png" width="90%" height="90%"></p>
 <div class="section level3">
+<h3 id="descriptive-statistics">descriptive statistics<a class="anchor" aria-label="anchor" href="#descriptive-statistics"></a>
+</h3>
+<div class="section level4">
+<h4 id="classical-approach">classical approach<a class="anchor" aria-label="anchor" href="#classical-approach"></a>
+</h4>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/summaryStats.html">summaryStats</a></span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 14</span></span>
+<span><span class="co">#&gt;   variable     mean  mode median   IQR    sd variance     cv     min   max range</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 heavy_tail… -1.43  0.81  -0.1   1.87  9.28   86.0   -649.  -80.6    8.98 89.6 </span></span>
+<span><span class="co">#&gt; 2 normal       0.09 -0.56   0.06  1.19  0.91    0.833 1011.   -2.31   2.19  4.50</span></span>
+<span><span class="co">#&gt; 3 skewed       1.93  0.76   1.62  1.52  1.26    1.58    65.3   0.244  6.65  6.41</span></span>
+<span><span class="co">#&gt; # ℹ 3 more variables: skewness &lt;dbl&gt;, kurtosis &lt;dbl&gt;, count &lt;int&gt;</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="robust-approach">robust approach<a class="anchor" aria-label="anchor" href="#robust-approach"></a>
+</h4>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/summaryStats.html">summaryStats</a></span><span class="op">(</span><span class="va">tbl</span>, robust <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 14</span></span>
+<span><span class="co">#&gt;   variable    median   mad    Qn    Sn medcouple   LMC   RMC   rsd biloc biscale</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 heavy_tail…  -0.1   1.4   1.78  1.61     -0.03  0.54  0.36  2.08  0.05    2.01</span></span>
+<span><span class="co">#&gt; 2 normal        0.06  0.89  0.93  0.92      0.03  0.33  0.21  1.32  0.08    0.92</span></span>
+<span><span class="co">#&gt; 3 skewed        1.62  1.1   1.05  1.16      0.25 -0.05  0.47  1.63  1.79    1.21</span></span>
+<span><span class="co">#&gt; # ℹ 3 more variables: bivar &lt;dbl&gt;, rcv &lt;dbl&gt;, count &lt;int&gt;</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level3">
 <h3 id="adjusted-boxplot">adjusted boxplot<a class="anchor" aria-label="anchor" href="#adjusted-boxplot"></a>
 </h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/adjboxplot.html">adjboxplot</a></span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, linewidth <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="90%" height="90%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%"></p>
 </div>
 </div>
 </div>
