@@ -94,6 +94,16 @@ specProc::adjboxplot(tbl) +
   ggplot2::coord_flip()
 ```
 
+## Correlation
+
+```{r}
+data("glass", package = "chemometrics")
+glass <- tibble::as_tibble(glass)
+```
+
+```{r}
+glass |> specProc::correlation(Na2O, method = "spearman", .plot = TRUE)
+```
 
 
 

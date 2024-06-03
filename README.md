@@ -91,3 +91,34 @@ specProc::adjboxplot(tbl) +
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
+
+## Correlation
+
+``` r
+data("glass", package = "chemometrics")
+glass <- tibble::as_tibble(glass)
+```
+
+``` r
+glass |> specProc::correlation(Na2O, method = "spearman", .plot = TRUE)
+#> $.correlation
+#> # A tibble: 12 × 3
+#>    variable .correlation method  
+#>    <chr>           <dbl> <chr>   
+#>  1 Cl              0.601 spearman
+#>  2 SO3             0.406 spearman
+#>  3 SiO2            0.244 spearman
+#>  4 P2O5           -0.115 spearman
+#>  5 BaO            -0.144 spearman
+#>  6 MgO            -0.234 spearman
+#>  7 MnO            -0.241 spearman
+#>  8 Al2O3          -0.267 spearman
+#>  9 Fe2O3          -0.281 spearman
+#> 10 CaO            -0.316 spearman
+#> 11 PbO            -0.356 spearman
+#> 12 K2O            -0.571 spearman
+#> 
+#> $.plot
+```
+
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="90%" height="90%" />
