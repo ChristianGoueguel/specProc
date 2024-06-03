@@ -54,7 +54,7 @@ options(mc_doScale_quiet=TRUE)
 
 ## Examples
 ```{r message=FALSE, warning=FALSE}
-set.seed(123)
+set.seed(02301)
 tbl <- data.frame(
   normal = stats::rnorm(100),
   skewed = stats::rgamma(100, shape = 2, scale = 1),

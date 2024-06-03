@@ -44,7 +44,7 @@ devtools::install_github("ChristianGoueguel/specProc")
 ## Examples
 
 ``` r
-set.seed(123)
+set.seed(02301)
 tbl <- data.frame(
   normal = stats::rnorm(100),
   skewed = stats::rgamma(100, shape = 2, scale = 1),
@@ -63,9 +63,9 @@ specProc::summaryStats(tbl)
 #> # A tibble: 3 × 14
 #>   variable     mean  mode median   IQR    sd variance     cv     min   max range
 #>   <chr>       <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>  <dbl>   <dbl> <dbl> <dbl>
-#> 1 heavy_tail… -1.43  0.81  -0.1   1.87  9.28   86.0   -649.  -80.6    8.98 89.6 
-#> 2 normal       0.09 -0.56   0.06  1.19  0.91    0.833 1011.   -2.31   2.19  4.50
-#> 3 skewed       1.93  0.76   1.62  1.52  1.26    1.58    65.3   0.244  6.65  6.41
+#> 1 heavy_tail…  0.44 -1.74  -0.22  2.36  6.54   42.7   1486.  -19.4   41.5  60.9 
+#> 2 normal       0    -0.4   -0.14  1.04  0.91    0.823 -Inf    -1.80   2.54  4.34
+#> 3 skewed       1.83  6.82   1.37  1.32  1.32    1.73    72.1   0.160  6.82  6.66
 #> # ℹ 3 more variables: skewness <dbl>, kurtosis <dbl>, count <int>
 ```
 
@@ -76,9 +76,9 @@ specProc::summaryStats(tbl, robust = TRUE)
 #> # A tibble: 3 × 14
 #>   variable    median   mad    Qn    Sn medcouple   LMC   RMC   rsd biloc biscale
 #>   <chr>        <dbl> <dbl> <dbl> <dbl>     <dbl> <dbl> <dbl> <dbl> <dbl>   <dbl>
-#> 1 heavy_tail…  -0.1   1.4   1.78  1.61     -0.03  0.54  0.36  2.08  0.05    2.01
-#> 2 normal        0.06  0.89  0.93  0.92      0.03  0.33  0.21  1.32  0.08    0.92
-#> 3 skewed        1.62  1.1   1.05  1.16      0.25 -0.05  0.47  1.63  1.79    1.21
+#> 1 heavy_tail…  -0.22  1.74  2.2   2.03      0.1   0.35  0.63  2.58 -0.22    2.4 
+#> 2 normal       -0.14  0.82  0.92  0.93      0.19  0.29  0.55  1.22 -0.05    0.92
+#> 3 skewed        1.37  0.95  0.91  0.85      0.46  0.2   0.43  1.41  1.58    1.18
 #> # ℹ 3 more variables: bivar <dbl>, rcv <dbl>, count <int>
 ```
 
