@@ -45,18 +45,19 @@ devtools::install_github("ChristianGoueguel/specProc")
 
 ``` r
 tbl <- data.frame(
-  normal = rnorm(100),
-  skewed = rexp(100, rate = 0.5),
-  heavy_tailed = rt(100, df = 3)
+  normal = stats::rnorm(100),
+  skewed = stats::rgamma(100, shape = 1, scale = 1),
+  heavy_tailed = stats::rcauchy(100, location = 0, scale = 1)
   )
 ```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="90%" height="90%" />
 
 ### adjusted boxplot
 
 ``` r
-specProc::adjboxplot(tbl)
-#> The default of 'doScale' is FALSE now for stability;
-#>   set options(mc_doScale_quiet=TRUE) to suppress this (once per session) message
+specProc::adjboxplot(tbl) +
+  ggplot2::geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.1)
 ```
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="90%" height="90%" />

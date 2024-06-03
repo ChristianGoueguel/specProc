@@ -48,20 +48,38 @@ You can install the development version from
 install.packages("devtools")
 devtools::install_github("ChristianGoueguel/specProc")
 ```
+```{r include=FALSE}
+options(mc_doScale_quiet=TRUE)
+```
 
 ## Examples
-```{r}
+```{r message=FALSE, warning=FALSE}
+set.seed(123)
 tbl <- data.frame(
-  normal = rnorm(100),
-  skewed = rexp(100, rate = 0.5),
-  heavy_tailed = rt(100, df = 3)
+  normal = stats::rnorm(100),
+  skewed = stats::rgamma(100, shape = 2, scale = 1),
+  heavy_tailed = stats::rcauchy(100, location = 0, scale = 1)
   )
 ```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot2::ggplot(tbl) +
+  ggplot2::geom_density(ggplot2::aes(x = normal, fill = "Normal"), linewidth = 0.1, adjust = 2L, alpha = 1/5) +
+  ggplot2::geom_density(ggplot2::aes(x = skewed, fill = "Skewed"), linetype = "dashed", linewidth = 0.1, adjust = 2L, alpha = 1/5) +
+  ggplot2::geom_density(ggplot2::aes(x = heavy_tailed, fill = "Heavy-tailed"), linetype = "dotted", linewidth = 0.1, adjust = 2L, alpha = 1/5) +
+  ggplot2::scale_fill_manual(values = c("Normal" = "#112446", "Skewed" = "red", "Heavy-tailed" = "blue")) +
+  ggplot2::xlim(-10,10) +
+  ggplot2::labs(x = "x", fill = "Distribution") +
+  ggplot2::theme_light() +
+  ggplot2::theme(legend.position = "left", panel.grid = ggplot2::element_blank())
+```
+
 
 ### adjusted boxplot
 
 ```{r}
-specProc::adjboxplot(tbl)
+specProc::adjboxplot(tbl) +
+  ggplot2::geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.1)
 ```
 
 
