@@ -16,14 +16,14 @@ orthogonalize against. If not provided, the default value is 2.}
 The function returns a list of three components:
 \itemize{
 \item \code{correction}: The orthogonalized matrix, representing the signal of interest.
-\item \code{perturbation}: The cutter matrix.
+\item \code{clutter}: The cutter data matrix.
 \item \code{loadings}: The singular vectors (loadings of the input data) used for the orthogonalization.
 }
 }
 \description{
 This function implements the External Parameter Orthogonalization (EPO)
 algorithm as proposed by Roger \emph{et al.} (2003). The EPO algorithm aims to
-remove interferences or clutter present in the data (spectrum), effectively
+remove interferences or clutter present in the data (spectra), effectively
 separating the signal of interest from unwanted perturbations.
 }
 \details{
@@ -37,7 +37,7 @@ Let \eqn{\textbf{X}} be the input data. The EPO algorithm aims to split \eqn{\te
 \deqn{\textbf{X} = \textbf{XP} + \textbf{XQ} + \textbf{R}}
 
 where \eqn{\textbf{P}} and \eqn{\textbf{Q}} are, respectively, the projection
-matrices of \eqn{\textbf{X}} onto the useful and perturbation subspaces.
+matrices of \eqn{\textbf{X}} onto the useful and perturbation (clutter) subspaces.
 \eqn{\textbf{R}} is the residual matrix.
 }
 \references{

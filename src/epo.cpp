@@ -13,16 +13,16 @@ Rcpp::List epo_cpp(Rcpp::NumericMatrix X, int ncomp) {
   Eigen::MatrixXd V = svd.matrixV();
   Eigen::VectorXd S = svd.singularValues();
 
-  Eigen::MatrixXd perturbation_direction = V.rightCols(ncomp);
+  Eigen::MatrixXd clutter_direction = V.rightCols(ncomp);
   Eigen::MatrixXd I = Eigen::MatrixXd::Identity(X_map.cols(), X_map.cols());
-  Eigen::MatrixXd Q = perturbation_direction * perturbation_direction.transpose();
+  Eigen::MatrixXd Q = clutter_direction * clutter_direction.transpose();
 
   Eigen::MatrixXd X_corrected = X_map * (I - Q);
-  Eigen::MatrixXd X_perturbation = X_map * Q;
+  Eigen::MatrixXd X_clutter = X_map * Q;
 
   return Rcpp::List::create(
     Rcpp::Named("correction") = Rcpp::wrap(X_corrected),
-    Rcpp::Named("perturbation") = Rcpp::wrap(X_perturbation),
-    Rcpp::Named("loadings") = Rcpp::wrap(perturbation_direction)
+    Rcpp::Named("clutter") = Rcpp::wrap(X_clutter),
+    Rcpp::Named("loadings") = Rcpp::wrap(clutter_direction)
   );
 }

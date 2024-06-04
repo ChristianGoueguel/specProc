@@ -14,6 +14,7 @@
 #' @importFrom mt osc_sjoblom
 #' @importFrom mt osc_wise
 #' @importFrom mt osc_wold
+#' @importFrom prospectr savitzkyGolay
 #' @importFrom Rcpp sourceCpp
 #' @importFrom ropls opls
 #' @useDynLib specProc, .registration = TRUE

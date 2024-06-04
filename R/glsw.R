@@ -20,9 +20,9 @@
 #' filtering matrix is constructed using a regularization parameter, denoted as
 #' alpha (\eqn{\alpha}). The value of \eqn{\alpha} determines how strongly the algorithm down-weights
 #' the clutter components in the data. In cases where the interferences are
-#' well-characterized and distinct from the desired signal, a higher \eqn{\alpha} value
+#' well-characterized and distinct from the desired signal, a small \eqn{\alpha} value
 #' may be appropriate to achieve effective clutter removal. However, if the
-#' interferences are more subtle or intertwined with the desired signal, a lower
+#' interferences are more subtle or intertwined with the desired signal, a larger
 #' \eqn{\alpha} value may be preferred to avoid over-suppression of the signal itself.
 #'
 #' Let \eqn{\textbf{X}} be a data matrix. The GLSW filter is applied as follows:
