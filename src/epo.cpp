@@ -5,7 +5,6 @@ using namespace Rcpp;
 
 // [[Rcpp::depends(RcppEigen)]]
 // [[Rcpp::export]]
-
 Rcpp::List epo_cpp(Rcpp::NumericMatrix X, int ncomp) {
   Eigen::Map<Eigen::MatrixXd> X_map(as<Eigen::Map<Eigen::MatrixXd> >(X));
   Eigen::JacobiSVD<Eigen::MatrixXd> svd(X_map, Eigen::ComputeThinU | Eigen::ComputeThinV);

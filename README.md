@@ -24,8 +24,10 @@ essential for spectroscopic data analysis. Spectral preprocessing is
 essential in ensuring accurate and reliable results by minimizing the
 impact of various distortions and artifacts that can arise during data
 acquisition or due to inherent characteristics of the sample or
-instrument. Some of the techniques are purely based on mathematical
-concepts, leveraging robust statistics and signal processing techniques.
+instrument.
+
+Some of the techniques are purely based on mathematical concepts,
+leveraging robust statistics and signal processing techniques.
 Additionally, `specProc` incorporates preprocessing methods inspired by
 the chemical-physical background of the dataset. These techniques
 leverage domain knowledge and exploit the fundamental principles
@@ -85,14 +87,14 @@ specProc::summaryStats(tbl, robust = TRUE)
 ### adjusted boxplot
 
 ``` r
-specProc::adjboxplot(tbl) +
+specProc::adjboxplot(tbl, xlabels.angle = 0) +
   ggplot2::geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.1) +
   ggplot2::coord_flip()
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
 
-## correlation
+### correlation
 
 ``` r
 data("glass", package = "chemometrics")

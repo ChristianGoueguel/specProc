@@ -23,11 +23,12 @@ The function returns three components:
 \description{
 This function implements the External Parameter Orthogonalization (EPO)
 algorithm as proposed by Roger \emph{et al.} (2003). The EPO algorithm aims to
-remove the influence of external factors or interferences from the input data,
-effectively separating the signal of interest from unwanted perturbations.
+remove the influence of independent external factors or interferences from
+the input data (spectrum), effectively separating the signal of interest from
+unwanted perturbations.
 }
 \details{
-The EPO algorithm works by detecting directions in the input data (or singular vectors)
+The EPO algorithm works by detecting directions (singular vectors) in the input data
 that are affected by external variations. It then projects the input data onto
 the subspace orthogonal to these variations, effectively removing the unwanted
 perturbations and extracting the signal of interest.

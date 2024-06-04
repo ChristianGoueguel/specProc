@@ -37,7 +37,9 @@ coverage](https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/bad
 
 **Testing and experimenting.**
 
-The `specProc` package performs a wide range of preprocessing tasks essential for spectroscopic data analysis. Spectral preprocessing is essential in ensuring accurate and reliable results by minimizing the impact of various distortions and artifacts that can arise during data acquisition or due to inherent characteristics of the sample or instrument. Some of the techniques are purely based on mathematical concepts, leveraging robust statistics and signal processing techniques. Additionally, `specProc` incorporates preprocessing methods inspired by the chemical-physical background of the dataset. These techniques leverage domain knowledge and exploit the fundamental principles governing the spectroscopic phenomenon under investigation.
+The `specProc` package performs a wide range of preprocessing tasks essential for spectroscopic data analysis. Spectral preprocessing is essential in ensuring accurate and reliable results by minimizing the impact of various distortions and artifacts that can arise during data acquisition or due to inherent characteristics of the sample or instrument. 
+
+Some of the techniques are purely based on mathematical concepts, leveraging robust statistics and signal processing techniques. Additionally, `specProc` incorporates preprocessing methods inspired by the chemical-physical background of the dataset. These techniques leverage domain knowledge and exploit the fundamental principles governing the spectroscopic phenomenon under investigation.
 
 ## Installation
 
@@ -89,12 +91,12 @@ specProc::summaryStats(tbl, robust = TRUE)
 ### adjusted boxplot
 
 ```{r}
-specProc::adjboxplot(tbl) +
+specProc::adjboxplot(tbl, xlabels.angle = 0) +
   ggplot2::geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.1) +
   ggplot2::coord_flip()
 ```
 
-## correlation
+### correlation
 
 ```{r}
 data("glass", package = "chemometrics")
@@ -104,10 +106,6 @@ glass <- tibble::as_tibble(glass)
 ```{r}
 glass |> specProc::correlation(Na2O, method = "spearman", .plot = TRUE)
 ```
-
-
-
-
 
 
 

@@ -4,13 +4,12 @@
 \alias{glsw}
 \title{Generalized Least Squares Weighting}
 \usage{
-glsw(data1, data2 = NULL, alpha = 0.01)
+glsw(data1, data2, alpha = 0.01)
 }
 \arguments{
 \item{data1}{A numeric matrix, data frame or tibble representing the first set of data.}
 
-\item{data2}{A numeric matrix, data frame or tibble representing the second set of data.
-If \code{NULL} (default), interferences variance found in \code{data1} is down-weighted.}
+\item{data2}{A numeric matrix, data frame or tibble representing the second set of data.}
 
 \item{alpha}{A numeric value specifying the weighting parameter. Typical values
 range from 1 to 0.0001. Default is 0.01.}
@@ -19,17 +18,33 @@ range from 1 to 0.0001. Default is 0.01.}
 A tibble containing the filtering matrix.
 }
 \description{
-This function implements the Generalized Least Squares Weighting (GLSW) algorithm
-proposed by Geladi and Kowalski (1986). The GLSW algorithm calculates a covariance
-matrix from the differences between similar samples and applies a filtering matrix
-to down-weight correlations present in the original covariance matrix. A regularization parameter,
-\eqn{\alpha}, defines how strongly GLSW down-weights interferences. The choice of \eqn{\alpha}
-depends on the scale of the original values and the similarity between the interferences
-and the net analyte signal.
+The Generalized Least Squares Weighting (GLSW) algorithm is a technique used
+to mitigate the effects of external interferences or noise in datasets. It
+constructs a filter to remove these interferences, allowing for more accurate
+data analysis and processing.
 }
 \details{
-The filtering matrix down-weights correlations in the original
-covariance matrix, effectively reducing the impact of interferences on the data.
+The algorithm works by first calculating a covariance matrix from the differences
+between two datasets that should ideally be similar. These differences are
+considered to be the interferences or clutter present in the data.
+For example, if two sets of measurements have been taken under similar conditions,
+the differences between them could be attributed to external factors such as
+sensor noise, environmental conditions, or other sources of interference.
+Once the covariance matrix is calculated, GLSW applies a filtering matrix to
+down-weight the contributions of the identified interferences or clutter. This
+filtering matrix is constructed using a regularization parameter, denoted as
+alpha (\eqn{\alpha}). The value of \eqn{\alpha} determines how strongly the algorithm down-weights
+the clutter components in the data. In cases where the interferences are
+well-characterized and distinct from the desired signal, a higher \eqn{\alpha} value
+may be appropriate to achieve effective clutter removal. However, if the
+interferences are more subtle or intertwined with the desired signal, a lower
+\eqn{\alpha} value may be preferred to avoid over-suppression of the signal itself.
+
+Let \eqn{\textbf{X}} be a data matrix. The GLSW filter is applied as follows:
+
+\deqn{\textbf{X}_{new} = \textbf{X} \cdot \textbf{G}}
+
+where, \eqn{\textbf{X}_{new}} is the filtered matrix and \eqn{\textbf{G}} the filtering matrix.
 }
 \references{
 \itemize{
