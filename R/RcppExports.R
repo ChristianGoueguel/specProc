@@ -17,3 +17,7 @@ glsw_cpp <- function(X_diff, alpha) {
     .Call(`_specProc_glsw_cpp`, X_diff, alpha)
 }
 
+yGradientglswCpp <- function(X_diff, w_i, alpha) {
+    .Call(`_specProc_yGradientglswCpp`, X_diff, w_i, alpha)
+}
+

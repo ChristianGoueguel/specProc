@@ -44,24 +44,14 @@ yGradientglsw <- function(X, y, alpha = 0.01) {
   }
 
   X <- as.matrix(X)
-
   sorted_idx <- order(y)
   X_sorted <- X[sorted_idx, ]
   y_sorted <- y[sorted_idx, ]
-
   X_diff <- prospectr::savitzkyGolay(X_sorted, m = 1, p = 1, w = 5)
   y_diff <- prospectr::savitzkyGolay(y_sorted, m = 1, p = 1, w = 5)
-
   w_i <- 2^(-y_diff / stats::sd(y_diff))
-  W <- diag(w_i)
 
-  C <- t(X_diff) %*% W^2 %*% X_diff
-  svd_result <- svd(C)
-  V <- svd_result$v
-  S <- svd_result$d
-
-  D <- sqrt((S^2 / alpha) + diag(ncol(X_diff)))
-  G <- V %*% (1 / D) %*% t(V)
+  G <- yGradientglswCpp(X_diff, w_i, alpha)
 
   return(G)
 }
