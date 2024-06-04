@@ -18,10 +18,10 @@ range from 1 to 0.0001. Default is 0.01.}
 A tibble containing the filtering matrix.
 }
 \description{
-The Generalized Least Squares Weighting (GLSW) algorithm is a technique used
-to mitigate the effects of external interferences or noise in datasets. It
-constructs a filter to remove these interferences, allowing for more accurate
-data analysis and processing.
+The Generalized Least Squares Weighting (GLSW) algorithm, proposed by Martens \emph{et al.} (2003),
+is a technique used to mitigate the effects of external interferences in datasets.
+It constructs a filter to remove these interferences, allowing for more
+accurate data analysis and processing.
 }
 \details{
 The algorithm works by first calculating a covariance matrix from the differences
@@ -48,8 +48,9 @@ where, \eqn{\textbf{X}_{new}} is the filtered matrix and \eqn{\textbf{G}} the fi
 }
 \references{
 \itemize{
-\item Geladi, P., & Kowalski, B. R. (1986). Partial least-squares regression: a tutorial.
-Analytica Chimica Acta, 185, 1-17.
+\item Martens, H., Hoy, M., Wise, B.M., Bro, R., Brockhoff, P.B., (2003).
+Pre-whitening of data by covariance-weighted preprocessing.
+Journal of Chemometrics, 17(3):153-165
 }
 }
 \author{
