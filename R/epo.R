@@ -5,9 +5,8 @@
 #' @description
 #' This function implements the External Parameter Orthogonalization (EPO)
 #' algorithm as proposed by Roger *et al.* (2003). The EPO algorithm aims to
-#' remove the influence of independent external factors or interferences from
-#' the input data (spectrum), effectively separating the signal of interest from
-#' unwanted perturbations.
+#' remove interferences or clutter present in the data (spectrum), effectively
+#' separating the signal of interest from unwanted perturbations.
 #'
 #' @details
 #' The EPO algorithm works by detecting directions (singular vectors) in the input data
@@ -27,10 +26,10 @@
 #' @param ncomp An integer specifying the number of singular vectors to
 #' orthogonalize against. If not provided, the default value is 2.
 #'
-#' @return The function returns three components:
+#' @return The function returns a list of three components:
 #' \itemize{
-#'   \item \code{correction}: The orthogonalized data, representing the signal of interest.
-#'   \item \code{perturbation}: The perturbation data filtered out.
+#'   \item \code{correction}: The orthogonalized matrix, representing the signal of interest.
+#'   \item \code{perturbation}: The cutter matrix.
 #'   \item \code{loadings}: The singular vectors (loadings of the input data) used for the orthogonalization.
 #' }
 #'
