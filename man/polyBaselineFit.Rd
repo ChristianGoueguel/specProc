@@ -4,29 +4,43 @@
 \alias{polyBaselineFit}
 \title{Polynomial Baseline Correction}
 \usage{
-polyBaselineFit(.data, degree = 4, tol = 0.001, rep = 100)
+polyBaselineFit(data, degree = 4, tol = 0.001, rep = 100)
 }
 \arguments{
-\item{.data}{A data frame or tibble containing the emission spectra data. Each column should represent a separate emission spectrum.}
+\item{data}{A matrix, data frame or tibble.}
 
-\item{degree}{An integer specifying the degree of the polynomial fitting function. The default value is 4.}
+\item{degree}{An integer specifying the degree of the polynomial fitting
+function. The default value is 4.}
 
-\item{tol}{A numeric value representing the tolerance for the difference between iterations. The default value is 1e-3.}
+\item{tol}{A numeric value representing the tolerance for the difference
+between iterations. The default value is 1e-3.}
 
-\item{rep}{An integer specifying the maximum number of iterations for the algorithm. The default value is 100.}
+\item{rep}{An integer specifying the maximum number of iterations for the
+algorithm. The default value is 100.}
 }
 \value{
 A list with two elements:
 \itemize{
-\item \code{spec}: A data frame containing the baseline-corrected emission spectra.
-\item \code{bkg}: A data frame containing the estimated background emission.
+\item \code{correction}: The baseline-corrected spectral matrix.
+\item \code{continuum}: The fitted continuum emission.
 }
 }
 \description{
-This function performs baseline correction on emission spectra data by estimating and removing the continuous background emission using a polynomial curve fitting approach.
+This function performs baseline correction on the spectra matrix by
+estimating and removing the continuous background emission using a polynomial
+curve fitting approach.
 }
 \details{
-This function is a wrapper around the \code{baseline.modpolyfit} function from the \code{baseline} package, which implements the algorithm described in Chad A. Lieber, Anita Mahadevan-Jansen. (2003). "Automated method for subtraction of fluorescence from biological Raman spectra." Applied Spectroscopy, 57(11), 1363-1367. https://doi.org/10.1366/000370203322554518
+This function is a wrapper around the \code{baseline.modpolyfit} function from the
+\code{baseline} package, which implements the algorithm described in Lieber and
+Mahadevan-Jansen (2003).
+}
+\references{
+\itemize{
+\item Lieber, C.A., Mahadevan-Jansen, A., (2003). Automated method for
+subtraction of fluorescence from biological Raman spectra.
+Applied Spectroscopy, 57(11):1363-1367
+}
 }
 \author{
 Christian L. Goueguel
