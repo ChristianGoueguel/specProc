@@ -57,7 +57,7 @@ reference:
   desc: >
     Function that perform normalization of the spectra.
   contents:
-  - normSpec
+  - normalize
 
 - title: Robust statistical estimators
 

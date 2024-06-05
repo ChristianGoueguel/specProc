@@ -17,7 +17,6 @@
 #'      subtraction of fluorescence from biological Raman spectra.
 #'      Applied Spectroscopy, 57(11):1363-1367
 #'
-#' @author Christian L. Goueguel
 #' @param data A matrix, data frame or tibble.
 #' @param degree An integer specifying the degree of the polynomial fitting
 #' function. The default value is 4.
