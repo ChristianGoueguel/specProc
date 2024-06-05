@@ -44,7 +44,7 @@ polyBaselineFit <- function(data, degree = 4, tol = 1e-3, rep = 100) {
     stop("'rep' must be numeric.")
   }
 
-  if (is.data.frame(data) && tibble::is_tibble(.data)) {
+  if (is.data.frame(data) && tibble::is_tibble(data)) {
     X_mat <- data %>%
       dplyr::select(dplyr::where(is.numeric)) %>%
       as.matrix()

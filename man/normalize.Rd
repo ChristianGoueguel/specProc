@@ -9,17 +9,7 @@ normalize(data, method = "min_max")
 \arguments{
 \item{data}{A numeric data frame containing the spectra.}
 
-\item{method}{A character vector specifying the normalization method to apply.
-Available methods are:
-\itemize{
-\item{"min_max"}{Min-max normalization: (x - min(x)) / (max(x) - min(x))}
-\item{"mean"}{Mean normalization: (x - mean(x)) / (max(x) - min(x))}
-\item{"vector"}{Vector normalization: x / sqrt(sum(x^2))}
-\item{"area"}{Area normalization: x / sum(x)}
-\item{"max_intensity"}{Max intensity normalization: x / max(x)}
-\item{"snv"}{Standard Normal Variate (SNV) normalization: (x - mean(x)) / sd(x)}
-}
-Default is "min_max".}
+\item{method}{A character vector specifying the normalization method to apply.}
 }
 \value{
 A data frame containing the original columns and the normalized

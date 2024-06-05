@@ -1,13 +1,8 @@
 #' @title Orthogonal Signal Correction
 #'
 #' @description
-#' This function applies orthogonal signal correction (OSC) to remove systematic
-#' variation in the X-data (predictors) that is orthogonal (unrelated) to the
-#' Y-data (response). OSC is a preprocessing technique used in chemometrics
-#' and multivariate data analysis to improve the interpretability and predictive
-#' ability of regression models. It is particularly useful when the X-data
-#' contains a large amount of variation that is not relevant to the Y-data,
-#' which can mask the underlying signal of interest and lead to poor model performance.
+#' Orthogonal signal correction (OSC) removes systematic variation in the
+#' spectral matrix that is orthogonal to the response vector.
 #'
 #' @details
 #' The OSC algorithm identifies and removes the orthogonal variation in the
