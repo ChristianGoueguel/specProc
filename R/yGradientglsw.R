@@ -1,11 +1,11 @@
 #' @title y-Gradient Generalized Least Squares Weighting
 #'
 #' @description
-#' The Y-gradient generalized least squares weighting algorithm (GLSW) removes
+#' The y-gradient generalized least squares weighting algorithm (GLSW) removes
 #' variance from the data (spectra), which is orthogonal to the response.
 #'
 #' @details
-#' y-Gradient GLSW is an alternative method to GLSW, where a continuous \eqn{\textbf{y}}-variable
+#' The y-Gradient GLSW is an alternative method to GLSW, where a continuous \eqn{\textbf{y}}-variable
 #' is used to develop pseudo-groupings of samples in \eqn{\textbf{X}} by comparing
 #' the differences in the corresponding \eqn{\textbf{y}} values. This is referred to as the *"gradient method"*
 #' because it utilizes a gradient of the sorted \eqn{\textbf{X}}- and

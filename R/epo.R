@@ -5,16 +5,16 @@
 #' @description
 #' This function implements the External Parameter Orthogonalization (EPO)
 #' algorithm as proposed by Roger *et al.* (2003). The EPO algorithm aims to
-#' remove interferences or clutter present in the data (spectra), effectively
+#' remove interferences or clutter present in the spectral matrix, effectively
 #' separating the signal of interest from unwanted perturbations.
 #'
 #' @details
-#' The EPO algorithm works by detecting directions (singular vectors) in the input data
-#' that are affected by external variations. It then projects the input data onto
+#' The EPO algorithm works by detecting directions (singular vectors) in the spectral matrix
+#' that are affected by external variations. It then projects the spectral matrix onto
 #' the subspace orthogonal to these variations, effectively removing the unwanted
 #' perturbations and extracting the signal of interest.
 #'
-#' Let \eqn{\textbf{X}} be the input data. The EPO algorithm aims to split \eqn{\textbf{X}} into:
+#' Let \eqn{\textbf{X}} be the spectral matrix. The EPO algorithm aims to split \eqn{\textbf{X}} into:
 #'
 #' \deqn{\textbf{X} = \textbf{XP} + \textbf{XQ} + \textbf{R}}
 #'
@@ -29,7 +29,7 @@
 #' @return The function returns a list of three components:
 #' \itemize{
 #'   \item \code{correction}: The orthogonalized matrix, representing the signal of interest.
-#'   \item \code{clutter}: The cutter data matrix.
+#'   \item \code{clutter}: The clutter data matrix.
 #'   \item \code{loadings}: The singular vectors (loadings of the input data) used for the orthogonalization.
 #' }
 #'

@@ -10,7 +10,7 @@
 #'
 #' @details
 #' The algorithm works by first calculating a covariance matrix from the differences
-#' between two datasets that should ideally be similar. These differences are
+#' between two spectral datasets that should ideally be similar. These differences are
 #' considered to be the interferences or clutter present in the data.
 #' For example, if two sets of measurements have been taken under similar conditions,
 #' the differences between them could be attributed to external factors such as
@@ -18,7 +18,10 @@
 #' Once the covariance matrix is calculated, GLSW applies a filtering matrix to
 #' down-weight the contributions of the identified interferences or clutter. This
 #' filtering matrix is constructed using a regularization parameter, denoted as
-#' alpha (\eqn{\alpha}). The value of \eqn{\alpha} determines how strongly the algorithm down-weights
+#' alpha (\eqn{\alpha}).
+#'
+#'
+#' The value of \eqn{\alpha} determines how strongly the algorithm down-weights
 #' the clutter components in the data. In cases where the interferences are
 #' well-characterized and distinct from the desired signal, a small \eqn{\alpha} value
 #' may be appropriate to achieve effective clutter removal. However, if the
