@@ -23,8 +23,9 @@ A tibble containing the corrected predictor variables
 }
 \description{
 This function implements the Net Analyte Signal (NAS) algorithm, as proposed
-by Lorber (1997), to remove information from the predictor variables, that is
-orthogonal or irrelevant to the response variable(s) by orthogonal projection.
+by Lorber (1997), which involves the concentration matrix. NAS aims to remove
+information from the predictor variables, that is orthogonal or irrelevant to
+the response variable(s) by orthogonal projection.
 }
 \details{
 The NAS algorithm aims to obtain a corrected matrix that contains
