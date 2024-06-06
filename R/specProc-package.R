@@ -7,6 +7,7 @@
 #' @importFrom cowplot theme_minimal_vgrid
 #' @importFrom forcats as_factor
 #' @importFrom ggsci scale_fill_d3
+#' @importFrom MASS ginv
 #' @importFrom minpack.lm nls.lm.control
 #' @importFrom minpack.lm nlsLM
 #' @importFrom moments kurtosis

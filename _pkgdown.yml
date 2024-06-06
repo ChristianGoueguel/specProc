@@ -17,6 +17,7 @@ reference:
   contents:
   - opls
   - osc
+  - direct_osc
   - epo
   - glsw
   - yGradientglsw

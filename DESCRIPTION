@@ -17,6 +17,7 @@ Imports:
     forcats,
     ggsci,
     magrittr,
+    MASS,
     minpack.lm,
     moments,
     mt,
@@ -48,7 +49,8 @@ Suggests:
     rlang,
     purrr,
     patchwork,
-    robustHD
+    robustHD,
+    pls
 VignetteBuilder: knitr
 URL: https://github.com/ChristianGoueguel/specProc, https://christiangoueguel.github.io/specProc/
 BugReports: https://github.com/ChristianGoueguel/specProc/issues
