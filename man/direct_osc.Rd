@@ -4,7 +4,15 @@
 \alias{direct_osc}
 \title{Direct Orthogonal Signal Correction}
 \usage{
-direct_osc(x, y, ncomp = 10, center = TRUE, scale = FALSE)
+direct_osc(
+  x,
+  y,
+  ncomp = 10,
+  center = TRUE,
+  scale = FALSE,
+  max_iter = 10,
+  tol = 0.001
+)
 }
 \arguments{
 \item{x}{A matrix or data frame of the predictor variables}
@@ -17,6 +25,12 @@ retain for orthogonal processing. Default is 2.}
 \item{center}{A logical value specifying whether to center the data. Default is \code{TRUE}.}
 
 \item{scale}{A logical value specifying whether to scale the data. Default is \code{FALSE}.}
+
+\item{max_iter}{An integer representing the maximum number of iterations.
+The default value is 10.}
+
+\item{tol}{A numeric value representing the tolerance for convergence.
+The default value is 1e-3}
 }
 \value{
 A list with the following components:

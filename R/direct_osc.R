@@ -29,6 +29,10 @@
 #' retain for orthogonal processing. Default is 2.
 #' @param center A logical value specifying whether to center the data. Default is `TRUE`.
 #' @param scale A logical value specifying whether to scale the data. Default is `FALSE`.
+#' @param max_iter An integer representing the maximum number of iterations.
+#' The default value is 10.
+#' @param tol A numeric value representing the tolerance for convergence.
+#' The default value is 1e-3
 #'
 #' @return A list with the following components:
 #'  - `correction`: The corrected \eqn{\textbf{X}} matrix after DOSC.
@@ -36,7 +40,7 @@
 #'  - `score`: The scores \eqn{\textbf{T}} matrix.
 #' @export direct_osc
 #'
-direct_osc <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE) {
+direct_osc <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, max_iter = 10, tol = 1e-3) {
 
   requireNamespace("pls", quietly = TRUE)
 
@@ -72,13 +76,26 @@ direct_osc <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE) {
   m <- t(x) %*% MASS::ginv(t(x)) %*% t(y)
   z <- x - m %*% MASS::ginv(m) %*% x
 
-  pca_mod <- stats::prcomp(z %*% t(z), scale = TRUE)
-  t <- pca_mod$x[, 1:ncomp]
+  p_mat <- matrix(nrow = ncol(x), ncol = ncomp)
 
-  w <- pls::oscorespls.fit(x, t)$weights
-  t <- x %*% w
+  for (i in 1:ncomp) {
+    pca_mod <- stats::prcomp(z, scale = FALSE)
+    t <- pca_mod$x[, 1]
+    p <- pca_mod$rotation[, 1]
+    iter <- 1; diff <- Inf
+    while (diff > tol && iter <= max_iter) {
+      w <- pls::oscorespls.fit(x, t)$weights
+      t_new <- x %*% w
+      diff <- sqrt(sum((t - t_new)^2))
+      t <- t_new
+      iter <- iter + 1
+    }
+    p_mat[, i] <- p
+    z <- z - t %*% t(p)
+  }
+
+  t <- x %*% p_mat
   p <- (t(x) %*% t) / (t(t) %*% t)
-
   x_dosc <- x - t %*% t(p)
 
   result <- list(

@@ -33,6 +33,10 @@
 #' retain for orthogonal processing. Default is 2.
 #' @param center A logical value specifying whether to center the data. Default is `TRUE`.
 #' @param scale A logical value specifying whether to scale the data. Default is `FALSE`.
+#' @param max_iter An integer representing the maximum number of iterations.
+#' The default value is 10.
+#' @param tol A numeric value representing the tolerance for convergence.
+#' The default value is 1e-3.
 #'
 #' @return A list with the following components:
 #'  - `correction`: The corrected \eqn{\textbf{X}} matrix after DO.
@@ -40,7 +44,7 @@
 #'  - `score`: The scores \eqn{\textbf{T}} matrix.
 #' @export direct_orthogonal
 #'
-direct_orthogonal <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE) {
+direct_orthogonal <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, max_iter = 10, tol = 1e-3) {
 
   if (missing(x) || missing(y)) {
     stop("Both 'x' and 'y' must be provided")
@@ -61,16 +65,29 @@ direct_orthogonal <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE) {
   m <- t(X) %*% Y %*% solve(t(Y) %*% Y)
   z <- x - y %*% t(m)
 
-  pca_mod <- stats::prcomp(z, scale = TRUE)
-  t <- pca_mod$x[, 1:ncomp]
-  p <- pca_mod$rotation[, 1:ncomp]
+  p_mat <- matrix(nrow = ncol(x), ncol = ncomp)
 
-  t <- x %*% p
-  x_do <- x - t %*% t(p)
+  for (i in 1:ncomp) {
+    pca_mod <- stats::prcomp(z, scale = FALSE)
+    t <- pca_mod$x[, 1]
+    p <- pca_mod$rotation[, 1]
+    iter <- 1; diff <- Inf
+    while (diff > tol && iter <= max_iter) {
+      t_new <- x %*% p
+      diff <- sqrt(sum((t - t_new)^2))
+      t <- t_new
+      iter <- iter + 1
+    }
+    p_mat[, i] <- p
+    z <- z - t %*% t(p)
+  }
+
+  t <- x %*% p_mat
+  x_do <- x - t %*% t(p_mat)
 
   result <- list(
     correction = tibble::as_tibble(x_do),
-    loading = tibble::as_tibble(p),
+    loading = tibble::as_tibble(p_mat),
     score = tibble::as_tibble(t)
   )
 
