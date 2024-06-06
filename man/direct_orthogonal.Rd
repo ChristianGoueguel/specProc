@@ -7,7 +7,7 @@
 direct_orthogonal(
   x,
   y,
-  ncomp = 10,
+  ncomp = 2,
   center = TRUE,
   scale = FALSE,
   max_iter = 10,

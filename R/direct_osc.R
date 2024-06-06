@@ -40,7 +40,7 @@
 #'  - `score`: The scores \eqn{\textbf{T}} matrix.
 #' @export direct_osc
 #'
-direct_osc <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, max_iter = 10, tol = 1e-3) {
+direct_osc <- function(x, y, ncomp = 2, center = TRUE, scale = FALSE, max_iter = 10, tol = 1e-3) {
 
   requireNamespace("pls", quietly = TRUE)
 
@@ -75,6 +75,10 @@ direct_osc <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, max_iter 
 
   m <- t(x) %*% MASS::ginv(t(x)) %*% t(y)
   z <- x - m %*% MASS::ginv(m) %*% x
+
+  if (ncomp < 1 || ncomp > min(nrow(x) - 1, ncol(x))) {
+    ncomp <- min(nrow(x) - 1, ncol(x))
+  }
 
   p_mat <- matrix(nrow = ncol(x), ncol = ncomp)
 

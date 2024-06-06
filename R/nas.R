@@ -66,8 +66,11 @@ nas <- function(x, y, ncomp = 2, center = TRUE, scale = FALSE) {
     y <- scale(y, center = TRUE, scale = TRUE)
   }
 
-  n <- nrow(x)
-  z <- (diag(n) - y %*% t(y) / (t(y) %*% y)) %*% x
+  if (ncomp < 1 || ncomp > min(nrow(x) - 1, ncol(x))) {
+    ncomp <- min(nrow(x) - 1, ncol(x))
+  }
+
+  z <- (diag(nrow(x)) - y %*% t(y) / (t(y) %*% y)) %*% x
 
   pca_mod <- stats::prcomp(z, scale = FALSE)
   p <- pca_mod$rotation[, 1:ncomp]

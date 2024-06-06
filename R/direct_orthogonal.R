@@ -44,7 +44,7 @@
 #'  - `score`: The scores \eqn{\textbf{T}} matrix.
 #' @export direct_orthogonal
 #'
-direct_orthogonal <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, max_iter = 10, tol = 1e-3) {
+direct_orthogonal <- function(x, y, ncomp = 2, center = TRUE, scale = FALSE, max_iter = 10, tol = 1e-3) {
 
   if (missing(x) || missing(y)) {
     stop("Both 'x' and 'y' must be provided")
@@ -77,6 +77,10 @@ direct_orthogonal <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, ma
 
   m <- t(x) %*% y %*% solve(t(y) %*% y)
   z <- x - y %*% t(m)
+
+  if (ncomp < 1 || ncomp > min(nrow(x) - 1, ncol(x))) {
+    ncomp <- min(nrow(x) - 1, ncol(x))
+  }
 
   p_mat <- matrix(nrow = ncol(x), ncol = ncomp)
 
