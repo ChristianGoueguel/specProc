@@ -20,7 +20,7 @@
 #'    - Andersson, C.A., (1999).
 #'      Direct orthogonalization.
 #'      Chemometrics Intell. Lab. Syst., 47(1):51-63
-#'    - Pierna, J.A.F., Massart, de Noord, O.E., Ricoux, P., (2001).
+#'    - Pierna, J.A.F., Massart, D.L., de Noord, O.E., Ricoux, P., (2001).
 #'      Direct orthogonalization: some case studies.
 #'      Chemometrics Intell. Lab. Syst., 55(1-2):101-108
 #'    - Wold, S., Antti, H., Lindgren, F., Ohman, J. (1998).
