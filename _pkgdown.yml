@@ -20,6 +20,7 @@ reference:
   - direct_osc
   - direct_orthogonal
   - epo
+  - nas
   - glsw
   - yGradientglsw
 

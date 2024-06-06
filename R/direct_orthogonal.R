@@ -62,7 +62,20 @@ direct_orthogonal <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, ma
     stop("x and y don't match.")
   }
 
-  m <- t(X) %*% Y %*% solve(t(Y) %*% Y)
+  if (center == TRUE && scale == FALSE) {
+    x <- scale(x, center = TRUE)
+    y <- scale(y, center = TRUE)
+  }
+  if (center == FALSE && scale == TRUE) {
+    x <- scale(x, scale = TRUE)
+    y <- scale(y, scale = TRUE)
+  }
+  if (center == TRUE && scale == TRUE) {
+    x <- scale(x, center = TRUE, scale = TRUE)
+    y <- scale(y, center = TRUE, scale = TRUE)
+  }
+
+  m <- t(x) %*% y %*% solve(t(y) %*% y)
   z <- x - y %*% t(m)
 
   p_mat <- matrix(nrow = ncol(x), ncol = ncomp)
