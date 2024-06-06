@@ -9,11 +9,11 @@
 #' the response variable(s), \eqn{\textbf{Y}}.
 #'
 #' @details
-#' Different from the Wold algorithm, Wold *et al.* (1998), the DOSC algorithm
-#' firstly orthogonalizes the matrices \eqn{\textbf{X}} and \eqn{\textbf{Y}}.
-#' Then principal components analysis (PCA) is performed on the orthogonalized
-#' \eqn{\textbf{X}} to obtain the scores \eqn{\textbf{T}} and loadings
-#' \eqn{\textbf{P}} matrices.
+#' Different from the Orthogonal Signal Correction (OSC) algorithm, Wold *et al.*
+#' (1998), the DOSC algorithm firstly orthogonalizes the matrices \eqn{\textbf{X}}
+#' and \eqn{\textbf{Y}}. Then principal components analysis (PCA) is performed on
+#' the orthogonalized \eqn{\textbf{X}} to obtain the scores \eqn{\textbf{T}} and
+#' loadings \eqn{\textbf{P}} matrices.
 #'
 #' @references
 #'    - Westerhuis, J.A., Jong, S.D., Smilde, A.K., (2001).

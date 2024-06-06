@@ -8,7 +8,7 @@
 #' \eqn{\textbf{X}}, that is orthogonal to the response variable(s), \eqn{\textbf{Y}}.
 #'
 #' @details
-#' Contrary to the Orthogonal Signal Correction (OSC) algorithm, Wold and Lindgren (1998), which uses inverse
+#' Contrary to the Orthogonal Signal Correction (OSC) algorithm, Wold *et al.* (1998), which uses inverse
 #' Partial Least Squares (PLS) regression to filter out the orthogonal signal, DO
 #' filters out the orthogonal signal directly by orthogonalization of the
 #' \eqn{\textbf{X}} matrix. Principal Components Analysis (PCA) is performed on the
