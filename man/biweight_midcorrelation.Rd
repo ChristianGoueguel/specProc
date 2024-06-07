@@ -24,6 +24,7 @@ The biweight midcorrelation is calculated using the biweight midvariances
 and biweight midcovariance, as described by Wilcox (1994).
 }
 \examples{
+set.seed(11230)
 x <- rnorm(100)
 y <- 2 * x + rnorm(100)
 biweight_midcorrelation(x, y)

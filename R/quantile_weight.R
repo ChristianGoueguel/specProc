@@ -52,7 +52,7 @@
 #' # non-robust approach
 #' moments::kurtosis(vec)
 #'
-#' # non approach
+#' # robust approach
 #' quantile_weight(vec)
 #'
 #' @export quantile_weight

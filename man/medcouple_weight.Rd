@@ -25,16 +25,13 @@ robust measure of the distribution's tail behavior in the presence of outliers
 or contaminated data.
 }
 \details{
-The medcouple is a robust measure of skewness based on the median and the
-medcouple (Brys \emph{et al.} 2004), which is a kernel estimator of the cumulative
-distribution function (CDF). It is calculated by comparing the median
-to a robust measure of location within each half of the distribution,
-divided at the median.
-
-Specifically, the left medcouple (LMC) measures the skewness in the lower tail
+The left and right medcouples are a robust measure of tail weight based on the
+median and the medcouple (Brys \emph{et al.} 2004), which is a kernel estimator of
+the cumulative distribution function (CDF). The left and right medcouples are
+robust to outliers and have a breakdown value of 25\%. Specifically, the left
+medcouple (LMC) measures the skewness in the lower tail
 of the distribution, while the right medcouple (RMC) measures the skewness in
-the upper tail. The left and right medcouples are robust to outliers and have
-a breakdown value of 25\%.
+the upper tail.
 
 The interpretation of LMC and RMC is as follows:
 \itemize{

@@ -21,6 +21,7 @@
 #' @return The biweight midcorrelation between `x` and `y`.
 #'
 #' @examples
+#' set.seed(11230)
 #' x <- rnorm(100)
 #' y <- 2 * x + rnorm(100)
 #' biweight_midcorrelation(x, y)
