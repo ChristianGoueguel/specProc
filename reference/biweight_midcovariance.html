@@ -93,12 +93,16 @@ Academic Press</p></li>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Example 1: Compute biweight midcovariance for two vectors</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cov</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2.5</span>
 <span class="r-in"><span><span class="fu">biweight_midcovariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2.297065</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Example 2: Biweight midcovariance is robust to outliers</span></span></span>
 <span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">100</span><span class="op">)</span>  <span class="co"># An outlier at 100</span></span></span>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cov</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 50</span>
 <span class="r-in"><span><span class="fu">biweight_midcovariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.689955</span>
 <span class="r-in"><span></span></span>
