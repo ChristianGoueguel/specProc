@@ -14,12 +14,12 @@
 #' the subspace orthogonal to these variations, effectively removing the unwanted
 #' perturbations and extracting the signal of interest.
 #'
-#' Let \eqn{\textbf{x}} be the spectral matrix. The EPO algorithm aims to split \eqn{\textbf{x}} into:
+#' Let \eqn{\textbf{X}} be the spectral matrix. The EPO algorithm aims to split \eqn{\textbf{X}} into:
 #'
-#' \deqn{\textbf{x} = \textbf{xP} + \textbf{xQ} + \textbf{R}}
+#' \deqn{\textbf{X} = \textbf{XP} + \textbf{XQ} + \textbf{R}}
 #'
 #' where \eqn{\textbf{P}} and \eqn{\textbf{Q}} are, respectively, the projection
-#' matrices of \eqn{\textbf{x}} onto the useful and perturbation (clutter) subspaces.
+#' matrices of \eqn{\textbf{X}} onto the useful and perturbation (clutter) subspaces.
 #' \eqn{\textbf{R}} is the residual matrix.
 #'
 #' @param x A numeric matrix, data frame or tibble.

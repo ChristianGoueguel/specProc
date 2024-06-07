@@ -6,9 +6,9 @@
 #'
 #' @details
 #' The OSC algorithm identifies and removes the orthogonal variation in the
-#' X-data by iteratively deflating the X-matrix with respect to the Y-data.
-#' The resulting X-matrix contains only the variation that is relevant to the
-#' Y-data, which can then be used for further modeling or analysis.
+#' x-data by iteratively deflating the x-matrix with respect to the y-data.
+#' The resulting x-matrix contains only the variation that is relevant to the
+#' y-data, which can then be used for further modeling or analysis.
 #' This function implements three different methods for OSC: the original
 #' method proposed by Wold et al. (1998), the method proposed by Sjöblom et al.
 #' (1998), and the method proposed by Wise and Gallagher.
@@ -27,14 +27,14 @@
 #'
 #' @author Christian L. Goueguel
 #'
-#' @param X A matrix or data.frame containing the X-data (predictors).
-#' @param Y A vector containing the Y-data (response). The length of `Y` must
-#' match the number of rows in `X`.
+#' @param x A matrix or data.frame containing the x-data (predictors).
+#' @param y A vector containing the y-data (response). The length of `y` must
+#' match the number of rows in `x`.
 #' @param method A character string indicating the OSC method to use. Accepted
 #' values are `"wold"` (Wold's original method), `"sjoblom"` (Sjöblom's method), or
 #' `"wise"` (Wise and Gallagher's method).
-#' @param center A logical value indicating whether to center the X-data before
-#' applying OSC. If `TRUE`, the columns of X will be mean-centered.
+#' @param center A logical value indicating whether to center the x-data before
+#' applying OSC. If `TRUE`, the columns of x will be mean-centered.
 #' @param osc.ncomp An integer representing the number of OSC components to be
 #' calculated. The default value is 4.
 #' @param pls.ncomp An integer representing the number of PLS components to be
@@ -46,42 +46,33 @@
 #'
 #' @return An list containing the following components:
 #' \describe{
-#'   \item{X_corrected}{The corrected X-data after applying OSC.}
-#'   \item{scores}{The X-scores after orthogonal variations are removed.}
+#'   \item{x_corrected}{The corrected x-data after applying OSC.}
+#'   \item{scores}{The x-scores after orthogonal variations are removed.}
 #'   \item{loadings}{The loadings.}
 #'   \item{weights}{The wights.}
 #'   \item{R2}{The value of R2}
 #' }
 #'
 #' @export osc
-#' @examples
-#' \dontrun{
-#' osc_result <- osc(
-#'   x_data, y_data,
-#'   method = "wold",
-#'   center = TRUE,
-#'   osc.ncomp = 4,
-#'   pls.ncomp = 10
-#' )
-#' }
-osc <- function(X, Y, method = "wold", center = TRUE, osc.ncomp = 4, pls.ncomp = 10, tol = 1e-3, iter = 20) {
-  if (missing(X) || missing(Y)) {
+#'
+osc <- function(x, y, method = "wold", center = TRUE, osc.ncomp = 4, pls.ncomp = 10, tol = 1e-3, iter = 20) {
+  if (missing(x) || missing(y)) {
     stop("data set or response are missing")
   }
-  if (nrow(X) != length(Y)) {
-    stop("X and Y don't match.")
+  if (nrow(x) != length(y)) {
+    stop("x and y don't match.")
   }
-  if (is.factor(Y) && length(unique(Y)) < 2) {
+  if (is.factor(y) && length(unique(y)) < 2) {
     stop("Classification needs at least two classes.")
   }
-  if (any(is.na(X)) || any(is.na(Y))) {
+  if (any(is.na(x)) || any(is.na(y))) {
     stop("NA is not permitted in data set or response.")
   }
 
-  X <- as.matrix(X)
-  Y <- as.vector(Y)
-  n <- nrow(X)
-  p <- ncol(X)
+  x <- as.matrix(x)
+  y <- as.vector(y)
+  n <- nrow(x)
+  p <- ncol(x)
 
   if (pls.ncomp < 1 || pls.ncomp > min(n - 1, p)) {
     pls.ncomp <- min(n - 1, p)
@@ -91,14 +82,14 @@ osc <- function(X, Y, method = "wold", center = TRUE, osc.ncomp = 4, pls.ncomp =
 
   osc_method <- switch(
     method,
-    wold = mt::osc_wold,
-    sjoblom = mt::osc_sjoblom,
-    wise = mt::osc_wise
+    wold = wold,
+    sjoblom = sjoblom,
+    wise = wise
   )
 
   out <- osc_method(
-    X,
-    Y,
+    x,
+    y,
     center = center,
     osc.ncomp = osc.ncomp,
     pls.ncomp = pls.ncomp,
@@ -107,7 +98,7 @@ osc <- function(X, Y, method = "wold", center = TRUE, osc.ncomp = 4, pls.ncomp =
   )
 
   res <- list(
-    X_corrected = out@X |> tibble::as_tibble(),
+    x_corrected = out@x |> tibble::as_tibble(),
     R2 = out@R2,
     weights = out@W |> tibble::as_tibble(),
     loadings = out@p |> tibble::as_tibble(),

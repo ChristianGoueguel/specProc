@@ -63,17 +63,6 @@ This function implements three different methods for OSC: the original
 method proposed by Wold et al. (1998), the method proposed by Sjöblom et al.
 (1998), and the method proposed by Wise and Gallagher.
 }
-\examples{
-\dontrun{
-osc_result <- osc(
-  x_data, y_data,
-  method = "wold",
-  center = TRUE,
-  osc.ncomp = 4,
-  pls.ncomp = 10
-)
-}
-}
 \references{
 \itemize{
 \item Sjoblom, J., Svensson, O., Josefson, M., Kullberg, H., Wold, S. (1998).
