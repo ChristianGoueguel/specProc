@@ -5,8 +5,8 @@
 \title{Biweight Scale}
 \usage{
 biweight_scale(
-  X,
-  loc = stats::median(X),
+  x,
+  loc = stats::median(x),
   c = 9,
   reduced = FALSE,
   tol = 1e-06,
@@ -14,9 +14,9 @@ biweight_scale(
 )
 }
 \arguments{
-\item{X}{A numeric vector.}
+\item{x}{A numeric vector.}
 
-\item{loc}{Initial guess for the location (default: median of \code{X}).}
+\item{loc}{Initial guess for the location (default: median of \code{x}).}
 
 \item{c}{A numeric value specifying the tuning constant for the biweight estimator
 (\code{c = 9} by default).}
@@ -24,14 +24,14 @@ biweight_scale(
 \item{reduced}{A logical value specifying whether the sample size, \emph{n},
 should be reduced to the number of non-rejected values. If \code{TRUE}, \emph{n} is
 reduced to the number of observations that pass a rejection criteria.
-If \code{FALSE} (default), \emph{n} is equal to the length of \code{X} (the input data).}
+If \code{FALSE} (default), \emph{n} is equal to the length of \code{x} (the input data).}
 
 \item{tol}{Convergence tolerance for the iterative computation (default: 1e-6).}
 
 \item{max_iter}{Maximum number of iterations (default: 50).}
 }
 \value{
-The biweight scale of \code{X}.
+The biweight scale of \code{x}.
 }
 \description{
 This function computes the biweight scale, a robust measure of scale or dispersion
@@ -54,11 +54,13 @@ sd = stats::sd(x),
 mad = stats::mad(x),
 biscale = biweight_scale(x)
 )
+
 }
 \references{
 \itemize{
-\item Mosteller, F., and Tukey, J. W. (1977). Data Analysis and Regression: A Second
-Course in Statistics. Addison-Wesley, pp. 203-209.
+\item Mosteller, F., and Tukey, J. W. (1977).
+Data Analysis and Regression: A Second Course in Statistics.
+Addison-Wesley, pp. 203-209.
 }
 }
 \author{

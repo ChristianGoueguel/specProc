@@ -5,7 +5,7 @@
 \title{Multiple Peaks Fitting}
 \usage{
 multipeakfit(
-  .data,
+  x,
   peaks,
   profiles,
   wL = NULL,
@@ -18,34 +18,37 @@ multipeakfit(
 )
 }
 \arguments{
-\item{.data}{Data frame of emission spectra}
+\item{x}{A data frame or tibble}
 
-\item{peaks}{(vector) Center wavelengths of selected peaks}
+\item{peaks}{A vector of the selected peaks center wavelengths}
 
-\item{profiles}{(vector) Lineshape functions}
+\item{profiles}{A vector of the lineshape functions for fitting}
 
-\item{wL}{(numeric) Lorentzian full width at half maximum (overall initial guess)}
+\item{wL}{A numeric of the Lorentzian full width at half maximum (overall initial guess)}
 
-\item{wG}{(numeric) Gaussian full width at half maximum (overall initial guess)}
+\item{wG}{A numeric of the Gaussian full width at half maximum (overall initial guess)}
 
-\item{A}{(numeric) Peak area (overall initial guess)}
+\item{A}{A numeric of the peak area (overall initial guess)}
 
-\item{wlgth.min}{(numeric) Lower bound of the wavelength subset}
+\item{wlgth.min}{A numeric of the lower bound of the wavelength subset}
 
-\item{wlgth.max}{(numeric) Upper bound of the wavelength subset}
+\item{wlgth.max}{A numeric of the upper bound of the wavelength subset}
 
-\item{id}{Spectra name (optional)}
+\item{id}{A character specifying the spectra id (optional)}
 
-\item{max.iter}{(numeric) Maximum number of iteration (200 by default)}
+\item{max.iter}{A numeric specifying the maximum number of iteration (200 by default)}
 }
 \value{
-Fitted value for each peak and the estimated parameters along with the corresponding errors
+Fitted value for each peak and the estimated parameters along with the
+corresponding errors
 }
 \description{
-Fitting of multiple spectral lines by the same or different lineshape functions with variable parameters.
+Fitting of multiple spectral lines by the same or different lineshape
+functions with variable parameters.
 }
 \details{
-The function uses \code{minpack.lm::nlsLM}, which is based on the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals.
+The function uses \code{minpack.lm::nlsLM}, which is based on the Levenberg-Marquardt
+algorithm for searching the minimum value of the square of the sum of the residuals.
 }
 \author{
 Christian L. Goueguel

@@ -23,7 +23,7 @@
 #' - Hubert, M., Vandervieren, E., (2008). An adjusted boxplot for skewed distributions.
 #'   Computational Statistics and Data Analysis, 52(12):5186-5201
 #'
-#' @param data A numeric data frame or tibble.
+#' @param x A numeric data frame or tibble.
 #' @param .plot A logical value indicating whether to plot the adjusted boxplot (default is `TRUE`).
 #' @param xlabels.angle A numeric value specifying the angle (in degrees) for x-axis labels (default is 90).
 #' @param xlabels.vjust A numeric value specifying the vertical justification of x-axis labels (default is 1).
@@ -51,12 +51,12 @@
 #' # Retrieve the adjusted boxplot statistics
 #' stats <- adjboxplot(data, .plot = FALSE)
 #'
-adjboxplot <- function(data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, xlabels.hjust = 1, box.width = .5, notch = FALSE, notchwidth = 0.5, staplewidth = 0.5) {
-  if (missing(data)) {
-    stop("Missing 'data' argument.")
+adjboxplot <- function(x, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, xlabels.hjust = 1, box.width = .5, notch = FALSE, notchwidth = 0.5, staplewidth = 0.5) {
+  if (missing(x)) {
+    stop("Missing 'x' argument.")
   }
-  if (!all(data %>% purrr::map_lgl(is.numeric))) {
-    stop("Input data must be a numeric data frame.")
+  if (!all(x %>% purrr::map_lgl(is.numeric))) {
+    stop("Input x must be a numeric data frame.")
   }
   if(!is.logical(.plot)) {
     stop("Argument '.plot' must be of type boolean (TRUE or FALSE).")
@@ -86,7 +86,7 @@ adjboxplot <- function(data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1
     stop("Argument 'staplewidth' must be a positive numeric value.")
   }
 
-  adjBoxplot_stats <- data %>%
+  adjBoxplot_stats <- x %>%
     purrr::map(
       function(.x) {
         adj_box <- robustbase::adjboxStats(.x)
@@ -103,7 +103,7 @@ adjboxplot <- function(data, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1
     dplyr::bind_rows(.id = "variable") %>%
     purrr::modify_at("variable", forcats::as_factor)
 
-  outlier_tbl <- data %>%
+  outlier_tbl <- x %>%
     purrr::map(
       function(.x) {
         out_tbl <- robustbase::adjboxStats(.x)

@@ -46,6 +46,7 @@
 #' plot(x, y, type = "l", col = "red", main = "Gaussian Profile")
 #'
 #' @export gaussian
+#'
 gaussian <- function(x, y0, xc, wG, A) {
   if (!is.numeric(x) || !is.vector(x)) {
     stop("'x' must be a numeric vector.")

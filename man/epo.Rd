@@ -4,10 +4,10 @@
 \alias{epo}
 \title{External Parameter Orthogonalization}
 \usage{
-epo(data, ncomp = 2)
+epo(x, ncomp = 2)
 }
 \arguments{
-\item{data}{A numeric matrix, data frame or tibble.}
+\item{x}{A numeric matrix, data frame or tibble.}
 
 \item{ncomp}{An integer specifying the number of singular vectors to
 orthogonalize against. If not provided, the default value is 2.}
@@ -32,12 +32,12 @@ that are affected by external variations. It then projects the spectral matrix o
 the subspace orthogonal to these variations, effectively removing the unwanted
 perturbations and extracting the signal of interest.
 
-Let \eqn{\textbf{X}} be the spectral matrix. The EPO algorithm aims to split \eqn{\textbf{X}} into:
+Let \eqn{\textbf{x}} be the spectral matrix. The EPO algorithm aims to split \eqn{\textbf{x}} into:
 
-\deqn{\textbf{X} = \textbf{XP} + \textbf{XQ} + \textbf{R}}
+\deqn{\textbf{x} = \textbf{xP} + \textbf{xQ} + \textbf{R}}
 
 where \eqn{\textbf{P}} and \eqn{\textbf{Q}} are, respectively, the projection
-matrices of \eqn{\textbf{X}} onto the useful and perturbation (clutter) subspaces.
+matrices of \eqn{\textbf{x}} onto the useful and perturbation (clutter) subspaces.
 \eqn{\textbf{R}} is the residual matrix.
 }
 \references{

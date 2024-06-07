@@ -5,8 +5,8 @@
 \title{Correlation Coefficients: Pearson, Spearman, Kendall, Chatterjee, and Biweight Midcorrelation}
 \usage{
 correlation(
-  .data,
-  response_var,
+  x,
+  var,
   method = "pearson",
   .plot = FALSE,
   .color = "#111D71",
@@ -14,9 +14,9 @@ correlation(
 )
 }
 \arguments{
-\item{.data}{A data frame or tibble containing the variables of interest.}
+\item{x}{A data frame or tibble containing the variables of interest.}
 
-\item{response_var}{A character string specifying the name of the response variable.}
+\item{var}{A character string specifying the name of the response variable.}
 
 \item{method}{A character string indicating the correlation method to use. Allowed values are
 "pearson", "spearman", "kendall", "chatterjee", or "bicor" (for biweight midcorrelation).

@@ -40,6 +40,7 @@
 #' plot(x, y, type = "l", col = "red", main = "Lorentzian Profile")
 #'
 #' @export lorentzian
+#'
 lorentzian <- function(x, y0, xc, wL, A) {
   if (!is.numeric(x) || !is.vector(x)) {
     stop("'x' must be a numeric vector.")

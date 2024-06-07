@@ -19,14 +19,19 @@
 #' kurtosis or long-tailed behavior.
 #'
 #' @references
-#'  - Everitt, B. S., and Skrondal, A. (2010). The Cambridge Dictionary of Statistics.
+#'  - Everitt, B. S., and Skrondal, A. (2010).
+#'    The Cambridge Dictionary of Statistics.
 #'    Cambridge University Press.
-#'  - Tukey, J. (1977). Exploratory Data Analysis. Addison-Wesley
-#'  - Hubert M., and Vandervieren E. (2008). An Adjusted Boxplot for Skewed Distributions.
+#'  - Tukey, J. (1977).
+#'    Exploratory Data Analysis.
+#'    Addison-Wesley
+#'  - Hubert M., and Vandervieren E. (2008).
+#'    An Adjusted Boxplot for Skewed Distributions.
 #'    Computational Statistics & Data Analysis, 52(12):5186-5201
 #'
 #' @author Christian L. Goueguel
-#' @param X A numeric vector.
+#'
+#' @param x A numeric vector.
 #' @param k A numeric value specifying the fence factor. `k = 1.5` is the default
 #' as it strikes a balance between sensitivity to mild outliers and robustness against extreme outliers.
 #' `k = 3` is more lenient and is sometimes used when a higher tolerance for outliers is desired.
@@ -38,6 +43,7 @@
 #' These formulas are explicitly derived and optimized for the scenario where `k = 1.5` (Hubert and Vandervieren, 2008).
 #' Consequently, if the user attempts to use a value of `k` other than 1.5, the code will issue a warning message indicating that the formula is only defined for `k = 1.5`.
 #' In such cases, the code will automatically reset `k` to 1.5 and proceed with the calculations using the appropriate formulas and constants.
+#'
 #' @return A tibble with two columns:
 #'   - `data`: The original numeric values.
 #'   - `outlier`: A logical vector indicating whether each value is a potential outlier or not.
@@ -46,13 +52,15 @@
 #' iqrMethod(x)
 #'
 #' iqrMethod(x, skew = TRUE)
+#'
 #' @export iqrMethod
-iqrMethod <- function(X, k = 1.5, skew = FALSE) {
-  if (missing(X)) {
-    stop("Missing 'X' argument.")
+#'
+iqrMethod <- function(x, k = 1.5, skew = FALSE) {
+  if (missing(x)) {
+    stop("Missing 'x' argument.")
   }
-  if (!is.numeric(X)) {
-    stop("The input 'X' must be a numeric vector.")
+  if (!is.numeric(x)) {
+    stop("The input 'x' must be a numeric vector.")
   }
   if (!is.numeric(k) || k <= 0) {
     stop("The input 'k' must be a positive numeric scalar.")
@@ -60,20 +68,20 @@ iqrMethod <- function(X, k = 1.5, skew = FALSE) {
   if (!is.logical(skew)) {
     stop("'skew' must be of type boolean (TRUE or FALSE)")
   }
-  q1 <- stats::quantile(X, 0.25)
-  q3 <- stats::quantile(X, 0.75)
+  q1 <- stats::quantile(x, 0.25)
+  q3 <- stats::quantile(x, 0.75)
   iqr <- q3 - q1
 
   value <- NULL
   outlier <- NULL
   name <- NULL
-  x_tbl <- tibble::enframe(X)
+  x_tbl <- tibble::enframe(x)
 
   if (skew == FALSE) {
     lower_fence <- q1 - k * iqr
     upper_fence <- q3 + k * iqr
   } else {
-    medcouple <- robustbase::mc(X)
+    medcouple <- robustbase::mc(x)
     alpha <- dplyr::if_else(medcouple >= 0, 4, 3)
     beta <- dplyr::if_else(medcouple >= 0, 3, 4)
 

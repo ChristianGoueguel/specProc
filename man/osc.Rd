@@ -5,8 +5,8 @@
 \title{Orthogonal Signal Correction}
 \usage{
 osc(
-  X,
-  Y,
+  x,
+  y,
   method = "wold",
   center = TRUE,
   osc.ncomp = 4,
@@ -16,17 +16,17 @@ osc(
 )
 }
 \arguments{
-\item{X}{A matrix or data.frame containing the X-data (predictors).}
+\item{x}{A matrix or data.frame containing the x-data (predictors).}
 
-\item{Y}{A vector containing the Y-data (response). The length of \code{Y} must
-match the number of rows in \code{X}.}
+\item{y}{A vector containing the y-data (response). The length of \code{y} must
+match the number of rows in \code{x}.}
 
 \item{method}{A character string indicating the OSC method to use. Accepted
 values are \code{"wold"} (Wold's original method), \code{"sjoblom"} (Sjöblom's method), or
 \code{"wise"} (Wise and Gallagher's method).}
 
-\item{center}{A logical value indicating whether to center the X-data before
-applying OSC. If \code{TRUE}, the columns of X will be mean-centered.}
+\item{center}{A logical value indicating whether to center the x-data before
+applying OSC. If \code{TRUE}, the columns of x will be mean-centered.}
 
 \item{osc.ncomp}{An integer representing the number of OSC components to be
 calculated. The default value is 4.}
@@ -43,8 +43,8 @@ OSC algorithm. The default value is 20.}
 \value{
 An list containing the following components:
 \describe{
-\item{X_corrected}{The corrected X-data after applying OSC.}
-\item{scores}{The X-scores after orthogonal variations are removed.}
+\item{x_corrected}{The corrected x-data after applying OSC.}
+\item{scores}{The x-scores after orthogonal variations are removed.}
 \item{loadings}{The loadings.}
 \item{weights}{The wights.}
 \item{R2}{The value of R2}
@@ -56,9 +56,9 @@ spectral matrix that is orthogonal to the response vector.
 }
 \details{
 The OSC algorithm identifies and removes the orthogonal variation in the
-X-data by iteratively deflating the X-matrix with respect to the Y-data.
-The resulting X-matrix contains only the variation that is relevant to the
-Y-data, which can then be used for further modeling or analysis.
+x-data by iteratively deflating the x-matrix with respect to the y-data.
+The resulting x-matrix contains only the variation that is relevant to the
+y-data, which can then be used for further modeling or analysis.
 This function implements three different methods for OSC: the original
 method proposed by Wold et al. (1998), the method proposed by Sjöblom et al.
 (1998), and the method proposed by Wise and Gallagher.

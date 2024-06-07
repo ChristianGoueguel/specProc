@@ -4,10 +4,10 @@
 \alias{yGradientglsw}
 \title{y-Gradient Generalized Least Squares Weighting}
 \usage{
-yGradientglsw(X, y, alpha = 0.01)
+yGradientglsw(x, y, alpha = 0.01)
 }
 \arguments{
-\item{X}{A numeric matrix, data frame or tibble, representing the predictors data.}
+\item{x}{A numeric matrix, data frame or tibble, representing the predictors data.}
 
 \item{y}{A numeric vector representing the response vector.}
 

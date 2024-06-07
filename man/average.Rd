@@ -4,10 +4,10 @@
 \alias{average}
 \title{Fast Average for Large Dataset}
 \usage{
-average(data, .group_by = NULL)
+average(x, .group_by = NULL)
 }
 \arguments{
-\item{data}{A data frame or tibble.}
+\item{x}{A data frame or tibble.}
 
 \item{.group_by}{The column name to group the data by (optional).
 If not provided, the average of the overall data will be computed.}

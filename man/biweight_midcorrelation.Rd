@@ -4,15 +4,15 @@
 \alias{biweight_midcorrelation}
 \title{Biweight Midcorrelation}
 \usage{
-biweight_midcorrelation(X, Y)
+biweight_midcorrelation(x, y)
 }
 \arguments{
-\item{X}{A numeric vector.}
+\item{x}{A numeric vector.}
 
-\item{Y}{A numeric vector of the same length as X.}
+\item{y}{A numeric vector of the same length as \code{x}.}
 }
 \value{
-The biweight midcorrelation between X and Y.
+The biweight midcorrelation between \code{x} and \code{y}.
 }
 \description{
 This function computes the biweight midcorrelation between two numeric vectors.
@@ -22,15 +22,19 @@ sensitive to outliers than the traditional Pearson correlation coefficient.
 \details{
 The biweight midcorrelation is calculated using the biweight midvariances
 and biweight midcovariance, as described in the following paper:
-
-Wilcox, R. R. (1994). The Biweight Midcorrelation: A Robust Correlation
-Technique for Two Samples. Journal of Statistical Computation and Simulation,
-48(2), 103-110.
 }
 \examples{
 x <- rnorm(100)
 y <- 2 * x + rnorm(100)
 biweight_midcorrelation(x, y)
+
+}
+\references{
+\itemize{
+\item Wilcox, R. R. (1994).
+The Biweight Midcorrelation: A Robust Correlation Technique for Two Samples.
+Journal of Statistical Computation and Simulation, 48(2):103-110.
+}
 }
 \author{
 Christian L. Goueguel

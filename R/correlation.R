@@ -19,8 +19,8 @@
 #' recommended when the data contains extreme values or deviates significantly
 #' from normality.
 #'
-#' @param .data A data frame or tibble containing the variables of interest.
-#' @param response_var A character string specifying the name of the response variable.
+#' @param x A data frame or tibble containing the variables of interest.
+#' @param var A character string specifying the name of the response variable.
 #' @param method A character string indicating the correlation method to use. Allowed values are
 #'   "pearson", "spearman", "kendall", "chatterjee", or "bicor" (for biweight midcorrelation).
 #'   The default is "pearson".
@@ -43,15 +43,15 @@
 #' @author Christian L. Goueguel
 #'
 #' @export correlation
-correlation <- function(.data, response_var, method = "pearson", .plot = FALSE, .color = "#111D71", .interactive = FALSE) {
-  if (missing(.data)) {
-    stop("Missing '.data' argument.")
+correlation <- function(x, var, method = "pearson", .plot = FALSE, .color = "#111D71", .interactive = FALSE) {
+  if (missing(x)) {
+    stop("Missing 'x' argument.")
   }
-  if (!is.data.frame(.data) || !all(.data %>% purrr::map_lgl(is.numeric))) {
-    stop("Input '.data' must be a numeric data frame")
+  if (!isx.frame(x) || !all(x %>% purrr::map_lgl(is.numeric))) {
+    stop("Input 'x' must be a numeric data frame")
   }
-  if (!rlang::quo_name(rlang::enquo(response_var)) %in% colnames(.data)) {
-    stop("'response_var' not found in the data frame")
+  if (!rlang::quo_name(rlang::enquo(var)) %in% colnames(x)) {
+    stop("'var' not found in the data frame")
   }
   valid_methods <- c("pearson", "spearman", "kendall", "chatterjee", "bicor")
   if (!method %in% valid_methods) {
@@ -67,44 +67,44 @@ correlation <- function(.data, response_var, method = "pearson", .plot = FALSE, 
   reorder <- NULL
 
   if (method != "kendall") {
-    tbl_corr <- .data %>%
+    tbl_corr <- x %>%
       corrr::correlate(
         method = ifelse(method == "spearman", "spearman", "pearson"),
         use = "pairwise.complete.obs",
         quiet = TRUE
       ) %>%
       tibble::rownames_to_column("variable") %>%
-      dplyr::select(variable, {{response_var}}) %>%
-      dplyr::rename(.correlation = {{response_var}}) %>%
+      dplyr::select(variable, {{var}}) %>%
+      dplyr::rename(.correlation = {{var}}) %>%
       dplyr::mutate(method = method)
   } else {
-    tbl_corr <- .data %>%
+    tbl_corr <- x %>%
       corrr::correlate(
         method = "kendall",
         use = "pairwise.complete.obs",
         quiet = TRUE
       ) %>%
       tibble::rownames_to_column("variable") %>%
-      dplyr::select(variable, {{response_var}}) %>%
-      dplyr::rename(.correlation = {{response_var}}) %>%
+      dplyr::select(variable, {{var}}) %>%
+      dplyr::rename(.correlation = {{var}}) %>%
       dplyr::mutate(method = method)
   }
   if (method == "chatterjee") {
-    tbl_corr <- .data %>%
+    tbl_corr <- x %>%
       as.matrix() %>%
       XICOR::xicor(pvalue = FALSE, ties = TRUE) %>%
-      as.data.frame() %>%
+      asx.frame() %>%
       tibble::rownames_to_column("variable") %>%
       tibble::as_tibble() %>%
-      dplyr::select(variable, {{response_var}}) %>%
-      dplyr::rename(.correlation = {{response_var}}) %>%
+      dplyr::select(variable, {{var}}) %>%
+      dplyr::rename(.correlation = {{var}}) %>%
       dplyr::mutate(method = method)
   }
   if (method == "bicor") {
-    tbl_corr <- .data %>%
-      dplyr::select(-{{response_var}}) %>%
-      purrr::map_dbl(~ biweight_midcorrelation(X = ., Y = .data[[ rlang::ensym(response_var) ]])) %>%
-      as.data.frame() %>%
+    tbl_corr <- x %>%
+      dplyr::select(-{{var}}) %>%
+      purrr::map_dbl(~ biweight_midcorrelation(X = ., Y = x[[ rlang::ensym(var) ]])) %>%
+      asx.frame() %>%
       tibble::rownames_to_column("variable") %>%
       tibble::as_tibble() %>%
       dplyr::mutate(method = method)
@@ -112,14 +112,14 @@ correlation <- function(.data, response_var, method = "pearson", .plot = FALSE, 
   }
 
   if (method != "chatterjee" && method != "bicor") {
-    tbl_corr$variable <- names(.data)
+    tbl_corr$variable <- names(x)
     tbl_corr <- tbl_corr %>%
       tidyr::drop_na() %>%
       dplyr::arrange(desc(.correlation))
   } else if (method == "chatterjee") {
-    tbl_corr$variable <- names(.data)
+    tbl_corr$variable <- names(x)
     tbl_corr <- tbl_corr %>%
-      dplyr::filter(variable != rlang::quo_name(rlang::enquo(response_var))) %>%
+      dplyr::filter(variable != rlang::quo_name(rlang::enquo(var))) %>%
       tidyr::drop_na() %>%
       dplyr::arrange(desc(.correlation))
   } else {
@@ -135,7 +135,7 @@ correlation <- function(.data, response_var, method = "pearson", .plot = FALSE, 
     ggplot2::geom_vline(xintercept = 0, colour = "white", linewidth = 1) +
     ggplot2::scale_fill_manual(values = .color) +
     ggplot2::scale_y_continuous(breaks = c(-1, -.5, 0, .5, 1), limits = c(-1, 1)) +
-    ggplot2::labs(x = " ", y = paste0(rlang::quo_name(rlang::enquo(response_var)), " ", "correlation")) +
+    ggplot2::labs(x = " ", y = paste0(rlang::quo_name(rlang::enquo(var)), " ", "correlation")) +
     ggplot2::coord_flip() +
     cowplot::theme_minimal_vgrid() +
     ggplot2::theme(legend.position = "top")

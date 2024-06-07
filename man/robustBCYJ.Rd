@@ -4,10 +4,10 @@
 \alias{robustBCYJ}
 \title{Robust Box-Cox and Yeo-Johnson Transformation}
 \usage{
-robustBCYJ(.data, var = NULL, type = "bestObj", quant = 0.99, nbsteps = 2)
+robustBCYJ(x, var = NULL, type = "bestObj", quant = 0.99, nbsteps = 2)
 }
 \arguments{
-\item{.data}{A data frame or tibble containing the variables to be transformed.}
+\item{x}{A data frame or tibble containing the variables to be transformed.}
 
 \item{var}{A vector of character or numeric variable names to be transformed.
 If \code{NULL} (default), all columns are selected.}

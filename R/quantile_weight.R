@@ -21,6 +21,7 @@
 #'    Biometrika, 62(1):101–111.
 #'
 #' @author Christian L. Goueguel
+#'
 #' @param x A numeric vector.
 #' @param p A numeric value between 0 and 0.5 (`p = 0.25` by default).
 #' @param q A numeric value between 0.5 and 1 (`q = 0.75` by default).
@@ -28,10 +29,13 @@
 #' @return A tibble with two numeric columns:
 #'  - `LQW`: Left quantile weight.
 #'  - `RQW`: Right quantile weight.
+#'
 #' @examples
 #' vec <- c(-100, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100)
 #' quantile_weight(vec)
+#'
 #' @export quantile_weight
+#'
 quantile_weight <- function(x, p = 0.25, q = 0.75, drop.na = FALSE) {
   if (missing(x)) {
     stop("Missing 'x' argument.")

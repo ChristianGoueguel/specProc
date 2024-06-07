@@ -34,8 +34,8 @@
 #'
 #' where, \eqn{\textbf{X}_{new}} is the filtered matrix and \eqn{\textbf{G}} the filtering matrix.
 #'
-#' @param data1 A numeric matrix, data frame or tibble representing the first set of data.
-#' @param data2 A numeric matrix, data frame or tibble representing the second set of data.
+#' @param x1 A numeric matrix, data frame or tibble representing the first set of data.
+#' @param x2 A numeric matrix, data frame or tibble representing the second set of data.
 #' @param alpha A numeric value specifying the weighting parameter. Typical values
 #' range from 1 to 0.0001. Default is 0.01.
 #'
@@ -47,18 +47,18 @@
 #'
 #' @export glsw
 #'
-glsw <- function(data1, data2, alpha = 0.01) {
+glsw <- function(x1, x2, alpha = 0.01) {
 
-  if (missing(data1)) {
-    stop("Missing 'data1' argument.")
+  if (missing(x1)) {
+    stop("Missing 'x1' argument.")
   }
-  if (missing(data2)) {
-    stop("Missing 'data2' argument.")
+  if (missing(x2)) {
+    stop("Missing 'x2' argument.")
   }
-  if (nrow(data1) != nrow(data2)) {
+  if (nrow(x1) != nrow(x2)) {
     stop("Both data must have the same number of rows.")
   }
-  if (ncol(data1) != ncol(data2)) {
+  if (ncol(x1) != ncol(x2)) {
     stop("Both data must have the same number of columns.")
   }
   if (alpha < 1e-4 || alpha > 1) {
@@ -71,24 +71,20 @@ glsw <- function(data1, data2, alpha = 0.01) {
     return(xc)
   }
 
-  if (is.data.frame(data1) || tibble::is_tibble(data1)) {
-    X1 <- as.matrix(data1)
-  } else {
-    X1 <- data1
+  if (is.data.frame(x1) || tibble::is_tibble(x1)) {
+    x1 <- as.matrix(x1)
   }
 
-  if (is.data.frame(data2) || tibble::is_tibble(data2)) {
-    X2 <- as.matrix(data2)
-  } else {
-    X2 <- data2
+  if (is.data.frame(x2) || tibble::is_tibble(x2)) {
+    x2 <- as.matrix(x2)
   }
 
-  X1c <- centering(X1)
-  X2c <- centering(X2)
-  .diff <- X2c - X1c
+  x1c <- centering(x1)
+  x2c <- centering(x2)
+  .diff <- x2c - x1c
 
   .filter <- glsw_cpp(as.matrix(.diff), alpha)
-  colnames(.filter) <- colnames(X1)
+  colnames(.filter) <- colnames(x1)
 
   return(tibble::as_tibble(.filter))
 }

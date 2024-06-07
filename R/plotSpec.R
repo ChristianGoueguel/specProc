@@ -1,25 +1,43 @@
 #' @title Plotting of Spectra
-#' @description Spectrum plots are commonly x–y plots in which the x-axis represents the wavelength and the y-axis represents intensity of a spectrum's signal. The function allows to plot a spectrum or several spectra in a single plot, identified either by an id (for example, the samples or spectra id) or by a target variable (for example, the concentration of a chemical element) .
+#'
+#' @description
+#' Spectrum plots are commonly x–y plots in which the x-axis represents the
+#' wavelength and the y-axis represents intensity of a spectrum's signal.
+#' The function allows to plot a spectrum or several spectra in a single plot,
+#' identified either by an id (for example, the samples or spectra id) or by a
+#' target variable (for example, the concentration of a chemical element).
+#'
 #' @author Christian L. Goueguel
-#' @details This function is based on the ggplot2 package, thus allowing users to easily add or modify different components of the plot.
-#' @param .data data frame or tibble of the spectra.
-#' @param id optional (`NULL` by default). Column name of a factor variable that identified each spectrum.
-#' @param colvar optional (`NULL` by default). Column name of a numeric variable to be display in color scale.
-#' @param .interactive optional (`FALSE` by default). When set to `TRUE` enables interactive plot.
-#' @param drop_na Optional (`FALSE` by default). Remove rows with NA intensity if drop_na is `TRUE`.
+#'
+#' @details
+#' This function is based on the ggplot2 package, thus allowing users to easily
+#' add or modify different components of the plot.
+#'
+#' @param x data frame or tibble of the spectra.
+#' @param id optional (`NULL` by default). Column name of a factor variable
+#' that identified each spectrum.
+#' @param colvar optional (`NULL` by default). Column name of a numeric
+#' variable to be display in color scale.
+#' @param .interactive optional (`FALSE` by default). When set to `TRUE`
+#' enables interactive plot.
+#' @param drop_na Optional (`FALSE` by default). Remove rows with NA intensity
+#' if drop_na is `TRUE`.
+#'
 #' @return Object of class ggplot or of class plotly if `.interactive = TRUE`.
+#'
 #' @export plotSpec
-plotSpec <- function(.data, id = NULL, colvar = NULL, .interactive = FALSE, drop_na = FALSE) {
-  if (missing(.data)) {
+#'
+plotSpec <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop_na = FALSE) {
+  if (missing(x)) {
     stop("Missing 'data' argument.")
   }
-  if (!is.data.frame(.data) && !tibble::is_tibble(.data)) {
+  if (!isx.frame(x) && !tibble::is_tibble(x)) {
     stop("Input 'data' must be a data frame or tibble.")
   }
-  if (!rlang::quo_is_null(rlang::enquo(id)) && !(rlang::quo_name(rlang::enquo(id)) %in% colnames(.data))) {
+  if (!rlang::quo_is_null(rlang::enquo(id)) && !(rlang::quo_name(rlang::enquo(id)) %in% colnames(x))) {
     stop("The 'id' column does not exist in the provided data.")
   }
-  if (!rlang::quo_is_null(rlang::enquo(colvar)) && !(rlang::quo_name(rlang::enquo(colvar)) %in% colnames(.data))) {
+  if (!rlang::quo_is_null(rlang::enquo(colvar)) && !(rlang::quo_name(rlang::enquo(colvar)) %in% colnames(x))) {
     stop("The 'colvar' column does not exist in the provided data.")
   }
   if (!is.logical(.interactive)) {
@@ -35,9 +53,9 @@ plotSpec <- function(.data, id = NULL, colvar = NULL, .interactive = FALSE, drop
   intensity <- NULL
   wavelength <- NULL
 
-  x_long <- .data %>%
+  x_long <- x %>%
     tidyr::pivot_longer(
-      cols = setdiff(names(.data), id_cols),
+      cols = setdiff(names(x), id_cols),
       names_to = "wavelength",
       values_to = "intensity"
     ) %>%

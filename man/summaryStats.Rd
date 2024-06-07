@@ -4,10 +4,10 @@
 \alias{summaryStats}
 \title{Classical or Robust Descriptive Statistics}
 \usage{
-summaryStats(data, var = NULL, drop.na = TRUE, digits = 2, robust = FALSE)
+summaryStats(x, var = NULL, drop.na = TRUE, digits = 2, robust = FALSE)
 }
 \arguments{
-\item{data}{A data frame or tibble containing the variable(s) of interest.}
+\item{x}{A data frame or tibble.}
 
 \item{var}{A character vector specifying the variable(s) for which to calculate the
 summary statistics. If left as \code{NULL} (the default), summary statistics will
@@ -43,6 +43,7 @@ iris |> summaryStats(
   var = c("Sepal.Length", "Petal.Length"),
   robust = TRUE
   )
+
 }
 \author{
 Christian L. Goueguel

@@ -4,15 +4,15 @@
 \alias{biweight_midcovariance}
 \title{Biweight Midcovariance}
 \usage{
-biweight_midcovariance(X, Y)
+biweight_midcovariance(x, y)
 }
 \arguments{
-\item{X}{A numeric vector.}
+\item{x}{A numeric vector.}
 
-\item{Y}{A numeric vector of the same length as \code{X}.}
+\item{y}{A numeric vector of the same length as \code{x}.}
 }
 \value{
-The biweight midcovariance between \code{X} and \code{Y}.
+The biweight midcovariance between \code{x} and \code{y}.
 }
 \description{
 This function computes the biweight midcovariance, a robust measure of
@@ -29,10 +29,15 @@ biweight_midcovariance(x, y)
 x <- c(1, 2, 3, 4, 100)  # An outlier at 100
 y <- c(2, 3, 4, 5, 6)
 biweight_midcovariance(x, y)
+
 }
 \references{
 \itemize{
-\item Wilcox, R., (1997). Introduction to Robust Estimation and Hypothesis Testing.
+\item Wilcox, R., (1997).
+Introduction to Robust Estimation and Hypothesis Testing.
 Academic Press
 }
+}
+\author{
+Christian L. Goueguel
 }

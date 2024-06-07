@@ -19,7 +19,7 @@
 #' while leveraging the efficient C++ implementation for the core computations. The overall
 #' time complexity remains \emph{O(n × m)}.
 #'
-#' @param data A data frame or tibble.
+#' @param x A data frame or tibble.
 #' @param .group_by The column name to group the data by (optional).
 #' If not provided, the average of the overall data will be computed.
 #' @return
@@ -31,35 +31,35 @@
 #'
 #' @export average
 #'
-average <- function(data, .group_by = NULL) {
-  if (missing(data)) {
-    stop("Missing 'data' argument.")
+average <- function(x, .group_by = NULL) {
+  if (missing(x)) {
+    stop("Missing 'x' argument.")
   }
-  if (!is.data.frame(data) && !tibble::is_tibble(data)) {
-    stop("'data' must be a data frame or tibble.")
+  if (!is.data.frame(x) && !tibble::is_tibble(x)) {
+    stop("'x' must be a data frame or tibble.")
   }
   if (!rlang::quo_is_null(rlang::enquo(.group_by)) &&
-      !rlang::quo_name(rlang::enquo(.group_by)) %in% colnames(data)) {
+      !rlang::quo_name(rlang::enquo(.group_by)) %in% colnames(x)) {
     stop("Grouping variable '.group_by' not found in the data")
   }
 
   if (rlang::quo_is_null(rlang::enquo(.group_by))) {
-    if (!all(data %>% purrr::map_lgl(is.numeric))) {
+    if (!all(x %>% purrr::map_lgl(is.numeric))) {
       stop("The input 'data' must be numeric")
     } else {
-      Xmat <- data %>% as.matrix()
+      Xmat <- x %>% as.matrix()
       avg <- computeMeans(Xmat)
-      colnames(avg) <- names(data)
+      colnames(avg) <- names(x)
     }
   } else {
-    Xmat <- data %>% dplyr::select(-{{ .group_by }}) %>% as.matrix()
-    grp_vec <- data[[rlang::ensym(.group_by)]]
+    Xmat <- x %>% dplyr::select(-{{ .group_by }}) %>% as.matrix()
+    grp_vec <- x[[rlang::ensym(.group_by)]]
 
     if (!is.factor(grp_vec)) {
       grp_vec <- forcats::as_factor(grp_vec)
     }
 
-    data_name <- data %>% dplyr::select(-{{ .group_by }}) %>% names()
+    data_name <- x %>% dplyr::select(-{{ .group_by }}) %>% names()
 
     avg <- computeGroupedMeans(Xmat, grp_vec)
     colnames(avg) <- data_name

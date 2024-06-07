@@ -14,15 +14,15 @@
 #' the subspace orthogonal to these variations, effectively removing the unwanted
 #' perturbations and extracting the signal of interest.
 #'
-#' Let \eqn{\textbf{X}} be the spectral matrix. The EPO algorithm aims to split \eqn{\textbf{X}} into:
+#' Let \eqn{\textbf{x}} be the spectral matrix. The EPO algorithm aims to split \eqn{\textbf{x}} into:
 #'
-#' \deqn{\textbf{X} = \textbf{XP} + \textbf{XQ} + \textbf{R}}
+#' \deqn{\textbf{x} = \textbf{xP} + \textbf{xQ} + \textbf{R}}
 #'
 #' where \eqn{\textbf{P}} and \eqn{\textbf{Q}} are, respectively, the projection
-#' matrices of \eqn{\textbf{X}} onto the useful and perturbation (clutter) subspaces.
+#' matrices of \eqn{\textbf{x}} onto the useful and perturbation (clutter) subspaces.
 #' \eqn{\textbf{R}} is the residual matrix.
 #'
-#' @param data A numeric matrix, data frame or tibble.
+#' @param x A numeric matrix, data frame or tibble.
 #' @param ncomp An integer specifying the number of singular vectors to
 #' orthogonalize against. If not provided, the default value is 2.
 #'
@@ -41,34 +41,32 @@
 #'
 #' @export epo
 #'
-epo <- function(data, ncomp = 2) {
-  if (missing(data)) {
-    stop("Missing 'data' argument.")
+epo <- function(x, ncomp = 2) {
+  if (missing(x)) {
+    stop("Missing 'x' argument.")
   }
 
-  if (is.data.frame(data) || tibble::is_tibble(data)) {
-    X <- as.matrix(data)
-  } else {
-    X <- data
+  if (is.data.frame(x) || tibble::is_tibble(x)) {
+    x <- as.matrix(x)
   }
 
-  if (dim(X)[1] == 1 || dim(X)[2] == 1) {
+  if (dim(x)[1] == 1 || dim(x)[2] == 1) {
     stop("The dimensions of the input data must be at least 2 x 2")
   } else {
-    ncomp <- min(ncomp, dim(X)[1], dim(X)[2])
+    ncomp <- min(ncomp, dim(x)[1], dim(x)[2])
   }
 
   if (ncomp %% 1 != 0 | ncomp <= 0) {
     stop("'ncomp' must be a positive integer greater than 0.")
   }
 
-  result <- epo_cpp(X, ncomp)
+  result <- epo_cpp(x, ncomp)
 
   result$correction <- tibble::as_tibble(result$correction)
-  colnames(result$correction) <- colnames(X)
+  colnames(result$correction) <- colnames(x)
 
   result$clutter <- tibble::as_tibble(result$clutter)
-  colnames(result$clutter) <- colnames(X)
+  colnames(result$clutter) <- colnames(x)
 
   result$loadings <- tibble::as_tibble(result$loadings)
 

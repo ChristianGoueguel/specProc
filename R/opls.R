@@ -2,79 +2,74 @@
 #'
 #' @description
 #'  This function fits an Orthogonal Projections to Latent Structures (OPLS)
-#'  model to the provided X (predictor) and Y (response) data.
+#'  model to the provided x (predictor) and y (response) data.
 #'
 #' @details
 #'  OPLS is a supervised modeling technique used to find the
-#'  multidimensional direction in the X-space that explains the maximum
-#'  multidimensional variance in the Y-space. It separates the systematic
-#'  variation in X into two parts: one that is linearly related to Y
+#'  multidimensional direction in the x-space that explains the maximum
+#'  multidimensional variance in the y-space. It separates the systematic
+#'  variation in x into two parts: one that is linearly related to y
 #'  (predictive components) and one that is statistically uncorrelated to the
-#'  response variable Y (orthogonal components).
+#'  response variable y (orthogonal components).
 #'
 #' @references
-#'  - Trygg, J., and Wold, S., (2002). Orthogonal projections to latent structures (O-PLS).
+#'  - Trygg, J., and Wold, S., (2002).
+#'    Orthogonal projections to latent structures (O-PLS).
 #'    Journal of Chemometrics, 16(3):119-128.
 #'
 #' @author Christian L. Goueguel
-#' @param X A data.frame or tibble containing the X-data (predictors).
-#' @param Y A data.frame or tibble containing the Y-data (responses).
+#'
+#' @param x A data.frame or tibble containing the x-data (predictors).
+#' @param y A data.frame or tibble containing the y-data (responses).
 #' @param scale A character string indicating the scaling method for the data
 #' ("center" or "pareto").
 #' @param crossval An integer representing the number of cross-validation groups.
 #' @param permutation An integer representing the number of permutations for
 #' the permutation test.
+#'
 #' @return A list containing the following components:
 #' \describe{
-#'   \item{x_scores}{A matrix of X-scores (the projections of the X-data onto
+#'   \item{x_scores}{A matrix of x-scores (the projections of the x-data onto
 #'   the predictive components).}
-#'   \item{x_loadings}{A matrix of X-loadings (the weights of the original
-#'   X-variables on the predictive components).}
-#'   \item{x_weights}{A matrix of X-weights (the weights used to calculate
-#'   the X-scores).}
+#'   \item{x_loadings}{A matrix of x-loadings (the weights of the original
+#'   x-variables on the predictive components).}
+#'   \item{x_weights}{A matrix of x-weights (the weights used to calculate
+#'   the x-scores).}
 #'   \item{orthoScores}{A matrix of orthogonal scores (the projections of
-#'   the X-data onto the orthogonal components).}
+#'   the x-data onto the orthogonal components).}
 #'   \item{orthoLoadings}{A matrix of orthogonal loadings (the weights of
-#'   the original X-variables on the orthogonal components).}
+#'   the original x-variables on the orthogonal components).}
 #'   \item{orthoWeights}{A matrix of orthogonal weights (the weights used
 #'   to calculate the orthogonal scores).}
-#'   \item{y_weights}{A matrix of Y-weights (the weights used to calculate
-#'   the Y-scores).}
-#'   \item{y_orthoWeights}{A matrix of orthogonal Y-weights (the weights
-#'   used to calculate the orthogonal Y-scores).}
-#'   \item{y_scores}{A matrix of Y-scores (the projections of the Y-data
+#'   \item{y_weights}{A matrix of y-weights (the weights used to calculate
+#'   the y-scores).}
+#'   \item{y_orthoWeights}{A matrix of orthogonal y-weights (the weights
+#'   used to calculate the orthogonal y-scores).}
+#'   \item{y_scores}{A matrix of y-scores (the projections of the y-data
 #'   onto the predictive components).}
 #' }
 #' @export opls
-#' @examples
-#' \dontrun{
-#' opls_result <- opls(
-#' x_data, y_data,
-#' scale = "center",
-#' crossval = 7,
-#' permutation = 20
-#' )
-#' }
-opls <- function(X, Y, scale = "center", crossval = 7, permutation = 20) {
-  if (is.null(X) == TRUE) {
-    stop("X-data must be provided")
+#'
+opls <- function(x, y, scale = "center", crossval = 7, permutation = 20) {
+  if (is.null(x) == TRUE) {
+    stop("x-data must be provided")
   }
-  if (is.null(Y) == TRUE) {
-    stop("Y-data must be provided")
+  if (is.null(y) == TRUE) {
+    stop("y-data must be provided")
   }
-  if (is.data.frame(X) == FALSE & tibble::is_tibble(X) == FALSE) {
-    stop("X-data must be of class data.frame, tbl_df, or tbl")
+  if (is.data.frame(x) == FALSE & tibble::is_tibble(x) == FALSE) {
+    stop("x-data must be of class data.frame, tbl_df, or tbl")
   }
-  if (is.data.frame(Y) == FALSE & tibble::is_tibble(Y) == FALSE) {
-    stop("Y-data must be of class data.frame, tbl_df, or tbl")
+  if (is.data.frame(y) == FALSE & tibble::is_tibble(y) == FALSE) {
+    stop("y-data must be of class data.frame, tbl_df, or tbl")
   }
 
-  X <- as.matrix(X)
-  Y <- as.matrix(Y)
+  x <- as.matrix(x)
+  y <- as.matrix(y)
 
   modout <- ropls::opls(
-    X,
-    Y,
+    x,
+    y,
     predI = 1,
     orthoI = NA,
     algoC = "nipals",

@@ -14,16 +14,18 @@
 #' The bias-correction factors used in the calculations have been refined
 #' according to Akinshin, A., (2022).
 #'
-#' @param X A numeric vector of data values.
+#' @param x A numeric vector of data values.
 #' @param estimator A character string indicating whether to calculate the "Sn" or "Qn" estimator.
 #' @param drop.na A logical value indicating whether to remove missing values (`NA`) from the input vector.
 #' @return A numeric value representing the calculated Sn or Qn scale estimator.
+#'
 #' @author Christian L. Goueguel
+#'
 #' @references
 #'  - Rousseeuw, P.J. and Croux, C. (1993). Alternatives to the median absolute deviation.
 #'    Journal of the American Statistical Association, 88(424):1273-1283.
 #'  - Akinshin, A., (2022). Finite-sample Rousseeuw-Croux scale estimators.
-#'    arXiv:2209.12268v1.
+#'    arxiv:2209.12268v1.
 #'
 #' @examples
 #' # Example 1:
@@ -44,26 +46,26 @@
 #' Qn = rousseeuwCroux(x, estimator = "Qn")
 #' )
 #' @export rousseeuwCroux
-rousseeuwCroux <- function(X, estimator = c("Sn", "Qn"), drop.na = FALSE) {
-  if (missing(X)) {
-    stop("Input 'X' must be provided.")
+rousseeuwCroux <- function(x, estimator = c("Sn", "Qn"), drop.na = FALSE) {
+  if (missing(x)) {
+    stop("Input 'x' must be provided.")
   }
-  if (!is.numeric(X)) {
-    stop("'X' must be a numeric vector.")
+  if (!is.numeric(x)) {
+    stop("'x' must be a numeric vector.")
   }
-  if (length(unique(X)) == 1) {
-    stop("'X' cannot be a constant vector.")
+  if (length(unique(x)) == 1) {
+    stop("'x' cannot be a constant vector.")
   }
-  if (length(X) < 2) {
-    stop("'X' must have at least two elements.")
+  if (length(x) < 2) {
+    stop("'x' must have at least two elements.")
   } else {
-    n <- length(X)
+    n <- length(x)
   }
 
   estimator <- match.arg(estimator)
 
   if (drop.na != FALSE) {
-    X <- X[!is.na(X)]
+    x <- x[!is.na(x)]
   }
 
   if (estimator == "Sn") {
@@ -88,7 +90,7 @@ rousseeuwCroux <- function(X, estimator = c("Sn", "Qn"), drop.na = FALSE) {
       ifelse(n %% 2 == 1, n_odd, n_even)
     }
     factor <- if (n <= 100) factors[n] else predict_factor(n)
-    res <- robustbase::Sn(X, constant = 1.1926 * factor)
+    res <- robustbase::Sn(x, constant = 1.1926 * factor)
   } else {
     factors <- c(NA,
       0.3995, 0.9939, 0.5133, 0.8441, 0.6122, 0.8589, 0.6700, 0.8736,
@@ -111,7 +113,7 @@ rousseeuwCroux <- function(X, estimator = c("Sn", "Qn"), drop.na = FALSE) {
       ifelse(n %% 2 == 1, n_odd, n_even)
     }
     factor <- if (n <= 100) factors[n] else predict_factor(n)
-    res <- robustbase::Qn(X, constant = 2.2191 * factor)
+    res <- robustbase::Qn(x, constant = 2.2191 * factor)
   }
   return(res)
 }

@@ -4,12 +4,12 @@
 \alias{opls}
 \title{Orthogonal Projections to Latent Structures}
 \usage{
-opls(X, Y, scale = "center", crossval = 7, permutation = 20)
+opls(x, y, scale = "center", crossval = 7, permutation = 20)
 }
 \arguments{
-\item{X}{A data.frame or tibble containing the X-data (predictors).}
+\item{x}{A data.frame or tibble containing the x-data (predictors).}
 
-\item{Y}{A data.frame or tibble containing the Y-data (responses).}
+\item{y}{A data.frame or tibble containing the y-data (responses).}
 
 \item{scale}{A character string indicating the scaling method for the data
 ("center" or "pareto").}
@@ -22,51 +22,42 @@ the permutation test.}
 \value{
 A list containing the following components:
 \describe{
-\item{x_scores}{A matrix of X-scores (the projections of the X-data onto
+\item{x_scores}{A matrix of x-scores (the projections of the x-data onto
 the predictive components).}
-\item{x_loadings}{A matrix of X-loadings (the weights of the original
-X-variables on the predictive components).}
-\item{x_weights}{A matrix of X-weights (the weights used to calculate
-the X-scores).}
+\item{x_loadings}{A matrix of x-loadings (the weights of the original
+x-variables on the predictive components).}
+\item{x_weights}{A matrix of x-weights (the weights used to calculate
+the x-scores).}
 \item{orthoScores}{A matrix of orthogonal scores (the projections of
-the X-data onto the orthogonal components).}
+the x-data onto the orthogonal components).}
 \item{orthoLoadings}{A matrix of orthogonal loadings (the weights of
-the original X-variables on the orthogonal components).}
+the original x-variables on the orthogonal components).}
 \item{orthoWeights}{A matrix of orthogonal weights (the weights used
 to calculate the orthogonal scores).}
-\item{y_weights}{A matrix of Y-weights (the weights used to calculate
-the Y-scores).}
-\item{y_orthoWeights}{A matrix of orthogonal Y-weights (the weights
-used to calculate the orthogonal Y-scores).}
-\item{y_scores}{A matrix of Y-scores (the projections of the Y-data
+\item{y_weights}{A matrix of y-weights (the weights used to calculate
+the y-scores).}
+\item{y_orthoWeights}{A matrix of orthogonal y-weights (the weights
+used to calculate the orthogonal y-scores).}
+\item{y_scores}{A matrix of y-scores (the projections of the y-data
 onto the predictive components).}
 }
 }
 \description{
 This function fits an Orthogonal Projections to Latent Structures (OPLS)
-model to the provided X (predictor) and Y (response) data.
+model to the provided x (predictor) and y (response) data.
 }
 \details{
 OPLS is a supervised modeling technique used to find the
-multidimensional direction in the X-space that explains the maximum
-multidimensional variance in the Y-space. It separates the systematic
-variation in X into two parts: one that is linearly related to Y
+multidimensional direction in the x-space that explains the maximum
+multidimensional variance in the y-space. It separates the systematic
+variation in x into two parts: one that is linearly related to y
 (predictive components) and one that is statistically uncorrelated to the
-response variable Y (orthogonal components).
-}
-\examples{
-\dontrun{
-opls_result <- opls(
-x_data, y_data,
-scale = "center",
-crossval = 7,
-permutation = 20
-)
-}
+response variable y (orthogonal components).
 }
 \references{
 \itemize{
-\item Trygg, J., and Wold, S., (2002). Orthogonal projections to latent structures (O-PLS).
+\item Trygg, J., and Wold, S., (2002).
+Orthogonal projections to latent structures (O-PLS).
 Journal of Chemometrics, 16(3):119-128.
 }
 }

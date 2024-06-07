@@ -5,7 +5,7 @@
 \title{Peak Fitting}
 \usage{
 peakfit(
-  .data,
+  x,
   profile = "voigt",
   wL = NULL,
   wG = NULL,
@@ -17,23 +17,24 @@ peakfit(
 )
 }
 \arguments{
-\item{.data}{Data frame of emission spectra}
+\item{x}{A data frame or tibble}
 
-\item{profile}{(character) Lineshape function: "lorentzian", "gaussian" or "voigt"}
+\item{profile}{A character specifying the lineshape function to be used:
+"lorentzian", "gaussian" or "voigt"}
 
-\item{wL}{(numeric) Lorentzian full width at half maximum (initial guess)}
+\item{wL}{A numeric specifying the Lorentzian full width at half maximum (initial guess)}
 
-\item{wG}{(numeric) Gaussian full width at half maximum (initial guess)}
+\item{wG}{A numeric specifying the Gaussian full width at half maximum (initial guess)}
 
-\item{A}{(numeric) Peak area (initial guess)}
+\item{A}{A numeric specifying the peak area (initial guess)}
 
-\item{wlgth.min}{(numeric) Lower bound of the wavelength subset}
+\item{wlgth.min}{A numeric specifying the lower bound of the wavelength subset}
 
-\item{wlgth.max}{(numeric) Upper bound of the wavelength subset}
+\item{wlgth.max}{A numeric specifying the upper bound of the wavelength subset}
 
-\item{id}{Spectra name (optional)}
+\item{id}{A character specifying the spectra id (optional)}
 
-\item{max.iter}{(numeric) Maximum number of iteration (200 by default)}
+\item{max.iter}{A numeric specifying the maximum number of iteration (200 by default)}
 }
 \value{
 Fitted value and the estimated parameters along with the corresponding errors
@@ -42,7 +43,8 @@ Fitted value and the estimated parameters along with the corresponding errors
 Fitting of a single spectral line by lineshape functions with variable parameters.
 }
 \details{
-The function uses \code{minpack.lm::nlsLM}, which is based on the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals.
+The function uses \code{minpack.lm::nlsLM}, which is based on the Levenberg-Marquardt
+algorithm for searching the minimum value of the square of the sum of the residuals.
 }
 \author{
 Christian L. Goueguel

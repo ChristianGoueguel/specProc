@@ -4,10 +4,10 @@
 \alias{rousseeuwCroux}
 \title{Rousseeuw-Croux Scale Estimators}
 \usage{
-rousseeuwCroux(X, estimator = c("Sn", "Qn"), drop.na = FALSE)
+rousseeuwCroux(x, estimator = c("Sn", "Qn"), drop.na = FALSE)
 }
 \arguments{
-\item{X}{A numeric vector of data values.}
+\item{x}{A numeric vector of data values.}
 
 \item{estimator}{A character string indicating whether to calculate the "Sn" or "Qn" estimator.}
 
@@ -54,7 +54,7 @@ Qn = rousseeuwCroux(x, estimator = "Qn")
 \item Rousseeuw, P.J. and Croux, C. (1993). Alternatives to the median absolute deviation.
 Journal of the American Statistical Association, 88(424):1273-1283.
 \item Akinshin, A., (2022). Finite-sample Rousseeuw-Croux scale estimators.
-arXiv:2209.12268v1.
+arxiv:2209.12268v1.
 }
 }
 \author{

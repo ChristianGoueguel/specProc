@@ -21,7 +21,7 @@
 #'    applied, and the solution with the lowest objective function value is kept.
 #'    For variables with negative values, only YJ is applied.
 #'
-#' @param .data A data frame or tibble containing the variables to be transformed.
+#' @param x A data frame or tibble containing the variables to be transformed.
 #' @param var A vector of character or numeric variable names to be transformed.
 #'   If `NULL` (default), all columns are selected.
 #' @param type A character string specifying the transformation method(s) to use.
@@ -47,17 +47,19 @@
 #'   Journal of the Royal Statistical Society, Series B, 26:211–252.
 #'
 #' @author Christian L. Goueguel
+#'
 #' @export robustBCYJ
-robustBCYJ <- function(.data, var = NULL, type = "bestObj", quant = 0.99, nbsteps = 2) {
-  if (missing(.data)) {
+#'
+robustBCYJ <- function(x, var = NULL, type = "bestObj", quant = 0.99, nbsteps = 2) {
+  if (missing(x)) {
     stop("Missing 'data' argument.")
   }
-  if (!is.data.frame(.data) && !tibble::is_tibble(.data)) {
+  if (!is.data.frame(x) && !tibble::is_tibble(x)) {
     stop("Input 'data' must be a data frame or tibble.")
   }
   if (!is.null(var)) {
     if (is.character(var)) {
-      not_found <- var[!var %in% names(.data)]
+      not_found <- var[!var %in% names(x)]
       if (length(not_found) > 0) {
         stop("The following variable(s) are not present in the data: ", paste(not_found, collapse = ", "))
       }
@@ -78,7 +80,7 @@ robustBCYJ <- function(.data, var = NULL, type = "bestObj", quant = 0.99, nbstep
     stop("'nbsteps' must be a positive integer")
   }
   . <- NULL
-  s_tbl <- .data %>%
+  s_tbl <- x %>%
     dplyr::select(dplyr::where(is.numeric)) %>%
     { if (!is.null(var)) dplyr::select(., dplyr::all_of(var)) else . }
 

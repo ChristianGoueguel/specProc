@@ -5,7 +5,7 @@
 \title{Adjusted Boxplot for Skewed Distributions}
 \usage{
 adjboxplot(
-  data,
+  x,
   .plot = TRUE,
   xlabels.angle = 90,
   xlabels.vjust = 1,
@@ -17,7 +17,7 @@ adjboxplot(
 )
 }
 \arguments{
-\item{data}{A numeric data frame or tibble.}
+\item{x}{A numeric data frame or tibble.}
 
 \item{.plot}{A logical value indicating whether to plot the adjusted boxplot (default is \code{TRUE}).}
 

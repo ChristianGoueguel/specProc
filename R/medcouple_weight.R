@@ -14,17 +14,21 @@
 #' to the specified breakdown value of 12.5%.
 #'
 #' @references
-#'  - Brys, G., Hubert, M., and Struyf, A. (2006). Robust measures of tail weight.
+#'  - Brys, G., Hubert, M., and Struyf, A. (2006).
+#'    Robust measures of tail weight.
 #'    Computational Statistics & Data Analysis, 50(3):733-759
-#'  - Brys, G., Hubert, M., and Struyf, A. (2004). A robust measure of skewness.
+#'  - Brys, G., Hubert, M., and Struyf, A. (2004).
+#'    A robust measure of skewness.
 #'    Journal of Computational and Graphical Statistics, 13(4):996-1017
 #'
 #' @author Christian L. Goueguel
 #' @param x A numeric vector.
 #' @param drop.na Logical value indicating whether to remove missing values (NA) or not.
+#'
 #' @return A tibble with two numeric columns:
 #'  - `LMC`: Left medcouple.
 #'  - `RMC`: Right medcouple.
+#'
 #' @examples
 #' vec <- c(-100, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100)
 #' # non-robust approach
@@ -32,7 +36,9 @@
 #'
 #' # robust approach
 #' medcouple_weight(vec)
+#'
 #' @export medcouple_weight
+#'
 medcouple_weight <- function(x, drop.na = FALSE) {
   if (missing(x)) {
     stop("Missing 'x' argument.")

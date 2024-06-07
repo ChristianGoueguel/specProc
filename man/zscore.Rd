@@ -4,10 +4,10 @@
 \alias{zscore}
 \title{Classical or Robust Z-Score}
 \usage{
-zscore(X, robust = TRUE)
+zscore(x, robust = TRUE)
 }
 \arguments{
-\item{X}{A numeric vector.}
+\item{x}{A numeric vector.}
 
 \item{robust}{A logical value indicating whether to calculate classical or robust (default) z-score.}
 }

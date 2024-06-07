@@ -4,10 +4,10 @@
 \alias{iqrMethod}
 \title{Interquartile Range Method}
 \usage{
-iqrMethod(X, k = 1.5, skew = FALSE)
+iqrMethod(x, k = 1.5, skew = FALSE)
 }
 \arguments{
-\item{X}{A numeric vector.}
+\item{x}{A numeric vector.}
 
 \item{k}{A numeric value specifying the fence factor. \code{k = 1.5} is the default
 as it strikes a balance between sensitivity to mild outliers and robustness against extreme outliers.
@@ -52,13 +52,18 @@ x <- rexp(7, rate = 0.5)
 iqrMethod(x)
 
 iqrMethod(x, skew = TRUE)
+
 }
 \references{
 \itemize{
-\item Everitt, B. S., and Skrondal, A. (2010). The Cambridge Dictionary of Statistics.
+\item Everitt, B. S., and Skrondal, A. (2010).
+The Cambridge Dictionary of Statistics.
 Cambridge University Press.
-\item Tukey, J. (1977). Exploratory Data Analysis. Addison-Wesley
-\item Hubert M., and Vandervieren E. (2008). An Adjusted Boxplot for Skewed Distributions.
+\item Tukey, J. (1977).
+Exploratory Data Analysis.
+Addison-Wesley
+\item Hubert M., and Vandervieren E. (2008).
+An Adjusted Boxplot for Skewed Distributions.
 Computational Statistics & Data Analysis, 52(12):5186-5201
 }
 }

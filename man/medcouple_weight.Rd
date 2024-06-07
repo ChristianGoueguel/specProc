@@ -38,12 +38,15 @@ moments::kurtosis(vec)
 
 # robust approach
 medcouple_weight(vec)
+
 }
 \references{
 \itemize{
-\item Brys, G., Hubert, M., and Struyf, A. (2006). Robust measures of tail weight.
+\item Brys, G., Hubert, M., and Struyf, A. (2006).
+Robust measures of tail weight.
 Computational Statistics & Data Analysis, 50(3):733-759
-\item Brys, G., Hubert, M., and Struyf, A. (2004). A robust measure of skewness.
+\item Brys, G., Hubert, M., and Struyf, A. (2004).
+A robust measure of skewness.
 Journal of Computational and Graphical Statistics, 13(4):996-1017
 }
 }

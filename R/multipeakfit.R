@@ -1,24 +1,47 @@
 #' @title Multiple Peaks Fitting
+#'
 #' @author Christian L. Goueguel
-#' @description Fitting of multiple spectral lines by the same or different lineshape functions with variable parameters.
-#' @details The function uses `minpack.lm::nlsLM`, which is based on the Levenberg-Marquardt algorithm for searching the minimum value of the square of the sum of the residuals.
-#' @param .data Data frame of emission spectra
-#' @param peaks (vector) Center wavelengths of selected peaks
-#' @param profiles (vector) Lineshape functions
-#' @param wL (numeric) Lorentzian full width at half maximum (overall initial guess)
-#' @param wG (numeric) Gaussian full width at half maximum (overall initial guess)
-#' @param A (numeric) Peak area (overall initial guess)
-#' @param wlgth.min (numeric) Lower bound of the wavelength subset
-#' @param wlgth.max (numeric) Upper bound of the wavelength subset
-#' @param id Spectra name (optional)
-#' @param max.iter (numeric) Maximum number of iteration (200 by default)
-#' @return Fitted value for each peak and the estimated parameters along with the corresponding errors
+#'
+#' @description
+#' Fitting of multiple spectral lines by the same or different lineshape
+#' functions with variable parameters.
+#'
+#' @details
+#' The function uses `minpack.lm::nlsLM`, which is based on the Levenberg-Marquardt
+#' algorithm for searching the minimum value of the square of the sum of the residuals.
+#'
+#' @param x A data frame or tibble
+#' @param peaks A vector of the selected peaks center wavelengths
+#' @param profiles A vector of the lineshape functions for fitting
+#' @param wL A numeric of the Lorentzian full width at half maximum (overall initial guess)
+#' @param wG A numeric of the Gaussian full width at half maximum (overall initial guess)
+#' @param A A numeric of the peak area (overall initial guess)
+#' @param wlgth.min A numeric of the lower bound of the wavelength subset
+#' @param wlgth.max A numeric of the upper bound of the wavelength subset
+#' @param id A character specifying the spectra id (optional)
+#' @param max.iter A numeric specifying the maximum number of iteration (200 by default)
+#'
+#' @return Fitted value for each peak and the estimated parameters along with the
+#' corresponding errors
+#'
 #' @export multipeakfit
-multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL, wlgth.min = NULL, wlgth.max = NULL, id = NULL, max.iter = 200) {
-  if (length(.data) == 0 & is.null(.data) == TRUE) {
+#'
+multipeakfit <- function(
+    x,
+    peaks,
+    profiles,
+    wL = NULL,
+    wG = NULL,
+    A = NULL,
+    wlgth.min = NULL,
+    wlgth.max = NULL,
+    id = NULL,
+    max.iter = 200) {
+
+  if (length(x) == 0 & is.null(x) == TRUE) {
     stop("Apparently you forgot to provide the spectra.")
   }
-  if (is.data.frame(.data) == FALSE & tibble::is.tibble(.data) == FALSE) {
+  if (isx.frame(x) == FALSE & tibble::is.tibble(x) == FALSE) {
     stop("Data must be of class tbl_df, tbl or data.frame")
   }
   if (is.numeric(peaks) == FALSE) {
@@ -34,14 +57,13 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
     stop("Peaks and profiles must have the same length")
   }
 
-  x <- NULL
   fit <- NULL
 
   rlang::check_installed("broom")
   if (is.null(id) == TRUE) {
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
       wlgth.min <- as.numeric(wlgth.min)
-      df <- .data %>%
+      df <- x %>%
         tidyr::pivot_longer(
           cols = tidyr::everything(),
           names_to = "x",
@@ -52,7 +74,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
     }
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == FALSE) {
       wlgth.max <- as.numeric(wlgth.max)
-      df <- .data %>%
+      df <- x %>%
         tidyr::pivot_longer(
           cols = tidyr::everything(),
           names_to = "x",
@@ -62,7 +84,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
         dplyr::filter(x <= wlgth.max)
     }
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == TRUE) {
-      df <- .data %>%
+      df <- x %>%
         tidyr::pivot_longer(
           cols = tidyr::everything(),
           names_to = "x",
@@ -76,7 +98,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
       if (wlgth.min >= wlgth.max) {
         stop("wlgth.min must be strictly smaller than wlgth.max")
       } else {
-        df <- .data %>%
+        df <- x %>%
           tidyr::pivot_longer(
             cols = tidyr::everything(),
             names_to = "x",
@@ -105,7 +127,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
             peak = peaks[i],
             lineshape = profiles[i],
             fit = purrr::map(
-              .data, ~ minpack.lm::nlsLM(
+              x, ~ minpack.lm::nlsLM(
                 data = .,
                 y ~ lorentzianfun(x, y0, xc, wL, A),
                 start =  list(
@@ -135,7 +157,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
             peak = peaks[i],
             lineshape = profiles[i],
             fit = purrr::map(
-              .data, ~ minpack.lm::nlsLM(
+              x, ~ minpack.lm::nlsLM(
                 data = .,
                 y ~ gaussianfun(x, y0, xc, wG, A),
                 start =  list(
@@ -166,7 +188,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
             peak = peaks[i],
             lineshape = profiles[i],
             fit = purrr::map(
-              .data, ~ minpack.lm::nlsLM(
+              x, ~ minpack.lm::nlsLM(
                 data = .,
                 y ~ voigtfun(x, y0, xc, wG, wL, A),
                 start =  list(
@@ -188,7 +210,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
   } else {
     if (is.null(wlgth.min) == FALSE & is.null(wlgth.max) == TRUE) {
       wlgth.min <- as.numeric(wlgth.min)
-      df <- .data %>%
+      df <- x %>%
         tidyr::pivot_longer(
           cols = !id,
           names_to = "x",
@@ -200,7 +222,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
 
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == FALSE) {
       wlgth.max <- as.numeric(wlgth.max)
-      df <- .data %>%
+      df <- x %>%
         tidyr::pivot_longer(
           cols = !id,
           names_to = "x",
@@ -211,7 +233,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
     }
 
     if (is.null(wlgth.min) == TRUE & is.null(wlgth.max) == TRUE) {
-      df <- .data %>%
+      df <- x %>%
         tidyr::pivot_longer(
           cols = !id,
           names_to = "x",
@@ -226,7 +248,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
       if (wlgth.min >= wlgth.max) {
         stop("wlgth.min must be strictly smaller than wlgth.max")
       }
-      df <- .data %>%
+      df <- x %>%
         tidyr::pivot_longer(
           cols = !id,
           names_to = "x",
@@ -253,7 +275,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
             peak = peaks[i],
             lineshape = profiles[i],
             fit = purrr::map(
-              .data, ~ minpack.lm::nlsLM(
+              x, ~ minpack.lm::nlsLM(
                 data = .,
                 y ~ lorentzianfun(x, y0, xc, wL, A),
                 start =  list(
@@ -283,7 +305,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
             peak = peaks[i],
             lineshape = profiles[i],
             fit = purrr::map(
-              .data, ~ minpack.lm::nlsLM(
+              x, ~ minpack.lm::nlsLM(
                 data = .,
                 y ~ gaussianfun(x, y0, xc, wG, A),
                 start =  list(
@@ -314,7 +336,7 @@ multipeakfit <- function(.data, peaks, profiles, wL = NULL, wG = NULL, A = NULL,
             peak = peaks[i],
             lineshape = profiles[i],
             fit = purrr::map(
-              .data, ~ minpack.lm::nlsLM(
+              x, ~ minpack.lm::nlsLM(
                 data = .,
                 y ~ voigtfun(x, y0, xc, wG, wL, A),
                 start =  list(

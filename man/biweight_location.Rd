@@ -4,12 +4,12 @@
 \alias{biweight_location}
 \title{Biweight Location}
 \usage{
-biweight_location(X, loc = stats::median(X), c = 6, tol = 1e-06, max_iter = 50)
+biweight_location(x, loc = stats::median(x), c = 6, tol = 1e-06, max_iter = 50)
 }
 \arguments{
-\item{X}{A numeric vector.}
+\item{x}{A numeric vector.}
 
-\item{loc}{Initial guess for the location (default: median of \code{X}).}
+\item{loc}{Initial guess for the location (default: median of \code{x}).}
 
 \item{c}{A numeric value specifying the tuning constant for the biweight estimator
 (\code{c = 6} by default).}
@@ -19,7 +19,7 @@ biweight_location(X, loc = stats::median(X), c = 6, tol = 1e-06, max_iter = 50)
 \item{max_iter}{Maximum number of iterations (default: 50).}
 }
 \value{
-The biweight location of \code{X}.
+The biweight location of \code{x}.
 }
 \description{
 This function computes the biweight location, a robust measure of central tendency
@@ -47,8 +47,9 @@ biloc = biweight_location(x)
 }
 \references{
 \itemize{
-\item Mosteller, F., and Tukey, J. W. (1977). Data Analysis and Regression: A Second
-Course in Statistics. Addison-Wesley, pp. 203-209.
+\item Mosteller, F., and Tukey, J. W. (1977).
+Data Analysis and Regression: A Second Course in Statistics.
+Addison-Wesley, pp. 203-209.
 }
 }
 \author{

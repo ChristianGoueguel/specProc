@@ -4,7 +4,7 @@
 #' This function calculates various descriptive statistics (robust and non-robust)
 #' for a specified variable or all variables in a given data frame or tibble.
 #'
-#' @param data A data frame or tibble containing the variable(s) of interest.
+#' @param x A data frame or tibble.
 #' @param var A character vector specifying the variable(s) for which to calculate the
 #'   summary statistics. If left as \code{NULL} (the default), summary statistics will
 #'   be calculated for all variables in the data frame/tibble.
@@ -21,6 +21,7 @@
 #' @author Christian L. Goueguel
 #'
 #' @export summaryStats
+#'
 #' @examples
 #' # Load the iris dataset
 #' data(iris)
@@ -33,18 +34,19 @@
 #'   var = c("Sepal.Length", "Petal.Length"),
 #'   robust = TRUE
 #'   )
-summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = FALSE) {
-  if (is.null(data) == TRUE) {
+#'
+summaryStats <- function(x, var = NULL, drop.na = TRUE, digits = 2, robust = FALSE) {
+  if (is.null(x) == TRUE) {
     stop("Data must be provided")
   }
-  if (is.data.frame(data) == FALSE & tibble::is_tibble(data) == FALSE) {
+  if (is.data.frame(x) == FALSE & tibble::is_tibble(x) == FALSE) {
     stop("Data must be of class data.frame, tbl_df, or tbl")
   }
   if (!is.null(var)) {
     if (!is.character(var) && !is.numeric(var)) {
       stop("'var' must be either a character vector or a numeric vector")
     }
-    if (is.character(var) && !all(var %in% names(data))) {
+    if (is.character(var) && !all(var %in% names(x))) {
       stop("One or more variables specified in 'var' are not present in the data")
     }
   }
@@ -118,7 +120,7 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = 
 
   if (is.null(var) == FALSE) {
     if (drop.na == TRUE) {
-      data %>%
+      x %>%
         dplyr::select(tidyselect::where(is.numeric)) %>%
         tidyr::pivot_longer(
           cols = dplyr::all_of(var),
@@ -128,7 +130,7 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = 
         tidyr::drop_na(value) %>%
         fct_summary()
     } else {
-      data %>%
+      x %>%
         dplyr::select(tidyselect::where(is.numeric)) %>%
         tidyr::pivot_longer(
           cols = dplyr::all_of(var),
@@ -139,7 +141,7 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = 
     }
   } else {
     if (drop.na == TRUE) {
-      data %>%
+      x %>%
         dplyr::select(dplyr::where(is.numeric)) %>%
         tidyr::pivot_longer(
           cols = tidyselect::everything(),
@@ -149,7 +151,7 @@ summaryStats <- function(data, var = NULL, drop.na = TRUE, digits = 2, robust = 
         tidyr::drop_na(value) %>%
         fct_summary()
     } else {
-      data %>%
+      x %>%
         dplyr::select(tidyselect::where(is.numeric)) %>%
         tidyr::pivot_longer(
           cols = tidyselect::everything(),

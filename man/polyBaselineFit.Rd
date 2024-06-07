@@ -4,10 +4,10 @@
 \alias{polyBaselineFit}
 \title{Polynomial Baseline Correction}
 \usage{
-polyBaselineFit(data, degree = 4, tol = 0.001, rep = 100)
+polyBaselineFit(x, degree = 4, tol = 0.001, rep = 100)
 }
 \arguments{
-\item{data}{A matrix, data frame or tibble.}
+\item{x}{A matrix, data frame or tibble.}
 
 \item{degree}{An integer specifying the degree of the polynomial fitting
 function. The default value is 4.}
