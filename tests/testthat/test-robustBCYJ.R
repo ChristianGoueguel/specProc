@@ -10,7 +10,7 @@ test_that("robustBCYJ function works as expected", {
   expect_no_error(robustBCYJ(test_data, var = oxide))
   expect_error(robustBCYJ(test_data, var = 1), "The 'var' argument must be a character vector or NULL.")
   expect_error(robustBCYJ(test_data, type = 1.5), "Invalid type of transformation. Available method types are: BC, YJ and bestObj.")
-  expect_error(robustBCYJ(test_data, quant = -0.5), "'quant' must be a numeric value between 0 and 1")
+  expect_error(robustBCYJ(test_data, quantile = -0.5), "'quantile' must be a numeric value between 0 and 1")
   expect_error(robustBCYJ(test_data, nbsteps = 0), "'nbsteps' must be a positive integer")
   expect_error(robustBCYJ(test_data, nbsteps = -2), "'nbsteps' must be a positive integer")
   }
