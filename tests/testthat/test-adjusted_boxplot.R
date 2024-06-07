@@ -5,8 +5,8 @@ test_data <- data.frame(
 )
 
 test_that("adjboxplot function works as expected", {
-  expect_error(adjboxplot(), "Missing 'data' argument.")
-  expect_error(adjboxplot(data.frame(test = c("m", "t", "w", 1, 2, 3))), "Input data must be a numeric data frame.")
+  expect_error(adjboxplot(), "Missing 'x' argument.")
+  expect_error(adjboxplot(data.frame(test = c("m", "t", "w", 1, 2, 3))), "Input 'x' must be a numeric data frame.")
   expect_error(adjboxplot(test_data, .plot = 1), "Argument '.plot' must be of type boolean \\(TRUE or FALSE\\).")
   expect_error(adjboxplot(test_data, notch = 1), "Argument 'notch' must be of type boolean \\(TRUE or FALSE\\).")
   expect_error(adjboxplot(test_data, xlabels.angle = -10), "Argument 'x_axis_angle' must be a numeric value between 0 and 360.")

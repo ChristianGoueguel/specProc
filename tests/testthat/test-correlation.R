@@ -11,8 +11,8 @@ test_that("correlation function works as expected", {
   expect_equal(ncol(result), 3)
   expect_equal(result$method, rep("pearson", 2))
 
-  expect_error(correlation(list(1, 2, 3), y), "Input '.data' must be a numeric data frame")
-  expect_error(correlation(test_data, w), "'response_var' not found in the data frame")
+  expect_error(correlation(list(1, 2, 3), y), "Input 'x' must be a numeric data frame")
+  expect_error(correlation(test_data, w), "'var' not found in the data frame")
   expect_error(correlation(test_data, y, method = "invalid"), "Invalid method specified.")
   expect_error(correlation(test_data, y, .plot = 1), "'.plot' must be of type boolean \\(TRUE or FALSE\\)")
 

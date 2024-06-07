@@ -31,7 +31,7 @@ plotSpec <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop_na 
   if (missing(x)) {
     stop("Missing 'data' argument.")
   }
-  if (!isx.frame(x) && !tibble::is_tibble(x)) {
+  if (!is.data.frame(x) && !tibble::is_tibble(x)) {
     stop("Input 'data' must be a data frame or tibble.")
   }
   if (!rlang::quo_is_null(rlang::enquo(id)) && !(rlang::quo_name(rlang::enquo(id)) %in% colnames(x))) {

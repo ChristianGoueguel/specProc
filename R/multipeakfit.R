@@ -41,7 +41,7 @@ multipeakfit <- function(
   if (length(x) == 0 & is.null(x) == TRUE) {
     stop("Apparently you forgot to provide the spectra.")
   }
-  if (isx.frame(x) == FALSE & tibble::is.tibble(x) == FALSE) {
+  if (is.data.frame(x) == FALSE & tibble::is.tibble(x) == FALSE) {
     stop("Data must be of class tbl_df, tbl or data.frame")
   }
   if (is.numeric(peaks) == FALSE) {

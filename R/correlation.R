@@ -43,11 +43,19 @@
 #' @author Christian L. Goueguel
 #'
 #' @export correlation
-correlation <- function(x, var, method = "pearson", .plot = FALSE, .color = "#111D71", .interactive = FALSE) {
+#'
+correlation <- function(
+    x,
+    var,
+    method = "pearson",
+    .plot = FALSE,
+    .color = "#111D71",
+    .interactive = FALSE) {
+
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!isx.frame(x) || !all(x %>% purrr::map_lgl(is.numeric))) {
+  if (!is.data.frame(x) || !all(x %>% purrr::map_lgl(is.numeric))) {
     stop("Input 'x' must be a numeric data frame")
   }
   if (!rlang::quo_name(rlang::enquo(var)) %in% colnames(x)) {
@@ -93,7 +101,7 @@ correlation <- function(x, var, method = "pearson", .plot = FALSE, .color = "#11
     tbl_corr <- x %>%
       as.matrix() %>%
       XICOR::xicor(pvalue = FALSE, ties = TRUE) %>%
-      asx.frame() %>%
+      as.data.frame() %>%
       tibble::rownames_to_column("variable") %>%
       tibble::as_tibble() %>%
       dplyr::select(variable, {{var}}) %>%
@@ -104,7 +112,7 @@ correlation <- function(x, var, method = "pearson", .plot = FALSE, .color = "#11
     tbl_corr <- x %>%
       dplyr::select(-{{var}}) %>%
       purrr::map_dbl(~ biweight_midcorrelation(X = ., Y = x[[ rlang::ensym(var) ]])) %>%
-      asx.frame() %>%
+      as.data.frame() %>%
       tibble::rownames_to_column("variable") %>%
       tibble::as_tibble() %>%
       dplyr::mutate(method = method)

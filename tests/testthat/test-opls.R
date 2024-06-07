@@ -8,9 +8,9 @@ test_y <- tibble::tibble(
 )
 
 test_that("opls function works as expected", {
-  expect_error(opls(NULL, test_y), "X-data must be provided")
-  expect_error(opls(test_x, NULL), "Y-data must be provided")
-  expect_error(opls(list(1, 2, 3), test_y), "X-data must be of class data.frame, tbl_df, or tbl")
-  expect_error(opls(test_x, list(1, 2, 3)), "Y-data must be of class data.frame, tbl_df, or tbl")
+  expect_error(opls(NULL, test_y), "x-data must be provided")
+  expect_error(opls(test_x, NULL), "y-data must be provided")
+  expect_error(opls(list(1, 2, 3), test_y), "x-data must be of class data.frame, tbl_df, or tbl")
+  expect_error(opls(test_x, list(1, 2, 3)), "y-data must be of class data.frame, tbl_df, or tbl")
   }
   )

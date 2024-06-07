@@ -56,7 +56,7 @@ adjboxplot <- function(x, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, x
     stop("Missing 'x' argument.")
   }
   if (!all(x %>% purrr::map_lgl(is.numeric))) {
-    stop("Input x must be a numeric data frame.")
+    stop("Input 'x' must be a numeric data frame.")
   }
   if(!is.logical(.plot)) {
     stop("Argument '.plot' must be of type boolean (TRUE or FALSE).")
