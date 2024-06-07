@@ -60,12 +60,12 @@ separating the signal of interest from unwanted perturbations.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">epo</span><span class="op">(</span><span class="va">data</span>, ncomp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">epo</span><span class="op">(</span><span class="va">x</span>, ncomp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>data</dt>
+    <dl><dt>x</dt>
 <dd><p>A numeric matrix, data frame or tibble.</p></dd>
 
 
@@ -88,10 +88,10 @@ orthogonalize against. If not provided, the default value is 2.</p></dd>
 that are affected by external variations. It then projects the spectral matrix onto
 the subspace orthogonal to these variations, effectively removing the unwanted
 perturbations and extracting the signal of interest.</p>
-<p>Let \(\textbf{X}\) be the spectral matrix. The EPO algorithm aims to split \(\textbf{X}\) into:</p>
-<p>$$\textbf{X} = \textbf{XP} + \textbf{XQ} + \textbf{R}$$</p>
+<p>Let \(\textbf{x}\) be the spectral matrix. The EPO algorithm aims to split \(\textbf{x}\) into:</p>
+<p>$$\textbf{x} = \textbf{xP} + \textbf{xQ} + \textbf{R}$$</p>
 <p>where \(\textbf{P}\) and \(\textbf{Q}\) are, respectively, the projection
-matrices of \(\textbf{X}\) onto the useful and perturbation (clutter) subspaces.
+matrices of \(\textbf{x}\) onto the useful and perturbation (clutter) subspaces.
 \(\textbf{R}\) is the residual matrix.</p>
     </div>
     <div class="section level2">

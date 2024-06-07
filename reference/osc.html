@@ -55,8 +55,8 @@ spectral matrix that is orthogonal to the response vector.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">osc</span><span class="op">(</span></span>
-<span>  <span class="va">X</span>,</span>
-<span>  <span class="va">Y</span>,</span>
+<span>  <span class="va">x</span>,</span>
+<span>  <span class="va">y</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"wold"</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  osc.ncomp <span class="op">=</span> <span class="fl">4</span>,</span>
@@ -68,13 +68,13 @@ spectral matrix that is orthogonal to the response vector.</p>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>X</dt>
-<dd><p>A matrix or data.frame containing the X-data (predictors).</p></dd>
+    <dl><dt>x</dt>
+<dd><p>A matrix or data.frame containing the x-data (predictors).</p></dd>
 
 
-<dt>Y</dt>
-<dd><p>A vector containing the Y-data (response). The length of <code>Y</code> must
-match the number of rows in <code>X</code>.</p></dd>
+<dt>y</dt>
+<dd><p>A vector containing the y-data (response). The length of <code>y</code> must
+match the number of rows in <code>x</code>.</p></dd>
 
 
 <dt>method</dt>
@@ -84,8 +84,8 @@ values are <code>"wold"</code> (Wold's original method), <code>"sjoblom"</code> 
 
 
 <dt>center</dt>
-<dd><p>A logical value indicating whether to center the X-data before
-applying OSC. If <code>TRUE</code>, the columns of X will be mean-centered.</p></dd>
+<dd><p>A logical value indicating whether to center the x-data before
+applying OSC. If <code>TRUE</code>, the columns of x will be mean-centered.</p></dd>
 
 
 <dt>osc.ncomp</dt>
@@ -112,11 +112,11 @@ OSC algorithm. The default value is 20.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>An list containing the following components:</p><dl><dt>X_corrected</dt>
-<dd><p>The corrected X-data after applying OSC.</p></dd>
+<p>An list containing the following components:</p><dl><dt>x_corrected</dt>
+<dd><p>The corrected x-data after applying OSC.</p></dd>
 
 <dt>scores</dt>
-<dd><p>The X-scores after orthogonal variations are removed.</p></dd>
+<dd><p>The x-scores after orthogonal variations are removed.</p></dd>
 
 <dt>loadings</dt>
 <dd><p>The loadings.</p></dd>
@@ -132,9 +132,9 @@ OSC algorithm. The default value is 20.</p></dd>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The OSC algorithm identifies and removes the orthogonal variation in the
-X-data by iteratively deflating the X-matrix with respect to the Y-data.
-The resulting X-matrix contains only the variation that is relevant to the
-Y-data, which can then be used for further modeling or analysis.
+x-data by iteratively deflating the x-matrix with respect to the y-data.
+The resulting x-matrix contains only the variation that is relevant to the
+y-data, which can then be used for further modeling or analysis.
 This function implements three different methods for OSC: the original
 method proposed by Wold et al. (1998), the method proposed by Sjöblom et al.
 (1998), and the method proposed by Wise and Gallagher.</p>

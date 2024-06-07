@@ -58,8 +58,8 @@ than the sample standard deviation.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">biweight_scale</span><span class="op">(</span></span>
-<span>  <span class="va">X</span>,</span>
-<span>  loc <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,</span>
+<span>  <span class="va">x</span>,</span>
+<span>  loc <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
 <span>  c <span class="op">=</span> <span class="fl">9</span>,</span>
 <span>  reduced <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  tol <span class="op">=</span> <span class="fl">1e-06</span>,</span>
@@ -69,12 +69,12 @@ than the sample standard deviation.</p>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>X</dt>
+    <dl><dt>x</dt>
 <dd><p>A numeric vector.</p></dd>
 
 
 <dt>loc</dt>
-<dd><p>Initial guess for the location (default: median of <code>X</code>).</p></dd>
+<dd><p>Initial guess for the location (default: median of <code>x</code>).</p></dd>
 
 
 <dt>c</dt>
@@ -86,7 +86,7 @@ than the sample standard deviation.</p>
 <dd><p>A logical value specifying whether the sample size, <em>n</em>,
 should be reduced to the number of non-rejected values. If <code>TRUE</code>, <em>n</em> is
 reduced to the number of observations that pass a rejection criteria.
-If <code>FALSE</code> (default), <em>n</em> is equal to the length of <code>X</code> (the input data).</p></dd>
+If <code>FALSE</code> (default), <em>n</em> is equal to the length of <code>x</code> (the input data).</p></dd>
 
 
 <dt>tol</dt>
@@ -101,13 +101,14 @@ If <code>FALSE</code> (default), <em>n</em> is equal to the length of <code>X</c
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>The biweight scale of <code>X</code>.</p>
+<p>The biweight scale of <code>x</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     
-<ul><li><p>Mosteller, F., and Tukey, J. W. (1977). Data Analysis and Regression: A Second
-Course in Statistics. Addison-Wesley, pp. 203-209.</p></li>
+<ul><li><p>Mosteller, F., and Tukey, J. W. (1977).
+Data Analysis and Regression: A Second Course in Statistics.
+Addison-Wesley, pp. 203-209.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -139,6 +140,7 @@ Course in Statistics. Addison-Wesley, pp. 203-209.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      sd   mad biscale</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  99.2  37.1    29.5</span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

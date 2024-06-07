@@ -57,33 +57,37 @@ sensitive to outliers than the traditional Pearson correlation coefficient.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">biweight_midcorrelation</span><span class="op">(</span><span class="va">X</span>, <span class="va">Y</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">biweight_midcorrelation</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>X</dt>
+    <dl><dt>x</dt>
 <dd><p>A numeric vector.</p></dd>
 
 
-<dt>Y</dt>
-<dd><p>A numeric vector of the same length as X.</p></dd>
+<dt>y</dt>
+<dd><p>A numeric vector of the same length as <code>x</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>The biweight midcorrelation between X and Y.</p>
+<p>The biweight midcorrelation between <code>x</code> and <code>y</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The biweight midcorrelation is calculated using the biweight midvariances
 and biweight midcovariance, as described in the following paper:</p>
-<p>Wilcox, R. R. (1994). The Biweight Midcorrelation: A Robust Correlation
-Technique for Two Samples. Journal of Statistical Computation and Simulation,
-48(2), 103-110.</p>
     </div>
+    <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    
+<ul><li><p>Wilcox, R. R. (1994).
+The Biweight Midcorrelation: A Robust Correlation Technique for Two Samples.
+Journal of Statistical Computation and Simulation, 48(2):103-110.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
     <p>Christian L. Goueguel</p>
@@ -95,6 +99,7 @@ Technique for Two Samples. Journal of Statistical Computation and Simulation,
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">x</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">biweight_midcorrelation</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.8588303</span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

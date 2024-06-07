@@ -57,31 +57,36 @@ less sensitive to outliers than the traditional covariance.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">biweight_midcovariance</span><span class="op">(</span><span class="va">X</span>, <span class="va">Y</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">biweight_midcovariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>X</dt>
+    <dl><dt>x</dt>
 <dd><p>A numeric vector.</p></dd>
 
 
-<dt>Y</dt>
-<dd><p>A numeric vector of the same length as <code>X</code>.</p></dd>
+<dt>y</dt>
+<dd><p>A numeric vector of the same length as <code>x</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>The biweight midcovariance between <code>X</code> and <code>Y</code>.</p>
+<p>The biweight midcovariance between <code>x</code> and <code>y</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     
-<ul><li><p>Wilcox, R., (1997). Introduction to Robust Estimation and Hypothesis Testing.
+<ul><li><p>Wilcox, R., (1997).
+Introduction to Robust Estimation and Hypothesis Testing.
 Academic Press</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
+    <p>Christian L. Goueguel</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -96,6 +101,7 @@ Academic Press</p></li>
 <span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">biweight_midcovariance</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.689955</span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

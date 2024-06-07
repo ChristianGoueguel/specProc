@@ -60,17 +60,17 @@ algorithm described in Mosteller and Tukey (1977).</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">biweight_location</span><span class="op">(</span><span class="va">X</span>, loc <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>, c <span class="op">=</span> <span class="fl">6</span>, tol <span class="op">=</span> <span class="fl">1e-06</span>, max_iter <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">biweight_location</span><span class="op">(</span><span class="va">x</span>, loc <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, c <span class="op">=</span> <span class="fl">6</span>, tol <span class="op">=</span> <span class="fl">1e-06</span>, max_iter <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>X</dt>
+    <dl><dt>x</dt>
 <dd><p>A numeric vector.</p></dd>
 
 
 <dt>loc</dt>
-<dd><p>Initial guess for the location (default: median of <code>X</code>).</p></dd>
+<dd><p>Initial guess for the location (default: median of <code>x</code>).</p></dd>
 
 
 <dt>c</dt>
@@ -90,13 +90,14 @@ algorithm described in Mosteller and Tukey (1977).</p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>The biweight location of <code>X</code>.</p>
+<p>The biweight location of <code>x</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     
-<ul><li><p>Mosteller, F., and Tukey, J. W. (1977). Data Analysis and Regression: A Second
-Course in Statistics. Addison-Wesley, pp. 203-209.</p></li>
+<ul><li><p>Mosteller, F., and Tukey, J. W. (1977).
+Data Analysis and Regression: A Second Course in Statistics.
+Addison-Wesley, pp. 203-209.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
