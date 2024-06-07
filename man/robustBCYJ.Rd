@@ -4,7 +4,7 @@
 \alias{robustBCYJ}
 \title{Robust Box-Cox and Yeo-Johnson Transformation}
 \usage{
-robustBCYJ(x, var = NULL, type = "bestObj", quant = 0.99, nbsteps = 2)
+robustBCYJ(x, var = NULL, type = "bestObj", quantile = 0.99, nbsteps = 2)
 }
 \arguments{
 \item{x}{A data frame or tibble containing the variables to be transformed.}
@@ -15,7 +15,7 @@ If \code{NULL} (default), all columns are selected.}
 \item{type}{A character string specifying the transformation method(s) to use.
 Allowed values are "BC", "YJ", or "bestObj" (default).}
 
-\item{quant}{A numeric value between 0 and 1 specifying the quantile to use
+\item{quantile}{A numeric value between 0 and 1 specifying the quantile to use
 for determining the weights in the re-weighting step. Default is 0.99.}
 
 \item{nbsteps}{An integer specifying the number of re-weighting steps to perform.

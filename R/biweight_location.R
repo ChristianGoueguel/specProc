@@ -3,8 +3,7 @@
 #' @description
 #' This function computes the biweight location, a robust measure of central tendency
 #' for a numeric vector. The biweight location is less sensitive to outliers
-#' than the sample mean. The computation is done iteratively, following the
-#' algorithm described in Mosteller and Tukey (1977).
+#' than the sample mean.
 #'
 #' @param x A numeric vector.
 #' @param loc Initial guess for the location (default: median of `x`).

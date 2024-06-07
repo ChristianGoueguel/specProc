@@ -26,8 +26,14 @@ of efficiency, while the biweight midvariance estimator is both resistant
 and robust of efficiency.
 }
 \examples{
-vec <- c(1, 2, 3, 4, 5, 100)
-biweight_midvariance(x = vec)
+
+vec <- c(1, 2, 3, 4, 4, 2)
+stats::var(vec)
+biweight_midvariance(vec)
+
+vec <- c(1, 2, 3, 4, 4, 100)
+stats::var(vec)
+biweight_midvariance(vec)
 
 }
 \references{

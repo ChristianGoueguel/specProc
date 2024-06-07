@@ -24,7 +24,7 @@ test_that("correlation function works as expected", {
   expect_equal(result_chatterjee$method, rep("chatterjee", 2))
 
   result_plot <- correlation(test_data, y, .plot = TRUE)
-  expect_type(result_plot$.plot, "list")
+  expect_type(result_plot$plot, "list")
 
   result_interactive <- correlation(test_data, y, .plot = TRUE, .interactive = TRUE)
   expect_s3_class(result_interactive, "plotly")

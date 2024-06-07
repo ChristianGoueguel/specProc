@@ -26,8 +26,8 @@ property for estimators in the presence of outliers or heavy-tailed distribution
 both estimators have a breakdown point of 50\%. The Sn estimator is based on
 the median, while the Qn estimator is based on a weighted combination of order statistics.
 Both estimators are consistent estimators of the population scale parameter
-under normality. The function uses the \code{robustbase} package for estimating Sn and
-Qn, whilst the bias-correction factors used in the calculations have been refined
+under normality. Although, the function uses the \code{robustbase} package for estimating Sn and
+Qn, the bias-correction factors used in the calculations have been, however, refined
 according to Akinshin, A., (2022).
 }
 \examples{

@@ -24,8 +24,7 @@ The biweight location of \code{x}.
 \description{
 This function computes the biweight location, a robust measure of central tendency
 for a numeric vector. The biweight location is less sensitive to outliers
-than the sample mean. The computation is done iteratively, following the
-algorithm described in Mosteller and Tukey (1977).
+than the sample mean.
 }
 \examples{
 # Example 1: Compute biweight location for a vector

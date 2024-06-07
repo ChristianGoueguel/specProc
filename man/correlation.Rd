@@ -33,8 +33,8 @@ plotly. Default is FALSE (static ggplot2 plot).}
 \value{
 A list containing:
 \itemize{
-\item \verb{$.correlation}: A tibble with columns for the variable name, correlation value, and method used.
-\item \verb{$.plot}: If \code{.plot = TRUE}, a \code{ggplot2} object (or a \code{plotly} object if \code{.interactive = TRUE}).
+\item \code{correlation}: A tibble with columns for the variable name, correlation value, and method used.
+\item \code{plot}: If \code{.plot = TRUE}, a \code{ggplot2} object (or a \code{plotly} object if \code{.interactive = TRUE}).
 }
 }
 \description{

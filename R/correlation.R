@@ -31,8 +31,8 @@
 #'   plotly. Default is FALSE (static ggplot2 plot).
 #'
 #' @return A list containing:
-#' - `$.correlation`: A tibble with columns for the variable name, correlation value, and method used.
-#' - `$.plot`: If `.plot = TRUE`, a `ggplot2` object (or a `plotly` object if `.interactive = TRUE`).
+#' - `correlation`: A tibble with columns for the variable name, correlation value, and method used.
+#' - `plot`: If `.plot = TRUE`, a `ggplot2` object (or a `plotly` object if `.interactive = TRUE`).
 #'
 #' @references
 #' - Chatterjee, S. (2021). A new coefficient of correlation.
@@ -152,7 +152,7 @@ correlation <- function(
     return(tbl_corr)
   } else {
     if (.interactive == FALSE) {
-      return(list(.correlation = tbl_corr, .plot = p))
+      return(list(correlation = tbl_corr, plot = p))
     } else {
       return(plotly::ggplotly(p, tooltip = "y"))
     }

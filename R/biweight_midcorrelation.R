@@ -3,11 +3,11 @@
 #' @description
 #' This function computes the biweight midcorrelation between two numeric vectors.
 #' The biweight midcorrelation is a robust measure of correlation that is less
-#' sensitive to outliers than the traditional Pearson correlation coefficient.
+#' sensitive to outliers than the traditional Pearson's correlation coefficient.
 #'
 #' @details
 #' The biweight midcorrelation is calculated using the biweight midvariances
-#' and biweight midcovariance, as described in the following paper:
+#' and biweight midcovariance, as described by Wilcox (1994).
 #'
 #' @references
 #'    - Wilcox, R. R. (1994).

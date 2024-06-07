@@ -1,18 +1,34 @@
 #' @title Quantile Tail Weight Measure
 #'
 #' @description
-#' The function calculates the left quantile weight (LQW) and the right quantile
-#' weight (RQW) for a given numeric vector. Values closer to 0 indicate lighter
-#' tails, while values closer to 1 signify heavier tails.
+#' This function calculates the left quantile weight (LQW) and the right
+#' quantile weight (RQW) for a given numeric vector. These weights serve as
+#' robust measures of tail heaviness, providing insights into the distribution's
+#' behavior in the left and right tails, respectively.
 #'
 #' @details
-#' The quantile weights are a robust measure of tail weight in probability
-#' distributions (breakdown value of 12.5%). They are derived from the concept of quartile skewness,
-#' introduced by D.V. Hinkley in 1975. Quartile skewness measures the skewness
-#' or asymmetry of a distribution by comparing the differences between the quartiles.
-#' Specifically, the quantile weights are calculated when applying quartile skewness
-#' to either the left half or the right half of the probability mass, divided at
-#' the median of the univariate distribution.
+#' The quantile weights, comprising the left quantile weight (LQW) and the right
+#' quantile weight (RQW), are robust measures of tail weight in probability
+#' distributions. They have a breakdown value of 12.5%, meaning that they are
+#' resistant to the influence of up to 12.5% of outliers or contaminated data.
+#'
+#' The concept of quantile weights is derived from quartile skewness, introduced
+#' by D.V. Hinkley in 1975. Quartile skewness measures the skewness or asymmetry
+#' of a distribution by comparing the differences between the quartiles, which
+#' are robust measures of location and scale.
+#'
+#' Specifically, the quantile weights are calculated when applying quartile
+#' skewness to either the left half or the right half of the probability mass,
+#' divided at the median of the univariate distribution. The left quantile weight
+#' (LQW) is the proportion of the data below the median, divided by the expected
+#' proportion (0.5) if the data were normally distributed. The right quantile
+#' weight (RQW) is the proportion of the data above the median, divided by 0.5.
+#'
+#' Interpretation of Quantile Weights:
+#'  - Values closer to 0 indicate lighter tails compared to the normal distribution.
+#'  - Values closer to 1 signify heavier tails compared to the normal distribution.
+#'  - Values significantly greater than 1 suggest the presence of outliers or
+#'    extreme values in the respective tail.
 #'
 #' @references
 #'  - Brys, G., Hubert, M., and Struyf, A. (2006). Robust measures of tail weight.
@@ -26,12 +42,17 @@
 #' @param p A numeric value between 0 and 0.5 (`p = 0.25` by default).
 #' @param q A numeric value between 0.5 and 1 (`q = 0.75` by default).
 #' @param drop.na Logical value indicating whether to remove missing values (NA) or not.
+#'
 #' @return A tibble with two numeric columns:
 #'  - `LQW`: Left quantile weight.
 #'  - `RQW`: Right quantile weight.
 #'
 #' @examples
 #' vec <- c(-100, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100)
+#' # non-robust approach
+#' moments::kurtosis(vec)
+#'
+#' # non approach
 #' quantile_weight(vec)
 #'
 #' @export quantile_weight

@@ -29,7 +29,7 @@
 #'   If `NULL` (default), all columns are selected.
 #' @param type A character string specifying the transformation method(s) to use.
 #'   Allowed values are "BC", "YJ", or "bestObj" (default).
-#' @param quant A numeric value between 0 and 1 specifying the quantile to use
+#' @param quantile A numeric value between 0 and 1 specifying the quantile to use
 #'   for determining the weights in the re-weighting step. Default is 0.99.
 #' @param nbsteps An integer specifying the number of re-weighting steps to perform.
 #'   Default is 2.
@@ -53,7 +53,7 @@
 #'
 #' @export robustBCYJ
 #'
-robustBCYJ <- function(x, var = NULL, type = "bestObj", quant = 0.99, nbsteps = 2) {
+robustBCYJ <- function(x, var = NULL, type = "bestObj", quantile = 0.99, nbsteps = 2) {
   if (missing(x)) {
     stop("Missing 'data' argument.")
   }
@@ -76,8 +76,8 @@ robustBCYJ <- function(x, var = NULL, type = "bestObj", quant = 0.99, nbsteps = 
   if (!is.character(type)) {
     stop("The argument 'type' must be a character.")
   }
-  if (quant < 0 || quant > 1) {
-    stop("'quant' must be a numeric value between 0 and 1.")
+  if (quantile < 0 || quantile > 1) {
+    stop("'quantile' must be a numeric value between 0 and 1.")
   }
   if (nbsteps <= 0) {
     stop("'nbsteps' must be a positive integer")
@@ -93,7 +93,7 @@ robustBCYJ <- function(x, var = NULL, type = "bestObj", quant = 0.99, nbsteps = 
       type = type,
       robust = TRUE,
       standardize = TRUE,
-      quant = quant,
+      quant = quantile,
       nbsteps = nbsteps,
       checkPars = list(silent = TRUE)
     )

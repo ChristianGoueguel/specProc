@@ -1,17 +1,27 @@
 #' @title Medcouple Tail Weight Measure
 #'
 #' @description
-#' This function calculates the left medcouple (LMC) and the right medcouple (RMC)
-#' for a given numeric vector, which provides a robust measure of the distribution
-#' tail in the presence of outliers or contamination.
+#' This function calculates the left medcouple (LMC) and the right medcouple
+#' (RMC) for a given numeric vector. The left and right medcouples provide a
+#' robust measure of the distribution's tail behavior in the presence of outliers
+#' or contaminated data.
 #'
 #' @details
-#' The medcouple weights are calculated by splitting the data into two parts: values below
-#' the median (left) and values above the median (right). By partitioning the data
-#' into lower and upper tails and using median and quantiles, the medcouple weights
-#' can effectively capture the tail behavior of heavy-tailed distributions, while
-#' maintaining a high degree of robustness against outliers and contamination, up
-#' to the specified breakdown value of 12.5%.
+#' The medcouple is a robust measure of skewness based on the median and the
+#' medcouple (Brys *et al.* 2004), which is a kernel estimator of the cumulative
+#' distribution function (CDF). It is calculated by comparing the median
+#' to a robust measure of location within each half of the distribution,
+#' divided at the median.
+#'
+#' Specifically, the left medcouple (LMC) measures the skewness in the lower tail
+#' of the distribution, while the right medcouple (RMC) measures the skewness in
+#' the upper tail. The left and right medcouples are robust to outliers and have
+#' a breakdown value of 25%.
+#'
+#' The interpretation of LMC and RMC is as follows:
+#'  - Values close to 0 indicate a symmetric distribution or light tails.
+#'  - Positive values indicate right-skewness or a heavier right tail.
+#'  - Negative values indicate left-skewness or a heavier left tail.
 #'
 #' @references
 #'  - Brys, G., Hubert, M., and Struyf, A. (2006).

@@ -24,8 +24,14 @@
 #' @return The biweight midvariance of the input vector.
 #'
 #' @examples
-#' vec <- c(1, 2, 3, 4, 5, 100)
-#' biweight_midvariance(x = vec)
+#'
+#' vec <- c(1, 2, 3, 4, 4, 2)
+#' stats::var(vec)
+#' biweight_midvariance(vec)
+#'
+#' vec <- c(1, 2, 3, 4, 4, 100)
+#' stats::var(vec)
+#' biweight_midvariance(vec)
 #'
 #' @export biweight_midvariance
 #'
