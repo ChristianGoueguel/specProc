@@ -3,18 +3,21 @@
 #' @description
 #' Transforms each variable in a dataset toward central normality using
 #' re-weighted maximum likelihood to robustly fit the Box-Cox or Yeo-Johnson
-#' transformation. This function is a wrapper around the `transfo` function
-#' from the `cellWise` package.
+#' transformation.
 #'
 #' @details
 #' The Box-Cox and Yeo-Johnson transformations are power transformations
 #' aimed at making the data distribution more normal-like. The Box-Cox
 #' transformation is suitable for strictly positive values, while the
 #' Yeo-Johnson transformation can handle both positive and negative values.
-#' This function applies a robust version of these transformations by using
-#' re-weighted maximum likelihood estimation. This approach downweights
-#' outlying observations to make the transformation more robust to their
-#' influence. The `type` parameter controls which transformation method(s) to use:
+#' The function is a wrapper around the `transfo` function
+#' from the `cellWise` package, which applies a robust version of these
+#' transformations by using re-weighted maximum likelihood estimation.
+#' This approach downweights outlying observations to make the transformation
+#' more robust to their influence.
+#'
+#'
+#' The `type` parameter controls which transformation method(s) to use:
 #'  - "BC": Only applies the Box-Cox transformation to strictly positive variables.
 #'  - "YJ": Only applies the Yeo-Johnson transformation to all variables.
 #'  - "bestObj" (default): For strictly positive variables, both BC and YJ are
@@ -31,13 +34,13 @@
 #' @param nbsteps An integer specifying the number of re-weighting steps to perform.
 #'   Default is 2.
 #'
-#' @return A list containing two tibbles:
-#'  - `$summary`:
+#' @return A list containing two data frames:
+#'  - `summary`:
 #'    - `variable`: the variable(s) name
 #'    - `lambda`: the estimated lambda parameter
 #'    - `method`: the method used ('BC' for Box-Cox or 'YJ' for Yeo-Johnson)
 #'    - `objective`: the objective function value
-#'  - `$transformation`:
+#'  - `transformation`:
 #'    - the transformed variable(s)
 #'
 #' @references

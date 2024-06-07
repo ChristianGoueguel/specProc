@@ -22,16 +22,16 @@ for determining the weights in the re-weighting step. Default is 0.99.}
 Default is 2.}
 }
 \value{
-A list containing two tibbles:
+A list containing two data frames:
 \itemize{
-\item \verb{$summary}:
+\item \code{summary}:
 \itemize{
 \item \code{variable}: the variable(s) name
 \item \code{lambda}: the estimated lambda parameter
 \item \code{method}: the method used ('BC' for Box-Cox or 'YJ' for Yeo-Johnson)
 \item \code{objective}: the objective function value
 }
-\item \verb{$transformation}:
+\item \code{transformation}:
 \itemize{
 \item the transformed variable(s)
 }
@@ -40,18 +40,20 @@ A list containing two tibbles:
 \description{
 Transforms each variable in a dataset toward central normality using
 re-weighted maximum likelihood to robustly fit the Box-Cox or Yeo-Johnson
-transformation. This function is a wrapper around the \code{transfo} function
-from the \code{cellWise} package.
+transformation.
 }
 \details{
 The Box-Cox and Yeo-Johnson transformations are power transformations
 aimed at making the data distribution more normal-like. The Box-Cox
 transformation is suitable for strictly positive values, while the
 Yeo-Johnson transformation can handle both positive and negative values.
-This function applies a robust version of these transformations by using
-re-weighted maximum likelihood estimation. This approach downweights
-outlying observations to make the transformation more robust to their
-influence. The \code{type} parameter controls which transformation method(s) to use:
+The function is a wrapper around the \code{transfo} function
+from the \code{cellWise} package, which applies a robust version of these
+transformations by using re-weighted maximum likelihood estimation.
+This approach downweights outlying observations to make the transformation
+more robust to their influence.
+
+The \code{type} parameter controls which transformation method(s) to use:
 \itemize{
 \item "BC": Only applies the Box-Cox transformation to strictly positive variables.
 \item "YJ": Only applies the Yeo-Johnson transformation to all variables.

@@ -3,15 +3,15 @@
 #' @description
 #' This function calculates either the Rousseeuw-Croux Sn or Qn scale estimator.
 #'
-#' #' @details
+#' @details
 #' The Sn and Qn estimators, proposed by Rousseeuw and Croux (1993), are robust measures of
 #' scale (or dispersion) that are designed to have a high breakdown point, which is a desirable
 #' property for estimators in the presence of outliers or heavy-tailed distributions. Specifically,
 #' both estimators have a breakdown point of 50%. The Sn estimator is based on
 #' the median, while the Qn estimator is based on a weighted combination of order statistics.
 #' Both estimators are consistent estimators of the population scale parameter
-#' under normality. The function is built around the `robustbase` package.
-#' The bias-correction factors used in the calculations have been refined
+#' under normality. The function uses the `robustbase` package for estimating Sn and
+#' Qn, whilst the bias-correction factors used in the calculations have been refined
 #' according to Akinshin, A., (2022).
 #'
 #' @param x A numeric vector of data values.
