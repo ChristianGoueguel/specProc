@@ -67,6 +67,12 @@
     <loc>https://christiangoueguel.github.io/specProc/reference/medcouple_weight.html</loc>
   </url>
   <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/minmax.html</loc>
+  </url>
+  <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/msc.html</loc>
+  </url>
+  <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/multipeakfit.html</loc>
   </url>
   <url>
@@ -101,9 +107,6 @@
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/quantile_weight.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/rescale.html</loc>
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/robustBCYJ.html</loc>
