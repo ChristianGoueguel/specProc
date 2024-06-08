@@ -18,9 +18,9 @@
 #' @return A numeric vector of the same length as `x`, with values rescaled to
 #' the new range `[a, b]`.
 #'
-#' @export rescale
+#' @export minmax
 #'
-rescale <- function(x, a = 0, b = 1, drop.na = "TRUE") {
+minmax <- function(x, a = 0, b = 1, drop.na = "TRUE") {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
