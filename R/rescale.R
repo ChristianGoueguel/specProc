@@ -11,13 +11,16 @@
 #' @param x A numeric vector.
 #' @param a The minimum value of the new range (default: 0).
 #' @param b The maximum value of the new range (default: 1).
+#' @param drop.na A logical value indicating whether to remove missing values
+#' (NA) from the calculations. If `TRUE` (the default), missing values will be
+#' removed. If `FALSE`, missing values will be included.
 #'
 #' @return A numeric vector of the same length as `x`, with values rescaled to
 #' the new range `[a, b]`.
 #'
 #' @export rescale
 #'
-rescale <- function(x, a = 0, b = 1) {
+rescale <- function(x, a = 0, b = 1, drop.na = "TRUE") {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -31,8 +34,8 @@ rescale <- function(x, a = 0, b = 1) {
     stop("'b' must be greater than 'a'.")
   }
 
-  x_min <- min(x, na.rm = TRUE)
-  x_max <- max(x, na.rm = TRUE)
+  x_min <- min(x, na.rm = drop.na)
+  x_max <- max(x, na.rm = drop.na)
 
   if (x_min == x_max) {
     return(rep(a, length(x)))

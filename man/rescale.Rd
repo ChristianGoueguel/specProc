@@ -4,7 +4,7 @@
 \alias{rescale}
 \title{Min-Max Normalization}
 \usage{
-rescale(x, a = 0, b = 1)
+rescale(x, a = 0, b = 1, drop.na = "TRUE")
 }
 \arguments{
 \item{x}{A numeric vector.}
@@ -12,6 +12,10 @@ rescale(x, a = 0, b = 1)
 \item{a}{The minimum value of the new range (default: 0).}
 
 \item{b}{The maximum value of the new range (default: 1).}
+
+\item{drop.na}{A logical value indicating whether to remove missing values
+(NA) from the calculations. If \code{TRUE} (the default), missing values will be
+removed. If \code{FALSE}, missing values will be included.}
 }
 \value{
 A numeric vector of the same length as \code{x}, with values rescaled to
