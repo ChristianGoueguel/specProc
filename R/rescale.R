@@ -1,4 +1,4 @@
-#' @title Rescaling Numeric Vector Using Min-Max Normalization
+#' @title Min-Max Normalization
 #'
 #' @author Christian L. Goueguel
 #'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/rescale.R
 \name{rescale}
 \alias{rescale}
-\title{Rescaling Numeric Vector Using Min-Max Normalization}
+\title{Min-Max Normalization}
 \usage{
 rescale(x, a = 0, b = 1)
 }
