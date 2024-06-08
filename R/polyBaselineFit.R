@@ -3,7 +3,7 @@
 #' @author Christian L. Goueguel
 #'
 #' @description
-#' This function performs baseline correction on the spectra matrix by
+#' This function performs baseline correction on the spectral matrix by
 #' estimating and removing the continuous background emission using a polynomial
 #' curve fitting approach.
 #'
@@ -28,7 +28,7 @@
 #' @return A list with two elements:
 #' \itemize{
 #'   \item \code{correction}: The baseline-corrected spectral matrix.
-#'   \item \code{continuum}: The fitted continuum emission.
+#'   \item \code{continuum}: The fitted background emission.
 #' }
 #'
 #' @export polyBaselineFit
