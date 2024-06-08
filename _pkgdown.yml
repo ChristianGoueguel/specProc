@@ -73,6 +73,7 @@ reference:
   - minmax
   - snv
   - pareto
+  - poisson_scale
 
 - subtitle: data transformation
   desc: >
