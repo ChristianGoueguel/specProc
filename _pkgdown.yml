@@ -61,6 +61,7 @@ reference:
     Function that perform normalization of the spectra.
   contents:
   - normalize
+  - rescale
 
 - title: Robust statistical estimators
 
