@@ -57,13 +57,28 @@ reference:
   - polyBaselineFit
 
 - title: Normalization
+
+- subtitle: samples normalization
   desc: >
-    Function that perform normalization of the spectra.
+    Functions used to adjust the systematic differences among samples.
   contents:
   - normalize
-  - minmax
   - msc
+
+- subtitle: data scaling
+  desc: >
+    Functions used to adjust each variable/feature by a scaling factor computed
+    based on the dispersion of the variable.
+  contents:
+  - minmax
   - snv
+  - pareto
+
+- subtitle: data transformation
+  desc: >
+    Function used to transform variable(s) toward central normality.
+  contents:
+  - robustBCYJ
 
 - title: Robust statistical estimators
 
@@ -89,12 +104,6 @@ reference:
     Function used to compute highly robust estimators for scale (or dispersion).
   contents:
   - rousseeuwCroux
-
-- subtitle: transformation
-  desc: >
-    Function used to robustly transform variable(s) toward central normality.
-  contents:
-  - robustBCYJ
 
 - title: Miscellaneous
   contents:
