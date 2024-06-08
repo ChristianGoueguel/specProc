@@ -4,7 +4,7 @@
 \alias{minmax}
 \title{Min-Max Normalization}
 \usage{
-minmax(x, a = 0, b = 1, drop.na = "TRUE")
+minmax(x, a = 0, b = 1, drop.na = TRUE)
 }
 \arguments{
 \item{x}{A numeric vector.}

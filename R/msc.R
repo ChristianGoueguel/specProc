@@ -16,6 +16,9 @@
 #' @param robust A logical value indicating whether the mean or median of `x` is used as `xref`.
 #' @param window An optional list of numeric vectors specifying the indices of
 #' spectral windows. If provided, MSC is performed separately for each window.
+#' @param drop.na A logical value indicating whether to remove missing values
+#' (NA) from the calculations. If `TRUE` (the default), missing values will be
+#' removed. If `FALSE`, missing values will be included.
 #'
 #' @return A list with the following components:
 #'   \item{`correction`}{The corrected spectra.}
@@ -24,7 +27,7 @@
 #'
 #' @export msc
 #'
-msc <- function(x, xref = NULL, drop.offset = TRUE, robust = TRUE, window = NULL) {
+msc <- function(x, xref = NULL, drop.offset = TRUE, robust = TRUE, window = NULL, drop.na = TRUE) {
 
   if (missing(x)) {
     stop("Missing 'x' argument.")
@@ -37,6 +40,16 @@ msc <- function(x, xref = NULL, drop.offset = TRUE, robust = TRUE, window = NULL
   }
   if (!is.logical(robust)) {
     stop("'robust' must be a logical value (TRUE or FALSE).")
+  }
+  if (!is.logical(drop.na)) {
+    stop("'drop.na' must be a logical value (TRUE or FALSE).")
+  }
+
+  if (is.data.frame(x) || tibble::is_tibble(x)) {
+    x <- as.matrix(x)
+  }
+  if (drop.na) {
+    x <- na.omit(x)
   }
 
   if (is.null(xref)) {

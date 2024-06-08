@@ -63,6 +63,7 @@ reference:
   - normalize
   - minmax
   - msc
+  - snv
 
 - title: Robust statistical estimators
 

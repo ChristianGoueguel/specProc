@@ -20,7 +20,7 @@
 #'
 #' @export minmax
 #'
-minmax <- function(x, a = 0, b = 1, drop.na = "TRUE") {
+minmax <- function(x, a = 0, b = 1, drop.na = TRUE) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -32,6 +32,13 @@ minmax <- function(x, a = 0, b = 1, drop.na = "TRUE") {
   }
   if (b <= a) {
     stop("'b' must be greater than 'a'.")
+  }
+  if (!is.logical(drop.na)) {
+    stop("'drop.na' must be a logical value (TRUE or FALSE).")
+  }
+
+  if (drop.na) {
+    x <- na.omit(x)
   }
 
   x_min <- min(x, na.rm = drop.na)

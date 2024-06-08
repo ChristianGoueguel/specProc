@@ -4,7 +4,14 @@
 \alias{msc}
 \title{Multiplicative Signal Correction}
 \usage{
-msc(x, xref = NULL, drop.offset = TRUE, robust = TRUE, window = NULL)
+msc(
+  x,
+  xref = NULL,
+  drop.offset = TRUE,
+  robust = TRUE,
+  window = NULL,
+  drop.na = TRUE
+)
 }
 \arguments{
 \item{x}{A numeric matrix or data frame containing the input spectra.
@@ -20,6 +27,10 @@ the spectra (default is \code{TRUE}).}
 
 \item{window}{An optional list of numeric vectors specifying the indices of
 spectral windows. If provided, MSC is performed separately for each window.}
+
+\item{drop.na}{A logical value indicating whether to remove missing values
+(NA) from the calculations. If \code{TRUE} (the default), missing values will be
+removed. If \code{FALSE}, missing values will be included.}
 }
 \value{
 A list with the following components:
