@@ -37,8 +37,8 @@
 #'
 #' @return The MAD scale estimate for the input vector `x`.
 #'
-#' @export madc
-madc <- function(x, drop.na = TRUE, method = "hayes") {
+#' @export umad
+umad <- function(x, drop.na = TRUE, method = "hayes") {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
