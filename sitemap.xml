@@ -64,9 +64,6 @@
     <loc>https://christiangoueguel.github.io/specProc/reference/lorentzian.html</loc>
   </url>
   <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/madc.html</loc>
-  </url>
-  <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/medcouple_weight.html</loc>
   </url>
   <url>
@@ -131,6 +128,9 @@
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/summaryStats.html</loc>
+  </url>
+  <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/umad.html</loc>
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/yGradientglsw.html</loc>
