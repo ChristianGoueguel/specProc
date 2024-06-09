@@ -32,7 +32,7 @@
 #' (NA) from the calculations. If `TRUE` (the default), missing values will be
 #' removed. If `FALSE`, missing values will be included.
 #' @param method A character string specifying the method to use for calculating
-#' the correction factor when the number of sample is less than 100. The available
+#' the correction factor when the number of sample is more than 100. The available
 #' options are "hayes" (default) and "williams".
 #'
 #' @return The MAD scale estimate for the input vector `x`.

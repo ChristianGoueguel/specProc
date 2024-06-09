@@ -14,7 +14,7 @@ madc(x, drop.na = TRUE, method = "hayes")
 removed. If \code{FALSE}, missing values will be included.}
 
 \item{method}{A character string specifying the method to use for calculating
-the correction factor when the number of sample is less than 100. The available
+the correction factor when the number of sample is more than 100. The available
 options are "hayes" (default) and "williams".}
 }
 \value{
