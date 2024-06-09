@@ -1,4 +1,4 @@
-#' @title Poisson Scaling with Scaling Offset
+#' @title Poisson Scaling
 #'
 #' @author Christian L. Goueguel
 #'

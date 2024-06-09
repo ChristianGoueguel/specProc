@@ -2,7 +2,7 @@
 % Please edit documentation in R/poisson_scale.R
 \name{poisson_scale}
 \alias{poisson_scale}
-\title{Poisson Scaling with Scaling Offset}
+\title{Poisson Scaling}
 \usage{
 poisson_scale(x, sc = NULL, drop.na = TRUE, options = list())
 }
