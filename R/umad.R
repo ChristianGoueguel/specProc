@@ -38,6 +38,7 @@
 #' @return The MAD scale estimate for the input vector `x`.
 #'
 #' @export umad
+#'
 umad <- function(x, drop.na = TRUE, method = "hayes") {
   if (missing(x)) {
     stop("Missing 'x' argument.")
@@ -49,14 +50,23 @@ umad <- function(x, drop.na = TRUE, method = "hayes") {
     stop("'drop.na' must be a single logical value (TRUE or FALSE).")
   }
   if (!is.character(method) || !(method %in% c("hayes", "williams"))) {
-    stop("'method' must be either 'hayes' (default) or 'williams'.")
+    stop("'method' must be either 'hayes' or 'williams'.")
   }
 
   if (drop.na) {
     x <- x[!is.na(x)]
   }
 
-  n <- length(x)
+  if (length(x) < 2) {
+    stop("The size of 'x' must be greater than 1")
+  } else {
+    n <- length(x)
+  }
+
+  if (all(x == x[1])) {
+    stop("All values in the vector 'x' are the same (constant value).")
+  }
+
   med_x <- stats::median(x)
   mad_x <- stats::median(abs(x - med_x))
 
