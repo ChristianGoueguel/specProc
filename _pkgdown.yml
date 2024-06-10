@@ -110,4 +110,5 @@ reference:
 - title: Miscellaneous
   contents:
   - correlation
+  - centering
   - summaryStats
