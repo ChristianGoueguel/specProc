@@ -74,6 +74,7 @@ reference:
   - snv
   - pareto
   - poisson_scale
+  - centering
 
 - subtitle: data transformation
   desc: >
@@ -110,5 +111,4 @@ reference:
 - title: Miscellaneous
   contents:
   - correlation
-  - centering
   - summaryStats

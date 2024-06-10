@@ -2,22 +2,64 @@
 % Please edit documentation in R/normalize.R
 \name{normalize}
 \alias{normalize}
-\title{Normalization}
+\title{Spectra Normalization}
 \usage{
-normalize(data, method = "min_max")
+normalize(x, method = "area", bkg = NULL, wlength = NULL, drop.na = TRUE)
 }
 \arguments{
-\item{data}{A numeric data frame containing the spectra.}
+\item{x}{A numeric matrix or data frame containing the spectra.}
 
-\item{method}{A character vector specifying the normalization method to apply.}
+\item{method}{A character vector specifying the normalization method to apply.
+Available methods are: "area", "background", and "internal".}
+
+\item{bkg}{A numeric matrix or data frame of the same dimension as \code{x}, specifying
+the intensity of the continuum radiation (background emission) used for
+normalizing \code{x}. Required for "background" method.}
+
+\item{wlength}{A character vector of the selected wavelength(s) related to the
+internal standard(s) peak intensity. Optional for "background" method.}
+
+\item{drop.na}{A logical value indicating whether to remove missing values before
+normalizing (default: \code{TRUE}).}
 }
 \value{
-A data frame containing the original columns and the normalized
-columns for each specified method with the method name as a prefix.
+A data frame of normalized spectra.
 }
 \description{
-This function normalizes each row (observation) of the input data using various
-normalization methods.
+This function implements normalization methods based on background,
+total area, and internal standard.
+}
+\details{
+The three normalization methods:
+\itemize{
+\item \strong{Normalization to the background:} Spectra are divided by the intensity
+of the background emission. Note that it is recommended that the detector
+dark current be subtracted prior to the normalization.
+\item \strong{Normalization to the total area:} Each spectrum is divided by the total
+area of the spectrum over the whole spectral range. The detector dark current
+must be subtracted prior to this normalization. The total area is calculated
+as the sum of all intensity levels.
+\item \strong{Normalization to an internal standard:} The peak intensity (or area) of the
+emission line related to the analyte is divided by the peak intensity (or area)
+of a selected emission line related to the internal standard. The internal
+standard concentration is assumed constant or known.
+}
+}
+\references{
+\itemize{
+\item De Giacomo, A., Dell’Aglio, M., De Pascale, O., Gaudiuso, R.,
+Santagata, A., Teghil, R., (2008).
+Laser-induced breakdown spectroscopy methodology for the analysis of
+copper based alloys used in ancient artworks.
+Spectrochimica Acta Part B, 63(5):585-590
+\item Body, D., Chadwick, B.L., (2001).
+Optimization of the spectral data processing in a LIBS simultaneous
+elemental analysis system.
+Spectrochimica Acta Part B, 56(6):725-736.
+\item Rinnan, A., Van den Berg, F., Balling Engelsen, S., (2009).
+Review of the most common preprocessing techniques for near-infrared
+spectra, Trends in Analytical Chemistry, 28(10):1201-1222.
+}
 }
 \author{
 Christian L. Goueguel
