@@ -2,7 +2,7 @@
 % Please edit documentation in R/centering.R
 \name{centering}
 \alias{centering}
-\title{Variable Centering}
+\title{Data Centering}
 \usage{
 centering(x, method = "mean", drop.na = FALSE)
 }

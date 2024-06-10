@@ -63,29 +63,22 @@ normalize <- function(x, method = "area", bkg = NULL, wlength = NULL, drop.na = 
     method,
     "area" = x / rowSums(x),
     "background" = {
-
       if (is.null(bkg)) {
         stop("'bkg' argument is missing for the 'background' method.")
       }
-
       if (!is.numeric(bkg)) {
         stop("'bkg' must be a numeric data frame or matrix.")
       }
-
       if (drop.na) {
         bkg <- na.omit(bkg)
       }
-
       if (is.matrix(bkg)) {
         bkg <- as.data.frame(bkg)
       }
-
       if (!identical(dim(x), dim(bkg))) {
         stop("Dimensions of 'x' and 'bkg' must be the same for the 'background' method.")
       }
-
       if (!is.null(wlength)) {
-
         if (!is.character(wlength)) {
           stop("'wlength' must be a character vector.")
         }
@@ -95,20 +88,16 @@ normalize <- function(x, method = "area", bkg = NULL, wlength = NULL, drop.na = 
       x / bkg
     },
     "internal" = {
-
       if (is.null(wlength)) {
         stop("'wlength' argument is missing for the 'internal' method.")
       }
-
       if (!is.character(wlength)) {
         stop("'wlength' must be a character vector.")
       }
-
       wlength_cols <- dplyr::select(x, dplyr::all_of(wlength))
       internal_std <- rowSums(wlength_cols)
       x / internal_std
     }
   )
-
   return(tibble::as_tibble(norm_spectra))
 }

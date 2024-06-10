@@ -1,4 +1,4 @@
-#' @title Variable Centering
+#' @title Data Centering
 #'
 #' @author Christian L. Goueguel
 #'

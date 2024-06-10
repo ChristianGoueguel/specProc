@@ -1,9 +1,9 @@
-#' @title Fast Average for Large Dataset
+#' @title Fast Average for Large Spectral Dataset
 #'
 #' @author Christian L. Goueguel
 #'
 #' @description
-#' This function efficiently averages the spectra (or observations) in a large
+#' This function efficiently averages the samples spectra in a large
 #' dataset. It provides flexibility by computing either the overall
 #' mean across all spectra or group-wise means based on the values of a
 #' specified grouping column.
