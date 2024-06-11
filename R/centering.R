@@ -34,7 +34,7 @@ centering <- function(x, method = "mean", drop.na = FALSE) {
   }
 
   if (drop.na) {
-    x <- na.omit(x)
+    x <- stats::na.omit(x)
   }
 
   if (method == "mean") {

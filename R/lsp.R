@@ -1,4 +1,4 @@
-#' @title Least-Squares Polynomial Smoothing
+#' @title Least-Squares Polynomial
 #'
 #' @author Christian L. Goueguel
 #'
@@ -55,7 +55,7 @@ lsp <- function(x, degree = 4, tol = 1e-3, max.iter = 10) {
 
   degree <- as.numeric(degree)
   tol <- as.numeric(tol)
-  rep <- as.numeric(rep)
+  max.iter <- as.numeric(max.iter)
   wlength <- colnames(x)
 
   replaceWithZero <- function(x) {

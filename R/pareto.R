@@ -33,7 +33,7 @@ pareto <- function(x, drop.na = FALSE) {
     x <- as.matrix(x)
   }
 
-  std_devs <- apply(x, 2, sd, na.rm = drop.na)
+  std_devs <- apply(x, 2, stats::sd, na.rm = drop.na)
 
   if (any(std_devs == 0)) {
     warning("Some variables have zero standard deviation and will not be scaled.")

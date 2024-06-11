@@ -2,7 +2,7 @@
 % Please edit documentation in R/arpls.R
 \name{arpls}
 \alias{arpls}
-\title{Asymmetrically Reweighted Penalized Least Squares Smoothing}
+\title{Asymmetrically Reweighted Penalized Least Squares}
 \usage{
 arpls(x, lambda = 1000, ratio = 0.05, max.iter = 10)
 }
@@ -32,10 +32,8 @@ Baseline correction based on asymmetrically reweighted penalized least
 squares smoothing algorithm as proposed by Baek \emph{et al.} (2015).
 }
 \details{
-The \code{arpls} function applies the asymmetrically reweighted penalized least
-squares smoothing algorithm to a numeric matrix or data frame. The
-algorithm estimates a baseline curve by iteratively updating weights based on
-the residuals and minimizing a penalized least squares criterion. The
+The algorithm estimates a baseline curve by iteratively updating weights based
+on the residuals and minimizing a penalized least squares criterion. The
 resulting baseline curve is subtracted from the input data, providing a
 baseline-corrected version.
 }

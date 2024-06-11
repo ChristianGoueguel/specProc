@@ -49,26 +49,27 @@ msc <- function(x, xref = NULL, drop.offset = TRUE, robust = TRUE, window = NULL
     x <- as.matrix(x)
   }
   if (drop.na) {
-    x <- na.omit(x)
+    x <- stats::na.omit(x)
   }
 
   if (is.null(xref)) {
     if (robust) {
-      xref <- apply(x, 2, median)
+      xref <- apply(x, 2, stats::median)
     } else {
       xref <- apply(x, 2, mean)
     }
   }
 
+  subind <- NULL
   if (is.null(window)) {
     alpha <- colMeans(x[, subind, drop = FALSE] - xref[subind])
-    beta <- apply(x[, subind, drop = FALSE], 2, function(y) cov(y, xref[subind]) / var(xref[subind]))
+    beta <- apply(x[, subind, drop = FALSE], 2, function(y) stats::cov(y, xref[subind]) / stats::var(xref[subind]))
     sx <- sweep(x, 2, alpha, `-`) / beta
   } else {
     sx <- x
     for (w in window) {
       alpha <- colMeans(x[, w, drop = FALSE] - xref[w])
-      beta <- apply(x[, w, drop = FALSE], 2, function(y) cov(y, xref[w]) / var(xref[w]))
+      beta <- apply(x[, w, drop = FALSE], 2, function(y) stats::cov(y, xref[w]) / stats::var(xref[w]))
       sx[, w] <- sweep(x[, w, drop = FALSE], 2, alpha, `-`) / beta
     }
     alpha <- beta <- NULL

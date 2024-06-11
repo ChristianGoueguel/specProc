@@ -2,7 +2,7 @@
 % Please edit documentation in R/lsp.R
 \name{lsp}
 \alias{lsp}
-\title{Least-Squares Polynomial Smoothing}
+\title{Least-Squares Polynomial}
 \usage{
 lsp(x, degree = 4, tol = 0.001, max.iter = 10)
 }

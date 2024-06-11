@@ -2,7 +2,7 @@
 % Please edit documentation in R/whittaker.R
 \name{whittaker}
 \alias{whittaker}
-\title{Asymmetric Least Squares Smoothing}
+\title{Asymmetric Least Squares}
 \usage{
 whittaker(x, lambda = 1000, p = 0.001, max.iter = 10)
 }
@@ -27,14 +27,13 @@ A list containing two tibbles:
 }
 }
 \description{
-Baseline correction based on asymmetric least squares (ALS) smoothing
-algorithm as proposed by Eilers \emph{et al.} (2005).
+Baseline correction based on asymmetric least squares (ALS) algorithm
+as proposed by Eilers \emph{et al.} (2005).
 }
 \details{
-The function applies Eilers' method based on a Whittaker filter to a numeric
-matrix or data frame. The algorithm estimates a
-baseline curve by minimizing the asymmetric least squares criterion, which
-allows for different weights for positive and negative residuals. The
+The function applies Eilers' method based on a Whittaker filter. The algorithm
+estimates a baseline curve by minimizing the asymmetric least squares criterion,
+which allows for different weights for positive and negative residuals. The
 resulting baseline curve is subtracted from the input data, providing a
 baseline-corrected version.
 }

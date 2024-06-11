@@ -38,7 +38,7 @@ minmax <- function(x, a = 0, b = 1, drop.na = TRUE) {
   }
 
   if (drop.na) {
-    x <- na.omit(x)
+    x <- stats::na.omit(x)
   }
 
   x_min <- min(x, na.rm = drop.na)

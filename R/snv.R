@@ -36,11 +36,11 @@ snv <- function(x, drop.na = TRUE) {
     x <- as.matrix(x)
   }
   if (drop.na) {
-    x <- na.omit(x)
+    x <- stats::na.omit(x)
   }
 
   mns <- rowMeans(x, na.rm = drop.na)
-  sds <- apply(x, 1, sd, na.rm = drop.na)
+  sds <- apply(x, 1, stats::sd, na.rm = drop.na)
   x_snv <- sweep(x, 1, mns, "-") / sds
 
   res <- list(

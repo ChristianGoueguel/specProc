@@ -54,13 +54,13 @@ poisson_scale <- function(x, sc = NULL, drop.na = TRUE, options = list()) {
 
   # Set default options
   default_options <- list(offset = 3, mode = 1)
-  options <- modifyList(default_options, options)
+  options <- utils::modifyList(default_options, options)
 
   if (is.data.frame(x) || tibble::is_tibble(x)) {
     x <- as.matrix(x)
   }
   if (drop.na) {
-    x <- na.omit(x)
+    x <- stats::na.omit(x)
   }
 
   # Calculate mean values

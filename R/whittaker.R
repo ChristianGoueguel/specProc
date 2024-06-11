@@ -1,16 +1,15 @@
-#' @title Asymmetric Least Squares Smoothing
+#' @title Asymmetric Least Squares
 #'
 #' @author Christian L. Goueguel
 #'
 #' @description
-#' Baseline correction based on asymmetric least squares (ALS) smoothing
-#' algorithm as proposed by Eilers *et al.* (2005).
+#' Baseline correction based on asymmetric least squares (ALS) algorithm
+#' as proposed by Eilers *et al.* (2005).
 #'
 #' @details
-#' The function applies Eilers' method based on a Whittaker filter to a numeric
-#' matrix or data frame. The algorithm estimates a
-#' baseline curve by minimizing the asymmetric least squares criterion, which
-#' allows for different weights for positive and negative residuals. The
+#' The function applies Eilers' method based on a Whittaker filter. The algorithm
+#' estimates a baseline curve by minimizing the asymmetric least squares criterion,
+#' which allows for different weights for positive and negative residuals. The
 #' resulting baseline curve is subtracted from the input data, providing a
 #' baseline-corrected version.
 #'
@@ -70,8 +69,8 @@ whittaker <- function(x, lambda = 1e3, p = 0.001, max.iter = 10){
     baseline[i, ] <- row_baseline
   }
 
-  corrected_data <- as_tibble(corrected_data)
-  baseline <- as_tibble(baseline)
+  corrected_data <- tibble::as_tibble(corrected_data)
+  baseline <- tibble::as_tibble(baseline)
 
   res <- list(
     "correction" = corrected_data,

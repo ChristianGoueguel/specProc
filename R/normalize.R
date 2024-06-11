@@ -55,7 +55,7 @@ normalize <- function(x, method = "area", bkg = NULL, wlength = NULL, drop.na = 
     x <- as.data.frame(x)
   }
   if (drop.na) {
-    x <- na.omit(x)
+    x <- stats::na.omit(x)
   }
   method <- match.arg(method, c("area", "background", "internal"))
 
@@ -70,7 +70,7 @@ normalize <- function(x, method = "area", bkg = NULL, wlength = NULL, drop.na = 
         stop("'bkg' must be a numeric data frame or matrix.")
       }
       if (drop.na) {
-        bkg <- na.omit(bkg)
+        bkg <- stats::na.omit(bkg)
       }
       if (is.matrix(bkg)) {
         bkg <- as.data.frame(bkg)

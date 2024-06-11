@@ -1,4 +1,4 @@
-#' @title Asymmetrically Reweighted Penalized Least Squares Smoothing
+#' @title Asymmetrically Reweighted Penalized Least Squares
 #'
 #' @author Christian L. Goueguel
 #'
@@ -7,10 +7,8 @@
 #' squares smoothing algorithm as proposed by Baek *et al.* (2015).
 #'
 #' @details
-#' The `arpls` function applies the asymmetrically reweighted penalized least
-#' squares smoothing algorithm to a numeric matrix or data frame. The
-#' algorithm estimates a baseline curve by iteratively updating weights based on
-#' the residuals and minimizing a penalized least squares criterion. The
+#' The algorithm estimates a baseline curve by iteratively updating weights based
+#' on the residuals and minimizing a penalized least squares criterion. The
 #' resulting baseline curve is subtracted from the input data, providing a
 #' baseline-corrected version.
 #'
@@ -88,13 +86,13 @@ baselineArPls <- function(x, lambda, ratio, max.iter) {
   for (i in 1:max.iter) {
     wd <- diag(w)
     c <- chol(wd + h)
-    z <- c %\% (c %\% (wd %*% x))
+    z <- c %/% (c %/% (wd %*% x))
     d <- x - z
     dn <- d[d < 0]
     m <- mean(dn)
-    s <- sd(dn)
+    s <- stats::sd(dn)
     wt <- 1 / (1 + exp(2 * (d - (2 * s - m)) / s))
-    if (stats::norm(w - wt, type = "2") / stats::norm(w, type = "2") < ratio) {
+    if (norm(w - wt, type = "2") / norm(w, type = "2") < ratio) {
       break
     }
     w <- wt
