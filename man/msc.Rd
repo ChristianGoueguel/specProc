@@ -20,10 +20,11 @@ Each row represents a sample, and each column represents a spectral variable.}
 \item{xref}{An optional numeric vector representing the reference spectrum.
 If \code{NULL} (default), the mean or median of \code{x} is used as the reference.}
 
-\item{drop.offset}{A logical value indicating whether the offset should be removed from
-the spectra (default is \code{TRUE}).}
+\item{drop.offset}{A logical value indicating whether the offset should be
+removed from the spectra (default is \code{TRUE}).}
 
-\item{robust}{A logical value indicating whether the mean or median of \code{x} is used as \code{xref}.}
+\item{robust}{A logical value indicating whether the mean or median of \code{x} is
+used as \code{xref}.}
 
 \item{window}{An optional list of numeric vectors specifying the indices of
 spectral windows. If provided, MSC is performed separately for each window.}

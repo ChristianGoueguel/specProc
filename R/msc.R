@@ -11,9 +11,10 @@
 #' Each row represents a sample, and each column represents a spectral variable.
 #' @param xref An optional numeric vector representing the reference spectrum.
 #' If `NULL` (default), the mean or median of `x` is used as the reference.
-#' @param drop.offset A logical value indicating whether the offset should be removed from
-#' the spectra (default is `TRUE`).
-#' @param robust A logical value indicating whether the mean or median of `x` is used as `xref`.
+#' @param drop.offset A logical value indicating whether the offset should be
+#' removed from the spectra (default is `TRUE`).
+#' @param robust A logical value indicating whether the mean or median of `x` is
+#' used as `xref`.
 #' @param window An optional list of numeric vectors specifying the indices of
 #' spectral windows. If provided, MSC is performed separately for each window.
 #' @param drop.na A logical value indicating whether to remove missing values
@@ -27,7 +28,13 @@
 #'
 #' @export msc
 #'
-msc <- function(x, xref = NULL, drop.offset = TRUE, robust = TRUE, window = NULL, drop.na = TRUE) {
+msc <- function(
+    x,
+    xref = NULL,
+    drop.offset = TRUE,
+    robust = TRUE,
+    window = NULL,
+    drop.na = TRUE) {
 
   if (missing(x)) {
     stop("Missing 'x' argument.")
@@ -60,23 +67,24 @@ msc <- function(x, xref = NULL, drop.offset = TRUE, robust = TRUE, window = NULL
     }
   }
 
-  subind <- NULL
+  subind <- 1:ncol(x)
+
   if (is.null(window)) {
     alpha <- colMeans(x[, subind, drop = FALSE] - xref[subind])
     beta <- apply(x[, subind, drop = FALSE], 2, function(y) stats::cov(y, xref[subind]) / stats::var(xref[subind]))
-    sx <- sweep(x, 2, alpha, `-`) / beta
+    sx <- sweep(x, 2, alpha, "-") / beta
   } else {
     sx <- x
     for (w in window) {
       alpha <- colMeans(x[, w, drop = FALSE] - xref[w])
       beta <- apply(x[, w, drop = FALSE], 2, function(y) stats::cov(y, xref[w]) / stats::var(xref[w]))
-      sx[, w] <- sweep(x[, w, drop = FALSE], 2, alpha, `-`) / beta
+      sx[, w] <- sweep(x[, w, drop = FALSE], 2, alpha, "-") / beta
     }
     alpha <- beta <- NULL
   }
 
   if (!drop.offset) {
-    sx <- sweep(sx, 2, colMeans(sx), `-`)
+    sx <- sweep(sx, 2, colMeans(sx), "-")
   }
 
   res <- list(
