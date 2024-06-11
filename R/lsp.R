@@ -1,11 +1,11 @@
-#' @title Polynomial Baseline Correction
+#' @title Least-Squares Polynomial Smoothing
 #'
 #' @author Christian L. Goueguel
 #'
 #' @description
 #' This function performs baseline correction on the spectral matrix by
-#' estimating and removing the continuous background emission using a polynomial
-#' curve fitting approach.
+#' estimating and removing the continuous background emission using least-squares
+#' polynomial curve fitting approach.
 #'
 #' @details
 #' This function is a wrapper around the `baseline.modpolyfit` function from the
@@ -17,13 +17,13 @@
 #'      subtraction of fluorescence from biological Raman spectra.
 #'      Applied Spectroscopy, 57(11):1363-1367
 #'
-#' @param x A matrix, data frame or tibble.
+#' @param x A matrix or data frame.
 #' @param degree An integer specifying the degree of the polynomial fitting
 #' function. The default value is 4.
 #' @param tol A numeric value representing the tolerance for the difference
 #' between iterations. The default value is 1e-3.
-#' @param rep An integer specifying the maximum number of iterations for the
-#' algorithm. The default value is 100.
+#' @param max.iter An integer specifying the maximum number of iterations for the
+#' algorithm. The default value is 10.
 #'
 #' @return A list with two elements:
 #' \itemize{
@@ -31,20 +31,20 @@
 #'   \item \code{continuum}: The fitted background emission.
 #' }
 #'
-#' @export polyBaselineFit
+#' @export lsp
 #'
-polyBaselineFit <- function(x, degree = 4, tol = 1e-3, rep = 100) {
+lsp <- function(x, degree = 4, tol = 1e-3, max.iter = 10) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!is.numeric(degree)) {
-    stop("'degree' must be numeric.")
+  if (!is.numeric(degree) || length(degree) != 1) {
+    stop("'degree' must be a single numeric value.")
   }
-  if (!is.numeric(tol)) {
-    stop("'tol' must be numeric.")
+  if (!is.numeric(tol) || length(tol) != 1) {
+    stop("'tol must be a single numeric value.")
   }
-  if (!is.numeric(rep)) {
-    stop("'rep' must be numeric.")
+  if (!is.numeric(max.iter) || length(max.iter) != 1) {
+    stop("'max.iter' must be a single numeric value.")
   }
 
   if (is.data.frame(x) && tibble::is_tibble(x)) {
@@ -66,7 +66,7 @@ polyBaselineFit <- function(x, degree = 4, tol = 1e-3, rep = 100) {
     spectra = x,
     degree = degree,
     tol = tol,
-    rep = rep
+    rep = max.iter
   )
 
   bc_spec <- bc_mod %>%
