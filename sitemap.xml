@@ -19,6 +19,9 @@
     <loc>https://christiangoueguel.github.io/specProc/reference/adjboxplot.html</loc>
   </url>
   <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/arpls.html</loc>
+  </url>
+  <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/average.html</loc>
   </url>
   <url>
@@ -67,6 +70,9 @@
     <loc>https://christiangoueguel.github.io/specProc/reference/lorentzian.html</loc>
   </url>
   <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/lsp.html</loc>
+  </url>
+  <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/medcouple_weight.html</loc>
   </url>
   <url>
@@ -109,9 +115,6 @@
     <loc>https://christiangoueguel.github.io/specProc/reference/poisson_scale.html</loc>
   </url>
   <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/polyBaselineFit.html</loc>
-  </url>
-  <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/pseudo_voigt.html</loc>
   </url>
   <url>
@@ -134,6 +137,9 @@
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/umad.html</loc>
+  </url>
+  <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/whittaker.html</loc>
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/yGradientglsw.html</loc>
