@@ -34,9 +34,9 @@
 #'   \item \code{background}: The fitted background emission.
 #' }
 #'
-#' @export arpls
+#' @export baseline_arpls
 #'
-arpls <- function(x, lambda = 1e3, ratio = 0.05, max.iter = 10) {
+baseline_arpls <- function(x, lambda = 1e3, ratio = 0.05, max.iter = 10) {
 
   if (missing(x)) {
     stop("Missing 'x' argument.")

@@ -2,8 +2,8 @@
 
 export("%>%")
 export(adjboxplot)
-export(arpls)
 export(average)
+export(baseline_arpls)
 export(baseline_lsp)
 export(biweight_location)
 export(biweight_midcorrelation)
