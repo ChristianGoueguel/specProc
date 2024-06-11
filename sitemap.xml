@@ -19,10 +19,13 @@
     <loc>https://christiangoueguel.github.io/specProc/reference/adjboxplot.html</loc>
   </url>
   <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/arpls.html</loc>
+    <loc>https://christiangoueguel.github.io/specProc/reference/average.html</loc>
   </url>
   <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/average.html</loc>
+    <loc>https://christiangoueguel.github.io/specProc/reference/baseline_arpls.html</loc>
+  </url>
+  <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/baseline_lsp.html</loc>
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/biweight_location.html</loc>
@@ -68,9 +71,6 @@
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/lorentzian.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/lsp.html</loc>
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/medcouple_weight.html</loc>
