@@ -59,28 +59,37 @@ whittaker <- function(x, lambda = 1e3, p = 0.001, max.iter = 10){
 
   n <- nrow(x)
   m <- ncol(x)
-  corrected_data <- matrix(nrow = n, ncol = m)
+  correctedData <- matrix(nrow = n, ncol = m)
   baseline <- matrix(nrow = n, ncol = m)
 
   for (i in 1:n) {
-    row_data <- x[i, ]
-    row_baseline <- baseline_als(row_data, lambda, p, max.iter)
-    corrected_data[i, ] <- row_data - row_baseline
-    baseline[i, ] <- row_baseline
+    rowData <- x[i, ]
+    rowBaseline <- als(rowData, lambda, p, max.iter)
+    correctedData[i, ] <- rowData - rowBaseline
+    baseline[i, ] <- rowBaseline
   }
+  wlength <- colnames(x)
+  replaceWithZero <- function(x) {
+    ifelse(x < 0, 0, x)
+  }
+  correctedData <- correctedData %>%
+    tibble::as_tibble() %>%
+    dplyr::rename_with(~wlength, dplyr::everything()) %>%
+    purrr::map(replaceWithZero)
 
-  corrected_data <- tibble::as_tibble(corrected_data)
-  baseline <- tibble::as_tibble(baseline)
+  baseline <- tibble::as_tibble(baseline) %>%
+    dplyr::rename_with(~wlength, dplyr::everything()) %>%
+    purrr::map(replaceWithZero)
 
   res <- list(
-    "correction" = corrected_data,
+    "correction" = correctedData,
     "background" = baseline
     )
 
   return(res)
 }
 
-baseline_als <- function(x, lambda, p, max.iter) {
+als <- function(x, lambda, p, max.iter) {
   n <- length(x)
   d <- diff(diag(n), differences = 2)
   w <- rep(1, n)

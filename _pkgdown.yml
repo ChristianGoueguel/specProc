@@ -54,9 +54,9 @@ reference:
   desc: >
     Functions used to fit and remove the background emission.
   contents:
-  - lsp
+  - baseline_lsp
+  - baseline_arpls
   - whittaker
-  - arpls
 
 - title: Normalization
 

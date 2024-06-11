@@ -8,8 +8,7 @@
 #' polynomial curve fitting approach.
 #'
 #' @details
-#' This function is a wrapper around the `baseline.modpolyfit` function from the
-#' `baseline` package, which implements the algorithm described in Lieber and
+#' This function implements the algorithm described in Lieber and
 #' Mahadevan-Jansen (2003).
 #'
 #' @references
@@ -28,12 +27,12 @@
 #' @return A list with two elements:
 #' \itemize{
 #'   \item \code{correction}: The baseline-corrected spectral matrix.
-#'   \item \code{continuum}: The fitted background emission.
+#'   \item \code{background}: The fitted background emission.
 #' }
 #'
-#' @export lsp
+#' @export baseline_lsp
 #'
-lsp <- function(x, degree = 4, tol = 1e-3, max.iter = 10) {
+baseline_lsp <- function(x, degree = 4, tol = 1e-3, max.iter = 10) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -48,43 +47,57 @@ lsp <- function(x, degree = 4, tol = 1e-3, max.iter = 10) {
   }
 
   if (is.data.frame(x) && tibble::is_tibble(x)) {
-    x <- x %>%
-      dplyr::select(dplyr::where(is.numeric)) %>%
-      as.matrix()
+    x <- as.matrix(x)
   }
 
-  degree <- as.numeric(degree)
-  tol <- as.numeric(tol)
-  max.iter <- as.numeric(max.iter)
-  wlength <- colnames(x)
+  n <- nrow(x)
+  m <- ncol(x)
+  correctedData <- matrix(nrow = n, ncol = m)
+  baseline <- matrix(nrow = n, ncol = m)
 
+  for (i in 1:n) {
+    rowData <- x[i, ]
+    rowBaseline <- lsp(rowData, degree, tol, max.iter)
+    correctedData[i, ] <- rowData - rowBaseline
+    baseline[i, ] <- rowBaseline
+  }
+  wlength <- colnames(x)
   replaceWithZero <- function(x) {
     ifelse(x < 0, 0, x)
   }
-
-  bc_mod <- baseline::baseline.modpolyfit(
-    spectra = x,
-    degree = degree,
-    tol = tol,
-    rep = max.iter
-  )
-
-  bc_spec <- bc_mod %>%
-    purrr::pluck("corrected") %>%
+  correctedData <- correctedData %>%
     tibble::as_tibble() %>%
     dplyr::rename_with(~wlength, dplyr::everything()) %>%
     purrr::map(replaceWithZero)
 
-  background <- bc_mod %>%
-    purrr::pluck("baseline") %>%
-    tibble::as_tibble() %>%
+  baseline <- tibble::as_tibble(baseline) %>%
     dplyr::rename_with(~wlength, dplyr::everything()) %>%
     purrr::map(replaceWithZero)
 
   res <- list(
-    "correction" = bc_spec,
-    "continuum" = background
-    )
+    "correction" = correctedData,
+    "background" = baseline
+  )
 
   return(res)
+}
+
+lsp <- function(x, degree, tol, max.iter) {
+  n <- length(x)
+  z <- rep(0, n)
+  p <- cbind(1 / sqrt(n), stats::poly(1:n, degree = degree))
+  z_w <- z_d <- z_g <- x
+  i <- 0
+  repeat {
+    i <- i + 1
+    z_p <- p %*% crossprod(p, z_d)
+    z_w <- pmin(z_g, z_p)
+    crit <- sum(abs((z_w - z_d) / z_d), na.rm = TRUE)
+    if (crit < tol || i > max.iter)
+      break
+    z_d <- z_w
   }
+  z <- z_p
+
+  return(z)
+}

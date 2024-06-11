@@ -62,13 +62,22 @@ arpls <- function(x, lambda = 1e3, ratio = 0.05, max.iter = 10) {
 
   for (i in 1:n) {
     rowData <- x[i, ]
-    rowBaseline <- baselineArPls(rowData, lambda, ratio, max.iter)
+    rowBaseline <- arpls(rowData, lambda, ratio, max.iter)
     correctedData[i, ] <- rowData - rowBaseline
     baseline[i, ] <- rowBaseline
   }
+  wlength <- colnames(x)
+  replaceWithZero <- function(x) {
+    ifelse(x < 0, 0, x)
+  }
+  correctedData <- correctedData %>%
+    tibble::as_tibble() %>%
+    dplyr::rename_with(~wlength, dplyr::everything()) %>%
+    purrr::map(replaceWithZero)
 
-  correctedData <- tibble::as_tibble(correctedData)
-  baseline <- tibble::as_tibble(baseline)
+  baseline <- tibble::as_tibble(baseline) %>%
+    dplyr::rename_with(~wlength, dplyr::everything()) %>%
+    purrr::map(replaceWithZero)
 
   res <- list(
     "correction" = correctedData,
@@ -78,7 +87,7 @@ arpls <- function(x, lambda = 1e3, ratio = 0.05, max.iter = 10) {
   return(res)
 }
 
-baselineArPls <- function(x, lambda, ratio, max.iter) {
+arpls <- function(x, lambda, ratio, max.iter) {
   n <- length(x)
   d <- diff(diag(n), differences = 2)
   h <- lambda * t(d) %*% d
