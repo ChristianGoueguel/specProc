@@ -63,7 +63,7 @@ baseline_lsp <- function(x, degree = 4, tol = 1e-3, max.iter = 10) {
   }
   wlength <- colnames(x)
   replaceWithZero <- function(x) {
-    ifelse(x < 0, 0, x)
+    ifelse(x < 0, 1, x)
   }
   correctedData <- correctedData %>%
     tibble::as_tibble() %>%

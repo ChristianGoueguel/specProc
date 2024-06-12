@@ -70,7 +70,7 @@ whittaker <- function(x, lambda = 1e3, p = 0.001, max.iter = 10){
   }
   wlength <- colnames(x)
   replaceWithZero <- function(x) {
-    ifelse(x < 0, 0, x)
+    ifelse(x < 0, 1, x)
   }
   correctedData <- correctedData %>%
     tibble::as_tibble() %>%
