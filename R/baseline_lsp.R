@@ -9,7 +9,13 @@
 #'
 #' @details
 #' This function implements the algorithm described in Lieber and
-#' Mahadevan-Jansen (2003).
+#' Mahadevan-Jansen (2003), which smoothes the spectrum in such a way that
+#' peaks are automatically eliminated, leaving only the baseline to be
+#' subtracted from the raw spectrum. The basis for this method is a
+#' modified least-squares-based polynomial curve-fitting function, such that all
+#' data points in the generated curve that have an intensity value higher than
+#' their respective pixel value in the input spectrum are automatically
+#' reassigned to the original intensity.
 #'
 #' @references
 #'    - Lieber, C.A., Mahadevan-Jansen, A., (2003). Automated method for
