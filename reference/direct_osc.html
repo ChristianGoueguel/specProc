@@ -63,11 +63,11 @@ the response variable(s), \(\textbf{Y}\).</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">direct_osc</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
-<span>  ncomp <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  ncomp <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  scale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  max_iter <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  tol <span class="op">=</span> <span class="fl">0.001</span></span>
+<span>  tol <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>  max_iter <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -82,8 +82,7 @@ the response variable(s), \(\textbf{Y}\).</p>
 
 
 <dt>ncomp</dt>
-<dd><p>An integer specifying the number of principal components to
-retain for orthogonal processing. Default is 2.</p></dd>
+<dd><p>An integer specifying the number of principal components to retain for orthogonal processing. Default is 10.</p></dd>
 
 
 <dt>center</dt>
@@ -94,23 +93,21 @@ retain for orthogonal processing. Default is 2.</p></dd>
 <dd><p>A logical value specifying whether to scale the data. Default is <code>FALSE</code>.</p></dd>
 
 
-<dt>max_iter</dt>
-<dd><p>An integer representing the maximum number of iterations.
-The default value is 10.</p></dd>
-
-
 <dt>tol</dt>
-<dd><p>A numeric value representing the tolerance for convergence.
-The default value is 1e-3</p></dd>
+<dd><p>A numeric value representing the tolerance for convergence. The default value is 1e-3.</p></dd>
+
+
+<dt>max_iter</dt>
+<dd><p>An integer representing the maximum number of iterations. The default value is 10.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A list with the following components:</p><ul><li><p><code>correction</code>: The corrected \(\textbf{X}\) matrix after DOSC.</p></li>
-<li><p><code>loading</code>: The loadings \(\textbf{P}\) matrix.</p></li>
-<li><p><code>score</code>: The scores \(\textbf{T}\) matrix.</p></li>
+<p>A list with the following components:</p><ul><li><p><code>correction</code>: The corrected matrix.</p></li>
+<li><p><code>loading</code>: The loadings matrix.</p></li>
+<li><p><code>score</code>: The scores matrix.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
