@@ -4,15 +4,14 @@
 \alias{nas}
 \title{Net Analyte Signal}
 \usage{
-nas(x, y, ncomp = 2, center = TRUE, scale = FALSE)
+nas(x, y, ncomp = 5, center = TRUE, scale = FALSE)
 }
 \arguments{
 \item{x}{A matrix or data frame of the predictor variables}
 
 \item{y}{A vector, matrix or data frame of the response variable(s)}
 
-\item{ncomp}{An integer specifying the number of principal components to
-retain for orthogonal processing. Default is 2.}
+\item{ncomp}{An integer specifying the number of principal components to retain for orthogonal processing. Default is 5.}
 
 \item{center}{A logical value specifying whether to center the data. Default is \code{TRUE}.}
 

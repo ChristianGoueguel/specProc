@@ -35,9 +35,9 @@ The default value is 1e-3.}
 \value{
 A list with the following components:
 \itemize{
-\item \code{correction}: The corrected \eqn{\textbf{X}} matrix after DO.
-\item \code{loading}: The loadings \eqn{\textbf{P}} matrix.
-\item \code{score}: The scores \eqn{\textbf{T}} matrix.
+\item \code{correction}: The corrected matrix.
+\item \code{loading}: The loadings matrix.
+\item \code{score}: The scores matrix.
 }
 }
 \description{

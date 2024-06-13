@@ -28,16 +28,14 @@
 #'
 #' @param x A matrix or data frame of the predictor variables
 #' @param y A vector, matrix or data frame of the response variable(s)
-#' @param ncomp An integer specifying the number of principal components to
-#' retain for orthogonal processing. Default is 2.
+#' @param ncomp An integer specifying the number of principal components to retain for orthogonal processing. Default is 5.
 #' @param center A logical value specifying whether to center the data. Default is `TRUE`.
 #' @param scale A logical value specifying whether to scale the data. Default is `FALSE`.
 #'
 #' @return A tibble containing the corrected predictor variables
 #' @export nas
 #'
-nas <- function(x, y, ncomp = 2, center = TRUE, scale = FALSE) {
-
+nas <- function(x, y, ncomp = 5, center = TRUE, scale = FALSE) {
   if (missing(x) || missing(y)) {
     stop("Both 'x' and 'y' must be provided")
   }
@@ -70,14 +68,10 @@ nas <- function(x, y, ncomp = 2, center = TRUE, scale = FALSE) {
   if (ncomp < 1 || ncomp > min(nrow(x) - 1, ncol(x))) {
     ncomp <- min(nrow(x) - 1, ncol(x))
   }
-
-  z <- (diag(nrow(x)) - y %*% t(y) / (t(y) %*% y)) %*% x
-
+  z <- (diag(nrow(x)) - tcrossprod(y, y) / crossprod(y, y)) %*% x
   pca_mod <- stats::prcomp(z, scale = FALSE)
   p <- pca_mod$rotation[, 1:ncomp]
-  r <- diag(ncomp) - p %*% t(p)
-
+  r <- diag(ncomp) - tcrossprod(p, p)
   x_nas <- x %*% r
-
   return(tibble::as_tibble(x_nas))
 }

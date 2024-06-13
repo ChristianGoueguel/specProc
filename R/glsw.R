@@ -36,8 +36,7 @@
 #'
 #' @param x1 A numeric matrix, data frame or tibble representing the first set of data.
 #' @param x2 A numeric matrix, data frame or tibble representing the second set of data.
-#' @param alpha A numeric value specifying the weighting parameter. Typical values
-#' range from 1 to 0.0001. Default is 0.01.
+#' @param alpha A numeric value specifying the weighting parameter. Typical values range from 1 to 0.0001. Default is 0.01.
 #'
 #' @return A tibble containing the filtering matrix.
 #' @references

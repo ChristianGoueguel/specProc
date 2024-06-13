@@ -13,20 +13,18 @@
 #'
 #' @param x A numeric matrix, data frame or tibble, representing the predictors data.
 #' @param y A numeric vector representing the response vector.
-#' @param alpha A numeric value specifying the weighting parameter. Typical values
-#'   range from 1 to 0.0001. Default is 0.01.
+#' @param alpha A numeric value specifying the weighting parameter. Typical values range from 1 to 0.0001. Default is 0.01.
 #'
 #' @return A tibble containing the filtering matrix.
 #'
 #' @references
-#'  - Zorzetti, B.M., Shaver, J.M., Harynuk, J.J., (2011). Estimation of the age
-#'    of a weathered mixture of volatile organic compounds,
+#'  - Zorzetti, B.M., Shaver, J.M., Harynuk, J.J., (2011).
+#'    Estimation of the age of a weathered mixture of volatile organic compounds.
 #'    Analytica Chimica Acta, 694(1-2):31–37.
 #'
 #' @export yGradientglsw
 #'
 yGradientglsw <- function(x, y, alpha = 0.01) {
-
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -51,8 +49,6 @@ yGradientglsw <- function(x, y, alpha = 0.01) {
   x_diff <- prospectr::savitzkyGolay(x_sorted, m = 1, p = 1, w = 5)
   y_diff <- prospectr::savitzkyGolay(y_sorted, m = 1, p = 1, w = 5)
   w_i <- 2^(-y_diff / stats::sd(y_diff))
-
   G <- yGradientglswCpp(x_diff, w_i, alpha)
-
   return(G)
 }

@@ -39,9 +39,9 @@
 #' The default value is 1e-3.
 #'
 #' @return A list with the following components:
-#'  - `correction`: The corrected \eqn{\textbf{X}} matrix after DO.
-#'  - `loading`: The loadings \eqn{\textbf{P}} matrix.
-#'  - `score`: The scores \eqn{\textbf{T}} matrix.
+#'  - `correction`: The corrected matrix.
+#'  - `loading`: The loadings matrix.
+#'  - `score`: The scores matrix.
 #' @export direct_orthogonal
 #'
 direct_orthogonal <- function(x, y, ncomp = 2, center = TRUE, scale = FALSE, max_iter = 10, tol = 1e-3) {
@@ -75,8 +75,8 @@ direct_orthogonal <- function(x, y, ncomp = 2, center = TRUE, scale = FALSE, max
     y <- scale(y, center = TRUE, scale = TRUE)
   }
 
-  m <- t(x) %*% y %*% solve(t(y) %*% y)
-  z <- x - y %*% t(m)
+  m <- crossprod(x, y) %*% solve(crossprod(y, y))
+  z <- x - tcrossprod(y, m)
 
   if (ncomp < 1 || ncomp > min(nrow(x) - 1, ncol(x))) {
     ncomp <- min(nrow(x) - 1, ncol(x))
@@ -96,11 +96,11 @@ direct_orthogonal <- function(x, y, ncomp = 2, center = TRUE, scale = FALSE, max
       iter <- iter + 1
     }
     p_mat[, i] <- p
-    z <- z - t %*% t(p)
+    z <- z - tcrossprod(t, p)
   }
 
   t <- x %*% p_mat
-  x_do <- x - t %*% t(p_mat)
+  x_do <- x - tcrossprod(t, p_mat)
 
   result <- list(
     correction = tibble::as_tibble(x_do),

@@ -23,8 +23,7 @@
 #' \eqn{\textbf{R}} is the residual matrix.
 #'
 #' @param x A numeric matrix, data frame or tibble.
-#' @param ncomp An integer specifying the number of singular vectors to
-#' orthogonalize against. If not provided, the default value is 2.
+#' @param ncomp An integer specifying the number of singular vectors to orthogonalize against. If not provided, the default value is 2.
 #'
 #' @return The function returns a list of three components:
 #' \itemize{
@@ -34,14 +33,13 @@
 #' }
 #'
 #' @references
-#'  - Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003). EPO-PLS external
-#'    parameter orthogonalization of PLS application to temperature-independent
-#'    measurement of sugar content of intact fruits.
+#'  - Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003).
+#'    EPO-PLS external parameter orthogonalization of PLS application to temperature-independent measurement of sugar content of intact fruits.
 #'    Chemometrics and Intelligent Laboratory Systems, 66(2):191-204.
 #'
 #' @export epo
 #'
-epo <- function(x, ncomp = 2) {
+epo <- function(x, ncomp = 5) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }

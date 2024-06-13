@@ -89,13 +89,14 @@ whittaker <- function(x, lambda = 1e3, p = 0.001, max.iter = 10){
   return(res)
 }
 
+# Asymmetric least squares algorithm
 als <- function(x, lambda, p, max.iter) {
   n <- length(x)
   d <- diff(diag(n), differences = 2)
   w <- rep(1, n)
   for (i in 1:max.iter) {
     wd <- diag(w)
-    h <- wd + lambda * d %*% t(d)
+    h <- wd + lambda * tcrossprod(d, d)
     z <- solve(h, w * x)
     w <- p * (x > z) + (1 - p) * (x < z)
   }

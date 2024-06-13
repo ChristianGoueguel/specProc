@@ -25,22 +25,19 @@
 #'
 #' @param x A matrix or data frame of the predictor variables
 #' @param y A vector, matrix or data frame of the response variable(s)
-#' @param ncomp An integer specifying the number of principal components to
-#' retain for orthogonal processing. Default is 2.
+#' @param ncomp An integer specifying the number of principal components to retain for orthogonal processing. Default is 10.
 #' @param center A logical value specifying whether to center the data. Default is `TRUE`.
 #' @param scale A logical value specifying whether to scale the data. Default is `FALSE`.
-#' @param max_iter An integer representing the maximum number of iterations.
-#' The default value is 10.
-#' @param tol A numeric value representing the tolerance for convergence.
-#' The default value is 1e-3
+#' @param tol A numeric value representing the tolerance for convergence. The default value is 1e-3.
+#' @param max_iter An integer representing the maximum number of iterations. The default value is 10.
 #'
 #' @return A list with the following components:
-#'  - `correction`: The corrected \eqn{\textbf{X}} matrix after DOSC.
-#'  - `loading`: The loadings \eqn{\textbf{P}} matrix.
-#'  - `score`: The scores \eqn{\textbf{T}} matrix.
+#'  - `correction`: The corrected matrix.
+#'  - `loading`: The loadings matrix.
+#'  - `score`: The scores matrix.
 #' @export direct_osc
 #'
-direct_osc <- function(x, y, ncomp = 2, center = TRUE, scale = FALSE, max_iter = 10, tol = 1e-3) {
+direct_osc <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, tol = 1e-3, max_iter = 10) {
 
   requireNamespace("pls", quietly = TRUE)
 
@@ -95,12 +92,12 @@ direct_osc <- function(x, y, ncomp = 2, center = TRUE, scale = FALSE, max_iter =
       iter <- iter + 1
     }
     p_mat[, i] <- p
-    z <- z - t %*% t(p)
+    z <- z - tcrossprod(t, p)
   }
 
   t <- x %*% p_mat
-  p <- (t(x) %*% t) / (t(t) %*% t)
-  x_dosc <- x - t %*% t(p)
+  p <- crossprod(x, t) / crossprod(t, t)
+  x_dosc <- x - tcrossprod(t, p)
 
   result <- list(
     correction = tibble::as_tibble(x_dosc),

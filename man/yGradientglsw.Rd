@@ -11,8 +11,7 @@ yGradientglsw(x, y, alpha = 0.01)
 
 \item{y}{A numeric vector representing the response vector.}
 
-\item{alpha}{A numeric value specifying the weighting parameter. Typical values
-range from 1 to 0.0001. Default is 0.01.}
+\item{alpha}{A numeric value specifying the weighting parameter. Typical values range from 1 to 0.0001. Default is 0.01.}
 }
 \value{
 A tibble containing the filtering matrix.
@@ -30,8 +29,8 @@ because it utilizes a gradient of the sorted \eqn{\textbf{X}}- and
 }
 \references{
 \itemize{
-\item Zorzetti, B.M., Shaver, J.M., Harynuk, J.J., (2011). Estimation of the age
-of a weathered mixture of volatile organic compounds,
+\item Zorzetti, B.M., Shaver, J.M., Harynuk, J.J., (2011).
+Estimation of the age of a weathered mixture of volatile organic compounds.
 Analytica Chimica Acta, 694(1-2):31–37.
 }
 }

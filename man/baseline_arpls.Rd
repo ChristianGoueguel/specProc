@@ -9,14 +9,9 @@ baseline_arpls(x, lambda = 1000, ratio = 0.05, max.iter = 10)
 \arguments{
 \item{x}{A numeric matrix or data frame.}
 
-\item{lambda}{A numeric value specifying the smoothing parameter, which
-controls the amount of curvature allowed for the baseline. The smaller the
-lambda, the more curvature in the baseline fitting. Default is 1000.}
+\item{lambda}{A numeric value specifying the smoothing parameter, which controls the amount of curvature allowed for the baseline. The smaller the lambda, the more curvature in the baseline fitting. Default is 1000.}
 
-\item{ratio}{A numeric value specifying the convergence ratio for the
-iterative algorithm. The algorithm stops when the relative change in the
-weights is less than this ratio. Typical values are between 0.01 and 0.1.
-Default is 0.05.}
+\item{ratio}{A numeric value specifying the convergence ratio for the iterative algorithm. The algorithm stops when the relative change in the weights is less than this ratio. Typical values are between 0.01 and 0.1. Default is 0.05.}
 
 \item{max.iter}{Maximum number of iterations for the algorithm. Default is 10.}
 }
@@ -40,8 +35,7 @@ baseline-corrected version.
 \references{
 \itemize{
 \item Baek, S.-J., Park, A., Ahn, Y.-J., Choo, J., (2015).
-Baseline correction using asymmetrically reweighted penalized least
-squares smoothing.
+Baseline correction using asymmetrically reweighted penalized least squares smoothing.
 Analyst, 140(1):250–257.
 }
 }

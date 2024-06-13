@@ -4,13 +4,12 @@
 \alias{epo}
 \title{External Parameter Orthogonalization}
 \usage{
-epo(x, ncomp = 2)
+epo(x, ncomp = 5)
 }
 \arguments{
 \item{x}{A numeric matrix, data frame or tibble.}
 
-\item{ncomp}{An integer specifying the number of singular vectors to
-orthogonalize against. If not provided, the default value is 2.}
+\item{ncomp}{An integer specifying the number of singular vectors to orthogonalize against. If not provided, the default value is 2.}
 }
 \value{
 The function returns a list of three components:
@@ -42,9 +41,8 @@ matrices of \eqn{\textbf{X}} onto the useful and perturbation (clutter) subspace
 }
 \references{
 \itemize{
-\item Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003). EPO-PLS external
-parameter orthogonalization of PLS application to temperature-independent
-measurement of sugar content of intact fruits.
+\item Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003).
+EPO-PLS external parameter orthogonalization of PLS application to temperature-independent measurement of sugar content of intact fruits.
 Chemometrics and Intelligent Laboratory Systems, 66(2):191-204.
 }
 }

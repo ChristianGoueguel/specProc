@@ -51,6 +51,9 @@
 #' @export osc
 #'
 osc <- function(x, y, method = "sjoblom", center = TRUE, scale = FALSE, ncomp = 10, tol = 1e-3, max.iter = 10) {
+
+  requireNamespace("pls", quietly = TRUE)
+
   if (missing(x) || missing(y)) {
     stop("Both 'x' and 'y' must be provided.")
   }

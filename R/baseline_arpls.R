@@ -14,18 +14,12 @@
 #'
 #' @references
 #'  - Baek, S.-J., Park, A., Ahn, Y.-J., Choo, J., (2015).
-#'    Baseline correction using asymmetrically reweighted penalized least
-#'    squares smoothing.
+#'    Baseline correction using asymmetrically reweighted penalized least squares smoothing.
 #'    Analyst, 140(1):250–257.
 #'
 #' @param x A numeric matrix or data frame.
-#' @param lambda A numeric value specifying the smoothing parameter, which
-#' controls the amount of curvature allowed for the baseline. The smaller the
-#' lambda, the more curvature in the baseline fitting. Default is 1000.
-#' @param ratio A numeric value specifying the convergence ratio for the
-#' iterative algorithm. The algorithm stops when the relative change in the
-#' weights is less than this ratio. Typical values are between 0.01 and 0.1.
-#' Default is 0.05.
+#' @param lambda A numeric value specifying the smoothing parameter, which controls the amount of curvature allowed for the baseline. The smaller the lambda, the more curvature in the baseline fitting. Default is 1000.
+#' @param ratio A numeric value specifying the convergence ratio for the iterative algorithm. The algorithm stops when the relative change in the weights is less than this ratio. Typical values are between 0.01 and 0.1. Default is 0.05.
 #' @param max.iter Maximum number of iterations for the algorithm. Default is 10.
 #'
 #' @return A list containing two tibbles:
@@ -37,7 +31,6 @@
 #' @export baseline_arpls
 #'
 baseline_arpls <- function(x, lambda = 1e3, ratio = 0.05, max.iter = 10) {
-
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -87,10 +80,11 @@ baseline_arpls <- function(x, lambda = 1e3, ratio = 0.05, max.iter = 10) {
   return(res)
 }
 
+# Asymmetrically reweighted penalized least squares algorithm
 arpls <- function(x, lambda, ratio, max.iter) {
   n <- length(x)
   d <- diff(diag(n), differences = 2)
-  h <- lambda * t(d) %*% d
+  h <- lambda * crossprod(d, d)
   w <- rep(1, n)
   for (i in 1:max.iter) {
     wd <- diag(w)

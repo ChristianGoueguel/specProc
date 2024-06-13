@@ -11,8 +11,7 @@ glsw(x1, x2, alpha = 0.01)
 
 \item{x2}{A numeric matrix, data frame or tibble representing the second set of data.}
 
-\item{alpha}{A numeric value specifying the weighting parameter. Typical values
-range from 1 to 0.0001. Default is 0.01.}
+\item{alpha}{A numeric value specifying the weighting parameter. Typical values range from 1 to 0.0001. Default is 0.01.}
 }
 \value{
 A tibble containing the filtering matrix.

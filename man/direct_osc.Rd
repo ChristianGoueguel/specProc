@@ -7,11 +7,11 @@
 direct_osc(
   x,
   y,
-  ncomp = 2,
+  ncomp = 10,
   center = TRUE,
   scale = FALSE,
-  max_iter = 10,
-  tol = 0.001
+  tol = 0.001,
+  max_iter = 10
 )
 }
 \arguments{
@@ -19,25 +19,22 @@ direct_osc(
 
 \item{y}{A vector, matrix or data frame of the response variable(s)}
 
-\item{ncomp}{An integer specifying the number of principal components to
-retain for orthogonal processing. Default is 2.}
+\item{ncomp}{An integer specifying the number of principal components to retain for orthogonal processing. Default is 10.}
 
 \item{center}{A logical value specifying whether to center the data. Default is \code{TRUE}.}
 
 \item{scale}{A logical value specifying whether to scale the data. Default is \code{FALSE}.}
 
-\item{max_iter}{An integer representing the maximum number of iterations.
-The default value is 10.}
+\item{tol}{A numeric value representing the tolerance for convergence. The default value is 1e-3.}
 
-\item{tol}{A numeric value representing the tolerance for convergence.
-The default value is 1e-3}
+\item{max_iter}{An integer representing the maximum number of iterations. The default value is 10.}
 }
 \value{
 A list with the following components:
 \itemize{
-\item \code{correction}: The corrected \eqn{\textbf{X}} matrix after DOSC.
-\item \code{loading}: The loadings \eqn{\textbf{P}} matrix.
-\item \code{score}: The scores \eqn{\textbf{T}} matrix.
+\item \code{correction}: The corrected matrix.
+\item \code{loading}: The loadings matrix.
+\item \code{score}: The scores matrix.
 }
 }
 \description{
