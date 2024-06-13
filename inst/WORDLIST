@@ -36,6 +36,7 @@ Engelsen
 Everitt
 FWHM
 Faber
+Fearn
 GLSW
 Gaudiuso
 Giacomo
@@ -89,9 +90,7 @@ Rinnan
 Rousseeuw
 SNV
 Santagata
-Sjoblom
 Sjöblom
-Sjöblom's
 Skrondal
 Smilde
 Spectrochimica
@@ -126,7 +125,6 @@ downweights
 et
 ggplot
 hayes
-http
 https
 interferences
 iteratively
@@ -153,6 +151,7 @@ pre
 repo
 rescaled
 rescales
+smoothes
 spearman
 subspaces
 th
@@ -160,4 +159,3 @@ tibble
 tibbles
 voigt
 williams
-www

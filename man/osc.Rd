@@ -7,74 +7,71 @@
 osc(
   x,
   y,
-  method = "wold",
+  method = "sjoblom",
   center = TRUE,
-  osc.ncomp = 4,
-  pls.ncomp = 10,
+  scale = FALSE,
+  ncomp = 10,
   tol = 0.001,
-  iter = 20
+  max.iter = 10
 )
 }
 \arguments{
-\item{x}{A matrix or data.frame containing the x-data (predictors).}
+\item{x}{A matrix or data frame of the predictor variables.}
 
-\item{y}{A vector containing the y-data (response). The length of \code{y} must
-match the number of rows in \code{x}.}
+\item{y}{A vector of the response variable.}
 
-\item{method}{A character string indicating the OSC method to use. Accepted
-values are \code{"wold"} (Wold's original method), \code{"sjoblom"} (Sjöblom's method), or
-\code{"wise"} (Wise and Gallagher's method).}
+\item{method}{A character string indicating the OSC method to use. Accepted values are \code{"wold"}, \code{"sjoblom"} and \code{"fearn"}. Default is \code{"sjoblom"}.}
 
-\item{center}{A logical value indicating whether to center the x-data before
-applying OSC. If \code{TRUE}, the columns of x will be mean-centered.}
+\item{center}{A logical value indicating whether to mean-centered \code{x} and \code{y}. Default is \code{TRUE}.}
 
-\item{osc.ncomp}{An integer representing the number of OSC components to be
-calculated. The default value is 4.}
+\item{scale}{A logical value indicating whether to scale \code{x} and \code{y}. Default is \code{FALSE}.}
 
-\item{pls.ncomp}{An integer representing the number of PLS components to be
-calculated. The default value is 10.}
+\item{ncomp}{An integer representing the number of components, which defines how many times the entire process will be performed. Default value is 10.}
 
-\item{tol}{A numeric value representing the tolerance for convergence of the
-OSC algorithm. The default value is 1e-3.}
+\item{tol}{A numeric value representing the tolerance for convergence. The default value is 1e-3.}
 
-\item{iter}{An integer representing the maximum number of iterations for the
-OSC algorithm. The default value is 20.}
+\item{max.iter}{An integer representing the maximum number of iterations. The default value is 10.}
 }
 \value{
 An list containing the following components:
-\describe{
-\item{x_corrected}{The corrected x-data after applying OSC.}
-\item{scores}{The x-scores after orthogonal variations are removed.}
-\item{loadings}{The loadings.}
-\item{weights}{The wights.}
-\item{R2}{The value of R2}
+\itemize{
+\item \code{correction}: The corrected matrix.
+\item \code{scores}: The orthogonal scores matrix.
+\item \code{loadings}: The orthogonal loadings matrix.
+\item \code{weights}: The orthogonal weights matrix.
+\item \code{R2}: The value of the explained variance.
+\item \code{angle}: The value of the orthogonalization angle.
 }
 }
 \description{
-Orthogonal signal correction (OSC) removes systematic variation in the
-spectral matrix that is orthogonal to the response vector.
+This function implements three orthogonal signal correction (OSC) algorithms, which
+are a class of preprocessing techniques designed to minimize, in a set of spectral
+data, the systematic variability or noise not directly related to or correlated
+with the response vector or property of interest.
 }
 \details{
-The OSC algorithm identifies and removes the orthogonal variation in the
-x-data by iteratively deflating the x-matrix with respect to the y-data.
-The resulting x-matrix contains only the variation that is relevant to the
-y-data, which can then be used for further modeling or analysis.
-This function implements three different methods for OSC: the original
-method proposed by Wold et al. (1998), the method proposed by Sjöblom et al.
-(1998), and the method proposed by Wise and Gallagher.
+The OSC algorithm identifies and removes the orthogonal variation in the input
+spectral matrix, \eqn{\textbf{X}}, by iteratively deflating \eqn{\textbf{X}}
+with respect to the response vector \eqn{\textbf{y}}. The resulting \eqn{\textbf{X}}-matrix
+contains only the variation that is relevant to the \eqn{\textbf{y}}-vector,
+which can then be used for further modeling or analysis. This function implements
+three different methods for OSC: the original method proposed by Wold \emph{et al.} (1998),
+the method proposed by Sjöblom \emph{et al.} (1998), and the method proposed by Fearn (2000).
 }
 \references{
 \itemize{
-\item Sjoblom, J., Svensson, O., Josefson, M., Kullberg, H., Wold, S. (1998).
-An evaluation of orthogonal signal correction applied to calibration transfer
-of near infrared spectra. Chemometrics Intell. Lab. Syst., 44(1):229-244.
-\item Wise, B. M. and Gallagher, N.B. http://www.eigenvector.com/MATLAB/OSC.html.
-\item Wold, S., Antti, H., Lindgren, F., Ohman, J. (1998). Orthogonal signal
-correction of near-infrared spectra. Chemometrics Intell. Lab. Syst., 44(1):175-185.
-\item Svensson, O., Kourti, T. and MacGregor, J.F. (2002). An investigation of
-orthogonal correction algorithms and their characteristics. Journal of Chemometrics, 16(1):176-188.
-\item Westerhuis, J. A., de Jong, S., Smilde, A. K. (2001). Direct orthogonal
-signal correction. Chemometrics Intell. Lab. Syst., 56(1):13-25.
+\item Sjöblom, J., Svensson, O., Josefson, M., Kullberg, H., Wold, S., (1998).
+An evaluation of orthogonal signal correction applied to calibration transfer of near infrared spectra.
+Chemometrics Intell. Lab. Syst., 44(1):229-244.
+\item Fearn, T., (2000).
+On orthogonal signal correction.
+Chemometrics Intell. Lab. Syst., 50(1):47-52.
+\item Wold, S., Antti, H., Lindgren, F., Ohman, J. (1998).
+Orthogonal signal correction of near-infrared spectra.
+Chemometrics Intell. Lab. Syst., 44(1):175-185.
+\item Svensson, O., Kourti, T. and MacGregor, J.F., (2002).
+An investigation of orthogonal correction algorithms and their characteristics.
+Journal of Chemometrics, 16(1):176-188.
 }
 }
 \author{
