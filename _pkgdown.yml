@@ -16,6 +16,7 @@ reference:
     structures and sources of variance from the multivariate data.
   contents:
   - opls
+  - o2pls
   - osc
   - direct_osc
   - direct_orthogonal

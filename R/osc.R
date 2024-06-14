@@ -86,8 +86,7 @@ osc <- function(x, y, method = "sjoblom", center = TRUE, scale = FALSE, ncomp = 
     method,
     wold = wold,
     sjoblom = sjoblom,
-    fearn = fearn,
-    wise = wise
+    fearn = fearn
   )
   out <- osc_method(
     x = x,
@@ -112,7 +111,7 @@ wold <- function(x, y, ncomp, tol, max.iter) {
     while (dif > tol && iter < max.iter) {
       iter <- iter + 1
       t_new <- t - y %*% MASS::ginv(crossprod(y, y)) %*% crossprod(y, t)
-      plsFit <- pls::simpls.fit(x, t_new, ncomp)
+      plsFit <- pls::simpls.fit(x, t_new, ncomp, center = FALSE)
       w <- plsFit$coefficients[ , , ncomp]
       w <- w / sqrt(sum(w^2))
       t_new <- x %*% w
