@@ -47,14 +47,24 @@ direct_osc <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, tol = 1e-
   if (!is.logical(center) || !is.logical(scale)) {
     stop("Arguments 'center' and 'scale' must be boolean (TRUE or FALSE)")
   }
+
+  if (is.vector(y)) {
+    if (nrow(x) != length(y)) {
+      stop("Dimensions of 'x' and 'y' don't match.")
+    }
+  }
+
+  if (is.matrix(y) || is.data.frame(y) || tibble::is_tibble(y)) {
+    if (nrow(x) != nrow(y)) {
+      stop("Dimensions of 'x' and 'y' don't match.")
+    }
+  }
+
   if (is.data.frame(x) || tibble::is_tibble(x)) {
     x <- as.matrix(x)
   }
   if (is.data.frame(y) || tibble::is_tibble(y)) {
     y <- as.matrix(y)
-  }
-  if (nrow(x) != nrow(y)) {
-    stop("x and y don't match.")
   }
 
   if (center == TRUE && scale == FALSE) {

@@ -1,5 +1,7 @@
 #' @title Orthogonal Projections to Latent Structures
 #'
+#' @author Christian L. Goueguel
+#'
 #' @description
 #'  This function fits an Orthogonal Projections to Latent Structures (OPLS)
 #'  model to the provided x (predictor) and y (response) data.
@@ -17,37 +19,25 @@
 #'    Orthogonal projections to latent structures (O-PLS).
 #'    Journal of Chemometrics, 16(3):119-128.
 #'
-#' @author Christian L. Goueguel
-#'
 #' @param x A data.frame or tibble containing the x-data (predictors).
 #' @param y A data.frame or tibble containing the y-data (responses).
-#' @param scale A character string indicating the scaling method for the data
-#' ("center" or "pareto").
+#' @param scale A character string indicating the scaling method for the data ("center" or "pareto").
 #' @param crossval An integer representing the number of cross-validation groups.
-#' @param permutation An integer representing the number of permutations for
-#' the permutation test.
+#' @param permutation An integer representing the number of permutations for the permutation test.
 #'
 #' @return A list containing the following components:
 #' \describe{
-#'   \item{x_scores}{A matrix of x-scores (the projections of the x-data onto
-#'   the predictive components).}
-#'   \item{x_loadings}{A matrix of x-loadings (the weights of the original
-#'   x-variables on the predictive components).}
-#'   \item{x_weights}{A matrix of x-weights (the weights used to calculate
-#'   the x-scores).}
-#'   \item{orthoScores}{A matrix of orthogonal scores (the projections of
-#'   the x-data onto the orthogonal components).}
-#'   \item{orthoLoadings}{A matrix of orthogonal loadings (the weights of
-#'   the original x-variables on the orthogonal components).}
-#'   \item{orthoWeights}{A matrix of orthogonal weights (the weights used
-#'   to calculate the orthogonal scores).}
-#'   \item{y_weights}{A matrix of y-weights (the weights used to calculate
-#'   the y-scores).}
-#'   \item{y_orthoWeights}{A matrix of orthogonal y-weights (the weights
-#'   used to calculate the orthogonal y-scores).}
-#'   \item{y_scores}{A matrix of y-scores (the projections of the y-data
-#'   onto the predictive components).}
+#'   \item{x_scores}{A matrix of x-scores (the projections of the x-data onto the predictive components).}
+#'   \item{x_loadings}{A matrix of x-loadings (the weights of the original x-variables on the predictive components).}
+#'   \item{x_weights}{A matrix of x-weights (the weights used to calculate the x-scores).}
+#'   \item{orthoScores}{A matrix of orthogonal scores (the projections of the x-data onto the orthogonal components).}
+#'   \item{orthoLoadings}{A matrix of orthogonal loadings (the weights of the original x-variables on the orthogonal components).}
+#'   \item{orthoWeights}{A matrix of orthogonal weights (the weights used to calculate the orthogonal scores).}
+#'   \item{y_weights}{A matrix of y-weights (the weights used to calculate the y-scores).}
+#'   \item{y_orthoWeights}{A matrix of orthogonal y-weights (the weights used to calculate the orthogonal y-scores).}
+#'   \item{y_scores}{A matrix of y-scores (the projections of the y-data onto the predictive components).}
 #' }
+#'
 #' @export opls
 #'
 opls <- function(x, y, scale = "center", crossval = 7, permutation = 20) {

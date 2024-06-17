@@ -11,35 +11,24 @@ opls(x, y, scale = "center", crossval = 7, permutation = 20)
 
 \item{y}{A data.frame or tibble containing the y-data (responses).}
 
-\item{scale}{A character string indicating the scaling method for the data
-("center" or "pareto").}
+\item{scale}{A character string indicating the scaling method for the data ("center" or "pareto").}
 
 \item{crossval}{An integer representing the number of cross-validation groups.}
 
-\item{permutation}{An integer representing the number of permutations for
-the permutation test.}
+\item{permutation}{An integer representing the number of permutations for the permutation test.}
 }
 \value{
 A list containing the following components:
 \describe{
-\item{x_scores}{A matrix of x-scores (the projections of the x-data onto
-the predictive components).}
-\item{x_loadings}{A matrix of x-loadings (the weights of the original
-x-variables on the predictive components).}
-\item{x_weights}{A matrix of x-weights (the weights used to calculate
-the x-scores).}
-\item{orthoScores}{A matrix of orthogonal scores (the projections of
-the x-data onto the orthogonal components).}
-\item{orthoLoadings}{A matrix of orthogonal loadings (the weights of
-the original x-variables on the orthogonal components).}
-\item{orthoWeights}{A matrix of orthogonal weights (the weights used
-to calculate the orthogonal scores).}
-\item{y_weights}{A matrix of y-weights (the weights used to calculate
-the y-scores).}
-\item{y_orthoWeights}{A matrix of orthogonal y-weights (the weights
-used to calculate the orthogonal y-scores).}
-\item{y_scores}{A matrix of y-scores (the projections of the y-data
-onto the predictive components).}
+\item{x_scores}{A matrix of x-scores (the projections of the x-data onto the predictive components).}
+\item{x_loadings}{A matrix of x-loadings (the weights of the original x-variables on the predictive components).}
+\item{x_weights}{A matrix of x-weights (the weights used to calculate the x-scores).}
+\item{orthoScores}{A matrix of orthogonal scores (the projections of the x-data onto the orthogonal components).}
+\item{orthoLoadings}{A matrix of orthogonal loadings (the weights of the original x-variables on the orthogonal components).}
+\item{orthoWeights}{A matrix of orthogonal weights (the weights used to calculate the orthogonal scores).}
+\item{y_weights}{A matrix of y-weights (the weights used to calculate the y-scores).}
+\item{y_orthoWeights}{A matrix of orthogonal y-weights (the weights used to calculate the orthogonal y-scores).}
+\item{y_scores}{A matrix of y-scores (the projections of the y-data onto the predictive components).}
 }
 }
 \description{

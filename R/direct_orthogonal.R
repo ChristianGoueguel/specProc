@@ -52,14 +52,19 @@ direct_orthogonal <- function(x, y, ncomp = 2, center = TRUE, scale = FALSE, max
   if (!is.logical(center) || !is.logical(scale)) {
     stop("Arguments 'center' and 'scale' must be boolean (TRUE or FALSE)")
   }
+
   if (is.data.frame(x) || tibble::is_tibble(x)) {
     x <- as.matrix(x)
   }
   if (is.data.frame(y) || tibble::is_tibble(y)) {
     y <- as.matrix(y)
   }
-  if (nrow(x) != nrow(y)) {
-    stop("x and y don't match.")
+
+  if (is.data.frame(x) || tibble::is_tibble(x)) {
+    x <- as.matrix(x)
+  }
+  if (is.data.frame(y) || tibble::is_tibble(y)) {
+    y <- as.matrix(y)
   }
 
   if (center == TRUE && scale == FALSE) {

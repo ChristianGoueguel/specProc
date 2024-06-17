@@ -1,20 +1,22 @@
-#' @title O2PLS
+#' @title Modified Orthogonal Projections to Latent Structures
 #'
 #' @author Christian L. Goueguel
 #'
 #' @description
-#' Implements the O2PLS (Orthogonal to Partial Least Squares) algorithm.
+#' This function implements the modified orthogonal projections to latent
+#' structures (O2PLS) algorithm as proposed by Trygg (2002). The OPLS and O2PLS
+#' methods differ as follows: OPLS is unidirectional \eqn{(X \Rightarrow Y)},
+#' meaning that only orthogonal variations in the \eqn{X}-space are filtered out.
+#' Whilst O2PLS is bi-directional \eqn{(X \Leftrightarrow Y)}, meaning that
+#' orthogonal variations in both the \eqn{X}- and \eqn{Y}-space are filtered out.
 #'
 #' @details
-#' The O2-PLS method handles situations where systematic X-orthogonal variation
-#' in Y exists, and it is predictive in both ways, X → Y and Y → X. The basic
-#' idea of O2-PLS is (a) to use multiple linear regression to estimate the pure
-#' constituent profiles and (b) to divide the systematic part in X and Y into
-#' two parts, one which is related to both X and Y (covarying) and one that is
-#' not (orthogonal). For each matrix the latter is computed in a way that makes
-#' it orthogonal to the other matrix, i.e. linearly independent. Thus the O2-PLS
-#' model can be written as a factor analysis model where some factors (T) are
-#' common to both X and Y.
+#' The O2PLS method handles situations where systematic \eqn{X}-orthogonal variation
+#' in \eqn{Y} exists, and it is predictive in both ways, \eqn{(X \Rightarrow Y)}
+#' and \eqn{(Y \Rightarrow X)}. O2PLS uses least squares regression to estimate
+#' the pure constituent profiles and divide the systematic part in \eqn{X} and
+#' \eqn{Y} into two parts, one which is related to both \eqn{X} and \eqn{Y}
+#' (covarying) and one that is not (orthogonal).
 #'
 #' @references
 #'    - Trygg, J., (2002).
@@ -22,13 +24,13 @@
 #'      J. Chemom. 16(1):283–293.
 #'
 #' @param x A numeric matrix or data frame representing the predictor variables.
-#' @param y A numeric matrix or data frame representing the response variables.
+#' @param y A numeric vector, matrix or data frame representing the response variables.
 #' @param center A logical value indicating whether to mean-centered `x` and `y`. Default is `TRUE`.
 #' @param scale A logical value indicating whether to scale `x` and `y`. Default is `FALSE`.
 #' @param ncomp An integer representing the number of components. Default value is 10.
 #' @param tol A numeric value representing the tolerance for convergence. The default value is 1e-5.
 #'
-#' @return An list containing the following components:
+#' @return A list containing the following components:
 #'  - `correction`: The corrected matrix.
 #'  - `scores`: The orthogonal scores matrix.
 #'  - `loadings`: The orthogonal loadings matrix.
@@ -43,9 +45,19 @@ o2pls <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, tol = 1e-5) {
   if (missing(x) || missing(y)) {
     stop("Both 'x' and 'y' must be provided.")
   }
-  if (nrow(x) != nrow(y)) {
-    stop("Dimensions of 'x' and 'y' don't match.")
+
+  if (is.vector(y)) {
+    if (nrow(x) != length(y)) {
+      stop("Dimensions of 'x' and 'y' don't match.")
+    }
   }
+
+  if (is.matrix(y) || is.data.frame(y) || tibble::is_tibble(y)) {
+    if (nrow(x) != nrow(y)) {
+      stop("Dimensions of 'x' and 'y' don't match.")
+    }
+  }
+
   if (any(is.na(x)) || any(is.na(y))) {
     stop("'x' and 'y' cannot contain missing values.")
   }
