@@ -91,6 +91,9 @@
     <loc>https://christiangoueguel.github.io/specProc/reference/normalize.html</loc>
   </url>
   <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/o2pls.html</loc>
+  </url>
+  <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/opls.html</loc>
   </url>
   <url>
@@ -98,6 +101,9 @@
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/pareto.html</loc>
+  </url>
+  <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/pds.html</loc>
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/peakfit.html</loc>
@@ -113,6 +119,9 @@
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/poisson_scale.html</loc>
+  </url>
+  <url>
+    <loc>https://christiangoueguel.github.io/specProc/reference/projected_osc.html</loc>
   </url>
   <url>
     <loc>https://christiangoueguel.github.io/specProc/reference/pseudo_voigt.html</loc>

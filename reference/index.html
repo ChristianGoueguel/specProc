@@ -87,16 +87,6 @@
         <dd>Orthogonal Signal Correction</dd>
       </dl><dl><dt>
           
-          <code><a href="direct_osc.html">direct_osc()</a></code> 
-        </dt>
-        <dd>Direct Orthogonal Signal Correction</dd>
-      </dl><dl><dt>
-          
-          <code><a href="direct_orthogonal.html">direct_orthogonal()</a></code> 
-        </dt>
-        <dd>Direct Orthogonalization</dd>
-      </dl><dl><dt>
-          
           <code><a href="epo.html">epo()</a></code> 
         </dt>
         <dd>External Parameter Orthogonalization</dd>
@@ -107,14 +97,39 @@
         <dd>Net Analyte Signal</dd>
       </dl><dl><dt>
           
+          <code><a href="pds.html">pds()</a></code> 
+        </dt>
+        <dd>Piecewise Direct Standardization</dd>
+      </dl><dl><dt>
+          
           <code><a href="glsw.html">glsw()</a></code> 
         </dt>
         <dd>Generalized Least Squares Weighting</dd>
       </dl><dl><dt>
           
+          <code><a href="o2pls.html">o2pls()</a></code> 
+        </dt>
+        <dd>Modified Orthogonal Projections to Latent Structures</dd>
+      </dl><dl><dt>
+          
+          <code><a href="direct_osc.html">direct_osc()</a></code> 
+        </dt>
+        <dd>Direct Orthogonal Signal Correction</dd>
+      </dl><dl><dt>
+          
+          <code><a href="projected_osc.html">projected_osc()</a></code> 
+        </dt>
+        <dd>Projected Orthogonal Signal Correction</dd>
+      </dl><dl><dt>
+          
           <code><a href="yGradientglsw.html">yGradientglsw()</a></code> 
         </dt>
         <dd>y-Gradient Generalized Least Squares Weighting</dd>
+      </dl><dl><dt>
+          
+          <code><a href="direct_orthogonal.html">direct_orthogonal()</a></code> 
+        </dt>
+        <dd>Direct Orthogonalization</dd>
       </dl></div><div class="section level2">
       <h2 id="peak-fitting">Peak fitting<a class="anchor" aria-label="anchor" href="#peak-fitting"></a></h2>
       
@@ -164,11 +179,6 @@
 
       <dl><dt>
           
-          <code><a href="adjboxplot.html">adjboxplot()</a></code> 
-        </dt>
-        <dd>Adjusted Boxplot for Skewed Distributions</dd>
-      </dl><dl><dt>
-          
           <code><a href="plotfit.html">plotfit()</a></code> 
         </dt>
         <dd>Plotting of Fitted Spectral Line</dd>
@@ -177,6 +187,11 @@
           <code><a href="plotSpec.html">plotSpec()</a></code> 
         </dt>
         <dd>Plotting of Spectra</dd>
+      </dl><dl><dt>
+          
+          <code><a href="adjboxplot.html">adjboxplot()</a></code> 
+        </dt>
+        <dd>Adjusted Boxplot for Skewed Distributions</dd>
       </dl></div><div class="section level2">
       <h2 id="smoothing">Smoothing<a class="anchor" aria-label="anchor" href="#smoothing"></a></h2>
       
@@ -206,6 +221,11 @@
 
       <dl><dt>
           
+          <code><a href="whittaker.html">whittaker()</a></code> 
+        </dt>
+        <dd>Asymmetric Least Squares</dd>
+      </dl><dl><dt>
+          
           <code><a href="baseline_lsp.html">baseline_lsp()</a></code> 
         </dt>
         <dd>Least-Squares Polynomial</dd>
@@ -214,11 +234,6 @@
           <code><a href="baseline_arpls.html">baseline_arpls()</a></code> 
         </dt>
         <dd>Asymmetrically Reweighted Penalized Least Squares</dd>
-      </dl><dl><dt>
-          
-          <code><a href="whittaker.html">whittaker()</a></code> 
-        </dt>
-        <dd>Asymmetric Least Squares</dd>
       </dl></div><div class="section level2">
       <h2 id="normalization">Normalization<a class="anchor" aria-label="anchor" href="#normalization"></a></h2>
       
@@ -238,14 +253,14 @@
 
       <dl><dt>
           
-          <code><a href="normalize.html">normalize()</a></code> 
-        </dt>
-        <dd>Spectra Normalization</dd>
-      </dl><dl><dt>
-          
           <code><a href="msc.html">msc()</a></code> 
         </dt>
         <dd>Multiplicative Signal Correction</dd>
+      </dl><dl><dt>
+          
+          <code><a href="normalize.html">normalize()</a></code> 
+        </dt>
+        <dd>Spectra Normalization</dd>
       </dl></div><div class="section level2">
       
       <h3 id="data-scaling">data scaling<a class="anchor" aria-label="anchor" href="#data-scaling"></a></h3>
@@ -259,11 +274,6 @@
 
       <dl><dt>
           
-          <code><a href="minmax.html">minmax()</a></code> 
-        </dt>
-        <dd>Min-Max Normalization</dd>
-      </dl><dl><dt>
-          
           <code><a href="snv.html">snv()</a></code> 
         </dt>
         <dd>Standard Normal Variate</dd>
@@ -274,14 +284,19 @@
         <dd>Pareto Scaling</dd>
       </dl><dl><dt>
           
-          <code><a href="poisson_scale.html">poisson_scale()</a></code> 
+          <code><a href="minmax.html">minmax()</a></code> 
         </dt>
-        <dd>Poisson Scaling</dd>
+        <dd>Min-Max Normalization</dd>
       </dl><dl><dt>
           
           <code><a href="centering.html">centering()</a></code> 
         </dt>
         <dd>Data Centering</dd>
+      </dl><dl><dt>
+          
+          <code><a href="poisson_scale.html">poisson_scale()</a></code> 
+        </dt>
+        <dd>Poisson Scaling</dd>
       </dl></div><div class="section level2">
       
       <h3 id="data-transformation">data transformation<a class="anchor" aria-label="anchor" href="#data-transformation"></a></h3>
@@ -317,9 +332,14 @@
 
       <dl><dt>
           
-          <code><a href="biweight_midcorrelation.html">biweight_midcorrelation()</a></code> 
+          <code><a href="biweight_scale.html">biweight_scale()</a></code> 
         </dt>
-        <dd>Biweight Midcorrelation</dd>
+        <dd>Biweight Scale</dd>
+      </dl><dl><dt>
+          
+          <code><a href="biweight_location.html">biweight_location()</a></code> 
+        </dt>
+        <dd>Biweight Location</dd>
       </dl><dl><dt>
           
           <code><a href="biweight_midvariance.html">biweight_midvariance()</a></code> 
@@ -332,14 +352,9 @@
         <dd>Biweight Midcovariance</dd>
       </dl><dl><dt>
           
-          <code><a href="biweight_location.html">biweight_location()</a></code> 
+          <code><a href="biweight_midcorrelation.html">biweight_midcorrelation()</a></code> 
         </dt>
-        <dd>Biweight Location</dd>
-      </dl><dl><dt>
-          
-          <code><a href="biweight_scale.html">biweight_scale()</a></code> 
-        </dt>
-        <dd>Biweight Scale</dd>
+        <dd>Biweight Midcorrelation</dd>
       </dl></div><div class="section level2">
       
       <h3 id="tail-weight">tail weight<a class="anchor" aria-label="anchor" href="#tail-weight"></a></h3>
@@ -353,14 +368,14 @@
 
       <dl><dt>
           
-          <code><a href="medcouple_weight.html">medcouple_weight()</a></code> 
-        </dt>
-        <dd>Medcouple Tail Weight Measure</dd>
-      </dl><dl><dt>
-          
           <code><a href="quantile_weight.html">quantile_weight()</a></code> 
         </dt>
         <dd>Quantile Tail Weight Measure</dd>
+      </dl><dl><dt>
+          
+          <code><a href="medcouple_weight.html">medcouple_weight()</a></code> 
+        </dt>
+        <dd>Medcouple Tail Weight Measure</dd>
       </dl></div><div class="section level2">
       
       <h3 id="scale">scale<a class="anchor" aria-label="anchor" href="#scale"></a></h3>
@@ -374,14 +389,14 @@
 
       <dl><dt>
           
-          <code><a href="rousseeuwCroux.html">rousseeuwCroux()</a></code> 
-        </dt>
-        <dd>Rousseeuw-Croux Scale Estimators</dd>
-      </dl><dl><dt>
-          
           <code><a href="umad.html">umad()</a></code> 
         </dt>
         <dd>Unbiased Median Absolute Deviation</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rousseeuwCroux.html">rousseeuwCroux()</a></code> 
+        </dt>
+        <dd>Rousseeuw-Croux Scale Estimators</dd>
       </dl></div><div class="section level2">
       <h2 id="miscellaneous">Miscellaneous<a class="anchor" aria-label="anchor" href="#miscellaneous"></a></h2>
       
