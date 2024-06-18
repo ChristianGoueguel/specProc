@@ -27,10 +27,11 @@ reference:
   - yGradientglsw
   - direct_orthogonal
 
-- subtitle: Calibration Transfer
+- subtitle: calibration transfer
   desc: >
-    Calibration transfer methods are specifically designed to transfer
-    a calibration model developed on one instrument to another instrument.
+    Functions used to to transfer a calibration model developed on one
+    instrument to another instrument.
+  contents:
   - pds
   - glsw
 
