@@ -31,7 +31,6 @@ Depends:
     R (>= 2.10)
 Suggests: 
     testthat (>= 3.0.0),
-    knitr,
     markdown,
     rmarkdown,
     spelling,
@@ -49,7 +48,8 @@ Suggests:
     purrr,
     patchwork,
     robustHD,
-    pls
+    pls,
+    knitr
 VignetteBuilder: knitr
 URL: https://github.com/ChristianGoueguel/specProc, https://christiangoueguel.github.io/specProc/
 BugReports: https://github.com/ChristianGoueguel/specProc/issues

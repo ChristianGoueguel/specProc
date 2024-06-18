@@ -39,13 +39,15 @@ projected_osc <- function(x, y, ncomp = 5, center = TRUE, scale = FALSE, tol = 1
     y <- scale(y, center = FALSE, scale = TRUE)
   }
 
+  p_ortho <- t_last_ortho_P_ortho <- x_psoc <- NULL
+
   plsFit <- pls::simpls.fit(x, y, ncomp, center = FALSE)
   w <- plsFit$coefficients[, , 1:ncomp]
   w <- w / sqrt(sum(w^2))
   t <- x %*% w
 
   # Step 2: Estimate principal components of T using PCA
-  t_pca <- prcomp(t, center = FALSE)
+  t_pca <- stats::prcomp(t, center = FALSE)
   r_pca <- t_pca$sdev^2 / sum(t_pca$sdev^2)
   num_components <- sum(cumsum(r_pca) <= tol)
 

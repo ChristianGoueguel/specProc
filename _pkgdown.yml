@@ -16,14 +16,16 @@ reference:
     structures and sources of variance from the multivariate data.
   contents:
   - opls
-  - o2pls
   - osc
-  - direct_osc
-  - direct_orthogonal
   - epo
   - nas
+  - pds
   - glsw
+  - o2pls
+  - direct_osc
+  - projected_osc
   - yGradientglsw
+  - direct_orthogonal
 
 - title: Peak fitting
   desc: >
@@ -41,9 +43,9 @@ reference:
   desc: >
     Functions that help visualize the state of the data.
   contents:
-  - adjboxplot
   - plotfit
   - plotSpec
+  - adjboxplot
 
 - title: Smoothing
   desc: >
@@ -55,9 +57,9 @@ reference:
   desc: >
     Functions used to fit and remove the background emission.
   contents:
+  - whittaker
   - baseline_lsp
   - baseline_arpls
-  - whittaker
 
 - title: Normalization
 
@@ -65,19 +67,20 @@ reference:
   desc: >
     Functions used to adjust the systematic differences among samples.
   contents:
-  - normalize
   - msc
+  - normalize
 
 - subtitle: data scaling
   desc: >
     Functions used to adjust each variable/feature by a scaling factor computed
     based on the dispersion of the variable.
   contents:
-  - minmax
+
   - snv
   - pareto
-  - poisson_scale
+  - minmax
   - centering
+  - poisson_scale
 
 - subtitle: data transformation
   desc: >
@@ -91,25 +94,25 @@ reference:
   desc: >
     Functions that use Tukey’s biweight formalism.
   contents:
-  - biweight_midcorrelation
+  - biweight_scale
+  - biweight_location
   - biweight_midvariance
   - biweight_midcovariance
-  - biweight_location
-  - biweight_scale
+  - biweight_midcorrelation
 
 - subtitle: tail weight
   desc: >
     Functions used to measure the tail weight of a distribution.
   contents:
-  - medcouple_weight
   - quantile_weight
+  - medcouple_weight
 
 - subtitle: scale
   desc: >
     Function used to compute highly robust estimators for scale (or dispersion).
   contents:
-  - rousseeuwCroux
   - umad
+  - rousseeuwCroux
 
 - title: Miscellaneous
   contents:
