@@ -85,7 +85,7 @@ reference:
   - snv
   - pareto
   - minmax
-  - centering
+  - center
   - poisson_scale
 
 - subtitle: data transformation

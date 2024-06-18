@@ -37,9 +37,6 @@ coverage](https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/bad
 ![GitHub R package version](https://img.shields.io/github/r-package/v/ChristianGoueguel/specProc)
 ![GitHub language count](https://img.shields.io/github/languages/count/ChristianGoueguel/specProc)
 
-
-
-
 <!-- badges: end -->
 
 **Testing and experimenting.**

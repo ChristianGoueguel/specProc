@@ -21,9 +21,9 @@
 #' @return A data frame with the same dimensions as the input,
 #' but with columns centered according to the specified method.
 #'
-#' @export centering
+#' @export center
 #'
-centering <- function(x, method = "mean", drop.na = FALSE) {
+center <- function(x, method = "mean", drop.na = FALSE) {
 
   if (!is.numeric(x) && !is.data.frame(x)) {
     stop("Input must be a numeric matrix or data frame")
