@@ -11,21 +11,28 @@ reference:
   - iqrMethod
 
 - title: Multivariate filtering
+
+- subtitle: orthogonalization methods
   desc: >
     Functions used to identify and remove unwanted covariance
     structures and sources of variance from the multivariate data.
   contents:
-  - opls
-  - osc
   - epo
+  - osc
   - nas
-  - pds
-  - glsw
+  - opls
   - o2pls
   - direct_osc
   - projected_osc
   - yGradientglsw
   - direct_orthogonal
+
+- subtitle: Calibration Transfer
+  desc: >
+    Calibration transfer methods are specifically designed to transfer
+    a calibration model developed on one instrument to another instrument.
+  - pds
+  - glsw
 
 - title: Peak fitting
   desc: >
@@ -34,10 +41,10 @@ reference:
     mechanisms and physical conditions of the emitting environment.
   contents:
   - peakfit
-  - multipeakfit
   - gaussian
   - lorentzian
   - pseudo_voigt
+  - multipeakfit
 
 - title: Data visualization
   desc: >
@@ -75,7 +82,6 @@ reference:
     Functions used to adjust each variable/feature by a scaling factor computed
     based on the dispersion of the variable.
   contents:
-
   - snv
   - pareto
   - minmax
