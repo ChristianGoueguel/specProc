@@ -48,9 +48,16 @@ generalized_boxplot(
 }
 }
 \description{
-This function computes the Generalized Boxplot, a robust data visualization technique
-for detecting outliers and skewed and heavy-tailed distribution, as proposed by
-Bruffaerts \emph{et al}. (2014). It uses the Tukey g-and-h distribution to model the data.
+This function implements the generalized boxplot, a robust data visualization
+technique designed to effectively represent skewed and heavy-tailed distributions,
+as proposed by Bruffaerts \emph{et al}. (2014).
+}
+\details{
+This method extends the adjusted boxplot method by leveraging the flexible Tukey's
+g-and-h parametric distribution to model the underlying data structure,
+particularly for asymmetric or long-tailed datasets, providing a more nuanced
+and informative summary of the data's central tendency, spread, and potential
+outliers.
 }
 \examples{
 set.seed(123)

@@ -3,9 +3,9 @@
 #' @author Christian L. Goueguel
 #'
 #' @description
-#' This function generates an adjusted boxplot, which is a robust graphical method
+#' This function generates the adjusted boxplot, which is a robust graphical method
 #' for visualizing skewed data distributions. It provides a more accurate representation
-#' of the data's spread and skewness compared to traditional boxplot, especially
+#' of the data's spread and skewness compared to standard boxplot, especially
 #' in the presence of outliers.
 #'
 #' @details

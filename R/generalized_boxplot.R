@@ -3,9 +3,20 @@
 #' @author Christian L. Goueguel
 #'
 #' @description
-#' This function computes the Generalized Boxplot, a robust data visualization technique
-#' for detecting outliers and skewed and heavy-tailed distribution, as proposed by
-#' Bruffaerts *et al*. (2014). It uses the Tukey g-and-h distribution to model the data.
+#' This function implements the generalized boxplot, a robust data visualization
+#' technique designed to effectively represent skewed and heavy-tailed distributions,
+#' as proposed by Bruffaerts *et al*. (2014).
+#'
+#' @details
+#' This method extends the adjusted boxplot method by leveraging the flexible Tukey's
+#' g-and-h parametric distribution to model the underlying data structure,
+#' particularly for asymmetric or long-tailed datasets, providing a more nuanced
+#' and informative summary of the data's central tendency, spread, and potential
+#' outliers.
+#'
+#' @references
+#'  - Bruffaerts, C., Verardi, V., Vermandele, C. (2014). A generalized boxplot for
+#'    skewed and heavy-tailed distributions. Statistics and Probability Letters 95(C):110–117
 #'
 #' @param x A numeric data frame or tibble.
 #' @param alpha A scalar, between 0 and 1 that specifies the desired detection rate of atypical values.
@@ -22,10 +33,6 @@
 #' @return
 #'    - If `plot = TRUE`, returns a `ggplot2` object containing the generalized boxplot.
 #'    - If `plot = FALSE`, returns a list of tibbles with the generalized boxplot statistics and potantial outliers.
-#'
-#' @references
-#'  - Bruffaerts, C., Verardi, V., Vermandele, C. (2014). A generalized boxplot for
-#'    skewed and heavy-tailed distributions. Statistics and Probability Letters 95(C):110–117
 #'
 #' @export generalized_boxplot
 #'
