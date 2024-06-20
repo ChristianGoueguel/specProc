@@ -65,20 +65,27 @@ where:
 }
 }
 \examples{
-# Example 1: g = 0 and h = 0 (Gaussian distribution)
-curve(tukeyGH(x, type = "d", location = 0, scale = 1, g = 0, h = 0),
--5, 5, col = "blue", ylab = "y", add = TRUE);
-curve(gaussian(x, 0, 0, 2.3, 1), -5, 5, col = "red", add = TRUE)
-
-# Example 2: g = 1 and h = 0 (skewed distribution)
-curve(tukeyGH(x, type = "d", location = 0, scale = 1, g = 1, h = 0.1),
--3, 3, col = "blue", ylab = "y", add = TRUE);
-curve(gaussian(x, 0, 0, 2.5, 1.5), -3, 3, col = "red", add = TRUE)
-
-# Example 3: g = 0 and h = 1 (heavy-tail distribution)
-curve(tukeyGH(x, type = "d", location = 0, scale = 1, g = 0.1, h = 1),
--5, 5, col = "blue", ylab = "y", add = TRUE);
-curve(gaussian(x, 0, 0, 2.3, 1), -5, 5, col = "red", add = TRUE)
+x <- seq(-5, 5, length.out = 100)
+y1 <- tukeyGH(x, type = "d", location = 0, scale = 1, g = 0, h = 0)
+y2 <- tukeyGH(x, type = "d", location = 0, scale = 1, g = 0.5, h = 0)
+y3 <- tukeyGH(x, type = "d", location = 0, scale = 1, g = -0.5, h = 0)
+y4 <- tukeyGH(x, type = "d", location = 0, scale = 1, g = 0, h = 0.1)
+y5 <- tukeyGH(x, type = "d", location = 0, scale = 1, g = 0.5, h = 0.1)
+y6 <- tukeyGH(x, type = "d", location = 0, scale = 1, g = -0.5, h = 0.1)
+plot(x, y1, type = "b", col = "red", pch = 16, main = "Tukey g-and-h distribution", ylim = c(0, 0.6))
+lines(x, y2, type = "b", col = "blue", pch = 15)
+lines(x, y3, type = "b", col = "green", pch = 17)
+lines(x, y4, type = "b", col = "black", pch = 6)
+lines(x, y5, type = "b", col = "gold", pch = 18)
+lines(x, y6, type = "b", col = "orange", pch = 8)
+legend(
+"topright",
+legend = c(
+"g = 0, h = 0", "g = 0.5, h = 0", "g = -0.5, h = 0",
+"g = 0, h = 0.1", "g = 0.5, h = 0.1", "g = -0.5, h = 0.1"),
+col = c("red", "blue", "green", "black", "gold", "orange"),
+lty = 1
+)
 
 }
 \references{
@@ -89,7 +96,7 @@ NSF‐sponsored regional research conference at Southeastern Massachusetts
 University, North Dartmouth, MA.
 \item Martinez, J., Iglewicz, B., (1984).
 Some properties of the Tukey g and h family of distributions.
-Communications in Statistics:Theory and Methods, 13(3):353–369.
+Communications in Statistics: Theory and Methods, 13(3):353–369.
 \item Hoaglin, D.C., (1985).
 Summarizing shape numerically: The g-and-h distributions.
 In: Hoaglin, D.C., Mosteller, F., Tukey, J.W., (eds),
