@@ -55,17 +55,17 @@
 #' @examples
 #' # Example 1: g = 0 and h = 0 (Gaussian distribution)
 #' curve(tukeyGH(x, type = "d", location = 0, scale = 1, g = 0, h = 0),
-#' -5, 5, col = "blue", ylab = "y", add = TRUE)
+#' -5, 5, col = "blue", ylab = "y", add = TRUE);
 #' curve(gaussian(x, 0, 0, 2.3, 1), -5, 5, col = "red", add = TRUE)
 #'
 #' # Example 2: g = 1 and h = 0 (skewed distribution)
 #' curve(tukeyGH(x, type = "d", location = 0, scale = 1, g = 1, h = 0.1),
-#' -3, 3, col = "blue", ylab = "y", add = TRUE)
+#' -3, 3, col = "blue", ylab = "y", add = TRUE);
 #' curve(gaussian(x, 0, 0, 2.5, 1.5), -3, 3, col = "red", add = TRUE)
 #'
 #' # Example 3: g = 0 and h = 1 (heavy-tail distribution)
 #' curve(tukeyGH(x, type = "d", location = 0, scale = 1, g = 0.1, h = 1),
-#' -5, 5, col = "blue", ylab = "y", add = TRUE)
+#' -5, 5, col = "blue", ylab = "y", add = TRUE);
 #' curve(gaussian(x, 0, 0, 2.3, 1), -5, 5, col = "red", add = TRUE)
 #'
 tukeyGH <- function(x, type = "d", location = 0, scale = 1, g = 0, h = 0, log = FALSE, log.p = FALSE, n = NULL) {
