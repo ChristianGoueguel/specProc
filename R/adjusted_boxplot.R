@@ -1,4 +1,4 @@
-#' @title Adjusted Boxplot for Skewed Distributions
+#' @title Adjusted Boxplot
 #'
 #' @author Christian L. Goueguel
 #'
@@ -24,7 +24,7 @@
 #'   Computational Statistics and Data Analysis, 52(12):5186-5201
 #'
 #' @param x A numeric data frame or tibble.
-#' @param .plot A logical value indicating whether to plot the adjusted boxplot (default is `TRUE`).
+#' @param plot A logical value indicating whether to plot the adjusted boxplot (default is `TRUE`).
 #' @param xlabels.angle A numeric value specifying the angle (in degrees) for x-axis labels (default is 90).
 #' @param xlabels.vjust A numeric value specifying the vertical justification of x-axis labels (default is 1).
 #' @param xlabels.hjust A numeric value specifying the horizontal justification of x-axis labels (default is 1).
@@ -32,12 +32,14 @@
 #' @param notch A logical value indicating whether to display a notched boxplot (default is `FALSE`).
 #' @param notchwidth A numeric value specifying the width of the notch relative to the body of the boxplot (default is 0.5).
 #' @param staplewidth A numeric value specifying the width of staples at the ends of the whiskers.
+#'
 #' @return
-#'    - If `.plot = TRUE`, returns a `ggplot2` object containing the adjusted boxplot.
-#'    - If `.plot = FALSE`, returns a data frame with the adjusted boxplot statistics.
-#' @export adjboxplot
+#'    - If `plot = TRUE`, returns a `ggplot2` object containing the adjusted boxplot.
+#'    - If `plot = FALSE`, returns a list of tibbles with the adjusted boxplot statistics and potantial outliers.
+#'
+#' @export adjusted_boxplot
+#'
 #' @examples
-#' # Generate some skewed data
 #' set.seed(123)
 #' data <- data.frame(
 #'   normal = rnorm(100),
@@ -46,20 +48,20 @@
 #' )
 #'
 #' # Plot the adjusted boxplot
-#' adjboxplot(data)
+#' adjusted_boxplot(data)
 #'
 #' # Retrieve the adjusted boxplot statistics
-#' stats <- adjboxplot(data, .plot = FALSE)
+#' adjusted_boxplot(data, plot = FALSE)
 #'
-adjboxplot <- function(x, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, xlabels.hjust = 1, box.width = .5, notch = FALSE, notchwidth = 0.5, staplewidth = 0.5) {
+adjusted_boxplot <- function(x, plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, xlabels.hjust = 1, box.width = .5, notch = FALSE, notchwidth = 0.5, staplewidth = 0.5) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
   if (!all(x %>% purrr::map_lgl(is.numeric))) {
     stop("Input 'x' must be a numeric data frame.")
   }
-  if(!is.logical(.plot)) {
-    stop("Argument '.plot' must be of type boolean (TRUE or FALSE).")
+  if(!is.logical(plot)) {
+    stop("Argument 'plot' must be of type boolean (TRUE or FALSE).")
   }
   if (!is.logical(notch)) {
     stop("Argument 'notch' must be of type boolean (TRUE or FALSE).")
@@ -121,8 +123,7 @@ adjboxplot <- function(x, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, x
   upper <- NULL
   value <- NULL
 
-  p <-
-    ggplot2::ggplot() +
+  p <- ggplot2::ggplot() +
     ggplot2::geom_boxplot(
       data = adjBoxplot_stats,
       ggplot2::aes(
@@ -161,9 +162,10 @@ adjboxplot <- function(x, .plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, x
       axis.text.x = ggplot2::element_text(angle = xlabels.angle, vjust = xlabels.vjust, hjust = xlabels.hjust)) +
     ggplot2::labs(x = " ", y = " ")
 
-  if (.plot == TRUE) {
+  if (plot == TRUE) {
     return(p)
   } else{
-    return(adjBoxplot_stats)
+    r <- list("stats" = adjBoxplot_stats, "outliers" = outlier_tbl)
+    return(r)
   }
 }

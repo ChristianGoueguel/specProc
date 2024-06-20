@@ -50,7 +50,8 @@ reference:
   contents:
   - plotfit
   - plotSpec
-  - adjboxplot
+  - adjusted_boxplot
+  - generalized_boxplot
 
 - title: Smoothing
   desc: >

@@ -54,7 +54,8 @@
 #' y4 <- tukeyGH(x, type = "d", location = 0, scale = 1, g = 0, h = 0.1)
 #' y5 <- tukeyGH(x, type = "d", location = 0, scale = 1, g = 0.5, h = 0.1)
 #' y6 <- tukeyGH(x, type = "d", location = 0, scale = 1, g = -0.5, h = 0.1)
-#' plot(x, y1, type = "b", col = "red", pch = 16, main = "Tukey g-and-h distribution", ylim = c(0, 0.6))
+#' plot(x, y1, type = "b", col = "red", pch = 16,
+#' main = "Tukey g-and-h distribution", ylim = c(0, 0.6))
 #' lines(x, y2, type = "b", col = "blue", pch = 15)
 #' lines(x, y3, type = "b", col = "green", pch = 17)
 #' lines(x, y4, type = "b", col = "black", pch = 6)
