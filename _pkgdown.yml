@@ -42,9 +42,6 @@ reference:
     mechanisms and physical conditions of the emitting environment.
   contents:
   - peakfit
-  - gaussian
-  - lorentzian
-  - pseudo_voigt
   - multipeakfit
 
 - title: Data visualization
@@ -120,6 +117,15 @@ reference:
   contents:
   - umad
   - rousseeuwCroux
+
+- title: Special functions
+  desc: >
+    Functions used for charcaterizing plasma emission in laser spectroscopy.
+  contents:
+  - tukeyGH
+  - gaussian
+  - lorentzian
+  - pseudo_voigt
 
 - title: Miscellaneous
   contents:
