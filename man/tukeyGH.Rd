@@ -48,21 +48,13 @@ The Tukey g-and-h distribution, introduced by John W. Tukey in 1977, is
 defined by two transformation functions, g and h, which are applied to a
 standard normal distribution. The g transformation controls the skewness of
 the distribution, while the h transformation controls the kurtosis
-(or heaviness of the tails). The probability density function (PDF) of the
-TGH distribution is given by:
+(or heaviness of the tails). The TGH distribution is given by:
 
-\deqn{f(x; \mu, \sigma, g, h) = \frac{1}{\sigma} \phi(\frac{x - \mu}{\sigma T_g(z) T_h(z)})  \frac{dT_g(z)}{dz}  \frac{dT_h(z)}{dz}}
+\deqn{T_{g,h}(Z) = \frac{1}{g} (e^{g Z} -1) e^{\frac{1}{2} h Z^2}}
 
-where:
-\itemize{
-\item \eqn{\mu} is the location parameter (shifting the distribution horizontally)
-\item \eqn{\sigma} is the scale parameter (stretching or shrinking the distribution)
-\item \eqn{g} is the skewness parameter
-\item \eqn{h} is the kurtosis parameter
-\item \eqn{\phi(z)} is the standard normal PDF
-\item \eqn{T_g(z)} is the Tukey g-transformation function: \eqn{\frac{(e^{gz} - 1)}{g}} if \eqn{g != 0}, or \eqn{z} if \eqn{g = 0}
-\item \eqn{T_h(z)} is the Tukey h-transformation function: \eqn{e^{\frac{h z^2}{2}}}
-}
+Where \eqn{Z} is a random variable with standard normal distribution.
+The parameters \eqn{g} and \eqn{h} stand for the bias and elongation of the tails,
+respectively, of Tukey’s \eqn{g}-and-\eqn{h} distribution.
 }
 \examples{
 x <- seq(-5, 5, length.out = 100)
