@@ -54,7 +54,7 @@ for a specified variable or all variables in a given data frame or tibble.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">summaryStats</span><span class="op">(</span><span class="va">x</span>, var <span class="op">=</span> <span class="cn">NULL</span>, drop.na <span class="op">=</span> <span class="cn">TRUE</span>, digits <span class="op">=</span> <span class="fl">2</span>, robust <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">summaryStats</span><span class="op">(</span><span class="va">x</span>, var <span class="op">=</span> <span class="cn">NULL</span>, digits <span class="op">=</span> <span class="fl">2</span>, robust <span class="op">=</span> <span class="cn">FALSE</span>, drop.na <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -64,26 +64,19 @@ for a specified variable or all variables in a given data frame or tibble.</p>
 
 
 <dt>var</dt>
-<dd><p>A character vector specifying the variable(s) for which to calculate the
-summary statistics. If left as <code>NULL</code> (the default), summary statistics will
-be calculated for all variables in the data frame/tibble.</p></dd>
-
-
-<dt>drop.na</dt>
-<dd><p>A logical value indicating whether to remove missing values (<code>NA</code>)
-from the calculations. If <code>TRUE</code> (the default), missing values will be removed.
-If <code>FALSE</code>, missing values will be included in the calculations.</p></dd>
+<dd><p>A character vector specifying the variable(s) for which to calculate the summary statistics. If left as <code>NULL</code> (the default), summary statistics will be calculated for all variables in the data frame/tibble.</p></dd>
 
 
 <dt>digits</dt>
-<dd><p>An integer specifying the number of significant digits to display after
-the decimal point in the output.</p></dd>
+<dd><p>An integer specifying the number of significant digits to display after the decimal point in the output.</p></dd>
 
 
 <dt>robust</dt>
-<dd><p>A logical value indicating whether to compute robust descriptive
-statistics. If <code>FALSE</code> (the default), computes the classical descriptive
-statistics for describing the distribution of a univariate variable.</p></dd>
+<dd><p>A logical value indicating whether to compute robust descriptive statistics. If <code>FALSE</code> (the default), computes the classical descriptive statistics for describing the distribution of a univariate variable.</p></dd>
+
+
+<dt>drop.na</dt>
+<dd><p>A logical value indicating whether to remove missing values (<code>NA</code>) from the calculations. If <code>TRUE</code> (the default), missing values will be removed. If <code>FALSE</code>, missing values will be included in the calculations.</p></dd>
 
 </dl></div>
     <div class="section level2">

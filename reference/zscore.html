@@ -51,7 +51,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">zscore</span><span class="op">(</span><span class="va">x</span>, robust <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">zscore</span><span class="op">(</span><span class="va">x</span>, robust <span class="op">=</span> <span class="cn">TRUE</span>, drop.na <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -62,6 +62,10 @@
 
 <dt>robust</dt>
 <dd><p>A logical value indicating whether to calculate classical or robust (default) z-score.</p></dd>
+
+
+<dt>drop.na</dt>
+<dd><p>A logical value indicating whether to remove missing values (<code>NA</code>) from the calculations. If <code>TRUE</code>, missing values will be removed. If <code>FALSE</code> (the default), missing values will be included in the calculations.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -119,6 +123,7 @@ Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 1(1), 73-7
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>     3 -<span style="color: #BB0000;">0.225</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>     2 -<span style="color: #BB0000;">0.674</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>     1 -<span style="color: #BB0000;">1.12</span> </span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

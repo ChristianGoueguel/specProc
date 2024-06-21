@@ -67,9 +67,9 @@ the biweight midcorrelation (a robust correlation measure).</p>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">var</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"pearson"</span>,</span>
-<span>  .plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  .color <span class="op">=</span> <span class="st">"#111D71"</span>,</span>
-<span>  .interactive <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  color <span class="op">=</span> <span class="st">"#111D71"</span>,</span>
+<span>  interactive <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -84,23 +84,19 @@ the biweight midcorrelation (a robust correlation measure).</p>
 
 
 <dt>method</dt>
-<dd><p>A character string indicating the correlation method to use. Allowed values are
-"pearson", "spearman", "kendall", "chatterjee", or "bicor" (for biweight midcorrelation).
-The default is "pearson".</p></dd>
+<dd><p>A character string indicating the correlation method to use. Allowed values are "pearson", "spearman", "kendall", "chatterjee", or "bicor" (for biweight midcorrelation). The default is "pearson".</p></dd>
 
 
-<dt>.plot</dt>
-<dd><p>A logical value indicating whether to produce a visualization of the correlations.
-Default is FALSE (no plot).</p></dd>
+<dt>plot</dt>
+<dd><p>A logical value indicating whether to produce a visualization of the correlations. Default is FALSE (no plot).</p></dd>
 
 
-<dt>.color</dt>
+<dt>color</dt>
 <dd><p>A character string specifying the color to use for the plot. Default is "#111D71".</p></dd>
 
 
-<dt>.interactive</dt>
-<dd><p>A logical value indicating whether to create an interactive plot using
-plotly. Default is FALSE (static ggplot2 plot).</p></dd>
+<dt>interactive</dt>
+<dd><p>A logical value indicating whether to create an interactive plot using plotly. Default is FALSE (static ggplot2 plot).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -108,7 +104,7 @@ plotly. Default is FALSE (static ggplot2 plot).</p></dd>
     
 
 <p>A list containing:</p><ul><li><p><code>correlation</code>: A tibble with columns for the variable name, correlation value, and method used.</p></li>
-<li><p><code>plot</code>: If <code>.plot = TRUE</code>, a <code>ggplot2</code> object (or a <code>plotly</code> object if <code>.interactive = TRUE</code>).</p></li>
+<li><p><code>plot</code>: If <code>plot = TRUE</code>, a <code>ggplot2</code> object (or a <code>plotly</code> object if <code>interactive = TRUE</code>).</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

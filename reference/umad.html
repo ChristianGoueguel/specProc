@@ -57,7 +57,7 @@ adds a small sample correction factor to make MAD unbiased at the normal distrib
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">umad</span><span class="op">(</span><span class="va">x</span>, drop.na <span class="op">=</span> <span class="cn">TRUE</span>, method <span class="op">=</span> <span class="st">"hayes"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">umad</span><span class="op">(</span><span class="va">x</span>, method <span class="op">=</span> <span class="st">"hayes"</span>, drop.na <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -66,16 +66,12 @@ adds a small sample correction factor to make MAD unbiased at the normal distrib
 <dd><p>A numeric vector.</p></dd>
 
 
-<dt>drop.na</dt>
-<dd><p>A logical value indicating whether to remove missing values
-(NA) from the calculations. If <code>TRUE</code> (the default), missing values will be
-removed. If <code>FALSE</code>, missing values will be included.</p></dd>
-
-
 <dt>method</dt>
-<dd><p>A character string specifying the method to use for calculating
-the correction factor when the number of sample is more than 100. The available
-options are "hayes" (default) and "williams".</p></dd>
+<dd><p>A character string specifying the method to use for calculating the correction factor when the number of sample is more than 100. The available options are "hayes" (default) and "williams".</p></dd>
+
+
+<dt>drop.na</dt>
+<dd><p>A logical value indicating whether to remove missing values (NA) from the calculations. If <code>TRUE</code> (the default), missing values will be removed. If <code>FALSE</code>, missing values will be included.</p></dd>
 
 </dl></div>
     <div class="section level2">
