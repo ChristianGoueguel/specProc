@@ -76,7 +76,7 @@
 <!-- badges: end -->
 <p><strong>Testing and experimenting.</strong></p>
 <p>The <code>specProc</code> package performs a wide range of preprocessing tasks essential for spectroscopic data analysis. Spectral preprocessing is essential in ensuring accurate and reliable results by minimizing the impact of various distortions and artifacts that can arise during data acquisition or due to inherent characteristics of the sample or instrument.</p>
-<p>Some of the techniques are purely based on mathematical concepts, leveraging robust statistics and signal processing techniques. Additionally, <code>specProc</code> incorporates preprocessing methods inspired by the chemical-physical background of the dataset. These techniques leverage domain knowledge and exploit the fundamental principles governing the spectroscopic phenomenon under investigation.</p>
+<p>Some techniques are purely based on mathematical concepts, relying on robust statistics and signal processing techniques. Other methods are inspired by the physicochemical context of the dataset. These techniques rely on domain knowledge and exploit the fundamental principles governing the spectroscopic phenomenon used.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -130,20 +130,29 @@
 <h3 id="adjusted-boxplot">adjusted boxplot<a class="anchor" aria-label="anchor" href="#adjusted-boxplot"></a>
 </h3>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu">adjboxplot</span><span class="op">(</span><span class="va">tbl</span>, xlabels.angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/adjusted_boxplot.html">adjusted_boxplot</a></span><span class="op">(</span><span class="va">tbl</span>, xlabels.angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, linewidth <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html" class="external-link">coord_flip</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%"></p>
 </div>
 <div class="section level3">
-<h3 id="correlation">correlation<a class="anchor" aria-label="anchor" href="#correlation"></a>
+<h3 id="generalized-boxplot">generalized boxplot<a class="anchor" aria-label="anchor" href="#generalized-boxplot"></a>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/generalized_boxplot.html">generalized_boxplot</a></span><span class="op">(</span><span class="va">tbl</span>, xlabels.angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, linewidth <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html" class="external-link">coord_flip</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="90%" height="90%"></p>
+</div>
+<div class="section level3">
+<h3 id="correlation">correlation<a class="anchor" aria-label="anchor" href="#correlation"></a>
+</h3>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"glass"</span>, package <span class="op">=</span> <span class="st">"chemometrics"</span><span class="op">)</span></span>
 <span><span class="va">glass</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">glass</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">glass</span> <span class="op">|&gt;</span> <span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/correlation.html">correlation</a></span><span class="op">(</span><span class="va">Na2O</span>, method <span class="op">=</span> <span class="st">"spearman"</span>, .plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; $.correlation</span></span>
+<span><span class="co">#&gt; $correlation</span></span>
 <span><span class="co">#&gt; # A tibble: 12 × 3</span></span>
 <span><span class="co">#&gt;    variable .correlation method  </span></span>
 <span><span class="co">#&gt;    &lt;chr&gt;           &lt;dbl&gt; &lt;chr&gt;   </span></span>
@@ -160,8 +169,8 @@
 <span><span class="co">#&gt; 11 PbO            -0.356 spearman</span></span>
 <span><span class="co">#&gt; 12 K2O            -0.571 spearman</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $.plot</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="90%" height="90%"></p>
+<span><span class="co">#&gt; $plot</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-10-1.png" width="90%" height="90%"></p>
 </div>
 </div>
 </div>
