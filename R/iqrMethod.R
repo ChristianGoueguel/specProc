@@ -32,9 +32,7 @@
 #' @author Christian L. Goueguel
 #'
 #' @param x A numeric vector.
-#' @param k A numeric value specifying the fence factor. `k = 1.5` is the default
-#' as it strikes a balance between sensitivity to mild outliers and robustness against extreme outliers.
-#' `k = 3` is more lenient and is sometimes used when a higher tolerance for outliers is desired.
+#' @param k A numeric value specifying the fence factor. `k = 1.5` is the default as it strikes a balance between sensitivity to mild outliers and robustness against extreme outliers. `k = 3` is more lenient and is sometimes used when a higher tolerance for outliers is desired.
 #' @param skew A logical value indicating whether to calculate the version of
 #' the fences that accounts for moderate skewness in the underlying data distribution.
 #' By default, `skew = FALSE`, which calculates the fences assuming a symmetric distribution.
@@ -43,19 +41,21 @@
 #' These formulas are explicitly derived and optimized for the scenario where `k = 1.5` (Hubert and Vandervieren, 2008).
 #' Consequently, if the user attempts to use a value of `k` other than 1.5, the code will issue a warning message indicating that the formula is only defined for `k = 1.5`.
 #' In such cases, the code will automatically reset `k` to 1.5 and proceed with the calculations using the appropriate formulas and constants.
+#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.
 #'
 #' @return A tibble with two columns:
 #'   - `data`: The original numeric values.
 #'   - `outlier`: A logical vector indicating whether each value is a potential outlier or not.
 #' @examples
-#' x <- rexp(7, rate = 0.5)
+#' set.seed(3317)
+#' x <- stats::rexp(7, rate = 0.5)
 #' iqrMethod(x)
 #'
 #' iqrMethod(x, skew = TRUE)
 #'
 #' @export iqrMethod
 #'
-iqrMethod <- function(x, k = 1.5, skew = FALSE) {
+iqrMethod <- function(x, k = 1.5, skew = FALSE, drop.na = FALSE) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -68,6 +68,11 @@ iqrMethod <- function(x, k = 1.5, skew = FALSE) {
   if (!is.logical(skew)) {
     stop("'skew' must be of type boolean (TRUE or FALSE)")
   }
+
+  if (drop.na) {
+    x <- x[!is.na(x)]
+  }
+
   q1 <- stats::quantile(x, 0.25)
   q3 <- stats::quantile(x, 0.75)
   iqr <- q3 - q1

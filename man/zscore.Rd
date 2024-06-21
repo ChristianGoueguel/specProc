@@ -4,12 +4,14 @@
 \alias{zscore}
 \title{Classical or Robust Z-Score}
 \usage{
-zscore(x, robust = TRUE)
+zscore(x, robust = TRUE, drop.na = FALSE)
 }
 \arguments{
 \item{x}{A numeric vector.}
 
 \item{robust}{A logical value indicating whether to calculate classical or robust (default) z-score.}
+
+\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.}
 }
 \value{
 A tibble with two columns:
@@ -36,6 +38,7 @@ zscore(x, robust = FALSE)
 
 # Robust approach
 zscore(x)
+
 }
 \references{
 \itemize{

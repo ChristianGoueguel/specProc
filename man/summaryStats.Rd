@@ -4,25 +4,18 @@
 \alias{summaryStats}
 \title{Classical or Robust Descriptive Statistics}
 \usage{
-summaryStats(x, var = NULL, drop.na = TRUE, digits = 2, robust = FALSE)
+summaryStats(x, var = NULL, digits = 2, robust = FALSE, drop.na = TRUE)
 }
 \arguments{
 \item{x}{A data frame or tibble.}
 
-\item{var}{A character vector specifying the variable(s) for which to calculate the
-summary statistics. If left as \code{NULL} (the default), summary statistics will
-be calculated for all variables in the data frame/tibble.}
+\item{var}{A character vector specifying the variable(s) for which to calculate the summary statistics. If left as \code{NULL} (the default), summary statistics will be calculated for all variables in the data frame/tibble.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA})
-from the calculations. If \code{TRUE} (the default), missing values will be removed.
-If \code{FALSE}, missing values will be included in the calculations.}
+\item{digits}{An integer specifying the number of significant digits to display after the decimal point in the output.}
 
-\item{digits}{An integer specifying the number of significant digits to display after
-the decimal point in the output.}
+\item{robust}{A logical value indicating whether to compute robust descriptive statistics. If \code{FALSE} (the default), computes the classical descriptive statistics for describing the distribution of a univariate variable.}
 
-\item{robust}{A logical value indicating whether to compute robust descriptive
-statistics. If \code{FALSE} (the default), computes the classical descriptive
-statistics for describing the distribution of a univariate variable.}
+\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE} (the default), missing values will be removed. If \code{FALSE}, missing values will be included in the calculations.}
 }
 \value{
 A data frame containing the summary statistics for the specified variable(s).

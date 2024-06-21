@@ -18,11 +18,15 @@
 #'   Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 1(1), 73-79.
 #'
 #' @author Christian L. Goueguel
+#'
 #' @param x A numeric vector.
 #' @param robust A logical value indicating whether to calculate classical or robust (default) z-score.
+#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.
+#'
 #' @return A tibble with two columns:
 #'   - `data`: The original numeric values.
 #'   - `score`: The calculated z-scores.
+#'
 #' @examples
 #' x <- c(1:5, 100)
 #' # Non-robust approach
@@ -30,8 +34,10 @@
 #'
 #' # Robust approach
 #' zscore(x)
+#'
 #' @export zscore
-zscore <- function(x, robust = TRUE) {
+#'
+zscore <- function(x, robust = TRUE, drop.na = FALSE) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -41,7 +47,12 @@ zscore <- function(x, robust = TRUE) {
   if (!is.logical(robust)) {
     stop("The input 'robust' must be a logical value (TRUE or FALSE).")
   }
+
   requireNamespace("robustHD", quietly = TRUE)
+
+  if (drop.na) {
+    x <- x[!is.na(x)]
+  }
 
   value <- NULL
   score <- NULL

@@ -7,10 +7,10 @@
 #'
 #' @param x A numeric vector.
 #' @param loc Initial guess for the location (default: median of `x`).
-#' @param c A numeric value specifying the tuning constant for the biweight estimator
-#' (`c = 6` by default).
+#' @param c A numeric value specifying the tuning constant for the biweight estimator (`c = 6` by default).
 #' @param tol Convergence tolerance for the iterative computation (default: 1e-6).
 #' @param max_iter Maximum number of iterations (default: 50).
+#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE} (the default), missing values will be removed. If \code{FALSE}, missing values will be included in the calculations.
 #'
 #' @return The biweight location of `x`.
 #'
@@ -39,7 +39,9 @@
 #' )
 #'
 #' @export biweight_location
-biweight_location <- function(x, loc = stats::median(x), c = 6, tol = 1e-6, max_iter = 50) {
+#'
+biweight_location <- function(x, loc = stats::median(x), c = 6, tol = 1e-6, max_iter = 50, drop.na = FALSE) {
+
   if (missing(x)) {
     stop("Input 'x' must be provided.")
   }
@@ -51,6 +53,10 @@ biweight_location <- function(x, loc = stats::median(x), c = 6, tol = 1e-6, max_
   }
   if (length(x) < 2) {
     stop("'x' must have at least two elements.")
+  }
+
+  if (drop.na) {
+    x <- x[!is.na(x)]
   }
 
   biloc <- loc

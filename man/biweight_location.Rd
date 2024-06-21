@@ -4,19 +4,27 @@
 \alias{biweight_location}
 \title{Biweight Location}
 \usage{
-biweight_location(x, loc = stats::median(x), c = 6, tol = 1e-06, max_iter = 50)
+biweight_location(
+  x,
+  loc = stats::median(x),
+  c = 6,
+  tol = 1e-06,
+  max_iter = 50,
+  drop.na = FALSE
+)
 }
 \arguments{
 \item{x}{A numeric vector.}
 
 \item{loc}{Initial guess for the location (default: median of \code{x}).}
 
-\item{c}{A numeric value specifying the tuning constant for the biweight estimator
-(\code{c = 6} by default).}
+\item{c}{A numeric value specifying the tuning constant for the biweight estimator (\code{c = 6} by default).}
 
 \item{tol}{Convergence tolerance for the iterative computation (default: 1e-6).}
 
 \item{max_iter}{Maximum number of iterations (default: 50).}
+
+\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE} (the default), missing values will be removed. If \code{FALSE}, missing values will be included in the calculations.}
 }
 \value{
 The biweight location of \code{x}.

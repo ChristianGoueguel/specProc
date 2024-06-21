@@ -29,6 +29,7 @@
 #' @export biweight_midcorrelation
 #'
 biweight_midcorrelation <- function(x, y) {
+
   if (missing(x) || missing(y)) {
     stop("Inputs 'x' and 'y' must be provided.")
   }

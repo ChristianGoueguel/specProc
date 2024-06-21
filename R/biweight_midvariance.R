@@ -21,10 +21,11 @@
 #' @author Christian L. Goueguel
 #'
 #' @param x A numeric vector.
+#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE} (the default), missing values will be removed. If \code{FALSE}, missing values will be included in the calculations.
+#'
 #' @return The biweight midvariance of the input vector.
 #'
 #' @examples
-#'
 #' vec <- c(1, 2, 3, 4, 4, 2)
 #' stats::var(vec)
 #' biweight_midvariance(vec)
@@ -35,7 +36,8 @@
 #'
 #' @export biweight_midvariance
 #'
-biweight_midvariance <- function(x) {
+biweight_midvariance <- function(x, drop.na = FALSE) {
+
   if (missing(x)) {
     stop("Input 'x' must be provided.")
   }
@@ -44,6 +46,10 @@ biweight_midvariance <- function(x) {
   }
   if (length(unique(x)) == 1) {
     stop("Input 'x' cannot be constant a vector.")
+  }
+
+  if (drop.na) {
+    x <- x[!is.na(x)]
   }
 
   if (length(x) < 2) {

@@ -28,18 +28,14 @@
 #'      Journal of Statistical Computation and Simulation, 81(11):1697–1702.
 #'
 #' @param x A numeric vector.
-#' @param drop.na A logical value indicating whether to remove missing values
-#' (NA) from the calculations. If `TRUE` (the default), missing values will be
-#' removed. If `FALSE`, missing values will be included.
-#' @param method A character string specifying the method to use for calculating
-#' the correction factor when the number of sample is more than 100. The available
-#' options are "hayes" (default) and "williams".
+#' @param method A character string specifying the method to use for calculating the correction factor when the number of sample is more than 100. The available options are "hayes" (default) and "williams".
+#' @param drop.na A logical value indicating whether to remove missing values (NA) from the calculations. If `TRUE` (the default), missing values will be removed. If `FALSE`, missing values will be included.
 #'
 #' @return The MAD scale estimate for the input vector `x`.
 #'
 #' @export umad
 #'
-umad <- function(x, drop.na = TRUE, method = "hayes") {
+umad <- function(x, method = "hayes", drop.na = TRUE) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }

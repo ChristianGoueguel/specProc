@@ -21,18 +21,14 @@
 #'
 #' @param x A data frame or tibble containing the variables of interest.
 #' @param var A character string specifying the name of the response variable.
-#' @param method A character string indicating the correlation method to use. Allowed values are
-#'   "pearson", "spearman", "kendall", "chatterjee", or "bicor" (for biweight midcorrelation).
-#'   The default is "pearson".
-#' @param .plot A logical value indicating whether to produce a visualization of the correlations.
-#'   Default is FALSE (no plot).
-#' @param .color A character string specifying the color to use for the plot. Default is "#111D71".
-#' @param .interactive A logical value indicating whether to create an interactive plot using
-#'   plotly. Default is FALSE (static ggplot2 plot).
+#' @param method A character string indicating the correlation method to use. Allowed values are "pearson", "spearman", "kendall", "chatterjee", or "bicor" (for biweight midcorrelation). The default is "pearson".
+#' @param plot A logical value indicating whether to produce a visualization of the correlations. Default is FALSE (no plot).
+#' @param color A character string specifying the color to use for the plot. Default is "#111D71".
+#' @param interactive A logical value indicating whether to create an interactive plot using plotly. Default is FALSE (static ggplot2 plot).
 #'
 #' @return A list containing:
 #' - `correlation`: A tibble with columns for the variable name, correlation value, and method used.
-#' - `plot`: If `.plot = TRUE`, a `ggplot2` object (or a `plotly` object if `.interactive = TRUE`).
+#' - `plot`: If `plot = TRUE`, a `ggplot2` object (or a `plotly` object if `interactive = TRUE`).
 #'
 #' @references
 #' - Chatterjee, S. (2021). A new coefficient of correlation.
@@ -44,13 +40,7 @@
 #'
 #' @export correlation
 #'
-correlation <- function(
-    x,
-    var,
-    method = "pearson",
-    .plot = FALSE,
-    .color = "#111D71",
-    .interactive = FALSE) {
+correlation <- function(x, var, method = "pearson", plot = FALSE, color = "#111D71", interactive = FALSE) {
 
   if (missing(x)) {
     stop("Missing 'x' argument.")
@@ -65,8 +55,8 @@ correlation <- function(
   if (!method %in% valid_methods) {
     stop("Invalid method specified.")
   }
-  if (!is.logical(.plot)) {
-    stop("'.plot' must be of type boolean (TRUE or FALSE)")
+  if (!is.logical(plot)) {
+    stop("'plot' must be of type boolean (TRUE or FALSE)")
   }
 
   variable <- NULL
@@ -141,17 +131,17 @@ correlation <- function(
     ggplot2::aes(x = reorder(variable, -.correlation), y = .correlation, fill = method) +
     ggplot2::geom_bar(stat = "identity") +
     ggplot2::geom_vline(xintercept = 0, colour = "white", linewidth = 1) +
-    ggplot2::scale_fill_manual(values = .color) +
+    ggplot2::scale_fill_manual(values = color) +
     ggplot2::scale_y_continuous(breaks = c(-1, -.5, 0, .5, 1), limits = c(-1, 1)) +
     ggplot2::labs(x = " ", y = paste0(rlang::quo_name(rlang::enquo(var)), " ", "correlation")) +
     ggplot2::coord_flip() +
     cowplot::theme_minimal_vgrid() +
     ggplot2::theme(legend.position = "top")
 
-  if (.plot == FALSE) {
+  if (plot == FALSE) {
     return(tbl_corr)
   } else {
-    if (.interactive == FALSE) {
+    if (interactive == FALSE) {
       return(list(correlation = tbl_corr, plot = p))
     } else {
       return(plotly::ggplotly(p, tooltip = "y"))

@@ -10,7 +10,8 @@ biweight_scale(
   c = 9,
   reduced = FALSE,
   tol = 1e-06,
-  max_iter = 50
+  max_iter = 50,
+  drop.na = FALSE
 )
 }
 \arguments{
@@ -18,17 +19,15 @@ biweight_scale(
 
 \item{loc}{Initial guess for the location (default: median of \code{x}).}
 
-\item{c}{A numeric value specifying the tuning constant for the biweight estimator
-(\code{c = 9} by default).}
+\item{c}{A numeric value specifying the tuning constant for the biweight estimator (\code{c = 9} by default).}
 
-\item{reduced}{A logical value specifying whether the sample size, \emph{n},
-should be reduced to the number of non-rejected values. If \code{TRUE}, \emph{n} is
-reduced to the number of observations that pass a rejection criteria.
-If \code{FALSE} (default), \emph{n} is equal to the length of \code{x} (the input data).}
+\item{reduced}{A logical value specifying whether the sample size, \emph{n}, should be reduced to the number of non-rejected values. If \code{TRUE}, \emph{n} is reduced to the number of observations that pass a rejection criteria. If \code{FALSE} (default), \emph{n} is equal to the length of \code{x} (the input data).}
 
 \item{tol}{Convergence tolerance for the iterative computation (default: 1e-6).}
 
 \item{max_iter}{Maximum number of iterations (default: 50).}
+
+\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.}
 }
 \value{
 The biweight scale of \code{x}.

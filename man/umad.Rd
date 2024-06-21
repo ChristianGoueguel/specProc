@@ -4,18 +4,14 @@
 \alias{umad}
 \title{Unbiased Median Absolute Deviation}
 \usage{
-umad(x, drop.na = TRUE, method = "hayes")
+umad(x, method = "hayes", drop.na = TRUE)
 }
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values
-(NA) from the calculations. If \code{TRUE} (the default), missing values will be
-removed. If \code{FALSE}, missing values will be included.}
+\item{method}{A character string specifying the method to use for calculating the correction factor when the number of sample is more than 100. The available options are "hayes" (default) and "williams".}
 
-\item{method}{A character string specifying the method to use for calculating
-the correction factor when the number of sample is more than 100. The available
-options are "hayes" (default) and "williams".}
+\item{drop.na}{A logical value indicating whether to remove missing values (NA) from the calculations. If \code{TRUE} (the default), missing values will be removed. If \code{FALSE}, missing values will be included.}
 }
 \value{
 The MAD scale estimate for the input vector \code{x}.

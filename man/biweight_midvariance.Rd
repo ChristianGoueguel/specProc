@@ -4,10 +4,12 @@
 \alias{biweight_midvariance}
 \title{Biweight Midvariance}
 \usage{
-biweight_midvariance(x)
+biweight_midvariance(x, drop.na = FALSE)
 }
 \arguments{
 \item{x}{A numeric vector.}
+
+\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE} (the default), missing values will be removed. If \code{FALSE}, missing values will be included in the calculations.}
 }
 \value{
 The biweight midvariance of the input vector.
@@ -26,7 +28,6 @@ of efficiency, while the biweight midvariance estimator is both resistant
 and robust of efficiency.
 }
 \examples{
-
 vec <- c(1, 2, 3, 4, 4, 2)
 stats::var(vec)
 biweight_midvariance(vec)

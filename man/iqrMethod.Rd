@@ -4,14 +4,12 @@
 \alias{iqrMethod}
 \title{Interquartile Range Method}
 \usage{
-iqrMethod(x, k = 1.5, skew = FALSE)
+iqrMethod(x, k = 1.5, skew = FALSE, drop.na = FALSE)
 }
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{k}{A numeric value specifying the fence factor. \code{k = 1.5} is the default
-as it strikes a balance between sensitivity to mild outliers and robustness against extreme outliers.
-\code{k = 3} is more lenient and is sometimes used when a higher tolerance for outliers is desired.}
+\item{k}{A numeric value specifying the fence factor. \code{k = 1.5} is the default as it strikes a balance between sensitivity to mild outliers and robustness against extreme outliers. \code{k = 3} is more lenient and is sometimes used when a higher tolerance for outliers is desired.}
 
 \item{skew}{A logical value indicating whether to calculate the version of
 the fences that accounts for moderate skewness in the underlying data distribution.
@@ -21,6 +19,8 @@ to account for potential asymmetry in the underlying data distribution.
 These formulas are explicitly derived and optimized for the scenario where \code{k = 1.5} (Hubert and Vandervieren, 2008).
 Consequently, if the user attempts to use a value of \code{k} other than 1.5, the code will issue a warning message indicating that the formula is only defined for \code{k = 1.5}.
 In such cases, the code will automatically reset \code{k} to 1.5 and proceed with the calculations using the appropriate formulas and constants.}
+
+\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.}
 }
 \value{
 A tibble with two columns:
@@ -48,7 +48,8 @@ may still struggle to accurately identify potential outliers in distributions wi
 kurtosis or long-tailed behavior.
 }
 \examples{
-x <- rexp(7, rate = 0.5)
+set.seed(3317)
+x <- stats::rexp(7, rate = 0.5)
 iqrMethod(x)
 
 iqrMethod(x, skew = TRUE)

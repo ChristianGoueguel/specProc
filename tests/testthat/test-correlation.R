@@ -14,7 +14,7 @@ test_that("correlation function works as expected", {
   expect_error(correlation(list(1, 2, 3), y), "Input 'x' must be a numeric data frame")
   expect_error(correlation(test_data, w), "'var' not found in the data frame")
   expect_error(correlation(test_data, y, method = "invalid"), "Invalid method specified.")
-  expect_error(correlation(test_data, y, .plot = 1), "'.plot' must be of type boolean \\(TRUE or FALSE\\)")
+  expect_error(correlation(test_data, y, plot = 1), "'plot' must be of type boolean \\(TRUE or FALSE\\)")
 
   result_spearman <- correlation(test_data, y, method = "spearman")
   expect_equal(result_spearman$method, rep("spearman", 2))
@@ -23,10 +23,10 @@ test_that("correlation function works as expected", {
   result_chatterjee <- correlation(test_data, y, method = "chatterjee")
   expect_equal(result_chatterjee$method, rep("chatterjee", 2))
 
-  result_plot <- correlation(test_data, y, .plot = TRUE)
+  result_plot <- correlation(test_data, y, plot = TRUE)
   expect_type(result_plot$plot, "list")
 
-  result_interactive <- correlation(test_data, y, .plot = TRUE, .interactive = TRUE)
+  result_interactive <- correlation(test_data, y, plot = TRUE, interactive = TRUE)
   expect_s3_class(result_interactive, "plotly")
   }
   )

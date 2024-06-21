@@ -5,17 +5,11 @@
 #' for a specified variable or all variables in a given data frame or tibble.
 #'
 #' @param x A data frame or tibble.
-#' @param var A character vector specifying the variable(s) for which to calculate the
-#'   summary statistics. If left as \code{NULL} (the default), summary statistics will
-#'   be calculated for all variables in the data frame/tibble.
-#' @param drop.na A logical value indicating whether to remove missing values (\code{NA})
-#'   from the calculations. If \code{TRUE} (the default), missing values will be removed.
-#'   If \code{FALSE}, missing values will be included in the calculations.
-#' @param digits An integer specifying the number of significant digits to display after
-#'   the decimal point in the output.
-#' @param robust A logical value indicating whether to compute robust descriptive
-#' statistics. If \code{FALSE} (the default), computes the classical descriptive
-#' statistics for describing the distribution of a univariate variable.
+#' @param var A character vector specifying the variable(s) for which to calculate the summary statistics. If left as \code{NULL} (the default), summary statistics will be calculated for all variables in the data frame/tibble.
+#' @param digits An integer specifying the number of significant digits to display after the decimal point in the output.
+#' @param robust A logical value indicating whether to compute robust descriptive statistics. If \code{FALSE} (the default), computes the classical descriptive statistics for describing the distribution of a univariate variable.
+#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE} (the default), missing values will be removed. If \code{FALSE}, missing values will be included in the calculations.
+#'
 #' @return A data frame containing the summary statistics for the specified variable(s).
 #'
 #' @author Christian L. Goueguel
@@ -35,7 +29,8 @@
 #'   robust = TRUE
 #'   )
 #'
-summaryStats <- function(x, var = NULL, drop.na = TRUE, digits = 2, robust = FALSE) {
+summaryStats <- function(x, var = NULL, digits = 2, robust = FALSE, drop.na = TRUE) {
+
   if (is.null(x) == TRUE) {
     stop("Data must be provided")
   }

@@ -7,14 +7,11 @@
 #'
 #' @param x A numeric vector.
 #' @param loc Initial guess for the location (default: median of `x`).
-#' @param c A numeric value specifying the tuning constant for the biweight estimator
-#' (`c = 9` by default).
-#' @param reduced A logical value specifying whether the sample size, *n*,
-#' should be reduced to the number of non-rejected values. If `TRUE`, *n* is
-#' reduced to the number of observations that pass a rejection criteria.
-#' If `FALSE` (default), *n* is equal to the length of `x` (the input data).
+#' @param c A numeric value specifying the tuning constant for the biweight estimator (`c = 9` by default).
+#' @param reduced A logical value specifying whether the sample size, *n*, should be reduced to the number of non-rejected values. If `TRUE`, *n* is reduced to the number of observations that pass a rejection criteria. If `FALSE` (default), *n* is equal to the length of `x` (the input data).
 #' @param tol Convergence tolerance for the iterative computation (default: 1e-6).
 #' @param max_iter Maximum number of iterations (default: 50).
+#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.
 #'
 #' @return The biweight scale of `x`.
 #'
@@ -44,7 +41,8 @@
 #'
 #' @export biweight_scale
 #'
-biweight_scale <- function(x, loc = stats::median(x), c = 9, reduced = FALSE, tol = 1e-6, max_iter = 50) {
+biweight_scale <- function(x, loc = stats::median(x), c = 9, reduced = FALSE, tol = 1e-6, max_iter = 50, drop.na = FALSE) {
+
   if (missing(x)) {
     stop("Input 'x' must be provided.")
   }
@@ -62,6 +60,10 @@ biweight_scale <- function(x, loc = stats::median(x), c = 9, reduced = FALSE, to
   }
   if (!is.logical(reduced)) {
     stop("'reduced' must be a logical value (TRUE or FALSE).")
+  }
+
+  if (drop.na) {
+    x <- x[!is.na(x)]
   }
 
   mad_x <- stats::mad(x, center = loc)

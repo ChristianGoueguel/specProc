@@ -32,6 +32,7 @@
 #' @export biweight_midcovariance
 #'
 biweight_midcovariance <- function(x, y) {
+
   if (missing(x) || missing(y)) {
     stop("Inputs 'x' and 'y' must be provided.")
   }

@@ -8,9 +8,9 @@ correlation(
   x,
   var,
   method = "pearson",
-  .plot = FALSE,
-  .color = "#111D71",
-  .interactive = FALSE
+  plot = FALSE,
+  color = "#111D71",
+  interactive = FALSE
 )
 }
 \arguments{
@@ -18,23 +18,19 @@ correlation(
 
 \item{var}{A character string specifying the name of the response variable.}
 
-\item{method}{A character string indicating the correlation method to use. Allowed values are
-"pearson", "spearman", "kendall", "chatterjee", or "bicor" (for biweight midcorrelation).
-The default is "pearson".}
+\item{method}{A character string indicating the correlation method to use. Allowed values are "pearson", "spearman", "kendall", "chatterjee", or "bicor" (for biweight midcorrelation). The default is "pearson".}
 
-\item{.plot}{A logical value indicating whether to produce a visualization of the correlations.
-Default is FALSE (no plot).}
+\item{plot}{A logical value indicating whether to produce a visualization of the correlations. Default is FALSE (no plot).}
 
-\item{.color}{A character string specifying the color to use for the plot. Default is "#111D71".}
+\item{color}{A character string specifying the color to use for the plot. Default is "#111D71".}
 
-\item{.interactive}{A logical value indicating whether to create an interactive plot using
-plotly. Default is FALSE (static ggplot2 plot).}
+\item{interactive}{A logical value indicating whether to create an interactive plot using plotly. Default is FALSE (static ggplot2 plot).}
 }
 \value{
 A list containing:
 \itemize{
 \item \code{correlation}: A tibble with columns for the variable name, correlation value, and method used.
-\item \code{plot}: If \code{.plot = TRUE}, a \code{ggplot2} object (or a \code{plotly} object if \code{.interactive = TRUE}).
+\item \code{plot}: If \code{plot = TRUE}, a \code{ggplot2} object (or a \code{plotly} object if \code{interactive = TRUE}).
 }
 }
 \description{
