@@ -54,7 +54,7 @@ a numeric vector.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">zscore</span><span class="op">(</span><span class="va">x</span>, robust <span class="op">=</span> <span class="cn">TRUE</span>, drop.na <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">zscore</span><span class="op">(</span><span class="va">x</span>, robust <span class="op">=</span> <span class="cn">FALSE</span>, drop.na <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -64,7 +64,7 @@ a numeric vector.</p>
 
 
 <dt>robust</dt>
-<dd><p>A logical value indicating whether to calculate classical or robust (default) z-score.</p></dd>
+<dd><p>A logical value indicating whether to calculate classical or robust z-score. Default is <code>FALSE</code>, uses the classical approach.</p></dd>
 
 
 <dt>drop.na</dt>
@@ -104,7 +104,7 @@ Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 1(1), 73-7
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">100</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Non-robust approach</span></span></span>
-<span class="r-in"><span><span class="fu">zscore</span><span class="op">(</span><span class="va">x</span>, robust <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">zscore</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 2</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    data  score</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
@@ -116,7 +116,7 @@ Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 1(1), 73-7
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>     1 -<span style="color: #BB0000;">0.458</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Robust approach</span></span></span>
-<span class="r-in"><span><span class="fu">zscore</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">zscore</span><span class="op">(</span><span class="va">x</span>, robust <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 2</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    data  score</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
