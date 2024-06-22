@@ -4,12 +4,12 @@
 \alias{zscore}
 \title{Classical or Robust Z-Score}
 \usage{
-zscore(x, robust = TRUE, drop.na = FALSE)
+zscore(x, robust = FALSE, drop.na = FALSE)
 }
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{robust}{A logical value indicating whether to calculate classical or robust (default) z-score.}
+\item{robust}{A logical value indicating whether to calculate classical or robust z-score. Default is \code{FALSE}, uses the classical approach.}
 
 \item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.}
 }
@@ -35,10 +35,10 @@ that covers 99.7\% of the data points in a normal distribution. (Note that a cut
 \examples{
 x <- c(1:5, 100)
 # Non-robust approach
-zscore(x, robust = FALSE)
+zscore(x)
 
 # Robust approach
-zscore(x)
+zscore(x, robust = TRUE)
 
 }
 \references{

@@ -21,7 +21,7 @@
 #' @author Christian L. Goueguel
 #'
 #' @param x A numeric vector.
-#' @param robust A logical value indicating whether to calculate classical or robust (default) z-score.
+#' @param robust A logical value indicating whether to calculate classical or robust z-score. Default is `FALSE`, uses the classical approach.
 #' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.
 #'
 #' @return A tibble with two columns:
@@ -31,14 +31,14 @@
 #' @examples
 #' x <- c(1:5, 100)
 #' # Non-robust approach
-#' zscore(x, robust = FALSE)
+#' zscore(x)
 #'
 #' # Robust approach
-#' zscore(x)
+#' zscore(x, robust = TRUE)
 #'
 #' @export zscore
 #'
-zscore <- function(x, robust = TRUE, drop.na = FALSE) {
+zscore <- function(x, robust = FALSE, drop.na = FALSE) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
