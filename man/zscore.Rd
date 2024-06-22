@@ -21,7 +21,8 @@ A tibble with two columns:
 }
 }
 \description{
-This function is a wrapper around the \code{robustHD} package and calculates classical or robust z-score (standardization) for a numeric vector.
+This function calculates classical or robust z-score (standardization) for
+a numeric vector.
 }
 \details{
 Z-scores are useful for comparing data points from different distributions because they are
