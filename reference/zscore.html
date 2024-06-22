@@ -64,7 +64,7 @@ a numeric vector.</p>
 
 
 <dt>robust</dt>
-<dd><p>A logical value indicating whether to calculate classical or robust z-score. Default is <code>FALSE</code>, uses the classical approach.</p></dd>
+<dd><p>A logical value indicating whether to calculate classical or robust z-score. If <code>FALSE</code> (the default), uses the classical approach. If <code>TRUE</code>, computes the robust method, i.e. the so-called Stahel-Donoho outlyingness.</p></dd>
 
 
 <dt>drop.na</dt>
@@ -90,10 +90,18 @@ that covers 99.7% of the data points in a normal distribution. (Note that a cuto
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     
-<ul><li><p>Rousseeuw, P. J., and Croux, C. (1993). Alternatives to the median absolute deviation.
+<ul><li><p>Rousseeuw, P. J., and Croux, C. (1993).
+Alternatives to the median absolute deviation.
 Journal of the American Statistical Association, 88(424), 1273-1283.</p></li>
-<li><p>Rousseeuw, P. J., and Hubert, M. (2011). Robust statistics for outlier detection.
+<li><p>Rousseeuw, P. J., and Hubert, M. (2011).
+Robust statistics for outlier detection.
 Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 1(1), 73-79.</p></li>
+<li><p>Donoho, D., (1982).
+Breakdown properties of multivariate location estimators.
+Ph.D. Qualifying paper, Dept. Statistics, Harvard University, Boston.</p></li>
+<li><p>Stahel, W., (1981).
+Robuste Schätzungen: infinitesimale Optimalität und Schätzungen vonKovarianzmatrizen.
+PhD thesis, ETH Zürich.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
