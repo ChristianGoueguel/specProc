@@ -13,15 +13,23 @@
 #' that covers 99.7% of the data points in a normal distribution. (Note that a cutoff of |z| > 2.5 is also often used).
 #'
 #' @references
-#' - Rousseeuw, P. J., and Croux, C. (1993). Alternatives to the median absolute deviation.
+#' - Rousseeuw, P. J., and Croux, C. (1993).
+#'   Alternatives to the median absolute deviation.
 #'   Journal of the American Statistical Association, 88(424), 1273-1283.
-#' - Rousseeuw, P. J., and Hubert, M. (2011). Robust statistics for outlier detection.
+#' - Rousseeuw, P. J., and Hubert, M. (2011).
+#'   Robust statistics for outlier detection.
 #'   Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 1(1), 73-79.
+#' - Donoho, D., (1982).
+#'   Breakdown properties of multivariate location estimators.
+#'   Ph.D. Qualifying paper, Dept. Statistics, Harvard University, Boston.
+#' - Stahel, W., (1981).
+#'   Robuste Schätzungen: infinitesimale Optimalität und Schätzungen vonKovarianzmatrizen.
+#'   PhD thesis, ETH Zürich.
 #'
 #' @author Christian L. Goueguel
 #'
 #' @param x A numeric vector.
-#' @param robust A logical value indicating whether to calculate classical or robust z-score. Default is `FALSE`, uses the classical approach.
+#' @param robust A logical value indicating whether to calculate classical or robust z-score. If `FALSE` (the default), uses the classical approach. If `TRUE`, computes the robust method, i.e. the so-called Stahel-Donoho outlyingness.
 #' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.
 #'
 #' @return A tibble with two columns:

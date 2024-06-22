@@ -9,7 +9,7 @@ zscore(x, robust = FALSE, drop.na = FALSE)
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{robust}{A logical value indicating whether to calculate classical or robust z-score. Default is \code{FALSE}, uses the classical approach.}
+\item{robust}{A logical value indicating whether to calculate classical or robust z-score. If \code{FALSE} (the default), uses the classical approach. If \code{TRUE}, computes the robust method, i.e. the so-called Stahel-Donoho outlyingness.}
 
 \item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.}
 }
@@ -43,10 +43,18 @@ zscore(x, robust = TRUE)
 }
 \references{
 \itemize{
-\item Rousseeuw, P. J., and Croux, C. (1993). Alternatives to the median absolute deviation.
+\item Rousseeuw, P. J., and Croux, C. (1993).
+Alternatives to the median absolute deviation.
 Journal of the American Statistical Association, 88(424), 1273-1283.
-\item Rousseeuw, P. J., and Hubert, M. (2011). Robust statistics for outlier detection.
+\item Rousseeuw, P. J., and Hubert, M. (2011).
+Robust statistics for outlier detection.
 Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 1(1), 73-79.
+\item Donoho, D., (1982).
+Breakdown properties of multivariate location estimators.
+Ph.D. Qualifying paper, Dept. Statistics, Harvard University, Boston.
+\item Stahel, W., (1981).
+Robuste Schätzungen: infinitesimale Optimalität und Schätzungen vonKovarianzmatrizen.
+PhD thesis, ETH Zürich.
 }
 }
 \author{
