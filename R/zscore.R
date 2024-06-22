@@ -48,8 +48,6 @@ zscore <- function(x, robust = TRUE, drop.na = FALSE) {
     stop("The input 'robust' must be a logical value (TRUE or FALSE).")
   }
 
-  requireNamespace("robustHD", quietly = TRUE)
-
   if (drop.na) {
     x <- x[!is.na(x)]
   }
@@ -60,9 +58,9 @@ zscore <- function(x, robust = TRUE, drop.na = FALSE) {
   x <- tibble::enframe(x)
 
   if (robust) {
-    z <- dplyr::mutate(x, score = robustHD::robStandardize(value))
+    z <- dplyr::mutate(x, score = standardize(value, loc.fun = stats::median, scale.fun = stats::mad))
   } else {
-    z <- dplyr::mutate(x, score = robustHD::standardize(value))
+    z <- dplyr::mutate(x, score = standardize(value, loc.fun = mean, scale.fun = sd))
   }
 
   z <- z %>%
@@ -72,3 +70,18 @@ zscore <- function(x, robust = TRUE, drop.na = FALSE) {
 
   return(z)
 }
+
+
+standardize <- function(x, loc.fun, scale.fun) {
+  c <- loc.fun(x)
+  s <- scale.fun(x)
+  res <- (x - c) / s
+  return(res)
+}
+
+
+
+
+
+
+
