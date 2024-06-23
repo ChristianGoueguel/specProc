@@ -89,17 +89,10 @@ proposed by Rousseeuw <em>et al.</em> (2017).</p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     
 
-<p>A tibble with columns:</p>
-<dl><dt>data</dt>
-<dd><p>The original input data</p></dd>
-
-<dt>score</dt>
-<dd><p>The calculated outlyingness score</p></dd>
-
-<dt>outlier</dt>
-<dd><p>Logical; TRUE if the point is identified as potantial outlier</p></dd>
-
-</dl></div>
+<p>A tibble with columns:</p><ul><li><p><code>data</code>: The original numeric values.</p></li>
+<li><p><code>score</code>: The calculated outlyingness score.</p></li>
+<li><p><code>outlier</code>: A logical vector indicating whether each value is a potential outlier or not.</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Directional outlyingness takes the potential skewness of the underlying
