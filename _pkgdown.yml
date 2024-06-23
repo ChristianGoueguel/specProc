@@ -9,6 +9,7 @@ reference:
   contents:
   - zscore
   - iqrMethod
+  - directOutlyingness
 
 - title: Multivariate filtering
 
