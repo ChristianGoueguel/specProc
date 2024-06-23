@@ -33,13 +33,14 @@ A tibble with columns:
 }
 \description{
 This function computes the directional outlyingness of a numeric vector, as
-proposed by Rousseeuw \emph{et al.} (2017).
+proposed by Rousseeuw \emph{et al.} (2018), which is a measure of outlyingness of
+data point that takes the skewness of the underlying distribution into account.
 }
 \details{
 Directional outlyingness takes the potential skewness of the underlying
-distribution into account, while attaining a smaller computation time and bias.
-The main idea is to split the sample into two half samples, and then to apply
-a robust scale estimator to each of them.
+distribution into account, by the splitting the univariate dataset in two half
+samples around the median. And then apply one-step M-estimator with Huber
+\eqn{\rho}-function for scaling each part.
 }
 \examples{
 vec <- c(1, 5, 3, 9, 2, 6, 4, 8, 7, 1e3)
