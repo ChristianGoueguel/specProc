@@ -24,9 +24,9 @@
 #' @param precScale A numeric value specifying the precision scale for near-zero comparisons (default: 1e-10).
 #'
 #' @return A tibble with columns:
-#'   \item{data}{The original input data}
-#'   \item{score}{The calculated outlyingness score}
-#'   \item{outlier}{Logical; TRUE if the point is identified as potantial outlier}
+#'   - `data`: The original numeric values.
+#'   - `score`: The calculated outlyingness score.
+#'   - `outlier`: A logical vector indicating whether each value is a potential outlier or not.
 #'
 #' @export directOutlyingness
 #'

@@ -25,9 +25,11 @@ directOutlyingness(
 }
 \value{
 A tibble with columns:
-\item{data}{The original input data}
-\item{score}{The calculated outlyingness score}
-\item{outlier}{Logical; TRUE if the point is identified as potantial outlier}
+\itemize{
+\item \code{data}: The original numeric values.
+\item \code{score}: The calculated outlyingness score.
+\item \code{outlier}: A logical vector indicating whether each value is a potential outlier or not.
+}
 }
 \description{
 This function computes the directional outlyingness of a numeric vector, as
