@@ -2,7 +2,7 @@
 % Please edit documentation in R/outlierplot.R
 \name{outlierplot}
 \alias{outlierplot}
-\title{Univariate representation of multivariate outliers}
+\title{Univariate Representation of Multivariate Outliers}
 \usage{
 outlierplot(
   x,

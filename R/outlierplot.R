@@ -1,4 +1,4 @@
-#' @title Univariate representation of multivariate outliers
+#' @title Univariate Representation of Multivariate Outliers
 #'
 #' @author Christian L. Goueguel
 #'
