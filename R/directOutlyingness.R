@@ -36,6 +36,21 @@
 #' directOutlyingness(vec)
 #'
 directOutlyingness <- function(x, cutoff.quantile = 0.995, rmZeroes = FALSE, maxRatio = NULL, precScale = 1e-10) {
+  if (missing(x)) {
+    stop("Missing 'x' argument.")
+  }
+  if (!is.numeric(x)) {
+    stop("The input 'x' must be a numeric vector.")
+  }
+  if (!is.numeric(cutoff.quantile) || cutoff.quantile < 0 || cutoff.quantile > 1) {
+    stop("The input 'cutoff.quantile' must be a numeric value between 0 and 1.")
+  }
+  if (!is.logical(rmZeroes)) {
+    stop("'rmZeroes' must be of type boolean (TRUE or FALSE)")
+  }
+  if (!is.numeric(precScale) || precScale < 0) {
+    stop("'precScale' must be a positive numeric value.")
+  }
 
   x <- x[!is.na(x)]
   med <- stats::median(x)

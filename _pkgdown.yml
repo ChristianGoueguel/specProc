@@ -9,7 +9,10 @@ reference:
   contents:
   - zscore
   - iqrMethod
+  - outlierplot
+  - adjusted_boxplot
   - directOutlyingness
+  - generalized_boxplot
 
 - title: Multivariate filtering
 
@@ -51,8 +54,6 @@ reference:
   contents:
   - plotfit
   - plotSpec
-  - adjusted_boxplot
-  - generalized_boxplot
 
 - title: Smoothing
   desc: >
