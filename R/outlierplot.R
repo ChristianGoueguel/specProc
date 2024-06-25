@@ -25,7 +25,7 @@
 #'  - A `ggplot` object with Mahalanobis distances color-coded (if `show.mahal = TRUE`)
 #'  - A `ggplot` object combining both outlier highlighting and Mahalanobis distance color-coding
 #'   (if both `show.outlier` and `show.mahal` are `TRUE`)
-#'  - A tibble containing standardized scores, outlier flags, and Mahalanobis distances
+#'  - A tibble containing standardized scores, outlier flags, and robust multivariate Mahalanobis distances
 #'   (if both `show.outlier` and `show.mahal` are `FALSE`)
 #'
 #' @export outlierplot
@@ -86,6 +86,7 @@ outlierplot <- function(x, quan = 1/2, alpha = 0.025, show.outlier = TRUE, show.
   s_df <- as.data.frame(sx)
   colnames(s_df) <- colnames(x)
 
+  set.seed(123)
   s_df <- s_df %>%
     tibble::as_tibble() %>%
     dplyr::mutate(
@@ -131,9 +132,14 @@ outlierplot <- function(x, quan = 1/2, alpha = 0.025, show.outlier = TRUE, show.
       mid = "green",
       high = "blue",
       midpoint = 0) +
-    ggplot2::guides(color = ggplot2::guide_colorbar())
+    ggplot2::guides(color = ggplot2::guide_colorbar()) +
+    ggplot2::labs(color = "Robust\nMahalanobis")
 
-  p_all <- p_mahal + ggplot2::aes(shape = outlier)
+  p_all <- p +
+    ggplot2::geom_point(ggplot2::aes(color = mahalanobis, shape = outlier)) +
+    ggplot2::scale_color_viridis_c(option = "plasma") +
+    ggplot2::scale_shape_manual(values = c("FALSE" = 1, "TRUE" = 17)) +
+    ggplot2::labs(color = "Robust\nMahalanobis", shape = "Outlier")
 
   if (show.outlier == TRUE && show.mahal == FALSE) {
     return(p_outl)

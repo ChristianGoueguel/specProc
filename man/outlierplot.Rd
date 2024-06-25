@@ -30,7 +30,7 @@ Depending on the combination of \code{show.outlier} and \code{show.mahal}:
 \item A \code{ggplot} object with Mahalanobis distances color-coded (if \code{show.mahal = TRUE})
 \item A \code{ggplot} object combining both outlier highlighting and Mahalanobis distance color-coding
 (if both \code{show.outlier} and \code{show.mahal} are \code{TRUE})
-\item A tibble containing standardized scores, outlier flags, and Mahalanobis distances
+\item A tibble containing standardized scores, outlier flags, and robust multivariate Mahalanobis distances
 (if both \code{show.outlier} and \code{show.mahal} are \code{FALSE})
 }
 }
