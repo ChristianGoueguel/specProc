@@ -9,18 +9,13 @@ normalize(x, method = "area", bkg = NULL, wlength = NULL, drop.na = TRUE)
 \arguments{
 \item{x}{A numeric matrix or data frame containing the spectra.}
 
-\item{method}{A character vector specifying the normalization method to apply.
-Available methods are: "area", "background", and "internal".}
+\item{method}{A character vector specifying the normalization method to apply. Available methods are: "area", "background", and "internal".}
 
-\item{bkg}{A numeric matrix or data frame of the same dimension as \code{x}, specifying
-the intensity of the continuum radiation (background emission) used for
-normalizing \code{x}. Required for "background" method.}
+\item{bkg}{A numeric matrix or data frame of the same dimension as \code{x}, specifying the intensity of the continuum radiation (background emission) used for normalizing \code{x}. Required for "background" method.}
 
-\item{wlength}{A character vector of the selected wavelength(s) related to the
-internal standard(s) peak intensity. Optional for "background" method.}
+\item{wlength}{A character vector of the selected wavelength(s) related to the internal standard(s) peak intensity. Optional for "background" method.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values before
-normalizing (default: \code{TRUE}).}
+\item{drop.na}{A logical value indicating whether to remove missing values before normalizing. Default is \code{TRUE}.}
 }
 \value{
 A data frame of normalized spectra.

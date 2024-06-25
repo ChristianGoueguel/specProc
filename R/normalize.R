@@ -35,15 +35,10 @@
 #'      spectra, Trends in Analytical Chemistry, 28(10):1201-1222.
 #'
 #' @param x A numeric matrix or data frame containing the spectra.
-#' @param method A character vector specifying the normalization method to apply.
-#'   Available methods are: "area", "background", and "internal".
-#' @param bkg A numeric matrix or data frame of the same dimension as `x`, specifying
-#'   the intensity of the continuum radiation (background emission) used for
-#'   normalizing `x`. Required for "background" method.
-#' @param wlength A character vector of the selected wavelength(s) related to the
-#'   internal standard(s) peak intensity. Optional for "background" method.
-#' @param drop.na A logical value indicating whether to remove missing values before
-#'   normalizing (default: `TRUE`).
+#' @param method A character vector specifying the normalization method to apply. Available methods are: "area", "background", and "internal".
+#' @param bkg A numeric matrix or data frame of the same dimension as `x`, specifying the intensity of the continuum radiation (background emission) used for normalizing `x`. Required for "background" method.
+#' @param wlength A character vector of the selected wavelength(s) related to the internal standard(s) peak intensity. Optional for "background" method.
+#' @param drop.na A logical value indicating whether to remove missing values before normalizing. Default is `TRUE`.
 #'
 #' @return A data frame of normalized spectra.
 #'

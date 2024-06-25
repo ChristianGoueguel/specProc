@@ -9,10 +9,7 @@ reference:
   contents:
   - zscore
   - iqrMethod
-  - outlierplot
-  - adjusted_boxplot
   - directOutlyingness
-  - generalized_boxplot
 
 - title: Multivariate filtering
 
@@ -50,10 +47,13 @@ reference:
 
 - title: Data visualization
   desc: >
-    Functions that help visualize the state of the data.
+    Functions that help assess data visually.
   contents:
   - plotfit
   - plotSpec
+  - outlierplot
+  - adjusted_boxplot
+  - generalized_boxplot
 
 - title: Smoothing
   desc: >

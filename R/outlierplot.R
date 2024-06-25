@@ -60,13 +60,19 @@ outlierplot <- function(x, quan = 1/2, alpha = 0.025, show.outlier = TRUE, show.
   if (!is.numeric(quan) || quan < 0.5 || quan > 1) {
     stop("'quan' must be a numeric value between 0.5 and 1")
   }
+  if (!is.logical(show.outlier)) {
+    stop("'show.outlier' must be of type boolean (TRUE or FALSE)")
+  }
+  if (!is.logical(show.mahal)) {
+    stop("'show.mahal' must be of type boolean (TRUE or FALSE)")
+  }
 
   if (is.data.frame(x) || tibble::is_tibble(x)) {
     x <- as.matrix(x)
   }
 
   rob <- robustbase::covMcd(x, alpha = quan)
-  xarw <- adapt_reweight(x, rob$center, rob$cov, alpha = alpha)
+  xarw <- covARW(x, rob$center, rob$cov, alpha = alpha)
 
   if (xarw$cn != Inf) {
     alpha <- sqrt(c(xarw$cn, stats::qchisq(c(0.75, 0.5, 0.25), ncol(x))))
@@ -160,7 +166,7 @@ outlierplot <- function(x, quan = 1/2, alpha = 0.025, show.outlier = TRUE, show.
 }
 
 
-adapt_reweight <- function(x, m0, c0, alpha, pcrit){
+covARW <- function(x, m0, c0, alpha, pcrit){
   n <- nrow(x)
   p <- ncol(x)
 
