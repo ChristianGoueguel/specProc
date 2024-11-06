@@ -1,171 +1,59 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/404.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/index.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/adjusted_boxplot.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/average.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/baseline_arpls.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/baseline_lsp.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/biweight_location.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/biweight_midcorrelation.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/biweight_midcovariance.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/biweight_midvariance.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/biweight_scale.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/center.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/correlation.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/directOutlyingness.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/direct_orthogonal.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/direct_osc.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/epo.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/gaussian.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/generalized_boxplot.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/glsw.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/iqrMethod.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/lorentzian.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/medcouple_weight.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/minmax.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/msc.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/multipeakfit.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/nas.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/normalize.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/o2pls.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/opls.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/osc.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/outlierplot.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/pareto.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/pds.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/peakfit.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/pipe.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/plotSpec.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/plotfit.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/poisson_scale.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/projected_osc.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/pseudo_voigt.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/quantile_weight.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/robustBCYJ.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/rousseeuwCroux.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/snv.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/specProc-package.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/summaryStats.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/tukeyGH.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/umad.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/whittaker.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/yGradientglsw.html</loc>
-  </url>
-  <url>
-    <loc>https://christiangoueguel.github.io/specProc/reference/zscore.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://christiangoueguel.github.io/specProc/404.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/LICENSE-text.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/authors.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/index.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/news/index.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/adjusted_boxplot.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/average.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/baseline_arpls.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/baseline_lsp.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/biweight_location.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/biweight_midcorrelation.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/biweight_midcovariance.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/biweight_midvariance.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/biweight_scale.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/center.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/correlation.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/directOutlyingness.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/direct_orthogonal.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/direct_osc.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/epo.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/gaussian.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/generalized_boxplot.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/glsw.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/index.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/iqrMethod.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/lorentzian.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/medcouple_weight.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/minmax.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/msc.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/multipeakfit.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/nas.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/normalize.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/o2pls.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/opls.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/osc.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/outlierplot.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/pareto.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/pds.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/peakfit.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/pipe.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/plotSpec.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/plotfit.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/poisson_scale.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/projected_osc.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/pseudo_voigt.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/quantile_weight.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/robustBCYJ.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/rousseeuwCroux.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/snv.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/specProc-package.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/summaryStats.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/tukeyGH.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/umad.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/whittaker.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/yGradientglsw.html</loc></url>
+<url><loc>https://christiangoueguel.github.io/specProc/reference/zscore.html</loc></url>
 </urlset>
+
