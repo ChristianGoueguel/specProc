@@ -28,7 +28,7 @@ A tibble with columns:
 \itemize{
 \item \code{data}: The original numeric values.
 \item \code{score}: The calculated outlyingness score.
-\item \code{outlier}: A logical vector indicating whether each value is a potential outlier or not.
+\item \code{flag}: A logical vector indicating whether each value is a potential outlier or not.
 }
 }
 \description{
@@ -43,8 +43,8 @@ samples around the median. And then apply one-step M-estimator with Huber
 \eqn{\rho}-function for scaling each part.
 }
 \examples{
-vec <- c(1, 5, 3, 9, 2, 6, 4, 8, 7, 1e3)
-directOutlyingness(vec)
+x <- c(1, 5, 3, 9, 2, 6, 4, 8, 7, 1e3)
+directOutlyingness(x)
 
 }
 \references{

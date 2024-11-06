@@ -45,7 +45,7 @@
 #'
 #' @return A tibble with two columns:
 #'   - `data`: The original numeric values.
-#'   - `outlier`: A logical vector indicating whether each value is a potential outlier or not.
+#'   - `flag`: A logical vector indicating whether each value is a potential outlier or not.
 #' @examples
 #' set.seed(3317)
 #' x <- stats::rexp(7, rate = 0.5)
@@ -56,6 +56,7 @@
 #' @export iqrMethod
 #'
 iqrMethod <- function(x, k = 1.5, skew = FALSE, drop.na = FALSE) {
+  options(mc_doScale_quiet = TRUE)
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -78,7 +79,7 @@ iqrMethod <- function(x, k = 1.5, skew = FALSE, drop.na = FALSE) {
   iqr <- q3 - q1
 
   value <- NULL
-  outlier <- NULL
+  flag <- NULL
   name <- NULL
   x_tbl <- tibble::enframe(x)
 
@@ -100,10 +101,10 @@ iqrMethod <- function(x, k = 1.5, skew = FALSE, drop.na = FALSE) {
   }
 
   x_tbl <- x_tbl %>%
-    dplyr::mutate(outlier = value < lower_fence | value > upper_fence) %>%
+    dplyr::mutate(flag = value < lower_fence | value > upper_fence) %>%
     dplyr::select(-name) %>%
     dplyr::rename(data = value) %>%
-    dplyr::arrange(dplyr::desc(outlier))
+    dplyr::arrange(dplyr::desc(flag))
 
   return(x_tbl)
 }

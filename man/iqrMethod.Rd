@@ -26,7 +26,7 @@ In such cases, the code will automatically reset \code{k} to 1.5 and proceed wit
 A tibble with two columns:
 \itemize{
 \item \code{data}: The original numeric values.
-\item \code{outlier}: A logical vector indicating whether each value is a potential outlier or not.
+\item \code{flag}: A logical vector indicating whether each value is a potential outlier or not.
 }
 }
 \description{

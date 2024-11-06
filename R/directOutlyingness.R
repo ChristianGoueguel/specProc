@@ -27,13 +27,13 @@
 #' @return A tibble with columns:
 #'   - `data`: The original numeric values.
 #'   - `score`: The calculated outlyingness score.
-#'   - `outlier`: A logical vector indicating whether each value is a potential outlier or not.
+#'   - `flag`: A logical vector indicating whether each value is a potential outlier or not.
 #'
 #' @export directOutlyingness
 #'
 #' @examples
-#' vec <- c(1, 5, 3, 9, 2, 6, 4, 8, 7, 1e3)
-#' directOutlyingness(vec)
+#' x <- c(1, 5, 3, 9, 2, 6, 4, 8, 7, 1e3)
+#' directOutlyingness(x)
 #'
 directOutlyingness <- function(x, cutoff.quantile = 0.995, rmZeroes = FALSE, maxRatio = NULL, precScale = 1e-10) {
   if (missing(x)) {
@@ -86,7 +86,7 @@ directOutlyingness <- function(x, cutoff.quantile = 0.995, rmZeroes = FALSE, max
   tbl <- tibble::tibble(
     data = x,
     score = res,
-    outlier = dplyr::if_else(res > cutoff, TRUE, FALSE)
+    flag = dplyr::if_else(res > cutoff, TRUE, FALSE)
   ) %>%
     dplyr::arrange(dplyr::desc(score))
 
@@ -132,7 +132,6 @@ scale1StepM <- function(x, precScale) {
     }
   }
 }
-
 
 computeCutoff <- function(outl, quant) {
   Ltemp <- log(0.1 + outl)
