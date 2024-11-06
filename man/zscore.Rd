@@ -4,10 +4,12 @@
 \alias{zscore}
 \title{Classical or Robust Z-Score}
 \usage{
-zscore(x, robust = FALSE, drop.na = FALSE)
+zscore(x, cutoff = 3, robust = FALSE, drop.na = FALSE)
 }
 \arguments{
 \item{x}{A numeric vector.}
+
+\item{cutoff}{A numeric value indicating the threshold above which data points are identified and flagged as potential outliers. By default, \code{cutoff = 3}.}
 
 \item{robust}{A logical value indicating whether to calculate classical or robust z-score. If \code{FALSE} (the default), uses the classical approach. If \code{TRUE}, computes the robust method, i.e. the so-called Stahel-Donoho outlyingness.}
 
@@ -18,6 +20,7 @@ A tibble with two columns:
 \itemize{
 \item \code{data}: The original numeric values.
 \item \code{score}: The calculated z-scores.
+\item \code{flag}: \code{TRUE} if the corresponding data point is flagged as a potential outlier, and \code{FALSE} otherwise.
 }
 }
 \description{
@@ -29,7 +32,7 @@ Z-scores are useful for comparing data points from different distributions becau
 dimensionless and standardized. A positive z-score indicates that the data point is above the
 mean (or the median in the robust approach), while a negative z-score indicates that the data point is below the mean (or the median). One common rule
 to detect outliers using z-scores is the "three-sigma rule", in which data points with an absolute
-z-score greater than 3 (|z| > 3) can be considered potential outliers, as they fall outside the range
+z-score greater than 3 (|z| > 3) can be considered potential outliers (default), as they fall outside the range
 that covers 99.7\% of the data points in a normal distribution. (Note that a cutoff of |z| > 2.5 is also often used).
 }
 \examples{

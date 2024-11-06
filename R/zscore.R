@@ -9,7 +9,7 @@
 #' dimensionless and standardized. A positive z-score indicates that the data point is above the
 #' mean (or the median in the robust approach), while a negative z-score indicates that the data point is below the mean (or the median). One common rule
 #' to detect outliers using z-scores is the "three-sigma rule", in which data points with an absolute
-#' z-score greater than 3 (|z| > 3) can be considered potential outliers, as they fall outside the range
+#' z-score greater than 3 (|z| > 3) can be considered potential outliers (default), as they fall outside the range
 #' that covers 99.7% of the data points in a normal distribution. (Note that a cutoff of |z| > 2.5 is also often used).
 #'
 #' @references
@@ -31,10 +31,12 @@
 #' @param x A numeric vector.
 #' @param robust A logical value indicating whether to calculate classical or robust z-score. If `FALSE` (the default), uses the classical approach. If `TRUE`, computes the robust method, i.e. the so-called Stahel-Donoho outlyingness.
 #' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.
+#' @param cutoff A numeric value indicating the threshold above which data points are identified and flagged as potential outliers. By default, `cutoff = 3`.
 #'
 #' @return A tibble with two columns:
 #'   - `data`: The original numeric values.
 #'   - `score`: The calculated z-scores.
+#'   - `flag`: `TRUE` if the corresponding data point is flagged as a potential outlier, and `FALSE` otherwise.
 #'
 #' @examples
 #' x <- c(1:5, 100)
@@ -46,7 +48,7 @@
 #'
 #' @export zscore
 #'
-zscore <- function(x, robust = FALSE, drop.na = FALSE) {
+zscore <- function(x, cutoff = 3, robust = FALSE, drop.na = FALSE) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -75,7 +77,8 @@ zscore <- function(x, robust = FALSE, drop.na = FALSE) {
   z <- z %>%
     dplyr::select(-name) %>%
     dplyr::rename(data = value) %>%
-    dplyr::arrange(dplyr::desc(score))
+    dplyr::arrange(dplyr::desc(score)) %>%
+    dplyr::mutate(flag = abs(score) > cutoff)
 
   return(z)
 }
