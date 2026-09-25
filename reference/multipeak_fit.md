@@ -35,8 +35,8 @@ multipeak_fit(
 - profiles:
 
   A character vector of the lineshape functions for fitting, one per
-  peak or a single one used for all peaks: "lorentzian", "gaussian" or
-  "voigt" (case insensitive).
+  peak or a single one used for all peaks: "lorentzian", "gaussian",
+  "voigt" (exact) or "pseudo_voigt" (case insensitive).
 
 - wL:
 

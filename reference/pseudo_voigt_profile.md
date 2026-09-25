@@ -119,6 +119,11 @@ of 0.02%).
   for approximating the Voigt profile. Journal of Applied
   Crystallography. 33(6):1311–1316.
 
+## See also
+
+[`voigt_profile()`](https://christiangoueguel.com/specProc/reference/voigt_profile.md)
+for the exact Voigt profile.
+
 ## Examples
 
 ``` r

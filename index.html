@@ -57,132 +57,482 @@
 <img src="logo.png" class="logo" alt=""><h1 id="specproc-">specProc <a class="anchor" aria-label="anchor" href="#specproc-"></a>
 </h1>
 </div>
-<p><a href="https://www.repostatus.org/#active" class="external-link"><img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public."></a> <a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a> <a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a> <a href="https://app.codecov.io/gh/ChristianGoueguel/specProc?branch=main" class="external-link"><img src="https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://github.com/ChristianGoueguel/specProc/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/ChristianGoueguel/specProc/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <img src="https://img.shields.io/github/last-commit/ChristianGoueguel/specProc" alt="GitHub last commit"><img src="https://img.shields.io/github/repo-size/ChristianGoueguel/specProc" alt="GitHub repo size"><img src="https://img.shields.io/github/r-package/v/ChristianGoueguel/specProc" alt="GitHub R package version"><img src="https://img.shields.io/github/languages/count/ChristianGoueguel/specProc" alt="GitHub language count"></p>
-<!-- badges: end -->
-<p><strong>Testing and experimenting.</strong></p>
-<p>The <code>specProc</code> package performs a wide range of preprocessing tasks essential for spectroscopic data analysis. Spectral preprocessing is essential in ensuring accurate and reliable results by minimizing the impact of various distortions and artifacts that can arise during data acquisition or due to inherent characteristics of the sample or instrument.</p>
-<p>Some techniques are purely based on mathematical concepts, relying on robust statistics and signal processing techniques. Other methods are inspired by the physicochemical context of the dataset. These techniques rely on domain knowledge and exploit the fundamental principles governing the spectroscopic phenomenon used.</p>
+<!-- badges: start -->
+
+<p><strong>specProc</strong> is an R package for preprocessing and exploring emission spectra, with a focus on laser-induced breakdown spectroscopy (LIBS). It covers the full chain between raw detector counts and a data matrix ready for modeling:</p>
+<ul>
+<li>
+<strong>Baseline correction</strong>: asymmetric least squares, arPLS, and iterative polynomial fitting.</li>
+<li>
+<strong>Normalization and scaling</strong>: SNV, MSC, area, background and internal-standard normalization; Pareto, Poisson and min-max scaling.</li>
+<li>
+<strong>Removing unwanted variation</strong>: OSC (three algorithms), direct orthogonalization, DOSC, NAS, O2PLS, projected OSC, EPO, GLSW.</li>
+<li>
+<strong>Calibration transfer</strong> between instruments: PDS, GLSW.</li>
+<li>
+<strong>Line fitting</strong>: exact Voigt, pseudo-Voigt, Gaussian and Lorentzian profiles, for single or overlapping lines.</li>
+<li>
+<strong>Robust statistics and outlier detection</strong>: biweight estimators, Rousseeuw–Croux Sn/Qn, bias-corrected MAD, medcouple-based skewness and tail weights, adjusted and generalized boxplots, directional outlyingness.</li>
+</ul>
+<p>The computationally heavy steps are written in C++: penalized baselines use a banded solver, the Voigt profile uses the Faddeeva function, and the large matrix decompositions use Eigen. This keeps the package practical for data sets with thousands of spectra and channels.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<p>specProc is not yet on CRAN. Install the development version from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ChristianGoueguel/specProc"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ChristianGoueguel/specProc"</span><span class="op">)</span></span></code></pre></div>
+<p>A C++ compiler is needed to build the package from source (Rtools on Windows, Xcode Command Line Tools on macOS). <code><a href="reference/opls.html">opls()</a></code> additionally needs the Bioconductor package ropls: <code>BiocManager::install("ropls")</code>.</p>
 </div>
 <div class="section level2">
-<h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
+<h2 id="design-principles">Design principles<a class="anchor" aria-label="anchor" href="#design-principles"></a>
 </h2>
+<ul>
+<li>
+<strong>Tidy in, tidy out.</strong> Spectra are stored one per row, and the column names are the wavelengths. Functions accept matrices, data frames or tibbles and return tibbles.</li>
+<li>
+<strong>Preprocessing parameters are returned, not hidden.</strong> Centers, scales, reference spectra, filter matrices and loadings come back with the result. You can then estimate a transformation on calibration data and apply exactly the same transformation to new data.</li>
+<li>
+<strong>Robust alternatives are available alongside the classical estimators.</strong> Emission spectra contain outlying shots, saturated channels and heavy tails, and the robust estimators are designed for them.</li>
+<li>
+<strong>The numerics are tested against references.</strong> The test suite (more than 400 expectations) checks results against analytic values, dense reference solvers and independent implementations, such as the Bioconductor ropls package for OPLS.</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="example-data">Example data<a class="anchor" aria-label="anchor" href="#example-data"></a>
+</h2>
+<p>The package ships with <code>specLIBS</code>: LIBS spectra of <strong>50 soil samples</strong>, each measured at <strong>8 locations</strong>. The spectra have 7152 channels between 199 and 822 nm, stored as raw counts, together with the clay, sand and silt content of each sample.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">02301</span><span class="op">)</span></span>
-<span><span class="va">tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  normal <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span>,</span>
-<span>  skewed <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fl">100</span>, shape <span class="op">=</span> <span class="fl">2</span>, scale <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  heavy_tailed <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Cauchy.html" class="external-link">rcauchy</a></span><span class="op">(</span><span class="fl">100</span>, location <span class="op">=</span> <span class="fl">0</span>, scale <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-3-1.png" width="90%" height="90%"></p>
-<div class="section level3">
-<h3 id="descriptive-statistics">descriptive statistics<a class="anchor" aria-label="anchor" href="#descriptive-statistics"></a>
-</h3>
-<div class="section level4">
-<h4 id="classical-approach">classical approach<a class="anchor" aria-label="anchor" href="#classical-approach"></a>
-</h4>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/summary_stats.html">summary_stats</a></span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 3 × 14</span></span>
-<span><span class="co">#&gt;   variable    mean  mode median   IQR    sd variance      cv     min   max range</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 normal      0    -0.4   -0.14  1.04  0.91     0.82 -2.66e4  -1.80   2.54  4.34</span></span>
-<span><span class="co">#&gt; 2 skewed      1.83  6.82   1.37  1.32  1.32     1.73  7.20e1   0.160  6.82  6.66</span></span>
-<span><span class="co">#&gt; 3 heavy_tai…  0.44 -1.74  -0.22  2.36  6.54    42.7   1.50e3 -19.4   41.5  60.9 </span></span>
-<span><span class="co">#&gt; # ℹ 3 more variables: skewness &lt;dbl&gt;, kurtosis &lt;dbl&gt;, count &lt;int&gt;</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="robust-approach">robust approach<a class="anchor" aria-label="anchor" href="#robust-approach"></a>
-</h4>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/summary_stats.html">summary_stats</a></span><span class="op">(</span><span class="va">tbl</span>, robust <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 3 × 13</span></span>
-<span><span class="co">#&gt;   variable    median   mad    Qn    Sn medcouple   LMC   RMC biloc biscale bivar</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 normal       -0.14  0.82  0.92  0.93      0.19  0.29  0.55 -0.07    0.91  0.82</span></span>
-<span><span class="co">#&gt; 2 skewed        1.37  0.95  0.91  0.85      0.46  0.2   0.43  1.47    1.04  1.07</span></span>
-<span><span class="co">#&gt; 3 heavy_tail…  -0.22  1.74  2.2   2.03      0.1   0.35  0.63 -0.2     2.08  4.31</span></span>
-<span><span class="co">#&gt; # ℹ 2 more variables: rcv &lt;dbl&gt;, count &lt;int&gt;</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level3">
-<h3 id="adjusted-boxplot">adjusted boxplot<a class="anchor" aria-label="anchor" href="#adjusted-boxplot"></a>
-</h3>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/adjusted_boxplot.html">adjusted_boxplot</a></span><span class="op">(</span><span class="va">tbl</span>, xlabels.angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, linewidth <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html" class="external-link">coord_flip</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="90%" height="90%"></p>
-</div>
-<div class="section level3">
-<h3 id="generalized-boxplot">generalized boxplot<a class="anchor" aria-label="anchor" href="#generalized-boxplot"></a>
-</h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/generalized_boxplot.html">generalized_boxplot</a></span><span class="op">(</span><span class="va">tbl</span>, xlabels.angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">0</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, linewidth <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html" class="external-link">coord_flip</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%"></p>
-</div>
-<div class="section level3">
-<h3 id="correlation">correlation<a class="anchor" aria-label="anchor" href="#correlation"></a>
-</h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>Ca <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">df</span><span class="op">$</span><span class="va">Mg</span> <span class="op">&lt;-</span> <span class="fl">0.8</span> <span class="op">*</span> <span class="va">df</span><span class="op">$</span><span class="va">Ca</span> <span class="op">+</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">50</span>, sd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
-<span><span class="va">df</span><span class="op">$</span><span class="va">Fe</span> <span class="op">&lt;-</span> <span class="op">-</span><span class="fl">0.5</span> <span class="op">*</span> <span class="va">df</span><span class="op">$</span><span class="va">Ca</span> <span class="op">+</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">50</span>, sd <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span>
-<span><span class="va">df</span><span class="op">$</span><span class="va">Na</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/correlation.html">correlation</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">Ca</span>, method <span class="op">=</span> <span class="st">"spearman"</span>, plot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">correlation</span></span>
-<span><span class="co">#&gt; # A tibble: 3 × 3</span></span>
-<span><span class="co">#&gt;   variable .correlation method  </span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;           &lt;dbl&gt; &lt;chr&gt;   </span></span>
-<span><span class="co">#&gt; 1 Mg              0.745 spearman</span></span>
-<span><span class="co">#&gt; 2 Na             -0.291 spearman</span></span>
-<span><span class="co">#&gt; 3 Fe             -0.485 spearman</span></span>
-<span><span class="va">res</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="90%" height="90%"></p>
-</div>
-<div class="section level3">
-<h3 id="baseline-correction">baseline correction<a class="anchor" aria-label="anchor" href="#baseline-correction"></a>
-</h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">390</span>, <span class="fl">400</span>, length.out <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
-<span><span class="va">spectrum</span> <span class="op">&lt;-</span> <span class="fl">50</span> <span class="op">+</span> <span class="fl">0.8</span> <span class="op">*</span> <span class="op">(</span><span class="va">wl</span> <span class="op">-</span> <span class="fl">390</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span></span>
-<span>  <span class="fl">120</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">wl</span> <span class="op">-</span> <span class="fl">393.4</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">/</span> <span class="fl">0.005</span><span class="op">)</span> <span class="op">+</span> <span class="fl">90</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="op">(</span><span class="va">wl</span> <span class="op">-</span> <span class="fl">396.8</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">/</span> <span class="fl">0.005</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1000</span>, sd <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/baseline_arpls.html">baseline_arpls</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">spectrum</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, lambda <span class="op">=</span> <span class="fl">1e5</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ChristianGoueguel/specProc" class="external-link">specProc</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">specLIBS</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">wl</span>, <span class="va">spectrum</span>, type <span class="op">=</span> <span class="st">"l"</span>, xlab <span class="op">=</span> <span class="st">"Wavelength [nm]"</span>, ylab <span class="op">=</span> <span class="st">"Intensity"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">wl</span>, <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">background</span><span class="op">)</span>, col <span class="op">=</span> <span class="st">"red"</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-9-1.png" width="90%" height="90%"></p>
+<span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="va">specLIBS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span>                       <span class="co"># sample information</span></span>
+<span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">specLIBS</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span><span class="op">]</span><span class="op">)</span>            <span class="co"># 400 x 7152 intensity matrix</span></span>
+<span><span class="va">wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span>               <span class="co"># wavelengths (nm)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1]  400 7152</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span>soil_type <span class="op">=</span> <span class="va">meta</span><span class="op">$</span><span class="va">Type</span><span class="op">)</span> <span class="op">/</span> <span class="fl">8</span>            <span class="co"># number of samples per soil type</span></span>
+<span><span class="co">#&gt; soil_type</span></span>
+<span><span class="co">#&gt;  Clay Loamy Sandy </span></span>
+<span><span class="co">#&gt;     6    37     7</span></span></code></pre></div>
+<p>The design is <strong>nested</strong>: the 8 spectra of a sample are repeated measurements of the same material, not independent observations. Treating them as 400 independent samples inflates the apparent sample size and biases cross-validated errors downward. The worked example below uses the sample as the unit of analysis wherever it matters.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">by_type</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/average.html">average</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span>Type <span class="op">=</span> <span class="va">meta</span><span class="op">$</span><span class="va">Type</span>, <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span><span class="op">)</span>, <span class="va">Type</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/plot_spectra.html">plot_spectra</a></span><span class="op">(</span><span class="va">by_type</span>, id <span class="op">=</span> <span class="va">Type</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>color <span class="op">=</span> <span class="cn">NULL</span>, title <span class="op">=</span> <span class="st">"Mean spectrum by soil type"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-overview-1.png" width="90%"></p>
+</div>
+<div class="section level2">
+<h2 id="a-worked-example">A worked example<a class="anchor" aria-label="anchor" href="#a-worked-example"></a>
+</h2>
+<div class="section level3">
+<h3 id="id_1-baseline-correction">1. Baseline correction<a class="anchor" aria-label="anchor" href="#id_1-baseline-correction"></a>
+</h3>
+<p>LIBS spectra sit on a continuum from bremsstrahlung and recombination radiation. <code><a href="reference/baseline_arpls.html">baseline_arpls()</a></code> estimates it with asymmetrically reweighted penalized least squares. Positive residuals (the emission lines) are downweighted, so the baseline follows the continuum instead of the peaks. The smoothing parameter <code>lambda</code> controls how stiff the baseline is.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bl</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/baseline_arpls.html">baseline_arpls</a></span><span class="op">(</span><span class="va">X</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
+<span><span class="va">Xc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">bl</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-baseline-plot-1.png" width="90%"></p>
+<p>The baseline is a model estimate, and the choice of <code>lambda</code> propagates into line areas. Report the value you used, and check how sensitive your downstream results are to it.</p>
 </div>
 <div class="section level3">
-<h3 id="peak-fitting">peak fitting<a class="anchor" aria-label="anchor" href="#peak-fitting"></a>
+<h3 id="id_2-normalization-and-shot-to-shot-repeatability">2. Normalization and shot-to-shot repeatability<a class="anchor" aria-label="anchor" href="#id_2-normalization-and-shot-to-shot-repeatability"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">window</span> <span class="op">&lt;-</span> <span class="va">wl</span> <span class="op">&gt;=</span> <span class="fl">393</span> <span class="op">&amp;</span> <span class="va">wl</span> <span class="op">&lt;=</span> <span class="fl">394</span></span>
-<span><span class="va">lines_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span><span class="op">[</span><span class="va">window</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">lines_df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">wl</span><span class="op">[</span><span class="va">window</span><span class="op">]</span></span>
-<span><span class="va">ca_line</span> <span class="op">&lt;-</span> <span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/peak_fit.html">peak_fit</a></span><span class="op">(</span><span class="va">lines_df</span>, profile <span class="op">=</span> <span class="st">"voigt"</span><span class="op">)</span></span>
-<span><span class="va">ca_line</span><span class="op">$</span><span class="va">tidied</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; # A tibble: 5 × 5</span></span>
-<span><span class="co">#&gt;   term    estimate std.error    statistic   p.value</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;      &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 y0     -0.0417   0.0859         -0.485  6.29e-  1</span></span>
-<span><span class="co">#&gt; 2 xc    393.       0.0000964 4081245.     0        </span></span>
-<span><span class="co">#&gt; 3 wG      0.118    0.000903      130.     6.56e-109</span></span>
-<span><span class="co">#&gt; 4 wL      0.000100 0.00140         0.0714 9.43e-  1</span></span>
-<span><span class="co">#&gt; 5 A      15.1      0.0885        170.     6.94e-120</span></span>
-<span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/plot_fit.html">plot_fit</a></span><span class="op">(</span><span class="va">ca_line</span>, title <span class="op">=</span> <span class="st">"Ca II 393.4 nm"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-10-1.png" width="90%" height="90%"></p>
+<p>Laser–sample coupling changes from shot to shot, so the whole spectrum fluctuates in intensity. Normalization aims to remove this multiplicative effect. The relative standard deviation (RSD) of a line across the 8 locations of a sample measures how well it works. The lower the RSD, the more repeatable the measurement:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">line_area</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">M</span>, <span class="va">center</span>, <span class="va">half_width</span> <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">M</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">wl</span> <span class="op">-</span> <span class="va">center</span><span class="op">)</span> <span class="op">&lt;</span> <span class="va">half_width</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">within_rsd</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tapply.html" class="external-link">tapply</a></span><span class="op">(</span><span class="va">v</span>, <span class="va">meta</span><span class="op">$</span><span class="va">Sample</span>, <span class="kw">function</span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">Xsnv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="reference/snv.html">snv</a></span><span class="op">(</span><span class="va">Xc</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span></span>
+<span><span class="va">Xarea</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="reference/normalize.html">normalize</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">Xc</span><span class="op">)</span>, method <span class="op">=</span> <span class="st">"area"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>  preprocessing <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"raw"</span>, <span class="st">"baseline"</span>, <span class="st">"baseline + area"</span>, <span class="st">"baseline + SNV"</span><span class="op">)</span>,</span>
+<span>  `median RSD of Ca II 393.37 nm (%)` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu">within_rsd</span><span class="op">(</span><span class="fu">line_area</span><span class="op">(</span><span class="va">X</span>, <span class="fl">393.37</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu">within_rsd</span><span class="op">(</span><span class="fu">line_area</span><span class="op">(</span><span class="va">Xc</span>, <span class="fl">393.37</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu">within_rsd</span><span class="op">(</span><span class="fu">line_area</span><span class="op">(</span><span class="va">Xarea</span>, <span class="fl">393.37</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu">within_rsd</span><span class="op">(</span><span class="fu">line_area</span><span class="op">(</span><span class="va">Xsnv</span>, <span class="fl">393.37</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 4 × 2</span></span>
+<span><span class="co">#&gt;   preprocessing   `median RSD of Ca II 393.37 nm (%)`</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                                         &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 raw                                            6.19</span></span>
+<span><span class="co">#&gt; 2 baseline                                       6.73</span></span>
+<span><span class="co">#&gt; 3 baseline + area                                5.44</span></span>
+<span><span class="co">#&gt; 4 baseline + SNV                                 3.79</span></span></code></pre></div>
+<p>On this data set, SNV reduces the typical shot-to-shot RSD of the Ca II line by about 40%. Baseline subtraction alone slightly increases the RSD. This is expected: the raw line area includes the detector offset and continuum, a large and relatively stable component that dilutes the relative variation. Removing it exposes the true variability of the line, which normalization then has to correct. Which normalization works best depends on the matrix and the line, so compare the options on replicate spectra rather than assuming one.</p>
 </div>
+<div class="section level3">
+<h3 id="id_3-screening-outlying-shots">3. Screening outlying shots<a class="anchor" aria-label="anchor" href="#id_3-screening-outlying-shots"></a>
+</h3>
+<p>A misfired or defocused shot can bias a sample’s mean spectrum. Compare each shot with the other shots of the same sample, using a robust z-score (median and MAD) of the total emitted intensity:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">total</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span></span>
+<span><span class="va">robust_z</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/ave.html" class="external-link">ave</a></span><span class="op">(</span><span class="va">total</span>, <span class="va">meta</span><span class="op">$</span><span class="va">Sample</span>, FUN <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">(</span><span class="va">v</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/stats/mad.html" class="external-link">mad</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span>flagged <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">robust_z</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">3.5</span><span class="op">)</span></span>
+<span><span class="co">#&gt; flagged</span></span>
+<span><span class="co">#&gt; FALSE  TRUE </span></span>
+<span><span class="co">#&gt;   384    16</span></span></code></pre></div>
+<p>The median and MAD are used because, with 8 shots per sample, a single aberrant shot shifts the mean and inflates the standard deviation enough to hide itself. <code>zscore(robust = TRUE)</code>, <code>iqr_outliers(skew = TRUE)</code> (medcouple-adjusted fences) and <code><a href="reference/directional_outlyingness.html">directional_outlyingness()</a></code> provide the same screening for a single vector.</p>
+</div>
+<div class="section level3">
+<h3 id="id_4-averaging-replicates">4. Averaging replicates<a class="anchor" aria-label="anchor" href="#id_4-averaging-replicates"></a>
+</h3>
+<p>After screening, reduce each sample to one spectrum. <code><a href="reference/average.html">average()</a></code> computes group means in C++:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">keep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">robust_z</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">3.5</span></span>
+<span><span class="va">Xs</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/average.html">average</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span>Sample <span class="op">=</span> <span class="va">meta</span><span class="op">$</span><span class="va">Sample</span><span class="op">[</span><span class="va">keep</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">Xsnv</span><span class="op">[</span><span class="va">keep</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span>, <span class="va">Sample</span><span class="op">)</span></span>
+<span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="va">meta</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">Xs</span><span class="op">$</span><span class="va">Sample</span>, <span class="va">meta</span><span class="op">$</span><span class="va">Sample</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sample"</span>, <span class="st">"Clay"</span>, <span class="st">"Sand"</span>, <span class="st">"Silt"</span>, <span class="st">"Type"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">Xs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1]   50 7153</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="id_5-fitting-emission-lines">5. Fitting emission lines<a class="anchor" aria-label="anchor" href="#id_5-fitting-emission-lines"></a>
+</h3>
+<p>The Ca II 393.37 / 396.85 nm and Al I 394.40 / 396.15 nm lines overlap in the 393–397 nm window. <code><a href="reference/multipeak_fit.html">multipeak_fit()</a></code> fits them jointly as a sum of exact Voigt profiles on a common baseline. Each line’s center, Gaussian and Lorentzian widths (FWHM) and area are estimated by Levenberg–Marquardt least squares.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">window</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">Xs</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">[</span><span class="va">wl</span> <span class="op">&gt;</span> <span class="fl">392.9</span> <span class="op">&amp;</span> <span class="va">wl</span> <span class="op">&lt;</span> <span class="fl">397.3</span><span class="op">]</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/multipeak_fit.html">multipeak_fit</a></span><span class="op">(</span></span>
+<span>  <span class="va">Xs</span><span class="op">[</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sample"</span>, <span class="va">window</span><span class="op">)</span><span class="op">]</span>,</span>
+<span>  peaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">393.37</span>, <span class="fl">394.40</span>, <span class="fl">396.15</span>, <span class="fl">396.85</span><span class="op">)</span>,</span>
+<span>  profiles <span class="op">=</span> <span class="st">"voigt"</span>,</span>
+<span>  id <span class="op">=</span> <span class="st">"Sample"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">fit</span><span class="op">$</span><span class="va">tidied</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co">#&gt; # A tibble: 17 × 5</span></span>
+<span><span class="co">#&gt;    term  estimate std.error  statistic   p.value</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 y0      0.0712   0.232        0.307 7.61e-  1</span></span>
+<span><span class="co">#&gt;  2 xc_1  393.       0.00246 159628.    6.64e-161</span></span>
+<span><span class="co">#&gt;  3 wG_1    0.129    0.0257       5.00  1.50e-  5</span></span>
+<span><span class="co">#&gt;  4 wL_1    0.0943   0.0265       3.56  1.06e-  3</span></span>
+<span><span class="co">#&gt;  5 A_1     6.68     0.394       17.0   9.28e- 19</span></span>
+<span><span class="co">#&gt;  6 xc_2  394.       0.00530  74474.    5.52e-149</span></span>
+<span><span class="co">#&gt;  7 wG_2    0.144    0.0423       3.39  1.70e-  3</span></span>
+<span><span class="co">#&gt;  8 wL_2    0.0374   0.0569       0.658 5.15e-  1</span></span>
+<span><span class="co">#&gt;  9 A_2     2.27     0.342        6.65  9.48e-  8</span></span>
+<span><span class="co">#&gt; 10 xc_3  396.       0.00534  74156.    6.44e-149</span></span>
+<span><span class="co">#&gt; 11 wG_3    0.141    0.0466       3.03  4.52e-  3</span></span>
+<span><span class="co">#&gt; 12 wL_3    0.0894   0.0536       1.67  1.04e-  1</span></span>
+<span><span class="co">#&gt; 13 A_3     3.26     0.393        8.29  7.14e- 10</span></span>
+<span><span class="co">#&gt; 14 xc_4  397.       0.00426  93151.    1.75e-152</span></span>
+<span><span class="co">#&gt; 15 wG_4    0.162    0.0314       5.15  9.44e-  6</span></span>
+<span><span class="co">#&gt; 16 wL_4    0.0442   0.0428       1.03  3.08e-  1</span></span>
+<span><span class="co">#&gt; 17 A_4     3.41     0.346        9.84  9.64e- 12</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_fit.html">plot_fit</a></span><span class="op">(</span><span class="va">fit</span>, title <span class="op">=</span> <span class="st">"Ca II and Al I lines, sample LSG-S18-0001 (mean of 8 locations)"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-multipeak-plot-1.png" width="90%"></p>
+<p>Read the parameter table critically:</p>
+<ul>
+<li>
+<strong>The standard errors are conditional on the model.</strong> They assume independent, homoscedastic Gaussian errors. LIBS noise is closer to Poisson, and residuals are correlated along the wavelength axis, so treat these standard errors as lower bounds. The spread of the parameters across the 8 replicate locations is a more honest measure of uncertainty.</li>
+<li>
+<strong>Some parameters are poorly identified.</strong> The Lorentzian widths of the weaker lines are not significantly different from zero. The data cannot separate Stark from Doppler/instrumental broadening for those lines. Consider fixing them, or using a simpler profile.</li>
+</ul>
+<p>The exact Voigt profile is also available directly. <code><a href="reference/voigt_profile.html">voigt_profile()</a></code> uses the Faddeeva function and is accurate to about 1e-10. The faster <code><a href="reference/pseudo_voigt_profile.html">pseudo_voigt_profile()</a></code> approximation deviates from it by up to about 1%:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">2</span>, <span class="fl">2</span>, length.out <span class="op">=</span> <span class="fl">400</span><span class="op">)</span></span>
+<span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/voigt_profile.html">voigt_profile</a></span><span class="op">(</span><span class="va">x</span>, y0 <span class="op">=</span> <span class="fl">0</span>, xc <span class="op">=</span> <span class="fl">0</span>, wG <span class="op">=</span> <span class="fl">0.6</span>, wL <span class="op">=</span> <span class="fl">0.4</span>, A <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">pv</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pseudo_voigt_profile.html">pseudo_voigt_profile</a></span><span class="op">(</span><span class="va">x</span>, y0 <span class="op">=</span> <span class="fl">0</span>, xc <span class="op">=</span> <span class="fl">0</span>, wG <span class="op">=</span> <span class="fl">0.6</span>, wL <span class="op">=</span> <span class="fl">0.4</span>, A <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">$</span><span class="va">y</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">v</span> <span class="op">-</span> <span class="va">pv</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 0.01234509</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="id_6-descriptive-statistics-classical-and-robust">6. Descriptive statistics: classical and robust<a class="anchor" aria-label="anchor" href="#id_6-descriptive-statistics-classical-and-robust"></a>
+</h3>
+<p>The texture fractions are bounded (0–100%), skewed, and contain a few extreme samples. The robust summary reports the median, MAD, Sn and Qn, biweight estimators, and medcouple-based measures of skewness and tail weight:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/summary_stats.html">summary_stats</a></span><span class="op">(</span><span class="va">samples</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Clay"</span>, <span class="st">"Sand"</span>, <span class="st">"Silt"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 14</span></span>
+<span><span class="co">#&gt;   variable  mean  mode median   IQR    sd variance    cv   min   max range</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 Clay      31.8  35.1   34.6  14.9  16.1     260.  50.6   1.1  81    79.9</span></span>
+<span><span class="co">#&gt; 2 Sand      33.6  19     25    11.6  25.2     637.  75.1   5    92.9  87.9</span></span>
+<span><span class="co">#&gt; 3 Silt      34.6  39.9   39.9  12.9  15.4     237.  44.5   4    65.7  61.7</span></span>
+<span><span class="co">#&gt; # ℹ 3 more variables: skewness &lt;dbl&gt;, kurtosis &lt;dbl&gt;, count &lt;int&gt;</span></span>
+<span><span class="fu"><a href="reference/summary_stats.html">summary_stats</a></span><span class="op">(</span><span class="va">samples</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Clay"</span>, <span class="st">"Sand"</span>, <span class="st">"Silt"</span><span class="op">)</span><span class="op">]</span>, robust <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 13</span></span>
+<span><span class="co">#&gt;   variable median   mad    Qn    Sn medcouple   LMC   RMC biloc biscale bivar</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 Clay       34.6  6.75  8.26  7.15     -0.45  0.23 -0.3   34.2   11.2  126. </span></span>
+<span><span class="co">#&gt; 2 Sand       25    8.9   8.47  9.42      0.06  0.02  0.85  22.9    9.1   82.8</span></span>
+<span><span class="co">#&gt; 3 Silt       39.9  6.08  8.26  8.22     -0.5   0.44  0.02  40.0    8.54  72.9</span></span>
+<span><span class="co">#&gt; # ℹ 2 more variables: rcv &lt;dbl&gt;, count &lt;int&gt;</span></span></code></pre></div>
+<p>The medcouple (MC) is a robust measure of skewness, bounded in [−1, 1]. For Clay and Silt it is strongly negative (left skew). Where the mean and median, or the SD and robust scale, disagree, a few observations are driving the classical estimates.</p>
+<p>The generalized boxplot (Bruffaerts et al., 2014) fits a Tukey g-and-h distribution, so its whiskers adapt to both skewness (<em>g</em>) and tail heaviness (<em>h</em>). Its fences are placed so that, under the fitted model, the chosen proportion <code>alpha</code> of observations falls outside them:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/generalized_boxplot.html">generalized_boxplot</a></span><span class="op">(</span><span class="va">samples</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Clay"</span>, <span class="st">"Sand"</span>, <span class="st">"Silt"</span><span class="op">)</span><span class="op">]</span>, xlabels.angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html" class="external-link">coord_flip</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Particle-size fractions (%), generalized boxplot"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-boxplot-1.png" width="90%"></p>
+</div>
+<div class="section level3">
+<h3 id="id_7-correlation-why-robustness-matters">7. Correlation: why robustness matters<a class="anchor" aria-label="anchor" href="#id_7-correlation-why-robustness-matters"></a>
+</h3>
+<p>How strongly do line intensities track clay content? Compare Pearson’s correlation with the biweight midcorrelation, which downweights observations far from the bulk of the data:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">Xmat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">Xs</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">lines_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  Clay <span class="op">=</span> <span class="va">samples</span><span class="op">$</span><span class="va">Clay</span>,</span>
+<span>  `Mg II 279.55` <span class="op">=</span> <span class="fu">line_area</span><span class="op">(</span><span class="va">Xmat</span>, <span class="fl">279.55</span><span class="op">)</span>,</span>
+<span>  `Si I 288.16` <span class="op">=</span> <span class="fu">line_area</span><span class="op">(</span><span class="va">Xmat</span>, <span class="fl">288.16</span><span class="op">)</span>,</span>
+<span>  `Ca II 393.37` <span class="op">=</span> <span class="fu">line_area</span><span class="op">(</span><span class="va">Xmat</span>, <span class="fl">393.37</span><span class="op">)</span>,</span>
+<span>  `Al I 396.15` <span class="op">=</span> <span class="fu">line_area</span><span class="op">(</span><span class="va">Xmat</span>, <span class="fl">396.15</span><span class="op">)</span>,</span>
+<span>  `K I 766.49` <span class="op">=</span> <span class="fu">line_area</span><span class="op">(</span><span class="va">Xmat</span>, <span class="fl">766.49</span><span class="op">)</span>,</span>
+<span>  check.names <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">pearson</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/correlation.html">correlation</a></span><span class="op">(</span><span class="va">lines_df</span>, <span class="va">Clay</span><span class="op">)</span></span>
+<span><span class="va">bicor</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/correlation.html">correlation</a></span><span class="op">(</span><span class="va">lines_df</span>, <span class="va">Clay</span>, method <span class="op">=</span> <span class="st">"bicor"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">pearson</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, <span class="va">bicor</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, by <span class="op">=</span> <span class="st">"variable"</span>, suffixes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"_pearson"</span>, <span class="st">"_bicor"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;       variable .correlation_pearson .correlation_bicor</span></span>
+<span><span class="co">#&gt; 1  Al I 396.15           -0.6442892         -0.2391099</span></span>
+<span><span class="co">#&gt; 2 Ca II 393.37           -0.5734797         -0.4272420</span></span>
+<span><span class="co">#&gt; 3   K I 766.49            0.7676607          0.5171088</span></span>
+<span><span class="co">#&gt; 4 Mg II 279.55            0.7565064          0.3375982</span></span>
+<span><span class="co">#&gt; 5  Si I 288.16           -0.5498840         -0.3494116</span></span></code></pre></div>
+<p>The two coefficients disagree sharply for some lines, notably Mg, which means a handful of extreme-texture samples drive the Pearson values. Neither number is “the” correlation. The gap tells you to look at the scatter plots, and to be cautious about extrapolating to the bulk of the data. <code><a href="reference/correlation.html">correlation()</a></code> also provides Spearman, Kendall and Chatterjee’s ξ, which captures non-monotonic dependence.</p>
+</div>
+<div class="section level3">
+<h3 id="id_8-removing-unwanted-variation">8. Removing unwanted variation<a class="anchor" aria-label="anchor" href="#id_8-removing-unwanted-variation"></a>
+</h3>
+<p>Remaining shot-to-shot differences within a sample are nuisance variation. External parameter orthogonalization (EPO) estimates the dominant directions of such variation from a <em>clutter matrix</em> and projects them out. The clutter matrix here is the deviation of each spectrum from its sample mean:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sample_means</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">Xsnv</span>, <span class="fl">2</span>, <span class="kw">function</span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/ave.html" class="external-link">ave</a></span><span class="op">(</span><span class="va">v</span>, <span class="va">meta</span><span class="op">$</span><span class="va">Sample</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">clutter</span> <span class="op">&lt;-</span> <span class="va">Xsnv</span> <span class="op">-</span> <span class="va">sample_means</span></span>
+<span></span>
+<span><span class="va">sd_ca</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">M</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tapply.html" class="external-link">tapply</a></span><span class="op">(</span><span class="fu">line_area</span><span class="op">(</span><span class="va">M</span>, <span class="fl">393.37</span><span class="op">)</span>, <span class="va">meta</span><span class="op">$</span><span class="va">Sample</span>, <span class="va">sd</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">5</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">k</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">M</span> <span class="op">&lt;-</span> <span class="kw">if</span> <span class="op">(</span><span class="va">k</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="va">Xsnv</span> <span class="kw">else</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="reference/epo.html">epo</a></span><span class="op">(</span><span class="va">Xsnv</span>, ncomp <span class="op">=</span> <span class="va">k</span>, clutter <span class="op">=</span> <span class="va">clutter</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ncomp <span class="op">=</span> <span class="va">k</span>, within_sample_sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu">sd_ca</span><span class="op">(</span><span class="va">M</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                   [,1]  [,2]  [,3]  [,4]  [,5]</span></span>
+<span><span class="co">#&gt; ncomp            0.000 1.000 2.000 3.000 5.000</span></span>
+<span><span class="co">#&gt; within_sample_sd 1.933 1.636 1.014 0.912 0.839</span></span></code></pre></div>
+<p>Here the clutter directions are estimated from the same spectra they are evaluated on, so this reduction is optimistic. In practice, estimate the EPO projection (or a <code><a href="reference/glsw.html">glsw()</a></code> filter) on calibration samples only, and choose <code>ncomp</code> by cross-validation with folds formed by sample.</p>
+<p>The same rule applies to supervised filters that use the response: <code><a href="reference/osc.html">osc()</a></code>, <code><a href="reference/direct_osc.html">direct_osc()</a></code>, <code><a href="reference/direct_orthogonal.html">direct_orthogonal()</a></code>, <code><a href="reference/nas.html">nas()</a></code>, <code><a href="reference/o2pls.html">o2pls()</a></code> and <code><a href="reference/projected_osc.html">projected_osc()</a></code>. Refit them inside each cross-validation fold. If a filter is fitted once on all the data before cross-validating, the estimated prediction error is biased downward. Each function returns what you need to apply the fitted filter to new spectra: loadings, weights, centers and scales.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="function-overview">Function overview<a class="anchor" aria-label="anchor" href="#function-overview"></a>
+</h2>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr>
+<th>Task</th>
+<th>Functions</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Baseline correction</td>
+<td>
+<code><a href="reference/baseline_arpls.html">baseline_arpls()</a></code>, <code><a href="reference/baseline_als.html">baseline_als()</a></code>, <code><a href="reference/baseline_lsp.html">baseline_lsp()</a></code>
+</td>
+</tr>
+<tr>
+<td>Normalization</td>
+<td>
+<code><a href="reference/snv.html">snv()</a></code>, <code><a href="reference/msc.html">msc()</a></code>, <code><a href="reference/normalize.html">normalize()</a></code>
+</td>
+</tr>
+<tr>
+<td>Scaling and centering</td>
+<td>
+<code><a href="reference/center.html">center()</a></code>, <code><a href="reference/pareto_scale.html">pareto_scale()</a></code>, <code><a href="reference/poisson_scale.html">poisson_scale()</a></code>, <code><a href="reference/minmax.html">minmax()</a></code>
+</td>
+</tr>
+<tr>
+<td>Orthogonal filtering</td>
+<td>
+<code><a href="reference/osc.html">osc()</a></code>, <code><a href="reference/direct_osc.html">direct_osc()</a></code>, <code><a href="reference/direct_orthogonal.html">direct_orthogonal()</a></code>, <code><a href="reference/nas.html">nas()</a></code>, <code><a href="reference/projected_osc.html">projected_osc()</a></code>, <code><a href="reference/o2pls.html">o2pls()</a></code>, <code><a href="reference/opls.html">opls()</a></code>
+</td>
+</tr>
+<tr>
+<td>Interference removal</td>
+<td>
+<code><a href="reference/epo.html">epo()</a></code>, <code><a href="reference/glsw.html">glsw()</a></code>, <code><a href="reference/y_gradient_glsw.html">y_gradient_glsw()</a></code>
+</td>
+</tr>
+<tr>
+<td>Calibration transfer</td>
+<td><code><a href="reference/pds.html">pds()</a></code></td>
+</tr>
+<tr>
+<td>Line profiles</td>
+<td>
+<code><a href="reference/voigt_profile.html">voigt_profile()</a></code>, <code><a href="reference/pseudo_voigt_profile.html">pseudo_voigt_profile()</a></code>, <code><a href="reference/gaussian_profile.html">gaussian_profile()</a></code>, <code><a href="reference/lorentzian_profile.html">lorentzian_profile()</a></code>
+</td>
+</tr>
+<tr>
+<td>Line fitting</td>
+<td>
+<code><a href="reference/peak_fit.html">peak_fit()</a></code>, <code><a href="reference/multipeak_fit.html">multipeak_fit()</a></code>, <code><a href="reference/plot_fit.html">plot_fit()</a></code>
+</td>
+</tr>
+<tr>
+<td>Location and scale</td>
+<td>
+<code><a href="reference/biweight_location.html">biweight_location()</a></code>, <code><a href="reference/biweight_scale.html">biweight_scale()</a></code>, <code><a href="reference/biweight_midvariance.html">biweight_midvariance()</a></code>, <code><a href="reference/rousseeuw_croux.html">rousseeuw_croux()</a></code>, <code><a href="reference/umad.html">umad()</a></code>
+</td>
+</tr>
+<tr>
+<td>Association</td>
+<td>
+<code><a href="reference/correlation.html">correlation()</a></code>, <code><a href="reference/biweight_midcovariance.html">biweight_midcovariance()</a></code>, <code><a href="reference/biweight_midcorrelation.html">biweight_midcorrelation()</a></code>
+</td>
+</tr>
+<tr>
+<td>Skewness and tail weight</td>
+<td>
+<code><a href="reference/medcouple_weight.html">medcouple_weight()</a></code>, <code><a href="reference/quantile_weight.html">quantile_weight()</a></code>, <code><a href="reference/tukey_gh.html">tukey_gh()</a></code>
+</td>
+</tr>
+<tr>
+<td>Outlier detection</td>
+<td>
+<code><a href="reference/zscore.html">zscore()</a></code>, <code><a href="reference/iqr_outliers.html">iqr_outliers()</a></code>, <code><a href="reference/directional_outlyingness.html">directional_outlyingness()</a></code>, <code><a href="reference/plot_outliers.html">plot_outliers()</a></code>
+</td>
+</tr>
+<tr>
+<td>Exploration</td>
+<td>
+<code><a href="reference/summary_stats.html">summary_stats()</a></code>, <code><a href="reference/adjusted_boxplot.html">adjusted_boxplot()</a></code>, <code><a href="reference/generalized_boxplot.html">generalized_boxplot()</a></code>, <code><a href="reference/plot_spectra.html">plot_spectra()</a></code>, <code><a href="reference/average.html">average()</a></code>
+</td>
+</tr>
+<tr>
+<td>Transformation to normality</td>
+<td><code><a href="reference/robust_bcyj.html">robust_bcyj()</a></code></td>
+</tr>
+</tbody>
+</table>
+<div class="section level3">
+<h3 id="robust-estimators-at-a-glance">Robust estimators at a glance<a class="anchor" aria-label="anchor" href="#robust-estimators-at-a-glance"></a>
+</h3>
+<p>For estimators of scale, the breakdown point is the largest fraction of contaminated observations the estimator can tolerate. The efficiency is its asymptotic efficiency relative to the standard deviation for normal data.</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr>
+<th>Estimator</th>
+<th>Function</th>
+<th>Breakdown point</th>
+<th>Efficiency</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>Standard deviation</td>
+<td><code><a href="https://rdrr.io/r/stats/sd.html" class="external-link">stats::sd()</a></code></td>
+<td>0%</td>
+<td>100%</td>
+</tr>
+<tr>
+<td>MAD (bias-corrected)</td>
+<td><code><a href="reference/umad.html">umad()</a></code></td>
+<td>50%</td>
+<td>37%</td>
+</tr>
+<tr>
+<td>Rousseeuw–Croux Sn</td>
+<td><code>rousseeuw_croux(estimator = "Sn")</code></td>
+<td>50%</td>
+<td>58%</td>
+</tr>
+<tr>
+<td>Rousseeuw–Croux Qn</td>
+<td><code>rousseeuw_croux(estimator = "Qn")</code></td>
+<td>50%</td>
+<td>82%</td>
+</tr>
+<tr>
+<td>Biweight midvariance</td>
+<td>
+<code><a href="reference/biweight_midvariance.html">biweight_midvariance()</a></code>, <code><a href="reference/biweight_scale.html">biweight_scale()</a></code>
+</td>
+<td>high</td>
+<td>≈ 87%</td>
+</tr>
+</tbody>
+</table>
+<p><code><a href="reference/umad.html">umad()</a></code> and <code><a href="reference/rousseeuw_croux.html">rousseeuw_croux()</a></code> include finite-sample bias corrections (Park et al., 2020; Akinshin, 2022), so they are also unbiased at the normal distribution for small samples, such as the 8 replicates per sample.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="performance">Performance<a class="anchor" aria-label="anchor" href="#performance"></a>
+</h2>
+<p>Timings on the full <code>specLIBS</code> data set (400 spectra × 7152 channels) on an Apple Silicon desktop:</p>
+<table class="table">
+<thead><tr>
+<th>Operation</th>
+<th>Time</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>
+<code><a href="reference/baseline_arpls.html">baseline_arpls()</a></code>, 400 spectra</td>
+<td>0.6 s</td>
+</tr>
+<tr>
+<td>
+<code><a href="reference/baseline_als.html">baseline_als()</a></code>, 400 spectra</td>
+<td>0.5 s</td>
+</tr>
+<tr>
+<td><code>epo(ncomp = 3)</code></td>
+<td>0.4 s</td>
+</tr>
+<tr>
+<td><code><a href="reference/snv.html">snv()</a></code></td>
+<td>0.08 s</td>
+</tr>
+<tr>
+<td>
+<code><a href="reference/voigt_profile.html">voigt_profile()</a></code>, 10⁶ points</td>
+<td>0.07 s</td>
+</tr>
+</tbody>
+</table>
+<p>For comparison, one iteration of the dense penalized least-squares solve for a single 7152-channel spectrum takes about 30 s. The banded solver does the same computation in linear time.</p>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<p>The main methodological references are:</p>
+<ul>
+<li>Baek, S.-J., et al. (2015). Baseline correction using asymmetrically reweighted penalized least squares smoothing. <em>Analyst</em>, 140, 250–257.</li>
+<li>Eilers, P.H.C., Boelens, H.F.M. (2005). Baseline correction with asymmetric least squares smoothing.</li>
+<li>Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003). EPO-PLS external parameter orthogonalisation of PLS. <em>Chemometr. Intell. Lab. Syst.</em>, 66, 191–204.</li>
+<li>Martens, H., et al. (2003). Pre-whitening of data by covariance-weighted pre-processing. <em>J. Chemometrics</em>, 17, 153–165.</li>
+<li>Trygg, J., Wold, S. (2002). Orthogonal projections to latent structures (O-PLS). <em>J. Chemometrics</em>, 16, 119–128.</li>
+<li>Weideman, J.A.C. (1994). Computation of the complex error function. <em>SIAM J. Numer. Anal.</em>, 31, 1497–1518.</li>
+<li>Rousseeuw, P.J., Croux, C. (1993). Alternatives to the median absolute deviation. <em>JASA</em>, 88, 1273–1283.</li>
+<li>Hubert, M., Vandervieren, E. (2008). An adjusted boxplot for skewed distributions. <em>Comput. Stat. Data Anal.</em>, 52, 5186–5201.</li>
+<li>Bruffaerts, C., Verardi, V., Vermandele, C. (2014). A generalized boxplot for skewed and heavy-tailed distributions. <em>Stat. Probab. Lett.</em>, 95, 110–117.</li>
+</ul>
+<p>Each function’s help page gives the full references for its method.</p>
+</div>
+<div class="section level2">
+<h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
+</h2>
+<p>Bug reports and feature requests are welcome on the <a href="https://github.com/ChristianGoueguel/specProc/issues" class="external-link">issue tracker</a>. Please include a minimal reproducible example.</p>
+</div>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
+<p>MIT © Christian L. Goueguel</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -217,7 +567,15 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://github.com/ChristianGoueguel/specProc/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/ChristianGoueguel/specProc/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://app.codecov.io/gh/ChristianGoueguel/specProc?branch=main" class="external-link"><img src="https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
+<li><a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>

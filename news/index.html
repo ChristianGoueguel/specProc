@@ -78,6 +78,14 @@
 <code><a href="../reference/specProc-deprecated.html">iqrMethod()</a></code> no longer changes global options. Missing values no longer cause errors.</li>
 </ul></div>
 <div class="section level3">
+<h3 id="new-features-0-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-2-0"></a></h3>
+<ul><li>New <code><a href="../reference/voigt_profile.html">voigt_profile()</a></code>: the exact Voigt profile, computed in C++ from the Faddeeva function with Weideman’s (1994) rational approximation (relative error below 1e-10). <code><a href="../reference/peak_fit.html">peak_fit()</a></code> and <code><a href="../reference/multipeak_fit.html">multipeak_fit()</a></code> now use it for <code>profile = "voigt"</code>; the pseudo-Voigt approximation is available as <code>profile = "pseudo_voigt"</code>.</li>
+<li>New data set <code>specLIBS</code>: 400 LIBS spectra (50 soil samples x 8 locations, 7152 channels, 199-822 nm) with the clay, sand and silt content of each sample.</li>
+<li>
+<code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code> whiskers now end at the most extreme observations within the fences, as in standard boxplots. The fences are returned as <code>lower_fence</code> and <code>upper_fence</code>.</li>
+<li>The README has been rewritten around a complete worked example on <code>specLIBS</code>.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="improvements-0-2-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-2-0"></a></h3>
 <ul><li>Asymmetric least squares and arPLS baselines are solved in C++ with a banded Cholesky factorization. The cost is O(n) per spectrum, so they scale to spectra with tens of thousands of channels.</li>
 <li>EPO and GLSW use Eigen’s divide-and-conquer SVD and never form the p x p covariance or projection matrices.</li>

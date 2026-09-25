@@ -111,8 +111,9 @@ as proposed by Bruffaerts <em>et al</em>. (2014).</p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
 
 <ul><li><p>If <code>plot = TRUE</code>, returns a <code>ggplot2</code> object containing the generalized boxplot.</p></li>
-<li><p>If <code>plot = FALSE</code>, returns a list of tibbles: <code>stats</code>, with the fences,
-quartiles, median and the estimated g and h parameters of each variable,
+<li><p>If <code>plot = FALSE</code>, returns a list of tibbles: <code>stats</code>, with the whisker
+ends (<code>lower</code>, <code>upper</code>: the most extreme observations within the fences),
+quartiles, median, fences and the estimated g and h parameters of each variable,
 and <code>outliers</code>, with the potential outliers (<code>out</code> gives the tail).</p></li>
 </ul></div>
     <div class="section level2">
@@ -150,12 +151,13 @@ skewed and heavy-tailed distributions. Statistics and Probability Letters 95(C):
 <span class="r-in"><span><span class="co"># Retrieve the generalized boxplot statistics</span></span></span>
 <span class="r-in"><span><span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">data</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $stats</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 8</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   variable       lower     q1 median    q3 upper      g     h</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> normal       -<span style="color: #BB0000;">1.65</span>   -<span style="color: #BB0000;">0.494</span> 0.061<span style="text-decoration: underline;">8</span> 0.692  1.86 0.094<span style="text-decoration: underline;">7</span> 0.102</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> skewed       -<span style="color: #BB0000;">0.066</span><span style="color: #BB0000; text-decoration: underline;">6</span>  0.685 1.43   2.99   6.23 0.092<span style="text-decoration: underline;">5</span> 0    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> heavy_tailed -<span style="color: #BB0000;">2.75</span>   -<span style="color: #BB0000;">0.569</span> 0.146  0.835  3.54 0.153  0.250</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 10</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   variable        lower     q1 median    q3 upper lower_fence upper_fence      g</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> normal       -<span style="color: #BB0000;">1.55</span>    -<span style="color: #BB0000;">0.494</span> 0.061<span style="text-decoration: underline;">8</span> 0.692  1.79     -<span style="color: #BB0000;">1.65</span>          1.86 0.094<span style="text-decoration: underline;">7</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> skewed        0.008<span style="text-decoration: underline;">73</span>  0.685 1.43   2.99   5.91     -<span style="color: #BB0000;">0.066</span><span style="color: #BB0000; text-decoration: underline;">6</span>        6.23 0.092<span style="text-decoration: underline;">5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> heavy_tailed -<span style="color: #BB0000;">2.63</span>    -<span style="color: #BB0000;">0.569</span> 0.146  0.835  2.80     -<span style="color: #BB0000;">2.75</span>          3.54 0.153 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 1 more variable: h &lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $outliers</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 18 × 3</span></span>

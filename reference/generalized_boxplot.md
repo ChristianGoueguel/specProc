@@ -83,9 +83,10 @@ generalized_boxplot(
   generalized boxplot.
 
 - If `plot = FALSE`, returns a list of tibbles: `stats`, with the
-  fences, quartiles, median and the estimated g and h parameters of each
-  variable, and `outliers`, with the potential outliers (`out` gives the
-  tail).
+  whisker ends (`lower`, `upper`: the most extreme observations within
+  the fences), quartiles, median, fences and the estimated g and h
+  parameters of each variable, and `outliers`, with the potential
+  outliers (`out` gives the tail).
 
 ## Details
 
@@ -122,12 +123,13 @@ generalized_boxplot(data)
 # Retrieve the generalized boxplot statistics
 generalized_boxplot(data, plot = FALSE)
 #> $stats
-#> # A tibble: 3 × 8
-#>   variable       lower     q1 median    q3 upper      g     h
-#>   <fct>          <dbl>  <dbl>  <dbl> <dbl> <dbl>  <dbl> <dbl>
-#> 1 normal       -1.65   -0.494 0.0618 0.692  1.86 0.0947 0.102
-#> 2 skewed       -0.0666  0.685 1.43   2.99   6.23 0.0925 0    
-#> 3 heavy_tailed -2.75   -0.569 0.146  0.835  3.54 0.153  0.250
+#> # A tibble: 3 × 10
+#>   variable        lower     q1 median    q3 upper lower_fence upper_fence      g
+#>   <fct>           <dbl>  <dbl>  <dbl> <dbl> <dbl>       <dbl>       <dbl>  <dbl>
+#> 1 normal       -1.55    -0.494 0.0618 0.692  1.79     -1.65          1.86 0.0947
+#> 2 skewed        0.00873  0.685 1.43   2.99   5.91     -0.0666        6.23 0.0925
+#> 3 heavy_tailed -2.63    -0.569 0.146  0.835  2.80     -2.75          3.54 0.153 
+#> # ℹ 1 more variable: h <dbl>
 #> 
 #> $outliers
 #> # A tibble: 18 × 3

@@ -30,7 +30,7 @@ peak_fit(
 - profile:
 
   A character specifying the lineshape function to be used:
-  "lorentzian", "gaussian" or "voigt" (pseudo-Voigt).
+  "lorentzian", "gaussian", "voigt" (exact) or "pseudo_voigt".
 
 - wL:
 
@@ -85,14 +85,17 @@ The function uses
 which is based on the Levenberg-Marquardt algorithm for searching the
 minimum value of the square of the sum of the residuals. Each spectrum
 (row of `x`) is fitted separately with the model \$\$y = y_0 + A \cdot
-f(x; x_c, w)\$\$ where \\f\\ is a unit-area Gaussian, Lorentzian or
-pseudo-Voigt profile (see
+f(x; x_c, w)\$\$ where \\f\\ is a unit-area Gaussian, Lorentzian, Voigt
+or pseudo-Voigt profile (see
 [`gaussian_profile()`](https://christiangoueguel.com/specProc/reference/gaussian_profile.md),
-[`lorentzian_profile()`](https://christiangoueguel.com/specProc/reference/lorentzian_profile.md)
+[`lorentzian_profile()`](https://christiangoueguel.com/specProc/reference/lorentzian_profile.md),
+[`voigt_profile()`](https://christiangoueguel.com/specProc/reference/voigt_profile.md)
 and
 [`pseudo_voigt_profile()`](https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.md)).
 The fitted parameters are `y0`, `xc`, `A` and the width(s) `wG` and/or
-`wL`.
+`wL` (full widths at half maximum). The Voigt profile is evaluated
+exactly in C++; the pseudo-Voigt (Thompson-Cox-Hastings) approximation
+is faster but accurate to about 1\\
 
 Initial values that are not supplied are estimated from the data: the
 peak center from the position of the maximum, the width from the full

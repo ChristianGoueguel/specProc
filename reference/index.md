@@ -167,6 +167,8 @@ Functions used for charcaterizing plasma emission in laser spectroscopy.
 
 - [`tukey_gh()`](https://christiangoueguel.com/specProc/reference/tukey_gh.md)
   : Tukey g-and-h Parametric Distribution
+- [`voigt_profile()`](https://christiangoueguel.com/specProc/reference/voigt_profile.md)
+  : Voigt Function
 - [`gaussian_profile()`](https://christiangoueguel.com/specProc/reference/gaussian_profile.md)
   : Gaussian Function
 - [`lorentzian_profile()`](https://christiangoueguel.com/specProc/reference/lorentzian_profile.md)
@@ -181,3 +183,8 @@ Functions used for charcaterizing plasma emission in laser spectroscopy.
   and Biweight Midcorrelation
 - [`summary_stats()`](https://christiangoueguel.com/specProc/reference/summary_stats.md)
   : Classical or Robust Descriptive Statistics
+
+## Data
+
+- [`specLIBS`](https://christiangoueguel.com/specProc/reference/specLIBS.md)
+  : LIBS Spectra of Soil Samples

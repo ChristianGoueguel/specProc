@@ -63,7 +63,7 @@ can be given with <code>id</code>.</p></dd>
 
 <dt id="arg-profile">profile<a class="anchor" aria-label="anchor" href="#arg-profile"></a></dt>
 <dd><p>A character specifying the lineshape function to be used:
-"lorentzian", "gaussian" or "voigt" (pseudo-Voigt).</p></dd>
+"lorentzian", "gaussian", "voigt" (exact) or "pseudo_voigt".</p></dd>
 
 
 <dt id="arg-wl">wL<a class="anchor" aria-label="anchor" href="#arg-wl"></a></dt>
@@ -108,9 +108,12 @@ can be given with <code>id</code>.</p></dd>
 algorithm for searching the minimum value of the square of the sum of the residuals.
 Each spectrum (row of <code>x</code>) is fitted separately with the model
 $$y = y_0 + A \cdot f(x; x_c, w)$$
-where \(f\) is a unit-area Gaussian, Lorentzian or pseudo-Voigt profile
-(see <code><a href="gaussian_profile.html">gaussian_profile()</a></code>, <code><a href="lorentzian_profile.html">lorentzian_profile()</a></code> and <code><a href="pseudo_voigt_profile.html">pseudo_voigt_profile()</a></code>). The fitted
-parameters are <code>y0</code>, <code>xc</code>, <code>A</code> and the width(s) <code>wG</code> and/or <code>wL</code>.</p>
+where \(f\) is a unit-area Gaussian, Lorentzian, Voigt or pseudo-Voigt profile
+(see <code><a href="gaussian_profile.html">gaussian_profile()</a></code>, <code><a href="lorentzian_profile.html">lorentzian_profile()</a></code>, <code><a href="voigt_profile.html">voigt_profile()</a></code> and
+<code><a href="pseudo_voigt_profile.html">pseudo_voigt_profile()</a></code>). The fitted parameters are <code>y0</code>, <code>xc</code>, <code>A</code> and the
+width(s) <code>wG</code> and/or <code>wL</code> (full widths at half maximum). The Voigt profile
+is evaluated exactly in C++; the pseudo-Voigt (Thompson-Cox-Hastings)
+approximation is faster but accurate to about 1\<!-- %. --></p>
 <p>Initial values that are not supplied are estimated from the data: the peak
 center from the position of the maximum, the width from the full width at
 half maximum, and the area from the integrated intensity above the minimum.
