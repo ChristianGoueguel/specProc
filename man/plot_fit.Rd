@@ -52,7 +52,9 @@ A \code{patchwork} (ggplot2) object.
 }
 \description{
 Plots the data and the fitted lineshape returned by \code{\link[=peak_fit]{peak_fit()}} or
-\code{\link[=multipeak_fit]{multipeak_fit()}}, together with the residuals. For multi-peak fits, the
+\code{\link[=multipeak_fit]{multipeak_fit()}}, together with the residuals. The fitted curve is drawn
+on a fine wavelength grid, so it shows the fitted profile between the
+measured channels. For multi-peak fits, the
 individual peak contributions are drawn as dashed lines. When several
 spectra were fitted, one panel is drawn per spectrum.
 }

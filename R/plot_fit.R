@@ -4,7 +4,9 @@
 #'
 #' @description
 #' Plots the data and the fitted lineshape returned by [peak_fit()] or
-#' [multipeak_fit()], together with the residuals. For multi-peak fits, the
+#' [multipeak_fit()], together with the residuals. The fitted curve is drawn
+#' on a fine wavelength grid, so it shows the fitted profile between the
+#' measured channels. For multi-peak fits, the
 #' individual peak contributions are drawn as dashed lines. When several
 #' spectra were fitted, one panel is drawn per spectrum.
 #'
@@ -61,23 +63,29 @@ plot_fit <- function(data, title = NULL, pt.size = 3, pt.colour = "black", pt.sh
 
   x <- y <- .fitted <- .resid <- value <- peak <- NULL
 
+  # Smooth fitted curves on a fine wavelength grid: lines are often sampled
+  # by only a few channels, so joining the fitted values at the data points
+  # would misrepresent the fitted profile.
+  curve <- dplyr::bind_rows(lapply(which(ok), function(i) {
+    xr <- range(data$augmented[[i]]$x)
+    cv <- fit_curve(data$fit[[i]], seq(xr[1], xr[2], length.out = 500))
+    cv$.id <- as.character(data[[id_col]][i])
+    cv
+  }))
+  curve$.id <- factor(curve$.id, levels = levels(aug$.id))
+
   plot1 <- ggplot2::ggplot(aug) +
     ggplot2::geom_point(ggplot2::aes(x = x, y = y), size = pt.size, colour = pt.colour, shape = pt.shape, fill = pt.fill)
 
-  peak_cols <- grep("^\\.peak_", names(aug), value = TRUE)
+  peak_cols <- grep("^\\.peak_", names(curve), value = TRUE)
   if (length(peak_cols) > 0) {
-    y0 <- vapply(which(ok), function(i) {
-      est <- data$tidied[[i]]
-      est$estimate[est$term == "y0"]
-    }, numeric(1))
-    comp <- tidyr::pivot_longer(aug, dplyr::all_of(peak_cols), names_to = "peak", values_to = "value")
-    comp$value <- comp$value + y0[as.integer(comp$.id)]
+    comp <- tidyr::pivot_longer(curve, dplyr::all_of(peak_cols), names_to = "peak", values_to = "value")
     plot1 <- plot1 +
       ggplot2::geom_line(data = comp, ggplot2::aes(x = x, y = value, group = peak), linetype = "dashed", colour = "grey40")
   }
 
   plot1 <- plot1 +
-    ggplot2::geom_line(ggplot2::aes(x = x, y = .fitted), linewidth = line.size, colour = line.colour, linetype = linetype) +
+    ggplot2::geom_line(data = curve, ggplot2::aes(x = x, y = .fitted), linewidth = line.size, colour = line.colour, linetype = linetype) +
     ggplot2::labs(subtitle = title, x = NULL, y = "Intensity [arb. units]") +
     ggplot2::theme_bw(base_size = 10)
   plot2 <- ggplot2::ggplot(aug, ggplot2::aes(x = x, y = .resid)) +
