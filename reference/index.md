@@ -6,9 +6,9 @@ Functions used to assess individual variables or features independently.
 
 - [`zscore()`](https://christiangoueguel.com/specProc/reference/zscore.md)
   : Classical or Robust Z-Score
-- [`iqrMethod()`](https://christiangoueguel.com/specProc/reference/iqrMethod.md)
+- [`iqr_outliers()`](https://christiangoueguel.com/specProc/reference/iqr_outliers.md)
   : Interquartile Range Method
-- [`directOutlyingness()`](https://christiangoueguel.com/specProc/reference/directOutlyingness.md)
+- [`directional_outlyingness()`](https://christiangoueguel.com/specProc/reference/directional_outlyingness.md)
   : Directional Outlyingness for Skewed Distribution
 
 ## Multivariate filtering
@@ -32,7 +32,7 @@ sources of variance from the multivariate data.
   : Direct Orthogonal Signal Correction
 - [`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md)
   : Projected Orthogonal Signal Correction
-- [`yGradientglsw()`](https://christiangoueguel.com/specProc/reference/yGradientglsw.md)
+- [`y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/y_gradient_glsw.md)
   : y-Gradient Generalized Least Squares Weighting
 - [`direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/direct_orthogonal.md)
   : Direct Orthogonalization
@@ -53,20 +53,20 @@ Functions used to characterize spectral lines. The choice of the fitting
 function depends on the specific broadening mechanisms and physical
 conditions of the emitting environment.
 
-- [`peakfit()`](https://christiangoueguel.com/specProc/reference/peakfit.md)
+- [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md)
   : Peak Fitting
-- [`multipeakfit()`](https://christiangoueguel.com/specProc/reference/multipeakfit.md)
+- [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md)
   : Multiple Peaks Fitting
 
 ## Data visualization
 
 Functions that help assess data visually.
 
-- [`plotfit()`](https://christiangoueguel.com/specProc/reference/plotfit.md)
+- [`plot_fit()`](https://christiangoueguel.com/specProc/reference/plot_fit.md)
   : Plotting of Fitted Spectral Line
-- [`plotSpec()`](https://christiangoueguel.com/specProc/reference/plotSpec.md)
+- [`plot_spectra()`](https://christiangoueguel.com/specProc/reference/plot_spectra.md)
   : Plotting of Spectra
-- [`outlierplot()`](https://christiangoueguel.com/specProc/reference/outlierplot.md)
+- [`plot_outliers()`](https://christiangoueguel.com/specProc/reference/plot_outliers.md)
   : Univariate Representation of Multivariate Outliers
 - [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md)
   : Adjusted Boxplot
@@ -84,7 +84,7 @@ Functions used to increase the signal-to-noise ratio.
 
 Functions used to fit and remove the background emission.
 
-- [`whittaker()`](https://christiangoueguel.com/specProc/reference/whittaker.md)
+- [`baseline_als()`](https://christiangoueguel.com/specProc/reference/baseline_als.md)
   : Asymmetric Least Squares
 - [`baseline_lsp()`](https://christiangoueguel.com/specProc/reference/baseline_lsp.md)
   : Least-Squares Polynomial
@@ -109,7 +109,7 @@ computed based on the dispersion of the variable.
 
 - [`snv()`](https://christiangoueguel.com/specProc/reference/snv.md) :
   Standard Normal Variate
-- [`pareto()`](https://christiangoueguel.com/specProc/reference/pareto.md)
+- [`pareto_scale()`](https://christiangoueguel.com/specProc/reference/pareto_scale.md)
   : Pareto Scaling
 - [`minmax()`](https://christiangoueguel.com/specProc/reference/minmax.md)
   : Min-Max Normalization
@@ -122,7 +122,7 @@ computed based on the dispersion of the variable.
 
 Function used to transform variable(s) toward central normality.
 
-- [`robustBCYJ()`](https://christiangoueguel.com/specProc/reference/robustBCYJ.md)
+- [`robust_bcyj()`](https://christiangoueguel.com/specProc/reference/robust_bcyj.md)
   : Robust Box-Cox and Yeo-Johnson Transformation
 
 ## Robust statistical estimators
@@ -158,20 +158,20 @@ dispersion).
 
 - [`umad()`](https://christiangoueguel.com/specProc/reference/umad.md) :
   Unbiased Median Absolute Deviation
-- [`rousseeuwCroux()`](https://christiangoueguel.com/specProc/reference/rousseeuwCroux.md)
+- [`rousseeuw_croux()`](https://christiangoueguel.com/specProc/reference/rousseeuw_croux.md)
   : Rousseeuw-Croux Scale Estimators
 
 ## Special functions
 
 Functions used for charcaterizing plasma emission in laser spectroscopy.
 
-- [`tukeyGH()`](https://christiangoueguel.com/specProc/reference/tukeyGH.md)
+- [`tukey_gh()`](https://christiangoueguel.com/specProc/reference/tukey_gh.md)
   : Tukey g-and-h Parametric Distribution
-- [`gaussian()`](https://christiangoueguel.com/specProc/reference/gaussian.md)
+- [`gaussian_profile()`](https://christiangoueguel.com/specProc/reference/gaussian_profile.md)
   : Gaussian Function
-- [`lorentzian()`](https://christiangoueguel.com/specProc/reference/lorentzian.md)
+- [`lorentzian_profile()`](https://christiangoueguel.com/specProc/reference/lorentzian_profile.md)
   : Lorentzian Function
-- [`pseudo_voigt()`](https://christiangoueguel.com/specProc/reference/pseudo_voigt.md)
+- [`pseudo_voigt_profile()`](https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.md)
   : Pseudo-Voigt Function
 
 ## Miscellaneous
@@ -179,5 +179,5 @@ Functions used for charcaterizing plasma emission in laser spectroscopy.
 - [`correlation()`](https://christiangoueguel.com/specProc/reference/correlation.md)
   : Correlation Coefficients: Pearson, Spearman, Kendall, Chatterjee,
   and Biweight Midcorrelation
-- [`summaryStats()`](https://christiangoueguel.com/specProc/reference/summaryStats.md)
+- [`summary_stats()`](https://christiangoueguel.com/specProc/reference/summary_stats.md)
   : Classical or Robust Descriptive Statistics

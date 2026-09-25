@@ -36,41 +36,32 @@
 <p>This release fixes a large number of bugs so that every exported function now runs and returns numerically correct results. It adds a test suite (400+ expectations), and several results are checked against independent reference implementations.</p>
 <div class="section level3">
 <h3 id="breaking-changes-0-2-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-2-0"></a></h3>
-<ul><li>
-<code><a href="../reference/baseline_arpls.html">baseline_arpls()</a></code>, <code><a href="../reference/baseline_lsp.html">baseline_lsp()</a></code> and <code><a href="../reference/whittaker.html">whittaker()</a></code> return tibbles (they previously returned plain lists of columns). They no longer replace negative corrected values with 1.</li>
-<li>
-<code><a href="../reference/average.html">average()</a></code> with <code>.group_by</code> now returns the group labels as the first column.</li>
-<li>
-<code><a href="../reference/biweight_location.html">biweight_location()</a></code> and <code><a href="../reference/biweight_scale.html">biweight_scale()</a></code> use the unscaled MAD, following the standard definition (Beers et al., 1990), so that <code>biweight_scale()^2</code> equals <code><a href="../reference/biweight_midvariance.html">biweight_midvariance()</a></code>. <code><a href="../reference/biweight_scale.html">biweight_scale()</a></code> loses its unused <code>tol</code> and <code>max_iter</code> arguments. <code>loc = NULL</code> now means “median of <code>x</code>”.</li>
-<li>
-<code><a href="../reference/direct_orthogonal.html">direct_orthogonal()</a></code> loses its unused <code>max_iter</code> and <code>tol</code> arguments, and <code><a href="../reference/direct_osc.html">direct_osc()</a></code> loses <code>max_iter</code>. <code>tol</code> now sets the pseudo-inverse tolerance.</li>
-<li>
-<code><a href="../reference/epo.html">epo()</a></code> gains a <code>clutter</code> argument (the matrix describing the external variation). Its default <code>ncomp</code> is now 2, as documented. It now removes the <em>dominant</em> singular directions; before, it removed the smallest ones.</li>
-<li>
-<code><a href="../reference/o2pls.html">o2pls()</a></code> has a new interface: <code>o2pls(x, y, ncomp, nx, ny, center, scale)</code>.</li>
-<li>
-<code><a href="../reference/pds.html">pds()</a></code> returns <code>transfer_matrix</code> (was <code>transfert_matrix</code>), <code>alpha</code> now blends the local and global models, and progress is no longer printed.</li>
-<li>
-<code><a href="../reference/projected_osc.html">projected_osc()</a></code> always returns the corrected training data. New data are preprocessed with the training centers and scales.</li>
-<li>
-<code><a href="../reference/quantile_weight.html">quantile_weight()</a></code> uses whole-distribution quantiles, as in Brys et al. (2006), and defaults to <code>p = 0.125</code>, <code>q = 0.875</code>.</li>
-<li>
-<code>summaryStats(robust = TRUE)</code> drops the <code>rsd</code> column. It applied the 1.4826 consistency factor twice, and <code>mad</code> already holds the correct value.</li>
-<li>
-<code><a href="../reference/opls.html">opls()</a></code> now requires the Bioconductor package ropls to be installed (it moved to Suggests). It no longer prints output or draws plots.</li>
-<li>R &gt;= 4.1.0 is required.</li>
+<ul><li><p>Functions were renamed to a consistent snake_case scheme. The old names still work but give a deprecation warning (see <code><a href="../reference/specProc-deprecated.html">?"specProc-deprecated"</a></code>): <code><a href="../reference/specProc-deprecated.html">whittaker()</a></code> -&gt; <code><a href="../reference/baseline_als.html">baseline_als()</a></code>, <code><a href="../reference/specProc-deprecated.html">lorentzian()</a></code> -&gt; <code><a href="../reference/lorentzian_profile.html">lorentzian_profile()</a></code>, <code><a href="../reference/specProc-deprecated.html">pseudo_voigt()</a></code> -&gt; <code><a href="../reference/pseudo_voigt_profile.html">pseudo_voigt_profile()</a></code>, <code><a href="../reference/specProc-deprecated.html">peakfit()</a></code> -&gt; <code><a href="../reference/peak_fit.html">peak_fit()</a></code>, <code><a href="../reference/specProc-deprecated.html">multipeakfit()</a></code> -&gt; <code><a href="../reference/multipeak_fit.html">multipeak_fit()</a></code>, <code><a href="../reference/specProc-deprecated.html">plotfit()</a></code> -&gt; <code><a href="../reference/plot_fit.html">plot_fit()</a></code>, <code><a href="../reference/specProc-deprecated.html">plotSpec()</a></code> -&gt; <code><a href="../reference/plot_spectra.html">plot_spectra()</a></code>, <code><a href="../reference/specProc-deprecated.html">outlierplot()</a></code> -&gt; <code><a href="../reference/plot_outliers.html">plot_outliers()</a></code>, <code><a href="../reference/specProc-deprecated.html">directOutlyingness()</a></code> -&gt; <code><a href="../reference/directional_outlyingness.html">directional_outlyingness()</a></code>, <code><a href="../reference/specProc-deprecated.html">iqrMethod()</a></code> -&gt; <code><a href="../reference/iqr_outliers.html">iqr_outliers()</a></code>, <code><a href="../reference/specProc-deprecated.html">robustBCYJ()</a></code> -&gt; <code><a href="../reference/robust_bcyj.html">robust_bcyj()</a></code>, <code><a href="../reference/specProc-deprecated.html">rousseeuwCroux()</a></code> -&gt; <code><a href="../reference/rousseeuw_croux.html">rousseeuw_croux()</a></code>, <code><a href="../reference/specProc-deprecated.html">summaryStats()</a></code> -&gt; <code><a href="../reference/summary_stats.html">summary_stats()</a></code>, <code><a href="../reference/specProc-deprecated.html">tukeyGH()</a></code> -&gt; <code><a href="../reference/tukey_gh.html">tukey_gh()</a></code>, <code><a href="../reference/specProc-deprecated.html">yGradientglsw()</a></code> -&gt; <code><a href="../reference/y_gradient_glsw.html">y_gradient_glsw()</a></code>, <code><a href="../reference/specProc-deprecated.html">pareto()</a></code> -&gt; <code><a href="../reference/pareto_scale.html">pareto_scale()</a></code>.</p></li>
+<li><p><code><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian()</a></code> is renamed to <code><a href="../reference/gaussian_profile.html">gaussian_profile()</a></code> <strong>without</strong> an alias, because exporting <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">gaussian()</a></code> masked <code><a href="https://rdrr.io/r/stats/family.html" class="external-link">stats::gaussian()</a></code>, which breaks <code>glm(family = gaussian)</code> when specProc is loaded.</p></li>
+<li><p><code><a href="../reference/baseline_arpls.html">baseline_arpls()</a></code>, <code><a href="../reference/baseline_lsp.html">baseline_lsp()</a></code> and <code><a href="../reference/specProc-deprecated.html">whittaker()</a></code> return tibbles (they previously returned plain lists of columns). They no longer replace negative corrected values with 1.</p></li>
+<li><p><code><a href="../reference/average.html">average()</a></code> with <code>.group_by</code> now returns the group labels as the first column.</p></li>
+<li><p><code><a href="../reference/biweight_location.html">biweight_location()</a></code> and <code><a href="../reference/biweight_scale.html">biweight_scale()</a></code> use the unscaled MAD, following the standard definition (Beers et al., 1990), so that <code>biweight_scale()^2</code> equals <code><a href="../reference/biweight_midvariance.html">biweight_midvariance()</a></code>. <code><a href="../reference/biweight_scale.html">biweight_scale()</a></code> loses its unused <code>tol</code> and <code>max_iter</code> arguments. <code>loc = NULL</code> now means “median of <code>x</code>”.</p></li>
+<li><p><code><a href="../reference/direct_orthogonal.html">direct_orthogonal()</a></code> loses its unused <code>max_iter</code> and <code>tol</code> arguments, and <code><a href="../reference/direct_osc.html">direct_osc()</a></code> loses <code>max_iter</code>. <code>tol</code> now sets the pseudo-inverse tolerance.</p></li>
+<li><p><code><a href="../reference/epo.html">epo()</a></code> gains a <code>clutter</code> argument (the matrix describing the external variation). Its default <code>ncomp</code> is now 2, as documented. It now removes the <em>dominant</em> singular directions; before, it removed the smallest ones.</p></li>
+<li><p><code><a href="../reference/o2pls.html">o2pls()</a></code> has a new interface: <code>o2pls(x, y, ncomp, nx, ny, center, scale)</code>.</p></li>
+<li><p><code><a href="../reference/pds.html">pds()</a></code> returns <code>transfer_matrix</code> (was <code>transfert_matrix</code>), <code>alpha</code> now blends the local and global models, and progress is no longer printed.</p></li>
+<li><p><code><a href="../reference/projected_osc.html">projected_osc()</a></code> always returns the corrected training data. New data are preprocessed with the training centers and scales.</p></li>
+<li><p><code><a href="../reference/quantile_weight.html">quantile_weight()</a></code> uses whole-distribution quantiles, as in Brys et al. (2006), and defaults to <code>p = 0.125</code>, <code>q = 0.875</code>.</p></li>
+<li><p><code>summaryStats(robust = TRUE)</code> drops the <code>rsd</code> column. It applied the 1.4826 consistency factor twice, and <code>mad</code> already holds the correct value.</p></li>
+<li><p><code><a href="../reference/opls.html">opls()</a></code> now requires the Bioconductor package ropls to be installed (it moved to Suggests). It no longer prints output or draws plots.</p></li>
+<li><p>R &gt;= 4.1.0 is required.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-2-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-0"></a></h3>
-<ul><li>Fixed crashes in <code><a href="../reference/baseline_arpls.html">baseline_arpls()</a></code>, <code><a href="../reference/whittaker.html">whittaker()</a></code>, <code><a href="../reference/baseline_lsp.html">baseline_lsp()</a></code> (data frames), <code>correlation(method = "bicor")</code>, <code>directOutlyingness(maxRatio = )</code>, <code><a href="../reference/direct_osc.html">direct_osc()</a></code>, <code><a href="../reference/msc.html">msc()</a></code>, <code><a href="../reference/multipeakfit.html">multipeakfit()</a></code>, <code><a href="../reference/nas.html">nas()</a></code>, <code><a href="../reference/o2pls.html">o2pls()</a></code>, <code><a href="../reference/osc.html">osc()</a></code> (<code>"wold"</code>, <code>"fearn"</code>), <code><a href="../reference/pds.html">pds()</a></code>, <code><a href="../reference/peakfit.html">peakfit()</a></code>, <code><a href="../reference/projected_osc.html">projected_osc()</a></code> and <code><a href="../reference/yGradientglsw.html">yGradientglsw()</a></code>.</li>
+<ul><li>Fixed crashes in <code><a href="../reference/baseline_arpls.html">baseline_arpls()</a></code>, <code><a href="../reference/specProc-deprecated.html">whittaker()</a></code>, <code><a href="../reference/baseline_lsp.html">baseline_lsp()</a></code> (data frames), <code>correlation(method = "bicor")</code>, <code>directOutlyingness(maxRatio = )</code>, <code><a href="../reference/direct_osc.html">direct_osc()</a></code>, <code><a href="../reference/msc.html">msc()</a></code>, <code><a href="../reference/specProc-deprecated.html">multipeakfit()</a></code>, <code><a href="../reference/nas.html">nas()</a></code>, <code><a href="../reference/o2pls.html">o2pls()</a></code>, <code><a href="../reference/osc.html">osc()</a></code> (<code>"wold"</code>, <code>"fearn"</code>), <code><a href="../reference/pds.html">pds()</a></code>, <code><a href="../reference/specProc-deprecated.html">peakfit()</a></code>, <code><a href="../reference/projected_osc.html">projected_osc()</a></code> and <code><a href="../reference/specProc-deprecated.html">yGradientglsw()</a></code>.</li>
 <li>
-<code><a href="../reference/glsw.html">glsw()</a></code> and <code><a href="../reference/yGradientglsw.html">yGradientglsw()</a></code> squared the eigenvalues of the covariance matrix when building the filter.</li>
+<code><a href="../reference/glsw.html">glsw()</a></code> and <code><a href="../reference/specProc-deprecated.html">yGradientglsw()</a></code> squared the eigenvalues of the covariance matrix when building the filter.</li>
 <li>
 <code><a href="../reference/msc.html">msc()</a></code> regressed each wavelength instead of each spectrum on the reference.</li>
 <li>
 <code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code> transformed the ranks instead of the data. This made the g-and-h estimates meaningless. It also failed when the two tails had different numbers of outliers.</li>
 <li>
-<code><a href="../reference/pseudo_voigt.html">pseudo_voigt()</a></code> counted the area and the offset twice.</li>
+<code><a href="../reference/specProc-deprecated.html">pseudo_voigt()</a></code> counted the area and the offset twice.</li>
 <li>
 <code><a href="../reference/biweight_scale.html">biweight_scale()</a></code> used a wrong exponent in the denominator. It also ignored <code>reduced = TRUE</code>.</li>
 <li>
@@ -80,18 +71,18 @@
 <li>
 <code>normalize(method = "background")</code> rejected data frames for <code>bkg</code>.</li>
 <li>
-<code><a href="../reference/plotSpec.html">plotSpec()</a></code> connected all spectra into a single line when <code>id</code> was not given.</li>
+<code><a href="../reference/specProc-deprecated.html">plotSpec()</a></code> connected all spectra into a single line when <code>id</code> was not given.</li>
 <li>
-<code><a href="../reference/outlierplot.html">outlierplot()</a></code> no longer changes the user’s random number generator state.</li>
+<code><a href="../reference/specProc-deprecated.html">outlierplot()</a></code> no longer changes the user’s random number generator state.</li>
 <li>
-<code><a href="../reference/iqrMethod.html">iqrMethod()</a></code> no longer changes global options. Missing values no longer cause errors.</li>
+<code><a href="../reference/specProc-deprecated.html">iqrMethod()</a></code> no longer changes global options. Missing values no longer cause errors.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-0-2-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-2-0"></a></h3>
 <ul><li>Asymmetric least squares and arPLS baselines are solved in C++ with a banded Cholesky factorization. The cost is O(n) per spectrum, so they scale to spectra with tens of thousands of channels.</li>
 <li>EPO and GLSW use Eigen’s divide-and-conquer SVD and never form the p x p covariance or projection matrices.</li>
 <li>
-<code><a href="../reference/peakfit.html">peakfit()</a></code> and <code><a href="../reference/multipeakfit.html">multipeakfit()</a></code> estimate starting values from the data when <code>wL</code>, <code>wG</code> or <code>A</code> are not given. <code><a href="../reference/multipeakfit.html">multipeakfit()</a></code> fits all lines simultaneously and returns each line’s contribution. A spectrum that fails to fit produces a warning instead of stopping the whole batch.</li>
+<code><a href="../reference/specProc-deprecated.html">peakfit()</a></code> and <code><a href="../reference/specProc-deprecated.html">multipeakfit()</a></code> estimate starting values from the data when <code>wL</code>, <code>wG</code> or <code>A</code> are not given. <code><a href="../reference/specProc-deprecated.html">multipeakfit()</a></code> fits all lines simultaneously and returns each line’s contribution. A spectrum that fails to fit produces a warning instead of stopping the whole batch.</li>
 <li>The orthogonalization functions return the centers and scales, so the same preprocessing can be applied to new data.</li>
 <li>Fewer dependencies: corrr, cowplot, forcats, mt, broom and ropls are no longer imported.</li>
 </ul></div>

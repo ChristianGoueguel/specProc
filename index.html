@@ -88,7 +88,7 @@
 <h4 id="classical-approach">classical approach<a class="anchor" aria-label="anchor" href="#classical-approach"></a>
 </h4>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/summaryStats.html">summaryStats</a></span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/summary_stats.html">summary_stats</a></span><span class="op">(</span><span class="va">tbl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 3 × 14</span></span>
 <span><span class="co">#&gt;   variable    mean  mode median   IQR    sd variance      cv     min   max range</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
@@ -101,7 +101,7 @@
 <h4 id="robust-approach">robust approach<a class="anchor" aria-label="anchor" href="#robust-approach"></a>
 </h4>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/summaryStats.html">summaryStats</a></span><span class="op">(</span><span class="va">tbl</span>, robust <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/summary_stats.html">summary_stats</a></span><span class="op">(</span><span class="va">tbl</span>, robust <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 3 × 13</span></span>
 <span><span class="co">#&gt;   variable    median   mad    Qn    Sn medcouple   LMC   RMC biloc biscale bivar</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;</span></span>
@@ -170,7 +170,7 @@
 <code class="sourceCode R"><span><span class="va">window</span> <span class="op">&lt;-</span> <span class="va">wl</span> <span class="op">&gt;=</span> <span class="fl">393</span> <span class="op">&amp;</span> <span class="va">wl</span> <span class="op">&lt;=</span> <span class="fl">394</span></span>
 <span><span class="va">lines_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span><span class="op">[</span><span class="va">window</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">lines_df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">wl</span><span class="op">[</span><span class="va">window</span><span class="op">]</span></span>
-<span><span class="va">ca_line</span> <span class="op">&lt;-</span> <span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/peakfit.html">peakfit</a></span><span class="op">(</span><span class="va">lines_df</span>, profile <span class="op">=</span> <span class="st">"voigt"</span><span class="op">)</span></span>
+<span><span class="va">ca_line</span> <span class="op">&lt;-</span> <span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/peak_fit.html">peak_fit</a></span><span class="op">(</span><span class="va">lines_df</span>, profile <span class="op">=</span> <span class="st">"voigt"</span><span class="op">)</span></span>
 <span><span class="va">ca_line</span><span class="op">$</span><span class="va">tidied</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="co">#&gt; # A tibble: 5 × 5</span></span>
 <span><span class="co">#&gt;   term    estimate std.error    statistic   p.value</span></span>
@@ -180,7 +180,7 @@
 <span><span class="co">#&gt; 3 wG      0.118    0.000903      130.     6.56e-109</span></span>
 <span><span class="co">#&gt; 4 wL      0.000100 0.00140         0.0714 9.43e-  1</span></span>
 <span><span class="co">#&gt; 5 A      15.1      0.0885        170.     6.94e-120</span></span>
-<span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/plotfit.html">plotfit</a></span><span class="op">(</span><span class="va">ca_line</span>, title <span class="op">=</span> <span class="st">"Ca II 393.4 nm"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">specProc</span><span class="fu">::</span><span class="fu"><a href="reference/plot_fit.html">plot_fit</a></span><span class="op">(</span><span class="va">ca_line</span>, title <span class="op">=</span> <span class="st">"Ca II 393.4 nm"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-10-1.png" width="90%" height="90%"></p>
 </div>
 </div>
