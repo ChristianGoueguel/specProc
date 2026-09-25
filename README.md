@@ -404,7 +404,8 @@ The vignettes develop the example above in more depth:
 - `vignette("line-fitting", package = "specProc")`: choosing a line
   profile, and the sources of uncertainty in fitted line areas.
 - `vignette("calibration", package = "specProc")`: predicting soil clay
-  content with PLS, and estimating prediction error without leakage.
+  content with a compositional (log-ratio) PLS model, and estimating
+  prediction error without leakage.
 
 They are also available as [articles on the package
 website](https://christiangoueguel.com/specProc/articles/).

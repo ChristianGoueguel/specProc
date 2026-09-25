@@ -23,11 +23,15 @@ vignette uses a concrete goal to evaluate preprocessing choices:
 predicting the clay content of the 50 soil samples in `specLIBS` with
 partial least squares (PLS) regression.
 
-The main difficulty is statistical, not spectroscopic. With 50 samples
-and 7152 variables, a model can fit the calibration data almost
-perfectly, so everything depends on estimating prediction error honestly.
-Several common shortcuts bias that estimate downward. The vignette
-quantifies two of them.
+Two statistical issues shape the analysis:
+
+-   **Clay content is part of a composition.** Clay, sand and silt sum to
+    100%, so they should be modeled on a log-ratio scale, not as three
+    unrelated percentages.
+-   **There are 50 samples and 7152 variables.** A model can fit the
+    calibration data almost perfectly, so everything depends on estimating
+    the prediction error honestly. Common shortcuts bias it downward; the
+    vignette quantifies two of them.
 
 ```{r setup}
 library(specProc)
@@ -37,21 +41,70 @@ meta <- specLIBS[1:8]
 X <- as.matrix(specLIBS[-(1:8)])
 ```
 
-## The target
+## The target: a composition
 
-```{r target, fig.height = 3.5}
-clay <- tapply(meta$Clay, meta$Sample, unique)
-summary(clay)
-hist(clay, breaks = 15, col = "grey80", border = "white", main = NULL,
-     xlab = "Clay content (%)")
-rug(clay)
+```{r target}
+texture <- meta[!duplicated(meta$Sample), c("Sample", "Clay", "Sand", "Silt")]
+summary(texture[c("Clay", "Sand", "Silt")])
+summary(rowSums(texture[c("Clay", "Sand", "Silt")]))
 ```
 
-The distribution is left-skewed. Most samples contain 20 to 45% clay,
-while a handful of samples lie well above 55%. These few samples have high
-leverage: the model's behaviour at high clay content rests on very little
-data, and any error summary is sensitive to how they fall in the
-cross-validation folds.
+The three fractions sum to 100% (up to rounding), so they carry only two
+independent pieces of information. Modeling clay percentage directly with
+a linear model ignores this constraint, which has two consequences:
+
+-   **Predictions can leave the range 0–100%.** A linear model can predict
+    negative clay contents.
+-   **Errors are treated as equal on an absolute scale.** An error of 5
+    points counts the same at 5% clay as at 50% clay, although it is a 100%
+    error in the first case and a 10% error in the second.
+
+Compositional data analysis (Aitchison, 1986) removes the constraint by
+working with log-ratios. We use the **additive log-ratio** (ALR)
+transformation with silt as the reference fraction:
+
+\[
+z_1 = \log\frac{\text{clay}}{\text{silt}}, \qquad
+z_2 = \log\frac{\text{sand}}{\text{silt}}
+\]
+
+The two log-ratios are unconstrained real numbers, so they suit linear
+models such as PLS. We fit one PLS model for each. Their predictions
+\(\hat z_1, \hat z_2\) are transformed back to a composition:
+
+\[
+\widehat{\text{clay}} = 100 \, \frac{e^{\hat z_1}}{1 + e^{\hat z_1} + e^{\hat z_2}}, \qquad
+\widehat{\text{sand}} = 100 \, \frac{e^{\hat z_2}}{1 + e^{\hat z_1} + e^{\hat z_2}}, \qquad
+\widehat{\text{silt}} = 100 - \widehat{\text{clay}} - \widehat{\text{sand}}
+\]
+
+By construction, the predicted fractions are positive and sum to 100%.
+None of the fractions is zero in this data set, so the log-ratios are
+defined for every sample. Zeros would need a replacement strategy first.
+
+```{r logratio, fig.height = 3.5}
+composition <- as.matrix(texture[c("Clay", "Sand", "Silt")])
+composition <- composition / rowSums(composition)   # close to exactly 1
+z <- cbind(
+  clay_silt = log(composition[, "Clay"] / composition[, "Silt"]),
+  sand_silt = log(composition[, "Sand"] / composition[, "Silt"])
+)
+rownames(z) <- texture$Sample
+clay <- 100 * composition[, "Clay"]
+names(clay) <- texture$Sample
+
+back_transform <- function(z1, z2) 100 * exp(z1) / (1 + exp(z1) + exp(z2))
+
+op <- par(mfrow = c(1, 2), mar = c(4, 4, 1, 1))
+hist(clay, breaks = 15, col = "grey80", border = "white", main = NULL, xlab = "Clay (%)")
+hist(z[, "clay_silt"], breaks = 15, col = "grey80", border = "white", main = NULL,
+     xlab = "log(clay / silt)")
+par(op)
+```
+
+On the percentage scale, clay content is left-skewed, with a few samples
+above 55% and several below 10%. On the log-ratio scale, the low-clay
+samples are spread out rather than squeezed against zero.
 
 ## Preprocessing without leakage
 
@@ -75,26 +128,36 @@ sample_mean <- function(M) {
   a <- average(cbind(Sample = meta$Sample, as.data.frame(M)), Sample)
   out <- as.matrix(a[-1])
   rownames(out) <- a$Sample
-  out
+  out[texture$Sample, ]
 }
 raw_s <- sample_mean(X)
 base_s <- sample_mean(Xb)
 snv_s <- sample_mean(Xsnv)
-y <- clay[rownames(snv_s)]
 ```
 
 ## Validation design
 
 We use **repeated 5-fold cross-validation** with the sample as the unit.
 Each sample is one row after averaging, so all 8 shots of a sample are
-always on the same side of a split. Within each calibration set, the
-number of PLS components is chosen by an inner cross-validation (up to
-10 components). The outer folds therefore never influence this choice:
-this is nested cross-validation. The whole procedure is repeated 5 times
-with different fold assignments, to show how much the error estimate
-itself varies.
+always on the same side of a split. Within each calibration set, a PLS
+model is fitted to each log-ratio, and the two predicted log-ratios are
+back-transformed to clay percentages.
+
+The number of PLS components (up to 10, the same for both log-ratios) is
+chosen by an inner cross-validation within the calibration set, so the
+outer folds never influence this choice: this is nested cross-validation.
+The inner cross-validation minimizes the error of the **back-transformed
+clay predictions**, the same criterion used to evaluate the model.
+Choosing it instead on the log-ratio scale would optimize relative
+errors, which favors fewer components and gives worse clay percentages.
+With only 40 calibration samples per split, the chosen number of
+components still varies considerably from split to split.
+
+The whole procedure is repeated 5 times with different fold assignments,
+to show how much the error estimate itself varies.
 
 ```{r helpers}
+# PLS for a single response, ncomp chosen by inner CV on that response
 fit_predict <- function(Xtr, ytr, Xte, ncomp = NULL, max_comp = 10) {
   if (is.null(ncomp)) {
     inner <- pls::plsr(ytr ~ Xtr, ncomp = max_comp, validation = "CV", segments = 5)
@@ -104,11 +167,35 @@ fit_predict <- function(Xtr, ytr, Xte, ncomp = NULL, max_comp = 10) {
   list(pred = drop(predict(model, newdata = Xte, ncomp = ncomp)), ncomp = ncomp)
 }
 
-# Repeated K-fold CV. `pipeline(train, test)` returns the preprocessed
-# calibration and validation matrices and, optionally, a fixed ncomp.
+# Predictions of the two log-ratio models for 1..max_comp components,
+# back-transformed to clay (%): a matrix with one column per ncomp.
+logratio_path <- function(Xtr1, Xtr2, ztr, Xte1, Xte2, max_comp = 10) {
+  z1 <- predict(pls::plsr(ztr[, 1] ~ Xtr1, ncomp = max_comp), newdata = Xte1)[, 1, ]
+  z2 <- predict(pls::plsr(ztr[, 2] ~ Xtr2, ncomp = max_comp), newdata = Xte2)[, 1, ]
+  back_transform(matrix(z1, nrow(Xte1)), matrix(z2, nrow(Xte2)))
+}
+
+# Common ncomp for both log-ratios, minimizing the inner-CV error of the
+# back-transformed clay predictions.
+select_ncomp <- function(Xtr, ztr, claytr, segments = 5, max_comp = 10) {
+  seg <- sample(rep(seq_len(segments), length.out = nrow(Xtr)))
+  press <- numeric(max_comp)
+  for (s in seq_len(segments)) {
+    v <- seg == s
+    pred <- logratio_path(Xtr[!v, ], Xtr[!v, ], ztr[!v, ], Xtr[v, , drop = FALSE],
+                          Xtr[v, , drop = FALSE], max_comp)
+    press <- press + colSums((pred - claytr[v])^2)
+  }
+  which.min(press)
+}
+
+# Repeated K-fold CV of the log-ratio model. `pipeline(train, test, response)`
+# returns the preprocessed calibration and validation matrices, and
+# optionally a fixed ncomp. `response` is the log-ratio being modeled, used
+# only by supervised preprocessing.
 cross_validate <- function(pipeline, repeats = 5, K = 5, seed = 2024) {
   set.seed(seed)
-  n <- length(y)
+  n <- nrow(z)
   preds <- matrix(NA_real_, n, repeats)
   ncomps <- integer(0)
   for (r in seq_len(repeats)) {
@@ -116,14 +203,16 @@ cross_validate <- function(pipeline, repeats = 5, K = 5, seed = 2024) {
     for (k in seq_len(K)) {
       test <- which(folds == k)
       train <- which(folds != k)
-      d <- pipeline(train, test)
-      f <- fit_predict(d$train, y[train], d$test, ncomp = d$ncomp)
-      preds[test, r] <- f$pred
-      ncomps <- c(ncomps, f$ncomp)
+      d1 <- pipeline(train, test, z[train, 1])
+      d2 <- pipeline(train, test, z[train, 2])
+      g <- if (is.null(d1$ncomp)) select_ncomp(d1$train, z[train, ], clay[train]) else d1$ncomp
+      ncomps <- c(ncomps, g)
+      path <- logratio_path(d1$train, d2$train, z[train, ], d1$test, d2$test, max_comp = g)
+      preds[test, r] <- path[, g]
     }
   }
-  rmse <- apply(preds, 2, function(p) sqrt(mean((p - y)^2)))
-  r2 <- apply(preds, 2, function(p) 1 - sum((p - y)^2) / sum((y - mean(y))^2))
+  rmse <- apply(preds, 2, function(p) sqrt(mean((p - clay)^2)))
+  r2 <- apply(preds, 2, function(p) 1 - sum((p - clay)^2) / sum((clay - mean(clay))^2))
   list(preds = preds, rmse = rmse, r2 = r2, ncomp = stats::median(ncomps))
 }
 ```
@@ -135,21 +224,21 @@ fold assignments, so the comparisons are paired:
 
 ```{r pipelines}
 pipelines <- list(
-  `raw counts` = function(tr, te) list(train = raw_s[tr, ], test = raw_s[te, ]),
+  `raw counts` = function(tr, te, resp) list(train = raw_s[tr, ], test = raw_s[te, ]),
 
-  `baseline` = function(tr, te) list(train = base_s[tr, ], test = base_s[te, ]),
+  `baseline` = function(tr, te, resp) list(train = base_s[tr, ], test = base_s[te, ]),
 
-  `baseline + SNV` = function(tr, te) list(train = snv_s[tr, ], test = snv_s[te, ]),
+  `baseline + SNV` = function(tr, te, resp) list(train = snv_s[tr, ], test = snv_s[te, ]),
 
   # MSC: the reference spectrum is estimated on the calibration samples only
-  `baseline + MSC` = function(tr, te) {
+  `baseline + MSC` = function(tr, te, resp) {
     cal <- msc(base_s[tr, ])
     val <- msc(base_s[te, ], xref = cal$reference)
     list(train = as.matrix(cal$correction), test = as.matrix(val$correction))
   },
 
   # EPO: clutter = shot-to-shot deviations of the calibration samples only
-  `SNV + EPO` = function(tr, te) {
+  `SNV + EPO` = function(tr, te, resp) {
     shots <- meta$Sample %in% rownames(snv_s)[tr]
     S <- Xsnv[shots, ]
     clutter <- S - apply(S, 2, function(v) ave(v, meta$Sample[shots]))
@@ -157,10 +246,10 @@ pipelines <- list(
     list(train = filtered[tr, ], test = filtered[te, ])
   },
 
-  # OPLS filter (projected OSC) fitted on the calibration samples only,
-  # followed by a one-component PLS model
-  `SNV + OPLS filter` = function(tr, te) {
-    f <- projected_osc(snv_s[tr, ], y[tr], ncomp = 4, newdata = snv_s[te, ])
+  # OPLS filter (projected OSC) fitted to the calibration samples and to the
+  # log-ratio being modeled, followed by a one-component PLS model
+  `SNV + OPLS filter` = function(tr, te, resp) {
+    f <- projected_osc(snv_s[tr, ], resp, ncomp = 4, newdata = snv_s[te, ])
     list(train = as.matrix(f$correction), test = as.matrix(f$newdata$correction), ncomp = 1)
   }
 )
@@ -169,7 +258,7 @@ results <- lapply(pipelines, cross_validate)
 ```
 
 ```{r results}
-null_rmse <- sqrt(mean((y - mean(y))^2))
+null_rmse <- sqrt(mean((clay - mean(clay))^2))
 summary_table <- data.frame(
   pipeline = names(results),
   RMSE = sapply(results, function(r) mean(r$rmse)),
@@ -183,12 +272,11 @@ summary_table
 c(null_model_RMSE = round(null_rmse, 2))
 ```
 
-`RMSE` and `R2` are averages over the 5 repeats, and `RMSE_sd` is the
-standard deviation of the RMSE across repeats. All pipelines predict clay
-content far better than the null model, which
-predicts the mean for every sample (RMSE `r round(null_rmse, 1)`%). With
-an RMSE of about 8% and a cross-validated R² of about 0.7, the spectra
-explain most of the variation in clay content.
+`RMSE` (in % clay) and `R2` are averages over the 5 repeats, and
+`RMSE_sd` is the standard deviation of the RMSE across repeats. All
+pipelines predict clay content far better than the null model, which
+predicts the mean for every sample (RMSE `r round(null_rmse, 1)`%). The
+spectra explain most of the variation in clay content.
 
 Are the pipelines different from each other? The fold assignments are
 shared, so we compare each pipeline with the baseline-only pipeline
@@ -203,16 +291,81 @@ paired <- t(sapply(results, function(r) {
 round(paired, 2)
 ```
 
-Every pipeline differs from the baseline-only pipeline by less than 0.25
-points of RMSE on average, and for every pipeline the sign of the
-difference changes from one repeat to another. With 50 samples, these data cannot distinguish the pipelines
-reliably. This matches the finding of the preprocessing vignette: SNV
-improves the repeatability of the spectra, but removes between-sample
-variation too, and the two effects roughly cancel for clay prediction.
+The comparison separates two questions:
 
-The honest conclusion is that preprocessing choice matters little here.
-A claim that one pipeline is better would need more samples, or an
-independent validation set.
+-   **Normalizing helps.** All four pipelines that normalize the spectra
+    (SNV, MSC, SNV + EPO and SNV + OPLS filter) have a lower RMSE than
+    baseline correction alone in every repeat, by about 1.5 points of clay
+    on average. This answers the question left open in the preprocessing
+    vignette: the between-sample variation that normalization removes is
+    mostly unrelated to clay content, so removing it helps.
+-   **The normalized pipelines cannot be ranked.** Their mean RMSEs lie within
+    a few tenths of a point of each other, well within the variation between
+    repeats. The additional filters (EPO, OPLS) do not measurably improve on
+    SNV or MSC alone.
+
+A claim that one normalized pipeline is better than another would need
+more samples, or an independent validation set.
+
+## What the log-ratio model gains
+
+For comparison, we fit PLS directly to the clay percentage, with the same
+preprocessing (baseline + SNV) and the same fold assignments:
+
+```{r direct}
+direct <- local({
+  set.seed(2024)
+  preds <- matrix(NA_real_, nrow(z), 5)
+  for (r in 1:5) {
+    folds <- sample(rep(1:5, length.out = nrow(z)))
+    for (k in 1:5) {
+      test <- folds == k
+      preds[test, r] <- fit_predict(snv_s[!test, ], clay[!test], snv_s[test, ])$pred
+    }
+  }
+  preds
+})
+
+logratio <- results$`baseline + SNV`$preds
+compare <- function(P) {
+  p <- rowMeans(P)
+  c(
+    RMSE = mean(apply(P, 2, function(q) sqrt(mean((q - clay)^2)))),
+    median_abs_error = stats::median(abs(p - clay)),
+    min_prediction = min(P),
+    RMSE_log_clay = sqrt(mean((log(pmax(p, 0.1)) - log(clay))^2))
+  )
+}
+round(rbind(direct = compare(direct), log_ratio = compare(logratio)), 2)
+```
+
+The two models have a comparable RMSE; the difference is well within the
+variation between repeats. The log-ratio model is better on the other
+criteria:
+
+-   **Its predictions are always valid percentages.** The direct model
+    predicts negative clay contents for some low-clay samples.
+-   **Its typical error is smaller,** as the median absolute error shows. The
+    RMSE is dominated by the few large errors at high clay content.
+-   **Its relative errors are much smaller,** as the RMSE of log(clay)
+    shows. The gain comes from the low-clay samples, where the direct model's
+    errors are large relative to the true values.
+
+The model also predicts the complete composition: the sand and silt
+predictions come with the same fit and are consistent with the clay
+prediction by construction.
+
+Two caveats apply to back-transformed predictions:
+
+-   **Back-transformed predictions are not unbiased means.** The model is
+    fitted on the log-ratio scale, so the back-transformed prediction
+    estimates a typical value on that scale (closer to a median than to a
+    mean) of the clay fraction. When residuals are large, the mean clay
+    content is slightly different.
+-   **The choice of reference fraction matters a little.** With separate PLS
+    models for each log-ratio, choosing silt as the denominator gives
+    slightly different predictions than choosing sand. Isometric log-ratios
+    (ILR) avoid this arbitrary choice, but are less directly interpretable.
 
 ## How much optimism do common shortcuts add?
 
@@ -225,14 +378,17 @@ on:
 
 ```{r leaky-shots}
 set.seed(2024)
-y_shot <- meta$Clay
+z_shot <- z[meta$Sample, ]
+clay_shot <- clay[meta$Sample]
 shot_folds <- sample(rep(1:5, length.out = nrow(Xsnv)))
 pred_shot <- numeric(nrow(Xsnv))
 for (k in 1:5) {
   test <- shot_folds == k
-  pred_shot[test] <- fit_predict(Xsnv[!test, ], y_shot[!test], Xsnv[test, ])$pred
+  z1 <- fit_predict(Xsnv[!test, ], z_shot[!test, 1], Xsnv[test, ])$pred
+  z2 <- fit_predict(Xsnv[!test, ], z_shot[!test, 2], Xsnv[test, ])$pred
+  pred_shot[test] <- back_transform(z1, z2)
 }
-shot_rmse <- sqrt(mean((pred_shot - y_shot)^2))
+shot_rmse <- sqrt(mean((pred_shot - clay_shot)^2))
 c(shot_level_CV = round(shot_rmse, 2),
   sample_level_CV = round(mean(results$`baseline + SNV`$rmse), 2))
 ```
@@ -245,14 +401,18 @@ become more alike, and it can be large for homogeneous materials.
 
 ### Shortcut 2: fitting a supervised filter before cross-validating
 
-The OPLS filter uses the response `y` to decide what to remove. If it is
+The OPLS filter uses the response to decide what to remove. If it is
 fitted once on all 50 samples and cross-validation is run afterwards, the
 validation samples have already influenced the filter:
 
 ```{r leaky-filter}
-filtered_all <- as.matrix(projected_osc(snv_s, y, ncomp = 4)$correction)
-leaky <- cross_validate(function(tr, te) {
-  list(train = filtered_all[tr, ], test = filtered_all[te, ], ncomp = 1)
+filtered_all <- lapply(1:2, function(j) {
+  as.matrix(projected_osc(snv_s, z[, j], ncomp = 4)$correction)
+})
+leaky <- cross_validate(function(tr, te, resp) {
+  # identify which log-ratio is being modeled, and use its pre-filtered data
+  j <- if (identical(resp, z[tr, 1])) 1 else 2
+  list(train = filtered_all[[j]][tr, ], test = filtered_all[[j]][te, ], ncomp = 1)
 })
 c(filter_before_CV = round(mean(leaky$rmse), 2),
   filter_inside_CV = round(mean(results$`SNV + OPLS filter`$rmse), 2))
@@ -269,31 +429,30 @@ components.
 
 ## Looking at the predictions
 
-The out-of-fold predictions, averaged over the 5 repeats, show where the
-model succeeds and where it fails:
+The out-of-fold predictions of the log-ratio model, averaged over the 5
+repeats, show where the model succeeds and where it fails:
 
 ```{r predictions, fig.height = 4.5, fig.width = 5, out.width = "70%"}
-pred <- rowMeans(results$`baseline + SNV`$preds)
-plot(y, pred, pch = 21, bg = "grey70", xlim = c(0, 85), ylim = c(0, 85),
+pred <- rowMeans(logratio)
+plot(clay, pred, pch = 21, bg = "grey70", xlim = c(0, 85), ylim = c(0, 85),
      xlab = "Measured clay (%)", ylab = "Cross-validated prediction (%)")
 abline(0, 1, lty = 2)
 ```
 
-Three of the four samples above 55% clay are underpredicted, by 12 to 21
-points. With so few calibration samples in that range, the model pulls
-extreme predictions toward the mean, and it should not be used to predict
-clay contents above about 55% without more calibration data there. At the
-other end, one sample receives a negative prediction: a linear model does
-not respect the bounds of a percentage.
+```{r high-clay}
+high <- clay > 55
+round(cbind(measured = clay[high], log_ratio = pred[high], direct = rowMeans(direct)[high]), 1)
+```
+
+The samples above 55% clay remain the weak point. Two of the four are
+underpredicted by more than 15 points with the log-ratio model, and three
+with the direct model. With so few
+calibration samples in that range, predictions are pulled toward the
+bulk of the data. The model should not be used to predict clay contents
+above about 55% without more calibration data there.
 
 ## Further considerations
 
--   **Clay, sand and silt are compositional.** They sum to 100% for every
-    sample, so separate models for each fraction will not, in general,
-    predict fractions that sum to 100%. To predict all three, model
-    log-ratios such as \(\log(\text{clay}/\text{silt})\) and
-    \(\log(\text{sand}/\text{silt})\), and transform the predictions back.
-    This also keeps predictions within 0–100%.
 -   **Cross-validation estimates error for similar samples.** It says
     nothing about soils from other regions, other instruments or other
     measurement sessions. An independent test set measured later is
@@ -301,3 +460,11 @@ not respect the bounds of a percentage.
     must be transferred between instruments.
 -   **Report the variability of the error estimate.** A single RMSE from a
     single cross-validation split hides the spread shown in the table above.
+-   **A joint model of both log-ratios** (PLS2, or a multivariate method) can
+    exploit the correlation between them. With two separate PLS1 models, as
+    here, each log-ratio has its own number of components.
+
+## Reference
+
+Aitchison, J. (1986). *The Statistical Analysis of Compositional Data*.
+Chapman and Hall, London.
