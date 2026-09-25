@@ -32,8 +32,9 @@
 #'
 #' @return
 #'    - If `plot = TRUE`, returns a `ggplot2` object containing the generalized boxplot.
-#'    - If `plot = FALSE`, returns a list of tibbles: `stats`, with the fences,
-#'      quartiles, median and the estimated g and h parameters of each variable,
+#'    - If `plot = FALSE`, returns a list of tibbles: `stats`, with the whisker
+#'      ends (`lower`, `upper`: the most extreme observations within the fences),
+#'      quartiles, median, fences and the estimated g and h parameters of each variable,
 #'      and `outliers`, with the potential outliers (`out` gives the tail).
 #'
 #' @export generalized_boxplot
@@ -101,11 +102,13 @@ generalized_boxplot <- function(x, alpha = 0.05, p = 0.9, plot = TRUE, xlabels.a
   for (nm in names(x)) {
     st <- genboxStats(x[[nm]], alpha, p)
     genBoxplot_stats[[nm]] <- tibble::tibble(
-      lower = st$stats$lower_fence,
+      lower = st$stats$lower_whisker,
       q1 = st$stats$lower_quantile,
       median = st$stats$median,
       q3 = st$stats$upper_quantile,
-      upper = st$stats$upper_fence,
+      upper = st$stats$upper_whisker,
+      lower_fence = st$stats$lower_fence,
+      upper_fence = st$stats$upper_fence,
       g = st$stats$g,
       h = st$stats$h
     )
@@ -210,7 +213,10 @@ genboxStats <- function(x, alpha, p) {
   }
   fences <- back(xi)
 
+  inside <- x[x >= fences[1] & x <= fences[2]]
   stats_tbl <- tibble::tibble(
+    lower_whisker = min(inside),
+    upper_whisker = max(inside),
     lower_fence = fences[1],
     lower_quantile = unname(stats::quantile(x, 0.25)),
     median = med,

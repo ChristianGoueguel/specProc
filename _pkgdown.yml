@@ -126,6 +126,7 @@ reference:
     Functions used for charcaterizing plasma emission in laser spectroscopy.
   contents:
   - tukey_gh
+  - voigt_profile
   - gaussian_profile
   - lorentzian_profile
   - pseudo_voigt_profile
@@ -134,3 +135,7 @@ reference:
   contents:
   - correlation
   - summary_stats
+
+- title: Data
+  contents:
+  - specLIBS

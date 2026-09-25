@@ -1,7 +1,7 @@
 ---
 output: github_document
-editor_options: 
-  markdown: 
+editor_options:
+  markdown:
     wrap: 72
 ---
 
@@ -13,131 +13,428 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "90%",
-  out.height = "90%",
-  fig.retina = 2
+  fig.width = 8,
+  fig.height = 4.5,
+  dpi = 150
 )
 ```
 
-<!-- badges: start -->
-
 # specProc <img src="man/figures/logo.png" align="right" height="160"/>
 
-[![Project Status: WIP -- Initial development is in progress, but there
-has not yet been a stable, usable release suitable for the
-public.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![License:
-MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Codecov test
-coverage](https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ChristianGoueguel/specProc?branch=main)
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![R-CMD-check](https://github.com/ChristianGoueguel/specProc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ChristianGoueguel/specProc/actions/workflows/R-CMD-check.yaml)
-![GitHub last commit](https://img.shields.io/github/last-commit/ChristianGoueguel/specProc)
-![GitHub repo size](https://img.shields.io/github/repo-size/ChristianGoueguel/specProc)
-![GitHub R package version](https://img.shields.io/github/r-package/v/ChristianGoueguel/specProc)
-![GitHub language count](https://img.shields.io/github/languages/count/ChristianGoueguel/specProc)
-
+[![Codecov test coverage](https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ChristianGoueguel/specProc?branch=main)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-**Testing and experimenting.**
+**specProc** is an R package for preprocessing and exploring emission
+spectra, with a focus on laser-induced breakdown spectroscopy (LIBS). It
+covers the full chain between raw detector counts and a data matrix
+ready for modeling:
 
-The `specProc` package performs a wide range of preprocessing tasks essential for spectroscopic data analysis. Spectral preprocessing is essential in ensuring accurate and reliable results by minimizing the impact of various distortions and artifacts that can arise during data acquisition or due to inherent characteristics of the sample or instrument. 
+-   **Baseline correction**: asymmetric least squares, arPLS, and iterative
+    polynomial fitting.
+-   **Normalization and scaling**: SNV, MSC, area, background and
+    internal-standard normalization; Pareto, Poisson and min-max scaling.
+-   **Removing unwanted variation**: OSC (three algorithms), direct
+    orthogonalization, DOSC, NAS, O2PLS, projected OSC, EPO, GLSW.
+-   **Calibration transfer** between instruments: PDS, GLSW.
+-   **Line fitting**: exact Voigt, pseudo-Voigt, Gaussian and Lorentzian
+    profiles, for single or overlapping lines.
+-   **Robust statistics and outlier detection**: biweight estimators,
+    Rousseeuw–Croux Sn/Qn, bias-corrected MAD, medcouple-based skewness
+    and tail weights, adjusted and generalized boxplots, directional
+    outlyingness.
 
-Some techniques are purely based on mathematical concepts, relying on robust statistics and signal processing techniques. Other methods are inspired by the physicochemical context of the dataset. These techniques rely on domain knowledge and exploit the fundamental principles governing the spectroscopic phenomenon used.
+The computationally heavy steps are written in C++: penalized baselines
+use a banded solver, the Voigt profile uses the Faddeeva function, and the
+large matrix decompositions use Eigen. This keeps the package practical
+for data sets with thousands of spectra and channels.
 
 ## Installation
 
-You can install the development version from
-[GitHub](https://github.com/) with:
+specProc is not yet on CRAN. Install the development version from GitHub:
 
 ``` r
-install.packages("devtools")
-devtools::install_github("ChristianGoueguel/specProc")
-```
-## Examples
-```{r message=FALSE, warning=FALSE}
-set.seed(02301)
-tbl <- data.frame(
-  normal = stats::rnorm(100),
-  skewed = stats::rgamma(100, shape = 2, scale = 1),
-  heavy_tailed = stats::rcauchy(100, location = 0, scale = 1)
-  )
+# install.packages("remotes")
+remotes::install_github("ChristianGoueguel/specProc")
 ```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-ggplot2::ggplot(tbl) +
-  ggplot2::geom_density(ggplot2::aes(x = normal, fill = "Normal"), linewidth = 0.1, adjust = 2L, alpha = 1/5) +
-  ggplot2::geom_density(ggplot2::aes(x = skewed, fill = "Skewed"), linetype = "dashed", linewidth = 0.1, adjust = 2L, alpha = 1/5) +
-  ggplot2::geom_density(ggplot2::aes(x = heavy_tailed, fill = "Heavy-tailed"), linetype = "dotted", linewidth = 0.1, adjust = 2L, alpha = 1/5) +
-  ggplot2::scale_fill_manual(values = c("Normal" = "#112446", "Skewed" = "red", "Heavy-tailed" = "blue")) +
-  ggplot2::xlim(-10,10) +
-  ggplot2::labs(x = "x", fill = "Distribution") +
-  ggplot2::theme_light() +
-  ggplot2::theme(legend.position = "right", panel.grid = ggplot2::element_blank())
+A C++ compiler is needed to build the package from source (Rtools on
+Windows, Xcode Command Line Tools on macOS). `opls()` additionally needs
+the Bioconductor package ropls: `BiocManager::install("ropls")`.
+
+## Design principles
+
+-   **Tidy in, tidy out.** Spectra are stored one per row, and the column
+    names are the wavelengths. Functions accept matrices, data frames or
+    tibbles and return tibbles.
+-   **Preprocessing parameters are returned, not hidden.** Centers, scales,
+    reference spectra, filter matrices and loadings come back with the
+    result. You can then estimate a transformation on calibration data and
+    apply exactly the same transformation to new data.
+-   **Robust alternatives are available alongside the classical estimators.**
+    Emission spectra contain outlying shots, saturated channels and heavy
+    tails, and the robust estimators are designed for them.
+-   **The numerics are tested against references.** The test suite (more
+    than 400 expectations) checks results against analytic values, dense
+    reference solvers and independent implementations, such as the
+    Bioconductor ropls package for OPLS.
+
+## Example data
+
+The package ships with `specLIBS`: LIBS spectra of **50 soil samples**,
+each measured at **8 locations**. The spectra have 7152 channels between
+199 and 822 nm, stored as raw counts, together with the clay, sand and
+silt content of each sample.
+
+```{r data}
+library(specProc)
+data(specLIBS)
+
+meta <- specLIBS[1:8]                       # sample information
+X <- as.matrix(specLIBS[-(1:8)])            # 400 x 7152 intensity matrix
+wl <- as.numeric(colnames(X))               # wavelengths (nm)
+
+dim(X)
+table(soil_type = meta$Type) / 8            # number of samples per soil type
 ```
 
-### descriptive statistics
+The design is **nested**: the 8 spectra of a sample are repeated
+measurements of the same material, not independent observations. Treating
+them as 400 independent samples inflates the apparent sample size and
+biases cross-validated errors downward. The worked example below uses
+the sample as the unit of analysis wherever it matters.
 
-#### classical approach
-```{r}
-specProc::summary_stats(tbl)
+```{r overview, fig.height = 4}
+by_type <- average(cbind(Type = meta$Type, as.data.frame(X)), Type)
+plot_spectra(by_type, id = Type) +
+  ggplot2::theme(legend.position = "top") +
+  ggplot2::labs(color = NULL, title = "Mean spectrum by soil type")
 ```
 
-#### robust approach
-```{r}
-specProc::summary_stats(tbl, robust = TRUE)
+## A worked example
+
+### 1. Baseline correction
+
+LIBS spectra sit on a continuum from bremsstrahlung and recombination
+radiation. `baseline_arpls()` estimates it with asymmetrically reweighted
+penalized least squares. Positive residuals (the emission lines) are
+downweighted, so the baseline follows the continuum instead of the peaks.
+The smoothing parameter `lambda` controls how stiff the baseline is.
+
+```{r baseline}
+bl <- baseline_arpls(X, lambda = 1e5, max.iter = 20)
+Xc <- as.matrix(bl$correction)
 ```
 
-### adjusted boxplot
-
-```{r}
-specProc::adjusted_boxplot(tbl, xlabels.angle = 0) +
-  ggplot2::geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.1) +
-  ggplot2::coord_flip()
+```{r baseline-plot, fig.height = 4, echo = FALSE}
+zoom <- wl > 370 & wl < 420
+plot(wl[zoom], X[1, zoom], type = "l", col = "grey30",
+     xlab = "Wavelength [nm]", ylab = "Intensity [counts]",
+     main = "arPLS baseline (first spectrum, 370-420 nm)")
+lines(wl[zoom], unlist(bl$background[1, zoom]), col = "red", lwd = 2)
+legend("topright", c("raw spectrum", "estimated baseline"),
+       col = c("grey30", "red"), lwd = c(1, 2), bty = "n")
 ```
 
-### generalized boxplot
+The baseline is a model estimate, and the choice of `lambda` propagates
+into line areas. Report the value you used, and check how sensitive your
+downstream results are to it.
 
-```{r}
-specProc::generalized_boxplot(tbl, xlabels.angle = 0) +
-  ggplot2::geom_hline(yintercept = 0, linetype = "dashed", linewidth = 0.1) +
-  ggplot2::coord_flip()
+### 2. Normalization and shot-to-shot repeatability
+
+Laser–sample coupling changes from shot to shot, so the whole spectrum
+fluctuates in intensity. Normalization aims to remove this multiplicative
+effect. The relative standard deviation (RSD) of a line across the 8
+locations of a sample measures how well it works. The lower the RSD, the
+more repeatable the measurement:
+
+```{r normalization}
+line_area <- function(M, center, half_width = 0.15) {
+  rowSums(M[, abs(wl - center) < half_width, drop = FALSE])
+}
+within_rsd <- function(v) {
+  median(tapply(v, meta$Sample, function(z) sd(z) / mean(z) * 100))
+}
+
+Xsnv <- as.matrix(snv(Xc)$correction)
+Xarea <- as.matrix(normalize(as.data.frame(Xc), method = "area"))
+
+tibble::tibble(
+  preprocessing = c("raw", "baseline", "baseline + area", "baseline + SNV"),
+  `median RSD of Ca II 393.37 nm (%)` = round(c(
+    within_rsd(line_area(X, 393.37)),
+    within_rsd(line_area(Xc, 393.37)),
+    within_rsd(line_area(Xarea, 393.37)),
+    within_rsd(line_area(Xsnv, 393.37))
+  ), 2)
+)
 ```
 
+On this data set, SNV reduces the typical shot-to-shot RSD of the Ca II
+line by about 40%. Baseline subtraction alone slightly increases the
+RSD. This is expected: the raw line area includes the detector offset
+and continuum, a large and relatively stable component that dilutes the
+relative variation. Removing it exposes the true variability of the line,
+which normalization then has to correct. Which normalization works best depends on the matrix
+and the line, so compare the options on replicate spectra rather than
+assuming one.
 
-### correlation
+### 3. Screening outlying shots
 
-```{r}
-set.seed(1)
-df <- data.frame(Ca = stats::rnorm(50))
-df$Mg <- 0.8 * df$Ca + stats::rnorm(50, sd = 0.5)
-df$Fe <- -0.5 * df$Ca + stats::rnorm(50, sd = 0.8)
-df$Na <- stats::rnorm(50)
-res <- specProc::correlation(df, Ca, method = "spearman", plot = TRUE)
-res$correlation
-res$plot
+A misfired or defocused shot can bias a sample's mean spectrum. Compare
+each shot with the other shots of the same sample, using a robust z-score
+(median and MAD) of the total emitted intensity:
+
+```{r outliers}
+total <- rowSums(X)
+robust_z <- ave(total, meta$Sample, FUN = function(v) (v - median(v)) / mad(v))
+table(flagged = abs(robust_z) > 3.5)
 ```
 
-### baseline correction
+The median and MAD are used because, with 8 shots per sample, a single
+aberrant shot shifts the mean and inflates the standard deviation enough
+to hide itself. `zscore(robust = TRUE)`, `iqr_outliers(skew = TRUE)`
+(medcouple-adjusted fences) and `directional_outlyingness()` provide the
+same screening for a single vector.
 
-```{r}
-wl <- seq(390, 400, length.out = 1000)
-spectrum <- 50 + 0.8 * (wl - 390)^2 +
-  120 * exp(-(wl - 393.4)^2 / 0.005) + 90 * exp(-(wl - 396.8)^2 / 0.005) +
-  stats::rnorm(1000, sd = 0.5)
-fit <- specProc::baseline_arpls(matrix(spectrum, nrow = 1), lambda = 1e5)
+### 4. Averaging replicates
 
-plot(wl, spectrum, type = "l", xlab = "Wavelength [nm]", ylab = "Intensity")
-lines(wl, unlist(fit$background), col = "red", lwd = 2)
+After screening, reduce each sample to one spectrum. `average()` computes
+group means in C++:
+
+```{r average}
+keep <- abs(robust_z) <= 3.5
+Xs <- average(cbind(Sample = meta$Sample[keep], as.data.frame(Xsnv[keep, ])), Sample)
+samples <- meta[match(Xs$Sample, meta$Sample), c("Sample", "Clay", "Sand", "Silt", "Type")]
+dim(Xs)
 ```
 
-### peak fitting
+### 5. Fitting emission lines
 
-```{r}
-window <- wl >= 393 & wl <= 394
-lines_df <- as.data.frame(t(unlist(fit$correction)[window]))
-names(lines_df) <- wl[window]
-ca_line <- specProc::peak_fit(lines_df, profile = "voigt")
-ca_line$tidied[[1]]
-specProc::plot_fit(ca_line, title = "Ca II 393.4 nm")
+The Ca II 393.37 / 396.85 nm and Al I 394.40 / 396.15 nm lines overlap
+in the 393–397 nm window. `multipeak_fit()` fits them jointly as a sum
+of exact Voigt profiles on a common baseline. Each line's center, Gaussian
+and Lorentzian widths (FWHM) and area are estimated by Levenberg–Marquardt
+least squares.
+
+```{r multipeak}
+window <- names(Xs)[-1][wl > 392.9 & wl < 397.3]
+fit <- multipeak_fit(
+  Xs[1, c("Sample", window)],
+  peaks = c(393.37, 394.40, 396.15, 396.85),
+  profiles = "voigt",
+  id = "Sample"
+)
+fit$tidied[[1]]
 ```
+
+```{r multipeak-plot, fig.height = 5}
+plot_fit(fit, title = "Ca II and Al I lines, sample LSG-S18-0001 (mean of 8 locations)")
+```
+
+Read the parameter table critically:
+
+-   **The standard errors are conditional on the model.** They assume
+    independent, homoscedastic Gaussian errors. LIBS noise is closer to
+    Poisson, and residuals are correlated along the wavelength axis, so
+    treat these standard errors as lower bounds. The spread of the
+    parameters across the 8 replicate locations is a more honest measure
+    of uncertainty.
+-   **Some parameters are poorly identified.** The Lorentzian widths of the
+    weaker lines are not significantly different from zero. The data
+    cannot separate Stark from Doppler/instrumental broadening for those
+    lines. Consider fixing them, or using a simpler profile.
+
+The exact Voigt profile is also available directly. `voigt_profile()`
+uses the Faddeeva function and is accurate to about 1e-10. The faster
+`pseudo_voigt_profile()` approximation deviates from it by up to about 1%:
+
+```{r voigt, fig.height = 3.5}
+x <- seq(-2, 2, length.out = 400)
+v <- voigt_profile(x, y0 = 0, xc = 0, wG = 0.6, wL = 0.4, A = 1)
+pv <- pseudo_voigt_profile(x, y0 = 0, xc = 0, wG = 0.6, wL = 0.4, A = 1)$y
+max(abs(v - pv)) / max(v)
+```
+
+### 6. Descriptive statistics: classical and robust
+
+The texture fractions are bounded (0–100%), skewed, and contain a few
+extreme samples. The robust summary reports the median, MAD, Sn and Qn,
+biweight estimators, and medcouple-based measures of skewness and tail
+weight:
+
+```{r summary}
+summary_stats(samples[c("Clay", "Sand", "Silt")])
+summary_stats(samples[c("Clay", "Sand", "Silt")], robust = TRUE)
+```
+
+The medcouple (MC) is a robust measure of skewness, bounded in [−1, 1].
+For Clay and Silt it is strongly negative (left skew). Where the mean and
+median, or the SD and robust scale, disagree, a few observations are
+driving the classical estimates.
+
+The generalized boxplot (Bruffaerts et al., 2014) fits a Tukey g-and-h
+distribution, so its whiskers adapt to both skewness (*g*) and tail
+heaviness (*h*). Its fences are placed so that, under the fitted model,
+the chosen proportion `alpha` of observations falls outside them:
+
+```{r boxplot, fig.height = 3.5}
+generalized_boxplot(samples[c("Clay", "Sand", "Silt")], xlabels.angle = 0) +
+  ggplot2::coord_flip() +
+  ggplot2::labs(title = "Particle-size fractions (%), generalized boxplot")
+```
+
+### 7. Correlation: why robustness matters
+
+How strongly do line intensities track clay content? Compare Pearson's
+correlation with the biweight midcorrelation, which downweights
+observations far from the bulk of the data:
+
+```{r correlation}
+Xmat <- as.matrix(Xs[-1])
+lines_df <- data.frame(
+  Clay = samples$Clay,
+  `Mg II 279.55` = line_area(Xmat, 279.55),
+  `Si I 288.16` = line_area(Xmat, 288.16),
+  `Ca II 393.37` = line_area(Xmat, 393.37),
+  `Al I 396.15` = line_area(Xmat, 396.15),
+  `K I 766.49` = line_area(Xmat, 766.49),
+  check.names = FALSE
+)
+pearson <- correlation(lines_df, Clay)
+bicor <- correlation(lines_df, Clay, method = "bicor")
+merge(pearson[1:2], bicor[1:2], by = "variable", suffixes = c("_pearson", "_bicor"))
+```
+
+The two coefficients disagree sharply for some lines, notably Mg, which
+means a handful of extreme-texture samples drive the Pearson values.
+Neither number is "the" correlation. The gap tells you to look at the
+scatter plots, and to be cautious about extrapolating to the bulk of the
+data. `correlation()` also provides Spearman, Kendall and Chatterjee's ξ,
+which captures non-monotonic dependence.
+
+### 8. Removing unwanted variation
+
+Remaining shot-to-shot differences within a sample are nuisance variation.
+External parameter orthogonalization (EPO) estimates the dominant
+directions of such variation from a *clutter matrix* and projects them out.
+The clutter matrix here is the deviation of each spectrum from its sample
+mean:
+
+```{r epo}
+sample_means <- apply(Xsnv, 2, function(v) ave(v, meta$Sample))
+clutter <- Xsnv - sample_means
+
+sd_ca <- function(M) median(tapply(line_area(M, 393.37), meta$Sample, sd))
+sapply(c(0, 1, 2, 3, 5), function(k) {
+  M <- if (k == 0) Xsnv else as.matrix(epo(Xsnv, ncomp = k, clutter = clutter)$correction)
+  c(ncomp = k, within_sample_sd = round(sd_ca(M), 3))
+})
+```
+
+Here the clutter directions are estimated from the same spectra they are
+evaluated on, so this reduction is optimistic. In practice, estimate the
+EPO projection (or a `glsw()` filter) on calibration samples only, and
+choose `ncomp` by cross-validation with folds formed by sample.
+
+The same rule applies to supervised filters that use the response:
+`osc()`, `direct_osc()`, `direct_orthogonal()`, `nas()`, `o2pls()` and
+`projected_osc()`. Refit them inside each cross-validation fold. If a
+filter is fitted once on all the data before cross-validating, the
+estimated prediction error is biased downward. Each function returns what
+you need to apply the fitted filter to new spectra: loadings, weights,
+centers and scales.
+
+## Function overview
+
+| Task | Functions |
+|---|---|
+| Baseline correction | `baseline_arpls()`, `baseline_als()`, `baseline_lsp()` |
+| Normalization | `snv()`, `msc()`, `normalize()` |
+| Scaling and centering | `center()`, `pareto_scale()`, `poisson_scale()`, `minmax()` |
+| Orthogonal filtering | `osc()`, `direct_osc()`, `direct_orthogonal()`, `nas()`, `projected_osc()`, `o2pls()`, `opls()` |
+| Interference removal | `epo()`, `glsw()`, `y_gradient_glsw()` |
+| Calibration transfer | `pds()` |
+| Line profiles | `voigt_profile()`, `pseudo_voigt_profile()`, `gaussian_profile()`, `lorentzian_profile()` |
+| Line fitting | `peak_fit()`, `multipeak_fit()`, `plot_fit()` |
+| Location and scale | `biweight_location()`, `biweight_scale()`, `biweight_midvariance()`, `rousseeuw_croux()`, `umad()` |
+| Association | `correlation()`, `biweight_midcovariance()`, `biweight_midcorrelation()` |
+| Skewness and tail weight | `medcouple_weight()`, `quantile_weight()`, `tukey_gh()` |
+| Outlier detection | `zscore()`, `iqr_outliers()`, `directional_outlyingness()`, `plot_outliers()` |
+| Exploration | `summary_stats()`, `adjusted_boxplot()`, `generalized_boxplot()`, `plot_spectra()`, `average()` |
+| Transformation to normality | `robust_bcyj()` |
+
+### Robust estimators at a glance
+
+For estimators of scale, the breakdown point is the largest fraction of
+contaminated observations the estimator can tolerate. The efficiency is
+its asymptotic efficiency relative to the standard deviation for normal data.
+
+| Estimator | Function | Breakdown point | Efficiency |
+|---|---|---|---|
+| Standard deviation | `stats::sd()` | 0% | 100% |
+| MAD (bias-corrected) | `umad()` | 50% | 37% |
+| Rousseeuw–Croux Sn | `rousseeuw_croux(estimator = "Sn")` | 50% | 58% |
+| Rousseeuw–Croux Qn | `rousseeuw_croux(estimator = "Qn")` | 50% | 82% |
+| Biweight midvariance | `biweight_midvariance()`, `biweight_scale()` | high | ≈ 87% |
+
+`umad()` and `rousseeuw_croux()` include finite-sample bias corrections
+(Park et al., 2020; Akinshin, 2022), so they are also unbiased at the
+normal distribution for small samples, such as the 8 replicates per sample.
+
+## Performance
+
+Timings on the full `specLIBS` data set (400 spectra × 7152 channels)
+on an Apple Silicon desktop:
+
+| Operation | Time |
+|---|---|
+| `baseline_arpls()`, 400 spectra | 0.6 s |
+| `baseline_als()`, 400 spectra | 0.5 s |
+| `epo(ncomp = 3)` | 0.4 s |
+| `snv()` | 0.08 s |
+| `voigt_profile()`, 10⁶ points | 0.07 s |
+
+For comparison, one iteration of the dense penalized least-squares solve
+for a single 7152-channel spectrum takes about 30 s. The banded solver
+does the same computation in linear time.
+
+## References
+
+The main methodological references are:
+
+-   Baek, S.-J., et al. (2015). Baseline correction using asymmetrically
+    reweighted penalized least squares smoothing. *Analyst*, 140, 250–257.
+-   Eilers, P.H.C., Boelens, H.F.M. (2005). Baseline correction with
+    asymmetric least squares smoothing.
+-   Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003). EPO-PLS
+    external parameter orthogonalisation of PLS. *Chemometr. Intell.
+    Lab. Syst.*, 66, 191–204.
+-   Martens, H., et al. (2003). Pre-whitening of data by
+    covariance-weighted pre-processing. *J. Chemometrics*, 17, 153–165.
+-   Trygg, J., Wold, S. (2002). Orthogonal projections to latent
+    structures (O-PLS). *J. Chemometrics*, 16, 119–128.
+-   Weideman, J.A.C. (1994). Computation of the complex error function.
+    *SIAM J. Numer. Anal.*, 31, 1497–1518.
+-   Rousseeuw, P.J., Croux, C. (1993). Alternatives to the median
+    absolute deviation. *JASA*, 88, 1273–1283.
+-   Hubert, M., Vandervieren, E. (2008). An adjusted boxplot for skewed
+    distributions. *Comput. Stat. Data Anal.*, 52, 5186–5201.
+-   Bruffaerts, C., Verardi, V., Vermandele, C. (2014). A generalized
+    boxplot for skewed and heavy-tailed distributions. *Stat. Probab.
+    Lett.*, 95, 110–117.
+
+Each function's help page gives the full references for its method.
+
+## Contributing
+
+Bug reports and feature requests are welcome on the [issue
+tracker](https://github.com/ChristianGoueguel/specProc/issues). Please
+include a minimal reproducible example.
+
+## License
+
+MIT © Christian L. Goueguel

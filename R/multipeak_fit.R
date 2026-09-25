@@ -21,8 +21,8 @@
 #'   with `id`.
 #' @param peaks A numeric vector of the (approximate) peak center wavelengths.
 #' @param profiles A character vector of the lineshape functions for fitting,
-#'   one per peak or a single one used for all peaks: "lorentzian", "gaussian"
-#'   or "voigt" (case insensitive).
+#'   one per peak or a single one used for all peaks: "lorentzian", "gaussian",
+#'   "voigt" (exact) or "pseudo_voigt" (case insensitive).
 #' @param wL A numeric (single value or one per peak) of the Lorentzian full width at half maximum (initial guess)
 #' @param wG A numeric (single value or one per peak) of the Gaussian full width at half maximum (initial guess)
 #' @param A A numeric (single value or one per peak) of the peak area (initial guess)
@@ -73,8 +73,8 @@ multipeak_fit <- function(
     stop("Profiles must be a valid vector of lineshape functions: Lorentzian, Gaussian and Voigt")
   }
   profiles <- tolower(profiles)
-  if (!all(profiles %in% c("lorentzian", "gaussian", "voigt"))) {
-    stop("Profiles must be a valid vector of lineshape functions: Lorentzian, Gaussian and Voigt")
+  if (!all(profiles %in% lineshapes)) {
+    stop("Profiles must be a valid vector of lineshape functions: Lorentzian, Gaussian, Voigt and pseudo_Voigt")
   }
   if (length(profiles) == 1) {
     profiles <- rep(profiles, length(peaks))

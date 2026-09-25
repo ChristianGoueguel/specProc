@@ -73,6 +73,22 @@ implementations.
 * `iqrMethod()` no longer changes global options. Missing values no longer
   cause errors.
 
+## New features
+
+* New `voigt_profile()`: the exact Voigt profile, computed in C++ from the
+  Faddeeva function with Weideman's (1994) rational approximation (relative
+  error below 1e-10). `peak_fit()` and `multipeak_fit()` now use it for
+  `profile = "voigt"`; the pseudo-Voigt approximation is available as
+  `profile = "pseudo_voigt"`.
+* New data set `specLIBS`: 400 LIBS spectra (50 soil samples x 8 locations,
+  7152 channels, 199-822 nm) with the clay, sand and silt content of each
+  sample.
+* `generalized_boxplot()` whiskers now end at the most extreme observations
+  within the fences, as in standard boxplots. The fences are returned as
+  `lower_fence` and `upper_fence`.
+* The README has been rewritten around a complete worked example on
+  `specLIBS`.
+
 ## Improvements
 
 * Asymmetric least squares and arPLS baselines are solved in C++ with a banded

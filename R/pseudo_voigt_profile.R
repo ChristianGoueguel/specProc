@@ -69,6 +69,7 @@
 #'  - Ida, T., Ando, M., Toraya, H., (2000). Extended pseudo-Voigt function
 #'    for approximating the Voigt profile. Journal of Applied Crystallography. 33(6):1311–1316.
 #'
+#' @seealso [voigt_profile()] for the exact Voigt profile.
 #' @export pseudo_voigt_profile
 #' @examples
 #' x <- seq(-2, 2, length.out = 100)
@@ -108,7 +109,7 @@ pseudo_voigt_profile <- function(x, y0, xc, wG, wL, A, eta = NULL) {
 
   if (is.null(eta)) {
     eta_approx <- tch_eta(wG, wL)
-    y <- y0 + A * profile_voigt(x, xc, wG, wL)
+    y <- y0 + A * profile_pseudo_voigt(x, xc, wG, wL)
     return(list(y = y, eta = eta_approx))
   }
   if (!is.numeric(eta) || length(eta) != 1 || eta < 0 || eta > 1) {

@@ -108,3 +108,40 @@ test_that("plot_fit plots single and multiple fits", {
   expect_s3_class(plot_fit(res, title = "Ca II"), "patchwork")
   expect_error(plot_fit(data.frame(a = 1)), "peak_fit")
 })
+
+test_that("voigt_profile matches exact references", {
+  # value at the line center: erfcx(y) / (sigma sqrt(2 pi)), erfcx via pnorm
+  for (wG in c(0.2, 1)) for (wL in c(0.01, 0.3, 3)) {
+    s <- wG / (2 * sqrt(2 * log(2)))
+    y <- (wL / 2) / (s * sqrt(2))
+    ref <- 2 * exp(y^2) * stats::pnorm(-y * sqrt(2)) / (s * sqrt(2 * pi))
+    expect_equal(voigt_profile(0, 0, 0, wG, wL, 1), ref, tolerance = 1e-10)
+  }
+  # numerical convolution of a Gaussian and a Lorentzian
+  s <- 0.7 / (2 * sqrt(2 * log(2)))
+  conv <- function(x) stats::integrate(function(t) stats::dnorm(t, 0, s) * stats::dcauchy(x - t, 0, 0.15),
+                                       -Inf, Inf, rel.tol = 1e-12, subdivisions = 2000L)$value
+  xs <- c(-20, -2, -0.3, 0.1, 1, 5)
+  expect_equal(voigt_profile(xs, 0, 0, 0.7, 0.3, 1), sapply(xs, conv), tolerance = 1e-9)
+  # limits, area and offset
+  x <- seq(-3, 3, length.out = 41)
+  expect_equal(voigt_profile(x, 0, 0, 1, 0, 1), gaussian_profile(x, 0, 0, 1, 1), tolerance = 1e-12)
+  expect_equal(voigt_profile(x, 0, 0, 0, 1, 1), lorentzian_profile(x, 0, 0, 1, 1), tolerance = 1e-12)
+  expect_equal(area(function(x) voigt_profile(x, 0, 1, 0.5, 0.4, 3)), 3, tolerance = 1e-6)
+  expect_equal(voigt_profile(1, 5, 1, 0.5, 0.4, 0), 5)
+  # the pseudo-Voigt approximation is within about 1.5% of the exact profile
+  v <- voigt_profile(x, 0, 0, 1, 0.5, 1)
+  expect_lt(max(abs(v - pseudo_voigt_profile(x, 0, 0, 1, 0.5, 1)$y)) / max(v), 0.015)
+  expect_error(voigt_profile(x, 0, 0, 0, 0, 1), "both be zero")
+  expect_error(voigt_profile(x, 0, 0, -1, 1, 1), "non-negative")
+})
+
+test_that("peak_fit recovers the widths of an exact Voigt line", {
+  set.seed(5)
+  y <- voigt_profile(wl, 2, 396, 0.15, 0.1, 30) + stats::rnorm(length(wl), sd = 0.05)
+  res <- peak_fit(wide_spectrum(wl, y), profile = "voigt")
+  est <- stats::setNames(res$tidied[[1]]$estimate, res$tidied[[1]]$term)
+  expect_equal(unname(est[c("xc", "wG", "wL", "A")]), c(396, 0.15, 0.1, 30), tolerance = 0.05)
+  pv <- peak_fit(wide_spectrum(wl, y), profile = "pseudo_voigt")
+  expect_gt(stats::deviance(pv$fit[[1]]), stats::deviance(res$fit[[1]]))
+})

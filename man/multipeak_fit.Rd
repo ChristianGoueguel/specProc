@@ -25,8 +25,8 @@ with \code{id}.}
 \item{peaks}{A numeric vector of the (approximate) peak center wavelengths.}
 
 \item{profiles}{A character vector of the lineshape functions for fitting,
-one per peak or a single one used for all peaks: "lorentzian", "gaussian"
-or "voigt" (case insensitive).}
+one per peak or a single one used for all peaks: "lorentzian", "gaussian",
+"voigt" (exact) or "pseudo_voigt" (case insensitive).}
 
 \item{wL}{A numeric (single value or one per peak) of the Lorentzian full width at half maximum (initial guess)}
 

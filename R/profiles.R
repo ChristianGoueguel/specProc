@@ -22,8 +22,14 @@ tch_eta <- function(wG, wL) {
   1.36603 * r - 0.47719 * r^2 + 0.11116 * r^3
 }
 
-profile_voigt <- function(x, xc, wG, wL) {
+profile_pseudo_voigt <- function(x, xc, wG, wL) {
   f <- tch_width(wG, wL)
   eta <- tch_eta(wG, wL)
   eta * profile_lorentzian(x, xc, f) + (1 - eta) * profile_gaussian(x, xc, f)
+}
+
+# Exact Voigt profile (convolution of a Gaussian and a Lorentzian), computed
+# in C++ from the Faddeeva function. wG and wL are the FWHM of the components.
+profile_voigt <- function(x, xc, wG, wL) {
+  voigt_cpp(x - xc, sigma = wG / (2 * sqrt(2 * log(2))), gamma = wL / 2)
 }

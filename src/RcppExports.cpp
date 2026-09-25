@@ -75,6 +75,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// voigt_cpp
+NumericVector voigt_cpp(NumericVector x, double sigma, double gamma);
+RcppExport SEXP _specProc_voigt_cpp(SEXP xSEXP, SEXP sigmaSEXP, SEXP gammaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type sigma(sigmaSEXP);
+    Rcpp::traits::input_parameter< double >::type gamma(gammaSEXP);
+    rcpp_result_gen = Rcpp::wrap(voigt_cpp(x, sigma, gamma));
+    return rcpp_result_gen;
+END_RCPP
+}
 // yGradientglswCpp
 Eigen::MatrixXd yGradientglswCpp(const Eigen::Map<Eigen::MatrixXd> X_diff, const Eigen::Map<Eigen::VectorXd> w_i, double alpha);
 RcppExport SEXP _specProc_yGradientglswCpp(SEXP X_diffSEXP, SEXP w_iSEXP, SEXP alphaSEXP) {
@@ -95,6 +108,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_specProc_computeMeans", (DL_FUNC) &_specProc_computeMeans, 1},
     {"_specProc_epo_cpp", (DL_FUNC) &_specProc_epo_cpp, 3},
     {"_specProc_glsw_cpp", (DL_FUNC) &_specProc_glsw_cpp, 2},
+    {"_specProc_voigt_cpp", (DL_FUNC) &_specProc_voigt_cpp, 3},
     {"_specProc_yGradientglswCpp", (DL_FUNC) &_specProc_yGradientglswCpp, 3},
     {NULL, NULL, 0}
 };
