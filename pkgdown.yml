@@ -1,8 +1,8 @@
-pandoc: 3.1.11
-pkgdown: 2.1.1
+pandoc: 3.8.3
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles: {}
-last_built: 2024-11-06T18:18Z
+last_built: 2026-09-25T06:12Z
 urls:
-  reference: https://christiangoueguel.github.io/specProc/reference
-  article: https://christiangoueguel.github.io/specProc/articles
+  reference: https://christiangoueguel.com/specProc/reference
+  article: https://christiangoueguel.com/specProc/articles

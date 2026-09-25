@@ -1,0 +1,77 @@
+# Net Analyte Signal
+
+This function implements the Net Analyte Signal (NAS) algorithm, as
+proposed by Lorber (1997), which involves the concentration matrix. NAS
+aims to remove information from the predictor variables, that is
+orthogonal or irrelevant to the response variable(s) by orthogonal
+projection.
+
+## Usage
+
+``` r
+nas(x, y, ncomp = 5, center = TRUE, scale = FALSE)
+```
+
+## Arguments
+
+- x:
+
+  A matrix or data frame of the predictor variables
+
+- y:
+
+  A vector, matrix or data frame of the response variable(s)
+
+- ncomp:
+
+  An integer specifying the number of principal components to retain for
+  orthogonal processing. Default is 5; it is reduced if larger than the
+  rank of the interferent space.
+
+- center:
+
+  A logical value specifying whether to center the data. Default is
+  `TRUE`.
+
+- scale:
+
+  A logical value specifying whether to scale the data. Default is
+  `FALSE`.
+
+## Value
+
+A tibble containing the corrected predictor variables. The interferent
+loadings are stored in the `"loadings"` attribute.
+
+## Details
+
+The NAS algorithm aims to obtain a corrected matrix that contains only
+the information relevant to the response variable \\\textbf{Y}\\. The
+part of \\\textbf{X}\\ that cannot be explained by \\\textbf{Y}\\,
+\\\textbf{Z} = (\textbf{I} - \textbf{Y}\textbf{Y}^{+})\textbf{X}\\,
+spans the interferent space. Its first `ncomp` principal component
+loadings \\\textbf{P}\\ are used to project \\\textbf{X}\\ onto the
+subspace orthogonal to the interferents: \\\textbf{X}\_{NAS} =
+\textbf{X}(\textbf{I} - \textbf{PP}^T)\\.
+
+## References
+
+- Lorber, A., (1997). Net analyte signal calculation in multivariate
+  calibration. Anal. Chem., 69(8):1620-1626
+
+- Faber, N.M., (1998). Efficient computation of net analyte signal
+  vector in inverse multivariate calibration models. Anal. Chem.,
+  70(23):5108-5110
+
+## Author
+
+Christian L. Goueguel
+
+## Examples
+
+``` r
+set.seed(1)
+x <- matrix(rnorm(20 * 50), 20, 50)
+y <- x[, 1] + rnorm(20, sd = 0.1)
+x_nas <- nas(x, y, ncomp = 2)
+```
