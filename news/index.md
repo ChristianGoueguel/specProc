@@ -176,6 +176,19 @@ independent reference implementations.
 
 ### New features
 
+- Three vignettes based on `specLIBS`: “Preprocessing LIBS spectra”
+  (baseline, normalization judged by replicate RSD and intraclass
+  correlation, robust screening of shots), “Fitting emission lines”
+  (profile choice, sources of uncertainty, identifiability) and
+  “Predicting soil clay content from LIBS spectra” (nested, repeated
+  cross-validation by sample, and the optimism of common shortcuts).
+
+- [`plot_fit()`](https://christiangoueguel.com/specProc/reference/plot_fit.md)
+  draws the fitted profiles on a fine wavelength grid.
+
+- Functions taking a response now accept 1-d arrays, such as the output
+  of [`tapply()`](https://rdrr.io/r/base/tapply.html).
+
 - New
   [`voigt_profile()`](https://christiangoueguel.com/specProc/reference/voigt_profile.md):
   the exact Voigt profile, computed in C++ from the Faddeeva function
@@ -186,13 +199,16 @@ independent reference implementations.
   [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md)
   now use it for `profile = "voigt"`; the pseudo-Voigt approximation is
   available as `profile = "pseudo_voigt"`.
+
 - New data set `specLIBS`: 400 LIBS spectra (50 soil samples x 8
   locations, 7152 channels, 199-822 nm) with the clay, sand and silt
   content of each sample.
+
 - [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
   whiskers now end at the most extreme observations within the fences,
   as in standard boxplots. The fences are returned as `lower_fence` and
   `upper_fence`.
+
 - The README has been rewritten around a complete worked example on
   `specLIBS`.
 

@@ -4,9 +4,11 @@ Plots the data and the fitted lineshape returned by
 [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md)
 or
 [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md),
-together with the residuals. For multi-peak fits, the individual peak
-contributions are drawn as dashed lines. When several spectra were
-fitted, one panel is drawn per spectrum.
+together with the residuals. The fitted curve is drawn on a fine
+wavelength grid, so it shows the fitted profile between the measured
+channels. For multi-peak fits, the individual peak contributions are
+drawn as dashed lines. When several spectra were fitted, one panel is
+drawn per spectrum.
 
 ## Usage
 

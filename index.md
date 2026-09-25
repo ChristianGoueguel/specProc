@@ -32,7 +32,7 @@ GitHub:
 ``` r
 
 # install.packages("remotes")
-remotes::install_github("ChristianGoueguel/specProc")
+remotes::install_github("ChristianGoueguel/specProc", build_vignettes = TRUE)
 ```
 
 A C++ compiler is needed to build the package from source (Rtools on
@@ -410,6 +410,22 @@ Refit them inside each cross-validation fold. If a filter is fitted once
 on all the data before cross-validating, the estimated prediction error
 is biased downward. Each function returns what you need to apply the
 fitted filter to new spectra: loadings, weights, centers and scales.
+
+## Learn more
+
+The vignettes develop the example above in more depth:
+
+- [`vignette("preprocessing", package = "specProc")`](https://christiangoueguel.com/specProc/articles/preprocessing.md):
+  choosing and checking each preprocessing step against replicate data.
+- [`vignette("line-fitting", package = "specProc")`](https://christiangoueguel.com/specProc/articles/line-fitting.md):
+  choosing a line profile, and the sources of uncertainty in fitted line
+  areas.
+- [`vignette("calibration", package = "specProc")`](https://christiangoueguel.com/specProc/articles/calibration.md):
+  predicting soil clay content with PLS, and estimating prediction error
+  without leakage.
+
+They are also available as [articles on the package
+website](https://christiangoueguel.com/specProc/articles/).
 
 ## Function overview
 

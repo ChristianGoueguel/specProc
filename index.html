@@ -39,6 +39,14 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="articles/calibration.html">Predicting soil clay content from LIBS spectra</a></li>
+    <li><a class="dropdown-item" href="articles/line-fitting.html">Fitting emission lines</a></li>
+    <li><a class="dropdown-item" href="articles/preprocessing.html">Preprocessing LIBS spectra</a></li>
+  </ul>
+</li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -82,7 +90,7 @@
 <p>specProc is not yet on CRAN. Install the development version from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ChristianGoueguel/specProc"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ChristianGoueguel/specProc"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>A C++ compiler is needed to build the package from source (Rtools on Windows, Xcode Command Line Tools on macOS). <code><a href="reference/opls.html">opls()</a></code> additionally needs the Bioconductor package ropls: <code>BiocManager::install("ropls")</code>.</p>
 </div>
 <div class="section level2">
@@ -320,6 +328,20 @@
 <p>Here the clutter directions are estimated from the same spectra they are evaluated on, so this reduction is optimistic. In practice, estimate the EPO projection (or a <code><a href="reference/glsw.html">glsw()</a></code> filter) on calibration samples only, and choose <code>ncomp</code> by cross-validation with folds formed by sample.</p>
 <p>The same rule applies to supervised filters that use the response: <code><a href="reference/osc.html">osc()</a></code>, <code><a href="reference/direct_osc.html">direct_osc()</a></code>, <code><a href="reference/direct_orthogonal.html">direct_orthogonal()</a></code>, <code><a href="reference/nas.html">nas()</a></code>, <code><a href="reference/o2pls.html">o2pls()</a></code> and <code><a href="reference/projected_osc.html">projected_osc()</a></code>. Refit them inside each cross-validation fold. If a filter is fitted once on all the data before cross-validating, the estimated prediction error is biased downward. Each function returns what you need to apply the fitted filter to new spectra: loadings, weights, centers and scales.</p>
 </div>
+</div>
+<div class="section level2">
+<h2 id="learn-more">Learn more<a class="anchor" aria-label="anchor" href="#learn-more"></a>
+</h2>
+<p>The vignettes develop the example above in more depth:</p>
+<ul>
+<li>
+<code><a href="articles/preprocessing.html">vignette("preprocessing", package = "specProc")</a></code>: choosing and checking each preprocessing step against replicate data.</li>
+<li>
+<code><a href="articles/line-fitting.html">vignette("line-fitting", package = "specProc")</a></code>: choosing a line profile, and the sources of uncertainty in fitted line areas.</li>
+<li>
+<code><a href="articles/calibration.html">vignette("calibration", package = "specProc")</a></code>: predicting soil clay content with PLS, and estimating prediction error without leakage.</li>
+</ul>
+<p>They are also available as <a href="https://christiangoueguel.com/specProc/articles/">articles on the package website</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="function-overview">Function overview<a class="anchor" aria-label="anchor" href="#function-overview"></a>

@@ -16,6 +16,12 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calibration.html">Predicting soil clay content from LIBS spectra</a></li>
+    <li><a class="dropdown-item" href="../articles/line-fitting.html">Fitting emission lines</a></li>
+    <li><a class="dropdown-item" href="../articles/preprocessing.html">Preprocessing LIBS spectra</a></li>
+  </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -79,11 +85,13 @@
 </ul></div>
 <div class="section level3">
 <h3 id="new-features-0-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-2-0"></a></h3>
-<ul><li>New <code><a href="../reference/voigt_profile.html">voigt_profile()</a></code>: the exact Voigt profile, computed in C++ from the Faddeeva function with Weideman’s (1994) rational approximation (relative error below 1e-10). <code><a href="../reference/peak_fit.html">peak_fit()</a></code> and <code><a href="../reference/multipeak_fit.html">multipeak_fit()</a></code> now use it for <code>profile = "voigt"</code>; the pseudo-Voigt approximation is available as <code>profile = "pseudo_voigt"</code>.</li>
-<li>New data set <code>specLIBS</code>: 400 LIBS spectra (50 soil samples x 8 locations, 7152 channels, 199-822 nm) with the clay, sand and silt content of each sample.</li>
-<li>
-<code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code> whiskers now end at the most extreme observations within the fences, as in standard boxplots. The fences are returned as <code>lower_fence</code> and <code>upper_fence</code>.</li>
-<li>The README has been rewritten around a complete worked example on <code>specLIBS</code>.</li>
+<ul><li><p>Three vignettes based on <code>specLIBS</code>: “Preprocessing LIBS spectra” (baseline, normalization judged by replicate RSD and intraclass correlation, robust screening of shots), “Fitting emission lines” (profile choice, sources of uncertainty, identifiability) and “Predicting soil clay content from LIBS spectra” (nested, repeated cross-validation by sample, and the optimism of common shortcuts).</p></li>
+<li><p><code><a href="../reference/plot_fit.html">plot_fit()</a></code> draws the fitted profiles on a fine wavelength grid.</p></li>
+<li><p>Functions taking a response now accept 1-d arrays, such as the output of <code><a href="https://rdrr.io/r/base/tapply.html" class="external-link">tapply()</a></code>.</p></li>
+<li><p>New <code><a href="../reference/voigt_profile.html">voigt_profile()</a></code>: the exact Voigt profile, computed in C++ from the Faddeeva function with Weideman’s (1994) rational approximation (relative error below 1e-10). <code><a href="../reference/peak_fit.html">peak_fit()</a></code> and <code><a href="../reference/multipeak_fit.html">multipeak_fit()</a></code> now use it for <code>profile = "voigt"</code>; the pseudo-Voigt approximation is available as <code>profile = "pseudo_voigt"</code>.</p></li>
+<li><p>New data set <code>specLIBS</code>: 400 LIBS spectra (50 soil samples x 8 locations, 7152 channels, 199-822 nm) with the clay, sand and silt content of each sample.</p></li>
+<li><p><code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code> whiskers now end at the most extreme observations within the fences, as in standard boxplots. The fences are returned as <code>lower_fence</code> and <code>upper_fence</code>.</p></li>
+<li><p>The README has been rewritten around a complete worked example on <code>specLIBS</code>.</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-0-2-0">Improvements<a class="anchor" aria-label="anchor" href="#improvements-0-2-0"></a></h3>
