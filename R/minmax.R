@@ -12,13 +12,16 @@
 #' @param a The minimum value of the new range (default: 0).
 #' @param b The maximum value of the new range (default: 1).
 #' @param drop.na A logical value indicating whether to remove missing values
-#' (NA) from the calculations. If `TRUE` (the default), missing values will be
-#' removed. If `FALSE`, missing values will be included.
+#' (NA). If `TRUE` (the default), missing values are removed from the output.
+#' If `FALSE`, they are kept (as `NA`) and ignored when computing the range.
 #'
-#' @return A numeric vector of the same length as `x`, with values rescaled to
-#' the new range `[a, b]`.
+#' @return A numeric vector with values rescaled to the new range `[a, b]`.
 #'
 #' @export minmax
+#'
+#' @examples
+#' minmax(c(2, 4, 6, 10))
+#' minmax(c(2, 4, NA, 10), a = -1, b = 1, drop.na = FALSE)
 #'
 minmax <- function(x, a = 0, b = 1, drop.na = TRUE) {
   if (missing(x)) {
@@ -38,14 +41,17 @@ minmax <- function(x, a = 0, b = 1, drop.na = TRUE) {
   }
 
   if (drop.na) {
-    x <- stats::na.omit(x)
+    x <- x[!is.na(x)]
+  }
+  if (all(is.na(x))) {
+    return(x)
   }
 
-  x_min <- min(x, na.rm = drop.na)
-  x_max <- max(x, na.rm = drop.na)
+  x_min <- min(x, na.rm = TRUE)
+  x_max <- max(x, na.rm = TRUE)
 
   if (x_min == x_max) {
-    return(rep(a, length(x)))
+    return(ifelse(is.na(x), NA_real_, a))
   }
 
   x_rescaled <- a + ((x - x_min) * (b - a)) / (x_max - x_min)

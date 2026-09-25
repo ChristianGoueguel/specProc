@@ -9,16 +9,15 @@ average(x, .group_by = NULL)
 \arguments{
 \item{x}{A data frame or tibble.}
 
-\item{.group_by}{The column name to group the data by (optional).
-If not provided, the average of the overall data will be computed.}
+\item{.group_by}{The column to group the data by (optional), given either
+unquoted or as a string. If not provided, the average of the overall data
+will be computed.}
 }
 \value{
 \itemize{
-\item If \code{.group_by = NULL}, the function returns a numeric vector containing the
-mean of each column across all spectra.
-\item If \code{.group_by} is provided, the function returns a data frame with columns corresponding
-to the unique values in the grouping column. Each cell contains the mean of the corresponding
-column for that group.
+\item If \code{.group_by = NULL}, a one-row tibble containing the mean of each column.
+\item If \code{.group_by} is provided, a tibble with one row per group: the first
+column holds the group labels and the remaining columns hold the group means.
 }
 }
 \description{
@@ -31,12 +30,19 @@ specified grouping column.
 The function leverages the power of \code{Rcpp} to perform the mean calculations
 in C++. The underlying C++ implementation has a time complexity of
 \emph{O(n × m)}, where \emph{n} is the number of rows and \emph{m} is
-the number of columns in the data. This efficient implementation ensures that
-the function can handle large datasets without significant performance overhead.
+the number of columns in the data. Missing values are ignored in the
+computation of each mean.
+}
+\examples{
+spectra <- data.frame(
+  sample = rep(c("a", "b"), each = 3),
+  `200.1` = c(1, 2, 3, 10, 11, 12),
+  `200.2` = c(2, 3, 4, 20, 21, 22),
+  check.names = FALSE
+)
+average(spectra[, -1])
+average(spectra, sample)
 
-The R wrapper function adds minimal overhead for argument checking and data manipulation,
-while leveraging the efficient C++ implementation for the core computations. The overall
-time complexity remains \emph{O(n × m)}.
 }
 \author{
 Christian L. Goueguel

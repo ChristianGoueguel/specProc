@@ -9,7 +9,7 @@ biweight_midvariance(x, drop.na = FALSE)
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE} (the default), missing values will be removed. If \code{FALSE}, missing values will be included in the calculations.}
+\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when \code{x} contains missing values.}
 }
 \value{
 The biweight midvariance of the input vector.

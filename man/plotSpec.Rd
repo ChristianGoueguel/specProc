@@ -33,7 +33,17 @@ target variable (for example, the concentration of a chemical element).
 }
 \details{
 This function is based on the ggplot2 package, thus allowing users to easily
-add or modify different components of the plot.
+add or modify different components of the plot. Each row of \code{x} is drawn as
+a separate line. All columns other than \code{id} and \code{colvar} must be named by
+their wavelength.
+}
+\examples{
+wl <- seq(390, 400, length.out = 200)
+spectra <- as.data.frame(t(sapply(1:3, function(i) i * exp(-(wl - 395)^2 / 0.1) + 0.1 * i)))
+names(spectra) <- wl
+spectra$conc <- 1:3
+plotSpec(spectra, colvar = conc)
+
 }
 \author{
 Christian L. Goueguel

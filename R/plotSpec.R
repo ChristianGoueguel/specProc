@@ -11,7 +11,9 @@
 #'
 #' @details
 #' This function is based on the ggplot2 package, thus allowing users to easily
-#' add or modify different components of the plot.
+#' add or modify different components of the plot. Each row of `x` is drawn as
+#' a separate line. All columns other than `id` and `colvar` must be named by
+#' their wavelength.
 #'
 #' @param x data frame or tibble of the spectra.
 #' @param id optional (`NULL` by default). Column name of a factor variable
@@ -27,17 +29,28 @@
 #'
 #' @export plotSpec
 #'
+#' @examples
+#' wl <- seq(390, 400, length.out = 200)
+#' spectra <- as.data.frame(t(sapply(1:3, function(i) i * exp(-(wl - 395)^2 / 0.1) + 0.1 * i)))
+#' names(spectra) <- wl
+#' spectra$conc <- 1:3
+#' plotSpec(spectra, colvar = conc)
+#'
 plotSpec <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop_na = FALSE) {
   if (missing(x)) {
     stop("Missing 'data' argument.")
   }
-  if (!is.data.frame(x) && !tibble::is_tibble(x)) {
+  if (!is.data.frame(x)) {
     stop("Input 'data' must be a data frame or tibble.")
   }
-  if (!rlang::quo_is_null(rlang::enquo(id)) && !(rlang::quo_name(rlang::enquo(id)) %in% colnames(x))) {
+  id_quo <- rlang::enquo(id)
+  col_quo <- rlang::enquo(colvar)
+  id_name <- if (rlang::quo_is_null(id_quo)) NULL else rlang::as_name(id_quo)
+  col_name <- if (rlang::quo_is_null(col_quo)) NULL else rlang::as_name(col_quo)
+  if (!is.null(id_name) && !id_name %in% colnames(x)) {
     stop("The 'id' column does not exist in the provided data.")
   }
-  if (!rlang::quo_is_null(rlang::enquo(colvar)) && !(rlang::quo_name(rlang::enquo(colvar)) %in% colnames(x))) {
+  if (!is.null(col_name) && !col_name %in% colnames(x)) {
     stop("The 'colvar' column does not exist in the provided data.")
   }
   if (!is.logical(.interactive)) {
@@ -47,49 +60,46 @@ plotSpec <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop_na 
     stop("The argument 'drop_na' must be of type boolean (TRUE or FALSE)")
   }
 
-  id_cols <- c(rlang::quo_name(rlang::enquo(id)), rlang::quo_name(rlang::enquo(colvar)))
-  id_cols <- id_cols[!is.na(id_cols)]
-  id_cols <- tidyselect::all_of(id_cols)
-  intensity <- NULL
-  wavelength <- NULL
-
-  x_long <- x %>%
-    tidyr::pivot_longer(
-      cols = setdiff(names(x), id_cols),
-      names_to = "wavelength",
-      values_to = "intensity"
-    ) %>%
-    purrr::modify_at("wavelength", as.numeric)
-
-  if (drop_na) {
-    x_long <- x_long %>%
-      dplyr::filter(!is.na(intensity)) %>%
-      dplyr::filter(!is.na(wavelength))
+  spec_cols <- setdiff(names(x), c(id_name, col_name))
+  wl <- parse_wavelength(spec_cols)
+  if (anyNA(wl)) {
+    stop("Spectral column names must be wavelengths; use 'id' and 'colvar' for the other columns.")
   }
 
-  p <- x_long %>%
-    ggplot2::ggplot() +
-    ggplot2::aes(x = wavelength, y = intensity)
+  intensity <- wavelength <- .spectrum <- NULL
 
-  if (!rlang::quo_is_null(rlang::enquo(id)) && !rlang::quo_is_null(rlang::enquo(colvar))) {
+  x_long <- x
+  x_long$.spectrum <- seq_len(nrow(x))
+  x_long <- tidyr::pivot_longer(
+    x_long,
+    cols = dplyr::all_of(spec_cols),
+    names_to = "wavelength",
+    values_to = "intensity"
+  )
+  x_long$wavelength <- wl[match(x_long$wavelength, spec_cols)]
+
+  if (drop_na) {
+    x_long <- x_long[!is.na(x_long$intensity), ]
+  }
+
+  p <- ggplot2::ggplot(x_long) +
+    ggplot2::aes(x = wavelength, y = intensity, group = .spectrum)
+
+  if (!is.null(col_name)) {
     p <- p +
-      ggplot2::geom_line(ggplot2::aes(group = {{id}}, color = {{colvar}})) +
+      ggplot2::geom_line(ggplot2::aes(color = .data[[col_name]])) +
       ggplot2::scale_color_gradient(low = "blue", high = "red")
-  } else if (!rlang::quo_is_null(rlang::enquo(id))) {
+  } else if (!is.null(id_name)) {
     p <- p +
-      ggplot2::geom_line(ggplot2::aes(color = {{id}})) +
+      ggplot2::geom_line(ggplot2::aes(color = factor(.data[[id_name]]))) +
       ggplot2::scale_colour_viridis_d(direction = -1)
-  } else if (!rlang::quo_is_null(rlang::enquo(colvar))) {
-    p <- p +
-      ggplot2::geom_line(ggplot2::aes(color = {{colvar}})) +
-      ggplot2::scale_color_gradient(low = "blue", high = "red")
   } else {
     p <- p +
       ggplot2::geom_line(color = "#002a52")
   }
 
   p <- p +
-    ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]") +
+    ggplot2::labs(x = "Wavelength [nm]", y = "Intensity [arb. units]", color = col_name %||% id_name) +
     ggplot2::theme_classic() +
     ggplot2::theme(
       legend.position = "none",
@@ -98,7 +108,7 @@ plotSpec <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop_na 
 
   if (.interactive == FALSE) {
     return(p)
-  } else {
-    return(plotly::ggplotly(p, tooltip = "all"))
   }
+  rlang::check_installed("plotly", reason = "to create interactive plots.")
+  return(plotly::ggplotly(p, tooltip = "all"))
 }

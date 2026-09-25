@@ -4,15 +4,7 @@
 \alias{direct_orthogonal}
 \title{Direct Orthogonalization}
 \usage{
-direct_orthogonal(
-  x,
-  y,
-  ncomp = 2,
-  center = TRUE,
-  scale = FALSE,
-  max_iter = 10,
-  tol = 0.001
-)
+direct_orthogonal(x, y, ncomp = 2, center = TRUE, scale = FALSE)
 }
 \arguments{
 \item{x}{A matrix or data frame of the predictor variables}
@@ -20,24 +12,20 @@ direct_orthogonal(
 \item{y}{A vector, matrix or data frame of the response variable(s)}
 
 \item{ncomp}{An integer specifying the number of principal components to
-retain for orthogonal processing. Default is 2.}
+retain for orthogonal processing. Default is 2. Values larger than the
+rank of the orthogonalized matrix are reduced accordingly.}
 
 \item{center}{A logical value specifying whether to center the data. Default is \code{TRUE}.}
 
 \item{scale}{A logical value specifying whether to scale the data. Default is \code{FALSE}.}
-
-\item{max_iter}{An integer representing the maximum number of iterations.
-The default value is 10.}
-
-\item{tol}{A numeric value representing the tolerance for convergence.
-The default value is 1e-3.}
 }
 \value{
 A list with the following components:
 \itemize{
 \item \code{correction}: The corrected matrix.
-\item \code{loading}: The loadings matrix.
-\item \code{score}: The scores matrix.
+\item \code{loading}: The loadings matrix \eqn{\textbf{P}}.
+\item \code{score}: The scores matrix \eqn{\textbf{XP}}.
+\item \code{center}, \code{scale}: The column centers and scales applied to \code{x}.
 }
 }
 \description{
@@ -49,10 +37,23 @@ by Andersson (1999), to filter out variation from predictor variables,
 Contrary to the Orthogonal Signal Correction (OSC) algorithm, Wold \emph{et al.} (1998), which uses inverse
 Partial Least Squares (PLS) regression to filter out the orthogonal signal, DO
 filters out the orthogonal signal directly by orthogonalization of the
-\eqn{\textbf{X}} matrix. Principal Components Analysis (PCA) is performed on the
-orthogonalized \eqn{\textbf{X}} to obtain the scores \eqn{\textbf{T}} and loadings
-\eqn{\textbf{P}} matrices. Direct Orthogonalization is typically simpler and
-faster than OSC.
+\eqn{\textbf{X}} matrix:
+\deqn{\textbf{Z} = \textbf{X} - \textbf{Y}(\textbf{Y}^T\textbf{Y})^{-1}\textbf{Y}^T\textbf{X}}
+Principal Components Analysis (PCA) is performed on \eqn{\textbf{Z}} to obtain
+the loadings \eqn{\textbf{P}}, and the corrected matrix is
+\eqn{\textbf{X}_{DO} = \textbf{X} - \textbf{XPP}^T}. Direct Orthogonalization
+is typically simpler and faster than OSC.
+
+To correct new data, preprocess it with the returned \code{center} and \code{scale}
+vectors and apply \eqn{\textbf{X}_{new} - \textbf{X}_{new}\textbf{PP}^T}.
+}
+\examples{
+set.seed(1)
+x <- matrix(rnorm(20 * 50), 20, 50)
+y <- x[, 1] + rnorm(20, sd = 0.1)
+res <- direct_orthogonal(x, y, ncomp = 2)
+dim(res$correction)
+
 }
 \references{
 \itemize{

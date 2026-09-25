@@ -35,7 +35,7 @@
 #'
 #' @return
 #'    - If `plot = TRUE`, returns a `ggplot2` object containing the adjusted boxplot.
-#'    - If `plot = FALSE`, returns a list of tibbles with the adjusted boxplot statistics and potantial outliers.
+#'    - If `plot = FALSE`, returns a list of tibbles with the adjusted boxplot statistics and potential outliers.
 #'
 #' @export adjusted_boxplot
 #'
@@ -57,7 +57,10 @@ adjusted_boxplot <- function(x, plot = TRUE, xlabels.angle = 90, xlabels.vjust =
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!all(x %>% purrr::map_lgl(is.numeric))) {
+  if (is.matrix(x)) {
+    x <- as.data.frame(x)
+  }
+  if (!is.data.frame(x) || !all(vapply(x, is.numeric, logical(1)))) {
     stop("Input 'x' must be a numeric data frame.")
   }
   if(!is.logical(plot)) {
@@ -88,84 +91,33 @@ adjusted_boxplot <- function(x, plot = TRUE, xlabels.angle = 90, xlabels.vjust =
     stop("Argument 'staplewidth' must be a positive numeric value.")
   }
 
-  adjBoxplot_stats <- x %>%
-    purrr::map(
-      function(.x) {
-        adj_box <- robustbase::adjboxStats(.x)
-        tibble::tibble(
-          lower = adj_box$stats[1],
-          q1 = adj_box$stats[2],
-          median = adj_box$stats[3],
-          q3 = adj_box$stats[4],
-          upper = adj_box$stats[5],
-          medcouple = robustbase::mc(.x)
-        )
-      }
-    ) %>%
-    dplyr::bind_rows(.id = "variable") %>%
-    purrr::modify_at("variable", forcats::as_factor)
-
-  outlier_tbl <- x %>%
-    purrr::map(
-      function(.x) {
-        out_tbl <- robustbase::adjboxStats(.x)
-        tibble::tibble(value = out_tbl$out)
-      }
-    ) %>%
-    dplyr::bind_rows(.id = "variable") %>%
-    purrr::modify_at("variable", forcats::as_factor)
-
-  variable <- NULL
-  lower <- NULL
-  q1 <- NULL
-  median <- NULL
-  q3 <- NULL
-  upper <- NULL
-  value <- NULL
-
-  p <- ggplot2::ggplot() +
-    ggplot2::geom_boxplot(
-      data = adjBoxplot_stats,
-      ggplot2::aes(
-        x = variable,
-        ymin = lower,
-        lower = q1,
-        middle = median,
-        upper = q3,
-        ymax = upper,
-        group = variable,
-        fill = variable),
-      stat = "identity",
-      width = box.width,
-      colour = "black",
-      outlier.colour = NA,
-      outlier.shape = NA,
-      notch = notch,
-      notchwidth = notchwidth,
-      staplewidth = staplewidth) +
-    ggplot2::geom_point(
-      data = outlier_tbl,
-      ggplot2::aes(
-        x = variable,
-        y = value,
-        fill = variable,
-        group = variable),
-      shape = 21,
-      size = 2,
-      alpha = 1/3) +
-    ggplot2::geom_jitter(size = 1.5) +
-    ggsci::scale_fill_d3(palette = "category20") +
-    ggplot2::theme_bw() +
-    ggplot2::theme(
-      legend.position = "none",
-      panel.grid = ggplot2::element_blank(),
-      axis.text.x = ggplot2::element_text(angle = xlabels.angle, vjust = xlabels.vjust, hjust = xlabels.hjust)) +
-    ggplot2::labs(x = " ", y = " ")
-
-  if (plot == TRUE) {
-    return(p)
-  } else{
-    r <- list("stats" = adjBoxplot_stats, "outliers" = outlier_tbl)
-    return(r)
+  adjBoxplot_stats <- list()
+  outlier_tbl <- list()
+  for (nm in names(x)) {
+    v <- x[[nm]]
+    v <- v[!is.na(v)]
+    adj_box <- robustbase::adjboxStats(v, doScale = FALSE)
+    adjBoxplot_stats[[nm]] <- tibble::tibble(
+      lower = adj_box$stats[1],
+      q1 = adj_box$stats[2],
+      median = adj_box$stats[3],
+      q3 = adj_box$stats[4],
+      upper = adj_box$stats[5],
+      medcouple = medcouple(v)
+    )
+    outlier_tbl[[nm]] <- tibble::tibble(value = adj_box$out)
   }
+  adjBoxplot_stats <- dplyr::bind_rows(adjBoxplot_stats, .id = "variable")
+  adjBoxplot_stats$variable <- factor(adjBoxplot_stats$variable, levels = names(x))
+  outlier_tbl <- dplyr::bind_rows(outlier_tbl, .id = "variable")
+  if (nrow(outlier_tbl) == 0) {
+    outlier_tbl <- tibble::tibble(variable = character(), value = numeric())
+  }
+  outlier_tbl$variable <- factor(outlier_tbl$variable, levels = names(x))
+
+  if (!plot) {
+    return(list("stats" = adjBoxplot_stats, "outliers" = outlier_tbl))
+  }
+  boxplot_stats_plot(adjBoxplot_stats, outlier_tbl, xlabels.angle, xlabels.vjust,
+                     xlabels.hjust, box.width, notch, notchwidth, staplewidth)
 }

@@ -6,7 +6,7 @@
 \usage{
 biweight_location(
   x,
-  loc = stats::median(x),
+  loc = NULL,
   c = 6,
   tol = 1e-06,
   max_iter = 50,
@@ -24,7 +24,7 @@ biweight_location(
 
 \item{max_iter}{Maximum number of iterations (default: 50).}
 
-\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE} (the default), missing values will be removed. If \code{FALSE}, missing values will be included in the calculations.}
+\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when \code{x} contains missing values.}
 }
 \value{
 The biweight location of \code{x}.
@@ -33,6 +33,15 @@ The biweight location of \code{x}.
 This function computes the biweight location, a robust measure of central tendency
 for a numeric vector. The biweight location is less sensitive to outliers
 than the sample mean.
+}
+\details{
+Starting from the initial location \eqn{M} (the median by default), the
+biweight location is
+\deqn{\zeta = M + \frac{\sum_{|u_i|<1} (x_i - M)(1 - u_i^2)^2}{\sum_{|u_i|<1} (1 - u_i^2)^2},
+\quad u_i = \frac{x_i - M}{c \cdot \mathrm{MAD}}}
+where MAD is the (unscaled) median absolute deviation. The estimate is
+iterated, replacing \eqn{M} by \eqn{\zeta}, until the change is smaller
+than \code{tol} or \code{max_iter} iterations are reached.
 }
 \examples{
 # Example 1: Compute biweight location for a vector
@@ -57,6 +66,9 @@ biloc = biweight_location(x)
 \item Mosteller, F., and Tukey, J. W. (1977).
 Data Analysis and Regression: A Second Course in Statistics.
 Addison-Wesley, pp. 203-209.
+\item Beers, T.C., Flynn, K., Gebhardt, K., (1990).
+Measures of location and scale for velocities in clusters of galaxies - A robust approach.
+The Astronomical Journal, 100:32-46.
 }
 }
 \author{

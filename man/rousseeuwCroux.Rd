@@ -11,7 +11,7 @@ rousseeuwCroux(x, estimator = c("Sn", "Qn"), drop.na = FALSE)
 
 \item{estimator}{A character string indicating whether to calculate the "Sn" or "Qn" estimator.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the input vector.}
+\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the input vector. If \code{FALSE} (default) and \code{x} contains missing values, \code{NA} is returned.}
 }
 \value{
 A numeric value representing the calculated Sn or Qn scale estimator.

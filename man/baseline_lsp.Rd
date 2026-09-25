@@ -7,7 +7,7 @@
 baseline_lsp(x, degree = 4, tol = 0.001, max.iter = 10)
 }
 \arguments{
-\item{x}{A matrix or data frame.}
+\item{x}{A matrix or data frame, with one spectrum per row.}
 
 \item{degree}{An integer specifying the degree of the polynomial fitting
 function. The default value is 4.}
@@ -39,6 +39,14 @@ modified least-squares-based polynomial curve-fitting function, such that all
 data points in the generated curve that have an intensity value higher than
 their respective pixel value in the input spectrum are automatically
 reassigned to the original intensity.
+}
+\examples{
+wl <- seq(200, 400, length.out = 500)
+spec <- 0.002 * (wl - 200)^2 + 50 * exp(-(wl - 300)^2 / 2) + rnorm(500, sd = 0.5)
+res <- baseline_lsp(matrix(spec, nrow = 1), degree = 3, max.iter = 100)
+plot(wl, spec, type = "l")
+lines(wl, unlist(res$background), col = "red")
+
 }
 \references{
 \itemize{

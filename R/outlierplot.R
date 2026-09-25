@@ -31,23 +31,24 @@
 #' @export outlierplot
 #'
 #' @examples
-#' # Load the glass dataset from the chemometrics package
-#' data(glass, package = "chemometrics")
+#' set.seed(1)
+#' x <- matrix(rnorm(100 * 4), ncol = 4, dimnames = list(NULL, paste0("V", 1:4)))
+#' x[1:5, ] <- x[1:5, ] + 4 # five multivariate outliers
 #'
 #' # Basic usage with default parameters
-#' outlierplot(glass)
+#' outlierplot(x)
 #'
 #' # Adjust the proportion of observations used for MCD estimation
-#' outlierplot(glass, quan = 0.75)
+#' outlierplot(x, quan = 0.75)
 #'
 #' # Show Mahalanobis distances instead of outlier highlighting
-#' outlierplot(glass, show.outlier = FALSE, show.mahal = TRUE)
+#' outlierplot(x, show.outlier = FALSE, show.mahal = TRUE)
 #'
 #' # Combine outlier highlighting and Mahalanobis distance color-coding
-#' outlierplot(glass, show.outlier = TRUE, show.mahal = TRUE)
+#' outlierplot(x, show.outlier = TRUE, show.mahal = TRUE)
 #'
 #' # Return data frame instead of plot
-#' result_df <- outlierplot(glass, show.outlier = FALSE, show.mahal = FALSE)
+#' result_df <- outlierplot(x, show.outlier = FALSE, show.mahal = FALSE)
 #' head(result_df)
 #'
 outlierplot <- function(x, quan = 1/2, alpha = 0.025, show.outlier = TRUE, show.mahal = FALSE) {
@@ -67,18 +68,18 @@ outlierplot <- function(x, quan = 1/2, alpha = 0.025, show.outlier = TRUE, show.
     stop("'show.mahal' must be of type boolean (TRUE or FALSE)")
   }
 
-  if (is.data.frame(x) || tibble::is_tibble(x)) {
-    x <- as.matrix(x)
+  if (!is.numeric(alpha) || length(alpha) != 1 || alpha <= 0 || alpha >= 1) {
+    stop("'alpha' must be a numeric value between 0 and 1")
+  }
+  x <- as_numeric_matrix(x, "x")
+  if (anyNA(x)) {
+    stop("'x' cannot contain missing values.")
   }
 
-  rob <- robustbase::covMcd(x, alpha = quan)
+  # covMcd draws random subsets: fix the seed for reproducible results while
+  # leaving the caller's random number stream untouched.
+  rob <- with_seed(123, robustbase::covMcd(x, alpha = quan))
   xarw <- covARW(x, rob$center, rob$cov, alpha = alpha)
-
-  if (xarw$cn != Inf) {
-    alpha <- sqrt(c(xarw$cn, stats::qchisq(c(0.75, 0.5, 0.25), ncol(x))))
-  } else {
-      alpha <- sqrt(stats::qchisq(c(0.975, 0.75, 0.5, 0.25), ncol(x)))
-  }
 
   dist <- stats::mahalanobis(x, center = rob$center, cov = rob$cov)
   sx <- matrix(NA, nrow = nrow(x), ncol = ncol(x))
@@ -89,17 +90,14 @@ outlierplot <- function(x, quan = 1/2, alpha = 0.025, show.outlier = TRUE, show.
   r <- range(sx)
   out <- sqrt(dist) > min(sqrt(xarw$cn), sqrt(stats::qchisq(0.975, dim(x)[2])))
 
-  s_df <- as.data.frame(sx)
-  colnames(s_df) <- colnames(x)
+  s_df <- as_tbl(sx, colnames(x))
+  s_df$outlier <- out
+  s_df$mahalanobis <- sqrt(dist)
+  # Horizontal jitter; a fixed seed keeps the plot reproducible without
+  # altering the caller's random number stream.
+  s_df$x <- with_seed(123, stats::runif(nrow(x), min = -1, max = 1))
 
-  set.seed(123)
-  s_df <- s_df %>%
-    tibble::as_tibble() %>%
-    dplyr::mutate(
-      outlier = out,
-      mahalanobis = sqrt(dist),
-      x = runif(nrow(x), min = -1, max = 1)
-    )
+  outlier <- mahalanobis <- score <- variable <- NULL
 
   df_long <- s_df %>%
     tidyr::pivot_longer(
@@ -131,13 +129,7 @@ outlierplot <- function(x, quan = 1/2, alpha = 0.025, show.outlier = TRUE, show.
 
   p_mahal <- p +
     ggplot2::geom_point(ggplot2::aes(color = mahalanobis)) +
-    ggplot2::scale_color_gradient2(
-      limits = c(round(r[1], 0), round(r[2], 0)),
-      breaks = c(round(r[1], 0), 0, round(r[2], 0)),
-      low = "red",
-      mid = "green",
-      high = "blue",
-      midpoint = 0) +
+    ggplot2::scale_color_viridis_c(option = "plasma") +
     ggplot2::guides(color = ggplot2::guide_colorbar()) +
     ggplot2::labs(color = "Robust\nMahalanobis")
 
@@ -159,10 +151,7 @@ outlierplot <- function(x, quan = 1/2, alpha = 0.025, show.outlier = TRUE, show.
     return(p_all)
   }
 
-  if (show.outlier == FALSE && show.mahal == FALSE) {
-    return(s_df %>% dplyr::select(-x))
-  }
-
+  return(s_df[setdiff(names(s_df), "x")])
 }
 
 
@@ -207,7 +196,7 @@ covARW <- function(x, m0, c0, alpha, pcrit){
     m <- m0
     c <- c0
     } else {
-    m <- apply(x[w,], 2, mean)
+    m <- colMeans(x[w, , drop = FALSE])
     c1 <- as.matrix(x - tcrossprod(rep(1, n), m))
     c <- crossprod(c1 * w, c1) / sum(w)
     }

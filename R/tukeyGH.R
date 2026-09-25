@@ -33,7 +33,7 @@
 #'    In: Hoaglin, D.C., Mosteller, F., Tukey, J.W., (eds),
 #'    Data Analysis for Tables, Trends, and Shapes. New York:Wiley.
 #'
-#' @param x A numeric vector or a single value, depending on the function being called.
+#' @param x A numeric vector: quantiles for `type = "d"` or `"p"`, probabilities for `type = "q"`. Ignored for `type = "r"`.
 #' @param type A character string specifying the function to be called (`d` for density, `p` for cumulative distribution, `q` for quantile, or `r` for random number generation).
 #' @param location The location parameter of the TGH distribution.
 #' @param scale The scale parameter of the TGH distribution.
@@ -71,6 +71,20 @@
 #' )
 #'
 tukeyGH <- function(x, type = "d", location = 0, scale = 1, g = 0, h = 0, log = FALSE, log.p = FALSE, n = NULL) {
+  if (!is.character(type) || length(type) != 1 || !type %in% c("d", "p", "q", "r")) {
+    stop("Invalid 'type'. Must be one of 'd', 'p', 'q', or 'r'.")
+  }
+  for (arg in list(location, scale, g, h)) {
+    if (!is.numeric(arg) || length(arg) != 1 || is.na(arg)) {
+      stop("'location', 'scale', 'g' and 'h' must be single numeric values.")
+    }
+  }
+  if (scale <= 0) {
+    stop("'scale' must be positive.")
+  }
+  if (h < 0) {
+    stop("Negative kurtosis parameter")
+  }
   if (type == "d") {
     dgh(x, location, scale, g, h, log)
   } else if (type == "p") {
@@ -103,24 +117,26 @@ deriv_gh <- function(z, g, h) {
 }
 
 gh_inv <- function(x, g, h) {
-  purrr::map_dbl(
-    x, ~ {
+  vapply(
+    x, function(.x) {
       if (h > 0) {
         f1 <- function(z, x, g, h) {
           tg(z, g) * th(z, h) - x
         }
         tryCatch(
-          stats::uniroot(f1, x = .x, g = g, h = h, interval = c(-10, 10), extendInt = "yes")$root,
+          stats::uniroot(f1, x = .x, g = g, h = h, interval = c(-10, 10), extendInt = "yes",
+                         tol = 1e-12)$root,
           error = function(err) .x * Inf
         )
       }
-    }
+    },
+    numeric(1)
   )
 }
 
 dgh <- function(x, location, scale, g, h, log = FALSE) {
-  purrr::map_dbl(
-    x, ~ {
+  vapply(
+    x, function(.x) {
       x_std <- (.x - location) / scale
       if (g == 0 && h == 0) {
         v <- stats::dnorm(x_std) / scale
@@ -135,13 +151,14 @@ dgh <- function(x, location, scale, g, h, log = FALSE) {
         stop("Negative kurtosis parameter")
       }
       if (log == FALSE) v else log(v)
-    }
+    },
+    numeric(1)
   )
 }
 
 pgh <- function(q, location, scale, g, h, log.p = FALSE) {
-  purrr::map_dbl(
-    q, ~ {
+  vapply(
+    q, function(.x) {
       if (g == 0 && h == 0) {
         l <- stats::pnorm(.x, location, scale)
       } else if (h == 0) {
@@ -158,20 +175,22 @@ pgh <- function(q, location, scale, g, h, log.p = FALSE) {
         stop("Negative kurtosis parameter")
       }
       if (log.p == FALSE) l else log(l)
-    }
+    },
+    numeric(1)
   )
 }
 
 qgh <- function(q, location, scale, g, h, log.p = FALSE) {
-  purrr::map_dbl(
-    q, ~ {
+  vapply(
+    q, function(.x) {
       if (h >= 0) {
         u <- stats::qnorm(.x, log.p = log.p)
         location + scale * tg(u, g) * th(u, h)
       } else {
         stop("Negative kurtosis parameter")
       }
-    }
+    },
+    numeric(1)
   )
 }
 

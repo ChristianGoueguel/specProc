@@ -11,10 +11,10 @@ glsw(x1, x2, alpha = 0.01)
 
 \item{x2}{A numeric matrix, data frame or tibble representing the second set of data.}
 
-\item{alpha}{A numeric value specifying the weighting parameter. Typical values range from 1 to 0.0001. Default is 0.01.}
+\item{alpha}{A positive numeric value specifying the weighting parameter. Typical values range from 1 to 0.0001. Default is 0.01.}
 }
 \value{
-A tibble containing the filtering matrix.
+A tibble containing the \eqn{p \times p} filtering matrix \eqn{\textbf{G}}.
 }
 \description{
 The Generalized Least Squares Weighting (GLSW) algorithm, proposed by Martens \emph{et al.} (2003),
@@ -34,6 +34,12 @@ down-weight the contributions of the identified interferences or clutter. This
 filtering matrix is constructed using a regularization parameter, denoted as
 alpha (\eqn{\alpha}).
 
+With \eqn{\textbf{X}_d} the difference between the mean-centered datasets,
+\eqn{\textbf{C} = \textbf{X}_d^T\textbf{X}_d = \textbf{V}\textbf{S}^2\textbf{V}^T},
+the filter is
+\deqn{\textbf{G} = \textbf{V}\textbf{D}^{-1}\textbf{V}^T, \quad \textbf{D} = \sqrt{\textbf{S}^2/\alpha + \textbf{I}}}
+where \eqn{\textbf{S}^2} holds the eigenvalues of \eqn{\textbf{C}}.
+
 The value of \eqn{\alpha} determines how strongly the algorithm down-weights
 the clutter components in the data. In cases where the interferences are
 well-characterized and distinct from the desired signal, a small \eqn{\alpha} value
@@ -46,6 +52,14 @@ Let \eqn{\textbf{X}} be a data matrix. The GLSW filter is applied as follows:
 \deqn{\textbf{X}_{new} = \textbf{X} \cdot \textbf{G}}
 
 where, \eqn{\textbf{X}_{new}} is the filtered matrix and \eqn{\textbf{G}} the filtering matrix.
+}
+\examples{
+set.seed(1)
+x1 <- matrix(rnorm(20 * 30), 20, 30)
+x2 <- x1 + outer(rnorm(20), cos(seq(0, pi, length.out = 30)))
+G <- glsw(x1, x2, alpha = 0.01)
+x1_filtered <- x1 \%*\% as.matrix(G)
+
 }
 \references{
 \itemize{

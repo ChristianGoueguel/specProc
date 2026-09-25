@@ -19,27 +19,25 @@ projected_osc(
 
 \item{y}{A vector of the response variable.}
 
-\item{ncomp}{An integer specifying the number of components to include in the POSC model. Default is 5.}
+\item{ncomp}{An integer specifying the number of PLS components (at least 2). \code{ncomp - 1} orthogonal components are removed. Default is 5.}
 
 \item{center}{A logical value indicating whether to mean-center \code{x} and \code{y}. Default is \code{TRUE}.}
 
 \item{scale}{A logical value indicating whether to scale \code{x} and \code{y}. Default is \code{FALSE}.}
 
-\item{tol}{A numeric value representing the tolerance for convergence. The default value is 1e-10.}
+\item{tol}{A numeric value; orthogonal components whose singular value is smaller than \code{tol} times the largest one are discarded. The default value is 1e-10.}
 
-\item{newdata}{A matrix or data frame of new predictor variables to be corrected using the POSC model.}
+\item{newdata}{An optional matrix or data frame of new predictor variables to be corrected using the POSC model. It is preprocessed with the centers and scales of \code{x}.}
 }
 \value{
-If \code{newdata} is provided, a list containing the following components:
+A list containing the following components:
 \itemize{
-\item \code{correction}: The corrected matrix for the new data after applying POSC.
-\item \code{scores}: The orthogonal scores matrix for the new data.
-If \code{newdata} is not provided, a list containing the following components:
-\item \code{model}: A list containing the POSC model components:
-\itemize{
-\item \code{loadings}: The orthogonal loadings matrix.
-\item \code{weights}: The orthogonal weights matrix.
-}
+\item \code{correction}: The corrected \code{x}.
+\item \code{scores}: The orthogonal scores matrix \eqn{\textbf{T}_o}.
+\item \code{loadings}: The orthogonal loadings matrix \eqn{\textbf{P}_o}.
+\item \code{weights}: The orthogonal weights \eqn{\textbf{W}_o}, such that \eqn{\textbf{T}_o = \textbf{XW}_o}.
+\item \code{center}, \code{scale}: The column centers and scales applied to \code{x}.
+\item \code{newdata}: If \code{newdata} is provided, a list with the corrected new data (\code{correction}) and its orthogonal scores (\code{scores}).
 }
 }
 \description{
@@ -47,6 +45,40 @@ The projected orthogonal signal correction (POSC) method is a preprocessing
 technique used to remove systematic variation from predictor variables that
 is orthogonal to the response variable. This function implements the POSC
 algorithm for model fitting and prediction.
+}
+\details{
+POSC obtains OPLS-filtered data directly from an ordinary (non-orthogonalized)
+PLS1 model (Kemsley and Tapp, 2009):
+\enumerate{
+\item A PLS1 model with \code{ncomp} components is fitted, giving the score matrix
+\eqn{\textbf{T}} and the fitted response \eqn{\hat{\textbf{y}}}.
+\item The part of the score space orthogonal to \eqn{\hat{\textbf{y}}},
+\eqn{\textbf{T} - \hat{\textbf{y}}(\hat{\textbf{y}}^T\hat{\textbf{y}})^{-1}\hat{\textbf{y}}^T\textbf{T}},
+spans \code{ncomp - 1} orthogonal components with scores \eqn{\textbf{T}_o}.
+\item The orthogonal loadings are \eqn{\textbf{P}_o = \textbf{X}^T\textbf{T}_o(\textbf{T}_o^T\textbf{T}_o)^{-1}}
+and the filtered data are \eqn{\textbf{X} - \textbf{T}_o\textbf{P}_o^T}.
+}
+
+The filtered data are identical to those obtained from an OPLS model with one
+predictive and \code{ncomp - 1} orthogonal components.
+}
+\examples{
+set.seed(1)
+x <- matrix(rnorm(30 * 40), 30, 40)
+y <- x[, 1] + rnorm(30, sd = 0.1)
+res <- projected_osc(x[1:20, ], y[1:20], ncomp = 3, newdata = x[21:30, ])
+dim(res$newdata$correction)
+
+}
+\references{
+\itemize{
+\item Kemsley, E.K., Tapp, H.S., (2009).
+OPLS filtered data can be obtained directly from non-orthogonalized PLS1.
+Journal of Chemometrics, 23(5):263-264.
+\item Trygg, J., Wold, S., (2002).
+Orthogonal projections to latent structures (O-PLS).
+Journal of Chemometrics, 16(3):119-128.
+}
 }
 \author{
 Christian L. Goueguel

@@ -13,12 +13,12 @@ normalize(x, method = "area", bkg = NULL, wlength = NULL, drop.na = TRUE)
 
 \item{bkg}{A numeric matrix or data frame of the same dimension as \code{x}, specifying the intensity of the continuum radiation (background emission) used for normalizing \code{x}. Required for "background" method.}
 
-\item{wlength}{A character vector of the selected wavelength(s) related to the internal standard(s) peak intensity. Optional for "background" method.}
+\item{wlength}{A character vector of the selected wavelength(s) (column names). Required for the "internal" method, where the intensities at these wavelengths are summed to give the internal standard. Optional for the "background" method, where only these wavelengths are normalized and returned.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values before normalizing. Default is \code{TRUE}.}
+\item{drop.na}{A logical value indicating whether to remove spectra (rows) containing missing values before normalizing. Default is \code{TRUE}.}
 }
 \value{
-A data frame of normalized spectra.
+A tibble of normalized spectra.
 }
 \description{
 This function implements normalization methods based on background,
@@ -39,6 +39,12 @@ emission line related to the analyte is divided by the peak intensity (or area)
 of a selected emission line related to the internal standard. The internal
 standard concentration is assumed constant or known.
 }
+}
+\examples{
+x <- data.frame(`400` = c(1, 2), `401` = c(3, 6), `402` = c(1, 2), check.names = FALSE)
+normalize(x, method = "area")
+normalize(x, method = "internal", wlength = "401")
+
 }
 \references{
 \itemize{

@@ -22,7 +22,7 @@
 #'      subtraction of fluorescence from biological Raman spectra.
 #'      Applied Spectroscopy, 57(11):1363-1367
 #'
-#' @param x A matrix or data frame.
+#' @param x A matrix or data frame, with one spectrum per row.
 #' @param degree An integer specifying the degree of the polynomial fitting
 #' function. The default value is 4.
 #' @param tol A numeric value representing the tolerance for the difference
@@ -38,6 +38,13 @@
 #'
 #' @export baseline_lsp
 #'
+#' @examples
+#' wl <- seq(200, 400, length.out = 500)
+#' spec <- 0.002 * (wl - 200)^2 + 50 * exp(-(wl - 300)^2 / 2) + rnorm(500, sd = 0.5)
+#' res <- baseline_lsp(matrix(spec, nrow = 1), degree = 3, max.iter = 100)
+#' plot(wl, spec, type = "l")
+#' lines(wl, unlist(res$background), col = "red")
+#'
 baseline_lsp <- function(x, degree = 4, tol = 1e-3, max.iter = 10) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
@@ -51,59 +58,34 @@ baseline_lsp <- function(x, degree = 4, tol = 1e-3, max.iter = 10) {
   if (!is.numeric(max.iter) || length(max.iter) != 1) {
     stop("'max.iter' must be a single numeric value.")
   }
+  check_count(degree, "degree")
+  check_count(max.iter, "max.iter")
 
-  if (is.data.frame(x) && tibble::is_tibble(x)) {
-    x <- as.matrix(x)
+  x <- as_numeric_matrix(x, "x")
+  if (anyNA(x)) {
+    stop("'x' contains missing values; remove or impute them before baseline correction.")
   }
-
-  n <- nrow(x)
   m <- ncol(x)
-  correctedData <- matrix(nrow = n, ncol = m)
-  baseline <- matrix(nrow = n, ncol = m)
-
-  for (i in 1:n) {
-    rowData <- x[i, ]
-    rowBaseline <- lsp(rowData, degree, tol, max.iter)
-    correctedData[i, ] <- rowData - rowBaseline
-    baseline[i, ] <- rowBaseline
+  if (degree >= m) {
+    stop("'degree' must be smaller than the number of spectral points.")
   }
-  wlength <- colnames(x)
-  replaceWithZero <- function(x) {
-    ifelse(x < 0, 1, x)
-  }
-  correctedData <- correctedData %>%
-    tibble::as_tibble() %>%
-    dplyr::rename_with(~wlength, dplyr::everything()) %>%
-    purrr::map(replaceWithZero)
 
-  baseline <- tibble::as_tibble(baseline) %>%
-    dplyr::rename_with(~wlength, dplyr::everything()) %>%
-    purrr::map(replaceWithZero)
+  # Orthonormal polynomial basis, shared by all spectra.
+  basis <- cbind(1 / sqrt(m), stats::poly(seq_len(m), degree = degree))
+  background <- t(apply(x, 1, lsp, basis = basis, tol = tol, max.iter = max.iter))
+  if (m == 1) background <- t(background)
 
-  res <- list(
-    "correction" = correctedData,
-    "background" = baseline
-  )
-
-  return(res)
+  baseline_result(x, background)
 }
 
-lsp <- function(x, degree, tol, max.iter) {
-  n <- length(x)
-  z <- rep(0, n)
-  p <- cbind(1 / sqrt(n), stats::poly(1:n, degree = degree))
-  z_w <- z_d <- z_g <- x
-  i <- 0
-  repeat {
-    i <- i + 1
-    z_p <- p %*% crossprod(p, z_d)
-    z_w <- pmin(z_g, z_p)
+lsp <- function(x, basis, tol, max.iter) {
+  z_d <- x
+  for (i in seq_len(max.iter)) {
+    z_p <- drop(basis %*% crossprod(basis, z_d))
+    z_w <- pmin(x, z_p)
     crit <- sum(abs((z_w - z_d) / z_d), na.rm = TRUE)
-    if (crit < tol || i > max.iter)
-      break
     z_d <- z_w
+    if (crit < tol) break
   }
-  z <- z_p
-
-  return(z)
+  z_p
 }

@@ -41,7 +41,7 @@
 #' These formulas are explicitly derived and optimized for the scenario where `k = 1.5` (Hubert and Vandervieren, 2008).
 #' Consequently, if the user attempts to use a value of `k` other than 1.5, the code will issue a warning message indicating that the formula is only defined for `k = 1.5`.
 #' In such cases, the code will automatically reset `k` to 1.5 and proceed with the calculations using the appropriate formulas and constants.
-#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.
+#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values are kept in the output (with a missing flag) and ignored when computing the fences.
 #'
 #' @return A tibble with two columns:
 #'   - `data`: The original numeric values.
@@ -56,14 +56,13 @@
 #' @export iqrMethod
 #'
 iqrMethod <- function(x, k = 1.5, skew = FALSE, drop.na = FALSE) {
-  options(mc_doScale_quiet = TRUE)
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
   if (!is.numeric(x)) {
     stop("The input 'x' must be a numeric vector.")
   }
-  if (!is.numeric(k) || k <= 0) {
+  if (!is.numeric(k) || length(k) != 1 || k <= 0) {
     stop("The input 'k' must be a positive numeric scalar.")
   }
   if (!is.logical(skew)) {
@@ -74,8 +73,8 @@ iqrMethod <- function(x, k = 1.5, skew = FALSE, drop.na = FALSE) {
     x <- x[!is.na(x)]
   }
 
-  q1 <- stats::quantile(x, 0.25)
-  q3 <- stats::quantile(x, 0.75)
+  q1 <- unname(stats::quantile(x, 0.25, na.rm = TRUE))
+  q3 <- unname(stats::quantile(x, 0.75, na.rm = TRUE))
   iqr <- q3 - q1
 
   value <- NULL
@@ -87,17 +86,17 @@ iqrMethod <- function(x, k = 1.5, skew = FALSE, drop.na = FALSE) {
     lower_fence <- q1 - k * iqr
     upper_fence <- q3 + k * iqr
   } else {
-    medcouple <- robustbase::mc(x)
-    alpha <- dplyr::if_else(medcouple >= 0, 4, 3)
-    beta <- dplyr::if_else(medcouple >= 0, 3, 4)
+    mc_x <- medcouple(x)
+    alpha <- if (mc_x >= 0) 4 else 3
+    beta <- if (mc_x >= 0) 3 else 4
 
     if (k != 1.5) {
-      message("Warning: The formula is only defined for k = 1.5. Resetting k to 1.5.\n")
+      warning("The formula is only defined for k = 1.5. Resetting k to 1.5.")
       k <- 1.5
     }
 
-    lower_fence <- q1 - k * exp(-alpha * medcouple) * iqr
-    upper_fence <- q3 + k * exp(beta * medcouple) * iqr
+    lower_fence <- q1 - k * exp(-alpha * mc_x) * iqr
+    upper_fence <- q3 + k * exp(beta * mc_x) * iqr
   }
 
   x_tbl <- x_tbl %>%

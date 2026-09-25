@@ -9,18 +9,22 @@ pareto(x, drop.na = FALSE)
 \arguments{
 \item{x}{A numeric matrix or data frame to be scaled.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values
-(NA) from the calculations. If \code{TRUE} (the default), missing values will be
-removed. If \code{FALSE}, missing values will be included.}
+\item{drop.na}{A logical value indicating whether to ignore missing values
+(NA) when computing the standard deviations. Default is \code{FALSE}.}
 }
 \value{
-A numeric matrix or data frame with the same dimensions as \code{x},
-but with each variable scaled by the square root of its standard deviation.
+A numeric matrix (or a tibble if \code{x} is a data frame) with the same
+dimensions as \code{x}, but with each variable scaled by the square root of its
+standard deviation.
 }
 \description{
 This function performs Pareto scaling on a numeric matrix or data frame.
 Pareto scaling scales each variable (column) by dividing it by the square
 root of its standard deviation.
+}
+\examples{
+pareto(matrix(c(1, 2, 3, 10, 20, 30), ncol = 2))
+
 }
 \author{
 Christian L. Goueguel

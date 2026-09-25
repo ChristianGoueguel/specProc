@@ -16,7 +16,7 @@ correlation(
 \arguments{
 \item{x}{A data frame or tibble containing the variables of interest.}
 
-\item{var}{A character string specifying the name of the response variable.}
+\item{var}{The response variable, given unquoted or as a string.}
 
 \item{method}{A character string indicating the correlation method to use. Allowed values are "pearson", "spearman", "kendall", "chatterjee", or "bicor" (for biweight midcorrelation). The default is "pearson".}
 
@@ -27,10 +27,10 @@ correlation(
 \item{interactive}{A logical value indicating whether to create an interactive plot using plotly. Default is FALSE (static ggplot2 plot).}
 }
 \value{
-A list containing:
 \itemize{
-\item \code{correlation}: A tibble with columns for the variable name, correlation value, and method used.
-\item \code{plot}: If \code{plot = TRUE}, a \code{ggplot2} object (or a \code{plotly} object if \code{interactive = TRUE}).
+\item If \code{plot = FALSE}, a tibble with columns \code{variable}, \code{.correlation} and \code{method}, sorted by decreasing correlation.
+\item If \code{plot = TRUE}, a list containing the tibble (\code{correlation}) and a \code{ggplot2} object (\code{plot}).
+\item If \code{plot = TRUE} and \code{interactive = TRUE}, a \code{plotly} object.
 }
 }
 \description{
@@ -45,12 +45,25 @@ The Pearson correlation coefficient measures the linear relationship between two
 variables and is suitable when the data follows a bivariate normal distribution. The Spearman
 and Kendall correlations are non-parametric measures of monotonic association, making them
 suitable for non-linear relationships and when the data deviates from normality.
-The Chatterjee correlation coefficient is a recently proposed measure that aims to address
-some limitations of existing correlation coefficients, particularly for heavy-tailed
-distributions and in the presence of outliers. The biweight midcorrelation is
+The Chatterjee correlation coefficient \eqn{\xi_n(X, Y)} measures how much the response
+\code{var} is a (possibly non-monotonic) function of each other variable; it lies between
+0 and 1 (asymptotically) and is not symmetric. The biweight midcorrelation is
 a robust correlation measure that downweights the influence of outliers and is
 recommended when the data contains extreme values or deviates significantly
 from normality.
+
+Missing values are handled pairwise: each coefficient uses the observations where both
+the response and the other variable are available.
+}
+\examples{
+set.seed(1)
+df <- data.frame(y = rnorm(50))
+df$a <- 2 * df$y + rnorm(50, sd = 0.5)
+df$b <- -df$y + rnorm(50)
+df$c <- rnorm(50)
+correlation(df, y)
+correlation(df, "y", method = "bicor")
+
 }
 \references{
 \itemize{

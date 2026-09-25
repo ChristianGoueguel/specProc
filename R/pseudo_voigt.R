@@ -17,7 +17,7 @@
 #'   \item \eqn{y_0} is the baseline offset
 #'   \item \eqn{G(x, x_c, w_G)} is the Gaussian component with center \eqn{x_c}
 #'   and the full width at half maximum \eqn{w_G}
-#'   \item \eqn{L(x, x_c, w_G)} is the Lorentzian component with center \eqn{x_c}
+#'   \item \eqn{L(x, x_c, w_L)} is the Lorentzian component with center \eqn{x_c}
 #'   and the full width at half maximum \eqn{w_L}
 #'   \item \eqn{\eta} is the mixing parameter, with \eqn{0 \leq \eta \leq 1}. The
 #'   mixing parameter \eqn{\eta} allows the pseudo-Voigt function to describe a wide
@@ -25,12 +25,18 @@
 #'   and various intermediate shapes in between.
 #' }
 #'
-#' The Olivero and Longbothum (1977) approximation, and its subsequent refinements
-#' (Belafhal 2000; Zdunkowski et al. 2007), offer an efficient and accurate way (accuracy of 0.02%)
-#' to estimate the half-width of a Voigt line, which is given by:
+#' Both \eqn{G} and \eqn{L} have unit area, so \eqn{A} is the area of the peak.
 #'
-#' \deqn{w_v = \frac{1}{2} \cdot [c_1 \cdot w_L + \sqrt(c_2 \cdot w_L^2 + 4 \cdot w_G^2)]}
-#' with \eqn{c_1 = 1.0692}, \eqn{c_2 = 0.86639}
+#' When `eta` is not given, the Thompson-Cox-Hastings approximation of the Voigt
+#' profile is used (Ida et al. 2000): both components share the total FWHM
+#' \deqn{f = (w_G^5 + 2.69269 w_G^4 w_L + 2.42843 w_G^3 w_L^2 + 4.47163 w_G^2 w_L^3 + 0.07842 w_G w_L^4 + w_L^5)^{1/5}}
+#' and the mixing parameter is
+#' \deqn{\eta = 1.36603 (w_L/f) - 0.47719 (w_L/f)^2 + 0.11116 (w_L/f)^3}
+#'
+#' For comparison, the Olivero and Longbothum (1977) approximation, and its subsequent refinements
+#' (Belafhal 2000; Zdunkowski et al. 2007), estimate the FWHM of a Voigt line as
+#' \eqn{w_V = \frac{1}{2} [c_1 w_L + \sqrt{c_2 w_L^2 + 4 w_G^2}]}
+#' with \eqn{c_1 = 1.0692}, \eqn{c_2 = 0.86639} (accuracy of 0.02%).
 #'
 #' @param x A numeric vector representing the independent variable (e.g., wavelength or frequency).
 #' @param y0 A numeric value specifying the baseline offset.
@@ -70,11 +76,11 @@
 #' y2 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 0.5)
 #' y3 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 1)
 #' y4 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2)
-#' plot(x, y1, type = "l", col = "red", main = "Pseudo-Voigt Profile", ylim = c(0, 5.5))
+#' plot(x, y1, type = "l", col = "red", main = "Pseudo-Voigt Profile", ylim = c(0, 2.5))
 #' lines(x, y2, col = "blue")
 #' lines(x, y3, col = "green")
 #' lines(x, y4$y, col = "black")
-#' legend("topright", legend = c("eta = 1", "eta = 0.5", "eta = 0", "eta = NULL"),
+#' legend("topright", legend = c("eta = 0", "eta = 0.5", "eta = 1", "eta = NULL"),
 #' col = c("red", "blue", "green", "black"), lty = 1)
 #'
 #' # The approximated mixing parameter:
@@ -85,7 +91,7 @@ pseudo_voigt <- function(x, y0, xc, wG, wL, A, eta = NULL) {
     stop("'x' must be a numeric vector.")
   }
   if (!is.numeric(xc) || length(xc) != 1) {
-    stop("'x0' must be a single numeric value.")
+    stop("'xc' must be a single numeric value.")
   }
   if (!is.numeric(wG) || length(wG) != 1 || wG <= 0) {
     stop("'wG' must be a positive numeric value.")
@@ -93,25 +99,20 @@ pseudo_voigt <- function(x, y0, xc, wG, wL, A, eta = NULL) {
   if (!is.numeric(wL) || length(wL) != 1 || wL <= 0) {
     stop("'wL' must be a positive numeric value.")
   }
-  if (!is.numeric(A) || length(A) != 1 || A <= 0) {
-    stop("'A' must be a positive numeric value.")
+  if (!is.numeric(A) || length(A) != 1 || A < 0) {
+    stop("'A' must be a non-negative numeric value.")
   }
   if (!is.numeric(y0) || length(y0) != 1) {
     stop("'y0' must be a single numeric value.")
   }
 
   if (is.null(eta)) {
-    wT <- (wG^5 + 2.69269 * wG^4 * wL + 2.42843 * wG^3 * wL^2 + 4.47163 * wG^2 * wL^3 + 0.07842 * wG * wL^4 + wL^5)^( 1 / 5)
-    eta_approx <- 1.36603 * (wL / wT) - 0.47719 * (wL / wT)^2 + 0.11116 * (wL / wT)^3
-    y <- y0 + A * (eta_approx * lorentzian(x, y0, xc, wL, A) + (1 - eta_approx) * gaussian(x, y0, xc, wG, A))
+    eta_approx <- tch_eta(wG, wL)
+    y <- y0 + A * profile_voigt(x, xc, wG, wL)
     return(list(y = y, eta = eta_approx))
-
-  } else {
-    if (!is.numeric(eta) || length(eta) != 1 || eta < 0 || eta > 1) {
-      stop("'eta' must be a numeric value between 0 and 1.")
-    }
-    y <- y0 + A * (eta * lorentzian(x, y0, xc, wL, A) + (1 - eta) * gaussian(x, y0, xc, wG, A))
-    return(y)
-
   }
+  if (!is.numeric(eta) || length(eta) != 1 || eta < 0 || eta > 1) {
+    stop("'eta' must be a numeric value between 0 and 1.")
+  }
+  y0 + A * (eta * profile_lorentzian(x, xc, wL) + (1 - eta) * profile_gaussian(x, xc, wG))
 }

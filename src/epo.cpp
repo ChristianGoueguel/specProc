@@ -1,28 +1,34 @@
-#include <Rcpp.h>
+// [[Rcpp::depends(RcppEigen)]]
 #include <RcppEigen.h>
 
-using namespace Rcpp;
-
-// [[Rcpp::depends(RcppEigen)]]
+// External parameter orthogonalization (Roger et al., 2003).
+//
+// The clutter subspace is spanned by the `ncomp` dominant right singular
+// vectors P of the clutter matrix D. X is projected onto the orthogonal
+// complement: X_epo = X - (X P) P'. The p x p projection matrix is never
+// formed, so memory stays O(n p) even for spectra with many channels.
 // [[Rcpp::export]]
-Rcpp::List epo_cpp(Rcpp::NumericMatrix X, int ncomp) {
-  Eigen::Map<Eigen::MatrixXd> X_map(as<Eigen::Map<Eigen::MatrixXd> >(X));
-  Eigen::JacobiSVD<Eigen::MatrixXd> svd(X_map, Eigen::ComputeThinU | Eigen::ComputeThinV);
+Rcpp::List epo_cpp(const Eigen::Map<Eigen::MatrixXd> X,
+                   const Eigen::Map<Eigen::MatrixXd> D,
+                   int ncomp) {
+  if (X.cols() != D.cols()) {
+    Rcpp::stop("'x' and the clutter matrix must have the same number of columns.");
+  }
+  Eigen::BDCSVD<Eigen::MatrixXd> svd(D, Eigen::ComputeThinV);
+  const Eigen::Index rank = svd.singularValues().size();
+  if (ncomp < 1 || ncomp > rank) {
+    Rcpp::stop("'ncomp' must be between 1 and min(dim(clutter)).");
+  }
 
-  Eigen::MatrixXd U = svd.matrixU();
-  Eigen::MatrixXd V = svd.matrixV();
-  Eigen::VectorXd S = svd.singularValues();
-
-  Eigen::MatrixXd clutter_direction = V.rightCols(ncomp);
-  Eigen::MatrixXd I = Eigen::MatrixXd::Identity(X_map.cols(), X_map.cols());
-  Eigen::MatrixXd Q = clutter_direction * clutter_direction.transpose();
-
-  Eigen::MatrixXd X_corrected = X_map * (I - Q);
-  Eigen::MatrixXd X_clutter = X_map * Q;
+  const Eigen::MatrixXd P = svd.matrixV().leftCols(ncomp);
+  const Eigen::MatrixXd XP = X * P;
+  const Eigen::MatrixXd X_clutter = XP * P.transpose();
+  const Eigen::MatrixXd X_corrected = X - X_clutter;
 
   return Rcpp::List::create(
-    Rcpp::Named("correction") = Rcpp::wrap(X_corrected),
-    Rcpp::Named("clutter") = Rcpp::wrap(X_clutter),
-    Rcpp::Named("loadings") = Rcpp::wrap(clutter_direction)
+    Rcpp::Named("correction") = X_corrected,
+    Rcpp::Named("clutter") = X_clutter,
+    Rcpp::Named("loadings") = P,
+    Rcpp::Named("singular_values") = svd.singularValues().head(ncomp)
   );
 }

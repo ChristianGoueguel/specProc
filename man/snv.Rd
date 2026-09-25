@@ -9,9 +9,8 @@ snv(x, drop.na = TRUE)
 \arguments{
 \item{x}{A numeric matrix or data frame.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values
-(NA) from the calculations. If \code{TRUE} (the default), missing values will be
-removed. If \code{FALSE}, missing values will be included.}
+\item{drop.na}{A logical value indicating whether to remove spectra (rows)
+containing missing values. If \code{TRUE} (the default), such rows are removed.}
 }
 \value{
 A list with the following components:
@@ -24,6 +23,11 @@ This function performs Standard Normal Variate (SNV) scaling on the input
 spectral data. SNV scaling scales each row of the input data to have zero
 mean and unit standard deviation. This is equivalent to autoscaling the
 transpose of the input data.
+}
+\examples{
+x <- rbind(c(1, 2, 3, 4), c(10, 20, 30, 40))
+snv(x)$correction
+
 }
 \author{
 Christian L. Goueguel

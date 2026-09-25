@@ -4,37 +4,31 @@
 \alias{direct_osc}
 \title{Direct Orthogonal Signal Correction}
 \usage{
-direct_osc(
-  x,
-  y,
-  ncomp = 10,
-  center = TRUE,
-  scale = FALSE,
-  tol = 0.001,
-  max_iter = 10
-)
+direct_osc(x, y, ncomp = 10, center = TRUE, scale = FALSE, tol = 0.001)
 }
 \arguments{
 \item{x}{A matrix or data frame of the predictor variables}
 
 \item{y}{A vector, matrix or data frame of the response variable(s)}
 
-\item{ncomp}{An integer specifying the number of principal components to retain for orthogonal processing. Default is 10.}
+\item{ncomp}{An integer specifying the number of orthogonal components to remove. Default is 10; it is reduced if larger than the rank of the orthogonalized matrix.}
 
 \item{center}{A logical value specifying whether to center the data. Default is \code{TRUE}.}
 
 \item{scale}{A logical value specifying whether to scale the data. Default is \code{FALSE}.}
 
-\item{tol}{A numeric value representing the tolerance for convergence. The default value is 1e-3.}
-
-\item{max_iter}{An integer representing the maximum number of iterations. The default value is 10.}
+\item{tol}{A numeric value giving the relative tolerance used to compute the
+pseudo-inverse of \eqn{\textbf{X}}; singular values smaller than \code{tol} times
+the largest one are discarded, which regularizes the weights. Default is 1e-3.}
 }
 \value{
 A list with the following components:
 \itemize{
 \item \code{correction}: The corrected matrix.
-\item \code{loading}: The loadings matrix.
-\item \code{score}: The scores matrix.
+\item \code{loading}: The loadings matrix \eqn{\textbf{P}}.
+\item \code{score}: The scores matrix \eqn{\textbf{T}}.
+\item \code{weight}: The weights matrix \eqn{\textbf{W}}.
+\item \code{center}, \code{scale}: The column centers and scales applied to \code{x}.
 }
 }
 \description{
@@ -45,10 +39,29 @@ the response variable(s), \eqn{\textbf{Y}}.
 }
 \details{
 Different from the Orthogonal Signal Correction (OSC) algorithm, Wold \emph{et al.}
-(1998), the DOSC algorithm firstly orthogonalizes the matrices \eqn{\textbf{X}}
-and \eqn{\textbf{Y}}. Then principal components analysis (PCA) is performed on
-the orthogonalized \eqn{\textbf{X}} to obtain the scores \eqn{\textbf{T}} and
-loadings \eqn{\textbf{P}} matrices.
+(1998), the DOSC algorithm is non-iterative:
+\enumerate{
+\item \eqn{\textbf{Y}} is projected onto the column space of \eqn{\textbf{X}}:
+\eqn{\hat{\textbf{Y}} = \textbf{XX}^{+}\textbf{Y}}.
+\item \eqn{\textbf{X}} is orthogonalized with respect to \eqn{\hat{\textbf{Y}}}:
+\eqn{\textbf{Z} = \textbf{X} - \hat{\textbf{Y}}\hat{\textbf{Y}}^{+}\textbf{X}}.
+\item PCA of \eqn{\textbf{Z}} gives the orthogonal scores \eqn{\textbf{T}}.
+\item The weights \eqn{\textbf{W} = \textbf{X}^{+}\textbf{T}} express the scores
+as a linear combination of \eqn{\textbf{X}}, the loadings are
+\eqn{\textbf{P} = \textbf{X}^T\textbf{T}(\textbf{T}^T\textbf{T})^{-1}}, and the
+corrected matrix is \eqn{\textbf{X} - \textbf{TP}^T}.
+}
+
+New data are corrected with \eqn{\textbf{X}_{new} - \textbf{X}_{new}\textbf{WP}^T}
+after applying the returned \code{center} and \code{scale}.
+}
+\examples{
+set.seed(1)
+x <- matrix(rnorm(20 * 50), 20, 50)
+y <- x[, 1] + rnorm(20, sd = 0.1)
+res <- direct_osc(x, y, ncomp = 2)
+dim(res$correction)
+
 }
 \references{
 \itemize{

@@ -53,6 +53,10 @@ directOutlyingness <- function(x, cutoff.quantile = 0.995, rmZeroes = FALSE, max
   }
 
   x <- x[!is.na(x)]
+  if (length(x) < 3) {
+    stop("'x' must contain at least 3 non-missing values.")
+  }
+  score <- NULL
   med <- stats::median(x)
   xc <- x - med
   n <- length(xc)
@@ -67,26 +71,26 @@ directOutlyingness <- function(x, cutoff.quantile = 0.995, rmZeroes = FALSE, max
     xb <- xb[xb > precScale]
   }
 
+  sa <- scale1StepM(x = xa, precScale = precScale)
+  sb <- scale1StepM(x = xb, precScale = precScale)
+
   if (!is.null(maxRatio)) {
-    if (maxRatio < 2) {
+    if (!is.numeric(maxRatio) || length(maxRatio) != 1 || maxRatio < 2) {
       stop("maxRatio must be at least 2")
-    } else {
-      sall <- scale1StepM(x = xc, precScale = precScale)
-      sa <- min(c(max(sa, sall / maxRatio, na.rm = TRUE), sall * maxRatio), na.rm = TRUE)
-      sb <- min(c(max(sb, sall / maxRatio, na.rm = TRUE), sall * maxRatio), na.rm = TRUE)
     }
-  } else {
-    sa <- scale1StepM(x = xa, precScale = precScale)
-    sb <- scale1StepM(x = xb, precScale = precScale)
+    sall <- scale1StepM(x = xc, precScale = precScale)
+    sa <- min(max(sa, sall / maxRatio), sall * maxRatio)
+    sb <- min(max(sb, sall / maxRatio), sall * maxRatio)
   }
 
-  res <- dplyr::if_else(x >= med, (x - med) / sa, (med - x) / sb)
+  res <- ifelse(x >= med, (x - med) / sa, (med - x) / sb)
+  res[x == med] <- 0
   cutoff <- computeCutoff(res, cutoff.quantile)
 
   tbl <- tibble::tibble(
     data = x,
     score = res,
-    flag = dplyr::if_else(res > cutoff, TRUE, FALSE)
+    flag = res > cutoff
   ) %>%
     dplyr::arrange(dplyr::desc(score))
 
@@ -98,23 +102,6 @@ rhoHuber <- function(x, c = 2.1){
   rho[rho > 1] <- 1
   r <- 1.54^2 * rho
   return(r)
-}
-
-loc1StepM <- function(x, c1 = 3, precScale) {
-  x <- x[!is.na(x)]
-  medx <- stats::median(x)
-  ax <- abs(x - medx)
-  denom <- c1 * stats::median(ax)
-  mu <- if (denom > precScale) {
-    ax = ax/denom
-    w = 1 - ax * ax
-    w = ((abs(w) + w)/2)^2
-    sum(x * w ) / sum(w)
-  }
-  else {
-    medx
-    }
-  return(mu)
 }
 
 scale1StepM <- function(x, precScale) {

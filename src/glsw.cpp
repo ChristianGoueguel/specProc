@@ -1,22 +1,10 @@
-#include <Rcpp.h>
-using namespace Rcpp;
 // [[Rcpp::depends(RcppEigen)]]
 #include <RcppEigen.h>
+#include "glsw.h"
 
+// GLSW filtering matrix from a matrix of (mean-centered) differences.
 // [[Rcpp::export]]
-Rcpp::NumericMatrix glsw_cpp(Rcpp::NumericMatrix X_diff, double alpha) {
-  Eigen::Map<Eigen::MatrixXd> X_diff_map(as<Eigen::Map<Eigen::MatrixXd> >(X_diff));
-
-  Eigen::MatrixXd C = X_diff_map.transpose() * X_diff_map;
-  Eigen::JacobiSVD<Eigen::MatrixXd> svd(C, Eigen::ComputeThinU | Eigen::ComputeThinV);
-
-  Eigen::MatrixXd V = svd.matrixV();
-  Eigen::VectorXd S = svd.singularValues();
-
-  int n = X_diff_map.cols();
-  Eigen::VectorXd D = ((S.array().square() / alpha) + Eigen::VectorXd::Constant(n, 1.0).array()).sqrt();
-
-  Eigen::MatrixXd G = V * D.asDiagonal().inverse() * V.transpose();
-
-  return Rcpp::wrap(G);
+Eigen::MatrixXd glsw_cpp(const Eigen::Map<Eigen::MatrixXd> X_diff, double alpha) {
+  if (!(alpha > 0.0)) Rcpp::stop("'alpha' must be positive.");
+  return glsw_filter(X_diff, alpha);
 }

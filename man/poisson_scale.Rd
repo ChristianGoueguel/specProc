@@ -12,9 +12,9 @@ poisson_scale(x, sc = NULL, drop.na = TRUE, options = list())
 \item{sc}{A vector of previously calculated scales. If provided, these scales
 will be applied to the data.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values
-(NA) from the calculations. If \code{TRUE} (the default), missing values will be
-removed. If \code{FALSE}, missing values will be included.}
+\item{drop.na}{A logical value indicating whether to remove rows containing
+missing values. If \code{TRUE} (the default), such rows are removed. If \code{FALSE},
+missing values are kept and ignored when computing the means.}
 
 \item{options}{A list of options for Poisson scaling. See the 'Options' section below.}
 }
@@ -40,6 +40,15 @@ The \code{options} argument is a list with the following fields:
 }
 }
 
+\examples{
+set.seed(1)
+x <- matrix(rpois(40, lambda = rep(c(5, 50, 500, 5000), each = 10)), ncol = 4)
+res <- poisson_scale(x)
+res$sc
+# apply the same scales to new data
+poisson_scale(x[1:2, ], sc = res$sc)
+
+}
 \author{
 Christian L. Goueguel
 }

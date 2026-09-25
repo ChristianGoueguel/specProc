@@ -4,17 +4,19 @@
 \alias{yGradientglsw}
 \title{y-Gradient Generalized Least Squares Weighting}
 \usage{
-yGradientglsw(x, y, alpha = 0.01)
+yGradientglsw(x, y, alpha = 0.01, window = 5)
 }
 \arguments{
 \item{x}{A numeric matrix, data frame or tibble, representing the predictors data.}
 
 \item{y}{A numeric vector representing the response vector.}
 
-\item{alpha}{A numeric value specifying the weighting parameter. Typical values range from 1 to 0.0001. Default is 0.01.}
+\item{alpha}{A positive numeric value specifying the weighting parameter. Typical values range from 1 to 0.0001. Default is 0.01.}
+
+\item{window}{An odd integer giving the width of the Savitzky-Golay window used to compute the gradients. Default is 5.}
 }
 \value{
-A tibble containing the filtering matrix.
+A tibble containing the \eqn{p \times p} filtering matrix.
 }
 \description{
 The y-gradient generalized least squares weighting algorithm (GLSW) removes
@@ -26,6 +28,23 @@ is used to develop pseudo-groupings of samples in \eqn{\textbf{X}} by comparing
 the differences in the corresponding \eqn{\textbf{y}} values. This is referred to as the \emph{"gradient method"}
 because it utilizes a gradient of the sorted \eqn{\textbf{X}}- and
 \eqn{\textbf{y}}-blocks to calculate a covariance matrix.
+
+The samples are sorted by increasing \eqn{\textbf{y}}, and the first
+derivatives of \eqn{\textbf{X}} and \eqn{\textbf{y}} along the sample axis are
+computed with a Savitzky-Golay filter. Samples whose neighbours have similar
+\eqn{\textbf{y}} values receive large weights
+\eqn{w_i = 2^{-\Delta y_i / s_{\Delta y}}}, so the differences between their
+spectra, \eqn{\Delta\textbf{X}}, describe variation unrelated to \eqn{\textbf{y}}.
+The filter is then built as in \code{\link[=glsw]{glsw()}} from
+\eqn{\textbf{C} = \Delta\textbf{X}^T\textbf{W}^2\Delta\textbf{X}}.
+}
+\examples{
+set.seed(1)
+x <- matrix(rnorm(30 * 20), 30, 20)
+y <- x[, 1] + rnorm(30, sd = 0.1)
+G <- yGradientglsw(x, y, alpha = 0.01)
+x_filtered <- x \%*\% as.matrix(G)
+
 }
 \references{
 \itemize{
@@ -33,4 +52,7 @@ because it utilizes a gradient of the sorted \eqn{\textbf{X}}- and
 Estimation of the age of a weathered mixture of volatile organic compounds.
 Analytica Chimica Acta, 694(1-2):31–37.
 }
+}
+\author{
+Christian L. Goueguel
 }

@@ -12,59 +12,60 @@
 #' The function leverages the power of `Rcpp` to perform the mean calculations
 #' in C++. The underlying C++ implementation has a time complexity of
 #' \emph{O(n × m)}, where \emph{n} is the number of rows and \emph{m} is
-#' the number of columns in the data. This efficient implementation ensures that
-#' the function can handle large datasets without significant performance overhead.
-#'
-#' The R wrapper function adds minimal overhead for argument checking and data manipulation,
-#' while leveraging the efficient C++ implementation for the core computations. The overall
-#' time complexity remains \emph{O(n × m)}.
+#' the number of columns in the data. Missing values are ignored in the
+#' computation of each mean.
 #'
 #' @param x A data frame or tibble.
-#' @param .group_by The column name to group the data by (optional).
-#' If not provided, the average of the overall data will be computed.
+#' @param .group_by The column to group the data by (optional), given either
+#'   unquoted or as a string. If not provided, the average of the overall data
+#'   will be computed.
 #' @return
-#'   - If `.group_by = NULL`, the function returns a numeric vector containing the
-#' mean of each column across all spectra.
-#'   - If `.group_by` is provided, the function returns a data frame with columns corresponding
-#' to the unique values in the grouping column. Each cell contains the mean of the corresponding
-#' column for that group.
+#'   - If `.group_by = NULL`, a one-row tibble containing the mean of each column.
+#'   - If `.group_by` is provided, a tibble with one row per group: the first
+#'   column holds the group labels and the remaining columns hold the group means.
 #'
 #' @export average
+#'
+#' @examples
+#' spectra <- data.frame(
+#'   sample = rep(c("a", "b"), each = 3),
+#'   `200.1` = c(1, 2, 3, 10, 11, 12),
+#'   `200.2` = c(2, 3, 4, 20, 21, 22),
+#'   check.names = FALSE
+#' )
+#' average(spectra[, -1])
+#' average(spectra, sample)
 #'
 average <- function(x, .group_by = NULL) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!is.data.frame(x) && !tibble::is_tibble(x)) {
+  if (!is.data.frame(x)) {
     stop("'x' must be a data frame or tibble.")
   }
-  if (!rlang::quo_is_null(rlang::enquo(.group_by)) &&
-      !rlang::quo_name(rlang::enquo(.group_by)) %in% colnames(x)) {
+
+  group_quo <- rlang::enquo(.group_by)
+
+  if (rlang::quo_is_null(group_quo)) {
+    Xmat <- as_numeric_matrix(x, "x")
+    avg <- computeMeans(Xmat)
+    return(as_tbl(avg, names(x)))
+  }
+
+  group_name <- rlang::as_name(group_quo)
+  if (!group_name %in% colnames(x)) {
     stop("Grouping variable '.group_by' not found in the data")
   }
 
-  if (rlang::quo_is_null(rlang::enquo(.group_by))) {
-    if (!all(x %>% purrr::map_lgl(is.numeric))) {
-      stop("The input 'data' must be numeric")
-    } else {
-      Xmat <- x %>% as.matrix()
-      avg <- computeMeans(Xmat)
-      colnames(avg) <- names(x)
-    }
-  } else {
-    Xmat <- x %>% dplyr::select(-{{ .group_by }}) %>% as.matrix()
-    grp_vec <- x[[rlang::ensym(.group_by)]]
-
-    if (!is.factor(grp_vec)) {
-      grp_vec <- forcats::as_factor(grp_vec)
-    }
-
-    data_name <- x %>% dplyr::select(-{{ .group_by }}) %>% names()
-
-    avg <- computeGroupedMeans(Xmat, grp_vec)
-    colnames(avg) <- data_name
+  data_cols <- setdiff(names(x), group_name)
+  Xmat <- as_numeric_matrix(x[data_cols], "x")
+  grp <- x[[group_name]]
+  if (!is.factor(grp)) {
+    grp <- factor(grp, levels = unique(grp[!is.na(grp)]))
   }
 
-  return(tibble::as_tibble(avg))
+  avg <- computeGroupedMeans(Xmat, as.integer(grp), nlevels(grp))
+  out <- as_tbl(avg, data_cols)
+  out <- tibble::add_column(out, !!group_name := levels(grp), .before = 1)
+  return(out)
 }
-

@@ -10,10 +10,19 @@
 #'
 #' @details
 #' Different from the Orthogonal Signal Correction (OSC) algorithm, Wold *et al.*
-#' (1998), the DOSC algorithm firstly orthogonalizes the matrices \eqn{\textbf{X}}
-#' and \eqn{\textbf{Y}}. Then principal components analysis (PCA) is performed on
-#' the orthogonalized \eqn{\textbf{X}} to obtain the scores \eqn{\textbf{T}} and
-#' loadings \eqn{\textbf{P}} matrices.
+#' (1998), the DOSC algorithm is non-iterative:
+#' 1. \eqn{\textbf{Y}} is projected onto the column space of \eqn{\textbf{X}}:
+#'    \eqn{\hat{\textbf{Y}} = \textbf{XX}^{+}\textbf{Y}}.
+#' 2. \eqn{\textbf{X}} is orthogonalized with respect to \eqn{\hat{\textbf{Y}}}:
+#'    \eqn{\textbf{Z} = \textbf{X} - \hat{\textbf{Y}}\hat{\textbf{Y}}^{+}\textbf{X}}.
+#' 3. PCA of \eqn{\textbf{Z}} gives the orthogonal scores \eqn{\textbf{T}}.
+#' 4. The weights \eqn{\textbf{W} = \textbf{X}^{+}\textbf{T}} express the scores
+#'    as a linear combination of \eqn{\textbf{X}}, the loadings are
+#'    \eqn{\textbf{P} = \textbf{X}^T\textbf{T}(\textbf{T}^T\textbf{T})^{-1}}, and the
+#'    corrected matrix is \eqn{\textbf{X} - \textbf{TP}^T}.
+#'
+#' New data are corrected with \eqn{\textbf{X}_{new} - \textbf{X}_{new}\textbf{WP}^T}
+#' after applying the returned `center` and `scale`.
 #'
 #' @references
 #'    - Westerhuis, J.A., Jong, S.D., Smilde, A.K., (2001).
@@ -25,21 +34,29 @@
 #'
 #' @param x A matrix or data frame of the predictor variables
 #' @param y A vector, matrix or data frame of the response variable(s)
-#' @param ncomp An integer specifying the number of principal components to retain for orthogonal processing. Default is 10.
+#' @param ncomp An integer specifying the number of orthogonal components to remove. Default is 10; it is reduced if larger than the rank of the orthogonalized matrix.
 #' @param center A logical value specifying whether to center the data. Default is `TRUE`.
 #' @param scale A logical value specifying whether to scale the data. Default is `FALSE`.
-#' @param tol A numeric value representing the tolerance for convergence. The default value is 1e-3.
-#' @param max_iter An integer representing the maximum number of iterations. The default value is 10.
+#' @param tol A numeric value giving the relative tolerance used to compute the
+#' pseudo-inverse of \eqn{\textbf{X}}; singular values smaller than `tol` times
+#' the largest one are discarded, which regularizes the weights. Default is 1e-3.
 #'
 #' @return A list with the following components:
 #'  - `correction`: The corrected matrix.
-#'  - `loading`: The loadings matrix.
-#'  - `score`: The scores matrix.
+#'  - `loading`: The loadings matrix \eqn{\textbf{P}}.
+#'  - `score`: The scores matrix \eqn{\textbf{T}}.
+#'  - `weight`: The weights matrix \eqn{\textbf{W}}.
+#'  - `center`, `scale`: The column centers and scales applied to `x`.
 #' @export direct_osc
 #'
-direct_osc <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, tol = 1e-3, max_iter = 10) {
-
-  requireNamespace("pls", quietly = TRUE)
+#' @examples
+#' set.seed(1)
+#' x <- matrix(rnorm(20 * 50), 20, 50)
+#' y <- x[, 1] + rnorm(20, sd = 0.1)
+#' res <- direct_osc(x, y, ncomp = 2)
+#' dim(res$correction)
+#'
+direct_osc <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, tol = 1e-3) {
 
   if (missing(x) || missing(y)) {
     stop("Both 'x' and 'y' must be provided")
@@ -47,73 +64,32 @@ direct_osc <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, tol = 1e-
   if (!is.logical(center) || !is.logical(scale)) {
     stop("Arguments 'center' and 'scale' must be boolean (TRUE or FALSE)")
   }
+  check_number(tol, "tol", lower = 0, upper = 1, lower_open = TRUE, upper_open = TRUE)
+  xy <- prepare_xy(x, y, center, scale)
+  x <- xy$x
+  y <- xy$y
 
-  if (is.vector(y)) {
-    if (nrow(x) != length(y)) {
-      stop("Dimensions of 'x' and 'y' don't match.")
-    }
-  }
+  x_pinv <- MASS::ginv(x, tol = tol)
+  y_hat <- x %*% (x_pinv %*% y)
+  z <- x - y_hat %*% (MASS::ginv(y_hat) %*% x)
 
-  if (is.matrix(y) || is.data.frame(y) || tibble::is_tibble(y)) {
-    if (nrow(x) != nrow(y)) {
-      stop("Dimensions of 'x' and 'y' don't match.")
-    }
-  }
+  ncomp <- clamp_ncomp(ncomp, z)
+  sv <- svd(z, nu = ncomp, nv = 0)
+  t_mat <- sv$u %*% diag(sv$d[seq_len(ncomp)], ncomp)
 
-  if (is.data.frame(x) || tibble::is_tibble(x)) {
-    x <- as.matrix(x)
-  }
-  if (is.data.frame(y) || tibble::is_tibble(y)) {
-    y <- as.matrix(y)
-  }
+  w_mat <- x_pinv %*% t_mat
+  t_mat <- x %*% w_mat
+  p_mat <- crossprod(x, t_mat) %*% solve(crossprod(t_mat))
+  x_dosc <- x - tcrossprod(t_mat, p_mat)
 
-  if (center == TRUE && scale == FALSE) {
-    x <- scale(x, center = TRUE)
-    y <- scale(y, center = TRUE)
-  }
-  if (center == FALSE && scale == TRUE) {
-    x <- scale(x, scale = TRUE)
-    y <- scale(y, scale = TRUE)
-  }
-  if (center == TRUE && scale == TRUE) {
-    x <- scale(x, center = TRUE, scale = TRUE)
-    y <- scale(y, center = TRUE, scale = TRUE)
-  }
-
-  m <- t(x) %*% MASS::ginv(t(x)) %*% t(y)
-  z <- x - m %*% MASS::ginv(m) %*% x
-
-  if (ncomp < 1 || ncomp > min(nrow(x) - 1, ncol(x))) {
-    ncomp <- min(nrow(x) - 1, ncol(x))
-  }
-
-  p_mat <- matrix(nrow = ncol(x), ncol = ncomp)
-
-  for (i in 1:ncomp) {
-    pca_mod <- stats::prcomp(z, scale = FALSE)
-    t <- pca_mod$x[, 1]
-    p <- pca_mod$rotation[, 1]
-    iter <- 1; diff <- Inf
-    while (diff > tol && iter <= max_iter) {
-      w <- pls::oscorespls.fit(x, t)$weights
-      t_new <- x %*% w
-      diff <- sqrt(sum((t - t_new)^2))
-      t <- t_new
-      iter <- iter + 1
-    }
-    p_mat[, i] <- p
-    z <- z - tcrossprod(t, p)
-  }
-
-  t <- x %*% p_mat
-  p <- crossprod(x, t) / crossprod(t, t)
-  x_dosc <- x - tcrossprod(t, p)
-
+  comp <- paste0("comp", seq_len(ncomp))
   result <- list(
-    correction = tibble::as_tibble(x_dosc),
-    loading = tibble::as_tibble(p),
-    score = tibble::as_tibble(t)
+    correction = as_tbl(x_dosc, xy$names),
+    loading = as_tbl(p_mat, comp),
+    score = as_tbl(t_mat, comp),
+    weight = as_tbl(w_mat, comp),
+    center = xy$center,
+    scale = xy$scale
   )
-
   return(result)
 }

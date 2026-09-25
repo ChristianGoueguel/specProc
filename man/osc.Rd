@@ -12,13 +12,14 @@ osc(
   scale = FALSE,
   ncomp = 10,
   tol = 0.001,
-  max.iter = 10
+  max.iter = 10,
+  pls.ncomp = 5
 )
 }
 \arguments{
 \item{x}{A matrix or data frame of the predictor variables.}
 
-\item{y}{A vector of the response variable.}
+\item{y}{A vector (or one-column matrix/data frame) of the response variable.}
 
 \item{method}{A character string indicating the OSC method to use. Accepted values are \code{"wold"}, \code{"sjoblom"} and \code{"fearn"}. Default is \code{"sjoblom"}.}
 
@@ -26,21 +27,24 @@ osc(
 
 \item{scale}{A logical value indicating whether to scale \code{x} and \code{y}. Default is \code{FALSE}.}
 
-\item{ncomp}{An integer representing the number of components, which defines how many times the entire process will be performed. Default value is 10.}
+\item{ncomp}{An integer representing the number of orthogonal components to remove. Default value is 10; it is reduced to \code{min(n - 1, p)} if larger.}
 
 \item{tol}{A numeric value representing the tolerance for convergence. The default value is 1e-3.}
 
 \item{max.iter}{An integer representing the maximum number of iterations. The default value is 10.}
+
+\item{pls.ncomp}{An integer giving the number of PLS components used to compute the weights in Wold's method. Default is 5.}
 }
 \value{
-An list containing the following components:
+A list containing the following components:
 \itemize{
 \item \code{correction}: The corrected matrix.
 \item \code{scores}: The orthogonal scores matrix.
 \item \code{loadings}: The orthogonal loadings matrix.
 \item \code{weights}: The orthogonal weights matrix.
-\item \code{R2}: The value of the explained variance.
-\item \code{angle}: The value of the orthogonalization angle.
+\item \code{R2}: The percentage of the (preprocessed) variance of \code{x} remaining after correction.
+\item \code{angle}: The mean angle (in degrees) between the orthogonal scores and \code{y}; values close to 90 indicate orthogonality.
+\item \code{center}, \code{scale}: The column centers and scales applied to \code{x}.
 }
 }
 \description{
@@ -55,8 +59,32 @@ spectral matrix, \eqn{\textbf{X}}, by iteratively deflating \eqn{\textbf{X}}
 with respect to the response vector \eqn{\textbf{y}}. The resulting \eqn{\textbf{X}}-matrix
 contains only the variation that is relevant to the \eqn{\textbf{y}}-vector,
 which can then be used for further modeling or analysis. This function implements
-three different methods for OSC: the original method proposed by Wold \emph{et al.} (1998),
-the method proposed by Sjöblom \emph{et al.} (1998), and the method proposed by Fearn (2000).
+three different methods for OSC:
+\itemize{
+\item \code{"wold"}: the original method of Wold \emph{et al.} (1998). The first principal
+component score is orthogonalized to \eqn{\textbf{y}} and the weights are
+obtained by a PLS regression of the orthogonalized score on \eqn{\textbf{X}},
+iterating until convergence.
+\item \code{"sjoblom"}: the method of Sjöblom \emph{et al.} (1998), where the weights are
+obtained by a simple least-squares regression instead of PLS.
+\item \code{"fearn"}: the non-iterative method of Fearn (2000), which finds the
+directions of maximum variance of \eqn{\textbf{X}} subject to the scores
+being exactly orthogonal to \eqn{\textbf{y}}.
+}
+
+For the iterative methods, \eqn{\textbf{X}} is deflated after each component.
+New data can be corrected by applying the returned \code{center} and \code{scale}
+and then, for each component \eqn{i}, computing
+\eqn{\textbf{t}_i = \textbf{X}_{new}\textbf{w}_i} and
+\eqn{\textbf{X}_{new} \leftarrow \textbf{X}_{new} - \textbf{t}_i\textbf{p}_i^T}.
+}
+\examples{
+set.seed(1)
+x <- matrix(rnorm(20 * 50), 20, 50)
+y <- x[, 1] + rnorm(20, sd = 0.1)
+res <- osc(x, y, method = "fearn", ncomp = 2)
+res$angle
+
 }
 \references{
 \itemize{

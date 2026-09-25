@@ -32,39 +32,33 @@
 #' @export biweight_midcovariance
 #'
 biweight_midcovariance <- function(x, y) {
+  check_bivariate(x, y)
+  if (anyNA(x) || anyNA(y)) {
+    return(NA_real_)
+  }
+  wx <- biweight_terms(x)
+  wy <- biweight_terms(y)
+  if (is.null(wx) || is.null(wy)) {
+    return(0)
+  }
+  return(length(x) * sum(wx$a * wy$a) / (sum(wx$d) * sum(wy$d)))
+}
 
+check_bivariate <- function(x, y) {
   if (missing(x) || missing(y)) {
-    stop("Inputs 'x' and 'y' must be provided.")
+    stop("Inputs 'x' and 'y' must be provided.", call. = FALSE)
   }
   if (!is.numeric(x) || !is.numeric(y)) {
-    stop("Both 'x' and 'y' must be numeric vectors.")
+    stop("Both 'x' and 'y' must be numeric vectors.", call. = FALSE)
   }
   if (length(x) != length(y)) {
-    stop("'x' and 'y' must have the same length.")
+    stop("'x' and 'y' must have the same length.", call. = FALSE)
+  }
+  if (length(x) < 2) {
+    stop("'x' and 'y' must have at least two elements.", call. = FALSE)
   }
   if (length(unique(x)) == 1 || length(unique(y)) == 1) {
-    stop("'x' and 'y' cannot be constant vectors.")
+    stop("'x' and 'y' cannot be constant vectors.", call. = FALSE)
   }
-  if (length(x) < 2 || length(y) < 2) {
-    stop("'x' and 'y' must have at least two elements.")
-  } else {
-    n <- length(x)
-  }
-
-  med_x <- stats::median(x)
-  med_y <- stats::median(y)
-  mad_x <- stats::mad(x)
-  mad_y <- stats::mad(y)
-
-  beta <- (x - med_x) / (9 * stats::qnorm(0.75) * mad_x)
-  theta <- (y - med_y) / (9 * stats::qnorm(0.75) * mad_y)
-
-  alpha <- dplyr::if_else(beta <= -1 | beta >= 1, 0, 1)
-  kappa <- dplyr::if_else(theta <= -1 | theta >= 1, 0, 1)
-
-  A <- n * sum((alpha * (x - med_x)) * ((1 - beta^2)^2) * (kappa * (y - med_y)) * ((1 - theta^2)^2))
-  B <- sum((alpha * (1 - beta^2)) * (1 - 5 * beta^2)) * sum((kappa * (1 - theta^2)) * (1 - 5 * theta^2))
-  bicovar <- A / B
-
-  return(bicovar)
+  invisible(TRUE)
 }

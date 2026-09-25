@@ -12,12 +12,14 @@ center(x, method = "mean", drop.na = FALSE)
 \item{method}{A character string specifying the centering method, either
 "mean" or "median".}
 
-\item{drop.na}{A logical value indicating whether to remove missing values
-(NA) before centering.}
+\item{drop.na}{A logical value indicating whether to ignore missing values
+(NA) when computing the column means or medians. Missing values are kept
+in the output.}
 }
 \value{
-A data frame with the same dimensions as the input,
-but with columns centered according to the specified method.
+A numeric matrix with the same dimensions as the input, with
+columns centered according to the specified method. The column centers
+are stored in the \code{"center"} attribute.
 }
 \description{
 Function to perform mean-centering or median-centering on a numeric matrix or
@@ -28,6 +30,12 @@ Mean-centering calculates the mean of each column and subtracts this from
 the column. Median-centering is very similar to
 mean-centering except that the reference point is the median of each column
 rather than the mean.
+}
+\examples{
+m <- matrix(c(1, 2, 3, 10, 20, 30), ncol = 2)
+center(m)
+center(m, method = "median")
+
 }
 \author{
 Christian L. Goueguel

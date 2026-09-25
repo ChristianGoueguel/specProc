@@ -8,17 +8,18 @@
 #'
 #' @details
 #' The left and right medcouples are a robust measure of tail weight based on the
-#' median and the medcouple (Brys *et al.* 2004), which is a kernel estimator of
-#' the cumulative distribution function (CDF). The left and right medcouples are
+#' median and the medcouple (Brys *et al.* 2004): the left medcouple is minus the
+#' medcouple of the observations below the median, and the right medcouple is the
+#' medcouple of the observations above the median. The left and right medcouples are
 #' robust to outliers and have a breakdown value of 25%. Specifically, the left
 #' medcouple (LMC) measures the skewness in the lower tail
 #' of the distribution, while the right medcouple (RMC) measures the skewness in
 #' the upper tail.
 #'
 #' The interpretation of LMC and RMC is as follows:
-#'  - Values close to 0 indicate a symmetric distribution or light tails.
-#'  - Positive values indicate right-skewness or a heavier right tail.
-#'  - Negative values indicate left-skewness or a heavier left tail.
+#'  - At the normal distribution, LMC = RMC ≈ 0.2.
+#'  - Larger values indicate heavier tails than the normal distribution, and
+#'    smaller values lighter tails.
 #'
 #' @references
 #'  - Brys, G., Hubert, M., and Struyf, A. (2006).
@@ -30,7 +31,7 @@
 #'
 #' @author Christian L. Goueguel
 #' @param x A numeric vector.
-#' @param drop.na Logical value indicating whether to remove missing values (NA) or not.
+#' @param drop.na Logical value indicating whether to remove missing values (NA). If `FALSE` (default) and `x` contains missing values, `NA` is returned.
 #'
 #' @return A tibble with two numeric columns:
 #'  - `LMC`: Left medcouple.
@@ -57,24 +58,22 @@ medcouple_weight <- function(x, drop.na = FALSE) {
     stop("The input 'drop.na' must be a logical value (TRUE or FALSE).")
   }
 
-  value <- NULL
-  below_med <- NULL
-  above_med <- NULL
-  med <- stats::median(x, na.rm = drop.na)
+  if (drop.na) {
+    x <- x[!is.na(x)]
+  } else if (anyNA(x)) {
+    return(tibble::tibble(LMC = NA_real_, RMC = NA_real_))
+  }
 
-  left <- tibble::enframe(x) %>%
-    dplyr::mutate(below_med = value <= med) %>%
-    dplyr::filter(below_med) %>%
-    dplyr::pull(value)
-
-  right <- tibble::enframe(x) %>%
-    dplyr::mutate(above_med = value >= med) %>%
-    dplyr::filter(above_med) %>%
-    dplyr::pull(value)
+  med <- stats::median(x)
+  left <- x[x < med]
+  right <- x[x > med]
+  if (length(left) < 2 || length(right) < 2) {
+    stop("'x' must have at least two values on each side of the median.")
+  }
 
   w_tbl <- tibble::tibble(
-    LMC = (-1) * robustbase::mc(left, na.rm = drop.na),
-    RMC = robustbase::mc(right, na.rm = drop.na)
+    LMC = -medcouple(left),
+    RMC = medcouple(right)
   )
 
   return(w_tbl)

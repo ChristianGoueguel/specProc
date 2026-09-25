@@ -6,3 +6,6 @@
 ^codecov\.yml$
 ^README.Rmd
 ^\.github$
+^inst/rstudio$
+^LICENSE\.md$
+^Rplots\.pdf$

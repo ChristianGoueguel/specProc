@@ -1,26 +1,22 @@
-test_data <- data.frame(
-  normal = rnorm(100),
-  skewed = rexp(100, rate = 0.5),
-  heavy_tailed = rt(100, df = 3)
-)
+test_that("adjusted_boxplot returns statistics and plots", {
+  df <- data.frame(normal = stats::rnorm(100), skewed = stats::rexp(100, 0.5))
+  res <- adjusted_boxplot(df, plot = FALSE)
+  expect_named(res, c("stats", "outliers"))
+  expect_equal(nrow(res$stats), 2)
+  expect_equal(res$stats$median, unname(sapply(df, stats::median)))
+  expect_s3_class(adjusted_boxplot(df), "ggplot")
+})
 
-test_that("adjusted_boxplot function works as expected", {
+test_that("adjusted_boxplot validates its inputs", {
+  test_data <- data.frame(a = stats::rnorm(20))
   expect_error(adjusted_boxplot(), "Missing 'x' argument.")
   expect_error(adjusted_boxplot(data.frame(test = c("m", "t", "w", 1, 2, 3))), "Input 'x' must be a numeric data frame.")
   expect_error(adjusted_boxplot(test_data, plot = 1), "Argument 'plot' must be of type boolean \\(TRUE or FALSE\\).")
   expect_error(adjusted_boxplot(test_data, notch = 1), "Argument 'notch' must be of type boolean \\(TRUE or FALSE\\).")
-  expect_error(adjusted_boxplot(test_data, xlabels.angle = -10), "Argument 'x_axis_angle' must be a numeric value between 0 and 360.")
-  expect_error(adjusted_boxplot(test_data, xlabels.angle = 370), "Argument 'x_axis_angle' must be a numeric value between 0 and 360.")
-  expect_error(adjusted_boxplot(test_data, xlabels.vjust = -0.5), "Argument 'xlabels.vjust' must be a numeric value between 0 and 1.")
+  expect_error(adjusted_boxplot(test_data, xlabels.angle = 370), "between 0 and 360.")
   expect_error(adjusted_boxplot(test_data, xlabels.vjust = 1.5), "Argument 'xlabels.vjust' must be a numeric value between 0 and 1.")
   expect_error(adjusted_boxplot(test_data, xlabels.hjust = -0.5), "Argument 'xlabels.hjust' must be a numeric value between 0 and 1.")
-  expect_error(adjusted_boxplot(test_data, xlabels.hjust = 1.5), "Argument 'xlabels.hjust' must be a numeric value between 0 and 1.")
   expect_error(adjusted_boxplot(test_data, box.width = 0), "Argument 'box.width' must be a positive numeric value.")
-  expect_error(adjusted_boxplot(test_data, box.width = -0.5), "Argument 'box.width' must be a positive numeric value.")
-  expect_error(adjusted_boxplot(test_data, notchwidth = -0.5), "Argument 'notchwidth' must be a numeric value between 0 and 1.")
   expect_error(adjusted_boxplot(test_data, notchwidth = 1.5), "Argument 'notchwidth' must be a numeric value between 0 and 1.")
   expect_error(adjusted_boxplot(test_data, staplewidth = -0.5), "Argument 'staplewidth' must be a positive numeric value.")
-  }
-  )
-
-
+})

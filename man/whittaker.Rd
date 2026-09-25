@@ -7,7 +7,7 @@
 whittaker(x, lambda = 1000, p = 0.001, max.iter = 10)
 }
 \arguments{
-\item{x}{A numeric matrix or data frame.}
+\item{x}{A numeric matrix or data frame, with one spectrum per row.}
 
 \item{lambda}{A numeric value specifying the smoothing parameter, which
 controls the amount of curvature allowed for the baseline. The smaller the
@@ -36,6 +36,19 @@ estimates a baseline curve by minimizing the asymmetric least squares criterion,
 which allows for different weights for positive and negative residuals. The
 resulting baseline curve is subtracted from the input data, providing a
 baseline-corrected version.
+
+The penalized system is pentadiagonal and is solved in C++ with a banded
+Cholesky decomposition, so the cost grows linearly with the number of
+spectral channels. Negative values in the corrected spectra are kept as they
+are (they typically reflect noise around the baseline).
+}
+\examples{
+wl <- seq(200, 400, length.out = 500)
+spec <- 0.002 * (wl - 200)^2 + 50 * exp(-(wl - 300)^2 / 2) + rnorm(500, sd = 0.5)
+res <- whittaker(matrix(spec, nrow = 1), lambda = 1e5, p = 0.01)
+plot(wl, spec, type = "l")
+lines(wl, unlist(res$background), col = "red")
+
 }
 \references{
 \itemize{

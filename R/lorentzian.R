@@ -54,10 +54,9 @@ lorentzian <- function(x, y0, xc, wL, A) {
   if (!is.numeric(wL) || length(wL) != 1 || wL <= 0) {
     stop("'wL' must be a positive numeric value.")
   }
-  if (!is.numeric(A) || length(A) != 1 || A <= 0) {
-    stop("'A' must be a positive numeric value.")
+  if (!is.numeric(A) || length(A) != 1 || A < 0) {
+    stop("'A' must be a non-negative numeric value.")
   }
 
-  y0 + (2 * A / pi) * (wL / (4 * (x - xc)^2 + wL^2))
-
+  y0 + A * profile_lorentzian(x, xc, wL)
 }

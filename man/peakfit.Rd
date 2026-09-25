@@ -17,10 +17,12 @@ peakfit(
 )
 }
 \arguments{
-\item{x}{A data frame or tibble}
+\item{x}{A data frame or tibble of spectra, one spectrum per row. Column
+names are the wavelengths (e.g. \code{"396.15"}); an optional identifier column
+can be given with \code{id}.}
 
 \item{profile}{A character specifying the lineshape function to be used:
-"lorentzian", "gaussian" or "voigt"}
+"lorentzian", "gaussian" or "voigt" (pseudo-Voigt).}
 
 \item{wL}{A numeric specifying the Lorentzian full width at half maximum (initial guess)}
 
@@ -32,12 +34,19 @@ peakfit(
 
 \item{wlgth.max}{A numeric specifying the upper bound of the wavelength subset}
 
-\item{id}{A character specifying the spectra id (optional)}
+\item{id}{A character specifying the name of the column holding the spectra id (optional)}
 
 \item{max.iter}{A numeric specifying the maximum number of iteration (200 by default)}
 }
 \value{
-Fitted value and the estimated parameters along with the corresponding errors
+A tibble with one row per spectrum and the columns:
+\itemize{
+\item \code{id} column (or \code{spectrum}, the row number, when \code{id = NULL}),
+\item \code{data}: the fitted data (\code{x}, \code{y}),
+\item \code{fit}: the \code{nls} model object,
+\item \code{tidied}: the estimated parameters with their standard errors,
+\item \code{augmented}: the data with fitted values (\code{.fitted}) and residuals (\code{.resid}).
+}
 }
 \description{
 Fitting of a single spectral line by lineshape functions with variable parameters.
@@ -45,6 +54,28 @@ Fitting of a single spectral line by lineshape functions with variable parameter
 \details{
 The function uses \code{minpack.lm::nlsLM}, which is based on the Levenberg-Marquardt
 algorithm for searching the minimum value of the square of the sum of the residuals.
+Each spectrum (row of \code{x}) is fitted separately with the model
+\deqn{y = y_0 + A \cdot f(x; x_c, w)}
+where \eqn{f} is a unit-area Gaussian, Lorentzian or pseudo-Voigt profile
+(see \code{\link[=gaussian]{gaussian()}}, \code{\link[=lorentzian]{lorentzian()}} and \code{\link[=pseudo_voigt]{pseudo_voigt()}}). The fitted
+parameters are \code{y0}, \code{xc}, \code{A} and the width(s) \code{wG} and/or \code{wL}.
+
+Initial values that are not supplied are estimated from the data: the peak
+center from the position of the maximum, the width from the full width at
+half maximum, and the area from the integrated intensity above the minimum.
+The center is constrained to the fitted wavelength range and the widths and
+area to positive values. If the fit of a spectrum fails, a warning is issued
+and the corresponding \code{fit}, \code{tidied} and \code{augmented} entries are \code{NULL}.
+}
+\examples{
+wl <- seq(395, 397, by = 0.02)
+set.seed(1)
+spec <- 10 + gaussian(wl, y0 = 0, xc = 396.15, wG = 0.2, A = 50) + rnorm(length(wl))
+df <- as.data.frame(t(spec))
+names(df) <- wl
+res <- peakfit(df, profile = "gaussian")
+res$tidied[[1]]
+
 }
 \author{
 Christian L. Goueguel

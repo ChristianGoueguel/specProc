@@ -54,7 +54,7 @@ where:
 \item \eqn{y_0} is the baseline offset
 \item \eqn{G(x, x_c, w_G)} is the Gaussian component with center \eqn{x_c}
 and the full width at half maximum \eqn{w_G}
-\item \eqn{L(x, x_c, w_G)} is the Lorentzian component with center \eqn{x_c}
+\item \eqn{L(x, x_c, w_L)} is the Lorentzian component with center \eqn{x_c}
 and the full width at half maximum \eqn{w_L}
 \item \eqn{\eta} is the mixing parameter, with \eqn{0 \leq \eta \leq 1}. The
 mixing parameter \eqn{\eta} allows the pseudo-Voigt function to describe a wide
@@ -62,12 +62,18 @@ range of line shapes, from pure Gaussian (\eqn{\eta = 0}) to pure Lorentzian (\e
 and various intermediate shapes in between.
 }
 
-The Olivero and Longbothum (1977) approximation, and its subsequent refinements
-(Belafhal 2000; Zdunkowski et al. 2007), offer an efficient and accurate way (accuracy of 0.02\%)
-to estimate the half-width of a Voigt line, which is given by:
+Both \eqn{G} and \eqn{L} have unit area, so \eqn{A} is the area of the peak.
 
-\deqn{w_v = \frac{1}{2} \cdot [c_1 \cdot w_L + \sqrt(c_2 \cdot w_L^2 + 4 \cdot w_G^2)]}
-with \eqn{c_1 = 1.0692}, \eqn{c_2 = 0.86639}
+When \code{eta} is not given, the Thompson-Cox-Hastings approximation of the Voigt
+profile is used (Ida et al. 2000): both components share the total FWHM
+\deqn{f = (w_G^5 + 2.69269 w_G^4 w_L + 2.42843 w_G^3 w_L^2 + 4.47163 w_G^2 w_L^3 + 0.07842 w_G w_L^4 + w_L^5)^{1/5}}
+and the mixing parameter is
+\deqn{\eta = 1.36603 (w_L/f) - 0.47719 (w_L/f)^2 + 0.11116 (w_L/f)^3}
+
+For comparison, the Olivero and Longbothum (1977) approximation, and its subsequent refinements
+(Belafhal 2000; Zdunkowski et al. 2007), estimate the FWHM of a Voigt line as
+\eqn{w_V = \frac{1}{2} [c_1 w_L + \sqrt{c_2 w_L^2 + 4 w_G^2}]}
+with \eqn{c_1 = 1.0692}, \eqn{c_2 = 0.86639} (accuracy of 0.02\%).
 }
 \examples{
 x <- seq(-2, 2, length.out = 100)
@@ -75,11 +81,11 @@ y1 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 0)
 y2 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 0.5)
 y3 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2, eta = 1)
 y4 <- pseudo_voigt(x, y0 = 0, xc = 0, wG = 1, wL = 0.5, A = 2)
-plot(x, y1, type = "l", col = "red", main = "Pseudo-Voigt Profile", ylim = c(0, 5.5))
+plot(x, y1, type = "l", col = "red", main = "Pseudo-Voigt Profile", ylim = c(0, 2.5))
 lines(x, y2, col = "blue")
 lines(x, y3, col = "green")
 lines(x, y4$y, col = "black")
-legend("topright", legend = c("eta = 1", "eta = 0.5", "eta = 0", "eta = NULL"),
+legend("topright", legend = c("eta = 0", "eta = 0.5", "eta = 1", "eta = NULL"),
 col = c("red", "blue", "green", "black"), lty = 1)
 
 # The approximated mixing parameter:

@@ -1,39 +1,43 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+// Group-wise column means of a numeric matrix, ignoring missing values.
+// `group` holds 1-based group codes (e.g. the integer codes of a factor);
+// rows with a missing or out-of-range group code are skipped. The result has
+// one row per group (1..ngroups); groups without data return NA.
 // [[Rcpp::export]]
-NumericMatrix computeGroupedMeans(NumericMatrix data, IntegerVector group) {
-  int nrows = data.nrow();
-  int ncols = data.ncol();
-  int ngroups = Rcpp::unique(group).size();  // Number of unique groups
+NumericMatrix computeGroupedMeans(NumericMatrix data, IntegerVector group, int ngroups) {
+  const int nrows = data.nrow();
+  const int ncols = data.ncol();
 
-  NumericVector group_means(ncols * ngroups);  // Initialize vector to store group means
-  IntegerVector group_counts(ncols * ngroups); // Initialize vector to store group counts
+  if (group.size() != nrows) {
+    stop("'group' must have one element per row of 'data'.");
+  }
+  if (ngroups < 1) {
+    stop("'ngroups' must be at least 1.");
+  }
+
+  NumericMatrix sums(ngroups, ncols);
+  IntegerMatrix counts(ngroups, ncols);
 
   for (int i = 0; i < nrows; ++i) {
-    int g = group[i] - 1;  // Adjust for 1-based indexing in R
+    const int g = group[i];
+    if (g == NA_INTEGER || g < 1 || g > ngroups) {
+      continue;
+    }
     for (int j = 0; j < ncols; ++j) {
-      int idx = g * ncols + j;
-      double value = data(i, j);
-      if (!NumericVector::is_na(value)) {
-        group_means[idx] += value;
-        group_counts[idx]++;
+      const double value = data(i, j);
+      if (!ISNAN(value)) {
+        sums(g - 1, j) += value;
+        counts(g - 1, j) += 1;
       }
     }
   }
 
-  for (int i = 0; i < ngroups * ncols; ++i) {
-    if (group_counts[i] > 0) {
-      group_means[i] /= group_counts[i];
-    } else {
-      group_means[i] = NA_REAL;
-    }
-  }
-
   NumericMatrix result(ngroups, ncols);
-  for (int i = 0; i < ngroups; ++i) {
+  for (int g = 0; g < ngroups; ++g) {
     for (int j = 0; j < ncols; ++j) {
-      result(i, j) = group_means[i * ncols + j];
+      result(g, j) = (counts(g, j) > 0) ? sums(g, j) / counts(g, j) : NA_REAL;
     }
   }
 

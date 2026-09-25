@@ -11,15 +11,31 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// whittaker_baseline_cpp
+NumericMatrix whittaker_baseline_cpp(NumericMatrix x, double lambda, double param, int max_iter, int method);
+RcppExport SEXP _specProc_whittaker_baseline_cpp(SEXP xSEXP, SEXP lambdaSEXP, SEXP paramSEXP, SEXP max_iterSEXP, SEXP methodSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< double >::type param(paramSEXP);
+    Rcpp::traits::input_parameter< int >::type max_iter(max_iterSEXP);
+    Rcpp::traits::input_parameter< int >::type method(methodSEXP);
+    rcpp_result_gen = Rcpp::wrap(whittaker_baseline_cpp(x, lambda, param, max_iter, method));
+    return rcpp_result_gen;
+END_RCPP
+}
 // computeGroupedMeans
-NumericMatrix computeGroupedMeans(NumericMatrix data, IntegerVector group);
-RcppExport SEXP _specProc_computeGroupedMeans(SEXP dataSEXP, SEXP groupSEXP) {
+NumericMatrix computeGroupedMeans(NumericMatrix data, IntegerVector group, int ngroups);
+RcppExport SEXP _specProc_computeGroupedMeans(SEXP dataSEXP, SEXP groupSEXP, SEXP ngroupsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericMatrix >::type data(dataSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type group(groupSEXP);
-    rcpp_result_gen = Rcpp::wrap(computeGroupedMeans(data, group));
+    Rcpp::traits::input_parameter< int >::type ngroups(ngroupsSEXP);
+    rcpp_result_gen = Rcpp::wrap(computeGroupedMeans(data, group, ngroups));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -35,37 +51,38 @@ BEGIN_RCPP
 END_RCPP
 }
 // epo_cpp
-Rcpp::List epo_cpp(Rcpp::NumericMatrix X, int ncomp);
-RcppExport SEXP _specProc_epo_cpp(SEXP XSEXP, SEXP ncompSEXP) {
+Rcpp::List epo_cpp(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> D, int ncomp);
+RcppExport SEXP _specProc_epo_cpp(SEXP XSEXP, SEXP DSEXP, SEXP ncompSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type D(DSEXP);
     Rcpp::traits::input_parameter< int >::type ncomp(ncompSEXP);
-    rcpp_result_gen = Rcpp::wrap(epo_cpp(X, ncomp));
+    rcpp_result_gen = Rcpp::wrap(epo_cpp(X, D, ncomp));
     return rcpp_result_gen;
 END_RCPP
 }
 // glsw_cpp
-Rcpp::NumericMatrix glsw_cpp(Rcpp::NumericMatrix X_diff, double alpha);
+Eigen::MatrixXd glsw_cpp(const Eigen::Map<Eigen::MatrixXd> X_diff, double alpha);
 RcppExport SEXP _specProc_glsw_cpp(SEXP X_diffSEXP, SEXP alphaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type X_diff(X_diffSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X_diff(X_diffSEXP);
     Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
     rcpp_result_gen = Rcpp::wrap(glsw_cpp(X_diff, alpha));
     return rcpp_result_gen;
 END_RCPP
 }
 // yGradientglswCpp
-Eigen::MatrixXd yGradientglswCpp(const Eigen::MatrixXd& X_diff, const Eigen::VectorXd& w_i, double alpha);
+Eigen::MatrixXd yGradientglswCpp(const Eigen::Map<Eigen::MatrixXd> X_diff, const Eigen::Map<Eigen::VectorXd> w_i, double alpha);
 RcppExport SEXP _specProc_yGradientglswCpp(SEXP X_diffSEXP, SEXP w_iSEXP, SEXP alphaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type X_diff(X_diffSEXP);
-    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type w_i(w_iSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X_diff(X_diffSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type w_i(w_iSEXP);
     Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
     rcpp_result_gen = Rcpp::wrap(yGradientglswCpp(X_diff, w_i, alpha));
     return rcpp_result_gen;
@@ -73,9 +90,10 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_specProc_computeGroupedMeans", (DL_FUNC) &_specProc_computeGroupedMeans, 2},
+    {"_specProc_whittaker_baseline_cpp", (DL_FUNC) &_specProc_whittaker_baseline_cpp, 5},
+    {"_specProc_computeGroupedMeans", (DL_FUNC) &_specProc_computeGroupedMeans, 3},
     {"_specProc_computeMeans", (DL_FUNC) &_specProc_computeMeans, 1},
-    {"_specProc_epo_cpp", (DL_FUNC) &_specProc_epo_cpp, 2},
+    {"_specProc_epo_cpp", (DL_FUNC) &_specProc_epo_cpp, 3},
     {"_specProc_glsw_cpp", (DL_FUNC) &_specProc_glsw_cpp, 2},
     {"_specProc_yGradientglswCpp", (DL_FUNC) &_specProc_yGradientglswCpp, 3},
     {NULL, NULL, 0}

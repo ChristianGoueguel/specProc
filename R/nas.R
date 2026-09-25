@@ -10,12 +10,13 @@
 #'
 #' @details
 #' The NAS algorithm aims to obtain a corrected matrix that contains
-#' only the information relevant to the response variable \eqn{\textbf{Y}}. This is achieved
-#' by constructing an orthogonal projection matrix based on the principal
-#' components of the data matrix, \eqn{\textbf{X}}, that are orthogonal to \eqn{\textbf{Y}}. The corrected
-#' matrix is then obtained by projecting \eqn{\textbf{X}} onto the subspace orthogonal
-#' to the unwanted components.
-#'
+#' only the information relevant to the response variable \eqn{\textbf{Y}}. The
+#' part of \eqn{\textbf{X}} that cannot be explained by \eqn{\textbf{Y}},
+#' \eqn{\textbf{Z} = (\textbf{I} - \textbf{Y}\textbf{Y}^{+})\textbf{X}}, spans the
+#' interferent space. Its first `ncomp` principal component loadings
+#' \eqn{\textbf{P}} are used to project \eqn{\textbf{X}} onto the subspace
+#' orthogonal to the interferents:
+#' \eqn{\textbf{X}_{NAS} = \textbf{X}(\textbf{I} - \textbf{PP}^T)}.
 #'
 #' @references
 #'    - Lorber, A., (1997).
@@ -28,12 +29,19 @@
 #'
 #' @param x A matrix or data frame of the predictor variables
 #' @param y A vector, matrix or data frame of the response variable(s)
-#' @param ncomp An integer specifying the number of principal components to retain for orthogonal processing. Default is 5.
+#' @param ncomp An integer specifying the number of principal components to retain for orthogonal processing. Default is 5; it is reduced if larger than the rank of the interferent space.
 #' @param center A logical value specifying whether to center the data. Default is `TRUE`.
 #' @param scale A logical value specifying whether to scale the data. Default is `FALSE`.
 #'
-#' @return A tibble containing the corrected predictor variables
+#' @return A tibble containing the corrected predictor variables. The
+#'   interferent loadings are stored in the `"loadings"` attribute.
 #' @export nas
+#'
+#' @examples
+#' set.seed(1)
+#' x <- matrix(rnorm(20 * 50), 20, 50)
+#' y <- x[, 1] + rnorm(20, sd = 0.1)
+#' x_nas <- nas(x, y, ncomp = 2)
 #'
 nas <- function(x, y, ncomp = 5, center = TRUE, scale = FALSE) {
   if (missing(x) || missing(y)) {
@@ -42,36 +50,16 @@ nas <- function(x, y, ncomp = 5, center = TRUE, scale = FALSE) {
   if (!is.logical(center) || !is.logical(scale)) {
     stop("Arguments 'center' and 'scale' must be boolean (TRUE or FALSE)")
   }
-  if (is.data.frame(x) || tibble::is_tibble(x)) {
-    x <- as.matrix(x)
-  }
-  if (is.data.frame(y) || tibble::is_tibble(y)) {
-    y <- as.matrix(y)
-  }
-  if (nrow(x) != nrow(y)) {
-    stop("x and y don't match.")
-  }
+  xy <- prepare_xy(x, y, center, scale)
+  x <- xy$x
+  y <- xy$y
 
-  if (center == TRUE && scale == FALSE) {
-    x <- scale(x, center = TRUE)
-    y <- scale(y, center = TRUE)
-  }
-  if (center == FALSE && scale == TRUE) {
-    x <- scale(x, scale = TRUE)
-    y <- scale(y, scale = TRUE)
-  }
-  if (center == TRUE && scale == TRUE) {
-    x <- scale(x, center = TRUE, scale = TRUE)
-    y <- scale(y, center = TRUE, scale = TRUE)
-  }
+  z <- x - y %*% solve_ls(y, x)
+  ncomp <- clamp_ncomp(ncomp, z)
+  p_mat <- svd(z, nu = 0, nv = ncomp)$v
+  x_nas <- x - (x %*% p_mat) %*% t(p_mat)
 
-  if (ncomp < 1 || ncomp > min(nrow(x) - 1, ncol(x))) {
-    ncomp <- min(nrow(x) - 1, ncol(x))
-  }
-  z <- (diag(nrow(x)) - tcrossprod(y, y) / crossprod(y, y)) %*% x
-  pca_mod <- stats::prcomp(z, scale = FALSE)
-  p <- pca_mod$rotation[, 1:ncomp]
-  r <- diag(ncomp) - tcrossprod(p, p)
-  x_nas <- x %*% r
-  return(tibble::as_tibble(x_nas))
+  out <- as_tbl(x_nas, xy$names)
+  attr(out, "loadings") <- p_mat
+  return(out)
 }

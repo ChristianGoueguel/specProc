@@ -4,18 +4,20 @@
 \alias{opls}
 \title{Orthogonal Projections to Latent Structures}
 \usage{
-opls(x, y, scale = "center", crossval = 7, permutation = 20)
+opls(x, y, scale = "center", crossval = 7, permutation = 20, ncomp.ortho = NA)
 }
 \arguments{
 \item{x}{A data.frame or tibble containing the x-data (predictors).}
 
 \item{y}{A data.frame or tibble containing the y-data (responses).}
 
-\item{scale}{A character string indicating the scaling method for the data ("center" or "pareto").}
+\item{scale}{A character string indicating the scaling method for the data: "none", "center", "pareto" or "standard".}
 
 \item{crossval}{An integer representing the number of cross-validation groups.}
 
 \item{permutation}{An integer representing the number of permutations for the permutation test.}
+
+\item{ncomp.ortho}{The number of orthogonal components. If \code{NA} (default), it is determined automatically by cross-validation.}
 }
 \value{
 A list containing the following components:
@@ -26,9 +28,10 @@ A list containing the following components:
 \item{orthoScores}{A matrix of orthogonal scores (the projections of the x-data onto the orthogonal components).}
 \item{orthoLoadings}{A matrix of orthogonal loadings (the weights of the original x-variables on the orthogonal components).}
 \item{orthoWeights}{A matrix of orthogonal weights (the weights used to calculate the orthogonal scores).}
-\item{y_weights}{A matrix of y-weights (the weights used to calculate the y-scores).}
-\item{y_orthoWeights}{A matrix of orthogonal y-weights (the weights used to calculate the orthogonal y-scores).}
+\item{y_weights}{A matrix of y-weights.}
 \item{y_scores}{A matrix of y-scores (the projections of the y-data onto the predictive components).}
+\item{summary}{The model summary (R2X, R2Y, Q2, ...).}
+\item{model}{The fitted \code{ropls} model object.}
 }
 }
 \description{
@@ -42,6 +45,12 @@ multidimensional variance in the y-space. It separates the systematic
 variation in x into two parts: one that is linearly related to y
 (predictive components) and one that is statistically uncorrelated to the
 response variable y (orthogonal components).
+
+The function is a wrapper around \code{ropls::opls()} from the Bioconductor
+package \pkg{ropls}, which must be installed
+(\code{BiocManager::install("ropls")}). The model is fitted silently (no
+printed summary or plots). For a dependency-free alternative that returns
+the OPLS-filtered data, see \code{\link[=projected_osc]{projected_osc()}} or \code{\link[=o2pls]{o2pls()}}.
 }
 \references{
 \itemize{

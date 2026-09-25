@@ -11,9 +11,9 @@
 #' @param x A numeric matrix or data frame.
 #' @param sc A vector of previously calculated scales. If provided, these scales
 #' will be applied to the data.
-#' @param drop.na A logical value indicating whether to remove missing values
-#' (NA) from the calculations. If `TRUE` (the default), missing values will be
-#' removed. If `FALSE`, missing values will be included.
+#' @param drop.na A logical value indicating whether to remove rows containing
+#' missing values. If `TRUE` (the default), such rows are removed. If `FALSE`,
+#' missing values are kept and ignored when computing the means.
 #' @param options A list of options for Poisson scaling. See the 'Options' section below.
 #'
 #' @return If `sc` is not provided, the function returns a list with the following components:
@@ -31,6 +31,14 @@
 #'
 #' @export poisson_scale
 #'
+#' @examples
+#' set.seed(1)
+#' x <- matrix(rpois(40, lambda = rep(c(5, 50, 500, 5000), each = 10)), ncol = 4)
+#' res <- poisson_scale(x)
+#' res$sc
+#' # apply the same scales to new data
+#' poisson_scale(x[1:2, ], sc = res$sc)
+#'
 poisson_scale <- function(x, sc = NULL, drop.na = TRUE, options = list()) {
 
   if (missing(x)) {
@@ -40,27 +48,30 @@ poisson_scale <- function(x, sc = NULL, drop.na = TRUE, options = list()) {
     stop("'x' must be a numeric matrix or data frame.")
   }
 
-  if (!is.null(sc) && (!is.numeric(sc) || length(sc) != ncol(x))) {
-    stop("'sc' must be a numeric vector of length equal to the number of columns in 'x'.")
-  }
   if (!is.logical(drop.na)) {
     stop("'drop.na' must be a logical value (TRUE or FALSE).")
   }
-
-  if (!is.null(sc)) {
-    # Apply previously calculated scales
-    return(sweep(x, 2, sc, "/"))
-  }
+  x <- as_numeric_matrix(x, "x")
 
   # Set default options
   default_options <- list(offset = 3, mode = 1)
   options <- utils::modifyList(default_options, options)
-
-  if (is.data.frame(x) || tibble::is_tibble(x)) {
-    x <- as.matrix(x)
+  if (!options$mode %in% c(1, 2)) {
+    stop("Invalid 'mode' value. It must be either 1 or 2.")
   }
+
+  if (!is.null(sc)) {
+    n_sc <- if (options$mode == 1) ncol(x) else nrow(x)
+    if (!is.numeric(sc) || length(sc) != n_sc) {
+      stop("'sc' must be a numeric vector with one scale per ",
+           if (options$mode == 1) "column" else "row", " of 'x'.")
+    }
+    # Apply previously calculated scales
+    return(sweep(x, if (options$mode == 1) 2 else 1, sc, "/"))
+  }
+
   if (drop.na) {
-    x <- stats::na.omit(x)
+    x <- x[stats::complete.cases(x), , drop = FALSE]
   }
 
   # Calculate mean values
