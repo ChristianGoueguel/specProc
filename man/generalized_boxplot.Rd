@@ -44,8 +44,9 @@ generalized_boxplot(
 \value{
 \itemize{
 \item If \code{plot = TRUE}, returns a \code{ggplot2} object containing the generalized boxplot.
-\item If \code{plot = FALSE}, returns a list of tibbles: \code{stats}, with the fences,
-quartiles, median and the estimated g and h parameters of each variable,
+\item If \code{plot = FALSE}, returns a list of tibbles: \code{stats}, with the whisker
+ends (\code{lower}, \code{upper}: the most extreme observations within the fences),
+quartiles, median, fences and the estimated g and h parameters of each variable,
 and \code{outliers}, with the potential outliers (\code{out} gives the tail).
 }
 }

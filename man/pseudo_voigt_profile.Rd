@@ -104,3 +104,6 @@ J. Quant. Spectrosc. Radiat. Transfer, 17(2):233–236.
 for approximating the Voigt profile. Journal of Applied Crystallography. 33(6):1311–1316.
 }
 }
+\seealso{
+\code{\link[=voigt_profile]{voigt_profile()}} for the exact Voigt profile.
+}

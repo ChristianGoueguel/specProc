@@ -9,3 +9,5 @@
 ^inst/rstudio$
 ^LICENSE\.md$
 ^Rplots\.pdf$
+^data-raw$
+^man/figures/README-.*\.png$

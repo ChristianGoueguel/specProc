@@ -21,6 +21,10 @@ glsw_cpp <- function(X_diff, alpha) {
     .Call(`_specProc_glsw_cpp`, X_diff, alpha)
 }
 
+voigt_cpp <- function(x, sigma, gamma) {
+    .Call(`_specProc_voigt_cpp`, x, sigma, gamma)
+}
+
 yGradientglswCpp <- function(X_diff, w_i, alpha) {
     .Call(`_specProc_yGradientglswCpp`, X_diff, w_i, alpha)
 }

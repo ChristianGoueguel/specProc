@@ -10,9 +10,12 @@
 #' algorithm for searching the minimum value of the square of the sum of the residuals.
 #' Each spectrum (row of `x`) is fitted separately with the model
 #' \deqn{y = y_0 + A \cdot f(x; x_c, w)}
-#' where \eqn{f} is a unit-area Gaussian, Lorentzian or pseudo-Voigt profile
-#' (see [gaussian_profile()], [lorentzian_profile()] and [pseudo_voigt_profile()]). The fitted
-#' parameters are `y0`, `xc`, `A` and the width(s) `wG` and/or `wL`.
+#' where \eqn{f} is a unit-area Gaussian, Lorentzian, Voigt or pseudo-Voigt profile
+#' (see [gaussian_profile()], [lorentzian_profile()], [voigt_profile()] and
+#' [pseudo_voigt_profile()]). The fitted parameters are `y0`, `xc`, `A` and the
+#' width(s) `wG` and/or `wL` (full widths at half maximum). The Voigt profile
+#' is evaluated exactly in C++; the pseudo-Voigt (Thompson-Cox-Hastings)
+#' approximation is faster but accurate to about 1\%.
 #'
 #' Initial values that are not supplied are estimated from the data: the peak
 #' center from the position of the maximum, the width from the full width at
@@ -25,7 +28,7 @@
 #'   names are the wavelengths (e.g. `"396.15"`); an optional identifier column
 #'   can be given with `id`.
 #' @param profile A character specifying the lineshape function to be used:
-#' "lorentzian", "gaussian" or "voigt" (pseudo-Voigt).
+#' "lorentzian", "gaussian", "voigt" (exact) or "pseudo_voigt".
 #' @param wL A numeric specifying the Lorentzian full width at half maximum (initial guess)
 #' @param wG A numeric specifying the Gaussian full width at half maximum (initial guess)
 #' @param A A numeric specifying the peak area (initial guess)
@@ -70,8 +73,8 @@ peak_fit <- function(
     stop("Input 'data' must be a data frame or tibble.")
   }
   if (!is.character(profile) || length(profile) != 1 ||
-      !tolower(profile) %in% c("lorentzian", "gaussian", "voigt")) {
-    stop("The profile function must be: 'lorentzian', 'gaussian' or 'voigt'")
+      !tolower(profile) %in% lineshapes) {
+    stop("The profile function must be: 'lorentzian', 'gaussian', 'voigt' or 'pseudo_voigt'")
   }
   if (!is.numeric(max.iter)) {
     stop("Maximum number of iteration must be numeric")
@@ -82,6 +85,8 @@ peak_fit <- function(
               wL = wL, wG = wG, A = A, max.iter = max.iter, single = TRUE)
 }
 
+
+lineshapes <- c("gaussian", "lorentzian", "voigt", "pseudo_voigt")
 
 # Splits a wide data frame of spectra into a list of (x, y) tibbles, one per
 # spectrum, restricted to [wlgth.min, wlgth.max].
@@ -177,14 +182,15 @@ peak_parameters <- function(data, peaks, profiles, wL, wG, A, single) {
         upper[nm] <- Inf
         sprintf("profile_lorentzian(x, %s, %s)", nm_xc, nm)
       },
-      voigt = {
+      voigt = ,
+      pseudo_voigt = {
         nmG <- sfx("wG", i)
         nmL <- sfx("wL", i)
         start[[nmG]] <- ifelse(is.na(pick(wG, i)), g$fwhm / 2, pick(wG, i))
         start[[nmL]] <- ifelse(is.na(pick(wL, i)), g$fwhm / 2, pick(wL, i))
         lower[c(nmG, nmL)] <- wmin
         upper[c(nmG, nmL)] <- Inf
-        sprintf("profile_voigt(x, %s, %s, %s)", nm_xc, nmG, nmL)
+        sprintf("profile_%s(x, %s, %s, %s)", profiles[i], nm_xc, nmG, nmL)
       }
     )
     start[[nm_A]] <- ifelse(is.na(pick(A, i)), g$A, pick(A, i))

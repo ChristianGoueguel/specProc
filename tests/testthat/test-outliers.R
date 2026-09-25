@@ -48,8 +48,11 @@ test_that("generalized_boxplot estimates g and h and sensible fences", {
   expect_lt(st$h[1], 0.1)
   expect_gt(st$g[2], 0.05)
   # For normal data, the fences are close to the alpha/2 quantiles.
-  expect_equal(st$lower[1], stats::qnorm(0.025), tolerance = 0.1)
-  expect_equal(st$upper[1], stats::qnorm(0.975), tolerance = 0.1)
+  expect_equal(st$lower_fence[1], stats::qnorm(0.025), tolerance = 0.1)
+  expect_equal(st$upper_fence[1], stats::qnorm(0.975), tolerance = 0.1)
+  # whiskers end at observations inside the fences
+  expect_true(all(st$lower >= st$lower_fence & st$upper <= st$upper_fence))
+  expect_true(st$upper[1] %in% df$normal)
   expect_true(all(res$outliers$out %in% c("lower", "upper")))
   expect_s3_class(generalized_boxplot(df[1:200, ]), "ggplot")
 })

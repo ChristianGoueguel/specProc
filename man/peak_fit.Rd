@@ -22,7 +22,7 @@ names are the wavelengths (e.g. \code{"396.15"}); an optional identifier column
 can be given with \code{id}.}
 
 \item{profile}{A character specifying the lineshape function to be used:
-"lorentzian", "gaussian" or "voigt" (pseudo-Voigt).}
+"lorentzian", "gaussian", "voigt" (exact) or "pseudo_voigt".}
 
 \item{wL}{A numeric specifying the Lorentzian full width at half maximum (initial guess)}
 
@@ -56,9 +56,12 @@ The function uses \code{minpack.lm::nlsLM}, which is based on the Levenberg-Marq
 algorithm for searching the minimum value of the square of the sum of the residuals.
 Each spectrum (row of \code{x}) is fitted separately with the model
 \deqn{y = y_0 + A \cdot f(x; x_c, w)}
-where \eqn{f} is a unit-area Gaussian, Lorentzian or pseudo-Voigt profile
-(see \code{\link[=gaussian_profile]{gaussian_profile()}}, \code{\link[=lorentzian_profile]{lorentzian_profile()}} and \code{\link[=pseudo_voigt_profile]{pseudo_voigt_profile()}}). The fitted
-parameters are \code{y0}, \code{xc}, \code{A} and the width(s) \code{wG} and/or \code{wL}.
+where \eqn{f} is a unit-area Gaussian, Lorentzian, Voigt or pseudo-Voigt profile
+(see \code{\link[=gaussian_profile]{gaussian_profile()}}, \code{\link[=lorentzian_profile]{lorentzian_profile()}}, \code{\link[=voigt_profile]{voigt_profile()}} and
+\code{\link[=pseudo_voigt_profile]{pseudo_voigt_profile()}}). The fitted parameters are \code{y0}, \code{xc}, \code{A} and the
+width(s) \code{wG} and/or \code{wL} (full widths at half maximum). The Voigt profile
+is evaluated exactly in C++; the pseudo-Voigt (Thompson-Cox-Hastings)
+approximation is faster but accurate to about 1\\%.
 
 Initial values that are not supplied are estimated from the data: the peak
 center from the position of the maximum, the width from the full width at
