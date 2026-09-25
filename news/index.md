@@ -180,8 +180,9 @@ independent reference implementations.
   (baseline, normalization judged by replicate RSD and intraclass
   correlation, robust screening of shots), “Fitting emission lines”
   (profile choice, sources of uncertainty, identifiability) and
-  “Predicting soil clay content from LIBS spectra” (nested, repeated
-  cross-validation by sample, and the optimism of common shortcuts).
+  “Predicting soil clay content from LIBS spectra” (a compositional
+  log-ratio PLS model with nested, repeated cross-validation by sample,
+  and the optimism of common shortcuts).
 
 - [`plot_fit()`](https://christiangoueguel.com/specProc/reference/plot_fit.md)
   draws the fitted profiles on a fine wavelength grid.
