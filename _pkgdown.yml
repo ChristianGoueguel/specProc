@@ -1,6 +1,7 @@
 url: https://christiangoueguel.com/specProc/
 template:
   bootstrap: 5
+  math-rendering: katex
 reference:
 - title: Univariate filtering
   desc: >
