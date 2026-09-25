@@ -13,7 +13,7 @@ zscore(x, cutoff = 3, robust = FALSE, drop.na = FALSE)
 
 \item{robust}{A logical value indicating whether to calculate classical or robust z-score. If \code{FALSE} (the default), uses the classical approach. If \code{TRUE}, computes the robust method, i.e. the so-called Stahel-Donoho outlyingness.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.}
+\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values are kept in the output (with a missing score) and ignored when computing the location and scale.}
 }
 \value{
 A tibble with two columns:

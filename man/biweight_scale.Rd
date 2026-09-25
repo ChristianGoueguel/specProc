@@ -4,30 +4,18 @@
 \alias{biweight_scale}
 \title{Biweight Scale}
 \usage{
-biweight_scale(
-  x,
-  loc = stats::median(x),
-  c = 9,
-  reduced = FALSE,
-  tol = 1e-06,
-  max_iter = 50,
-  drop.na = FALSE
-)
+biweight_scale(x, loc = NULL, c = 9, reduced = FALSE, drop.na = FALSE)
 }
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{loc}{Initial guess for the location (default: median of \code{x}).}
+\item{loc}{The location about which the scale is computed (default: median of \code{x}).}
 
 \item{c}{A numeric value specifying the tuning constant for the biweight estimator (\code{c = 9} by default).}
 
-\item{reduced}{A logical value specifying whether the sample size, \emph{n}, should be reduced to the number of non-rejected values. If \code{TRUE}, \emph{n} is reduced to the number of observations that pass a rejection criteria. If \code{FALSE} (default), \emph{n} is equal to the length of \code{x} (the input data).}
+\item{reduced}{A logical value specifying whether the sample size, \emph{n}, should be reduced to the number of non-rejected values. If \code{TRUE}, \emph{n} is reduced to the number of observations that pass a rejection criteria (\eqn{|u_i| < 1}). If \code{FALSE} (default), \emph{n} is equal to the length of \code{x} (the input data).}
 
-\item{tol}{Convergence tolerance for the iterative computation (default: 1e-6).}
-
-\item{max_iter}{Maximum number of iterations (default: 50).}
-
-\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.}
+\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when \code{x} contains missing values.}
 }
 \value{
 The biweight scale of \code{x}.
@@ -36,6 +24,15 @@ The biweight scale of \code{x}.
 This function computes the biweight scale, a robust measure of scale or dispersion
 for a numeric vector. The biweight scale is less sensitive to outliers
 than the sample standard deviation.
+}
+\details{
+The biweight scale is the square root of the biweight midvariance:
+\deqn{\zeta = \frac{\sqrt{n \sum_{|u_i|<1} (x_i - M)^2 (1 - u_i^2)^4}}
+{\left| \sum_{|u_i|<1} (1 - u_i^2)(1 - 5u_i^2) \right|},
+\quad u_i = \frac{x_i - M}{c \cdot \mathrm{MAD}}}
+where \eqn{M} is the location (the median by default) and MAD is the
+(unscaled) median absolute deviation. For normally distributed data the
+biweight scale is a consistent estimator of the standard deviation.
 }
 \examples{
 # Example 1: Compute biweight scale for a vector
@@ -60,6 +57,9 @@ biscale = biweight_scale(x)
 \item Mosteller, F., and Tukey, J. W. (1977).
 Data Analysis and Regression: A Second Course in Statistics.
 Addison-Wesley, pp. 203-209.
+\item Beers, T.C., Flynn, K., Gebhardt, K., (1990).
+Measures of location and scale for velocities in clusters of galaxies - A robust approach.
+The Astronomical Journal, 100:32-46.
 }
 }
 \author{

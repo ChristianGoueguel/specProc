@@ -4,28 +4,32 @@
 \alias{o2pls}
 \title{Modified Orthogonal Projections to Latent Structures}
 \usage{
-o2pls(x, y, ncomp = 10, center = TRUE, scale = FALSE, tol = 1e-05)
+o2pls(x, y, ncomp = 1, nx = 1, ny = 0, center = TRUE, scale = FALSE)
 }
 \arguments{
 \item{x}{A numeric matrix or data frame representing the predictor variables.}
 
 \item{y}{A numeric vector, matrix or data frame representing the response variables.}
 
-\item{ncomp}{An integer representing the number of components. Default value is 10.}
+\item{ncomp}{An integer giving the number of joint (predictive) components. Default is 1.}
+
+\item{nx}{An integer giving the number of \eqn{Y}-orthogonal components removed from \code{x}. Default is 1.}
+
+\item{ny}{An integer giving the number of \eqn{X}-orthogonal components removed from \code{y}. Default is 0.}
 
 \item{center}{A logical value indicating whether to mean-centered \code{x} and \code{y}. Default is \code{TRUE}.}
 
 \item{scale}{A logical value indicating whether to scale \code{x} and \code{y}. Default is \code{FALSE}.}
-
-\item{tol}{A numeric value representing the tolerance for convergence. The default value is 1e-5.}
 }
 \value{
-A list containing the following components:
+An object of class \code{o2pls}, a list containing:
 \itemize{
-\item \code{correction}: The corrected matrix.
-\item \code{scores}: The orthogonal scores matrix.
-\item \code{loadings}: The orthogonal loadings matrix.
-\item \code{weights}: The weights matrix.
+\item \code{correction}: The filtered \code{x} (\eqn{Y}-orthogonal variation removed).
+\item \code{correction_y}: The filtered \code{y} (\eqn{X}-orthogonal variation removed).
+\item \code{scores}: A list with the joint scores \code{x} (\eqn{\textbf{T}}) and \code{y} (\eqn{\textbf{U}}), and the orthogonal scores \code{x_ortho} and \code{y_ortho}.
+\item \code{loadings}: A list with the joint loadings \code{x} and \code{y}, and the orthogonal loadings \code{x_ortho} and \code{y_ortho}.
+\item \code{weights}: A list with the joint weights \code{x} (\eqn{\textbf{W}}) and \code{y} (\eqn{\textbf{C}}), and the orthogonal weights \code{x_ortho} and \code{y_ortho}.
+\item \code{center}, \code{scale}: The column centers and scales applied to \code{x}.
 }
 }
 \description{
@@ -39,16 +43,42 @@ orthogonal variations in both the \eqn{X}- and \eqn{Y}-space are filtered out.
 \details{
 The O2PLS method handles situations where systematic \eqn{X}-orthogonal variation
 in \eqn{Y} exists, and it is predictive in both ways, \eqn{(X \Rightarrow Y)}
-and \eqn{(Y \Rightarrow X)}. O2PLS uses least squares regression to estimate
-the pure constituent profiles and divide the systematic part in \eqn{X} and
-\eqn{Y} into two parts, one which is related to both \eqn{X} and \eqn{Y}
-(covarying) and one that is not (orthogonal).
+and \eqn{(Y \Rightarrow X)}. The systematic part in \eqn{X} and \eqn{Y} is
+divided into two parts, one which is related to both \eqn{X} and \eqn{Y}
+(joint/covarying) and one that is not (orthogonal).
+
+The algorithm follows Trygg and Wold (2003):
+\enumerate{
+\item The joint weights \eqn{\textbf{W}} and \eqn{\textbf{C}} are the dominant
+singular vectors of \eqn{\textbf{Y}^T\textbf{X}}.
+\item For each \eqn{Y}-orthogonal component of \eqn{X}, the weight
+\eqn{\textbf{w}_{o}} is the dominant singular vector of
+\eqn{\textbf{E}_{XY}^T\textbf{T}} (with \eqn{\textbf{T} = \textbf{XW}} and
+\eqn{\textbf{E}_{XY} = \textbf{X} - \textbf{TW}^T}), and \eqn{\textbf{X}}
+is deflated by \eqn{\textbf{t}_o\textbf{p}_o^T}.
+\item The same procedure is applied to \eqn{Y} for the \eqn{X}-orthogonal components.
+\item The joint components are recomputed from the filtered data.
+}
+
+For a single response variable, \code{ny} must be 0 and the method is equivalent
+to OPLS with \code{nx} orthogonal components.
+}
+\examples{
+set.seed(1)
+x <- matrix(rnorm(30 * 40), 30, 40)
+y <- x[, 1:2] \%*\% c(1, -1) + rnorm(30, sd = 0.1)
+fit <- o2pls(x, y, ncomp = 1, nx = 2)
+fit
+
 }
 \references{
 \itemize{
 \item Trygg, J., (2002).
 O2-PLS for qualitative and quantitative analysis in multivariate calibration.
 J. Chemom. 16(1):283–293.
+\item Trygg, J., Wold, S., (2003).
+O2-PLS, a two-block (X–Y) latent variable regression (LVR) method with an integral OSC filter.
+J. Chemom. 17(1):53–64.
 }
 }
 \author{

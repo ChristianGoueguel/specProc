@@ -4,16 +4,16 @@
 \alias{quantile_weight}
 \title{Quantile Tail Weight Measure}
 \usage{
-quantile_weight(x, p = 0.25, q = 0.75, drop.na = FALSE)
+quantile_weight(x, p = 0.125, q = 0.875, drop.na = FALSE)
 }
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{p}{A numeric value between 0 and 0.5 (\code{p = 0.25} by default).}
+\item{p}{A numeric value between 0 and 0.5 (\code{p = 0.125} by default).}
 
-\item{q}{A numeric value between 0.5 and 1 (\code{q = 0.75} by default).}
+\item{q}{A numeric value between 0.5 and 1 (\code{q = 0.875} by default).}
 
-\item{drop.na}{Logical value indicating whether to remove missing values (NA) or not.}
+\item{drop.na}{Logical value indicating whether to remove missing values (NA). If \code{FALSE} (default) and \code{x} contains missing values, \code{NA} is returned.}
 }
 \value{
 A tibble with two numeric columns:
@@ -39,19 +39,19 @@ by D.V. Hinkley in 1975. Quartile skewness measures the skewness or asymmetry
 of a distribution by comparing the differences between the quartiles, which
 are robust measures of location and scale.
 
-Specifically, the quantile weights are calculated when applying quartile
+Specifically, the quantile weights are obtained by applying quartile
 skewness to either the left half or the right half of the probability mass,
-divided at the median of the univariate distribution. The left quantile weight
-(LQW) is the proportion of the data below the median, divided by the expected
-proportion (0.5) if the data were normally distributed. The right quantile
-weight (RQW) is the proportion of the data above the median, divided by 0.5.
+divided at the median of the univariate distribution (Brys \emph{et al.} 2006):
+\deqn{LQW(p) = -\frac{Q((1-p)/2) + Q(p/2) - 2Q(0.25)}{Q((1-p)/2) - Q(p/2)}}
+\deqn{RQW(q) = \frac{Q((1+q)/2) + Q(1-q/2) - 2Q(0.75)}{Q((1+q)/2) - Q(1-q/2)}}
+where \eqn{Q} is the quantile function of the data. The defaults
+\eqn{p = 0.125} and \eqn{q = 0.875} give a breakdown value of 12.5\%.
 
 Interpretation of Quantile Weights:
 \itemize{
-\item Values closer to 0 indicate lighter tails compared to the normal distribution.
-\item Values closer to 1 signify heavier tails compared to the normal distribution.
-\item Values significantly greater than 1 suggest the presence of outliers or
-extreme values in the respective tail.
+\item At the normal distribution, LQW = RQW ≈ 0.2.
+\item Larger values indicate heavier tails than the normal distribution, and
+smaller values lighter tails.
 }
 }
 \examples{

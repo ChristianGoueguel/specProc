@@ -32,7 +32,9 @@
 #'
 #' @return
 #'    - If `plot = TRUE`, returns a `ggplot2` object containing the generalized boxplot.
-#'    - If `plot = FALSE`, returns a list of tibbles with the generalized boxplot statistics and potantial outliers.
+#'    - If `plot = FALSE`, returns a list of tibbles: `stats`, with the fences,
+#'      quartiles, median and the estimated g and h parameters of each variable,
+#'      and `outliers`, with the potential outliers (`out` gives the tail).
 #'
 #' @export generalized_boxplot
 #'
@@ -54,13 +56,16 @@ generalized_boxplot <- function(x, alpha = 0.05, p = 0.9, plot = TRUE, xlabels.a
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!all(x %>% purrr::map_lgl(is.numeric))) {
+  if (is.matrix(x)) {
+    x <- as.data.frame(x)
+  }
+  if (!is.data.frame(x) || !all(vapply(x, is.numeric, logical(1)))) {
     stop("Input 'x' must be a numeric data frame.")
   }
-  if (!is.numeric(alpha) || alpha < 0 || alpha > 1) {
+  if (!is.numeric(alpha) || alpha <= 0 || alpha >= 1) {
     stop("Argument 'alpha' must be a numeric value between 0 and 1.")
   }
-  if (!is.numeric(p) || p < 0.5 || p > 1) {
+  if (!is.numeric(p) || p <= 0.5 || p >= 1) {
     stop("Argument 'p' must be a numeric value between 0.5 and 1.")
   }
   if(!is.logical(plot)) {
@@ -91,47 +96,45 @@ generalized_boxplot <- function(x, alpha = 0.05, p = 0.9, plot = TRUE, xlabels.a
     stop("Argument 'staplewidth' must be a positive numeric value.")
   }
 
-  genBoxplot_stats <- x %>%
-    purrr::map(
-      function(.x) {
-        stats_tbl <- genboxStats(.x, alpha, p)
-        tibble::tibble(
-          lower = stats_tbl$stats$lower_fence,
-          q1 = stats_tbl$stats$lower_quantile,
-          median = stats_tbl$stats$median,
-          q3 = stats_tbl$stats$upper_quantile,
-          upper = stats_tbl$stats$upper_fence
-        )
-      }
-    ) %>%
-    dplyr::bind_rows(.id = "variable") %>%
-    purrr::modify_at("variable", forcats::as_factor)
+  genBoxplot_stats <- list()
+  genBoxplot_out <- list()
+  for (nm in names(x)) {
+    st <- genboxStats(x[[nm]], alpha, p)
+    genBoxplot_stats[[nm]] <- tibble::tibble(
+      lower = st$stats$lower_fence,
+      q1 = st$stats$lower_quantile,
+      median = st$stats$median,
+      q3 = st$stats$upper_quantile,
+      upper = st$stats$upper_fence,
+      g = st$stats$g,
+      h = st$stats$h
+    )
+    genBoxplot_out[[nm]] <- st$outliers
+  }
+  genBoxplot_stats <- dplyr::bind_rows(genBoxplot_stats, .id = "variable")
+  genBoxplot_stats$variable <- factor(genBoxplot_stats$variable, levels = names(x))
+  genBoxplot_out <- dplyr::bind_rows(genBoxplot_out, .id = "variable")
+  if (nrow(genBoxplot_out) == 0) {
+    genBoxplot_out <- tibble::tibble(variable = character(), out = character(), value = numeric())
+  }
+  genBoxplot_out$variable <- factor(genBoxplot_out$variable, levels = names(x))
 
-  genBoxplot_out <- x %>%
-    purrr::map(
-      function(.x) {
-        out_tbl <- genboxStats(.x, alpha, p)
-        tibble::tibble(
-          lower = out_tbl$outliers$lower,
-          upper = out_tbl$outliers$upper
-        )
-      }
-    ) %>%
-    dplyr::bind_rows(.id = "variable") %>%
-    purrr::modify_at("variable", forcats::as_factor) %>%
-    tidyr::pivot_longer(!variable, names_to = "out", values_to = "value")
+  if (!plot) {
+    return(list("stats" = genBoxplot_stats, "outliers" = genBoxplot_out))
+  }
+  boxplot_stats_plot(genBoxplot_stats, genBoxplot_out, xlabels.angle, xlabels.vjust,
+                     xlabels.hjust, box.width, notch, notchwidth, staplewidth)
+}
 
-  variable <- NULL
-  lower <- NULL
-  q1 <- NULL
-  median <- NULL
-  q3 <- NULL
-  upper <- NULL
-  value <- NULL
+# Draws a boxplot from precomputed statistics (lower, q1, median, q3, upper)
+# and outliers (variable, value). Shared by the adjusted and generalized boxplots.
+boxplot_stats_plot <- function(stats_tbl, outlier_tbl, xlabels.angle, xlabels.vjust,
+                               xlabels.hjust, box.width, notch, notchwidth, staplewidth) {
+  variable <- lower <- q1 <- median <- q3 <- upper <- value <- NULL
 
-  p <- ggplot2::ggplot() +
+  ggplot2::ggplot() +
     ggplot2::geom_boxplot(
-      data = genBoxplot_stats,
+      data = stats_tbl,
       ggplot2::aes(
         x = variable,
         ymin = lower,
@@ -144,22 +147,19 @@ generalized_boxplot <- function(x, alpha = 0.05, p = 0.9, plot = TRUE, xlabels.a
       stat = "identity",
       width = box.width,
       colour = "black",
-      outlier.colour = NA,
-      outlier.shape = NA,
       notch = notch,
       notchwidth = notchwidth,
       staplewidth = staplewidth) +
-     ggplot2::geom_point(
-       data = genBoxplot_out,
-       ggplot2::aes(
-         x = variable,
-         y = value,
-         fill = variable,
-         group = variable),
-       shape = 21,
-       size = 2,
-       alpha = 1/3) +
-    ggplot2::geom_jitter(size = 1.5) +
+    ggplot2::geom_point(
+      data = outlier_tbl,
+      ggplot2::aes(
+        x = variable,
+        y = value,
+        fill = variable,
+        group = variable),
+      shape = 21,
+      size = 2,
+      alpha = 1/3) +
     ggsci::scale_fill_d3(palette = "category20") +
     ggplot2::theme_bw() +
     ggplot2::theme(
@@ -167,60 +167,66 @@ generalized_boxplot <- function(x, alpha = 0.05, p = 0.9, plot = TRUE, xlabels.a
       panel.grid = ggplot2::element_blank(),
       axis.text.x = ggplot2::element_text(angle = xlabels.angle, vjust = xlabels.vjust, hjust = xlabels.hjust)) +
     ggplot2::labs(x = " ", y = " ")
-
-  if (plot == TRUE) {
-    return(p)
-  } else{
-    r <- list("stats" = genBoxplot_stats, "outliers" = genBoxplot_out)
-    return(r)
-  }
 }
 
 
+# Generalized boxplot statistics for one variable (Bruffaerts et al., 2014).
 genboxStats <- function(x, alpha, p) {
-  n <- length(x)
-  order_x <- sort(x)
-  x_star <- (x - stats::median(x)) / stats::IQR(x)
+  x <- x[!is.na(x)]
+  if (length(x) < 5 || stats::IQR(x) == 0) {
+    stop("Each variable must have at least 5 non-missing values and a non-zero IQR.", call. = FALSE)
+  }
+  med <- stats::median(x)
+  iqr <- stats::IQR(x)
+
+  # 1. Map the data into (0, 1) and then onto the real line.
+  x_star <- (x - med) / iqr
   r <- x_star - min(x_star) + 0.1
-  r_tilde <- r / (min(r) + max(r))
-  w <- stats::qnorm((rank(r_tilde, na.last = "keep") - 0.5) / sum(!is.na(r_tilde)))
-  w_star <- (w - stats::median(w)) / (stats::IQR(w) / 1.3426)
+  s <- min(r) + max(r)
+  w <- stats::qnorm(r / s)
+  w_med <- stats::median(w)
+  w_scale <- stats::IQR(w) / 1.3426
+  w_star <- (w - w_med) / w_scale
 
-  A <- stats::quantile(w_star, p) / stats::quantile(w_star, 1 - p)
-  B <- (stats::quantile(w_star, p) * stats::quantile(w_star, 1 - p)) / (stats::quantile(w_star, p) + stats::quantile(w_star, 1 - p))
-  z <- stats::qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
-  g <- (1 / z) * log(-A)
-  h <- (2 / z^2) * log(-g * B)
+  # 2. Quantile-based estimates of the Tukey g-and-h parameters.
+  z <- stats::qnorm(p)
+  Qp <- unname(stats::quantile(w_star, p))
+  Q1p <- unname(stats::quantile(w_star, 1 - p))
+  ratio <- -Qp / Q1p
+  if (is.finite(ratio) && ratio > 0 && abs(log(ratio)) > 1e-8) {
+    g <- log(ratio) / z
+    h <- 2 * log(-g * Qp * Q1p / (Qp + Q1p)) / z^2
+  } else {
+    g <- 0
+    h <- 2 * log((Qp - Q1p) / (2 * z)) / z^2
+  }
+  if (!is.finite(h) || h < 0) h <- 0
 
-  xi_alpha_2 <- tukeyGH(alpha / 2, type = "q", location = 0, scale = 1, g = g, h = h)
-  xi_1_alpha_2 <- tukeyGH(1 - alpha / 2, type = "q", location = 0, scale = 1, g = g, h = h)
+  # 3. Fences as g-and-h quantiles, transformed back to the original scale.
+  xi <- tukeyGH(c(alpha / 2, 1 - alpha / 2), type = "q", location = 0, scale = 1, g = g, h = h)
+  back <- function(q) {
+    r_q <- stats::pnorm(w_med + w_scale * q) * s
+    (r_q + min(x_star) - 0.1) * iqr + med
+  }
+  fences <- back(xi)
 
-  atypical_indices <- which(w_star < xi_alpha_2 | w_star > xi_1_alpha_2)
-
-  L_star_minus <- xi_alpha_2
-  L_star_plus <- xi_1_alpha_2
-  C_low <- stats::median(w) + (stats::IQR(w) / 1.3426) * L_star_minus
-  C_up <- stats::median(w) + (stats::IQR(w) / 1.3426) * L_star_plus
-  f_low <- stats::pnorm(C_low, mean = 0, sd = 1) * (min(r) + max(r)) + min(x_star) - 0.1
-  f_up <- stats::pnorm(C_up, mean = 0, sd = 1) * (min(r) + max(r)) + min(x_star) - 0.1
-
-  q1 <- stats::quantile(x, 0.25)
-  q3 <- stats::quantile(x, 0.75)
-
-  s <- tibble::tibble(
-    lower_fence = f_low * stats::IQR(x) + stats::median(x),
-    lower_quantile = q1,
-    median = stats::median(x),
-    upper_quantile = q3,
-    upper_fence = f_up * stats::IQR(x) + stats::median(x)
+  stats_tbl <- tibble::tibble(
+    lower_fence = fences[1],
+    lower_quantile = unname(stats::quantile(x, 0.25)),
+    median = med,
+    upper_quantile = unname(stats::quantile(x, 0.75)),
+    upper_fence = fences[2],
+    g = g,
+    h = h
   )
 
+  order_x <- sort(x)
+  low <- order_x[order_x < fences[1]]
+  high <- order_x[order_x > fences[2]]
   out <- tibble::tibble(
-    lower = order_x[order_x < s$lower_fence],
-    upper = order_x[order_x > s$upper_fence]
+    out = c(rep("lower", length(low)), rep("upper", length(high))),
+    value = c(low, high)
   )
 
-  results <- list("stats" = s, "outliers" = out)
-  return(results)
+  list("stats" = stats_tbl, "outliers" = out)
 }
-

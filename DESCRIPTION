@@ -1,60 +1,52 @@
 Package: specProc
 Type: Package
-Title: Preprocessing Tools For Laser-Induced Breakdown Spectroscopy (LIBS) Spectra 
-Version: 0.1.0
-Author: Christian L. Goueguel
-Maintainer: Christian L. Goueguel <christian.goueguel@gmail.com>
-Description: A collection of functions for preprocessing spectra in optical emission spectroscopy of laser-induced plasmas, called laser-induced breakdown spectroscopy. 
+Title: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy (LIBS) Spectra
+Version: 0.2.0
+Authors@R:
+    person("Christian L.", "Goueguel", , "christian.goueguel@gmail.com", role = c("aut", "cre"))
+Description: A collection of functions for preprocessing spectra in optical
+    emission spectroscopy of laser-induced plasmas, called laser-induced
+    breakdown spectroscopy. It covers baseline correction, normalization and
+    scaling, orthogonal signal correction and calibration transfer, peak
+    fitting, and robust statistics for outlier detection. Computationally
+    intensive steps are implemented in C++ for large spectral datasets.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.1
-Imports: 
+RoxygenNote: 7.3.2
+Depends:
+    R (>= 4.1.0)
+Imports:
     cellWise,
-    corrr,
-    cowplot,
-    forcats,
+    dplyr,
+    ggplot2,
     ggsci,
     magrittr,
     MASS,
     minpack.lm,
     moments,
-    mt,
+    pls,
     prospectr,
     Rcpp,
-    RcppEigen,
+    rlang,
     robustbase,
-    ropls,
-    XICOR
-Roxygen: list(markdown = TRUE)
-Depends: 
-    R (>= 2.10)
-Suggests: 
-    testthat (>= 3.0.0),
-    markdown,
-    rmarkdown,
-    spelling,
-    mvoutlier,
-    chemometrics,
-    stats,
-    broom,
-    dplyr,
-    ggplot2,
     tibble,
     tidyr,
-    tidyselect,
-    plotly,
-    rlang,
-    purrr,
+    XICOR
+Suggests:
+    knitr,
+    mt,
     patchwork,
-    robustHD,
-    pls,
-    knitr
-VignetteBuilder: knitr
-URL: https://github.com/ChristianGoueguel/specProc, https://christiangoueguel.github.io/specProc/
-BugReports: https://github.com/ChristianGoueguel/specProc/issues
-Language: en-US
-Config/testthat/edition: 3
-LinkingTo: 
+    plotly,
+    rmarkdown,
+    ropls,
+    spelling,
+    testthat (>= 3.0.0)
+LinkingTo:
     Rcpp,
     RcppEigen
+Roxygen: list(markdown = TRUE)
+Config/testthat/edition: 3
+URL: https://github.com/ChristianGoueguel/specProc, https://christiangoueguel.com/specProc/
+BugReports: https://github.com/ChristianGoueguel/specProc/issues
+Language: en-US

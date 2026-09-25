@@ -9,7 +9,7 @@ medcouple_weight(x, drop.na = FALSE)
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{drop.na}{Logical value indicating whether to remove missing values (NA) or not.}
+\item{drop.na}{Logical value indicating whether to remove missing values (NA). If \code{FALSE} (default) and \code{x} contains missing values, \code{NA} is returned.}
 }
 \value{
 A tibble with two numeric columns:
@@ -26,8 +26,9 @@ or contaminated data.
 }
 \details{
 The left and right medcouples are a robust measure of tail weight based on the
-median and the medcouple (Brys \emph{et al.} 2004), which is a kernel estimator of
-the cumulative distribution function (CDF). The left and right medcouples are
+median and the medcouple (Brys \emph{et al.} 2004): the left medcouple is minus the
+medcouple of the observations below the median, and the right medcouple is the
+medcouple of the observations above the median. The left and right medcouples are
 robust to outliers and have a breakdown value of 25\%. Specifically, the left
 medcouple (LMC) measures the skewness in the lower tail
 of the distribution, while the right medcouple (RMC) measures the skewness in
@@ -35,9 +36,9 @@ the upper tail.
 
 The interpretation of LMC and RMC is as follows:
 \itemize{
-\item Values close to 0 indicate a symmetric distribution or light tails.
-\item Positive values indicate right-skewness or a heavier right tail.
-\item Negative values indicate left-skewness or a heavier left tail.
+\item At the normal distribution, LMC = RMC ≈ 0.2.
+\item Larger values indicate heavier tails than the normal distribution, and
+smaller values lighter tails.
 }
 }
 \examples{

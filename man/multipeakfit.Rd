@@ -18,29 +18,35 @@ multipeakfit(
 )
 }
 \arguments{
-\item{x}{A data frame or tibble}
+\item{x}{A data frame or tibble of spectra, one spectrum per row. Column
+names are the wavelengths; an optional identifier column can be given
+with \code{id}.}
 
-\item{peaks}{A vector of the selected peaks center wavelengths}
+\item{peaks}{A numeric vector of the (approximate) peak center wavelengths.}
 
-\item{profiles}{A vector of the lineshape functions for fitting}
+\item{profiles}{A character vector of the lineshape functions for fitting,
+one per peak or a single one used for all peaks: "lorentzian", "gaussian"
+or "voigt" (case insensitive).}
 
-\item{wL}{A numeric of the Lorentzian full width at half maximum (overall initial guess)}
+\item{wL}{A numeric (single value or one per peak) of the Lorentzian full width at half maximum (initial guess)}
 
-\item{wG}{A numeric of the Gaussian full width at half maximum (overall initial guess)}
+\item{wG}{A numeric (single value or one per peak) of the Gaussian full width at half maximum (initial guess)}
 
-\item{A}{A numeric of the peak area (overall initial guess)}
+\item{A}{A numeric (single value or one per peak) of the peak area (initial guess)}
 
 \item{wlgth.min}{A numeric of the lower bound of the wavelength subset}
 
 \item{wlgth.max}{A numeric of the upper bound of the wavelength subset}
 
-\item{id}{A character specifying the spectra id (optional)}
+\item{id}{A character specifying the name of the column holding the spectra id (optional)}
 
 \item{max.iter}{A numeric specifying the maximum number of iteration (200 by default)}
 }
 \value{
-Fitted value for each peak and the estimated parameters along with the
-corresponding errors
+A tibble with one row per spectrum and the columns \code{id} (or
+\code{spectrum}), \code{data}, \code{fit}, \code{tidied} and \code{augmented} (see \code{\link[=peakfit]{peakfit()}}).
+\code{augmented} additionally contains one column per peak (\code{.peak_1}, ...)
+with the contribution of each fitted line.
 }
 \description{
 Fitting of multiple spectral lines by the same or different lineshape
@@ -49,6 +55,23 @@ functions with variable parameters.
 \details{
 The function uses \code{minpack.lm::nlsLM}, which is based on the Levenberg-Marquardt
 algorithm for searching the minimum value of the square of the sum of the residuals.
+All peaks are fitted simultaneously with a common baseline offset:
+\deqn{y = y_0 + \sum_{i} A_i \cdot f_i(x; x_{c,i}, w_i)}
+The parameters of peak \eqn{i} are named with the suffix \verb{_i}
+(e.g. \code{xc_1}, \code{wG_1}, \code{A_1}). Initial values that are not supplied are
+estimated from the data around each peak center. Each peak center is
+constrained to lie within the fitted wavelength range.
+}
+\examples{
+wl <- seq(395, 397, by = 0.02)
+set.seed(1)
+spec <- 5 + gaussian(wl, 0, 395.8, 0.15, 20) + lorentzian(wl, 0, 396.3, 0.2, 30) +
+  rnorm(length(wl), sd = 0.5)
+df <- as.data.frame(t(spec))
+names(df) <- wl
+res <- multipeakfit(df, peaks = c(395.8, 396.3), profiles = c("gaussian", "lorentzian"))
+res$tidied[[1]]
+
 }
 \author{
 Christian L. Goueguel

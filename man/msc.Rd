@@ -20,29 +20,47 @@ Each row represents a sample, and each column represents a spectral variable.}
 \item{xref}{An optional numeric vector representing the reference spectrum.
 If \code{NULL} (default), the mean or median of \code{x} is used as the reference.}
 
-\item{drop.offset}{A logical value indicating whether the offset should be
-removed from the spectra (default is \code{TRUE}).}
+\item{drop.offset}{A logical value indicating whether the additive offset
+\eqn{a_i} should be removed from the spectra (default is \code{TRUE}). If \code{FALSE},
+only the multiplicative effect is corrected: \eqn{\textbf{x}_i / b_i}.}
 
-\item{robust}{A logical value indicating whether the mean or median of \code{x} is
-used as \code{xref}.}
+\item{robust}{A logical value indicating whether the median (\code{TRUE}, default)
+or the mean (\code{FALSE}) of \code{x} is used as \code{xref}.}
 
-\item{window}{An optional list of numeric vectors specifying the indices of
+\item{window}{An optional list of numeric vectors specifying the column indices of
 spectral windows. If provided, MSC is performed separately for each window.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values
-(NA) from the calculations. If \code{TRUE} (the default), missing values will be
-removed. If \code{FALSE}, missing values will be included.}
+\item{drop.na}{A logical value indicating whether to remove spectra (rows)
+containing missing values. If \code{TRUE} (the default), such rows are removed.}
 }
 \value{
 A list with the following components:
 \item{\code{correction}}{The corrected spectra.}
-\item{\code{offset}}{The intercepts/offsets.}
-\item{\code{slope}}{The multiplicative scatter factors/slopes.}
+\item{\code{offset}}{The intercepts/offsets \eqn{a_i} (a matrix with one column per window when \code{window} is given).}
+\item{\code{slope}}{The multiplicative scatter factors/slopes \eqn{b_i} (a matrix with one column per window when \code{window} is given).}
+\item{\code{reference}}{The reference spectrum used.}
 }
 \description{
 This function performs multiplicative scatter/signal correction (MSC) on an
 input data of spectra. It corrects for multiplicative and additive effects
 in the spectral data by regressing against a reference spectrum.
+}
+\details{
+Each spectrum \eqn{\textbf{x}_i} is regressed against the reference spectrum,
+\eqn{\textbf{x}_i = a_i + b_i \textbf{x}_{ref} + \textbf{e}_i}, and corrected as
+\eqn{(\textbf{x}_i - a_i) / b_i}. When \code{window} is given, the regression and
+correction are carried out separately in each spectral window (piecewise MSC);
+variables outside all windows are left unchanged.
+
+To correct new spectra consistently, pass the returned \code{reference} as \code{xref}.
+}
+\examples{
+set.seed(1)
+base <- sin(seq(0, pi, length.out = 50))
+x <- t(sapply(1:10, function(i) runif(1, 0, 1) + runif(1, 0.5, 2) * base))
+res <- msc(x)
+range(apply(as.matrix(res$correction), 2, sd))
+
 }
 \author{
 Christian L. Goueguel

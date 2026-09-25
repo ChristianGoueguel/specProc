@@ -64,9 +64,9 @@ gaussian <- function(x, y0, xc, wG, A) {
     stop("'wG' must be a positive numeric value.")
   }
 
-  if (!is.numeric(A) || length(A) != 1 || A <= 0) {
-    stop("'A' must be a positive numeric value.")
+  if (!is.numeric(A) || length(A) != 1 || A < 0) {
+    stop("'A' must be a non-negative numeric value.")
   }
 
-  y0 + A / (wG * sqrt(pi / (4 * log(2)))) * exp((-4 * log(2) * (x - xc)^2) / (wG^2))
+  y0 + A * profile_gaussian(x, xc, wG)
 }

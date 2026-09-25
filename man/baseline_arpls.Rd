@@ -7,7 +7,7 @@
 baseline_arpls(x, lambda = 1000, ratio = 0.05, max.iter = 10)
 }
 \arguments{
-\item{x}{A numeric matrix or data frame.}
+\item{x}{A numeric matrix or data frame, with one spectrum per row.}
 
 \item{lambda}{A numeric value specifying the smoothing parameter, which controls the amount of curvature allowed for the baseline. The smaller the lambda, the more curvature in the baseline fitting. Default is 1000.}
 
@@ -31,6 +31,18 @@ The algorithm estimates a baseline curve by iteratively updating weights based
 on the residuals and minimizing a penalized least squares criterion. The
 resulting baseline curve is subtracted from the input data, providing a
 baseline-corrected version.
+
+The penalized system is pentadiagonal and is solved in C++ with a banded
+Cholesky decomposition, so the cost grows linearly with the number of
+spectral channels.
+}
+\examples{
+wl <- seq(200, 400, length.out = 500)
+spec <- 0.002 * (wl - 200)^2 + 50 * exp(-(wl - 300)^2 / 2) + rnorm(500, sd = 0.5)
+res <- baseline_arpls(matrix(spec, nrow = 1), lambda = 1e5)
+plot(wl, spec, type = "l")
+lines(wl, unlist(res$background), col = "red")
+
 }
 \references{
 \itemize{

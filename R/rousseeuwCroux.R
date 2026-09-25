@@ -16,7 +16,7 @@
 #'
 #' @param x A numeric vector of data values.
 #' @param estimator A character string indicating whether to calculate the "Sn" or "Qn" estimator.
-#' @param drop.na A logical value indicating whether to remove missing values (`NA`) from the input vector.
+#' @param drop.na A logical value indicating whether to remove missing values (`NA`) from the input vector. If `FALSE` (default) and `x` contains missing values, `NA` is returned.
 #' @return A numeric value representing the calculated Sn or Qn scale estimator.
 #'
 #' @author Christian L. Goueguel
@@ -53,20 +53,21 @@ rousseeuwCroux <- function(x, estimator = c("Sn", "Qn"), drop.na = FALSE) {
   if (!is.numeric(x)) {
     stop("'x' must be a numeric vector.")
   }
-  if (length(unique(x)) == 1) {
-    stop("'x' cannot be a constant vector.")
+  estimator <- match.arg(estimator)
+  check_flag(drop.na, "drop.na")
+
+  if (drop.na) {
+    x <- x[!is.na(x)]
+  } else if (anyNA(x)) {
+    return(NA_real_)
   }
   if (length(x) < 2) {
     stop("'x' must have at least two elements.")
-  } else {
-    n <- length(x)
   }
-
-  estimator <- match.arg(estimator)
-
-  if (drop.na != FALSE) {
-    x <- x[!is.na(x)]
+  if (length(unique(x)) == 1) {
+    stop("'x' cannot be a constant vector.")
   }
+  n <- length(x)
 
   if (estimator == "Sn") {
     factors <- c(NA,

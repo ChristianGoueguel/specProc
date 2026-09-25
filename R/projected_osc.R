@@ -8,107 +8,112 @@
 #' is orthogonal to the response variable. This function implements the POSC
 #' algorithm for model fitting and prediction.
 #'
+#' @details
+#' POSC obtains OPLS-filtered data directly from an ordinary (non-orthogonalized)
+#' PLS1 model (Kemsley and Tapp, 2009):
+#' 1. A PLS1 model with `ncomp` components is fitted, giving the score matrix
+#'    \eqn{\textbf{T}} and the fitted response \eqn{\hat{\textbf{y}}}.
+#' 2. The part of the score space orthogonal to \eqn{\hat{\textbf{y}}},
+#'    \eqn{\textbf{T} - \hat{\textbf{y}}(\hat{\textbf{y}}^T\hat{\textbf{y}})^{-1}\hat{\textbf{y}}^T\textbf{T}},
+#'    spans `ncomp - 1` orthogonal components with scores \eqn{\textbf{T}_o}.
+#' 3. The orthogonal loadings are \eqn{\textbf{P}_o = \textbf{X}^T\textbf{T}_o(\textbf{T}_o^T\textbf{T}_o)^{-1}}
+#'    and the filtered data are \eqn{\textbf{X} - \textbf{T}_o\textbf{P}_o^T}.
+#'
+#' The filtered data are identical to those obtained from an OPLS model with one
+#' predictive and `ncomp - 1` orthogonal components.
+#'
+#' @references
+#'  - Kemsley, E.K., Tapp, H.S., (2009).
+#'    OPLS filtered data can be obtained directly from non-orthogonalized PLS1.
+#'    Journal of Chemometrics, 23(5):263-264.
+#'  - Trygg, J., Wold, S., (2002).
+#'    Orthogonal projections to latent structures (O-PLS).
+#'    Journal of Chemometrics, 16(3):119-128.
+#'
 #' @param x A matrix or data frame of the predictor variables.
 #' @param y A vector of the response variable.
-#' @param ncomp An integer specifying the number of components to include in the POSC model. Default is 5.
+#' @param ncomp An integer specifying the number of PLS components (at least 2). `ncomp - 1` orthogonal components are removed. Default is 5.
 #' @param center A logical value indicating whether to mean-center `x` and `y`. Default is `TRUE`.
 #' @param scale A logical value indicating whether to scale `x` and `y`. Default is `FALSE`.
-#' @param tol A numeric value representing the tolerance for convergence. The default value is 1e-10.
-#' @param newdata A matrix or data frame of new predictor variables to be corrected using the POSC model.
+#' @param tol A numeric value; orthogonal components whose singular value is smaller than `tol` times the largest one are discarded. The default value is 1e-10.
+#' @param newdata An optional matrix or data frame of new predictor variables to be corrected using the POSC model. It is preprocessed with the centers and scales of `x`.
 #'
-#' @return If `newdata` is provided, a list containing the following components:
-#'  - `correction`: The corrected matrix for the new data after applying POSC.
-#'  - `scores`: The orthogonal scores matrix for the new data.
-#'  If `newdata` is not provided, a list containing the following components:
-#'  - `model`: A list containing the POSC model components:
-#'    - `loadings`: The orthogonal loadings matrix.
-#'    - `weights`: The orthogonal weights matrix.
+#' @return A list containing the following components:
+#'  - `correction`: The corrected `x`.
+#'  - `scores`: The orthogonal scores matrix \eqn{\textbf{T}_o}.
+#'  - `loadings`: The orthogonal loadings matrix \eqn{\textbf{P}_o}.
+#'  - `weights`: The orthogonal weights \eqn{\textbf{W}_o}, such that \eqn{\textbf{T}_o = \textbf{XW}_o}.
+#'  - `center`, `scale`: The column centers and scales applied to `x`.
+#'  - `newdata`: If `newdata` is provided, a list with the corrected new data (`correction`) and its orthogonal scores (`scores`).
 #'
 #' @export projected_osc
 #'
+#' @examples
+#' set.seed(1)
+#' x <- matrix(rnorm(30 * 40), 30, 40)
+#' y <- x[, 1] + rnorm(30, sd = 0.1)
+#' res <- projected_osc(x[1:20, ], y[1:20], ncomp = 3, newdata = x[21:30, ])
+#' dim(res$newdata$correction)
+#'
 projected_osc <- function(x, y, ncomp = 5, center = TRUE, scale = FALSE, tol = 1e-10, newdata = NULL) {
 
-  if (center && scale) {
-    x <- scale(x, center = TRUE, scale = TRUE)
-    y <- scale(y, center = TRUE, scale = TRUE)
-  } else if (center) {
-    x <- scale(x, center = TRUE, scale = FALSE)
-    y <- scale(y, center = TRUE, scale = FALSE)
-  } else if (scale) {
-    x <- scale(x, center = FALSE, scale = TRUE)
-    y <- scale(y, center = FALSE, scale = TRUE)
+  if (missing(x) || missing(y)) {
+    stop("Both 'x' and 'y' must be provided.")
+  }
+  check_count(ncomp, "ncomp", lower = 2)
+  check_number(tol, "tol", lower = 0)
+
+  xy <- prepare_xy(x, y, center, scale)
+  if (ncol(xy$y) != 1) {
+    stop("'y' must be a single response variable.")
+  }
+  x <- xy$x
+  y <- xy$y
+  ncomp <- min(ncomp, nrow(x) - 1, ncol(x))
+  if (ncomp < 2) {
+    stop("At least 2 PLS components are needed; the data have too few observations or variables.")
   }
 
-  p_ortho <- t_last_ortho_P_ortho <- x_psoc <- NULL
+  fit <- pls::simpls.fit(x, y, ncomp = ncomp, center = FALSE)
+  t_mat <- unclass(fit$scores)
+  r_mat <- unclass(fit$projection)
+  q <- t(unclass(fit$Yloadings))
+  y_hat <- t_mat %*% q
 
-  plsFit <- pls::simpls.fit(x, y, ncomp, center = FALSE)
-  w <- plsFit$coefficients[, , 1:ncomp]
-  w <- w / sqrt(sum(w^2))
-  t <- x %*% w
+  # T_o = T K spans the part of the PLS score space orthogonal to y_hat.
+  k_mat <- diag(ncomp) - q %*% solve(crossprod(y_hat)) %*% crossprod(y_hat, t_mat)
+  sv <- svd(t_mat %*% k_mat)
+  keep <- which(sv$d > tol * max(sv$d))
+  keep <- keep[seq_len(min(length(keep), ncomp - 1))]
+  if (length(keep) == 0) {
+    stop("No orthogonal component found; try a larger 'ncomp' or a smaller 'tol'.")
+  }
 
-  # Step 2: Estimate principal components of T using PCA
-  t_pca <- stats::prcomp(t, center = FALSE)
-  r_pca <- t_pca$sdev^2 / sum(t_pca$sdev^2)
-  num_components <- sum(cumsum(r_pca) <= tol)
+  w_o <- r_mat %*% k_mat %*% sv$v[, keep, drop = FALSE]
+  t_o <- x %*% w_o
+  p_o <- crossprod(x, t_o) %*% solve(crossprod(t_o))
+  x_posc <- x - tcrossprod(t_o, p_o)
 
-  # Step 3: Estimate P for each column
-  p <- t(x) %*% (t_pca$x[, 1:num_components])
+  comp <- paste0("ortho", seq_along(keep))
+  res <- list(
+    "correction" = as_tbl(x_posc, xy$names),
+    "scores" = as_tbl(t_o, comp),
+    "loadings" = as_tbl(p_o, comp),
+    "weights" = as_tbl(w_o, comp),
+    "center" = xy$center,
+    "scale" = xy$scale
+  )
 
-  # Step 4-6: Calculate PLS model and remove irrelevant variation
-  x_ortho <- x - tcrossprod(p, p) %*% x
-  x_pls <- x_ortho + tcrossprod(p, t)
-  x_posc <- x - x_pls
-
-  # Step 7: Set weight matrix W and orthogonal loadings P_ortho
-  w <- t(p)
-  P_ortho <- p
-
-  # If newdata is provided, predict using the POSC model
   if (!is.null(newdata)) {
-    # Center and scale new data if specified
-    if (center && scale) {
-      newdata <- scale(newdata, center = TRUE, scale = TRUE)
-    } else if (center) {
-      newdata <- scale(newdata, center = TRUE, scale = FALSE)
-    } else if (scale) {
-      newdata <- scale(newdata, center = FALSE, scale = TRUE)
+    newdata <- as_numeric_matrix(newdata, "newdata")
+    if (ncol(newdata) != ncol(x)) {
+      stop("'newdata' must have the same number of columns as 'x'.")
     }
-
-    # Step 8-10: Calculate orthogonal variation in new data
-    t_new <- newdata %*% w
-    t_ortho <- t_new %*% p_ortho
-    t_ortho_new <- t_ortho - tcrossprod(t_ortho, P_ortho) %*% p_ortho
-
-    # Step 11-14: Repeat for each orthogonal principal component
-    for (i in 1:num_components) {
-      t_last_ortho <- t_ortho_new[, i]
-      t_last_ortho <- t_last_ortho / sqrt(sum(t_last_ortho^2))
-      t_last_ortho_scores <- t_last_ortho
-
-      t_last_ortho_p_ortho <- t(newdata) %*% t_last_ortho
-      t_last_ortho_loadings <- cbind(t_last_ortho_P_ortho, t_last_ortho_scores)
-
-      t_last_ortho <- tcrossprod(t_last_ortho_p_ortho, t_last_ortho_scores)
-      newdata <- newdata - tcrossprod(t_last_ortho, t_last_ortho_p_ortho)
-    }
-
-    # Step 15: Return filtered new data
-    newdata_posc <- newdata
-
-    # Return the corrected data and scores for new data
-    res <- list(
-      "correction" = newdata_posc,
-      "scores" = t_pca$x[, 1:num_components]
-    )
-
-  } else {
-    # Return the POSC model components if no new data is provided
-    res <- list(
-      "model" = list(
-        "correction" = x_psoc,
-        "loadings" = p_ortho,
-        "weights" = w
-      )
+    xn <- apply_preprocess(newdata, list(center = xy$center, scale = xy$scale))
+    t_new <- xn %*% w_o
+    res$newdata <- list(
+      "correction" = as_tbl(xn - tcrossprod(t_new, p_o), xy$names),
+      "scores" = as_tbl(t_new, comp)
     )
   }
 

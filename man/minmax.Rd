@@ -14,18 +14,22 @@ minmax(x, a = 0, b = 1, drop.na = TRUE)
 \item{b}{The maximum value of the new range (default: 1).}
 
 \item{drop.na}{A logical value indicating whether to remove missing values
-(NA) from the calculations. If \code{TRUE} (the default), missing values will be
-removed. If \code{FALSE}, missing values will be included.}
+(NA). If \code{TRUE} (the default), missing values are removed from the output.
+If \code{FALSE}, they are kept (as \code{NA}) and ignored when computing the range.}
 }
 \value{
-A numeric vector of the same length as \code{x}, with values rescaled to
-the new range \verb{[a, b]}.
+A numeric vector with values rescaled to the new range \verb{[a, b]}.
 }
 \description{
 This function rescales a numeric vector using the min-max normalization technique,
 which linearly transforms the values to a new range specified by the \code{a} and
 \code{b} arguments. The minimum value in the original vector is mapped to \code{a}, and
 the maximum value is mapped to \code{b}.
+}
+\examples{
+minmax(c(2, 4, 6, 10))
+minmax(c(2, 4, NA, 10), a = -1, b = 1, drop.na = FALSE)
+
 }
 \author{
 Christian L. Goueguel

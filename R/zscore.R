@@ -30,7 +30,7 @@
 #'
 #' @param x A numeric vector.
 #' @param robust A logical value indicating whether to calculate classical or robust z-score. If `FALSE` (the default), uses the classical approach. If `TRUE`, computes the robust method, i.e. the so-called Stahel-Donoho outlyingness.
-#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values will be included in the calculations.
+#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values are kept in the output (with a missing score) and ignored when computing the location and scale.
 #' @param cutoff A numeric value indicating the threshold above which data points are identified and flagged as potential outliers. By default, `cutoff = 3`.
 #'
 #' @return A tibble with two columns:
@@ -58,6 +58,8 @@ zscore <- function(x, cutoff = 3, robust = FALSE, drop.na = FALSE) {
   if (!is.logical(robust)) {
     stop("The input 'robust' must be a logical value (TRUE or FALSE).")
   }
+  check_number(cutoff, "cutoff", lower = 0, lower_open = TRUE)
+  check_flag(drop.na, "drop.na")
 
   if (drop.na) {
     x <- x[!is.na(x)]
@@ -71,7 +73,7 @@ zscore <- function(x, cutoff = 3, robust = FALSE, drop.na = FALSE) {
   if (robust) {
     z <- dplyr::mutate(x, score = standardize(value, loc.fun = stats::median, scale.fun = stats::mad))
   } else {
-    z <- dplyr::mutate(x, score = standardize(value, loc.fun = mean, scale.fun = sd))
+    z <- dplyr::mutate(x, score = standardize(value, loc.fun = mean, scale.fun = stats::sd))
   }
 
   z <- z %>%
@@ -85,15 +87,8 @@ zscore <- function(x, cutoff = 3, robust = FALSE, drop.na = FALSE) {
 
 
 standardize <- function(x, loc.fun, scale.fun) {
-  c <- loc.fun(x)
-  s <- scale.fun(x)
+  c <- loc.fun(x, na.rm = TRUE)
+  s <- scale.fun(x, na.rm = TRUE)
   res <- (x - c) / s
   return(res)
 }
-
-
-
-
-
-
-

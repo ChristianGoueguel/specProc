@@ -17,7 +17,7 @@ tukeyGH(
 )
 }
 \arguments{
-\item{x}{A numeric vector or a single value, depending on the function being called.}
+\item{x}{A numeric vector: quantiles for \code{type = "d"} or \code{"p"}, probabilities for \code{type = "q"}. Ignored for \code{type = "r"}.}
 
 \item{type}{A character string specifying the function to be called (\code{d} for density, \code{p} for cumulative distribution, \code{q} for quantile, or \code{r} for random number generation).}
 

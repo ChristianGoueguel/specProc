@@ -21,7 +21,8 @@ sensitive to outliers than the traditional Pearson's correlation coefficient.
 }
 \details{
 The biweight midcorrelation is calculated using the biweight midvariances
-and biweight midcovariance, as described by Wilcox (1994).
+and biweight midcovariance, as described by Wilcox (1994). It is bounded
+between -1 and 1.
 }
 \examples{
 set.seed(11230)

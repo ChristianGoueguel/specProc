@@ -54,10 +54,6 @@ You can install the development version from
 install.packages("devtools")
 devtools::install_github("ChristianGoueguel/specProc")
 ```
-```{r include=FALSE}
-options(mc_doScale_quiet=TRUE)
-```
-
 ## Examples
 ```{r message=FALSE, warning=FALSE}
 set.seed(02301)
@@ -112,27 +108,36 @@ specProc::generalized_boxplot(tbl, xlabels.angle = 0) +
 ### correlation
 
 ```{r}
-data("glass", package = "chemometrics")
-glass <- tibble::as_tibble(glass)
+set.seed(1)
+df <- data.frame(Ca = stats::rnorm(50))
+df$Mg <- 0.8 * df$Ca + stats::rnorm(50, sd = 0.5)
+df$Fe <- -0.5 * df$Ca + stats::rnorm(50, sd = 0.8)
+df$Na <- stats::rnorm(50)
+res <- specProc::correlation(df, Ca, method = "spearman", plot = TRUE)
+res$correlation
+res$plot
 ```
+
+### baseline correction
 
 ```{r}
-glass |> specProc::correlation(Na2O, method = "spearman", .plot = TRUE)
+wl <- seq(390, 400, length.out = 1000)
+spectrum <- 50 + 0.8 * (wl - 390)^2 +
+  120 * exp(-(wl - 393.4)^2 / 0.005) + 90 * exp(-(wl - 396.8)^2 / 0.005) +
+  stats::rnorm(1000, sd = 0.5)
+fit <- specProc::baseline_arpls(matrix(spectrum, nrow = 1), lambda = 1e5)
+
+plot(wl, spectrum, type = "l", xlab = "Wavelength [nm]", ylab = "Intensity")
+lines(wl, unlist(fit$background), col = "red", lwd = 2)
 ```
 
+### peak fitting
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```{r}
+window <- wl >= 393 & wl <= 394
+lines_df <- as.data.frame(t(unlist(fit$correction)[window]))
+names(lines_df) <- wl[window]
+ca_line <- specProc::peakfit(lines_df, profile = "voigt")
+ca_line$tidied[[1]]
+specProc::plotfit(ca_line, title = "Ca II 393.4 nm")
+```

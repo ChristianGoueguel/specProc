@@ -47,23 +47,24 @@ the outlier detection. The results are visualized using \code{ggplot2}, with opt
 outliers and/or color-code points based on their Mahalanobis distances.
 }
 \examples{
-# Load the glass dataset from the chemometrics package
-data(glass, package = "chemometrics")
+set.seed(1)
+x <- matrix(rnorm(100 * 4), ncol = 4, dimnames = list(NULL, paste0("V", 1:4)))
+x[1:5, ] <- x[1:5, ] + 4 # five multivariate outliers
 
 # Basic usage with default parameters
-outlierplot(glass)
+outlierplot(x)
 
 # Adjust the proportion of observations used for MCD estimation
-outlierplot(glass, quan = 0.75)
+outlierplot(x, quan = 0.75)
 
 # Show Mahalanobis distances instead of outlier highlighting
-outlierplot(glass, show.outlier = FALSE, show.mahal = TRUE)
+outlierplot(x, show.outlier = FALSE, show.mahal = TRUE)
 
 # Combine outlier highlighting and Mahalanobis distance color-coding
-outlierplot(glass, show.outlier = TRUE, show.mahal = TRUE)
+outlierplot(x, show.outlier = TRUE, show.mahal = TRUE)
 
 # Return data frame instead of plot
-result_df <- outlierplot(glass, show.outlier = FALSE, show.mahal = FALSE)
+result_df <- outlierplot(x, show.outlier = FALSE, show.mahal = FALSE)
 head(result_df)
 
 }

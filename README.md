@@ -1,5 +1,6 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
 <!-- badges: start -->
 
 # specProc <img src="man/figures/logo.png" align="right" height="160"/>
@@ -61,7 +62,7 @@ tbl <- data.frame(
   )
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="90%" height="90%" />
 
 ### descriptive statistics
 
@@ -70,11 +71,11 @@ tbl <- data.frame(
 ``` r
 specProc::summaryStats(tbl)
 #> # A tibble: 3 × 14
-#>   variable     mean  mode median   IQR    sd variance     cv     min   max range
-#>   <chr>       <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>  <dbl>   <dbl> <dbl> <dbl>
-#> 1 heavy_tail…  0.44 -1.74  -0.22  2.36  6.54   42.7   1486.  -19.4   41.5  60.9 
-#> 2 normal       0    -0.4   -0.14  1.04  0.91    0.823 -Inf    -1.80   2.54  4.34
-#> 3 skewed       1.83  6.82   1.37  1.32  1.32    1.73    72.1   0.160  6.82  6.66
+#>   variable    mean  mode median   IQR    sd variance      cv     min   max range
+#>   <chr>      <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>   <dbl>   <dbl> <dbl> <dbl>
+#> 1 normal      0    -0.4   -0.14  1.04  0.91     0.82 -2.66e4  -1.80   2.54  4.34
+#> 2 skewed      1.83  6.82   1.37  1.32  1.32     1.73  7.20e1   0.160  6.82  6.66
+#> 3 heavy_tai…  0.44 -1.74  -0.22  2.36  6.54    42.7   1.50e3 -19.4   41.5  60.9 
 #> # ℹ 3 more variables: skewness <dbl>, kurtosis <dbl>, count <int>
 ```
 
@@ -82,13 +83,13 @@ specProc::summaryStats(tbl)
 
 ``` r
 specProc::summaryStats(tbl, robust = TRUE)
-#> # A tibble: 3 × 14
-#>   variable    median   mad    Qn    Sn medcouple   LMC   RMC   rsd biloc biscale
-#>   <chr>        <dbl> <dbl> <dbl> <dbl>     <dbl> <dbl> <dbl> <dbl> <dbl>   <dbl>
-#> 1 heavy_tail…  -0.22  1.74  2.2   2.03      0.1   0.35  0.63  2.58 -0.22    2.4 
-#> 2 normal       -0.14  0.82  0.92  0.93      0.19  0.29  0.55  1.22 -0.05    0.92
-#> 3 skewed        1.37  0.95  0.91  0.85      0.46  0.2   0.43  1.41  1.58    1.18
-#> # ℹ 3 more variables: bivar <dbl>, rcv <dbl>, count <int>
+#> # A tibble: 3 × 13
+#>   variable    median   mad    Qn    Sn medcouple   LMC   RMC biloc biscale bivar
+#>   <chr>        <dbl> <dbl> <dbl> <dbl>     <dbl> <dbl> <dbl> <dbl>   <dbl> <dbl>
+#> 1 normal       -0.14  0.82  0.92  0.93      0.19  0.29  0.55 -0.07    0.91  0.82
+#> 2 skewed        1.37  0.95  0.91  0.85      0.46  0.2   0.43  1.47    1.04  1.07
+#> 3 heavy_tail…  -0.22  1.74  2.2   2.03      0.1   0.35  0.63 -0.2     2.08  4.31
+#> # ℹ 2 more variables: rcv <dbl>, count <int>
 ```
 
 ### adjusted boxplot
@@ -99,7 +100,7 @@ specProc::adjusted_boxplot(tbl, xlabels.angle = 0) +
   ggplot2::coord_flip()
 ```
 
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="90%" height="90%" />
 
 ### generalized boxplot
 
@@ -109,35 +110,61 @@ specProc::generalized_boxplot(tbl, xlabels.angle = 0) +
   ggplot2::coord_flip()
 ```
 
-<img src="man/figures/README-unnamed-chunk-8-1.png" width="90%" height="90%" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="90%" height="90%" />
 
 ### correlation
 
 ``` r
-data("glass", package = "chemometrics")
-glass <- tibble::as_tibble(glass)
+set.seed(1)
+df <- data.frame(Ca = stats::rnorm(50))
+df$Mg <- 0.8 * df$Ca + stats::rnorm(50, sd = 0.5)
+df$Fe <- -0.5 * df$Ca + stats::rnorm(50, sd = 0.8)
+df$Na <- stats::rnorm(50)
+res <- specProc::correlation(df, Ca, method = "spearman", plot = TRUE)
+res$correlation
+#> # A tibble: 3 × 3
+#>   variable .correlation method  
+#>   <chr>           <dbl> <chr>   
+#> 1 Mg              0.745 spearman
+#> 2 Na             -0.291 spearman
+#> 3 Fe             -0.485 spearman
+res$plot
 ```
 
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="90%" height="90%" />
+
+### baseline correction
+
 ``` r
-glass |> specProc::correlation(Na2O, method = "spearman", .plot = TRUE)
-#> $correlation
-#> # A tibble: 12 × 3
-#>    variable .correlation method  
-#>    <chr>           <dbl> <chr>   
-#>  1 Cl              0.601 spearman
-#>  2 SO3             0.406 spearman
-#>  3 SiO2            0.244 spearman
-#>  4 P2O5           -0.115 spearman
-#>  5 BaO            -0.144 spearman
-#>  6 MgO            -0.234 spearman
-#>  7 MnO            -0.241 spearman
-#>  8 Al2O3          -0.267 spearman
-#>  9 Fe2O3          -0.281 spearman
-#> 10 CaO            -0.316 spearman
-#> 11 PbO            -0.356 spearman
-#> 12 K2O            -0.571 spearman
-#> 
-#> $plot
+wl <- seq(390, 400, length.out = 1000)
+spectrum <- 50 + 0.8 * (wl - 390)^2 +
+  120 * exp(-(wl - 393.4)^2 / 0.005) + 90 * exp(-(wl - 396.8)^2 / 0.005) +
+  stats::rnorm(1000, sd = 0.5)
+fit <- specProc::baseline_arpls(matrix(spectrum, nrow = 1), lambda = 1e5)
+
+plot(wl, spectrum, type = "l", xlab = "Wavelength [nm]", ylab = "Intensity")
+lines(wl, unlist(fit$background), col = "red", lwd = 2)
+```
+
+<img src="man/figures/README-unnamed-chunk-9-1.png" width="90%" height="90%" />
+
+### peak fitting
+
+``` r
+window <- wl >= 393 & wl <= 394
+lines_df <- as.data.frame(t(unlist(fit$correction)[window]))
+names(lines_df) <- wl[window]
+ca_line <- specProc::peakfit(lines_df, profile = "voigt")
+ca_line$tidied[[1]]
+#> # A tibble: 5 × 5
+#>   term    estimate std.error    statistic   p.value
+#>   <chr>      <dbl>     <dbl>        <dbl>     <dbl>
+#> 1 y0     -0.0417   0.0859         -0.485  6.29e-  1
+#> 2 xc    393.       0.0000964 4081245.     0        
+#> 3 wG      0.118    0.000903      130.     6.56e-109
+#> 4 wL      0.000100 0.00140         0.0714 9.43e-  1
+#> 5 A      15.1      0.0885        170.     6.94e-120
+specProc::plotfit(ca_line, title = "Ca II 393.4 nm")
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="90%" height="90%" />

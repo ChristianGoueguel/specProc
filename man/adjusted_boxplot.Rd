@@ -38,7 +38,7 @@ adjusted_boxplot(
 \value{
 \itemize{
 \item If \code{plot = TRUE}, returns a \code{ggplot2} object containing the adjusted boxplot.
-\item If \code{plot = FALSE}, returns a list of tibbles with the adjusted boxplot statistics and potantial outliers.
+\item If \code{plot = FALSE}, returns a list of tibbles with the adjusted boxplot statistics and potential outliers.
 }
 }
 \description{

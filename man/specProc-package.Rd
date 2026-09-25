@@ -4,19 +4,23 @@
 \name{specProc-package}
 \alias{specProc}
 \alias{specProc-package}
-\title{specProc: Preprocessing Tools For Laser-Induced Breakdown Spectroscopy (LIBS) Spectra}
+\title{specProc: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy (LIBS) Spectra}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-A collection of functions for preprocessing spectra in optical emission spectroscopy of laser-induced plasmas, called laser-induced breakdown spectroscopy.
+A collection of functions for preprocessing spectra in optical emission spectroscopy of laser-induced plasmas, called laser-induced breakdown spectroscopy. It covers baseline correction, normalization and scaling, orthogonal signal correction and calibration transfer, peak fitting, and robust statistics for outlier detection. Computationally intensive steps are implemented in C++ for large spectral datasets.
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://github.com/ChristianGoueguel/specProc}
-  \item \url{https://christiangoueguel.github.io/specProc/}
+  \item \url{https://christiangoueguel.com/specProc/}
   \item Report bugs at \url{https://github.com/ChristianGoueguel/specProc/issues}
 }
+
+}
+\author{
+\strong{Maintainer}: Christian L. Goueguel \email{christian.goueguel@gmail.com}
 
 }
 \keyword{internal}
