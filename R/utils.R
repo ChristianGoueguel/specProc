@@ -8,8 +8,9 @@ as_numeric_matrix <- function(x, arg = "x") {
       stop("'", arg, "' must contain only numeric columns.", call. = FALSE)
     }
     x <- as.matrix(x)
-  } else if (is.vector(x) && is.numeric(x)) {
-    x <- matrix(x, ncol = 1)
+  } else if (is.numeric(x) && (is.vector(x) || (is.array(x) && length(dim(x)) == 1))) {
+    # plain vectors and 1-d arrays (e.g. the result of tapply())
+    x <- matrix(as.vector(x), ncol = 1)
   }
   if (!is.matrix(x) || !is.numeric(x)) {
     stop("'", arg, "' must be a numeric matrix or data frame.", call. = FALSE)

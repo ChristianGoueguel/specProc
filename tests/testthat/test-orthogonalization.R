@@ -14,6 +14,9 @@ test_that("direct_orthogonal removes the orthogonal subspace", {
   expect_equal(abs(P), abs(svd(z)$v[, 1:2]), tolerance = 1e-8, ignore_attr = TRUE)
   expect_equal(unname(drop(crossprod(z %*% P, yc))), c(0, 0), tolerance = 1e-8)
   expect_error(direct_orthogonal(d$x), "must be provided")
+  # a 1-d array response (e.g. from tapply()) is accepted like a vector
+  y_arr <- array(d$y, dim = length(d$y))
+  expect_equal(direct_orthogonal(d$x, y_arr, ncomp = 2), res)
   expect_error(direct_orthogonal(d$x, d$y[-1]), "same number of rows")
 })
 

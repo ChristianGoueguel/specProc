@@ -237,6 +237,7 @@ fit_one <- function(data, peaks, profiles, wL, wG, A, max.iter, single) {
       augmented[[paste0(".peak_", i)]] <- eval(str2lang(spec$terms[i]), env)
     }
   }
+  attr(fit, "peak_terms") <- spec$terms
   list(fit = fit, tidied = tidied, augmented = augmented)
 }
 
@@ -264,5 +265,20 @@ fit_spectra <- function(spectra, peaks, profiles, wL, wG, A, max.iter, single) {
     tidied = lapply(results, `[[`, "tidied"),
     augmented = lapply(results, `[[`, "augmented")
   )
+  out
+}
+
+# Evaluates a fitted line model, and each line of a multi-peak model, on a
+# grid of wavelengths (used to draw smooth curves in plot_fit()).
+fit_curve <- function(fit, x) {
+  par <- as.list(stats::coef(fit))
+  env <- list2env(c(par, list(x = x)), parent = environment(profile_gaussian))
+  terms <- attr(fit, "peak_terms")
+  out <- tibble::tibble(x = x, .fitted = as.numeric(stats::predict(fit, newdata = data.frame(x = x))))
+  if (length(terms) > 1) {
+    for (i in seq_along(terms)) {
+      out[[paste0(".peak_", i)]] <- par$y0 + eval(str2lang(terms[i]), env)
+    }
+  }
   out
 }

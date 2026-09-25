@@ -75,6 +75,16 @@ implementations.
 
 ## New features
 
+* Three vignettes based on `specLIBS`: "Preprocessing LIBS spectra"
+  (baseline, normalization judged by replicate RSD and intraclass
+  correlation, robust screening of shots), "Fitting emission lines"
+  (profile choice, sources of uncertainty, identifiability) and
+  "Predicting soil clay content from LIBS spectra" (nested, repeated
+  cross-validation by sample, and the optimism of common shortcuts).
+* `plot_fit()` draws the fitted profiles on a fine wavelength grid.
+* Functions taking a response now accept 1-d arrays, such as the output of
+  `tapply()`.
+
 * New `voigt_profile()`: the exact Voigt profile, computed in C++ from the
   Faddeeva function with Weideman's (1994) rational approximation (relative
   error below 1e-10). `peak_fit()` and `multipeak_fit()` now use it for
