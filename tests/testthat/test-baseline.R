@@ -1,7 +1,7 @@
 spec <- make_spectra(n = 4, p = 150)
 
-test_that("whittaker (ALS) matches a dense reference implementation", {
-  res <- whittaker(spec$x, lambda = 1e4, p = 0.01, max.iter = 20)
+test_that("baseline_als (ALS) matches a dense reference implementation", {
+  res <- baseline_als(spec$x, lambda = 1e4, p = 0.01, max.iter = 20)
   expect_named(res, c("correction", "background"))
   expect_s3_class(res$correction, "tbl_df")
   expect_equal(dim(res$background), dim(spec$x))
@@ -24,7 +24,7 @@ test_that("baseline_arpls matches a dense reference implementation", {
 
 test_that("penalized baselines recover a smooth continuum under emission lines", {
   # noise sd = 0.5; ALS sits slightly below the noise, arPLS in its middle
-  res <- whittaker(spec$x, lambda = 1e3, p = 0.01, max.iter = 30)
+  res <- baseline_als(spec$x, lambda = 1e3, p = 0.01, max.iter = 30)
   err <- abs(as.matrix(res$background) - spec$background)
   expect_lt(stats::median(err), 1)
   res2 <- baseline_arpls(spec$x, lambda = 1e3, max.iter = 30)
@@ -33,29 +33,29 @@ test_that("penalized baselines recover a smooth continuum under emission lines",
 })
 
 test_that("negative corrected values are not clipped", {
-  res <- whittaker(spec$x, lambda = 1e4, p = 0.01)
+  res <- baseline_als(spec$x, lambda = 1e4, p = 0.01)
   expect_true(any(as.matrix(res$correction) < 0))
 })
 
 test_that("baseline functions accept data frames and vectors-as-rows", {
   df <- as.data.frame(spec$x)
-  expect_equal(whittaker(df)$background, whittaker(spec$x)$background)
+  expect_equal(baseline_als(df)$background, baseline_als(spec$x)$background)
   expect_equal(baseline_lsp(df)$background, baseline_lsp(spec$x)$background)
-  one <- whittaker(spec$x[1, , drop = FALSE])
+  one <- baseline_als(spec$x[1, , drop = FALSE])
   expect_equal(nrow(one$correction), 1)
 })
 
 test_that("baseline functions validate their inputs", {
-  expect_error(whittaker(), "Missing 'x' argument.")
-  expect_error(whittaker(spec$x, p = 1.5), "'p' must be between 0 and 1")
-  expect_error(whittaker(spec$x, lambda = "a"), "'lambda' must be a single numeric value.")
-  expect_error(whittaker(spec$x, lambda = -1), "'lambda' must be positive.")
+  expect_error(baseline_als(), "Missing 'x' argument.")
+  expect_error(baseline_als(spec$x, p = 1.5), "'p' must be between 0 and 1")
+  expect_error(baseline_als(spec$x, lambda = "a"), "'lambda' must be a single numeric value.")
+  expect_error(baseline_als(spec$x, lambda = -1), "'lambda' must be positive.")
   expect_error(baseline_arpls(), "Missing 'x' argument.")
   expect_error(baseline_arpls(spec$x, ratio = c(1, 2)), "'ratio' must be a single numeric value.")
   bad <- spec$x
   bad[1, 1] <- NA
-  expect_error(whittaker(bad), "missing values")
-  expect_error(whittaker(data.frame(a = letters[1:3])), "numeric")
+  expect_error(baseline_als(bad), "missing values")
+  expect_error(baseline_als(data.frame(a = letters[1:3])), "numeric")
 })
 
 test_that("banded solver scales to many channels", {

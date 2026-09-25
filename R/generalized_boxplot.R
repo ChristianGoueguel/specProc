@@ -203,7 +203,7 @@ genboxStats <- function(x, alpha, p) {
   if (!is.finite(h) || h < 0) h <- 0
 
   # 3. Fences as g-and-h quantiles, transformed back to the original scale.
-  xi <- tukeyGH(c(alpha / 2, 1 - alpha / 2), type = "q", location = 0, scale = 1, g = g, h = h)
+  xi <- tukey_gh(c(alpha / 2, 1 - alpha / 2), type = "q", location = 0, scale = 1, g = g, h = h)
   back <- function(q) {
     r_q <- stats::pnorm(w_med + w_scale * q) * s
     (r_q + min(x_star) - 0.1) * iqr + med

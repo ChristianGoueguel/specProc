@@ -13,30 +13,30 @@ test_that("zscore matches base scale() and flags outliers", {
   expect_error(zscore(x, cutoff = -1), "cutoff")
 })
 
-test_that("iqrMethod flags values outside the fences", {
-  res <- iqrMethod(x)
+test_that("iqr_outliers flags values outside the fences", {
+  res <- iqr_outliers(x)
   expect_true(all(res$flag[res$data %in% c(15, -12)]))
   q <- stats::quantile(x, c(0.25, 0.75))
   fence <- q[2] + 1.5 * diff(q)
   expect_equal(sum(res$flag & res$data > 0), sum(x > fence))
-  expect_warning(iqrMethod(x, k = 3, skew = TRUE), "only defined for k = 1.5")
+  expect_warning(iqr_outliers(x, k = 3, skew = TRUE), "only defined for k = 1.5")
   set.seed(1)
   skewed <- stats::rexp(200)
-  expect_lte(sum(iqrMethod(skewed, skew = TRUE)$flag), sum(iqrMethod(skewed)$flag))
-  expect_equal(nrow(iqrMethod(c(x, NA))), length(x) + 1)
-  expect_error(iqrMethod(x, k = 0), "positive")
+  expect_lte(sum(iqr_outliers(skewed, skew = TRUE)$flag), sum(iqr_outliers(skewed)$flag))
+  expect_equal(nrow(iqr_outliers(c(x, NA))), length(x) + 1)
+  expect_error(iqr_outliers(x, k = 0), "positive")
 })
 
-test_that("directOutlyingness flags gross outliers", {
+test_that("directional_outlyingness flags gross outliers", {
   y <- c(1, 5, 3, 9, 2, 6, 4, 8, 7, 1e3)
-  res <- directOutlyingness(y)
+  res <- directional_outlyingness(y)
   expect_named(res, c("data", "score", "flag"))
   expect_true(res$flag[res$data == 1e3])
   expect_equal(sum(res$flag), 1)
-  expect_no_error(res2 <- directOutlyingness(y, maxRatio = 3))
+  expect_no_error(res2 <- directional_outlyingness(y, maxRatio = 3))
   expect_true(res2$flag[res2$data == 1e3])
-  expect_error(directOutlyingness(y, maxRatio = 1), "at least 2")
-  expect_error(directOutlyingness("a"), "numeric")
+  expect_error(directional_outlyingness(y, maxRatio = 1), "at least 2")
+  expect_error(directional_outlyingness("a"), "numeric")
 })
 
 test_that("generalized_boxplot estimates g and h and sensible fences", {
@@ -63,20 +63,20 @@ test_that("generalized_boxplot handles unequal numbers of outliers per tail", {
   expect_error(generalized_boxplot(df, p = 0.2), "'p'")
 })
 
-test_that("outlierplot returns plots and data without touching the RNG", {
+test_that("plot_outliers returns plots and data without touching the RNG", {
   set.seed(5)
   m <- matrix(stats::rnorm(200), 50, 4, dimnames = list(NULL, paste0("v", 1:4)))
   m[1, ] <- 10
   set.seed(99)
   before <- .Random.seed
-  p <- outlierplot(m)
+  p <- plot_outliers(m)
   expect_identical(.Random.seed, before)
   expect_s3_class(p, "ggplot")
-  expect_s3_class(outlierplot(m, show.outlier = FALSE, show.mahal = TRUE), "ggplot")
-  expect_s3_class(outlierplot(m, show.mahal = TRUE), "ggplot")
-  res <- outlierplot(m, show.outlier = FALSE)
+  expect_s3_class(plot_outliers(m, show.outlier = FALSE, show.mahal = TRUE), "ggplot")
+  expect_s3_class(plot_outliers(m, show.mahal = TRUE), "ggplot")
+  res <- plot_outliers(m, show.outlier = FALSE)
   expect_named(res, c(paste0("v", 1:4), "outlier", "mahalanobis"))
   expect_true(res$outlier[1])
-  expect_error(outlierplot(m[, 1, drop = FALSE]), "two-dimensional")
-  expect_error(outlierplot(m, quan = 0.2), "quan")
+  expect_error(plot_outliers(m[, 1, drop = FALSE]), "two-dimensional")
+  expect_error(plot_outliers(m, quan = 0.2), "quan")
 })

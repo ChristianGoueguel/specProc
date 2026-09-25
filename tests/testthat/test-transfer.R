@@ -35,21 +35,21 @@ test_that("glsw validates its inputs", {
   expect_error(glsw(m, m, alpha = 0), "positive")
 })
 
-test_that("yGradientglsw matches a reference implementation", {
+test_that("y_gradient_glsw matches a reference implementation", {
   set.seed(3)
   x <- matrix(stats::rnorm(30 * 6), 30, 6)
   y <- x[, 1] + stats::rnorm(30, sd = 0.1)
-  G <- yGradientglsw(x, y, alpha = 0.02)
+  G <- y_gradient_glsw(x, y, alpha = 0.02)
   expect_equal(dim(G), c(6L, 6L))
   o <- order(y)
   xd <- t(prospectr::savitzkyGolay(t(x[o, ]), m = 1, p = 2, w = 5))
   yd <- drop(prospectr::savitzkyGolay(matrix(y[o], 1), m = 1, p = 2, w = 5))
   w <- 2^(-abs(yd) / stats::sd(yd))
   expect_equal(as.matrix(G), glsw_reference(w * xd, 0.02), tolerance = 1e-8, ignore_attr = TRUE)
-  expect_no_error(yGradientglsw(as.data.frame(x), data.frame(y = y)))
-  expect_error(yGradientglsw(x, y[-1]), "same length")
-  expect_error(yGradientglsw(x, y, window = 4), "odd")
-  expect_error(yGradientglsw(x, y, alpha = -1), "positive")
+  expect_no_error(y_gradient_glsw(as.data.frame(x), data.frame(y = y)))
+  expect_error(y_gradient_glsw(x, y[-1]), "same length")
+  expect_error(y_gradient_glsw(x, y, window = 4), "odd")
+  expect_error(y_gradient_glsw(x, y, alpha = -1), "positive")
 })
 
 test_that("pds recovers a linear instrument response", {

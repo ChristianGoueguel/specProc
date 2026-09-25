@@ -8,8 +8,8 @@ reference:
     or features independently.
   contents:
   - zscore
-  - iqrMethod
-  - directOutlyingness
+  - iqr_outliers
+  - directional_outlyingness
 
 - title: Multivariate filtering
 
@@ -25,7 +25,7 @@ reference:
   - o2pls
   - direct_osc
   - projected_osc
-  - yGradientglsw
+  - y_gradient_glsw
   - direct_orthogonal
 
 - subtitle: calibration transfer
@@ -42,16 +42,16 @@ reference:
     The choice of the fitting function depends on the specific broadening
     mechanisms and physical conditions of the emitting environment.
   contents:
-  - peakfit
-  - multipeakfit
+  - peak_fit
+  - multipeak_fit
 
 - title: Data visualization
   desc: >
     Functions that help assess data visually.
   contents:
-  - plotfit
-  - plotSpec
-  - outlierplot
+  - plot_fit
+  - plot_spectra
+  - plot_outliers
   - adjusted_boxplot
   - generalized_boxplot
 
@@ -65,7 +65,7 @@ reference:
   desc: >
     Functions used to fit and remove the background emission.
   contents:
-  - whittaker
+  - baseline_als
   - baseline_lsp
   - baseline_arpls
 
@@ -84,7 +84,7 @@ reference:
     based on the dispersion of the variable.
   contents:
   - snv
-  - pareto
+  - pareto_scale
   - minmax
   - center
   - poisson_scale
@@ -93,7 +93,7 @@ reference:
   desc: >
     Function used to transform variable(s) toward central normality.
   contents:
-  - robustBCYJ
+  - robust_bcyj
 
 - title: Robust statistical estimators
 
@@ -119,18 +119,18 @@ reference:
     Function used to compute highly robust estimators for scale (or dispersion).
   contents:
   - umad
-  - rousseeuwCroux
+  - rousseeuw_croux
 
 - title: Special functions
   desc: >
     Functions used for charcaterizing plasma emission in laser spectroscopy.
   contents:
-  - tukeyGH
-  - gaussian
-  - lorentzian
-  - pseudo_voigt
+  - tukey_gh
+  - gaussian_profile
+  - lorentzian_profile
+  - pseudo_voigt_profile
 
 - title: Miscellaneous
   contents:
   - correlation
-  - summaryStats
+  - summary_stats

@@ -80,12 +80,12 @@ ggplot2::ggplot(tbl) +
 
 #### classical approach
 ```{r}
-specProc::summaryStats(tbl)
+specProc::summary_stats(tbl)
 ```
 
 #### robust approach
 ```{r}
-specProc::summaryStats(tbl, robust = TRUE)
+specProc::summary_stats(tbl, robust = TRUE)
 ```
 
 ### adjusted boxplot
@@ -137,7 +137,7 @@ lines(wl, unlist(fit$background), col = "red", lwd = 2)
 window <- wl >= 393 & wl <= 394
 lines_df <- as.data.frame(t(unlist(fit$correction)[window]))
 names(lines_df) <- wl[window]
-ca_line <- specProc::peakfit(lines_df, profile = "voigt")
+ca_line <- specProc::peak_fit(lines_df, profile = "voigt")
 ca_line$tidied[[1]]
-specProc::plotfit(ca_line, title = "Ca II 393.4 nm")
+specProc::plot_fit(ca_line, title = "Ca II 393.4 nm")
 ```
