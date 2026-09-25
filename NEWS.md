@@ -7,6 +7,21 @@ implementations.
 
 ## Breaking changes
 
+* Functions were renamed to a consistent snake_case scheme. The old names still
+  work but give a deprecation warning (see `?"specProc-deprecated"`):
+  `whittaker()` -> `baseline_als()`, `lorentzian()` -> `lorentzian_profile()`,
+  `pseudo_voigt()` -> `pseudo_voigt_profile()`, `peakfit()` -> `peak_fit()`,
+  `multipeakfit()` -> `multipeak_fit()`, `plotfit()` -> `plot_fit()`,
+  `plotSpec()` -> `plot_spectra()`, `outlierplot()` -> `plot_outliers()`,
+  `directOutlyingness()` -> `directional_outlyingness()`,
+  `iqrMethod()` -> `iqr_outliers()`, `robustBCYJ()` -> `robust_bcyj()`,
+  `rousseeuwCroux()` -> `rousseeuw_croux()`, `summaryStats()` -> `summary_stats()`,
+  `tukeyGH()` -> `tukey_gh()`, `yGradientglsw()` -> `y_gradient_glsw()`,
+  `pareto()` -> `pareto_scale()`.
+* `gaussian()` is renamed to `gaussian_profile()` **without** an alias, because
+  exporting `gaussian()` masked `stats::gaussian()`, which breaks
+  `glm(family = gaussian)` when specProc is loaded.
+
 * `baseline_arpls()`, `baseline_lsp()` and `whittaker()` return tibbles (they
   previously returned plain lists of columns). They no longer replace negative
   corrected values with 1.

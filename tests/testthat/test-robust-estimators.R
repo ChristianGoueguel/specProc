@@ -42,11 +42,11 @@ test_that("biweight midcovariance and midcorrelation behave as expected", {
 })
 
 test_that("Rousseeuw-Croux estimators are consistent at the normal", {
-  expect_equal(rousseeuwCroux(z, "Sn"), 1, tolerance = 0.02)
-  expect_equal(rousseeuwCroux(z, "Qn"), 1, tolerance = 0.02)
-  expect_equal(rousseeuwCroux(c(1, 2, NA, 5)), NA_real_)
-  expect_type(rousseeuwCroux(c(1, 2, NA, 5, 9), drop.na = TRUE), "double")
-  expect_error(rousseeuwCroux(c(3, 3, 3)), "constant")
+  expect_equal(rousseeuw_croux(z, "Sn"), 1, tolerance = 0.02)
+  expect_equal(rousseeuw_croux(z, "Qn"), 1, tolerance = 0.02)
+  expect_equal(rousseeuw_croux(c(1, 2, NA, 5)), NA_real_)
+  expect_type(rousseeuw_croux(c(1, 2, NA, 5, 9), drop.na = TRUE), "double")
+  expect_error(rousseeuw_croux(c(3, 3, 3)), "constant")
 })
 
 test_that("umad is unbiased at the normal", {

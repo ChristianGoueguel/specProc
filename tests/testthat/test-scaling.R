@@ -35,13 +35,13 @@ test_that("snv standardizes each spectrum", {
 })
 
 test_that("pareto divides by the square root of the standard deviation", {
-  res <- pareto(m)
+  res <- pareto_scale(m)
   expect_equal(apply(res, 2, stats::sd), sqrt(apply(m, 2, stats::sd)))
-  expect_s3_class(pareto(as.data.frame(m)), "tbl_df")
-  expect_warning(pareto(cbind(m, 1)), "zero standard deviation")
+  expect_s3_class(pareto_scale(as.data.frame(m)), "tbl_df")
+  expect_warning(pareto_scale(cbind(m, 1)), "zero standard deviation")
   m_na <- m
   m_na[1, 1] <- NA
-  expect_false(anyNA(pareto(m_na, drop.na = TRUE)[-1, ]))
+  expect_false(anyNA(pareto_scale(m_na, drop.na = TRUE)[-1, ]))
 })
 
 test_that("minmax rescales to [a, b]", {
@@ -92,33 +92,33 @@ test_that("poisson_scale scales by the square root of the means", {
   expect_error(poisson_scale(x, options = list(mode = 3)), "mode")
 })
 
-test_that("plotSpec draws one line per spectrum", {
+test_that("plot_spectra draws one line per spectrum", {
   spec <- make_spectra(n = 3, p = 50)
   df <- as.data.frame(spec$x, check.names = FALSE)
-  p <- plotSpec(df)
+  p <- plot_spectra(df)
   expect_s3_class(p, "ggplot")
   built <- ggplot2::ggplot_build(p)
   expect_equal(length(unique(built$data[[1]]$group)), 3)
   df$conc <- 1:3
   df$id <- c("a", "b", "c")
-  expect_s3_class(plotSpec(df, id = id, colvar = conc), "ggplot")
-  expect_s3_class(plotSpec(df, id = "id", colvar = "conc"), "ggplot")
-  expect_error(plotSpec(df), "wavelengths")
-  expect_error(plotSpec(df, id = zz), "does not exist")
+  expect_s3_class(plot_spectra(df, id = id, colvar = conc), "ggplot")
+  expect_s3_class(plot_spectra(df, id = "id", colvar = "conc"), "ggplot")
+  expect_error(plot_spectra(df), "wavelengths")
+  expect_error(plot_spectra(df, id = zz), "does not exist")
 })
 
-test_that("tukeyGH distribution functions are consistent", {
+test_that("tukey_gh distribution functions are consistent", {
   u <- c(0.05, 0.3, 0.5, 0.9)
-  q <- tukeyGH(u, type = "q", g = 0.3, h = 0.1)
-  expect_equal(tukeyGH(q, type = "p", g = 0.3, h = 0.1), u, tolerance = 1e-8)
-  expect_equal(tukeyGH(q, type = "p", g = 0.3, h = 0), stats::pnorm(log(1 + 0.3 * q) / 0.3))
+  q <- tukey_gh(u, type = "q", g = 0.3, h = 0.1)
+  expect_equal(tukey_gh(q, type = "p", g = 0.3, h = 0.1), u, tolerance = 1e-8)
+  expect_equal(tukey_gh(q, type = "p", g = 0.3, h = 0), stats::pnorm(log(1 + 0.3 * q) / 0.3))
   x <- seq(-3, 3, length.out = 7)
-  expect_equal(tukeyGH(x, type = "d"), stats::dnorm(x))
-  expect_equal(tukeyGH(x, type = "p", location = 1, scale = 2), stats::pnorm(x, 1, 2))
-  dens <- stats::integrate(function(x) tukeyGH(x, type = "d", g = 0.3, h = 0.1), -Inf, Inf)$value
+  expect_equal(tukey_gh(x, type = "d"), stats::dnorm(x))
+  expect_equal(tukey_gh(x, type = "p", location = 1, scale = 2), stats::pnorm(x, 1, 2))
+  dens <- stats::integrate(function(x) tukey_gh(x, type = "d", g = 0.3, h = 0.1), -Inf, Inf)$value
   expect_equal(dens, 1, tolerance = 1e-4)
-  expect_length(tukeyGH(type = "r", n = 10, g = 0.2, h = 0.1), 10)
-  expect_error(tukeyGH(1, type = "r"), "'n' is required")
-  expect_error(tukeyGH(1, type = "z"), "Invalid 'type'")
-  expect_error(tukeyGH(1, h = -1), "Negative kurtosis")
+  expect_length(tukey_gh(type = "r", n = 10, g = 0.2, h = 0.1), 10)
+  expect_error(tukey_gh(1, type = "r"), "'n' is required")
+  expect_error(tukey_gh(1, type = "z"), "Invalid 'type'")
+  expect_error(tukey_gh(1, h = -1), "Negative kurtosis")
 })

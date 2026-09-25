@@ -69,7 +69,7 @@ tbl <- data.frame(
 #### classical approach
 
 ``` r
-specProc::summaryStats(tbl)
+specProc::summary_stats(tbl)
 #> # A tibble: 3 × 14
 #>   variable    mean  mode median   IQR    sd variance      cv     min   max range
 #>   <chr>      <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl>   <dbl>   <dbl> <dbl> <dbl>
@@ -82,7 +82,7 @@ specProc::summaryStats(tbl)
 #### robust approach
 
 ``` r
-specProc::summaryStats(tbl, robust = TRUE)
+specProc::summary_stats(tbl, robust = TRUE)
 #> # A tibble: 3 × 13
 #>   variable    median   mad    Qn    Sn medcouple   LMC   RMC biloc biscale bivar
 #>   <chr>        <dbl> <dbl> <dbl> <dbl>     <dbl> <dbl> <dbl> <dbl>   <dbl> <dbl>
@@ -154,7 +154,7 @@ lines(wl, unlist(fit$background), col = "red", lwd = 2)
 window <- wl >= 393 & wl <= 394
 lines_df <- as.data.frame(t(unlist(fit$correction)[window]))
 names(lines_df) <- wl[window]
-ca_line <- specProc::peakfit(lines_df, profile = "voigt")
+ca_line <- specProc::peak_fit(lines_df, profile = "voigt")
 ca_line$tidied[[1]]
 #> # A tibble: 5 × 5
 #>   term    estimate std.error    statistic   p.value
@@ -164,7 +164,7 @@ ca_line$tidied[[1]]
 #> 3 wG      0.118    0.000903      130.     6.56e-109
 #> 4 wL      0.000100 0.00140         0.0714 9.43e-  1
 #> 5 A      15.1      0.0885        170.     6.94e-120
-specProc::plotfit(ca_line, title = "Ca II 393.4 nm")
+specProc::plot_fit(ca_line, title = "Ca II 393.4 nm")
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="90%" height="90%" />
