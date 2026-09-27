@@ -20,7 +20,7 @@ rank of the orthogonalized matrix are reduced accordingly.}
 \item{scale}{A logical value specifying whether to scale the data. Default is \code{FALSE}.}
 }
 \value{
-A list with the following components:
+An object of class \code{specproc_direct_orthogonal} (a list), which \link[=predict.specproc_filter]{predict()} applies to new spectra, with the following components:
 \itemize{
 \item \code{correction}: The corrected matrix.
 \item \code{loading}: The loadings matrix \eqn{\textbf{P}}.
@@ -67,6 +67,11 @@ Chemometrics Intell. Lab. Syst., 55(1-2):101-108
 Orthogonal signal correction of near-infrared spectra.
 Chemometrics Intell. Lab. Syst., 44(1):175-185.
 }
+}
+\seealso{
+\code{\link[=predict.specproc_filter]{predict.specproc_filter()}} to correct new spectra with the fitted filter,
+\code{\link[=step_direct_orthogonal]{step_direct_orthogonal()}} to use it in a tidymodels recipe, and \code{\link[=nas]{nas()}},
+which computes the same correction.
 }
 \author{
 Christian L. Goueguel

@@ -41,12 +41,15 @@
 #' pseudo-inverse of \eqn{\textbf{X}}; singular values smaller than `tol` times
 #' the largest one are discarded, which regularizes the weights. Default is 1e-3.
 #'
-#' @return A list with the following components:
+#' @return An object of class `specproc_direct_osc` (a list), which [predict()][predict.specproc_filter] applies to new spectra, with the following components:
 #'  - `correction`: The corrected matrix.
 #'  - `loading`: The loadings matrix \eqn{\textbf{P}}.
 #'  - `score`: The scores matrix \eqn{\textbf{T}}.
 #'  - `weight`: The weights matrix \eqn{\textbf{W}}.
 #'  - `center`, `scale`: The column centers and scales applied to `x`.
+#' @seealso [predict.specproc_filter()] to correct new spectra with the fitted filter, and
+#'   [step_direct_osc()] to use it in a tidymodels recipe.
+#'
 #' @export direct_osc
 #'
 #' @examples
@@ -91,5 +94,5 @@ direct_osc <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, tol = 1e-
     center = xy$center,
     scale = xy$scale
   )
-  return(result)
+  return(new_filter(result, "specproc_direct_osc", x))
 }

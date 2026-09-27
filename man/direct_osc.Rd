@@ -22,7 +22,7 @@ pseudo-inverse of \eqn{\textbf{X}}; singular values smaller than \code{tol} time
 the largest one are discarded, which regularizes the weights. Default is 1e-3.}
 }
 \value{
-A list with the following components:
+An object of class \code{specproc_direct_osc} (a list), which \link[=predict.specproc_filter]{predict()} applies to new spectra, with the following components:
 \itemize{
 \item \code{correction}: The corrected matrix.
 \item \code{loading}: The loadings matrix \eqn{\textbf{P}}.
@@ -72,6 +72,10 @@ Chemometrics Intell. Lab. Syst., 56(1):13-25
 Orthogonal signal correction of near-infrared spectra.
 Chemometrics Intell. Lab. Syst., 44(1):175-185.
 }
+}
+\seealso{
+\code{\link[=predict.specproc_filter]{predict.specproc_filter()}} to correct new spectra with the fitted filter, and
+\code{\link[=step_direct_osc]{step_direct_osc()}} to use it in a tidymodels recipe.
 }
 \author{
 Christian L. Goueguel

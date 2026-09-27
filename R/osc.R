@@ -55,7 +55,7 @@
 #' @param max.iter An integer representing the maximum number of iterations. The default value is 10.
 #' @param pls.ncomp An integer giving the number of PLS components used to compute the weights in Wold's method. Default is 5.
 #'
-#' @return A list containing the following components:
+#' @return An object of class `specproc_osc` (a list), which [predict()][predict.specproc_filter] applies to new spectra, with the following components:
 #'  - `correction`: The corrected matrix.
 #'  - `scores`: The orthogonal scores matrix.
 #'  - `loadings`: The orthogonal loadings matrix.
@@ -63,6 +63,9 @@
 #'  - `R2`: The percentage of the (preprocessed) variance of `x` remaining after correction.
 #'  - `angle`: The mean angle (in degrees) between the orthogonal scores and `y`; values close to 90 indicate orthogonality.
 #'  - `center`, `scale`: The column centers and scales applied to `x`.
+#'
+#' @seealso [predict.specproc_filter()] to correct new spectra with the fitted filter, and
+#'   [step_osc()] to use it in a tidymodels recipe.
 #'
 #' @export osc
 #'
@@ -119,7 +122,7 @@ osc <- function(x, y, method = "sjoblom", center = TRUE, scale = FALSE, ncomp = 
     "center" = xy$center,
     "scale" = xy$scale
   )
-  return(res)
+  return(new_filter(res, "specproc_osc", x, method = method))
 }
 
 # Orthogonalizes a score vector with respect to y.

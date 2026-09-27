@@ -38,13 +38,16 @@
 #' @param tol A numeric value; orthogonal components whose singular value is smaller than `tol` times the largest one are discarded. The default value is 1e-10.
 #' @param newdata An optional matrix or data frame of new predictor variables to be corrected using the POSC model. It is preprocessed with the centers and scales of `x`.
 #'
-#' @return A list containing the following components:
+#' @return An object of class `specproc_projected_osc` (a list), which [predict()][predict.specproc_filter] applies to new spectra, with the following components:
 #'  - `correction`: The corrected `x`.
 #'  - `scores`: The orthogonal scores matrix \eqn{\textbf{T}_o}.
 #'  - `loadings`: The orthogonal loadings matrix \eqn{\textbf{P}_o}.
 #'  - `weights`: The orthogonal weights \eqn{\textbf{W}_o}, such that \eqn{\textbf{T}_o = \textbf{XW}_o}.
 #'  - `center`, `scale`: The column centers and scales applied to `x`.
 #'  - `newdata`: If `newdata` is provided, a list with the corrected new data (`correction`) and its orthogonal scores (`scores`).
+#'
+#' @seealso [predict.specproc_filter()] to correct new spectra with the fitted filter, and
+#'   [step_projected_osc()] to use it in a tidymodels recipe.
 #'
 #' @export projected_osc
 #'
@@ -117,5 +120,5 @@ projected_osc <- function(x, y, ncomp = 5, center = TRUE, scale = FALSE, tol = 1
     )
   }
 
-  return(res)
+  return(new_filter(res, "specproc_projected_osc", x))
 }

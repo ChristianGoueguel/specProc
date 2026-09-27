@@ -81,6 +81,11 @@ O2-PLS, a two-block (X–Y) latent variable regression (LVR) method with an inte
 J. Chemom. 17(1):53–64.
 }
 }
+\seealso{
+\code{\link[=predict.specproc_filter]{predict.specproc_filter()}} to correct new spectra with the fitted filter, and
+\code{\link[=step_projected_osc]{step_projected_osc()}}, which gives the same filtered data for a single
+response, to use it in a tidymodels recipe.
+}
 \author{
 Christian L. Goueguel
 }

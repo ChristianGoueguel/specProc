@@ -55,6 +55,10 @@ multivariate calibration models.
 Anal. Chem., 70(23):5108-5110
 }
 }
+\seealso{
+\code{\link[=direct_orthogonal]{direct_orthogonal()}}, which computes the same correction and returns a
+filter that \code{\link[=predict.specproc_filter]{predict.specproc_filter()}} can apply to new spectra.
+}
 \author{
 Christian L. Goueguel
 }

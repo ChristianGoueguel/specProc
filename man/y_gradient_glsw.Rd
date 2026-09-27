@@ -53,6 +53,9 @@ Estimation of the age of a weathered mixture of volatile organic compounds.
 Analytica Chimica Acta, 694(1-2):31–37.
 }
 }
+\seealso{
+\code{\link[=step_y_gradient_glsw]{step_y_gradient_glsw()}} to use the filter in a tidymodels recipe.
+}
 \author{
 Christian L. Goueguel
 }

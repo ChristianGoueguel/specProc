@@ -40,11 +40,15 @@
 #' @param center A logical value specifying whether to center the data. Default is `TRUE`.
 #' @param scale A logical value specifying whether to scale the data. Default is `FALSE`.
 #'
-#' @return A list with the following components:
+#' @return An object of class `specproc_direct_orthogonal` (a list), which [predict()][predict.specproc_filter] applies to new spectra, with the following components:
 #'  - `correction`: The corrected matrix.
 #'  - `loading`: The loadings matrix \eqn{\textbf{P}}.
 #'  - `score`: The scores matrix \eqn{\textbf{XP}}.
 #'  - `center`, `scale`: The column centers and scales applied to `x`.
+#' @seealso [predict.specproc_filter()] to correct new spectra with the fitted filter,
+#'   [step_direct_orthogonal()] to use it in a tidymodels recipe, and [nas()],
+#'   which computes the same correction.
+#'
 #' @export direct_orthogonal
 #'
 #' @examples
@@ -80,7 +84,7 @@ direct_orthogonal <- function(x, y, ncomp = 2, center = TRUE, scale = FALSE) {
     center = xy$center,
     scale = xy$scale
   )
-  return(result)
+  return(new_filter(result, "specproc_direct_orthogonal", x))
 }
 
 # Shared input handling for the orthogonalization methods: converts x and y to

@@ -28,6 +28,7 @@ reference:
   - projected_osc
   - y_gradient_glsw
   - direct_orthogonal
+  - predict.specproc_filter
 
 - subtitle: calibration transfer
   desc: >
@@ -36,6 +37,36 @@ reference:
   contents:
   - pds
   - glsw
+
+- title: Recipe steps (tidymodels)
+  desc: >
+    Steps for the recipes package, so that preprocessing and orthogonalization
+    are estimated on the training data of each resample and can be tuned
+    within a tidymodels workflow.
+
+- subtitle: preprocessing
+  contents:
+  - step_baseline
+  - step_snv
+  - step_msc
+  - step_emsc
+  - step_pareto_scale
+  - step_poisson_scale
+
+- subtitle: orthogonalization
+  contents:
+  - step_epo
+  - step_glsw
+  - step_osc
+  - step_direct_orthogonal
+  - step_direct_osc
+  - step_projected_osc
+  - step_y_gradient_glsw
+
+- subtitle: tuning parameters
+  contents:
+  - baseline_lambda
+  - glsw_alpha
 
 - title: Peak fitting
   desc: >
@@ -77,6 +108,8 @@ reference:
     Functions used to adjust the systematic differences among samples.
   contents:
   - msc
+  - emsc
+  - predict.specproc_emsc
   - normalize
 
 - subtitle: data scaling

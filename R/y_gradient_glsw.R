@@ -34,6 +34,8 @@
 #'    Estimation of the age of a weathered mixture of volatile organic compounds.
 #'    Analytica Chimica Acta, 694(1-2):31–37.
 #'
+#' @seealso [step_y_gradient_glsw()] to use the filter in a tidymodels recipe.
+#'
 #' @export y_gradient_glsw
 #'
 #' @examples
@@ -75,6 +77,14 @@ y_gradient_glsw <- function(x, y, alpha = 0.01, window = 5) {
     stop("'x' and 'y' cannot contain missing values.")
   }
 
+  g <- y_gradient(x, y, window)
+  G <- yGradientglswCpp(unname(g$x_diff), g$w_i, alpha)
+  return(as_tbl(G, colnames(x)))
+}
+
+# Gradients of X and y along the samples sorted by y, and the weights of the
+# y-gradient GLSW (Zorzetti et al., 2011).
+y_gradient <- function(x, y, window) {
   sorted_idx <- order(y)
   x_sorted <- x[sorted_idx, , drop = FALSE]
   y_sorted <- y[sorted_idx]
@@ -86,7 +96,25 @@ y_gradient_glsw <- function(x, y, alpha = 0.01, window = 5) {
 
   s <- stats::sd(y_diff)
   w_i <- if (is.finite(s) && s > 0) 2^(-abs(y_diff) / s) else rep(1, length(y_diff))
+  list(x_diff = x_diff, w_i = w_i)
+}
 
-  G <- yGradientglswCpp(unname(x_diff), w_i, alpha)
-  return(as_tbl(G, colnames(x)))
+# GLSW filter in factored form: G = I - V diag(shrink) V', with V and the
+# eigenvalues from the thin SVD of the clutter differences. Applying it as
+# X - (X V) diag(shrink) V' never forms the p x p matrix. `alpha` is relative
+# to the largest eigenvalue, so it does not depend on the scale of the data.
+glsw_factor <- function(x_diff, alpha) {
+  s <- svd(x_diff, nu = 0)
+  keep <- s$d > max(dim(x_diff)) * max(s$d) * .Machine$double.eps
+  lambda <- s$d[keep]^2
+  alpha_abs <- alpha * max(lambda)
+  list(
+    v = s$v[, keep, drop = FALSE],
+    shrink = 1 - 1 / sqrt(lambda / alpha_abs + 1),
+    alpha = alpha_abs
+  )
+}
+
+apply_glsw_factor <- function(x, f) {
+  x - (x %*% f$v) %*% (f$shrink * t(f$v))
 }

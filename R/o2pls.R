@@ -55,6 +55,10 @@
 #'  - `weights`: A list with the joint weights `x` (\eqn{\textbf{W}}) and `y` (\eqn{\textbf{C}}), and the orthogonal weights `x_ortho` and `y_ortho`.
 #'  - `center`, `scale`: The column centers and scales applied to `x`.
 #'
+#' @seealso [predict.specproc_filter()] to correct new spectra with the fitted filter, and
+#'   [step_projected_osc()], which gives the same filtered data for a single
+#'   response, to use it in a tidymodels recipe.
+#'
 #' @export o2pls
 #'
 #' @examples
@@ -142,6 +146,8 @@ o2pls <- function(x, y, ncomp = 1, nx = 1, ny = 0, center = TRUE, scale = FALSE)
       "center" = xy$center,
       "scale" = xy$scale
     ),
+    variables = xy$names,
+    nvar = ncol(x),
     class = "o2pls"
   )
   return(out)

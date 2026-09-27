@@ -1,3 +1,39 @@
+# specProc 0.3.0
+
+This release connects specProc to the tidymodels framework. Preprocessing and
+orthogonalization can now be estimated on calibration data and applied to new
+spectra, either directly with `predict()` or as recipe steps that are
+re-estimated on every resample and tuned together with the model.
+
+## New features
+
+* The orthogonalization filters can now be applied to new spectra:
+  `epo()`, `osc()`, `direct_orthogonal()`, `direct_osc()`, `projected_osc()`
+  and `o2pls()` return classed objects with a `predict()` method, which
+  corrects new data with the centers, scales and components estimated on the
+  calibration data. Existing fields are unchanged.
+* New recipe steps for tidymodels: `step_epo()`, `step_glsw()`, `step_osc()`,
+  `step_direct_orthogonal()`, `step_direct_osc()`, `step_projected_osc()` and
+  `step_y_gradient_glsw()`, with `tidy()` and `tunable()` methods, and the
+  dials parameter `glsw_alpha()`. In a workflow, the filters are re-estimated
+  on every resample and can be tuned with the model. The GLSW steps store the
+  filter in factored form instead of a p x p matrix. recipes and dials are
+  suggested, not required.
+* New `emsc()`: extended multiplicative signal correction (Martens and Stark,
+  1991), with a polynomial baseline and optional interferent spectra, and a
+  `predict()` method for new spectra. With `degree = 0` it equals `msc()`.
+* New recipe steps for spectral preprocessing: `step_baseline()` (arPLS, ALS
+  or LSP), `step_snv()`, `step_msc()`, `step_emsc()`, `step_pareto_scale()`
+  and `step_poisson_scale()`. MSC and EMSC estimate the reference spectrum,
+  and the scaling steps the column scales, on the training data only. The
+  baseline `lambda` or `degree` and the EMSC `degree` are tunable; the new
+  dials parameter `baseline_lambda()` covers `lambda`.
+* New data set `fourrage`: LIBS spectra of 365 forage samples with reference
+  contents of 12 elements, and a vignette based on it, "Removing unwanted
+  variation: a comparison of orthogonalization methods" (what EPO, GLSW, the
+  OSC family, DO/NAS, DOSC, POSC/OPLS and y-gradient GLSW remove, whether it
+  improves potassium predictions, and which methods are equivalent).
+
 # specProc 0.2.0
 
 This release fixes a large number of bugs so that every exported function now
@@ -82,11 +118,6 @@ implementations.
   "Predicting soil clay content from LIBS spectra" (a compositional
   log-ratio PLS model with nested, repeated cross-validation by sample, and
   the optimism of common shortcuts).
-* New data set `fourrage`: LIBS spectra of 365 forage samples with reference
-  contents of 12 elements, and a vignette based on it, "Removing unwanted
-  variation: a comparison of orthogonalization methods" (what EPO, GLSW, the
-  OSC family, DO/NAS, DOSC, POSC/OPLS and y-gradient GLSW remove, whether it
-  improves potassium predictions, and which methods are equivalent).
 * `plot_fit()` draws the fitted profiles on a fine wavelength grid.
 * Functions taking a response now accept 1-d arrays, such as the output of
   `tapply()`.

@@ -30,7 +30,7 @@ projected_osc(
 \item{newdata}{An optional matrix or data frame of new predictor variables to be corrected using the POSC model. It is preprocessed with the centers and scales of \code{x}.}
 }
 \value{
-A list containing the following components:
+An object of class \code{specproc_projected_osc} (a list), which \link[=predict.specproc_filter]{predict()} applies to new spectra, with the following components:
 \itemize{
 \item \code{correction}: The corrected \code{x}.
 \item \code{scores}: The orthogonal scores matrix \eqn{\textbf{T}_o}.
@@ -79,6 +79,10 @@ Journal of Chemometrics, 23(5):263-264.
 Orthogonal projections to latent structures (O-PLS).
 Journal of Chemometrics, 16(3):119-128.
 }
+}
+\seealso{
+\code{\link[=predict.specproc_filter]{predict.specproc_filter()}} to correct new spectra with the fitted filter, and
+\code{\link[=step_projected_osc]{step_projected_osc()}} to use it in a tidymodels recipe.
 }
 \author{
 Christian L. Goueguel

@@ -36,7 +36,7 @@ osc(
 \item{pls.ncomp}{An integer giving the number of PLS components used to compute the weights in Wold's method. Default is 5.}
 }
 \value{
-A list containing the following components:
+An object of class \code{specproc_osc} (a list), which \link[=predict.specproc_filter]{predict()} applies to new spectra, with the following components:
 \itemize{
 \item \code{correction}: The corrected matrix.
 \item \code{scores}: The orthogonal scores matrix.
@@ -101,6 +101,10 @@ Chemometrics Intell. Lab. Syst., 44(1):175-185.
 An investigation of orthogonal correction algorithms and their characteristics.
 Journal of Chemometrics, 16(1):176-188.
 }
+}
+\seealso{
+\code{\link[=predict.specproc_filter]{predict.specproc_filter()}} to correct new spectra with the fitted filter, and
+\code{\link[=step_osc]{step_osc()}} to use it in a tidymodels recipe.
 }
 \author{
 Christian L. Goueguel
