@@ -68,6 +68,9 @@ Pre-whitening of data by covariance-weighted preprocessing.
 Journal of Chemometrics, 17(3):153-165
 }
 }
+\seealso{
+\code{\link[=step_glsw]{step_glsw()}} to use the filter in a tidymodels recipe.
+}
 \author{
 Christian L. Goueguel
 }

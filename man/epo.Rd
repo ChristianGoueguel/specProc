@@ -17,7 +17,7 @@ columns as \code{x}, describing the external (clutter) variation. If \code{NULL}
 \code{ncomp} dominant directions of \code{x} are removed.}
 }
 \value{
-The function returns a list of four components:
+An object of class \code{specproc_epo} (a list), which \link[=predict.specproc_filter]{predict()} applies to new spectra, with four components:
 \itemize{
 \item \code{correction}: The orthogonalized matrix, representing the signal of interest.
 \item \code{clutter}: The clutter part of \code{x}, \eqn{\textbf{XVV}^T}.
@@ -67,6 +67,10 @@ dim(res$correction)
 EPO-PLS external parameter orthogonalization of PLS application to temperature-independent measurement of sugar content of intact fruits.
 Chemometrics and Intelligent Laboratory Systems, 66(2):191-204.
 }
+}
+\seealso{
+\code{\link[=predict.specproc_filter]{predict.specproc_filter()}} to correct new spectra with the fitted filter, and
+\code{\link[=step_epo]{step_epo()}} to use it in a tidymodels recipe.
 }
 \author{
 Christian L. Goueguel

@@ -35,6 +35,9 @@
 #'
 #' @return A tibble containing the corrected predictor variables. The
 #'   interferent loadings are stored in the `"loadings"` attribute.
+#' @seealso [direct_orthogonal()], which computes the same correction and returns a
+#'   filter that [predict.specproc_filter()] can apply to new spectra.
+#'
 #' @export nas
 #'
 #' @examples

@@ -36,7 +36,7 @@
 #'   (default), the clutter directions are estimated from `x` itself, i.e. the
 #'   `ncomp` dominant directions of `x` are removed.
 #'
-#' @return The function returns a list of four components:
+#' @return An object of class `specproc_epo` (a list), which [predict()][predict.specproc_filter] applies to new spectra, with four components:
 #' \itemize{
 #'   \item \code{correction}: The orthogonalized matrix, representing the signal of interest.
 #'   \item \code{clutter}: The clutter part of `x`, \eqn{\textbf{XVV}^T}.
@@ -48,6 +48,9 @@
 #'  - Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003).
 #'    EPO-PLS external parameter orthogonalization of PLS application to temperature-independent measurement of sugar content of intact fruits.
 #'    Chemometrics and Intelligent Laboratory Systems, 66(2):191-204.
+#'
+#' @seealso [predict.specproc_filter()] to correct new spectra with the fitted filter, and
+#'   [step_epo()] to use it in a tidymodels recipe.
 #'
 #' @export epo
 #'
@@ -82,10 +85,11 @@ epo <- function(x, ncomp = 2, clutter = NULL) {
   result <- epo_cpp(x, d, as.integer(ncomp))
   comp <- paste0("comp", seq_len(ncomp))
 
-  list(
+  res <- list(
     correction = as_tbl(result$correction, colnames(x)),
     clutter = as_tbl(result$clutter, colnames(x)),
     loadings = as_tbl(result$loadings, comp),
     singular_values = drop(result$singular_values)
   )
+  new_filter(res, "specproc_epo", x)
 }
