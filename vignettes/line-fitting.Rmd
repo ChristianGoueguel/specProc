@@ -25,16 +25,31 @@ and widths as parameters, with standard errors. This vignette shows how
 to fit single and overlapping lines with specProc, how to choose a
 profile, and how far the fitted standard errors can be trusted.
 
-```{r setup}
-library(specProc)
-data(specLIBS)
+```{r requirements, include = FALSE}
+if (!all(vapply(c("recipes", "purrr"), requireNamespace, logical(1), quietly = TRUE))) {
+  knitr::knit_exit("This vignette needs the recipes and purrr packages, which are not installed.")
+}
+```
 
-meta <- specLIBS[1:8]
-X <- as.matrix(specLIBS[-(1:8)])
-wl <- as.numeric(colnames(X))
+```{r setup, message = FALSE}
+library(specProc)
+library(recipes)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
+
+data(specLIBS)
+meta_cols <- c("Sample", "Location", "Clay", "Sand", "Silt", "Texture", "Structure", "Type")
+channels <- setdiff(names(specLIBS), meta_cols)
+wl <- as.numeric(channels)
 
 # Baseline-corrected counts (see vignette("preprocessing"))
-Xb <- as.matrix(baseline_arpls(X, lambda = 1e5, max.iter = 20)$correction)
+baselined <- recipe(~ ., data = specLIBS) |>
+  update_role(all_of(meta_cols), new_role = "id") |>
+  step_baseline(all_predictors(), lambda = 1e5, options = list(max.iter = 20)) |>
+  prep() |>
+  bake(new_data = NULL)
 ```
 
 ## Line profiles
@@ -58,21 +73,31 @@ approximates the Voigt profile. It is faster to compute, but it is an
 approximation:
 
 ```{r profiles, fig.height = 3.8}
-x <- seq(-1.5, 1.5, length.out = 500)
-v <- voigt_profile(x, y0 = 0, xc = 0, wG = 0.3, wL = 0.3, A = 1)
-pv <- pseudo_voigt_profile(x, y0 = 0, xc = 0, wG = 0.3, wL = 0.3, A = 1)$y
+profiles_df <- tibble(x = seq(-1.5, 1.5, length.out = 500)) |>
+  mutate(
+    Voigt = voigt_profile(x, y0 = 0, xc = 0, wG = 0.3, wL = 0.3, A = 1),
+    Gaussian = gaussian_profile(x, 0, 0, 0.3, 1),
+    Lorentzian = lorentzian_profile(x, 0, 0, 0.3, 1),
+    pseudo_voigt = pseudo_voigt_profile(x, y0 = 0, xc = 0, wG = 0.3, wL = 0.3, A = 1)$y
+  )
 
-op <- par(mfrow = c(1, 2), mar = c(4, 4, 2, 1))
-plot(x, v, type = "l", lwd = 2, ylim = c(0, max(gaussian_profile(x, 0, 0, 0.3, 1))),
-     xlab = "x - xc", ylab = "Profile", main = "Voigt profile")
-lines(x, gaussian_profile(x, 0, 0, 0.3, 1), lty = 2, col = "blue")
-lines(x, lorentzian_profile(x, 0, 0, 0.3, 1), lty = 3, col = "red")
-legend("topright", c("Voigt", "Gaussian", "Lorentzian"), lty = 1:3,
-       col = c("black", "blue", "red"), bty = "n", cex = 0.8)
-plot(x, (pv - v) / max(v) * 100, type = "l", xlab = "x - xc",
-     ylab = "Error (% of peak)", main = "Pseudo-Voigt error")
-abline(h = 0, col = "grey")
-par(op)
+bind_rows(
+  profiles_df |>
+    pivot_longer(c(Voigt, Gaussian, Lorentzian), names_to = "curve") |>
+    mutate(panel = "Voigt profile"),
+  profiles_df |>
+    transmute(x, curve = "Pseudo-Voigt error", value = (pseudo_voigt - Voigt) / max(Voigt) * 100,
+              panel = "Pseudo-Voigt error (% of peak)")
+) |>
+  ggplot(aes(x, value, colour = curve, linetype = curve)) +
+  geom_hline(yintercept = 0, colour = "grey80") +
+  geom_line() +
+  facet_wrap(~ panel, scales = "free_y") +
+  scale_colour_manual(values = c(Voigt = "black", Gaussian = "blue", Lorentzian = "red",
+                                 `Pseudo-Voigt error` = "black")) +
+  labs(x = "x - xc", y = NULL, colour = NULL, linetype = NULL) +
+  theme_bw() +
+  theme(legend.position = "top")
 ```
 
 For equal Gaussian and Lorentzian widths, the pseudo-Voigt deviates from
@@ -90,31 +115,30 @@ We fit the Ca II 393.37 nm line in the mean spectrum of the first
 sample, using each of the four profiles:
 
 ```{r single-line}
-first <- meta$Sample == meta$Sample[1]
-window <- wl > 392.6 & wl < 393.9
-line_data <- as.data.frame(t(colMeans(Xb[first, window])))
-names(line_data) <- wl[window]
+first_sample <- baselined |> filter(Sample == first(Sample))
+window <- channels[wl > 392.6 & wl < 393.9]
+line_data <- first_sample |> summarise(across(all_of(window), mean))
 
 profiles <- c("gaussian", "lorentzian", "pseudo_voigt", "voigt")
-fits <- lapply(profiles, function(p) peak_fit(line_data, profile = p))
-names(fits) <- profiles
+fits <- profiles |>
+  set_names() |>
+  map(\(p) peak_fit(line_data, profile = p))
 
-comparison <- data.frame(
+comparison <- tibble(
   profile = profiles,
-  parameters = sapply(fits, function(f) length(stats::coef(f$fit[[1]]))),
-  AIC = sapply(fits, function(f) round(stats::AIC(f$fit[[1]]), 1)),
-  area = sapply(fits, function(f) round(stats::coef(f$fit[[1]])[["A"]])),
-  area_SE = sapply(fits, function(f) round(summary(f$fit[[1]])$coefficients["A", 2])),
-  row.names = NULL
+  parameters = map_int(fits, \(f) length(stats::coef(f$fit[[1]]))),
+  AIC = map_dbl(fits, \(f) round(stats::AIC(f$fit[[1]]), 1)),
+  area = map_dbl(fits, \(f) round(stats::coef(f$fit[[1]])[["A"]])),
+  area_SE = map_dbl(fits, \(f) round(summary(f$fit[[1]])$coefficients["A", 2]))
 )
-comparison
+as.data.frame(comparison)
 ```
 
 The exact Voigt profile has the lowest AIC, but by only 1 to 3 units, so
 the evidence for it over the other profiles is modest. The reason is
 resolution: the channels are about 0.084 nm apart and the line FWHM is
 about 0.2 nm, so each line is sampled by only 2 to 3 channels across its
-half width. With `r sum(window)` points, the shapes of the profiles are
+half width. With `r length(window)` points, the shapes of the profiles are
 hard to tell apart.
 
 The fitted **area** differs markedly between profiles, by more than 40%
@@ -146,23 +170,26 @@ the 8 shots of the first sample (the joint fit is explained in the next
 section):
 
 ```{r replicates}
-window2 <- wl > 392.9 & wl < 397.3
-shots <- as.data.frame(Xb[first, window2])
-names(shots) <- wl[window2]
-shots$shot <- seq_len(nrow(shots))
+window2 <- channels[wl > 392.9 & wl < 397.3]
 centers <- c(393.37, 394.40, 396.15, 396.85)
-per_shot <- multipeak_fit(shots, peaks = centers, profiles = "voigt", id = "shot")
+line_names <- c(A_1 = "Ca II 393.37", A_2 = "Al I 394.40", A_3 = "Al I 396.15", A_4 = "Ca II 396.85")
 
-get <- function(term, what) sapply(per_shot$tidied, function(t) t[[what]][t$term == term])
-precision <- data.frame(
-  line = c("Ca II 393.37", "Al I 394.40", "Al I 396.15", "Ca II 396.85"),
-  mean_area = sapply(paste0("A_", 1:4), function(a) mean(get(a, "estimate"))),
-  model_SE = sapply(paste0("A_", 1:4), function(a) median(get(a, "std.error"))),
-  replicate_SD = sapply(paste0("A_", 1:4), function(a) sd(get(a, "estimate"))),
-  row.names = NULL
-)
-precision[-1] <- round(precision[-1])
-precision
+per_shot <- first_sample |>
+  select(all_of(window2)) |>
+  mutate(shot = row_number()) |>
+  multipeak_fit(peaks = centers, profiles = "voigt", id = "shot")
+
+per_shot$tidied |>
+  bind_rows(.id = "shot") |>
+  filter(term %in% names(line_names)) |>
+  group_by(line = line_names[term]) |>
+  summarise(
+    mean_area = mean(estimate),
+    model_SE = median(std.error),
+    replicate_SD = sd(estimate)
+  ) |>
+  arrange(match(line, line_names)) |>
+  mutate(across(-line, round))
 ```
 
 Here the model standard errors are *larger* than the replicate standard
@@ -198,10 +225,9 @@ overlap. `multipeak_fit()` fits all of them simultaneously on a common
 baseline offset. The parameters of line \(i\) carry the suffix `_i`:
 
 ```{r multipeak}
-region <- as.data.frame(t(colMeans(Xb[first, window2])))
-names(region) <- wl[window2]
-
-multi <- multipeak_fit(region, peaks = centers, profiles = "voigt")
+multi <- first_sample |>
+  summarise(across(all_of(window2), mean)) |>
+  multipeak_fit(peaks = centers, profiles = "voigt")
 multi$tidied[[1]]
 ```
 

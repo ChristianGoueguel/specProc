@@ -112,7 +112,7 @@ step_osc <- function(recipe, ..., role = NA, trained = FALSE, outcome = NULL,
 #' @description
 #' `step_direct_orthogonal()` creates a *specification* of a recipe step that
 #' removes response-orthogonal variation from the selected predictors with
-#' [direct_orthogonal()] (equivalent to [nas()]).
+#' [direct_orthogonal()].
 #'
 #' @inherit step_osc details return
 #' @inheritParams step_osc

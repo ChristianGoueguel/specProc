@@ -21,6 +21,22 @@ glsw_cpp <- function(X_diff, alpha) {
     .Call(`_specProc_glsw_cpp`, X_diff, alpha)
 }
 
+univariate_mcd_cpp <- function(x, h) {
+    .Call(`_specProc_univariate_mcd_cpp`, x, h)
+}
+
+sd_outlyingness_cpp <- function(z, h, ndir) {
+    .Call(`_specProc_sd_outlyingness_cpp`, z, h, ndir)
+}
+
+fast_mcd_cpp <- function(x, h, nsamp) {
+    .Call(`_specProc_fast_mcd_cpp`, x, h, nsamp)
+}
+
+spca_grid_cpp <- function(x_in, k, lambda, ngrid, maxiter, tol) {
+    .Call(`_specProc_spca_grid_cpp`, x_in, k, lambda, ngrid, maxiter, tol)
+}
+
 voigt_cpp <- function(x, sigma, gamma) {
     .Call(`_specProc_voigt_cpp`, x, sigma, gamma)
 }

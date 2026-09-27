@@ -23,8 +23,9 @@ is used.}
 \item{degree}{A non-negative integer giving the degree of the polynomial
 baseline. Default is 2. With 0, only a constant offset is modeled.}
 
-\item{interferents}{An optional numeric matrix or data frame of interferent
-spectra, one per row, with the same number of columns as \code{x}.}
+\item{interferents}{An optional numeric vector (a single spectrum), matrix
+or data frame of interferent spectra, one per row, with the same number
+of columns as \code{x}.}
 
 \item{wavelength}{An optional numeric vector of wavelengths used to build
 the polynomials. If \code{NULL} (default), the column names of \code{x} are used

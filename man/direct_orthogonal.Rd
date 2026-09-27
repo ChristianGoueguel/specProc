@@ -70,8 +70,9 @@ Chemometrics Intell. Lab. Syst., 44(1):175-185.
 }
 \seealso{
 \code{\link[=predict.specproc_filter]{predict.specproc_filter()}} to correct new spectra with the fitted filter,
-\code{\link[=step_direct_orthogonal]{step_direct_orthogonal()}} to use it in a tidymodels recipe, and \code{\link[=nas]{nas()}},
-which computes the same correction.
+\code{\link[=step_direct_orthogonal]{step_direct_orthogonal()}} to use it in a tidymodels recipe. Before
+specProc 0.4.0, \code{\link[=nas]{nas()}} returned the same correction; it now computes
+the net analyte signal and figures of merit.
 }
 \author{
 Christian L. Goueguel

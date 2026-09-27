@@ -14,6 +14,18 @@ reference:
 
 - title: Multivariate filtering
 
+- subtitle: robust PCA
+  desc: >
+    Principal component analysis that resists outlying observations
+    (and, for MacroPCA, outlying cells and missing values).
+  contents:
+  - robpca
+  - rospca
+  - macropca
+  - predict.specproc_robpca
+  - plot_outlier_map
+  - plot_cell_map
+
 - subtitle: orthogonalization methods
   desc: >
     Functions used to identify and remove unwanted covariance
@@ -21,7 +33,6 @@ reference:
   contents:
   - epo
   - osc
-  - nas
   - opls
   - o2pls
   - direct_osc
@@ -29,6 +40,14 @@ reference:
   - y_gradient_glsw
   - direct_orthogonal
   - predict.specproc_filter
+
+- subtitle: figures of merit
+  desc: >
+    Net analyte signal of a multivariate calibration model, with its
+    sensitivity, selectivity and limits of detection and quantification.
+  contents:
+  - nas
+  - predict.specproc_nas
 
 - subtitle: calibration transfer
   desc: >
@@ -52,6 +71,13 @@ reference:
   - step_emsc
   - step_pareto_scale
   - step_poisson_scale
+
+- subtitle: robust transformation and PCA
+  contents:
+  - step_robust_bcyj
+  - step_robpca
+  - step_rospca
+  - step_macropca
 
 - subtitle: orthogonalization
   contents:

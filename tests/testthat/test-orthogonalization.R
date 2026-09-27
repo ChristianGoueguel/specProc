@@ -31,14 +31,6 @@ test_that("direct_osc scores are orthogonal to y and reproduce the correction", 
   expect_warning(direct_osc(d$x[1:5, 1:3], d$y[1:5], ncomp = 10), "reduced")
 })
 
-test_that("nas projects out the interferent space", {
-  res <- nas(d$x, d$y, ncomp = 2)
-  expect_s3_class(res, "tbl_df")
-  P <- attr(res, "loadings")
-  expect_equal(as.matrix(res) %*% P, matrix(0, 40, 2), tolerance = 1e-10, ignore_attr = TRUE)
-  expect_equal(nas(as.data.frame(d$x), data.frame(y = d$y), ncomp = 2), res)
-})
-
 test_that("osc methods remove variation orthogonal to y", {
   fe <- osc(d$x, d$y, method = "fearn", ncomp = 2)
   expect_equal(fe$angle, 90, tolerance = 1e-8)

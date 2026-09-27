@@ -46,8 +46,9 @@
 #'  - `score`: The scores matrix \eqn{\textbf{XP}}.
 #'  - `center`, `scale`: The column centers and scales applied to `x`.
 #' @seealso [predict.specproc_filter()] to correct new spectra with the fitted filter,
-#'   [step_direct_orthogonal()] to use it in a tidymodels recipe, and [nas()],
-#'   which computes the same correction.
+#'   [step_direct_orthogonal()] to use it in a tidymodels recipe. Before
+#'   specProc 0.4.0, [nas()] returned the same correction; it now computes
+#'   the net analyte signal and figures of merit.
 #'
 #' @export direct_orthogonal
 #'

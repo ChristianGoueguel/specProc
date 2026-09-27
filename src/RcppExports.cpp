@@ -75,6 +75,60 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// univariate_mcd_cpp
+Rcpp::NumericVector univariate_mcd_cpp(const Eigen::Map<Eigen::VectorXd> x, int h);
+RcppExport SEXP _specProc_univariate_mcd_cpp(SEXP xSEXP, SEXP hSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type h(hSEXP);
+    rcpp_result_gen = Rcpp::wrap(univariate_mcd_cpp(x, h));
+    return rcpp_result_gen;
+END_RCPP
+}
+// sd_outlyingness_cpp
+Rcpp::NumericVector sd_outlyingness_cpp(const Eigen::Map<Eigen::MatrixXd> z, int h, int ndir);
+RcppExport SEXP _specProc_sd_outlyingness_cpp(SEXP zSEXP, SEXP hSEXP, SEXP ndirSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type z(zSEXP);
+    Rcpp::traits::input_parameter< int >::type h(hSEXP);
+    Rcpp::traits::input_parameter< int >::type ndir(ndirSEXP);
+    rcpp_result_gen = Rcpp::wrap(sd_outlyingness_cpp(z, h, ndir));
+    return rcpp_result_gen;
+END_RCPP
+}
+// fast_mcd_cpp
+Rcpp::List fast_mcd_cpp(const Eigen::Map<Eigen::MatrixXd> x, int h, int nsamp);
+RcppExport SEXP _specProc_fast_mcd_cpp(SEXP xSEXP, SEXP hSEXP, SEXP nsampSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type h(hSEXP);
+    Rcpp::traits::input_parameter< int >::type nsamp(nsampSEXP);
+    rcpp_result_gen = Rcpp::wrap(fast_mcd_cpp(x, h, nsamp));
+    return rcpp_result_gen;
+END_RCPP
+}
+// spca_grid_cpp
+Eigen::MatrixXd spca_grid_cpp(const Eigen::Map<Eigen::MatrixXd> x_in, int k, double lambda, int ngrid, int maxiter, double tol);
+RcppExport SEXP _specProc_spca_grid_cpp(SEXP x_inSEXP, SEXP kSEXP, SEXP lambdaSEXP, SEXP ngridSEXP, SEXP maxiterSEXP, SEXP tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type x_in(x_inSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< int >::type ngrid(ngridSEXP);
+    Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(spca_grid_cpp(x_in, k, lambda, ngrid, maxiter, tol));
+    return rcpp_result_gen;
+END_RCPP
+}
 // voigt_cpp
 NumericVector voigt_cpp(NumericVector x, double sigma, double gamma);
 RcppExport SEXP _specProc_voigt_cpp(SEXP xSEXP, SEXP sigmaSEXP, SEXP gammaSEXP) {
@@ -108,6 +162,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_specProc_computeMeans", (DL_FUNC) &_specProc_computeMeans, 1},
     {"_specProc_epo_cpp", (DL_FUNC) &_specProc_epo_cpp, 3},
     {"_specProc_glsw_cpp", (DL_FUNC) &_specProc_glsw_cpp, 2},
+    {"_specProc_univariate_mcd_cpp", (DL_FUNC) &_specProc_univariate_mcd_cpp, 2},
+    {"_specProc_sd_outlyingness_cpp", (DL_FUNC) &_specProc_sd_outlyingness_cpp, 3},
+    {"_specProc_fast_mcd_cpp", (DL_FUNC) &_specProc_fast_mcd_cpp, 3},
+    {"_specProc_spca_grid_cpp", (DL_FUNC) &_specProc_spca_grid_cpp, 6},
     {"_specProc_voigt_cpp", (DL_FUNC) &_specProc_voigt_cpp, 3},
     {"_specProc_yGradientglswCpp", (DL_FUNC) &_specProc_yGradientglswCpp, 3},
     {NULL, NULL, 0}

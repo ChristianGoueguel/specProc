@@ -21,10 +21,19 @@ ready for modeling:
 
 - **Baseline correction**: asymmetric least squares, arPLS, and
   iterative polynomial fitting.
-- **Normalization and scaling**: SNV, MSC, area, background and
-  internal-standard normalization; Pareto, Poisson and min-max scaling.
+- **Normalization and scaling**: SNV, MSC, extended MSC (EMSC), area,
+  background and internal-standard normalization; Pareto, Poisson and
+  min-max scaling.
 - **Removing unwanted variation**: OSC (three algorithms), direct
-  orthogonalization, DOSC, NAS, O2PLS, projected OSC, EPO, GLSW.
+  orthogonalization, DOSC, O2PLS, projected OSC, EPO, GLSW.
+- **Robust PCA**: ROBPCA, robust sparse PCA (ROSPCA) and MacroPCA, with
+  outlier maps and cell maps.
+- **Figures of merit**: net analyte signal, sensitivity, selectivity,
+  analytical sensitivity, limits of detection and quantification.
+- **tidymodels integration**: recipe steps for baseline correction, SNV,
+  MSC, EMSC, scaling and every orthogonalization filter, so that
+  preprocessing is re-estimated on each resample and tuned with the
+  model.
 - **Calibration transfer** between instruments: PDS, GLSW.
 - **Line fitting**: exact Voigt, pseudo-Voigt, Gaussian and Lorentzian
   profiles, for single or overlapping lines.
@@ -57,6 +66,9 @@ the Bioconductor package ropls: `BiocManager::install("ropls")`.
 - **Tidy in, tidy out.** Spectra are stored one per row, and the column
   names are the wavelengths. Functions accept matrices, data frames or
   tibbles and return tibbles.
+- **Built for tidymodels.** Preprocessing, filtering and robust PCA are
+  available as recipe steps, so they are estimated on training data only
+  and can be tuned with the model.
 - **Preprocessing parameters are returned, not hidden.** Centers,
   scales, reference spectra, filter matrices and loadings come back with
   the result. You can then estimate a transformation on calibration data
@@ -75,22 +87,31 @@ the Bioconductor package ropls: `BiocManager::install("ropls")`.
 The package ships with `specLIBS`: LIBS spectra of **50 soil samples**,
 each measured at **8 locations**. The spectra have 7152 channels between
 199 and 822 nm, stored as raw counts, together with the clay, sand and
-silt content of each sample.
+silt content of each sample. The examples below use the tidyverse and
+tidymodels.
 
 ``` r
+suppressPackageStartupMessages(library(mixOmics))  # PLS engine; attach before dplyr
 library(specProc)
+library(recipes)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
 data(specLIBS)
+meta_cols <- c("Sample", "Location", "Clay", "Sand", "Silt", "Texture", "Structure", "Type")
+channels <- setdiff(names(specLIBS), meta_cols)   # the 7152 wavelengths (nm)
+wl <- as.numeric(channels)
 
-meta <- specLIBS[1:8]                       # sample information
-X <- as.matrix(specLIBS[-(1:8)])            # 400 x 7152 intensity matrix
-wl <- as.numeric(colnames(X))               # wavelengths (nm)
-
-dim(X)
-#> [1]  400 7152
-table(soil_type = meta$Type) / 8            # number of samples per soil type
-#> soil_type
-#>  Clay Loamy Sandy 
-#>     6    37     7
+dim(specLIBS)
+#> [1]  400 7160
+specLIBS |> distinct(Sample, Type) |> count(Type)   # samples per soil type
+#> # A tibble: 3 × 2
+#>   Type      n
+#>   <fct> <int>
+#> 1 Clay      6
+#> 2 Loamy    37
+#> 3 Sandy     7
 ```
 
 The design is **nested**: the 8 spectra of a sample are repeated
@@ -100,10 +121,12 @@ size and biases cross-validated errors downward. The worked example
 below uses the sample as the unit of analysis wherever it matters.
 
 ``` r
-by_type <- average(cbind(Type = meta$Type, as.data.frame(X)), Type)
-plot_spectra(by_type, id = Type) +
-  ggplot2::theme(legend.position = "top") +
-  ggplot2::labs(color = NULL, title = "Mean spectrum by soil type")
+specLIBS |>
+  select(Type, all_of(channels)) |>
+  average(Type) |>
+  plot_spectra(id = Type) +
+  theme(legend.position = "top") +
+  labs(color = NULL, title = "Mean spectrum by soil type")
 ```
 
 <img src="man/figures/README-overview-1.png" width="90%" />
@@ -113,15 +136,19 @@ plot_spectra(by_type, id = Type) +
 ### 1. Baseline correction
 
 LIBS spectra sit on a continuum from bremsstrahlung and recombination
-radiation. `baseline_arpls()` estimates it with asymmetrically
-reweighted penalized least squares. Positive residuals (the emission
-lines) are downweighted, so the baseline follows the continuum instead
-of the peaks. The smoothing parameter `lambda` controls how stiff the
-baseline is.
+radiation. `step_baseline()` estimates it for each spectrum, by default
+with asymmetrically reweighted penalized least squares
+(`baseline_arpls()`). Positive residuals (the emission lines) are
+downweighted, so the baseline follows the continuum instead of the
+peaks. The smoothing parameter `lambda` controls how stiff the baseline
+is.
 
 ``` r
-bl <- baseline_arpls(X, lambda = 1e5, max.iter = 20)
-Xc <- as.matrix(bl$correction)
+baseline_recipe <- recipe(~ ., data = specLIBS) |>
+  update_role(all_of(meta_cols), new_role = "id") |>
+  step_baseline(all_predictors(), lambda = 1e5, options = list(max.iter = 20))
+
+baselined <- baseline_recipe |> prep() |> bake(new_data = NULL)
 ```
 
 <img src="man/figures/README-baseline-plot-1.png" width="90%" />
@@ -139,25 +166,25 @@ across the 8 locations of a sample measures how well it works. The lower
 the RSD, the more repeatable the measurement:
 
 ``` r
-line_area <- function(M, center, half_width = 0.15) {
-  rowSums(M[, abs(wl - center) < half_width, drop = FALSE])
+line_area <- function(spectra, center, half_width = 0.15) {
+  rowSums(spectra[channels[abs(wl - center) < half_width]])
 }
-within_rsd <- function(v) {
-  median(tapply(v, meta$Sample, function(z) sd(z) / mean(z) * 100))
+within_rsd <- function(area) {
+  tibble(Sample = specLIBS$Sample, area = area) |>
+    group_by(Sample) |>
+    summarise(rsd = sd(area) / mean(area) * 100) |>
+    summarise(median(rsd)) |>
+    pull()
 }
 
-Xsnv <- as.matrix(snv(Xc)$correction)
-Xarea <- as.matrix(normalize(as.data.frame(Xc), method = "area"))
+snv_normalized <- baseline_recipe |> step_snv(all_predictors()) |> prep() |> bake(new_data = NULL)
+area_normalized <- normalize(baselined[channels], method = "area")
 
-tibble::tibble(
-  preprocessing = c("raw", "baseline", "baseline + area", "baseline + SNV"),
-  `median RSD of Ca II 393.37 nm (%)` = round(c(
-    within_rsd(line_area(X, 393.37)),
-    within_rsd(line_area(Xc, 393.37)),
-    within_rsd(line_area(Xarea, 393.37)),
-    within_rsd(line_area(Xsnv, 393.37))
-  ), 2)
-)
+list(raw = specLIBS, baseline = baselined, `baseline + area` = area_normalized,
+     `baseline + SNV` = snv_normalized) |>
+  sapply(\(spectra) within_rsd(line_area(spectra, 393.37))) |>
+  round(2) |>
+  tibble::enframe(name = "preprocessing", value = "median RSD of Ca II 393.37 nm (%)")
 #> # A tibble: 4 × 2
 #>   preprocessing   `median RSD of Ca II 393.37 nm (%)`
 #>   <chr>                                         <dbl>
@@ -174,7 +201,9 @@ and continuum, a large and relatively stable component that dilutes the
 relative variation. Removing it exposes the true variability of the
 line, which normalization then has to correct. Which normalization works
 best depends on the matrix and the line, so compare the options on
-replicate spectra rather than assuming one.
+replicate spectra rather than assuming one. `step_msc()` and
+`step_emsc()` provide (extended) multiplicative scatter correction in
+the same way.
 
 ### 3. Screening outlying shots
 
@@ -183,12 +212,17 @@ each shot with the other shots of the same sample, using a robust
 z-score (median and MAD) of the total emitted intensity:
 
 ``` r
-total <- rowSums(X)
-robust_z <- ave(total, meta$Sample, FUN = function(v) (v - median(v)) / mad(v))
-table(flagged = abs(robust_z) > 3.5)
-#> flagged
-#> FALSE  TRUE 
-#>   384    16
+shots <- snv_normalized |>
+  mutate(total = rowSums(specLIBS[channels])) |>
+  group_by(Sample) |>
+  mutate(robust_z = (total - median(total)) / mad(total)) |>
+  ungroup()
+count(shots, flagged = abs(robust_z) > 3.5)
+#> # A tibble: 2 × 2
+#>   flagged     n
+#>   <lgl>   <int>
+#> 1 FALSE     384
+#> 2 TRUE       16
 ```
 
 The median and MAD are used because, with 8 shots per sample, a single
@@ -203,10 +237,14 @@ After screening, reduce each sample to one spectrum. `average()`
 computes group means in C++:
 
 ``` r
-keep <- abs(robust_z) <= 3.5
-Xs <- average(cbind(Sample = meta$Sample[keep], as.data.frame(Xsnv[keep, ])), Sample)
-samples <- meta[match(Xs$Sample, meta$Sample), c("Sample", "Clay", "Sand", "Silt", "Type")]
-dim(Xs)
+sample_spectra <- shots |>
+  filter(abs(robust_z) <= 3.5) |>
+  select(Sample, all_of(channels)) |>
+  average(Sample)
+samples <- specLIBS |>
+  distinct(Sample, Clay, Sand, Silt, Type) |>
+  semi_join(sample_spectra, by = "Sample")
+dim(sample_spectra)
 #> [1]   50 7153
 ```
 
@@ -219,13 +257,11 @@ Gaussian and Lorentzian widths (FWHM) and area are estimated by
 Levenberg–Marquardt least squares.
 
 ``` r
-window <- names(Xs)[-1][wl > 392.9 & wl < 397.3]
-fit <- multipeak_fit(
-  Xs[1, c("Sample", window)],
-  peaks = c(393.37, 394.40, 396.15, 396.85),
-  profiles = "voigt",
-  id = "Sample"
-)
+window <- channels[wl > 392.9 & wl < 397.3]
+fit <- sample_spectra |>
+  slice(1) |>
+  select(Sample, all_of(window)) |>
+  multipeak_fit(peaks = c(393.37, 394.40, 396.15, 396.85), profiles = "voigt", id = "Sample")
 fit$tidied[[1]]
 #> # A tibble: 17 × 5
 #>    term  estimate std.error  statistic   p.value
@@ -274,11 +310,14 @@ uses the Faddeeva function and is accurate to about 1e-10. The faster
 1%:
 
 ``` r
-x <- seq(-2, 2, length.out = 400)
-v <- voigt_profile(x, y0 = 0, xc = 0, wG = 0.6, wL = 0.4, A = 1)
-pv <- pseudo_voigt_profile(x, y0 = 0, xc = 0, wG = 0.6, wL = 0.4, A = 1)$y
-max(abs(v - pv)) / max(v)
-#> [1] 0.01234509
+profiles <- tibble(x = seq(-2, 2, length.out = 400)) |>
+  mutate(voigt = voigt_profile(x, y0 = 0, xc = 0, wG = 0.6, wL = 0.4, A = 1),
+         pseudo_voigt = pseudo_voigt_profile(x, y0 = 0, xc = 0, wG = 0.6, wL = 0.4, A = 1)$y)
+profiles |> summarise(max_relative_error = max(abs(voigt - pseudo_voigt)) / max(voigt))
+#> # A tibble: 1 × 1
+#>   max_relative_error
+#>                <dbl>
+#> 1             0.0123
 ```
 
 ### 6. Descriptive statistics: classical and robust
@@ -289,7 +328,8 @@ biweight estimators, and medcouple-based measures of skewness and tail
 weight:
 
 ``` r
-summary_stats(samples[c("Clay", "Sand", "Silt")])
+fractions <- select(samples, Clay, Sand, Silt)
+summary_stats(fractions)
 #> # A tibble: 3 × 14
 #>   variable  mean  mode median   IQR    sd variance    cv   min   max range
 #>   <chr>    <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl> <dbl> <dbl> <dbl> <dbl>
@@ -297,7 +337,7 @@ summary_stats(samples[c("Clay", "Sand", "Silt")])
 #> 2 Sand      33.6  19     25    11.6  25.2     637.  75.1   5    92.9  87.9
 #> 3 Silt      34.6  39.9   39.9  12.9  15.4     237.  44.5   4    65.7  61.7
 #> # ℹ 3 more variables: skewness <dbl>, kurtosis <dbl>, count <int>
-summary_stats(samples[c("Clay", "Sand", "Silt")], robust = TRUE)
+summary_stats(fractions, robust = TRUE)
 #> # A tibble: 3 × 13
 #>   variable median   mad    Qn    Sn medcouple   LMC   RMC biloc biscale bivar
 #>   <chr>     <dbl> <dbl> <dbl> <dbl>     <dbl> <dbl> <dbl> <dbl>   <dbl> <dbl>
@@ -318,9 +358,9 @@ heaviness (*h*). Its fences are placed so that, under the fitted model,
 the chosen proportion `alpha` of observations falls outside them:
 
 ``` r
-generalized_boxplot(samples[c("Clay", "Sand", "Silt")], xlabels.angle = 0) +
-  ggplot2::coord_flip() +
-  ggplot2::labs(title = "Particle-size fractions (%), generalized boxplot")
+generalized_boxplot(fractions, xlabels.angle = 0) +
+  coord_flip() +
+  labs(title = "Particle-size fractions (%), generalized boxplot")
 ```
 
 <img src="man/figures/README-boxplot-1.png" width="90%" />
@@ -332,25 +372,27 @@ correlation with the biweight midcorrelation, which downweights
 observations far from the bulk of the data:
 
 ``` r
-Xmat <- as.matrix(Xs[-1])
-lines_df <- data.frame(
-  Clay = samples$Clay,
-  `Mg II 279.55` = line_area(Xmat, 279.55),
-  `Si I 288.16` = line_area(Xmat, 288.16),
-  `Ca II 393.37` = line_area(Xmat, 393.37),
-  `Al I 396.15` = line_area(Xmat, 396.15),
-  `K I 766.49` = line_area(Xmat, 766.49),
-  check.names = FALSE
-)
-pearson <- correlation(lines_df, Clay)
-bicor <- correlation(lines_df, Clay, method = "bicor")
-merge(pearson[1:2], bicor[1:2], by = "variable", suffixes = c("_pearson", "_bicor"))
-#>       variable .correlation_pearson .correlation_bicor
-#> 1  Al I 396.15           -0.6442892         -0.2391099
-#> 2 Ca II 393.37           -0.5734797         -0.4272420
-#> 3   K I 766.49            0.7676607          0.5171088
-#> 4 Mg II 279.55            0.7565064          0.3375982
-#> 5  Si I 288.16           -0.5498840         -0.3494116
+lines_df <- samples |>
+  select(Sample, Clay) |>
+  inner_join(sample_spectra, by = "Sample") |>
+  transmute(
+    Clay,
+    `Mg II 279.55` = line_area(pick(everything()), 279.55),
+    `Si I 288.16` = line_area(pick(everything()), 288.16),
+    `Ca II 393.37` = line_area(pick(everything()), 393.37),
+    `Al I 396.15` = line_area(pick(everything()), 396.15),
+    `K I 766.49` = line_area(pick(everything()), 766.49)
+  )
+inner_join(correlation(lines_df, Clay)[1:2], correlation(lines_df, Clay, method = "bicor")[1:2],
+           by = "variable", suffix = c("_pearson", "_bicor"))
+#> # A tibble: 5 × 3
+#>   variable     .correlation_pearson .correlation_bicor
+#>   <chr>                       <dbl>              <dbl>
+#> 1 K I 766.49                  0.768              0.517
+#> 2 Mg II 279.55                0.757              0.338
+#> 3 Si I 288.16                -0.550             -0.349
+#> 4 Ca II 393.37               -0.573             -0.427
+#> 5 Al I 396.15                -0.644             -0.239
 ```
 
 The two coefficients disagree sharply for some lines, notably Mg, which
@@ -360,40 +402,73 @@ scatter plots, and to be cautious about extrapolating to the bulk of the
 data. `correlation()` also provides Spearman, Kendall and Chatterjee’s
 ξ, which captures non-monotonic dependence.
 
-### 8. Removing unwanted variation
+### 8. Screening samples with robust PCA
 
-Remaining shot-to-shot differences within a sample are nuisance
-variation. External parameter orthogonalization (EPO) estimates the
-dominant directions of such variation from a *clutter matrix* and
-projects them out. The clutter matrix here is the deviation of each
-spectrum from its sample mean:
+`robpca()` fits a PCA that resists outlying observations, and
+`plot_outlier_map()` classifies every sample by its score distance
+(within the PCA subspace) and orthogonal distance (to it):
 
 ``` r
-sample_means <- apply(Xsnv, 2, function(v) ave(v, meta$Sample))
-clutter <- Xsnv - sample_means
-
-sd_ca <- function(M) median(tapply(line_area(M, 393.37), meta$Sample, sd))
-sapply(c(0, 1, 2, 3, 5), function(k) {
-  M <- if (k == 0) Xsnv else as.matrix(epo(Xsnv, ncomp = k, clutter = clutter)$correction)
-  c(ncomp = k, within_sample_sd = round(sd_ca(M), 3))
-})
-#>                   [,1]  [,2]  [,3]  [,4]  [,5]
-#> ncomp            0.000 1.000 2.000 3.000 5.000
-#> within_sample_sd 1.933 1.636 1.014 0.912 0.839
+set.seed(1)
+pca <- robpca(select(sample_spectra, -Sample), k = 3)
+plot_outlier_map(pca)
 ```
 
-Here the clutter directions are estimated from the same spectra they are
-evaluated on, so this reduction is optimistic. In practice, estimate the
-EPO projection (or a `glsw()` filter) on calibration samples only, and
-choose `ncomp` by cross-validation with folds formed by sample.
+<img src="man/figures/README-robpca-1.png" width="90%" />
 
-The same rule applies to supervised filters that use the response:
-`osc()`, `direct_osc()`, `direct_orthogonal()`, `nas()`, `o2pls()` and
-`projected_osc()`. Refit them inside each cross-validation fold. If a
-filter is fitted once on all the data before cross-validating, the
-estimated prediction error is biased downward. Each function returns
-what you need to apply the fitted filter to new spectra: loadings,
-weights, centers and scales.
+Samples to the right of the vertical cut-off are far from the center but
+follow the main structure of the data (good leverage points); samples
+above the horizontal cut-off do not follow that structure. Inspect them
+before calibrating, rather than discarding them automatically.
+`rospca()` gives sparse loadings, and `macropca()` also handles outlying
+cells and missing values; `plot_cell_map()` shows which cells deviate.
+
+### 9. Modeling with tidymodels
+
+Every preprocessing and filtering method is also a recipe step, so a
+complete pipeline can be tuned and validated without leakage: each step
+is re-estimated on the analysis set of every resample. Here, SNV and an
+orthogonal signal correction filter feed a PLS model of clay content,
+and the filter and the model are tuned together by cross-validation over
+samples:
+
+``` r
+library(parsnip)
+library(workflows)
+library(tune)
+library(rsample)
+library(plsmod)
+
+clay_data <- samples |>
+  select(Sample, Clay) |>
+  inner_join(sample_spectra, by = "Sample")
+
+clay_recipe <- recipe(Clay ~ ., data = clay_data) |>
+  update_role(Sample, new_role = "id") |>
+  step_osc(all_predictors(), method = "fearn", num_comp = tune("filter"))
+clay_model <- pls(num_comp = tune()) |>
+  set_mode("regression") |>
+  set_engine("mixOmics", scale = FALSE)
+
+set.seed(2024)
+tuned <- tune_grid(
+  workflow(clay_recipe, clay_model),
+  resamples = vfold_cv(clay_data, v = 5),
+  grid = expand_grid(filter = 1:2, num_comp = 1:6)
+)
+show_best(tuned, metric = "rmse", n = 3)
+#> # A tibble: 3 × 8
+#>   num_comp filter .metric .estimator  mean     n std_err .config             
+#>      <int>  <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
+#> 1        5      2 rmse    standard    7.20     5   0.924 Preprocessor2_Model5
+#> 2        6      1 rmse    standard    7.20     5   0.925 Preprocessor1_Model6
+#> 3        6      2 rmse    standard    7.25     5   0.848 Preprocessor2_Model6
+```
+
+A supervised filter such as OSC must be refitted inside each fold, which
+the recipe guarantees. Fitted once on all the data before
+cross-validating, it biases the estimated prediction error downward. The
+`calibration` and `orthogonalization` vignettes develop this in detail.
 
 ## Learn more
 
@@ -406,6 +481,10 @@ The vignettes develop the example above in more depth:
 - `vignette("calibration", package = "specProc")`: predicting soil clay
   content with a compositional (log-ratio) PLS model, and estimating
   prediction error without leakage.
+- `vignette("orthogonalization", package = "specProc")`: what each
+  orthogonalization method removes from LIBS spectra of forage samples,
+  whether it improves potassium predictions, the net analyte signal and
+  figures of merit, and the same analysis as a tidymodels workflow.
 
 They are also available as [articles on the package
 website](https://christiangoueguel.com/specProc/articles/).
@@ -415,11 +494,14 @@ website](https://christiangoueguel.com/specProc/articles/).
 | Task | Functions |
 |----|----|
 | Baseline correction | `baseline_arpls()`, `baseline_als()`, `baseline_lsp()` |
-| Normalization | `snv()`, `msc()`, `normalize()` |
+| Normalization | `snv()`, `msc()`, `emsc()`, `normalize()` |
 | Scaling and centering | `center()`, `pareto_scale()`, `poisson_scale()`, `minmax()` |
-| Orthogonal filtering | `osc()`, `direct_osc()`, `direct_orthogonal()`, `nas()`, `projected_osc()`, `o2pls()`, `opls()` |
+| Orthogonal filtering | `osc()`, `direct_osc()`, `direct_orthogonal()`, `projected_osc()`, `o2pls()`, `opls()`, `predict()` |
 | Interference removal | `epo()`, `glsw()`, `y_gradient_glsw()` |
 | Calibration transfer | `pds()` |
+| Robust PCA | `robpca()`, `rospca()`, `macropca()`, `plot_outlier_map()`, `plot_cell_map()` |
+| Figures of merit | `nas()` |
+| Recipe steps (tidymodels) | `step_baseline()`, `step_snv()`, `step_msc()`, `step_emsc()`, `step_pareto_scale()`, `step_poisson_scale()`, `step_epo()`, `step_glsw()`, `step_osc()`, `step_direct_orthogonal()`, `step_direct_osc()`, `step_projected_osc()`, `step_y_gradient_glsw()`, `step_robust_bcyj()`, `step_robpca()`, `step_rospca()`, `step_macropca()` |
 | Line profiles | `voigt_profile()`, `pseudo_voigt_profile()`, `gaussian_profile()`, `lorentzian_profile()` |
 | Line fitting | `peak_fit()`, `multipeak_fit()`, `plot_fit()` |
 | Location and scale | `biweight_location()`, `biweight_scale()`, `biweight_midvariance()`, `rousseeuw_croux()`, `umad()` |
