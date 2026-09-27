@@ -1,0 +1,582 @@
+# Removing unwanted variation: a comparison of orthogonalization methods
+
+Most of the variation in a set of LIBS spectra has nothing to do with
+the property we want to predict. Plasma conditions change the total
+emitted intensity from shot to shot and sample to sample, and every
+element in the sample adds its own lines. Orthogonalization methods try
+to identify this unwanted variation and remove it before calibration.
+
+specProc implements two families of such methods, which differ in how
+they define “unwanted”:
+
+| Family | Unwanted variation is… | Functions |
+|:---|:---|:---|
+| External | the variation between spectra that should be identical (clutter) | [`epo()`](https://christiangoueguel.com/specProc/reference/epo.md), [`glsw()`](https://christiangoueguel.com/specProc/reference/glsw.md) |
+| Response-orthogonal | the variation in \mathbf{X} uncorrelated with the response \mathbf{y} | [`osc()`](https://christiangoueguel.com/specProc/reference/osc.md), [`direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/direct_orthogonal.md), [`nas()`](https://christiangoueguel.com/specProc/reference/nas.md), [`direct_osc()`](https://christiangoueguel.com/specProc/reference/direct_osc.md), [`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md), [`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md), [`opls()`](https://christiangoueguel.com/specProc/reference/opls.md), [`y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/y_gradient_glsw.md) |
+
+This vignette applies all of them to the same problem, predicting the
+potassium content of forage samples, and asks three questions:
+
+1.  **What does each method remove?**
+2.  **Does removing it improve predictions** on samples not used to fit
+    the filter?
+3.  **Which methods are actually the same method?**
+
+``` r
+
+library(specProc)
+data(fourrage)
+
+meta <- fourrage[1:14]
+X <- as.matrix(fourrage[-(1:14)])
+wl <- as.numeric(colnames(X))
+dim(X)
+#> [1]  368 7152
+```
+
+`fourrage` contains 368 measurements of 365 forage samples (three
+samples were measured twice). Each measurement is the mean of 8 laser
+shots. The target is potassium, which is available for every measurement
+and spans 0.5 to 4%.
+
+## Preparing the spectra
+
+Two practical steps come first:
+
+- **Channel overlap.** Two spectrometers overlap near 766 nm, so a few
+  channels repeat wavelengths already covered. We drop them.
+- **Binning.** The GLSW filters are p \times p matrices: with 7152
+  channels, each filter would take about 400 MB. Summing 4 adjacent
+  channels reduces this to 25 MB and speeds up every method, at the cost
+  of some spectral resolution. Most emission lines in these spectra span
+  several channels, so little information is lost.
+
+Finally, SNV normalizes each spectrum.
+
+``` r
+
+keep <- wl > cummax(c(-Inf, wl[-length(wl)]))
+sum(!keep)  # overlapping channels dropped
+#> [1] 6
+bin <- ceiling(seq_len(sum(keep)) / 4)
+Xb <- t(rowsum(t(X[, keep]), bin))
+wlb <- as.vector(tapply(wl[keep], bin, mean))
+Xs <- as.matrix(snv(Xb)$correction)
+dim(Xs)
+#> [1]  368 1787
+```
+
+## Identifying the unwanted variation
+
+A principal component analysis shows where the variance lies. We
+correlate the scores of the first five components with the total emitted
+intensity and with the reference contents of several elements:
+
+``` r
+
+y <- meta$K
+total <- rowSums(X)
+chem <- as.data.frame(meta[c("K", "Ca", "Mg", "Na", "P", "S")])
+pc_raw <- prcomp(Xb)
+pc_snv <- prcomp(Xs)
+explained <- function(pc, k = 5) round(100 * pc$sdev[1:k]^2 / sum(pc$sdev^2), 1)
+rbind(raw = explained(pc_raw), snv = explained(pc_snv))  # % variance, PC1-PC5
+#>     [,1] [,2] [,3] [,4] [,5]
+#> raw 63.2 18.5  6.1  3.2  2.5
+#> snv 39.5 29.2 10.9  5.2  3.8
+
+correlations <- function(scores) {
+  round(cor(scores, cbind(total, chem), use = "pairwise.complete.obs"), 2)
+}
+correlations(pc_raw$x[, 1:5])
+#>     total     K    Ca    Mg    Na     P     S
+#> PC1 -0.98 -0.28 -0.21 -0.32 -0.20 -0.30 -0.42
+#> PC2 -0.10 -0.22  0.26  0.41  0.77  0.19  0.16
+#> PC3 -0.02  0.48 -0.52 -0.11  0.10  0.14  0.06
+#> PC4  0.15 -0.25 -0.19 -0.26 -0.25 -0.26 -0.22
+#> PC5  0.01  0.08  0.33 -0.06 -0.06 -0.11  0.05
+correlations(pc_snv$x[, 1:5])
+#>     total     K    Ca    Mg    Na     P     S
+#> PC1 -0.71 -0.15 -0.33 -0.55 -0.62 -0.39 -0.47
+#> PC2 -0.60 -0.36  0.05  0.13  0.51 -0.04 -0.13
+#> PC3  0.01  0.47 -0.57 -0.15  0.03  0.12  0.05
+#> PC4  0.21 -0.20  0.02 -0.17 -0.25 -0.26 -0.12
+#> PC5  0.05 -0.29 -0.40  0.11 -0.06 -0.01 -0.05
+```
+
+The raw spectra are dominated by one structure. The first component
+explains 63.2% of the variance, and its scores are almost perfectly
+correlated with the total intensity. This is the multiplicative effect
+of the plasma: a hotter or denser plasma raises all lines together. SNV
+removes most of it, but the SNV spectra still carry several structures
+that have little to do with potassium:
+
+- **PC1 and PC2** still follow the total intensity, and also sodium and
+  magnesium. After SNV, intensity changes appear as changes in line
+  ratios, which a per-spectrum scaling cannot remove.
+- **PC3** contrasts potassium with calcium, the main cation that varies
+  in the opposite direction.
+
+How much of the SNV variance is related to potassium at all? Regressing
+each channel on \mathbf{y} gives the share of variance that a linear
+function of potassium content explains:
+
+``` r
+
+Xc <- scale(Xs, scale = FALSE)
+yc <- y - mean(y)
+y_part <- yc %*% crossprod(yc, Xc) / sum(yc^2)
+round(100 * sum(y_part^2) / sum(Xc^2), 1)  # % of the variance
+#> [1] 8
+```
+
+Only about 8% of the variance is directly related to potassium. The
+remaining variance is the target of the orthogonalization methods.
+
+## Calibration and test sets
+
+We set aside one third of the samples as a test set. Filters and PLS
+models are always fitted on the calibration set only, and every tuning
+decision uses cross-validation within the calibration set.
+
+The external methods need clutter: spectra that should be identical but
+are not. The three samples measured twice provide this. Their difference
+spectra describe how the measurement of a given material varies from one
+session to the next. We keep these three samples in the calibration set.
+
+``` r
+
+set.seed(1)
+samples <- unique(meta$Sample)
+twice <- unique(meta$Sample[duplicated(meta$Sample)])
+test_samples <- sample(setdiff(samples, twice), round(length(samples) / 3))
+test <- meta$Sample %in% test_samples
+cal <- !test
+c(calibration = sum(cal), test = sum(test))
+#> calibration        test 
+#>         246         122
+
+first <- match(twice, meta$Sample)
+second <- sapply(twice, function(s) max(which(meta$Sample == s)))
+X1 <- Xs[first, ]
+X2 <- Xs[second, ]
+clutter <- X2 - X1
+
+Xcal <- Xs[cal, ]
+ycal <- y[cal]
+```
+
+Three difference spectra are a small clutter matrix. In practice,
+repeated measurements of a few reference materials over several sessions
+would describe this variation better.
+
+## A common interface for the filters
+
+Every method is estimated on calibration spectra and then applied, with
+the same parameters, to new spectra. The functions return what is needed
+for this (loadings, weights, centers or filter matrices), but in
+different forms. We wrap each one in a function `fit(X, y, k)` that
+returns a function to correct new spectra. `k` is the tuning parameter:
+the number of components removed or, for GLSW, the strength of the
+down-weighting.
+
+``` r
+
+# Remove all components at once: (X - center) - (X - center) W P'
+remove_block <- function(Xn, center, W, P) {
+  Z <- sweep(Xn, 2, center)
+  Z - Z %*% W %*% t(P)
+}
+# Remove components one at a time (the weights refer to the deflated matrix)
+remove_seq <- function(Xn, center, W, P) {
+  Z <- sweep(Xn, 2, center)
+  for (i in seq_len(ncol(W))) Z <- Z - (Z %*% W[, i]) %*% t(P[, i])
+  Z
+}
+mat <- function(x) as.matrix(x)
+
+filters <- list(
+  `none` = list(grid = 0, fit = function(X, y, k) identity),
+
+  # External: the clutter directions are projected out ...
+  `EPO` = list(grid = 1:3, fit = function(X, y, k) {
+    V <- mat(epo(X, ncomp = k, clutter = clutter)$loadings)
+    function(Xn) Xn - Xn %*% V %*% t(V)
+  }),
+  # ... or down-weighted; alpha is set relative to the largest clutter eigenvalue
+  `GLSW` = list(grid = 0:4, fit = function(X, y, k) {
+    lambda <- svd(scale(clutter, scale = FALSE), 0, 0)$d[1]^2
+    G <- mat(glsw(X1, X2, alpha = lambda * 10^-k))
+    function(Xn) Xn %*% G
+  }),
+
+  # Response-orthogonal
+  `OSC (Wold)` = list(grid = 1:4, fit = function(X, y, k) {
+    o <- osc(X, y, method = "wold", ncomp = k)
+    function(Xn) remove_seq(Xn, o$center, mat(o$weights), mat(o$loadings))
+  }),
+  `OSC (Sjoblom)` = list(grid = 1:4, fit = function(X, y, k) {
+    o <- osc(X, y, method = "sjoblom", ncomp = k)
+    function(Xn) remove_seq(Xn, o$center, mat(o$weights), mat(o$loadings))
+  }),
+  `OSC (Fearn)` = list(grid = 1:4, fit = function(X, y, k) {
+    o <- osc(X, y, method = "fearn", ncomp = k)
+    function(Xn) remove_block(Xn, o$center, mat(o$weights), mat(o$loadings))
+  }),
+  `DO / NAS` = list(grid = 1:4, fit = function(X, y, k) {
+    o <- direct_orthogonal(X, y, ncomp = k)
+    function(Xn) remove_block(Xn, o$center, mat(o$loading), mat(o$loading))
+  }),
+  `DOSC` = list(grid = 1:4, fit = function(X, y, k) {
+    o <- direct_osc(X, y, ncomp = k)
+    function(Xn) remove_block(Xn, o$center, mat(o$weight), mat(o$loading))
+  }),
+  `POSC / OPLS` = list(grid = 1:4, fit = function(X, y, k) {
+    o <- projected_osc(X, y, ncomp = k + 1)  # k orthogonal components
+    function(Xn) remove_block(Xn, o$center, mat(o$weights), mat(o$loadings))
+  }),
+  # alpha relative to the largest eigenvalue of differences between neighbours in y
+  `y-gradient GLSW` = list(grid = 0:4, fit = function(X, y, k) {
+    lambda <- svd(diff(X[order(y), ]), 0, 0)$d[1]^2
+    G <- mat(y_gradient_glsw(X, y, alpha = lambda * 10^-k))
+    function(Xn) Xn %*% G
+  })
+)
+```
+
+[`opls()`](https://christiangoueguel.com/specProc/reference/opls.md) is
+not included: it wraps the Bioconductor package ropls and returns a
+fitted model rather than a filter.
+[`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md)
+gives the same filtered data, as shown below.
+
+## What does each method remove?
+
+We fit each method to the calibration set with a comparable setting (2
+components, or \alpha at 1% of the largest eigenvalue for GLSW). For the
+removed part of the spectra, \mathbf{X} - f(\mathbf{X}), we compute:
+
+- **`removed`:** its share of the calibration variance, in percent.
+- **The correlations of its first principal component** with the total
+  intensity and with the element contents (absolute values).
+
+``` r
+
+k_show <- c(EPO = 2, GLSW = 2, `OSC (Wold)` = 2, `OSC (Sjoblom)` = 2,
+            `OSC (Fearn)` = 2, `DO / NAS` = 2, DOSC = 2, `POSC / OPLS` = 2,
+            `y-gradient GLSW` = 2)
+direction <- list()
+removed <- t(sapply(names(k_show), function(m) {
+  f <- filters[[m]]$fit(Xcal, ycal, k_show[[m]])
+  R <- scale(Xcal - f(Xcal), scale = FALSE)
+  s <- svd(R, nu = 1, nv = 1)
+  direction[[m]] <<- s$v[, 1]
+  c(removed = 100 * sum(R^2) / sum(scale(Xcal, scale = FALSE)^2),
+    abs(cor(s$u, cbind(total = total[cal], chem[cal, ]), use = "pairwise.complete.obs"))[1, ])
+}))
+round(removed, 2)
+#>                 removed total    K   Ca   Mg   Na    P    S
+#> EPO               44.20  0.90 0.20 0.28 0.42 0.33 0.32 0.46
+#> GLSW              25.26  0.84 0.10 0.37 0.47 0.44 0.31 0.46
+#> OSC (Wold)        63.19  0.65 0.00 0.36 0.54 0.67 0.32 0.45
+#> OSC (Sjoblom)     68.39  0.74 0.12 0.38 0.51 0.60 0.35 0.49
+#> OSC (Fearn)       62.58  0.61 0.00 0.41 0.54 0.69 0.32 0.45
+#> DO / NAS          67.94  0.73 0.11 0.38 0.52 0.61 0.34 0.49
+#> DOSC              65.13  0.67 0.00 0.36 0.51 0.66 0.30 0.45
+#> POSC / OPLS       59.73  0.63 0.00 0.61 0.56 0.55 0.31 0.47
+#> y-gradient GLSW   10.35  0.61 0.06 0.35 0.53 0.70 0.34 0.46
+```
+
+The table shows what each family targets:
+
+- **The response-orthogonal methods remove the most variance**, about
+  60–70% with only two components. The removed part is uncorrelated with
+  potassium, exactly so for Wold’s and Fearn’s OSC, DOSC and POSC.
+  DO/NAS and Sjöblom’s OSC keep a small correlation, because they remove
+  the principal directions of the \mathbf{y}-orthogonal space, and the
+  scores of \mathbf{X} on these directions need not be orthogonal to
+  \mathbf{y}. What these methods remove is strongly related to the total
+  intensity and to sodium, the structures found by the PCA above.
+- **EPO and GLSW remove less**, and what they remove is mostly the total
+  intensity (correlations of 0.84 and 0.90). When a sample is measured
+  again, what changes most is the plasma, not the composition. It also
+  shows that SNV does not remove all intensity effects.
+- **y-gradient GLSW is the gentlest filter:** it removes about 10% of
+  the variance, again related to sodium and intensity.
+
+The first direction of the removed part (the loading) shows which
+emission lines are involved:
+
+``` r
+
+lines_nm <- c(`Mg` = 279.55, `Ca` = 393.37, `Na` = 588.99, `H` = 656.28,
+              `K` = 766.49, `O` = 777.19)
+op <- par(mfrow = c(4, 1), mar = c(2, 4, 1.5, 1), oma = c(2, 0, 0, 0))
+for (m in c("EPO", "DO / NAS", "POSC / OPLS", "y-gradient GLSW")) {
+  plot(wlb, direction[[m]], type = "l", xlab = "", ylab = "Loading", main = m,
+       cex.main = 0.9)
+  abline(v = lines_nm, col = "grey60", lty = 3)
+  mtext(names(lines_nm), side = 3, at = lines_nm, cex = 0.6, line = 0)
+}
+mtext("Wavelength (nm)", side = 1, outer = TRUE, line = 0.5)
+```
+
+![](orthogonalization_files/figure-html/directions-1.png)
+
+``` r
+
+par(op)
+```
+
+The sign of each loading is arbitrary. The four directions share a
+common pattern: the emission lines of the sample’s metals (Mg, Ca and
+above all the Na doublet at 589 nm) vary against the O I line at 777 nm
+and the continuum above 800 nm. For a measurement in air, the O I line
+comes from both the atmosphere and the organic matrix, so this contrast
+likely reflects how much material is ablated and how the plasma develops
+rather than the composition of the sample. The sodium doublet is the
+largest feature for the response-orthogonal methods and y-gradient GLSW:
+its variation between samples is large and independent of potassium. The
+potassium lines barely appear in these directions.
+
+## Does removing it improve predictions?
+
+We now combine each filter with PLS regression and tune both the filter
+parameter and the number of PLS components (up to 15) by 5-fold
+cross-validation within the calibration set. The two measurements of a
+sample are always in the same fold. The filter is refitted in every
+fold, so the validation spectra never influence it.
+
+``` r
+
+max_comp <- 15
+rmse <- function(pred, obs) sqrt(mean((pred - obs)^2))
+pls_path <- function(Xtr, ytr, Xte) {
+  model <- pls::plsr(ytr ~ Xtr, ncomp = max_comp, method = "simpls")
+  matrix(predict(model, newdata = Xte, ncomp = seq_len(max_comp)), nrow(Xte))
+}
+
+set.seed(2)
+cal_samples <- unique(meta$Sample[cal])
+fold_of <- setNames(sample(rep(1:5, length.out = length(cal_samples))), cal_samples)
+folds <- fold_of[meta$Sample[cal]]
+
+tune <- function(filter) {
+  cv <- sapply(filter$grid, function(k) {
+    pred <- matrix(NA_real_, sum(cal), max_comp)
+    for (f in 1:5) {
+      v <- folds == f
+      clean <- filter$fit(Xcal[!v, ], ycal[!v], k)
+      pred[v, ] <- pls_path(clean(Xcal[!v, ]), ycal[!v], clean(Xcal[v, , drop = FALSE]))
+    }
+    apply(pred, 2, rmse, ycal)
+  })
+  cv <- matrix(cv, max_comp)
+  best <- which(cv == min(cv), arr.ind = TRUE)[1, ]
+  list(k = filter$grid[best[2]], ncomp = unname(best[1]), rmsecv = min(cv))
+}
+```
+
+After tuning, each filter and its PLS model are refitted to the whole
+calibration set and applied to the test set:
+
+``` r
+
+tuned <- lapply(filters, tune)
+test_pred <- sapply(names(filters), function(m) {
+  clean <- filters[[m]]$fit(Xcal, ycal, tuned[[m]]$k)
+  pls_path(clean(Xcal), ycal, clean(Xs[test, ]))[, tuned[[m]]$ncomp]
+})
+```
+
+With 122 test spectra, the test error itself is uncertain. Because all
+methods predict the same test samples, we compare each one with plain
+PLS (`none`) using a paired bootstrap of the test samples. `diff_low`
+and `diff_high` bound a 95% interval for the difference in RMSEP;
+negative values favor the filter.
+
+``` r
+
+set.seed(3)
+boot <- replicate(2000, {
+  i <- sample(nrow(test_pred), replace = TRUE)
+  apply(test_pred[i, ], 2, rmse, y[test][i]) - rmse(test_pred[i, "none"], y[test][i])
+})
+comparison <- data.frame(
+  filter_k = sapply(tuned, `[[`, "k"),
+  pls_ncomp = sapply(tuned, `[[`, "ncomp"),
+  RMSECV = sapply(tuned, `[[`, "rmsecv"),
+  RMSEP = apply(test_pred, 2, rmse, y[test]),
+  diff_low = apply(boot, 1, quantile, 0.025),
+  diff_high = apply(boot, 1, quantile, 0.975)
+)
+round(comparison, 3)
+#>                 filter_k pls_ncomp RMSECV RMSEP diff_low diff_high
+#> none                   0        10  0.297 0.282    0.000     0.000
+#> EPO                    2         9  0.299 0.276   -0.017     0.003
+#> GLSW                   2         9  0.294 0.284   -0.009     0.012
+#> OSC (Wold)             3         7  0.296 0.286   -0.004     0.011
+#> OSC (Sjoblom)          1         9  0.300 0.297    0.007     0.023
+#> OSC (Fearn)            1         9  0.297 0.282    0.000     0.000
+#> DO / NAS               1         9  0.297 0.284    0.001     0.004
+#> DOSC                   1         5  0.310 0.281   -0.022     0.023
+#> POSC / OPLS            1         9  0.297 0.282    0.000     0.000
+#> y-gradient GLSW        4         2  0.294 0.273   -0.020     0.003
+c(null_RMSEP = round(rmse(mean(ycal), y[test]), 3))
+#> null_RMSEP 
+#>      0.534
+```
+
+All models predict potassium far better than the null model, which
+predicts the calibration mean for every sample. The comparison with
+plain PLS is clear:
+
+- **No filter improves predictions measurably.** Every interval for the
+  difference with plain PLS includes zero or favors plain PLS. The
+  differences in RMSEP are a few hundredths of a percent of potassium,
+  against a typical error of about 0.28%.
+- **Filtering mostly moves components from PLS to the filter.** DOSC
+  with one component needs fewer PLS components, and Wold’s OSC and POSC
+  remove three components and need three fewer. The total model
+  complexity hardly changes.
+- **Several filtered models are plain PLS in disguise.** The OSC (Fearn)
+  and POSC models give exactly the same test predictions as plain PLS
+  (both bootstrap bounds are 0), as the next section explains.
+- **y-gradient GLSW gives the most parsimonious model**, with 2 PLS
+  components, and the lowest RMSEP, but the improvement is not
+  distinguishable from chance. It is the one method here that reshapes
+  the covariance of \mathbf{X} rather than removing whole directions,
+  which can make the remaining PLS model simpler.
+
+The external filters could not help much: their clutter comes from three
+samples, and the main thing it describes, the intensity effect, is
+variation PLS already learns to ignore from 246 calibration spectra.
+
+## Which methods are the same method?
+
+Several functions compute the same filter, or a filter that cannot
+change PLS predictions:
+
+``` r
+
+# NAS and DO: both project X onto the complement of the leading principal
+# directions of X after removing the part explained by y
+all.equal(mat(nas(Xcal, ycal, ncomp = 2)),
+          mat(direct_orthogonal(Xcal, ycal, ncomp = 2)$correction),
+          check.attributes = FALSE)
+#> [1] TRUE
+
+# POSC and O2PLS with a single response: both give OPLS-filtered data
+all.equal(mat(projected_osc(Xcal, ycal, ncomp = 3)$correction),
+          mat(o2pls(Xcal, ycal, ncomp = 1, nx = 2)$correction),
+          check.attributes = FALSE)
+#> [1] TRUE
+
+# OPLS filter with 2 orthogonal components + 1-component PLS
+# gives the same predictions as a 3-component PLS model
+clean <- filters$`POSC / OPLS`$fit(Xcal, ycal, 2)
+all.equal(pls_path(clean(Xcal), ycal, clean(Xs[test, ]))[, 1],
+          pls_path(Xcal, ycal, Xs[test, ])[, 3])
+#> [1] TRUE
+```
+
+The first two results mean that
+[`nas()`](https://christiangoueguel.com/specProc/reference/nas.md) and
+[`direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/direct_orthogonal.md),
+and
+[`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md)
+and
+[`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md)
+(with one response), are interchangeable. The third explains the zero
+differences in the comparison table. OPLS splits the systematic
+variation of a PLS model into a predictive and an orthogonal part, but
+the model is the same (Trygg and Wold, 2002; Kemsley and Tapp, 2009).
+The same holds for Fearn’s OSC in this comparison. These filters are
+still useful for interpretation: the orthogonal components show what
+varies in the spectra independently of potassium, as in the figure
+above.
+
+## The main pitfall: fitting the filter before validating
+
+The response-orthogonal filters use \mathbf{y}. If a filter is fitted
+once on all calibration samples and cross-validation is run afterwards,
+the validation samples have already shaped the filter. DOSC shows the
+consequence in its most extreme form:
+
+``` r
+
+leak <- t(sapply(c(1, 2, 4, 8), function(k) {
+  o <- direct_osc(Xcal, ycal, ncomp = k)
+  clean <- function(Xn) remove_block(Xn, o$center, mat(o$weight), mat(o$loading))
+  Xf <- clean(Xcal)
+  pred <- matrix(NA_real_, sum(cal), max_comp)
+  for (f in 1:5) {
+    v <- folds == f
+    pred[v, ] <- pls_path(Xf[!v, ], ycal[!v], Xf[v, , drop = FALSE])
+  }
+  cv <- apply(pred, 2, rmse, ycal)
+  a <- which.min(cv)
+  c(filter_k = k, pls_ncomp = a, leaky_RMSECV = min(cv),
+    RMSEP = rmse(pls_path(Xf, ycal, clean(Xs[test, ]))[, a], y[test]))
+}))
+round(leak, 3)
+#>      filter_k pls_ncomp leaky_RMSECV RMSEP
+#> [1,]        1        15        0.024 0.323
+#> [2,]        2        15        0.002 0.322
+#> [3,]        4        15        0.001 0.322
+#> [4,]        8        15        0.000 0.322
+```
+
+With the filter fitted before cross-validation, the cross-validated
+error is close to zero, while the error on the test set is higher than
+for plain PLS. DOSC first projects \mathbf{y} onto the space of
+\mathbf{X}. With far more channels than samples, this projection
+reproduces the calibration values almost exactly, and so does the
+filtered \mathbf{X}. The calibration vignette
+([`vignette("calibration", package = "specProc")`](https://christiangoueguel.com/specProc/articles/calibration.md))
+shows a milder version of the same bias for the OPLS filter. The rule is
+the same for every method in the response-orthogonal family: refit the
+filter inside every cross-validation fold.
+
+## Summary
+
+- **Identify first.** A PCA with correlations to known factors (total
+  intensity, other elements) shows what the unwanted variation is. Here,
+  it is mainly the plasma intensity effect and the variation of sodium
+  and calcium.
+- **External methods remove what you tell them to.** EPO and GLSW are
+  only as good as the clutter. Differences between repeated measurements
+  of the same material captured the intensity effect, which SNV leaves
+  in part.
+- **Response-orthogonal methods remove a lot of variance, but add no
+  information.** They make models smaller and easier to interpret, not
+  more accurate: the removed variation is variation that PLS already
+  ignores. Some (OPLS/POSC, O2PLS, Fearn’s OSC here) give exactly the
+  PLS predictions.
+- **Validate honestly.** Supervised filters must be refitted inside each
+  fold. Otherwise the cross-validated error can be meaningless.
+
+## References
+
+- Andersson, C.A. (1999). Direct orthogonalization. *Chemometrics and
+  Intelligent Laboratory Systems*, 47(1):51–63.
+- Fearn, T. (2000). On orthogonal signal correction. *Chemometrics and
+  Intelligent Laboratory Systems*, 50(1):47–52.
+- Kemsley, E.K., Tapp, H.S. (2009). OPLS filtered data can be obtained
+  directly from non-orthogonalized PLS1. *Journal of Chemometrics*,
+  23(5):263–264.
+- Martens, H., Høy, M., Wise, B.M., Bro, R., Brockhoff, P.B. (2003).
+  Pre-whitening of data by covariance-weighted preprocessing. *Journal
+  of Chemometrics*, 17(3):153–165.
+- Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003). EPO-PLS
+  external parameter orthogonalisation of PLS application to
+  temperature-independent measurement of sugar content of intact fruits.
+  *Chemometrics and Intelligent Laboratory Systems*, 66(2):191–204.
+- Trygg, J., Wold, S. (2002). Orthogonal projections to latent
+  structures (O-PLS). *Journal of Chemometrics*, 16(3):119–128.
+- Westerhuis, J.A., de Jong, S., Smilde, A.K. (2001). Direct orthogonal
+  signal correction. *Chemometrics and Intelligent Laboratory Systems*,
+  56(1):13–25.
+- Wold, S., Antti, H., Lindgren, F., Öhman, J. (1998). Orthogonal signal
+  correction of near-infrared spectra. *Chemometrics and Intelligent
+  Laboratory Systems*, 44(1):175–185.

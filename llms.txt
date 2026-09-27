@@ -711,6 +711,8 @@ Functions used for charcaterizing plasma emission in laser spectroscopy.
 
 - [`specLIBS`](https://christiangoueguel.com/specProc/reference/specLIBS.md)
   : LIBS Spectra of Soil Samples
+- [`fourrage`](https://christiangoueguel.com/specProc/reference/fourrage.md)
+  : LIBS Spectra of Forage Samples
 
 # Articles
 
@@ -720,5 +722,7 @@ Functions used for charcaterizing plasma emission in laser spectroscopy.
   spectra](https://christiangoueguel.com/specProc/articles/calibration.md):
 - [Fitting emission
   lines](https://christiangoueguel.com/specProc/articles/line-fitting.md):
+- [Removing unwanted variation: a comparison of orthogonalization
+  methods](https://christiangoueguel.com/specProc/articles/orthogonalization.md):
 - [Preprocessing LIBS
   spectra](https://christiangoueguel.com/specProc/articles/preprocessing.md):

@@ -184,6 +184,13 @@ independent reference implementations.
   log-ratio PLS model with nested, repeated cross-validation by sample,
   and the optimism of common shortcuts).
 
+- New data set `fourrage`: LIBS spectra of 365 forage samples with
+  reference contents of 12 elements, and a vignette based on it,
+  “Removing unwanted variation: a comparison of orthogonalization
+  methods” (what EPO, GLSW, the OSC family, DO/NAS, DOSC, POSC/OPLS and
+  y-gradient GLSW remove, whether it improves potassium predictions, and
+  which methods are equivalent).
+
 - [`plot_fit()`](https://christiangoueguel.com/specProc/reference/plot_fit.md)
   draws the fitted profiles on a fine wavelength grid.
 
