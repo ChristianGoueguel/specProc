@@ -60,6 +60,11 @@ from \\\textbf{C} = \Delta\textbf{X}^T\textbf{W}^2\Delta\textbf{X}\\.
   age of a weathered mixture of volatile organic compounds. Analytica
   Chimica Acta, 694(1-2):31–37.
 
+## See also
+
+[`step_y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/step_y_gradient_glsw.md)
+to use the filter in a tidymodels recipe.
+
 ## Author
 
 Christian L. Goueguel

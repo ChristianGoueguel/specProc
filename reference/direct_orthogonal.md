@@ -39,7 +39,9 @@ direct_orthogonal(x, y, ncomp = 2, center = TRUE, scale = FALSE)
 
 ## Value
 
-A list with the following components:
+An object of class `specproc_direct_orthogonal` (a list), which
+[predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+applies to new spectra, with the following components:
 
 - `correction`: The corrected matrix.
 
@@ -78,6 +80,15 @@ To correct new data, preprocess it with the returned `center` and
 - Wold, S., Antti, H., Lindgren, F., Ohman, J. (1998). Orthogonal signal
   correction of near-infrared spectra. Chemometrics Intell. Lab. Syst.,
   44(1):175-185.
+
+## See also
+
+[`predict.specproc_filter()`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+to correct new spectra with the fitted filter,
+[`step_direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/step_direct_orthogonal.md)
+to use it in a tidymodels recipe, and
+[`nas()`](https://christiangoueguel.com/specProc/reference/nas.md),
+which computes the same correction.
 
 ## Author
 

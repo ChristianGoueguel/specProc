@@ -76,6 +76,11 @@ the filtering matrix.
   Pre-whitening of data by covariance-weighted preprocessing. Journal of
   Chemometrics, 17(3):153-165
 
+## See also
+
+[`step_glsw()`](https://christiangoueguel.com/specProc/reference/step_glsw.md)
+to use the filter in a tidymodels recipe.
+
 ## Author
 
 Christian L. Goueguel

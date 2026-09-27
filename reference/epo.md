@@ -32,7 +32,9 @@ epo(x, ncomp = 2, clutter = NULL)
 
 ## Value
 
-The function returns a list of four components:
+An object of class `specproc_epo` (a list), which
+[predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+applies to new spectra, with four components:
 
 - `correction`: The orthogonalized matrix, representing the signal of
   interest.
@@ -76,6 +78,13 @@ The singular value decomposition is computed in C++ (Eigen), and the \\p
   external parameter orthogonalization of PLS application to
   temperature-independent measurement of sugar content of intact fruits.
   Chemometrics and Intelligent Laboratory Systems, 66(2):191-204.
+
+## See also
+
+[`predict.specproc_filter()`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+to correct new spectra with the fitted filter, and
+[`step_epo()`](https://christiangoueguel.com/specProc/reference/step_epo.md)
+to use it in a tidymodels recipe.
 
 ## Author
 

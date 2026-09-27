@@ -105,6 +105,14 @@ equivalent to OPLS with `nx` orthogonal components.
   regression (LVR) method with an integral OSC filter. J. Chemom.
   17(1):53–64.
 
+## See also
+
+[`predict.specproc_filter()`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+to correct new spectra with the fitted filter, and
+[`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md),
+which gives the same filtered data for a single response, to use it in a
+tidymodels recipe.
+
 ## Author
 
 Christian L. Goueguel

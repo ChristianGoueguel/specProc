@@ -559,6 +559,13 @@ sources of variance from the multivariate data.
   : y-Gradient Generalized Least Squares Weighting
 - [`direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/direct_orthogonal.md)
   : Direct Orthogonalization
+- [`predict(`*`<specproc_epo>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+  [`predict(`*`<specproc_osc>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+  [`predict(`*`<specproc_direct_orthogonal>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+  [`predict(`*`<specproc_direct_osc>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+  [`predict(`*`<specproc_projected_osc>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+  [`predict(`*`<o2pls>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+  : Apply an Orthogonalization Filter to New Spectra
 
 ### calibration transfer
 
@@ -569,6 +576,51 @@ instrument to another instrument.
   Piecewise Direct Standardization
 - [`glsw()`](https://christiangoueguel.com/specProc/reference/glsw.md) :
   Generalized Least Squares Weighting
+
+## Recipe steps (tidymodels)
+
+Steps for the recipes package, so that preprocessing and
+orthogonalization are estimated on the training data of each resample
+and can be tuned within a tidymodels workflow.
+
+### preprocessing
+
+- [`step_baseline()`](https://christiangoueguel.com/specProc/reference/step_baseline.md)
+  : Baseline Correction Recipe Step
+- [`step_snv()`](https://christiangoueguel.com/specProc/reference/step_snv.md)
+  : Standard Normal Variate Recipe Step
+- [`step_msc()`](https://christiangoueguel.com/specProc/reference/step_msc.md)
+  : Multiplicative Scatter Correction Recipe Step
+- [`step_emsc()`](https://christiangoueguel.com/specProc/reference/step_emsc.md)
+  : Extended Multiplicative Signal Correction Recipe Step
+- [`step_pareto_scale()`](https://christiangoueguel.com/specProc/reference/step_pareto_scale.md)
+  : Pareto Scaling Recipe Step
+- [`step_poisson_scale()`](https://christiangoueguel.com/specProc/reference/step_poisson_scale.md)
+  : Poisson Scaling Recipe Step
+
+### orthogonalization
+
+- [`step_epo()`](https://christiangoueguel.com/specProc/reference/step_epo.md)
+  : External Parameter Orthogonalization Recipe Step
+- [`step_glsw()`](https://christiangoueguel.com/specProc/reference/step_glsw.md)
+  : Generalized Least Squares Weighting Recipe Step
+- [`step_osc()`](https://christiangoueguel.com/specProc/reference/step_osc.md)
+  : Orthogonal Signal Correction Recipe Step
+- [`step_direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/step_direct_orthogonal.md)
+  : Direct Orthogonalization Recipe Step
+- [`step_direct_osc()`](https://christiangoueguel.com/specProc/reference/step_direct_osc.md)
+  : Direct Orthogonal Signal Correction Recipe Step
+- [`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md)
+  : Projected Orthogonal Signal Correction (OPLS Filter) Recipe Step
+- [`step_y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/step_y_gradient_glsw.md)
+  : y-Gradient Generalized Least Squares Weighting Recipe Step
+
+### tuning parameters
+
+- [`baseline_lambda()`](https://christiangoueguel.com/specProc/reference/baseline_lambda.md)
+  : Baseline Smoothness Parameter
+- [`glsw_alpha()`](https://christiangoueguel.com/specProc/reference/glsw_alpha.md)
+  : Relative GLSW Weighting Parameter
 
 ## Peak fitting
 
@@ -622,6 +674,10 @@ Functions used to adjust the systematic differences among samples.
 
 - [`msc()`](https://christiangoueguel.com/specProc/reference/msc.md) :
   Multiplicative Signal Correction
+- [`emsc()`](https://christiangoueguel.com/specProc/reference/emsc.md) :
+  Extended Multiplicative Signal Correction
+- [`predict(`*`<specproc_emsc>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_emsc.md)
+  : Apply EMSC to New Spectra
 - [`normalize()`](https://christiangoueguel.com/specProc/reference/normalize.md)
   : Spectra Normalization
 

@@ -63,6 +63,13 @@ subspace orthogonal to the interferents: \\\textbf{X}\_{NAS} =
   vector in inverse multivariate calibration models. Anal. Chem.,
   70(23):5108-5110
 
+## See also
+
+[`direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/direct_orthogonal.md),
+which computes the same correction and returns a filter that
+[`predict.specproc_filter()`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+can apply to new spectra.
+
 ## Author
 
 Christian L. Goueguel

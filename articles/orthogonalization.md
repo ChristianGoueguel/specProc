@@ -85,17 +85,17 @@ rbind(raw = explained(pc_raw), snv = explained(pc_snv))  # % variance, PC1-PC5
 #> raw 63.2 18.5  6.1  3.2  2.5
 #> snv 39.5 29.2 10.9  5.2  3.8
 
-correlations <- function(scores) {
+score_correlations <- function(scores) {
   round(cor(scores, cbind(total, chem), use = "pairwise.complete.obs"), 2)
 }
-correlations(pc_raw$x[, 1:5])
+score_correlations(pc_raw$x[, 1:5])
 #>     total     K    Ca    Mg    Na     P     S
 #> PC1 -0.98 -0.28 -0.21 -0.32 -0.20 -0.30 -0.42
 #> PC2 -0.10 -0.22  0.26  0.41  0.77  0.19  0.16
 #> PC3 -0.02  0.48 -0.52 -0.11  0.10  0.14  0.06
 #> PC4  0.15 -0.25 -0.19 -0.26 -0.25 -0.26 -0.22
 #> PC5  0.01  0.08  0.33 -0.06 -0.06 -0.11  0.05
-correlations(pc_snv$x[, 1:5])
+score_correlations(pc_snv$x[, 1:5])
 #>     total     K    Ca    Mg    Na     P     S
 #> PC1 -0.71 -0.15 -0.33 -0.55 -0.62 -0.39 -0.47
 #> PC2 -0.60 -0.36  0.05  0.13  0.51 -0.04 -0.13
@@ -173,26 +173,31 @@ would describe this variation better.
 ## A common interface for the filters
 
 Every method is estimated on calibration spectra and then applied, with
-the same parameters, to new spectra. The functions return what is needed
-for this (loadings, weights, centers or filter matrices), but in
-different forms. We wrap each one in a function `fit(X, y, k)` that
-returns a function to correct new spectra. `k` is the tuning parameter:
-the number of components removed or, for GLSW, the strength of the
-down-weighting.
+the same parameters, to new spectra.
+[`epo()`](https://christiangoueguel.com/specProc/reference/epo.md),
+[`osc()`](https://christiangoueguel.com/specProc/reference/osc.md),
+[`direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/direct_orthogonal.md),
+[`direct_osc()`](https://christiangoueguel.com/specProc/reference/direct_osc.md),
+[`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md)
+and
+[`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md)
+return a fitted filter, and `predict(filter, newdata)` corrects new
+spectra with it (see
+[`?predict.specproc_filter`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)).
+[`glsw()`](https://christiangoueguel.com/specProc/reference/glsw.md) and
+[`y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/y_gradient_glsw.md)
+return the filter matrix \mathbf{G}, which is applied as
+\mathbf{X}\_{new}\mathbf{G}.
+
+To compare the methods, we wrap each one in a function `fit(X, y, k)`
+that returns a function to correct new spectra. `k` is the tuning
+parameter: the number of components removed or, for GLSW, the strength
+of the down-weighting.
 
 ``` r
 
-# Remove all components at once: (X - center) - (X - center) W P'
-remove_block <- function(Xn, center, W, P) {
-  Z <- sweep(Xn, 2, center)
-  Z - Z %*% W %*% t(P)
-}
-# Remove components one at a time (the weights refer to the deflated matrix)
-remove_seq <- function(Xn, center, W, P) {
-  Z <- sweep(Xn, 2, center)
-  for (i in seq_len(ncol(W))) Z <- Z - (Z %*% W[, i]) %*% t(P[, i])
-  Z
-}
+# A function that corrects new spectra with a fitted filter
+corrector <- function(filter) function(Xn) as.matrix(predict(filter, Xn))
 mat <- function(x) as.matrix(x)
 
 filters <- list(
@@ -200,8 +205,7 @@ filters <- list(
 
   # External: the clutter directions are projected out ...
   `EPO` = list(grid = 1:3, fit = function(X, y, k) {
-    V <- mat(epo(X, ncomp = k, clutter = clutter)$loadings)
-    function(Xn) Xn - Xn %*% V %*% t(V)
+    corrector(epo(X, ncomp = k, clutter = clutter))
   }),
   # ... or down-weighted; alpha is set relative to the largest clutter eigenvalue
   `GLSW` = list(grid = 0:4, fit = function(X, y, k) {
@@ -212,28 +216,22 @@ filters <- list(
 
   # Response-orthogonal
   `OSC (Wold)` = list(grid = 1:4, fit = function(X, y, k) {
-    o <- osc(X, y, method = "wold", ncomp = k)
-    function(Xn) remove_seq(Xn, o$center, mat(o$weights), mat(o$loadings))
+    corrector(osc(X, y, method = "wold", ncomp = k))
   }),
   `OSC (Sjoblom)` = list(grid = 1:4, fit = function(X, y, k) {
-    o <- osc(X, y, method = "sjoblom", ncomp = k)
-    function(Xn) remove_seq(Xn, o$center, mat(o$weights), mat(o$loadings))
+    corrector(osc(X, y, method = "sjoblom", ncomp = k))
   }),
   `OSC (Fearn)` = list(grid = 1:4, fit = function(X, y, k) {
-    o <- osc(X, y, method = "fearn", ncomp = k)
-    function(Xn) remove_block(Xn, o$center, mat(o$weights), mat(o$loadings))
+    corrector(osc(X, y, method = "fearn", ncomp = k))
   }),
   `DO / NAS` = list(grid = 1:4, fit = function(X, y, k) {
-    o <- direct_orthogonal(X, y, ncomp = k)
-    function(Xn) remove_block(Xn, o$center, mat(o$loading), mat(o$loading))
+    corrector(direct_orthogonal(X, y, ncomp = k))
   }),
   `DOSC` = list(grid = 1:4, fit = function(X, y, k) {
-    o <- direct_osc(X, y, ncomp = k)
-    function(Xn) remove_block(Xn, o$center, mat(o$weight), mat(o$loading))
+    corrector(direct_osc(X, y, ncomp = k))
   }),
   `POSC / OPLS` = list(grid = 1:4, fit = function(X, y, k) {
-    o <- projected_osc(X, y, ncomp = k + 1)  # k orthogonal components
-    function(Xn) remove_block(Xn, o$center, mat(o$weights), mat(o$loadings))
+    corrector(projected_osc(X, y, ncomp = k + 1))  # k orthogonal components
   }),
   # alpha relative to the largest eigenvalue of differences between neighbours in y
   `y-gradient GLSW` = list(grid = 0:4, fit = function(X, y, k) {
@@ -361,7 +359,7 @@ cal_samples <- unique(meta$Sample[cal])
 fold_of <- setNames(sample(rep(1:5, length.out = length(cal_samples))), cal_samples)
 folds <- fold_of[meta$Sample[cal]]
 
-tune <- function(filter) {
+tune_filter <- function(filter) {
   cv <- sapply(filter$grid, function(k) {
     pred <- matrix(NA_real_, sum(cal), max_comp)
     for (f in 1:5) {
@@ -382,7 +380,7 @@ calibration set and applied to the test set:
 
 ``` r
 
-tuned <- lapply(filters, tune)
+tuned <- lapply(filters, tune_filter)
 test_pred <- sapply(names(filters), function(m) {
   clean <- filters[[m]]$fit(Xcal, ycal, tuned[[m]]$k)
   pls_path(clean(Xcal), ycal, clean(Xs[test, ]))[, tuned[[m]]$ncomp]
@@ -506,8 +504,7 @@ consequence in its most extreme form:
 ``` r
 
 leak <- t(sapply(c(1, 2, 4, 8), function(k) {
-  o <- direct_osc(Xcal, ycal, ncomp = k)
-  clean <- function(Xn) remove_block(Xn, o$center, mat(o$weight), mat(o$loading))
+  clean <- corrector(direct_osc(Xcal, ycal, ncomp = k))
   Xf <- clean(Xcal)
   pred <- matrix(NA_real_, sum(cal), max_comp)
   for (f in 1:5) {
@@ -537,6 +534,84 @@ filtered \mathbf{X}. The calibration vignette
 shows a milder version of the same bias for the OPLS filter. The rule is
 the same for every method in the response-orthogonal family: refit the
 filter inside every cross-validation fold.
+
+## The same analysis with tidymodels
+
+Each filter is also available as a recipe step for the tidymodels
+framework:
+[`step_epo()`](https://christiangoueguel.com/specProc/reference/step_epo.md),
+[`step_glsw()`](https://christiangoueguel.com/specProc/reference/step_glsw.md),
+[`step_osc()`](https://christiangoueguel.com/specProc/reference/step_osc.md),
+[`step_direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/step_direct_orthogonal.md),
+[`step_direct_osc()`](https://christiangoueguel.com/specProc/reference/step_direct_osc.md),
+[`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md)
+and
+[`step_y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/step_y_gradient_glsw.md).
+In a workflow, the steps are re-estimated on the analysis set of every
+resample, so supervised filters cannot leak information from the
+assessment set, and the filter parameters can be tuned together with the
+model. The preprocessing steps
+[`step_baseline()`](https://christiangoueguel.com/specProc/reference/step_baseline.md),
+[`step_snv()`](https://christiangoueguel.com/specProc/reference/step_snv.md),
+[`step_msc()`](https://christiangoueguel.com/specProc/reference/step_msc.md),
+[`step_emsc()`](https://christiangoueguel.com/specProc/reference/step_emsc.md),
+[`step_pareto_scale()`](https://christiangoueguel.com/specProc/reference/step_pareto_scale.md)
+and
+[`step_poisson_scale()`](https://christiangoueguel.com/specProc/reference/step_poisson_scale.md)
+can precede them in the same recipe.
+
+The code below needs recipes, parsnip, workflows, tune, rsample,
+yardstick, dials, plsmod and mixOmics (from Bioconductor), and is only
+run when they are installed. It tunes Fearn’s OSC filter and the PLS
+model together, with the samples as the resampling unit. The two
+`num_comp` parameters get distinct ids.
+
+``` r
+
+library(recipes)
+library(parsnip)
+library(workflows)
+library(tune)
+
+spectra <- data.frame(K = y, Sample = meta$Sample, Xs)
+cal_data <- spectra[cal, ]
+test_data <- spectra[test, ]
+
+rec <- recipe(K ~ ., data = cal_data) |>
+  update_role(Sample, new_role = "id") |>
+  step_osc(all_predictors(), method = "fearn", num_comp = tune("filter_comp"))
+# mixOmics scales every channel to unit variance by default; scale = FALSE
+# only centers, like pls::plsr() above
+model <- pls(num_comp = tune()) |>
+  set_mode("regression") |>
+  set_engine("mixOmics", scale = FALSE)
+wf <- workflow(rec, model)
+
+set.seed(4)
+resamples <- rsample::group_vfold_cv(cal_data, group = Sample, v = 5)
+grid <- expand.grid(filter_comp = 1:3, num_comp = 1:12)
+tuned_wf <- tune_grid(wf, resamples = resamples, grid = grid,
+                      metrics = yardstick::metric_set(yardstick::rmse))
+show_best(tuned_wf, metric = "rmse", n = 3)
+#> # A tibble: 3 × 8
+#>   num_comp filter_comp .metric .estimator  mean     n std_err .config         
+#>      <int>       <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>           
+#> 1        7           1 rmse    standard   0.279     5  0.0249 pre1_mod07_post0
+#> 2        6           2 rmse    standard   0.279     5  0.0248 pre2_mod06_post0
+#> 3        5           3 rmse    standard   0.279     5  0.0246 pre3_mod05_post0
+
+final <- finalize_workflow(wf, select_best(tuned_wf, metric = "rmse")) |>
+  fit(data = cal_data)
+c(RMSEP = rmse(predict(final, test_data)$.pred, test_data$K))
+#>     RMSEP 
+#> 0.2821213
+```
+
+The best settings trade filter components against PLS components, with
+the same total and the same cross-validated error, and the test error of
+the final workflow matches the plain PLS and OSC (Fearn) rows of the
+comparison table. The fold assignments differ from those used above, so
+the chosen settings can differ as well.
 
 ## Summary
 

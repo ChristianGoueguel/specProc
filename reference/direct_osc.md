@@ -46,7 +46,9 @@ direct_osc(x, y, ncomp = 10, center = TRUE, scale = FALSE, tol = 0.001)
 
 ## Value
 
-A list with the following components:
+An object of class `specproc_direct_osc` (a list), which
+[predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+applies to new spectra, with the following components:
 
 - `correction`: The corrected matrix.
 
@@ -90,6 +92,13 @@ and `scale`.
 - Wold, S., Antti, H., Lindgren, F., Ohman, J. (1998). Orthogonal signal
   correction of near-infrared spectra. Chemometrics Intell. Lab. Syst.,
   44(1):175-185.
+
+## See also
+
+[`predict.specproc_filter()`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+to correct new spectra with the fitted filter, and
+[`step_direct_osc()`](https://christiangoueguel.com/specProc/reference/step_direct_osc.md)
+to use it in a tidymodels recipe.
 
 ## Author
 

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -144,6 +144,13 @@
 
         </dt>
         <dd>Direct Orthogonalization</dd>
+
+        <dt>
+
+          <code><a href="predict.specproc_filter.html">predict(<i>&lt;specproc_epo&gt;</i>)</a></code> <code><a href="predict.specproc_filter.html">predict(<i>&lt;specproc_osc&gt;</i>)</a></code> <code><a href="predict.specproc_filter.html">predict(<i>&lt;specproc_direct_orthogonal&gt;</i>)</a></code> <code><a href="predict.specproc_filter.html">predict(<i>&lt;specproc_direct_osc&gt;</i>)</a></code> <code><a href="predict.specproc_filter.html">predict(<i>&lt;specproc_projected_osc&gt;</i>)</a></code> <code><a href="predict.specproc_filter.html">predict(<i>&lt;o2pls&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Apply an Orthogonalization Filter to New Spectra</dd>
       </dl></div><div class="section level2">
 
       <h3 id="calibration-transfer">calibration transfer<a class="anchor" aria-label="anchor" href="#calibration-transfer"></a></h3>
@@ -167,6 +174,143 @@
 
         </dt>
         <dd>Generalized Least Squares Weighting</dd>
+      </dl></div><div class="section level2">
+      <h2 id="recipe-steps-tidymodels-">Recipe steps (tidymodels)<a class="anchor" aria-label="anchor" href="#recipe-steps-tidymodels-"></a></h2>
+
+      <div class="section-desc"><p>Steps for the recipes package, so that preprocessing and orthogonalization are estimated on the training data of each resample and can be tuned within a tidymodels workflow.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+      <h3 id="preprocessing">preprocessing<a class="anchor" aria-label="anchor" href="#preprocessing"></a></h3>
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="step_baseline.html">step_baseline()</a></code>
+
+        </dt>
+        <dd>Baseline Correction Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_snv.html">step_snv()</a></code>
+
+        </dt>
+        <dd>Standard Normal Variate Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_msc.html">step_msc()</a></code>
+
+        </dt>
+        <dd>Multiplicative Scatter Correction Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_emsc.html">step_emsc()</a></code>
+
+        </dt>
+        <dd>Extended Multiplicative Signal Correction Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_pareto_scale.html">step_pareto_scale()</a></code>
+
+        </dt>
+        <dd>Pareto Scaling Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_poisson_scale.html">step_poisson_scale()</a></code>
+
+        </dt>
+        <dd>Poisson Scaling Recipe Step</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="orthogonalization">orthogonalization<a class="anchor" aria-label="anchor" href="#orthogonalization"></a></h3>
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="step_epo.html">step_epo()</a></code>
+
+        </dt>
+        <dd>External Parameter Orthogonalization Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_glsw.html">step_glsw()</a></code>
+
+        </dt>
+        <dd>Generalized Least Squares Weighting Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_osc.html">step_osc()</a></code>
+
+        </dt>
+        <dd>Orthogonal Signal Correction Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_direct_orthogonal.html">step_direct_orthogonal()</a></code>
+
+        </dt>
+        <dd>Direct Orthogonalization Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_direct_osc.html">step_direct_osc()</a></code>
+
+        </dt>
+        <dd>Direct Orthogonal Signal Correction Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_projected_osc.html">step_projected_osc()</a></code>
+
+        </dt>
+        <dd>Projected Orthogonal Signal Correction (OPLS Filter) Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_y_gradient_glsw.html">step_y_gradient_glsw()</a></code>
+
+        </dt>
+        <dd>y-Gradient Generalized Least Squares Weighting Recipe Step</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="tuning-parameters">tuning parameters<a class="anchor" aria-label="anchor" href="#tuning-parameters"></a></h3>
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="baseline_lambda.html">baseline_lambda()</a></code>
+
+        </dt>
+        <dd>Baseline Smoothness Parameter</dd>
+
+        <dt>
+
+          <code><a href="glsw_alpha.html">glsw_alpha()</a></code>
+
+        </dt>
+        <dd>Relative GLSW Weighting Parameter</dd>
       </dl></div><div class="section level2">
       <h2 id="peak-fitting">Peak fitting<a class="anchor" aria-label="anchor" href="#peak-fitting"></a></h2>
 
@@ -301,6 +445,20 @@
 
         </dt>
         <dd>Multiplicative Signal Correction</dd>
+
+        <dt>
+
+          <code><a href="emsc.html">emsc()</a></code>
+
+        </dt>
+        <dd>Extended Multiplicative Signal Correction</dd>
+
+        <dt>
+
+          <code><a href="predict.specproc_emsc.html">predict(<i>&lt;specproc_emsc&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Apply EMSC to New Spectra</dd>
 
         <dt>
 

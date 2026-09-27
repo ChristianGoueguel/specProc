@@ -201,7 +201,7 @@ wide("ICC")   # fraction of variance between samples
 #> area                       0.56        0.63         0.70        0.68       0.47
 #> SNV                        0.80        0.49         0.60        0.61       0.54
 #> MSC                        0.79        0.54         0.66        0.64       0.51
-#> internal std. (Si)         0.76        0.00         0.41        0.33       0.66
+#> internal std. (Si)         0.76       -0.01         0.41        0.33       0.66
 ```
 
 The two criteria disagree, and the disagreement is informative:

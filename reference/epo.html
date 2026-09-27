@@ -13,7 +13,7 @@ separating the signal of interest from unwanted perturbations."><meta property="
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@ columns as <code>x</code>, describing the external (clutter) variation. If <code
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>The function returns a list of four components:</p><ul><li><p><code>correction</code>: The orthogonalized matrix, representing the signal of interest.</p></li>
+    <p>An object of class <code>specproc_epo</code> (a list), which <a href="predict.specproc_filter.html">predict()</a> applies to new spectra, with four components:</p><ul><li><p><code>correction</code>: The orthogonalized matrix, representing the signal of interest.</p></li>
 <li><p><code>clutter</code>: The clutter part of <code>x</code>, \(\textbf{XVV}^T\).</p></li>
 <li><p><code>loadings</code>: The singular vectors \(\textbf{V}\) used for the orthogonalization.</p></li>
 <li><p><code>singular_values</code>: The corresponding singular values of the clutter matrix.</p></li>
@@ -108,6 +108,11 @@ the corrected matrix is \(\textbf{X} - \textbf{XVV}^T\).</p>
 EPO-PLS external parameter orthogonalization of PLS application to temperature-independent measurement of sugar content of intact fruits.
 Chemometrics and Intelligent Laboratory Systems, 66(2):191-204.</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="predict.specproc_filter.html">predict.specproc_filter()</a></code> to correct new spectra with the fitted filter, and
+<code><a href="step_epo.html">step_epo()</a></code> to use it in a tidymodels recipe.</p></div>
+    </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
     <p>Christian L. Goueguel</p>

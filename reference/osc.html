@@ -13,7 +13,7 @@ with the response vector or property of interest."><meta property="og:image" con
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -109,7 +109,7 @@ with the response vector or property of interest.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list containing the following components:</p><ul><li><p><code>correction</code>: The corrected matrix.</p></li>
+    <p>An object of class <code>specproc_osc</code> (a list), which <a href="predict.specproc_filter.html">predict()</a> applies to new spectra, with the following components:</p><ul><li><p><code>correction</code>: The corrected matrix.</p></li>
 <li><p><code>scores</code>: The orthogonal scores matrix.</p></li>
 <li><p><code>loadings</code>: The orthogonal loadings matrix.</p></li>
 <li><p><code>weights</code>: The orthogonal weights matrix.</p></li>
@@ -155,6 +155,11 @@ Chemometrics Intell. Lab. Syst., 44(1):175-185.</p></li>
 An investigation of orthogonal correction algorithms and their characteristics.
 Journal of Chemometrics, 16(1):176-188.</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="predict.specproc_filter.html">predict.specproc_filter()</a></code> to correct new spectra with the fitted filter, and
+<code><a href="step_osc.html">step_osc()</a></code> to use it in a tidymodels recipe.</p></div>
+    </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
     <p>Christian L. Goueguel</p>

@@ -69,7 +69,9 @@ osc(
 
 ## Value
 
-A list containing the following components:
+An object of class `specproc_osc` (a list), which
+[predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+applies to new spectra, with the following components:
 
 - `correction`: The corrected matrix.
 
@@ -133,6 +135,13 @@ and `scale` and then, for each component \\i\\, computing
 - Svensson, O., Kourti, T. and MacGregor, J.F., (2002). An investigation
   of orthogonal correction algorithms and their characteristics. Journal
   of Chemometrics, 16(1):176-188.
+
+## See also
+
+[`predict.specproc_filter()`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+to correct new spectra with the fitted filter, and
+[`step_osc()`](https://christiangoueguel.com/specProc/reference/step_osc.md)
+to use it in a tidymodels recipe.
 
 ## Author
 

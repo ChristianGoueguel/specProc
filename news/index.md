@@ -1,5 +1,73 @@
 # Changelog
 
+## specProc 0.3.0
+
+This release connects specProc to the tidymodels framework.
+Preprocessing and orthogonalization can now be estimated on calibration
+data and applied to new spectra, either directly with
+[`predict()`](https://rdrr.io/r/stats/predict.html) or as recipe steps
+that are re-estimated on every resample and tuned together with the
+model.
+
+### New features
+
+- The orthogonalization filters can now be applied to new spectra:
+  [`epo()`](https://christiangoueguel.com/specProc/reference/epo.md),
+  [`osc()`](https://christiangoueguel.com/specProc/reference/osc.md),
+  [`direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/direct_orthogonal.md),
+  [`direct_osc()`](https://christiangoueguel.com/specProc/reference/direct_osc.md),
+  [`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md)
+  and
+  [`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md)
+  return classed objects with a
+  [`predict()`](https://rdrr.io/r/stats/predict.html) method, which
+  corrects new data with the centers, scales and components estimated on
+  the calibration data. Existing fields are unchanged.
+- New recipe steps for tidymodels:
+  [`step_epo()`](https://christiangoueguel.com/specProc/reference/step_epo.md),
+  [`step_glsw()`](https://christiangoueguel.com/specProc/reference/step_glsw.md),
+  [`step_osc()`](https://christiangoueguel.com/specProc/reference/step_osc.md),
+  [`step_direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/step_direct_orthogonal.md),
+  [`step_direct_osc()`](https://christiangoueguel.com/specProc/reference/step_direct_osc.md),
+  [`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md)
+  and
+  [`step_y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/step_y_gradient_glsw.md),
+  with [`tidy()`](https://generics.r-lib.org/reference/tidy.html) and
+  [`tunable()`](https://generics.r-lib.org/reference/tunable.html)
+  methods, and the dials parameter
+  [`glsw_alpha()`](https://christiangoueguel.com/specProc/reference/glsw_alpha.md).
+  In a workflow, the filters are re-estimated on every resample and can
+  be tuned with the model. The GLSW steps store the filter in factored
+  form instead of a p x p matrix. recipes and dials are suggested, not
+  required.
+- New
+  [`emsc()`](https://christiangoueguel.com/specProc/reference/emsc.md):
+  extended multiplicative signal correction (Martens and Stark, 1991),
+  with a polynomial baseline and optional interferent spectra, and a
+  [`predict()`](https://rdrr.io/r/stats/predict.html) method for new
+  spectra. With `degree = 0` it equals
+  [`msc()`](https://christiangoueguel.com/specProc/reference/msc.md).
+- New recipe steps for spectral preprocessing:
+  [`step_baseline()`](https://christiangoueguel.com/specProc/reference/step_baseline.md)
+  (arPLS, ALS or LSP),
+  [`step_snv()`](https://christiangoueguel.com/specProc/reference/step_snv.md),
+  [`step_msc()`](https://christiangoueguel.com/specProc/reference/step_msc.md),
+  [`step_emsc()`](https://christiangoueguel.com/specProc/reference/step_emsc.md),
+  [`step_pareto_scale()`](https://christiangoueguel.com/specProc/reference/step_pareto_scale.md)
+  and
+  [`step_poisson_scale()`](https://christiangoueguel.com/specProc/reference/step_poisson_scale.md).
+  MSC and EMSC estimate the reference spectrum, and the scaling steps
+  the column scales, on the training data only. The baseline `lambda` or
+  `degree` and the EMSC `degree` are tunable; the new dials parameter
+  [`baseline_lambda()`](https://christiangoueguel.com/specProc/reference/baseline_lambda.md)
+  covers `lambda`.
+- New data set `fourrage`: LIBS spectra of 365 forage samples with
+  reference contents of 12 elements, and a vignette based on it,
+  “Removing unwanted variation: a comparison of orthogonalization
+  methods” (what EPO, GLSW, the OSC family, DO/NAS, DOSC, POSC/OPLS and
+  y-gradient GLSW remove, whether it improves potassium predictions, and
+  which methods are equivalent).
+
 ## specProc 0.2.0
 
 This release fixes a large number of bugs so that every exported
@@ -183,13 +251,6 @@ independent reference implementations.
   “Predicting soil clay content from LIBS spectra” (a compositional
   log-ratio PLS model with nested, repeated cross-validation by sample,
   and the optimism of common shortcuts).
-
-- New data set `fourrage`: LIBS spectra of 365 forage samples with
-  reference contents of 12 elements, and a vignette based on it,
-  “Removing unwanted variation: a comparison of orthogonalization
-  methods” (what EPO, GLSW, the OSC family, DO/NAS, DOSC, POSC/OPLS and
-  y-gradient GLSW remove, whether it improves potassium predictions, and
-  which methods are equivalent).
 
 - [`plot_fit()`](https://christiangoueguel.com/specProc/reference/plot_fit.md)
   draws the fitted profiles on a fine wavelength grid.
