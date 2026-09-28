@@ -223,7 +223,7 @@ neutral <- boltzmann_plot(filter(lines, stage == 1))
 neutral
 #> Boltzmann plot (12 lines)
 #> 
-#> Temperature:  4802 ± 594 K
+#> Temperature:  4802 +/- 594 K
 #> R-squared:    0.8671
 ```
 
@@ -246,7 +246,7 @@ saha <- saha_boltzmann_plot(lines, ionization_energy = ionization_energy, electr
 saha
 #> Saha-Boltzmann plot (16 lines)
 #> 
-#> Temperature:  8791 ± 246 K
+#> Temperature:  8791 +/- 246 K
 #> R-squared:    0.9891
 #> Ne:           1.8e+17 cm-3
 ```

@@ -97,7 +97,7 @@ lines$intensity <- with(lines, gk * Aki / wavelength *
 saha_boltzmann_plot(lines, ionization_energy = E_ion, electron_density = ne)
 #> Saha-Boltzmann plot (6 lines)
 #> 
-#> Temperature:  12000 ± 0 K
+#> Temperature:  12000 +/- 0 K
 #> R-squared:    1
 #> Ne:           1e+17 cm-3
 ```

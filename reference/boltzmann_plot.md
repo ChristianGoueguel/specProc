@@ -94,7 +94,7 @@ fit <- boltzmann_plot(lines)
 fit
 #> Boltzmann plot (5 lines)
 #> 
-#> Temperature:  10000 ± 0 K
+#> Temperature:  10000 +/- 0 K
 #> R-squared:    1
 plot_boltzmann(fit)
 ```
