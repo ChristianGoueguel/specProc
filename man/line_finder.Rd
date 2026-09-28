@@ -29,7 +29,7 @@ per ionization stage.
 The app offers:
 \itemize{
 \item a clickable periodic table; elements without lines in the wavelength
-range of the spectra are greyed out once queried;
+range of the spectra are grayed out once queried;
 \item the ionization stages to show (I, II, III);
 \item the plasma temperature and the number of lines per species, which set
 the lines kept and the height of their markers (relative intensities in

@@ -56,7 +56,7 @@ Wiley Interdisciplinary Reviews: Data Mining and Knowledge Discovery, 1(1), 73-7
 Breakdown properties of multivariate location estimators.
 Ph.D. Qualifying paper, Dept. Statistics, Harvard University, Boston.
 \item Stahel, W., (1981).
-Robuste Schätzungen: infinitesimale Optimalität und Schätzungen vonKovarianzmatrizen.
+Robuste Schätzungen: infinitesimale Optimalität und Schätzungen von Kovarianzmatrizen.
 PhD thesis, ETH Zürich.
 }
 }

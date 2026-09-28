@@ -15,7 +15,7 @@
 #'
 #' The samples are sorted by increasing \eqn{\textbf{y}}, and the first
 #' derivatives of \eqn{\textbf{X}} and \eqn{\textbf{y}} along the sample axis are
-#' computed with a Savitzky-Golay filter. Samples whose neighbours have similar
+#' computed with a Savitzky-Golay filter. Samples whose neighbors have similar
 #' \eqn{\textbf{y}} values receive large weights
 #' \eqn{w_i = 2^{-\Delta y_i / s_{\Delta y}}}, so the differences between their
 #' spectra, \eqn{\Delta\textbf{X}}, describe variation unrelated to \eqn{\textbf{y}}.
