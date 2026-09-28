@@ -21,7 +21,7 @@ A \link[dials:dials-package]{dials} parameter for the \code{lambda} argument of
 \code{\link[=step_baseline]{step_baseline()}}, on a log10 scale.
 }
 \examples{
-\dontshow{if (rlang::is_installed("dials")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("dials")) withAutoprint(\{ # examplesIf}
 baseline_lambda()
 \dontshow{\}) # examplesIf}
 }

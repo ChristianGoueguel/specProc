@@ -34,7 +34,7 @@ Cite the STARK-B database and the original publications, listed in the
 \code{source} column, as for \code{\link[=starkb_lines]{starkb_lines()}}.
 }
 \examples{
-\dontshow{if (rlang::is_installed("xml2")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("xml2")) withAutoprint(\{ # examplesIf}
 # a minimal file in the STARK-B format, with made-up values
 file <- tempfile(fileext = ".xml")
 writeLines(c(

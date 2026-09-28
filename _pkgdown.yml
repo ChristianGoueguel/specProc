@@ -94,6 +94,15 @@ reference:
   - baseline_lambda
   - glsw_alpha
 
+- title: Line identification
+  desc: >
+    Candidate emission lines from the NIST Atomic Spectra Database, overlaid
+    on spectra, and an interactive app to identify lines.
+  contents:
+  - line_finder
+  - libs_lines
+  - plot_lines
+
 - title: Plasma diagnostics
   desc: >
     Electron density from Stark broadening (with the STARK-B database),

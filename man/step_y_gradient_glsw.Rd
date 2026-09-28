@@ -64,7 +64,7 @@ As in \code{\link[=step_glsw]{step_glsw()}}, \code{alpha} is relative to the lar
 filter uses the outcome, so it is estimated on training data only; the
 outcome is not needed when new data are baked. The selected columns are
 replaced by the filtered values (not centered). \code{alpha} can be tuned with
-\code{\link[tune:reexports]{tune::tune()}}, using \code{\link[=glsw_alpha]{glsw_alpha()}}. \link[recipes:tidy.recipe]{tidy()}
+\code{\link[tune:tune]{tune::tune()}}, using \code{\link[=glsw_alpha]{glsw_alpha()}}. \link[recipes:tidy.recipe]{tidy()}
 returns the selected \code{terms}, \code{alpha} (relative) and \code{id}.
 }
 \seealso{

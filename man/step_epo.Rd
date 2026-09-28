@@ -64,7 +64,7 @@ directions of the training data themselves are removed, as in \code{\link[=epo]{
 The outcome is not used.
 
 The selected columns are replaced by the corrected values (not centered).
-\code{num_comp} can be tuned with \code{\link[tune:reexports]{tune::tune()}}. \link[recipes:tidy.recipe]{tidy()}
+\code{num_comp} can be tuned with \code{\link[tune:tune]{tune::tune()}}. \link[recipes:tidy.recipe]{tidy()}
 returns the selected \code{terms}, \code{num_comp} and \code{id}.
 }
 \seealso{

@@ -1,3 +1,18 @@
+# specProc (development version)
+
+## New features
+
+* `line_finder()`: a Shiny app to identify the emission lines of LIBS
+  spectra. Elements are selected on a periodic table, and the strongest lines
+  of their ionization stages, from the NIST Atomic Spectra Database, are
+  overlaid on a spectrum in an interactive plotly graph (one color per
+  stage), with controls for the temperature, wavelength range, number of
+  lines, wavelength shift and spectrum (mean, group mean or single spectrum).
+  Fetched lines can be saved and reloaded for offline use.
+* `libs_lines()` lists the lines of selected species expected to be the
+  strongest in a plasma at a given temperature (relative intensities in
+  LTE), and `plot_lines()` overlays them on a spectrum (plotly or ggplot2).
+
 # specProc 0.5.0
 
 This release adds plasma diagnostics for LIBS: electron density from Stark

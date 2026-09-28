@@ -70,7 +70,7 @@ with \code{\link[=rospca]{rospca()}}.
 }
 \details{
 As \code{\link[=step_robpca]{step_robpca()}}, with sparse loadings. \code{num_comp} and \code{lambda} can be
-tuned with \code{\link[tune:reexports]{tune::tune()}}; \code{lambda} uses \code{\link[dials:penalty]{dials::penalty()}} with a range
+tuned with \code{\link[tune:tune]{tune::tune()}}; \code{lambda} uses \code{\link[dials:penalty]{dials::penalty()}} with a range
 of 0.01 to 100.
 }
 \seealso{

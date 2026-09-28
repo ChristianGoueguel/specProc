@@ -69,9 +69,9 @@ whether it is applied before or after the data are split. The selected
 columns are replaced by the corrected values.
 }
 \section{Tuning}{
-\code{lambda} (methods \code{"arpls"} and \code{"als"}) can be tuned with \code{\link[tune:reexports]{tune::tune()}},
+\code{lambda} (methods \code{"arpls"} and \code{"als"}) can be tuned with \code{\link[tune:tune]{tune::tune()}},
 using \code{\link[=baseline_lambda]{baseline_lambda()}}, and \code{degree} (method \code{"lsp"}) using
-\code{\link[dials:degree]{dials::degree_int()}} with values 1 to 8.
+\code{\link[dials:degree_int]{dials::degree_int()}} with values 1 to 8.
 }
 
 \section{Tidying}{
@@ -80,7 +80,7 @@ using \code{\link[=baseline_lambda]{baseline_lambda()}}, and \code{degree} (meth
 }
 
 \examples{
-\dontshow{if (rlang::is_installed("recipes")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
 library(recipes)
 data(specLIBS)
 spectra <- specLIBS[c(1, 9:400)]  # sample id and spectral channels
