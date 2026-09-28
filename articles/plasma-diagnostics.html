@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -362,7 +362,15 @@ a species:</p>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>  <span class="va">stark</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">density</span> <span class="op">==</span> <span class="fl">1e17</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">wavelength</span>, <span class="va">upper</span>, <span class="va">lower</span>, <span class="va">temperature</span>, <span class="va">width</span>, <span class="va">shift</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; STARK-B could not be reached; the sections that need it are skipped.</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 6</span></span></span>
+<span><span class="co">#&gt;   wavelength upper      lower     temperature  width    shift</span></span>
+<span><span class="co">#&gt;        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>       395. 3p6.4p 2Po 3p6.4s 2S        <span style="text-decoration: underline;">5</span>000 0.029<span style="text-decoration: underline;">6</span> -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">07</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>       395. 3p6.4p 2Po 3p6.4s 2S       <span style="text-decoration: underline;">10</span>000 0.022<span style="text-decoration: underline;">8</span> -<span style="color: #BB0000;">0.004</span><span style="color: #BB0000; text-decoration: underline;">18</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>       395. 3p6.4p 2Po 3p6.4s 2S       <span style="text-decoration: underline;">20</span>000 0.018<span style="text-decoration: underline;">8</span> -<span style="color: #BB0000;">0.003</span><span style="color: #BB0000; text-decoration: underline;">24</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>       395. 3p6.4p 2Po 3p6.4s 2S       <span style="text-decoration: underline;">30</span>000 0.017<span style="text-decoration: underline;">7</span> -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">75</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>       395. 3p6.4p 2Po 3p6.4s 2S       <span style="text-decoration: underline;">50</span>000 0.017<span style="text-decoration: underline;">1</span> -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">57</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>       395. 3p6.4p 2Po 3p6.4s 2S      <span style="text-decoration: underline;">100</span>000 0.016<span style="text-decoration: underline;">6</span> -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">14</span></span></span></code></pre></div>
 <p>STARK-B tabulates the Ca II 4s–4p multiplet at its mean wavelength.
 <code><a href="../reference/stark_width.html">stark_width()</a></code> interpolates the width at the plasma
 temperature, scales it linearly to the electron density, and converts
@@ -370,7 +378,12 @@ the multiplet width to that of the line with the <span class="math inline">\lamb
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">thin</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stark_width.html">stark_width</a></span><span class="op">(</span><span class="va">stark</span>, wavelength <span class="op">=</span> <span class="fl">393.366</span>, temperature <span class="op">=</span> <span class="va">saha</span><span class="op">$</span><span class="va">temperature</span>,</span>
 <span>                    density <span class="op">=</span> <span class="va">ne</span>, tolerance <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="va">thin</span></span></code></pre></div>
+<span><span class="va">thin</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 9</span></span></span>
+<span><span class="co">#&gt;   wavelength tabulated_wavelength upper      lower perturber temperature density</span></span>
+<span><span class="co">#&gt;        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>       393.                 395. 3p6.4p 2Po 3p6.… electron        <span style="text-decoration: underline;">8</span>747. 1.80<span style="color: #949494;">e</span>17</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: width &lt;dbl&gt;, shift &lt;dbl&gt;</span></span></span></code></pre></div>
 <p>If the service is not available, a table saved earlier can be read
 with <code><a href="../reference/read_starkb.html">read_starkb()</a></code>, and widths from other sources can be
 entered with <code><a href="../reference/stark_table.html">stark_table()</a></code>, which takes tabulated values or
@@ -406,12 +419,22 @@ jointly with its neighbors and take its Lorentzian width:</p>
 <span>  <span class="fu"><a href="../reference/multipeak_fit.html">multipeak_fit</a></span><span class="op">(</span>peaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">393.37</span>, <span class="fl">394.40</span>, <span class="fl">396.15</span>, <span class="fl">396.85</span><span class="op">)</span>, profiles <span class="op">=</span> <span class="st">"voigt"</span><span class="op">)</span></span>
 <span><span class="va">measured</span> <span class="op">&lt;-</span> <span class="va">ca_fit</span><span class="op">$</span><span class="va">tidied</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">term</span> <span class="op">==</span> <span class="st">"wL_1"</span><span class="op">)</span></span>
 <span><span class="va">measured</span></span>
-<span><span class="fu"><a href="../reference/self_absorption.html">self_absorption</a></span><span class="op">(</span>width <span class="op">=</span> <span class="va">measured</span><span class="op">$</span><span class="va">estimate</span>, thin_width <span class="op">=</span> <span class="va">thin</span><span class="op">$</span><span class="va">width</span><span class="op">)</span></span></code></pre></div>
-<p>(This section needs the STARK-B service.) The Lorentzian width of a
-line only a few channels wide is uncertain (see its standard error), so
-this coefficient is an order of magnitude rather than a correction
-factor. It confirms what the saturation of the same line in the forage
-spectra already suggested: the Ca II resonance lines are unsuitable for
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span></span>
+<span><span class="co">#&gt;   term  estimate std.error statistic  p.value</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> wL_1     0.102    0.026<span style="text-decoration: underline;">0</span>      3.90 0.000<span style="text-decoration: underline;">399</span></span></span>
+<span><span class="fu"><a href="../reference/self_absorption.html">self_absorption</a></span><span class="op">(</span>width <span class="op">=</span> <span class="va">measured</span><span class="op">$</span><span class="va">estimate</span>, thin_width <span class="op">=</span> <span class="va">thin</span><span class="op">$</span><span class="va">width</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 4</span></span></span>
+<span><span class="co">#&gt;   width thin_width    SA intensity_correction</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0.102     0.042<span style="text-decoration: underline;">9</span> 0.203                 4.94</span></span></code></pre></div>
+<p>The measured Lorentzian width, 0.102 nm, is 2.4 times the optically
+thin width of 0.043 nm, which gives SA of about 0.2: only a fraction of
+the peak intensity escapes the plasma. The Lorentzian width of a line
+only a few channels wide is uncertain (see its standard error), so this
+coefficient is an order of magnitude rather than a correction factor. It
+confirms what the saturation of the same line in the forage spectra
+already suggested: the Ca II resonance lines are unsuitable for
 quantification in these plasmas.</p>
 </div>
 <div class="section level2">

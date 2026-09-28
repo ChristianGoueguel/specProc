@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -527,9 +527,68 @@ analysis or calibration:</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>color <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"SNV intensity"</span>, title <span class="op">=</span> <span class="st">"Mean preprocessed spectrum by soil type"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="preprocessing_files/figure-html/final-1.png" class="r-plt" alt="" width="100%"></p>
+</div>
+<div class="section level2">
+<h2 id="exploring-the-samples">Exploring the samples<a class="anchor" aria-label="anchor" href="#exploring-the-samples"></a>
+</h2>
+<p>A map of the samples shows which of them have similar spectra.
+Principal component analysis (PCA) gives a linear map: its axes are
+directions of maximal variance, and distances on the map are distances
+between the spectra. UMAP (uniform manifold approximation and
+projection, through <code><a href="https://embed.tidymodels.org/reference/step_umap.html" class="external-link">embed::step_umap()</a></code>) gives a nonlinear
+map that keeps the neighbors of each sample together. With 7152 channels
+and 50 samples, UMAP is run on the first 10 principal components, which
+hold the structure of the data and drop most of the noise.
+<code><a href="../reference/plot_embedding.html">plot_embedding()</a></code> draws either map:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sample_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">specLIBS</span>, <span class="va">Sample</span>, <span class="va">Texture</span>, <span class="va">Clay</span><span class="op">)</span></span>
+<span><span class="va">map_data</span> <span class="op">&lt;-</span> <span class="va">sample_spectra</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">sample_info</span>, by <span class="op">=</span> <span class="st">"Sample"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">map_recipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">map_data</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://recipes.tidymodels.org/reference/roles.html" class="external-link">update_role</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="va">Texture</span>, <span class="va">Clay</span>, new_role <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://recipes.tidymodels.org/reference/step_normalize.html" class="external-link">step_normalize</a></span><span class="op">(</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://recipes.tidymodels.org/reference/step_pca.html" class="external-link">step_pca</a></span><span class="op">(</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span>, num_comp <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">pca_map</span> <span class="op">&lt;-</span> <span class="va">map_recipe</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/prep.html" class="external-link">prep</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/bake.html" class="external-link">bake</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">umap_map</span> <span class="op">&lt;-</span> <span class="va">map_recipe</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">embed</span><span class="fu">::</span><span class="fu"><a href="https://embed.tidymodels.org/reference/step_umap.html" class="external-link">step_umap</a></span><span class="op">(</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span>, neighbors <span class="op">=</span> <span class="fl">10</span>, min_dist <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://recipes.tidymodels.org/reference/prep.html" class="external-link">prep</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://recipes.tidymodels.org/reference/bake.html" class="external-link">bake</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">patchwork</span><span class="fu">::</span><span class="fu"><a href="https://patchwork.data-imaginist.com/reference/wrap_plots.html" class="external-link">wrap_plots</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/plot_embedding.html">plot_embedding</a></span><span class="op">(</span><span class="va">pca_map</span>, colour <span class="op">=</span> <span class="va">Texture</span>, title <span class="op">=</span> <span class="st">"PCA"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/plot_embedding.html">plot_embedding</a></span><span class="op">(</span><span class="va">umap_map</span>, colour <span class="op">=</span> <span class="va">Texture</span>, title <span class="op">=</span> <span class="st">"UMAP"</span><span class="op">)</span>,</span>
+<span>  guides <span class="op">=</span> <span class="st">"collect"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="preprocessing_files/figure-html/embedding-1.png" class="r-plt" alt="" width="100%"></p>
+<p>On the PCA map, the sands (right) and the clays (bottom) stand apart,
+with the loams in between: the spectra follow texture before any model
+is fitted. The UMAP map is less clear. It spreads the samples evenly,
+and the sands end up next to the clays. This is not a failure of the
+method but a reminder of what it does: UMAP keeps the nearest neighbors
+of each sample, and with 50 samples and <code>neighbors = 10</code>,
+each neighborhood holds a fifth of the data, while the sizes of the
+groups and the distances between them depend on <code>neighbors</code>,
+<code>min_dist</code> and the random seed. UMAP is most useful on large
+data sets with local structure, such as thousands of shots. PCA keeps
+distances, so on a data set of this size it is the more faithful map,
+and a sample far from the others on it really has an unusual
+spectrum.</p>
+<p>Coloring the PCA map by a continuous property shows whether it varies
+smoothly with the main directions of the spectra:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_embedding.html">plot_embedding</a></span><span class="op">(</span><span class="va">pca_map</span>, colour <span class="op">=</span> <span class="va">Clay</span>, title <span class="op">=</span> <span class="st">"PCA, colored by clay content (%)"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="preprocessing_files/figure-html/embedding-clay-1.png" class="r-plt" alt="" width="60%"></p>
+<p>The clay content increases from the sands to the clays across the
+map. A supervised UMAP
+(<code>embed::step_umap(outcome = vars(Clay))</code>) would arrange the
+samples by clay content, but it uses the outcome: like any supervised
+step, it must then be estimated within resampling, never on all the data
+before cross-validation.</p>
 <p>The same pipeline, written as one recipe, can be estimated on
 calibration spectra and applied to new ones:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pipeline</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">specLIBS</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://recipes.tidymodels.org/reference/roles.html" class="external-link">update_role</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">meta_cols</span><span class="op">)</span>, new_role <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/step_baseline.html">step_baseline</a></span><span class="op">(</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>

@@ -234,6 +234,8 @@ Functions that help assess data visually.
   : Plotting of Fitted Spectral Line
 - [`plot_spectra()`](https://christiangoueguel.com/specProc/reference/plot_spectra.md)
   : Plotting of Spectra
+- [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
+  : Plot a Two-Dimensional Embedding
 - [`plot_outliers()`](https://christiangoueguel.com/specProc/reference/plot_outliers.md)
   : Univariate Representation of Multivariate Outliers
 - [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md)

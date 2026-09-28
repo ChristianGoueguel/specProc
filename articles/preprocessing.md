@@ -526,6 +526,75 @@ sample_spectra |>
 
 ![](preprocessing_files/figure-html/final-1.png)
 
+## Exploring the samples
+
+A map of the samples shows which of them have similar spectra. Principal
+component analysis (PCA) gives a linear map: its axes are directions of
+maximal variance, and distances on the map are distances between the
+spectra. UMAP (uniform manifold approximation and projection, through
+[`embed::step_umap()`](https://embed.tidymodels.org/reference/step_umap.html))
+gives a nonlinear map that keeps the neighbors of each sample together.
+With 7152 channels and 50 samples, UMAP is run on the first 10 principal
+components, which hold the structure of the data and drop most of the
+noise.
+[`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
+draws either map:
+
+``` r
+
+sample_info <- distinct(specLIBS, Sample, Texture, Clay)
+map_data <- sample_spectra |> left_join(sample_info, by = "Sample")
+
+map_recipe <- recipe(~ ., data = map_data) |>
+  update_role(Sample, Texture, Clay, new_role = "id") |>
+  step_normalize(all_predictors()) |>
+  step_pca(all_predictors(), num_comp = 10)
+
+pca_map <- map_recipe |> prep() |> bake(new_data = NULL)
+set.seed(1)
+umap_map <- map_recipe |>
+  embed::step_umap(all_predictors(), neighbors = 10, min_dist = 0.1) |>
+  prep() |>
+  bake(new_data = NULL)
+
+patchwork::wrap_plots(
+  plot_embedding(pca_map, colour = Texture, title = "PCA"),
+  plot_embedding(umap_map, colour = Texture, title = "UMAP"),
+  guides = "collect"
+)
+```
+
+![](preprocessing_files/figure-html/embedding-1.png)
+
+On the PCA map, the sands (right) and the clays (bottom) stand apart,
+with the loams in between: the spectra follow texture before any model
+is fitted. The UMAP map is less clear. It spreads the samples evenly,
+and the sands end up next to the clays. This is not a failure of the
+method but a reminder of what it does: UMAP keeps the nearest neighbors
+of each sample, and with 50 samples and `neighbors = 10`, each
+neighborhood holds a fifth of the data, while the sizes of the groups
+and the distances between them depend on `neighbors`, `min_dist` and the
+random seed. UMAP is most useful on large data sets with local
+structure, such as thousands of shots. PCA keeps distances, so on a data
+set of this size it is the more faithful map, and a sample far from the
+others on it really has an unusual spectrum.
+
+Coloring the PCA map by a continuous property shows whether it varies
+smoothly with the main directions of the spectra:
+
+``` r
+
+plot_embedding(pca_map, colour = Clay, title = "PCA, colored by clay content (%)")
+```
+
+![](preprocessing_files/figure-html/embedding-clay-1.png)
+
+The clay content increases from the sands to the clays across the map. A
+supervised UMAP (`embed::step_umap(outcome = vars(Clay))`) would arrange
+the samples by clay content, but it uses the outcome: like any
+supervised step, it must then be estimated within resampling, never on
+all the data before cross-validation.
+
 The same pipeline, written as one recipe, can be estimated on
 calibration spectra and applied to new ones:
 

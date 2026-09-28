@@ -1,5 +1,19 @@
 # Changelog
 
+## specProc (development version)
+
+### New features
+
+- [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
+  draws two-dimensional embeddings (UMAP from
+  [`embed::step_umap()`](https://embed.tidymodels.org/reference/step_umap.html),
+  principal components from
+  [`recipes::step_pca()`](https://recipes.tidymodels.org/reference/step_pca.html),
+  [`prcomp()`](https://rdrr.io/r/stats/prcomp.html) or
+  [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)),
+  colored by a variable. The preprocessing vignette uses it to compare
+  PCA and UMAP maps of the samples.
+
 ## specProc 0.6.0
 
 ### New features
