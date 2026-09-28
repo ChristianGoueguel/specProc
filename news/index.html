@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,15 +40,21 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="development version" id="specproc-development-version">specProc (development version)<a class="anchor" aria-label="anchor" href="#specproc-development-version"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.6.0" id="specproc-060">specProc 0.6.0<a class="anchor" aria-label="anchor" href="#specproc-060"></a></h2>
 <div class="section level3">
-<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<h3 id="new-features-0-6-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-6-0"></a></h3>
 <ul><li>
 <code><a href="../reference/cf_libs.html">cf_libs()</a></code>: calibration-free LIBS quantification (Ciucci et al., 1999). The temperature is estimated from the common slope of parallel Boltzmann plots (one per species) or, when the electron density is known, Saha-Boltzmann plots (one per element, much more precise). The densities follow from the intercepts and the partition functions, and the ionization stages not observed from the Saha equation. The composition (atomic and mass fractions) is normalized by closure or by the known concentration of one element. <code><a href="../reference/plot_boltzmann.html">plot_boltzmann()</a></code> draws the plots of the fit. The plasma diagnostics vignette applies it to the forage samples and compares it with their laboratory values.</li>
 <li>
 <code><a href="../reference/nist_levels.html">nist_levels()</a></code> retrieves energy levels from the NIST Atomic Spectra Database, and <code><a href="../reference/nist_levels.html">partition_function()</a></code> computes partition functions from them, optionally truncated at a maximum energy (such as the lowered ionization energy).</li>
 <li>
 <code><a href="../reference/reject_shots.html">reject_shots()</a></code> flags the outlying laser shots of each sample (total intensity, correlation with or distance to the median spectrum, by robust z-scores), before they are averaged with <code><a href="../reference/average.html">average()</a></code>.</li>
+<li>
+<code><a href="../reference/line_intensities.html">line_intensities()</a></code> measures the area (or height, or Voigt-fitted area) of emission lines in spectra, searching each peak near its tabulated wavelength, with a signal-to-noise ratio and saturation check. It keeps the columns of a table of lines, so its result feeds <code><a href="../reference/boltzmann_plot.html">boltzmann_plot()</a></code>, <code><a href="../reference/cf_libs.html">cf_libs()</a></code> and <code><a href="../reference/calibration_curve.html">calibration_curve()</a></code>. <code><a href="../reference/step_line_intensities.html">step_line_intensities()</a></code> does the same in a recipe.</li>
+<li>
+<code><a href="../reference/correct_self_absorption.html">correct_self_absorption()</a></code> corrects line intensities for self-absorption by the internal reference method of Sun and Yu (2009), with the temperature given or estimated from a Saha-Boltzmann plot.</li>
+<li>
+<code><a href="../reference/calibration_curve.html">calibration_curve()</a></code> fits univariate (linear or quadratic, optionally weighted) calibration curves, with the sensitivity, LOD and LOQ, Mandel’s and lack-of-fit tests of linearity, inverse prediction of concentrations with confidence intervals (<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>) and <code><a href="../reference/plot_calibration.html">plot_calibration()</a></code>.</li>
 <li>New recipe steps: <code><a href="../reference/step_reject_shots.html">step_reject_shots()</a></code> removes the outlying shots from the training data (skipped on new data), and <code><a href="../reference/step_line_ratio.html">step_line_ratio()</a></code> normalizes each spectrum to the area or height of a reference line (internal standard).</li>
 <li>
 <code><a href="../reference/line_finder.html">line_finder()</a></code>: a Shiny app to identify the emission lines of LIBS spectra. Elements are selected on a periodic table, and the strongest lines of their ionization stages, from the NIST Atomic Spectra Database, are overlaid on a spectrum in an interactive plotly graph (one color per stage), with controls for the temperature, wavelength range, number of lines, wavelength shift and spectrum (mean, group mean or single spectrum). Fetched lines can be saved and reloaded for offline use.</li>

@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -251,16 +251,35 @@ self-absorbed, as shown at the end of this vignette.</p>
 <h3 id="line-intensities">Line intensities<a class="anchor" aria-label="anchor" href="#line-intensities"></a>
 </h3>
 <p>The spectrometer’s wavelength scale is offset from the NIST
-wavelengths by about one channel in places, so each line area is summed
-over ±0.15 nm around the observed peak within 0.2 nm of the tabulated
-wavelength:</p>
+wavelengths by about one channel in places.
+<code><a href="../reference/line_intensities.html">line_intensities()</a></code> therefore searches the peak of each line
+within 0.2 nm of its tabulated wavelength (<code>search</code>), and
+integrates it over ±0.15 nm around the peak (<code>half_width</code>).
+It keeps the columns of the table of lines and adds the measured
+<code>intensity</code>, so the result goes directly into the Boltzmann
+plots:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">line_area</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">center</span>, <span class="va">search</span> <span class="op">=</span> <span class="fl">0.2</span>, <span class="va">half_width</span> <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">near</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">wl</span> <span class="op">-</span> <span class="va">center</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">search</span></span>
-<span>  <span class="va">peak</span> <span class="op">&lt;-</span> <span class="va">wl</span><span class="op">[</span><span class="va">near</span><span class="op">]</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.max</a></span><span class="op">(</span><span class="va">spectrum</span><span class="op">[</span><span class="va">near</span><span class="op">]</span><span class="op">)</span><span class="op">]</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">spectrum</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">wl</span> <span class="op">-</span> <span class="va">peak</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">half_width</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">lines</span> <span class="op">&lt;-</span> <span class="va">atomic</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>intensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">wavelength</span>, <span class="va">line_area</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">spectrum</span>, <span class="va">atomic</span><span class="op">)</span></span>
+<span><span class="va">lines</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">species</span>, <span class="va">wavelength</span>, <span class="va">peak_wavelength</span>, <span class="va">intensity</span>, <span class="va">snr</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 16 × 5</span></span></span>
+<span><span class="co">#&gt;    species wavelength peak_wavelength intensity   snr</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Ca I          428.            428.      56.2  50.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Ca I          430.            430.     104.   91.5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Ca I          432.            432.      65.3  51.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Ca I          443.            443.      58.6  46.7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> Ca I          445.            445.     132.   95.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> Ca I          559.            559.     103.   70.6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Ca I          610.            610.      35.6  24.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Ca I          612.            612.      99.2  68.4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Ca I          616.            616.     170.  119. </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Ca I          644.            644.     135.   97.8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> Ca I          646.            646.      98.6  70.1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> Ca I          649.            649.      36.5  29.2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> Ca II         316.            316.      93.3  56.8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> Ca II         318.            318.     182.  119. </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> Ca II         371.            371.      55.5  38.4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> Ca II         374.            374.     188.  132.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="boltzmann-plot-of-the-neutral-atom">Boltzmann plot of the neutral atom<a class="anchor" aria-label="anchor" href="#boltzmann-plot-of-the-neutral-atom"></a>
@@ -270,8 +289,8 @@ wavelength:</p>
 <span><span class="va">neutral</span></span>
 <span><span class="co">#&gt; Boltzmann plot (12 lines)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Temperature:  4802 +/- 594 K</span></span>
-<span><span class="co">#&gt; R-squared:    0.8671</span></span></code></pre></div>
+<span><span class="co">#&gt; Temperature:  4991 +/- 611 K</span></span>
+<span><span class="co">#&gt; R-squared:    0.8697</span></span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boltzmann.html">plot_boltzmann</a></span><span class="op">(</span><span class="va">neutral</span><span class="op">)</span></span></code></pre></div>
 <p><img src="plasma-diagnostics_files/figure-html/boltzmann-plot-1.png" class="r-plt" alt="" width="100%"></p>
@@ -287,8 +306,8 @@ H<span class="math inline">\alpha</span>:</p>
 <span><span class="va">saha</span></span>
 <span><span class="co">#&gt; Saha-Boltzmann plot (16 lines)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Temperature:  8791 +/- 246 K</span></span>
-<span><span class="co">#&gt; R-squared:    0.9891</span></span>
+<span><span class="co">#&gt; Temperature:  8747 +/- 234 K</span></span>
+<span><span class="co">#&gt; R-squared:    0.99</span></span>
 <span><span class="co">#&gt; Ne:           1.8e+17 cm-3</span></span></code></pre></div>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boltzmann.html">plot_boltzmann</a></span><span class="op">(</span><span class="va">saha</span><span class="op">)</span></span></code></pre></div>
@@ -296,11 +315,11 @@ H<span class="math inline">\alpha</span>:</p>
 <p>The Ca I lines come from upper levels between 3.9 and 4.8 eV. Over
 such a narrow range, the slope of the Boltzmann plot is sensitive to
 errors in a few intensities or transition probabilities (graded C and D,
-that is, uncertain by 25 to 50%): its temperature, 4800 ± 590 K, is far
+that is, uncertain by 25 to 50%): its temperature, 4990 ± 610 K, is far
 below the Saha-Boltzmann estimate. This is the usual problem of
 Boltzmann plots with lines of a single species.</p>
 <p>The ionic points extend the abscissa by the ionization energy, to
-about 13 eV, and the Saha-Boltzmann fit gives <span class="math inline">T \approx</span> 8800 K with a standard error of 250
+about 13 eV, and the Saha-Boltzmann fit gives <span class="math inline">T \approx</span> 8700 K with a standard error of 230
 K. The standard error reflects the scatter of the points, not the
 systematic errors of the transition probabilities, the spectral
 response, or the density.</p>
@@ -317,7 +336,7 @@ the first excited level of Ca II, 3.15 eV above the ground state:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span></span>
 <span><span class="co">#&gt;   temperature delta_e minimum_density electron_density satisfied</span></span>
 <span><span class="co">#&gt;         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>       <span style="text-decoration: underline;">8</span>791.    3.15         4.69<span style="color: #949494;">e</span>15          1.80<span style="color: #949494;">e</span>17 TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>       <span style="text-decoration: underline;">8</span>747.    3.15         4.68<span style="color: #949494;">e</span>15          1.80<span style="color: #949494;">e</span>17 TRUE</span></span></code></pre></div>
 <p>The measured density is 38 times the minimum. The criterion is
 necessary but not sufficient: in a transient, inhomogeneous plasma, LTE
 also requires equilibration to be faster than the changes of the plasma
@@ -343,15 +362,7 @@ a species:</p>
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>  <span class="va">stark</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">density</span> <span class="op">==</span> <span class="fl">1e17</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">wavelength</span>, <span class="va">upper</span>, <span class="va">lower</span>, <span class="va">temperature</span>, <span class="va">width</span>, <span class="va">shift</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 6</span></span></span>
-<span><span class="co">#&gt;   wavelength upper      lower     temperature  width    shift</span></span>
-<span><span class="co">#&gt;        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>       395. 3p6.4p 2Po 3p6.4s 2S        <span style="text-decoration: underline;">5</span>000 0.029<span style="text-decoration: underline;">6</span> -<span style="color: #BB0000;">0.005</span><span style="color: #BB0000; text-decoration: underline;">07</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>       395. 3p6.4p 2Po 3p6.4s 2S       <span style="text-decoration: underline;">10</span>000 0.022<span style="text-decoration: underline;">8</span> -<span style="color: #BB0000;">0.004</span><span style="color: #BB0000; text-decoration: underline;">18</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>       395. 3p6.4p 2Po 3p6.4s 2S       <span style="text-decoration: underline;">20</span>000 0.018<span style="text-decoration: underline;">8</span> -<span style="color: #BB0000;">0.003</span><span style="color: #BB0000; text-decoration: underline;">24</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>       395. 3p6.4p 2Po 3p6.4s 2S       <span style="text-decoration: underline;">30</span>000 0.017<span style="text-decoration: underline;">7</span> -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">75</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>       395. 3p6.4p 2Po 3p6.4s 2S       <span style="text-decoration: underline;">50</span>000 0.017<span style="text-decoration: underline;">1</span> -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">57</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>       395. 3p6.4p 2Po 3p6.4s 2S      <span style="text-decoration: underline;">100</span>000 0.016<span style="text-decoration: underline;">6</span> -<span style="color: #BB0000;">0.002</span><span style="color: #BB0000; text-decoration: underline;">14</span></span></span></code></pre></div>
+<span><span class="co">#&gt; STARK-B could not be reached; the sections that need it are skipped.</span></span></code></pre></div>
 <p>STARK-B tabulates the Ca II 4s–4p multiplet at its mean wavelength.
 <code><a href="../reference/stark_width.html">stark_width()</a></code> interpolates the width at the plasma
 temperature, scales it linearly to the electron density, and converts
@@ -359,12 +370,7 @@ the multiplet width to that of the line with the <span class="math inline">\lamb
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">thin</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/stark_width.html">stark_width</a></span><span class="op">(</span><span class="va">stark</span>, wavelength <span class="op">=</span> <span class="fl">393.366</span>, temperature <span class="op">=</span> <span class="va">saha</span><span class="op">$</span><span class="va">temperature</span>,</span>
 <span>                    density <span class="op">=</span> <span class="va">ne</span>, tolerance <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="va">thin</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 9</span></span></span>
-<span><span class="co">#&gt;   wavelength tabulated_wavelength upper      lower perturber temperature density</span></span>
-<span><span class="co">#&gt;        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>       393.                 395. 3p6.4p 2Po 3p6.… electron        <span style="text-decoration: underline;">8</span>791. 1.80<span style="color: #949494;">e</span>17</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 more variables: width &lt;dbl&gt;, shift &lt;dbl&gt;</span></span></span></code></pre></div>
+<span><span class="va">thin</span></span></code></pre></div>
 <p>If the service is not available, a table saved earlier can be read
 with <code><a href="../reference/read_starkb.html">read_starkb()</a></code>, and widths from other sources can be
 entered with <code><a href="../reference/stark_table.html">stark_table()</a></code>, which takes tabulated values or
@@ -400,22 +406,12 @@ jointly with its neighbors and take its Lorentzian width:</p>
 <span>  <span class="fu"><a href="../reference/multipeak_fit.html">multipeak_fit</a></span><span class="op">(</span>peaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">393.37</span>, <span class="fl">394.40</span>, <span class="fl">396.15</span>, <span class="fl">396.85</span><span class="op">)</span>, profiles <span class="op">=</span> <span class="st">"voigt"</span><span class="op">)</span></span>
 <span><span class="va">measured</span> <span class="op">&lt;-</span> <span class="va">ca_fit</span><span class="op">$</span><span class="va">tidied</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">term</span> <span class="op">==</span> <span class="st">"wL_1"</span><span class="op">)</span></span>
 <span><span class="va">measured</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span></span>
-<span><span class="co">#&gt;   term  estimate std.error statistic  p.value</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> wL_1     0.102    0.026<span style="text-decoration: underline;">0</span>      3.90 0.000<span style="text-decoration: underline;">399</span></span></span>
-<span><span class="fu"><a href="../reference/self_absorption.html">self_absorption</a></span><span class="op">(</span>width <span class="op">=</span> <span class="va">measured</span><span class="op">$</span><span class="va">estimate</span>, thin_width <span class="op">=</span> <span class="va">thin</span><span class="op">$</span><span class="va">width</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 4</span></span></span>
-<span><span class="co">#&gt;   width thin_width    SA intensity_correction</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 0.102     0.042<span style="text-decoration: underline;">8</span> 0.202                 4.95</span></span></code></pre></div>
-<p>The measured Lorentzian width, 0.102 nm, is 2.4 times the optically
-thin width of 0.043 nm, which gives SA of about 0.2: only a fraction of
-the peak intensity escapes the plasma. The Lorentzian width of a line
-only a few channels wide is uncertain (see its standard error), so this
-coefficient is an order of magnitude rather than a correction factor. It
-confirms what the saturation of the same line in the forage spectra
-already suggested: the Ca II resonance lines are unsuitable for
+<span><span class="fu"><a href="../reference/self_absorption.html">self_absorption</a></span><span class="op">(</span>width <span class="op">=</span> <span class="va">measured</span><span class="op">$</span><span class="va">estimate</span>, thin_width <span class="op">=</span> <span class="va">thin</span><span class="op">$</span><span class="va">width</span><span class="op">)</span></span></code></pre></div>
+<p>(This section needs the STARK-B service.) The Lorentzian width of a
+line only a few channels wide is uncertain (see its standard error), so
+this coefficient is an order of magnitude rather than a correction
+factor. It confirms what the saturation of the same line in the forage
+spectra already suggested: the Ca II resonance lines are unsuitable for
 quantification in these plasmas.</p>
 </div>
 <div class="section level2">
@@ -436,6 +432,7 @@ measurements and measure the electron density on H<span class="math inline">\alp
 <code class="sourceCode R"><span><span class="va">forage_channels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fourrage</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="va">forage_wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">forage_channels</span><span class="op">)</span></span>
 <span><span class="va">forage</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="../reference/baseline_arpls.html">baseline_arpls</a></span><span class="op">(</span><span class="va">fourrage</span><span class="op">[</span><span class="va">forage_channels</span><span class="op">]</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">forage</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">forage_channels</span></span>
 <span><span class="va">forage_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">forage</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">forage_halpha</span> <span class="op">&lt;-</span> <span class="va">forage_mean</span><span class="op">[</span><span class="va">forage_channels</span><span class="op">[</span><span class="va">forage_wl</span> <span class="op">&gt;</span> <span class="fl">654.6</span> <span class="op">&amp;</span> <span class="va">forage_wl</span> <span class="op">&lt;</span> <span class="fl">658.3</span><span class="op">]</span><span class="op">]</span></span>
@@ -531,31 +528,25 @@ the mean forage spectrum. With the electron density given,
 spans a much wider energy range than the Boltzmann plot of a single
 species:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">forage_area</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">s</span>, <span class="va">center</span>, <span class="va">search</span> <span class="op">=</span> <span class="fl">0.2</span>, <span class="va">half_width</span> <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">near</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">forage_wl</span> <span class="op">-</span> <span class="va">center</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">search</span></span>
-<span>  <span class="va">peak</span> <span class="op">&lt;-</span> <span class="va">forage_wl</span><span class="op">[</span><span class="va">near</span><span class="op">]</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.max</a></span><span class="op">(</span><span class="va">s</span><span class="op">[</span><span class="va">near</span><span class="op">]</span><span class="op">)</span><span class="op">]</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">s</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">forage_wl</span> <span class="op">-</span> <span class="va">peak</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">half_width</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">cf_mean</span> <span class="op">&lt;-</span> <span class="va">cf_atomic</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>intensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">wavelength</span>, \<span class="op">(</span><span class="va">w</span><span class="op">)</span> <span class="fu">forage_area</span><span class="op">(</span><span class="va">forage_mean</span>, <span class="va">w</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">cf_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">forage_mean</span>, <span class="va">cf_atomic</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/cf_libs.html">cf_libs</a></span><span class="op">(</span>electron_density <span class="op">=</span> <span class="va">ne_forage</span>, partition <span class="op">=</span> <span class="va">partition</span>, ionization_energy <span class="op">=</span> <span class="va">cf_ionization</span><span class="op">)</span></span>
 <span><span class="va">cf_mean</span></span>
 <span><span class="co">#&gt; Calibration-free LIBS (24 lines, 6 species; Saha-Boltzmann plots)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Temperature:  8926 +/- 216 K</span></span>
+<span><span class="co">#&gt; Temperature:  8902 +/- 215 K</span></span>
 <span><span class="co">#&gt; Ne:           1.58e+17 cm-3</span></span>
 <span><span class="co">#&gt; Normalization: closure</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  element atomic_fraction mass_fraction stages      </span></span>
-<span><span class="co">#&gt;  Ca      0.0945          0.1022        I, II       </span></span>
-<span><span class="co">#&gt;  Mg      0.0815          0.0535        I, II       </span></span>
-<span><span class="co">#&gt;  K       0.7662          0.8085        I, II (Saha)</span></span>
-<span><span class="co">#&gt;  Na      0.0579          0.0359        I, II (Saha)</span></span></code></pre></div>
+<span><span class="co">#&gt;  Ca      0.0987          0.1067        I, II       </span></span>
+<span><span class="co">#&gt;  Mg      0.0857          0.0562        I, II       </span></span>
+<span><span class="co">#&gt;  K       0.7628          0.8044        I, II (Saha)</span></span>
+<span><span class="co">#&gt;  Na      0.0528          0.0327        I, II (Saha)</span></span></code></pre></div>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boltzmann.html">plot_boltzmann</a></span><span class="op">(</span><span class="va">cf_mean</span><span class="op">)</span></span></code></pre></div>
 <p><img src="plasma-diagnostics_files/figure-html/cf-plot-1.png" class="r-plt" alt="" width="100%"></p>
 <p>The four plots are parallel within the scatter of their points, at
-<span class="math inline">T \approx</span> 8930 K. The closure applies
+<span class="math inline">T \approx</span> 8900 K. The closure applies
 to the four measured elements only: the forage is mostly C, H, O and N,
 whose lines are not used here, so the fractions describe the relative
 composition of these four elements, which we compare with the laboratory
@@ -570,27 +561,70 @@ values on the same basis:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 4</span></span></span>
 <span><span class="co">#&gt;   element cf_libs laboratory ratio</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Ca       0.102      0.222  0.461</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Mg       0.053<span style="text-decoration: underline;">5</span>     0.070<span style="text-decoration: underline;">2</span> 0.761</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> K        0.808      0.698  1.16 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Na       0.035<span style="text-decoration: underline;">9</span>     0.010<span style="text-decoration: underline;">1</span> 3.55</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Ca       0.107      0.222  0.481</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Mg       0.056<span style="text-decoration: underline;">2</span>     0.070<span style="text-decoration: underline;">2</span> 0.800</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> K        0.804      0.698  1.15 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Na       0.032<span style="text-decoration: underline;">7</span>     0.010<span style="text-decoration: underline;">1</span> 3.23</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="self-absorption-of-the-resonance-lines">Self-absorption of the resonance lines<a class="anchor" aria-label="anchor" href="#self-absorption-of-the-resonance-lines"></a>
+</h3>
+<p>The K I resonance doublet at 766.49 and 769.90 nm is the strongest K
+feature of these spectra, and it is not saturated. Why not use it?
+<code><a href="../reference/correct_self_absorption.html">correct_self_absorption()</a></code> answers by comparing each line
+with a reference line of the same species that is little absorbed (Sun
+and Yu, 2009). By default, the reference is the line of smallest optical
+depth, which needs the lower-level energies <code>Ei</code> of
+<code><a href="../reference/nist_lines.html">nist_lines()</a></code>:</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">k_lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
+<span>  <span class="op">~</span><span class="va">species</span>, <span class="op">~</span><span class="va">wavelength</span>, <span class="op">~</span><span class="va">Aki</span>,      <span class="op">~</span><span class="va">Ei</span>,      <span class="op">~</span><span class="va">Ek</span>,      <span class="op">~</span><span class="va">gk</span>,</span>
+<span>  <span class="st">"K I"</span>,    <span class="fl">404.414</span>,     <span class="fl">1.150e+06</span>, <span class="fl">0</span>,        <span class="fl">3.064907</span>, <span class="fl">4</span>,</span>
+<span>  <span class="st">"K I"</span>,    <span class="fl">404.721</span>,     <span class="fl">1.070e+06</span>, <span class="fl">0</span>,        <span class="fl">3.062581</span>, <span class="fl">2</span>,</span>
+<span>  <span class="st">"K I"</span>,    <span class="fl">691.108</span>,     <span class="fl">2.500e+06</span>, <span class="fl">1.609958</span>, <span class="fl">3.403454</span>, <span class="fl">2</span>,</span>
+<span>  <span class="st">"K I"</span>,    <span class="fl">693.877</span>,     <span class="fl">4.956e+06</span>, <span class="fl">1.617113</span>, <span class="fl">3.403454</span>, <span class="fl">2</span>,</span>
+<span>  <span class="st">"K I"</span>,    <span class="fl">766.490</span>,     <span class="fl">3.779e+07</span>, <span class="fl">0</span>,        <span class="fl">1.617113</span>, <span class="fl">4</span>,</span>
+<span>  <span class="st">"K I"</span>,    <span class="fl">769.896</span>,     <span class="fl">3.734e+07</span>, <span class="fl">0</span>,        <span class="fl">1.609958</span>, <span class="fl">2</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">forage_mean</span>, <span class="va">k_lines</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/correct_self_absorption.html">correct_self_absorption</a></span><span class="op">(</span>temperature <span class="op">=</span> <span class="va">cf_mean</span><span class="op">$</span><span class="va">temperature</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">wavelength</span>, <span class="va">measured_intensity</span>, <span class="va">SA</span>, <span class="va">reference</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span></span>
+<span><span class="co">#&gt;   wavelength measured_intensity    SA reference</span></span>
+<span><span class="co">#&gt;        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>       404.               191. 0.660 FALSE    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>       405.               135. 1     TRUE     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>       691.               123. 1.04  FALSE    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>       694.               138. 0.592 FALSE    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>       766.              <span style="text-decoration: underline;">5</span>172. 0.156 FALSE    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>       770.              <span style="text-decoration: underline;">6</span>899. 0.419 FALSE</span></span></code></pre></div>
+<p>The resonance lines keep only a fraction of the intensity they would
+have in an optically thin plasma. The clearest sign needs no model: the
+766.49 nm line has twice the <span class="math inline">g_k A_{ki}</span>
+of the 769.90 nm line, so it should be twice as intense, yet it is
+weaker. The coefficients of the weaker lines, between about 0.6 and 1,
+show the precision of the method on these data: it inherits the noise of
+the reference line, blends, and the errors of the transition
+probabilities. The correction is therefore large and uncertain for the
+resonance lines, which is why the CF-LIBS analysis above leaves them
+out.</p>
 </div>
 <div class="section level3">
 <h3 id="every-measurement">Every measurement<a class="anchor" aria-label="anchor" href="#every-measurement"></a>
 </h3>
 <p>Applied to each of the 368 measurements, the method follows the
 variation of the composition between samples:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cf_each</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">forage</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="va">cf_atomic</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>intensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">wavelength</span>, \<span class="op">(</span><span class="va">w</span><span class="op">)</span> <span class="fu">forage_area</span><span class="op">(</span><span class="va">forage</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span>, <span class="va">w</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="../reference/cf_libs.html">cf_libs</a></span><span class="op">(</span>electron_density <span class="op">=</span> <span class="va">ne_forage</span>, partition <span class="op">=</span> <span class="va">partition</span>,</span>
-<span>            ionization_energy <span class="op">=</span> <span class="va">cf_ionization</span><span class="op">)</span></span>
-<span>  <span class="va">fit</span><span class="op">$</span><span class="va">composition</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">element</span>, cf_libs <span class="op">=</span> <span class="va">mass_fraction</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>measurement <span class="op">=</span> <span class="va">i</span>, temperature <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">temperature</span><span class="op">)</span></span>
-<span><span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cf_each</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">forage</span>, <span class="va">cf_atomic</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span>measurement <span class="op">=</span> <span class="va">spectrum</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_map.html" class="external-link">group_modify</a></span><span class="op">(</span>\<span class="op">(</span><span class="va">lines</span>, <span class="va">key</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cf_libs.html">cf_libs</a></span><span class="op">(</span><span class="va">lines</span>, electron_density <span class="op">=</span> <span class="va">ne_forage</span>, partition <span class="op">=</span> <span class="va">partition</span>,</span>
+<span>                   ionization_energy <span class="op">=</span> <span class="va">cf_ionization</span><span class="op">)</span></span>
+<span>    <span class="va">fit</span><span class="op">$</span><span class="va">composition</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">element</span>, cf_libs <span class="op">=</span> <span class="va">mass_fraction</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>temperature <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">temperature</span><span class="op">)</span></span>
+<span>  <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">lab_fractions</span> <span class="op">&lt;-</span> <span class="va">fourrage</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>measurement <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span>, total <span class="op">=</span> <span class="va">Ca</span> <span class="op">+</span> <span class="va">Mg</span> <span class="op">+</span> <span class="va">K</span> <span class="op">+</span> <span class="va">Na</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -603,7 +637,7 @@ variation of the composition between samples:</p>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">cf_each</span>, <span class="va">measurement</span>, <span class="va">temperature</span><span class="op">)</span><span class="op">$</span><span class="va">temperature</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;    8723    8890    8931    8935    8977    9189</span></span>
+<span><span class="co">#&gt;    8694    8868    8909    8912    8952    9171</span></span>
 <span><span class="va">cf_scores</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">element</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>correlation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">cf_libs</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">laboratory</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -611,11 +645,11 @@ variation of the composition between samples:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 3</span></span></span>
 <span><span class="co">#&gt;   element correlation median_ratio</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Ca            0.884        0.488</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> K             0.861        1.14 </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Mg            0.866        0.773</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Na            0.528        4.47</span></span></code></pre></div>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Ca            0.884        0.509</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> K             0.868        1.13 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Mg            0.862        0.812</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Na            0.541        4.05</span></span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">cf_scores</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">laboratory</span>, <span class="va">cf_libs</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_abline</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"grey50"</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.4</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
@@ -635,7 +669,7 @@ Ca, Mg and K, the CF-LIBS fractions correlate with the laboratory values
 any calibration.</li>
 <li>
 <strong>The values are biased.</strong> Ca is underestimated by
-about half, Mg by about a quarter, and K is slightly overestimated. The
+about half, Mg by about a fifth, and K is slightly overestimated. The
 main suspects are the spectral response of the instrument, which is not
 corrected here (the lines of each element lie in different parts of the
 spectrum), and the transition probabilities of the Ca lines, graded C
@@ -711,6 +745,9 @@ Radiative Transfer</em>, 17(2):233–236.</li>
 <li>Sahal-Bréchot, S., Dimitrijević, M.S., Moreau, N. STARK-B database,
 <a href="https://stark-b.obspm.fr" class="external-link uri">https://stark-b.obspm.fr</a>. Observatoire de Paris and
 Astronomical Observatory of Belgrade.</li>
+<li>Sun, L., Yu, H. (2009). Correction of self-absorption effect in
+calibration-free laser-induced breakdown spectroscopy by an internal
+reference method. <em>Talanta</em>, 79(2):388–395.</li>
 <li>Tognoni, E., Cristoforetti, G., Legnaioli, S., Palleschi, V. (2010).
 Calibration-free laser-induced breakdown spectroscopy: state of the art.
 <em>Spectrochimica Acta Part B</em>, 65(1):1–14.</li>

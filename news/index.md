@@ -1,6 +1,6 @@
 # Changelog
 
-## specProc (development version)
+## specProc 0.6.0
 
 ### New features
 
@@ -26,6 +26,28 @@
   correlation with or distance to the median spectrum, by robust
   z-scores), before they are averaged with
   [`average()`](https://christiangoueguel.com/specProc/reference/average.md).
+- [`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md)
+  measures the area (or height, or Voigt-fitted area) of emission lines
+  in spectra, searching each peak near its tabulated wavelength, with a
+  signal-to-noise ratio and saturation check. It keeps the columns of a
+  table of lines, so its result feeds
+  [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md),
+  [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md)
+  and
+  [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md).
+  [`step_line_intensities()`](https://christiangoueguel.com/specProc/reference/step_line_intensities.md)
+  does the same in a recipe.
+- [`correct_self_absorption()`](https://christiangoueguel.com/specProc/reference/correct_self_absorption.md)
+  corrects line intensities for self-absorption by the internal
+  reference method of Sun and Yu (2009), with the temperature given or
+  estimated from a Saha-Boltzmann plot.
+- [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md)
+  fits univariate (linear or quadratic, optionally weighted) calibration
+  curves, with the sensitivity, LOD and LOQ, Mandel’s and lack-of-fit
+  tests of linearity, inverse prediction of concentrations with
+  confidence intervals
+  ([`predict()`](https://rdrr.io/r/stats/predict.html)) and
+  [`plot_calibration()`](https://christiangoueguel.com/specProc/reference/plot_calibration.md).
 - New recipe steps:
   [`step_reject_shots()`](https://christiangoueguel.com/specProc/reference/step_reject_shots.md)
   removes the outlying shots from the training data (skipped on new

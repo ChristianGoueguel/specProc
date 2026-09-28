@@ -44,7 +44,9 @@ step_reject_shots(
 
 - method:
 
-  The baseline algorithm: `"arpls"` (default), `"als"` or `"lsp"`.
+  The criteria: one or more of `"intensity"`, `"correlation"` (both by
+  default) and `"distance"` (see
+  [`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md)).
 
 - cutoff:
 

@@ -23,6 +23,10 @@ ready for modeling:
 - **Calibration transfer** between instruments: PDS, GLSW.
 - **Line fitting**: exact Voigt, pseudo-Voigt, Gaussian and Lorentzian
   profiles, for single or overlapping lines.
+- **Line identification**: candidate lines from the NIST Atomic Spectra
+  Database overlaid on spectra, and an interactive app
+  ([`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md))
+  with a periodic table to select the elements.
 - **Plasma diagnostics**: electron density from Stark broadening, with
   widths from the STARK-B database, or from H-alpha; temperature from
   Boltzmann and Saha-Boltzmann plots; McWhirter criterion,
@@ -165,8 +169,9 @@ the RSD, the more repeatable the measurement:
 
 ``` r
 
-line_area <- function(spectra, center, half_width = 0.15) {
-  rowSums(spectra[channels[abs(wl - center) < half_width]])
+# area of a line in each spectrum, within 0.15 nm of its wavelength
+line_area <- function(spectra, center) {
+  line_intensities(spectra, center, search = 0)$intensity
 }
 within_rsd <- function(area) {
   tibble(Sample = specLIBS$Sample, area = area) |>
@@ -187,10 +192,10 @@ list(raw = specLIBS, baseline = baselined, `baseline + area` = area_normalized,
 #> # A tibble: 4 × 2
 #>   preprocessing   `median RSD of Ca II 393.37 nm (%)`
 #>   <chr>                                         <dbl>
-#> 1 raw                                            6.19
-#> 2 baseline                                       6.73
-#> 3 baseline + area                                5.44
-#> 4 baseline + SNV                                 3.79
+#> 1 raw                                            6.5 
+#> 2 baseline                                       7.06
+#> 3 baseline + area                                5.51
+#> 4 baseline + SNV                                 4.05
 ```
 
 On this data set, SNV reduces the typical shot-to-shot RSD of the Ca II
@@ -401,11 +406,11 @@ inner_join(correlation(lines_df, Clay)[1:2], correlation(lines_df, Clay, method 
 #> # A tibble: 5 × 3
 #>   variable     .correlation_pearson .correlation_bicor
 #>   <chr>                       <dbl>              <dbl>
-#> 1 K I 766.49                  0.768              0.517
-#> 2 Mg II 279.55                0.757              0.338
-#> 3 Si I 288.16                -0.550             -0.349
-#> 4 Ca II 393.37               -0.573             -0.427
-#> 5 Al I 396.15                -0.644             -0.239
+#> 1 K I 766.49                  0.769              0.520
+#> 2 Mg II 279.55                0.758              0.365
+#> 3 Si I 288.16                -0.564             -0.301
+#> 4 Ca II 393.37               -0.583             -0.427
+#> 5 Al I 396.15                -0.679             -0.270
 ```
 
 The two coefficients disagree sharply for some lines, notably Mg, which
@@ -481,11 +486,11 @@ tuned <- tune_grid(
 )
 show_best(tuned, metric = "rmse", n = 3)
 #> # A tibble: 3 × 8
-#>   num_comp filter .metric .estimator  mean     n std_err .config             
-#>      <int>  <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>               
-#> 1        5      2 rmse    standard    7.20     5   0.924 Preprocessor2_Model5
-#> 2        6      1 rmse    standard    7.20     5   0.925 Preprocessor1_Model6
-#> 3        6      2 rmse    standard    7.25     5   0.848 Preprocessor2_Model6
+#>   num_comp filter .metric .estimator  mean     n std_err .config        
+#>      <int>  <int> <chr>   <chr>      <dbl> <int>   <dbl> <chr>          
+#> 1        5      2 rmse    standard    7.20     5   0.924 pre2_mod5_post0
+#> 2        6      1 rmse    standard    7.20     5   0.925 pre1_mod6_post0
+#> 3        6      2 rmse    standard    7.25     5   0.848 pre2_mod6_post0
 ```
 
 A supervised filter such as OSC must be refitted inside each fold, which

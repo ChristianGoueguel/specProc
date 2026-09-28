@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -129,18 +129,22 @@ smallest count is about 630, not zero. Any ratio, relative standard
 deviation or normalization computed on uncorrected counts is diluted by
 this offset.</li>
 </ul>
-<p>We track five emission lines throughout, measured as the summed
-intensity within ±0.15 nm of the line center:</p>
+<p>We track five emission lines throughout, measured with
+<code><a href="../reference/line_intensities.html">line_intensities()</a></code> as the area within ±0.15 nm of the line
+center (<code>search = 0</code> keeps the window at the tabulated
+wavelength rather than at the peak of each spectrum):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>`Mg II 279.55` <span class="op">=</span> <span class="fl">279.55</span>, `Si I 288.16` <span class="op">=</span> <span class="fl">288.16</span>, `Ca II 393.37` <span class="op">=</span> <span class="fl">393.37</span>,</span>
 <span>           `Al I 396.15` <span class="op">=</span> <span class="fl">396.15</span>, `K I 766.49` <span class="op">=</span> <span class="fl">766.49</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Line areas of a table of spectra that has a Sample column</span></span>
+<span><span class="co"># Line areas of a table of spectra that has a Sample column, one column per line</span></span>
 <span><span class="va">line_areas</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">spectra</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">areas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">lines</span>, <span class="kw">function</span><span class="op">(</span><span class="va">center</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">[</span><span class="va">channels</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">wl</span> <span class="op">-</span> <span class="va">center</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0.15</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">spectra</span>, <span class="va">Sample</span><span class="op">)</span>, <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">areas</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">areas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sample"</span>, <span class="va">channels</span><span class="op">)</span><span class="op">]</span>, <span class="va">lines</span>, search <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span>  <span class="va">areas</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>row <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">line</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">lines</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">row</span>, <span class="va">Sample</span>, <span class="va">line</span>, <span class="va">intensity</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">line</span>, values_from <span class="op">=</span> <span class="va">intensity</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">row</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -202,11 +206,11 @@ one-step recipe for each value:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 6</span></span></span>
 <span><span class="co">#&gt;   lambda `Mg II 279.55` `Si I 288.16` `Ca II 393.37` `Al I 396.15` `K I 766.49`</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1e+03           <span style="text-decoration: underline;">48</span>336         <span style="text-decoration: underline;">20</span>437          <span style="text-decoration: underline;">45</span>902         <span style="text-decoration: underline;">28</span>128         <span style="text-decoration: underline;">3</span>313</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1e+04           <span style="text-decoration: underline;">48</span>423         <span style="text-decoration: underline;">20</span>509          <span style="text-decoration: underline;">46</span>114         <span style="text-decoration: underline;">28</span>182         <span style="text-decoration: underline;">3</span>325</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1e+05           <span style="text-decoration: underline;">48</span>648         <span style="text-decoration: underline;">20</span>484          <span style="text-decoration: underline;">46</span>151         <span style="text-decoration: underline;">28</span>282         <span style="text-decoration: underline;">3</span>328</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1e+06           <span style="text-decoration: underline;">49</span>153         <span style="text-decoration: underline;">20</span>438          <span style="text-decoration: underline;">46</span>155         <span style="text-decoration: underline;">28</span>281         <span style="text-decoration: underline;">3</span>405</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1e+07           <span style="text-decoration: underline;">49</span>500         <span style="text-decoration: underline;">20</span>503          <span style="text-decoration: underline;">46</span>204         <span style="text-decoration: underline;">28</span>311         <span style="text-decoration: underline;">3</span>445</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> 1e+03            <span style="text-decoration: underline;">1</span>692          <span style="text-decoration: underline;">1</span>245           <span style="text-decoration: underline;">2</span>757          <span style="text-decoration: underline;">1</span>511          184</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> 1e+04            <span style="text-decoration: underline;">1</span>695          <span style="text-decoration: underline;">1</span>249           <span style="text-decoration: underline;">2</span>769          <span style="text-decoration: underline;">1</span>514          185</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> 1e+05            <span style="text-decoration: underline;">1</span>705          <span style="text-decoration: underline;">1</span>247           <span style="text-decoration: underline;">2</span>771          <span style="text-decoration: underline;">1</span>518          185</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> 1e+06            <span style="text-decoration: underline;">1</span>726          <span style="text-decoration: underline;">1</span>245           <span style="text-decoration: underline;">2</span>771          <span style="text-decoration: underline;">1</span>518          189</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> 1e+07            <span style="text-decoration: underline;">1</span>740          <span style="text-decoration: underline;">1</span>248           <span style="text-decoration: underline;">2</span>774          <span style="text-decoration: underline;">1</span>519          192</span></span></code></pre></div>
 <p>Across four orders of magnitude of <code>lambda</code>, the areas of
 the strong lines change by less than 3%. The weak K line, which sits on
 a relatively larger continuum, changes by about 4%. The line areas are
@@ -295,27 +299,27 @@ the baseline; area normalization uses <code><a href="../reference/normalize.html
 <span><span class="op">}</span></span>
 <span><span class="fu">wide</span><span class="op">(</span><span class="st">"RSD"</span><span class="op">)</span>   <span class="co"># median within-sample RSD (%)</span></span>
 <span><span class="co">#&gt;        normalization Mg II 279.55 Si I 288.16 Ca II 393.37 Al I 396.15</span></span>
-<span><span class="co">#&gt; 1      baseline only         5.66        8.19         6.73        7.07</span></span>
-<span><span class="co">#&gt; 2               area         4.60        6.67         5.44        5.28</span></span>
-<span><span class="co">#&gt; 3                SNV         3.26        5.66         3.79        4.36</span></span>
-<span><span class="co">#&gt; 4                MSC         3.29        5.55         3.80        4.17</span></span>
-<span><span class="co">#&gt; 5 internal std. (Si)         6.66        0.84         7.60        6.49</span></span>
+<span><span class="co">#&gt; 1      baseline only         5.94        8.36         7.06        7.60</span></span>
+<span><span class="co">#&gt; 2               area         4.57        7.00         5.51        5.59</span></span>
+<span><span class="co">#&gt; 3                SNV         4.17        5.99         4.05        5.05</span></span>
+<span><span class="co">#&gt; 4                MSC         4.10        5.90         4.02        4.91</span></span>
+<span><span class="co">#&gt; 5 internal std. (Si)         6.55        0.00         7.70        6.55</span></span>
 <span><span class="co">#&gt;   K I 766.49</span></span>
-<span><span class="co">#&gt; 1      12.33</span></span>
-<span><span class="co">#&gt; 2      12.63</span></span>
-<span><span class="co">#&gt; 3      15.56</span></span>
-<span><span class="co">#&gt; 4      12.61</span></span>
-<span><span class="co">#&gt; 5      13.50</span></span>
+<span><span class="co">#&gt; 1      12.35</span></span>
+<span><span class="co">#&gt; 2      13.51</span></span>
+<span><span class="co">#&gt; 3      17.18</span></span>
+<span><span class="co">#&gt; 4      13.46</span></span>
+<span><span class="co">#&gt; 5      13.47</span></span>
 <span><span class="fu">wide</span><span class="op">(</span><span class="st">"ICC"</span><span class="op">)</span>   <span class="co"># fraction of variance between samples</span></span>
 <span><span class="co">#&gt;        normalization Mg II 279.55 Si I 288.16 Ca II 393.37 Al I 396.15</span></span>
-<span><span class="co">#&gt; 1      baseline only         0.90        0.77         0.81        0.79</span></span>
-<span><span class="co">#&gt; 2               area         0.56        0.63         0.70        0.68</span></span>
-<span><span class="co">#&gt; 3                SNV         0.80        0.49         0.60        0.61</span></span>
-<span><span class="co">#&gt; 4                MSC         0.79        0.54         0.66        0.64</span></span>
-<span><span class="co">#&gt; 5 internal std. (Si)         0.76        0.28         0.41        0.32</span></span>
+<span><span class="co">#&gt; 1      baseline only         0.90        0.76         0.81        0.77</span></span>
+<span><span class="co">#&gt; 2               area         0.63        0.64         0.69        0.73</span></span>
+<span><span class="co">#&gt; 3                SNV         0.81        0.51         0.60        0.67</span></span>
+<span><span class="co">#&gt; 4                MSC         0.80        0.56         0.66        0.70</span></span>
+<span><span class="co">#&gt; 5 internal std. (Si)         0.79          NA         0.41        0.33</span></span>
 <span><span class="co">#&gt;   K I 766.49</span></span>
 <span><span class="co">#&gt; 1       0.86</span></span>
-<span><span class="co">#&gt; 2       0.47</span></span>
+<span><span class="co">#&gt; 2       0.48</span></span>
 <span><span class="co">#&gt; 3       0.54</span></span>
 <span><span class="co">#&gt; 4       0.51</span></span>
 <span><span class="co">#&gt; 5       0.66</span></span></code></pre></div>
@@ -323,7 +327,7 @@ the baseline; area normalization uses <code><a href="../reference/normalize.html
 <ul>
 <li>
 <strong>SNV and MSC give the best repeatability.</strong> They
-reduce the replicate RSD of the Mg, Ca and Al lines by about 40%
+reduce the replicate RSD of the Mg, Ca and Al lines by a third or more
 compared with baseline correction alone.</li>
 <li>
 <strong>They also lower the ICC.</strong> A lower ICC means the
@@ -344,11 +348,10 @@ its RSD: dividing by the whole-spectrum standard deviation adds that
 statistic’s noise to a line that is itself noisy.</li>
 <li>
 <strong>Internal standardization by Si is not usable here.</strong>
-It makes the Si line nearly constant (the residual RSD comes from the
-slightly different windows of the step and of our line areas), so its
-own RSD and ICC are meaningless. It also assumes the silicon content is
-constant across samples, which is false for soils ranging from clay to
-sand. It lowers the ICC of every other line.</li>
+It sets the Si line to a constant, so its own RSD and ICC are
+meaningless. It also assumes the silicon content is constant across
+samples, which is false for soils ranging from clay to sand. It lowers
+the ICC of every other line.</li>
 </ul>
 <p>No normalization is universally best, so choose one on data from the
 matrix at hand, and confirm the choice against the end goal. We continue
@@ -391,8 +394,8 @@ share of the shots:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 2</span></span></span>
 <span><span class="co">#&gt;   flagged     n</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> FALSE     356</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> TRUE       44</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> FALSE     352</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> TRUE       48</span></span></code></pre></div>
 <p>That is about 11% of the shots, far more than the few gross errors
 one would expect from misfires. Before discarding anything, compare the
 distribution of the squared robust distances with the χ² distribution
@@ -434,21 +437,21 @@ removed:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 2</span></span></span>
 <span><span class="co">#&gt;   shots_kept     n</span></span>
 <span><span class="co">#&gt;        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>          2     1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>          3     1</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>          4     2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>          5     2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>          6     2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>          7     2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>          8    41</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>          5     1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>          6     3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>          7     4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>          8    39</span></span>
 <span><span class="va">shots</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">flagged</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">Sample</span>, sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 2</span></span></span>
 <span><span class="co">#&gt;   Sample     n</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> MRI007     6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> MRI007     5</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> MRI001     4</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> MRI004     4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> MRI010     3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> MRI016     3</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> MRI016     3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> MRI009     2</span></span></code></pre></div>
 <p>Most samples keep all 8 shots. The few samples that lose several
 shots are heterogeneous and deserve inspection: their mean spectrum
 rests on fewer measurements and is less certain.</p>
@@ -477,10 +480,10 @@ screen the baseline-corrected spectra:</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 3</span></span></span>
 <span><span class="co">#&gt;   lines whole_spectrum     n</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> FALSE FALSE            351</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> FALSE TRUE              23</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> TRUE  FALSE             18</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> TRUE  TRUE               8</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> FALSE FALSE            352</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> FALSE TRUE              22</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> TRUE  FALSE             17</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> TRUE  TRUE               9</span></span></code></pre></div>
 <p>The two screens flag different shots, because they look at different
 things: a shot can have normal intensities for the five lines and a
 different spectrum elsewhere, or the reverse. With 8 shots per sample,

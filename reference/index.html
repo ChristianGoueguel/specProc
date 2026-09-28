@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -300,7 +300,7 @@
         <dd>Poisson Scaling Recipe Step</dd>
       </dl></div><div class="section level2">
 
-      <h3 id="libs-shots-and-internal-standard">LIBS shots and internal standard<a class="anchor" aria-label="anchor" href="#libs-shots-and-internal-standard"></a></h3>
+      <h3 id="libs-lines-and-shots">LIBS lines and shots<a class="anchor" aria-label="anchor" href="#libs-lines-and-shots"></a></h3>
 
 
       <dl></dl></div><div class="section level2">
@@ -310,10 +310,10 @@
 
       <dl><dt>
 
-          <code><a href="step_reject_shots.html">step_reject_shots()</a></code>
+          <code><a href="step_line_intensities.html">step_line_intensities()</a></code>
 
         </dt>
-        <dd>Shot Rejection Recipe Step</dd>
+        <dd>Emission Line Intensities Recipe Step</dd>
 
         <dt>
 
@@ -321,6 +321,13 @@
 
         </dt>
         <dd>Internal Standard Normalization Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_reject_shots.html">step_reject_shots()</a></code>
+
+        </dt>
+        <dd>Shot Rejection Recipe Step</dd>
       </dl></div><div class="section level2">
 
       <h3 id="robust-transformation-and-pca">robust transformation and PCA<a class="anchor" aria-label="anchor" href="#robust-transformation-and-pca"></a></h3>
@@ -572,14 +579,21 @@
 
         <dt>
 
+          <code><a href="correct_self_absorption.html">correct_self_absorption()</a></code>
+
+        </dt>
+        <dd>Self-Absorption Correction with an Internal Reference Line</dd>
+
+        <dt>
+
           <code><a href="saturation_summary.html">saturation_summary()</a></code>
 
         </dt>
         <dd>Detect Saturated Channels in Spectra</dd>
       </dl></div><div class="section level2">
-      <h2 id="calibration-free-quantification">Calibration-free quantification<a class="anchor" aria-label="anchor" href="#calibration-free-quantification"></a></h2>
+      <h2 id="line-intensities-and-quantification">Line intensities and quantification<a class="anchor" aria-label="anchor" href="#line-intensities-and-quantification"></a></h2>
 
-      <div class="section-desc"><p>Elemental composition from line intensities without calibration standards (CF-LIBS).</p></div>
+      <div class="section-desc"><p>Intensities of emission lines, univariate calibration curves with limits of detection, and calibration-free composition (CF-LIBS).</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -587,6 +601,34 @@
 
 
       <dl><dt>
+
+          <code><a href="line_intensities.html">line_intensities()</a></code>
+
+        </dt>
+        <dd>Intensities of Emission Lines</dd>
+
+        <dt>
+
+          <code><a href="calibration_curve.html">calibration_curve()</a></code>
+
+        </dt>
+        <dd>Univariate Calibration Curve</dd>
+
+        <dt>
+
+          <code><a href="predict.specproc_calibration.html">predict(<i>&lt;specproc_calibration&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Predict Concentrations from a Calibration Curve</dd>
+
+        <dt>
+
+          <code><a href="plot_calibration.html">plot_calibration()</a></code>
+
+        </dt>
+        <dd>Plot a Calibration Curve</dd>
+
+        <dt>
 
           <code><a href="cf_libs.html">cf_libs()</a></code>
 

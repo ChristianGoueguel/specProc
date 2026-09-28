@@ -102,12 +102,14 @@ and can be tuned within a tidymodels workflow.
 - [`step_poisson_scale()`](https://christiangoueguel.com/specProc/reference/step_poisson_scale.md)
   : Poisson Scaling Recipe Step
 
-### LIBS shots and internal standard
+### LIBS lines and shots
 
-- [`step_reject_shots()`](https://christiangoueguel.com/specProc/reference/step_reject_shots.md)
-  : Shot Rejection Recipe Step
+- [`step_line_intensities()`](https://christiangoueguel.com/specProc/reference/step_line_intensities.md)
+  : Emission Line Intensities Recipe Step
 - [`step_line_ratio()`](https://christiangoueguel.com/specProc/reference/step_line_ratio.md)
   : Internal Standard Normalization Recipe Step
+- [`step_reject_shots()`](https://christiangoueguel.com/specProc/reference/step_reject_shots.md)
+  : Shot Rejection Recipe Step
 
 ### robust transformation and PCA
 
@@ -190,14 +192,24 @@ checks of LTE, self-absorption and detector saturation.
   : McWhirter Criterion for Local Thermodynamic Equilibrium
 - [`self_absorption()`](https://christiangoueguel.com/specProc/reference/self_absorption.md)
   : Self-Absorption Coefficient from Line Widths
+- [`correct_self_absorption()`](https://christiangoueguel.com/specProc/reference/correct_self_absorption.md)
+  : Self-Absorption Correction with an Internal Reference Line
 - [`saturation_summary()`](https://christiangoueguel.com/specProc/reference/saturation_summary.md)
   : Detect Saturated Channels in Spectra
 
-## Calibration-free quantification
+## Line intensities and quantification
 
-Elemental composition from line intensities without calibration
-standards (CF-LIBS).
+Intensities of emission lines, univariate calibration curves with limits
+of detection, and calibration-free composition (CF-LIBS).
 
+- [`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md)
+  : Intensities of Emission Lines
+- [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md)
+  : Univariate Calibration Curve
+- [`predict(`*`<specproc_calibration>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_calibration.md)
+  : Predict Concentrations from a Calibration Curve
+- [`plot_calibration()`](https://christiangoueguel.com/specProc/reference/plot_calibration.md)
+  : Plot a Calibration Curve
 - [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md)
   : Calibration-Free LIBS Quantification
 

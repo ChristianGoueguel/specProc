@@ -29,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -88,6 +88,8 @@
 <strong>Calibration transfer</strong> between instruments: PDS, GLSW.</li>
 <li>
 <strong>Line fitting</strong>: exact Voigt, pseudo-Voigt, Gaussian and Lorentzian profiles, for single or overlapping lines.</li>
+<li>
+<strong>Line identification</strong>: candidate lines from the NIST Atomic Spectra Database overlaid on spectra, and an interactive app (<code><a href="reference/line_finder.html">line_finder()</a></code>) with a periodic table to select the elements.</li>
 <li>
 <strong>Plasma diagnostics</strong>: electron density from Stark broadening, with widths from the STARK-B database, or from H-alpha; temperature from Boltzmann and Saha-Boltzmann plots; McWhirter criterion, self-absorption and detector saturation.</li>
 <li>
@@ -153,7 +155,7 @@
 <span>  <span class="fu"><a href="reference/plot_spectra.html">plot_spectra</a></span><span class="op">(</span>id <span class="op">=</span> <span class="va">Type</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>color <span class="op">=</span> <span class="cn">NULL</span>, title <span class="op">=</span> <span class="st">"Mean spectrum by soil type"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-overview-1.png" width="90%"></p>
+<p><img src="reference/figures/README-overview-1.png" alt="" width="90%"></p>
 </div>
 <div class="section level2">
 <h2 id="a-worked-example">A worked example<a class="anchor" aria-label="anchor" href="#a-worked-example"></a>
@@ -168,7 +170,7 @@
 <span>  <span class="fu"><a href="reference/step_baseline.html">step_baseline</a></span><span class="op">(</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">baselined</span> <span class="op">&lt;-</span> <span class="va">baseline_recipe</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/prep.html" class="external-link">prep</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/bake.html" class="external-link">bake</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-baseline-plot-1.png" width="90%"></p>
+<p><img src="reference/figures/README-baseline-plot-1.png" alt="" width="90%"></p>
 <p>The baseline is a model estimate, and the choice of <code>lambda</code> propagates into line areas. Report the value you used, and check how sensitive your downstream results are to it.</p>
 </div>
 <div class="section level3">
@@ -176,8 +178,9 @@
 </h3>
 <p>Laser–sample coupling changes from shot to shot, so the whole spectrum fluctuates in intensity. Normalization aims to remove this multiplicative effect. The relative standard deviation (RSD) of a line across the 8 locations of a sample measures how well it works. The lower the RSD, the more repeatable the measurement:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">line_area</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">spectra</span>, <span class="va">center</span>, <span class="va">half_width</span> <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">[</span><span class="va">channels</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">wl</span> <span class="op">-</span> <span class="va">center</span><span class="op">)</span> <span class="op">&lt;</span> <span class="va">half_width</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># area of a line in each spectrum, within 0.15 nm of its wavelength</span></span>
+<span><span class="va">line_area</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">spectra</span>, <span class="va">center</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">spectra</span>, <span class="va">center</span>, search <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">$</span><span class="va">intensity</span></span>
 <span><span class="op">}</span></span>
 <span><span class="va">within_rsd</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">area</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>Sample <span class="op">=</span> <span class="va">specLIBS</span><span class="op">$</span><span class="va">Sample</span>, area <span class="op">=</span> <span class="va">area</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -198,10 +201,10 @@
 <span><span class="co">#&gt; # A tibble: 4 × 2</span></span>
 <span><span class="co">#&gt;   preprocessing   `median RSD of Ca II 393.37 nm (%)`</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;                                         &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 raw                                            6.19</span></span>
-<span><span class="co">#&gt; 2 baseline                                       6.73</span></span>
-<span><span class="co">#&gt; 3 baseline + area                                5.44</span></span>
-<span><span class="co">#&gt; 4 baseline + SNV                                 3.79</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 raw                                            6.5 </span></span>
+<span><span class="co">#&gt; 2 baseline                                       7.06</span></span>
+<span><span class="co">#&gt; 3 baseline + area                                5.51</span></span>
+<span><span class="co">#&gt; 4 baseline + SNV                                 4.05</span></span></code></pre></div>
 <p>On this data set, SNV reduces the typical shot-to-shot RSD of the Ca II line by about 40%. Baseline subtraction alone slightly increases the RSD. This is expected: the raw line area includes the detector offset and continuum, a large and relatively stable component that dilutes the relative variation. Removing it exposes the true variability of the line, which normalization then has to correct. Which normalization works best depends on the matrix and the line, so compare the options on replicate spectra rather than assuming one. <code><a href="reference/step_msc.html">step_msc()</a></code> and <code><a href="reference/step_emsc.html">step_emsc()</a></code> provide (extended) multiplicative scatter correction in the same way.</p>
 </div>
 <div class="section level3">
@@ -270,7 +273,7 @@
 <span><span class="co">#&gt; 17 A_4     3.41     0.346        9.84  9.64e- 12</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plot_fit.html">plot_fit</a></span><span class="op">(</span><span class="va">fit</span>, title <span class="op">=</span> <span class="st">"Ca II and Al I lines, sample LSG-S18-0001 (mean of 8 locations)"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-multipeak-plot-1.png" width="90%"></p>
+<p><img src="reference/figures/README-multipeak-plot-1.png" alt="" width="90%"></p>
 <p>Read the parameter table critically:</p>
 <ul>
 <li>
@@ -317,7 +320,7 @@
 <code class="sourceCode R"><span><span class="fu"><a href="reference/generalized_boxplot.html">generalized_boxplot</a></span><span class="op">(</span><span class="va">fractions</span>, xlabels.angle <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html" class="external-link">coord_flip</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Particle-size fractions (%), generalized boxplot"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-boxplot-1.png" width="90%"></p>
+<p><img src="reference/figures/README-boxplot-1.png" alt="" width="90%"></p>
 </div>
 <div class="section level3">
 <h3 id="id_7-correlation-why-robustness-matters">7. Correlation: why robustness matters<a class="anchor" aria-label="anchor" href="#id_7-correlation-why-robustness-matters"></a>
@@ -340,11 +343,11 @@
 <span><span class="co">#&gt; # A tibble: 5 × 3</span></span>
 <span><span class="co">#&gt;   variable     .correlation_pearson .correlation_bicor</span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;                       &lt;dbl&gt;              &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 K I 766.49                  0.768              0.517</span></span>
-<span><span class="co">#&gt; 2 Mg II 279.55                0.757              0.338</span></span>
-<span><span class="co">#&gt; 3 Si I 288.16                -0.550             -0.349</span></span>
-<span><span class="co">#&gt; 4 Ca II 393.37               -0.573             -0.427</span></span>
-<span><span class="co">#&gt; 5 Al I 396.15                -0.644             -0.239</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 K I 766.49                  0.769              0.520</span></span>
+<span><span class="co">#&gt; 2 Mg II 279.55                0.758              0.365</span></span>
+<span><span class="co">#&gt; 3 Si I 288.16                -0.564             -0.301</span></span>
+<span><span class="co">#&gt; 4 Ca II 393.37               -0.583             -0.427</span></span>
+<span><span class="co">#&gt; 5 Al I 396.15                -0.679             -0.270</span></span></code></pre></div>
 <p>The two coefficients disagree sharply for some lines, notably Mg, which means a handful of extreme-texture samples drive the Pearson values. Neither number is “the” correlation. The gap tells you to look at the scatter plots, and to be cautious about extrapolating to the bulk of the data. <code><a href="reference/correlation.html">correlation()</a></code> also provides Spearman, Kendall and Chatterjee’s ξ, which captures non-monotonic dependence.</p>
 </div>
 <div class="section level3">
@@ -355,7 +358,7 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">pca</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/robpca.html">robpca</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sample_spectra</span>, <span class="op">-</span><span class="va">Sample</span><span class="op">)</span>, k <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/plot_outlier_map.html">plot_outlier_map</a></span><span class="op">(</span><span class="va">pca</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-robpca-1.png" width="90%"></p>
+<p><img src="reference/figures/README-robpca-1.png" alt="" width="90%"></p>
 <p>Samples to the right of the vertical cut-off are far from the center but follow the main structure of the data (good leverage points); samples above the horizontal cut-off do not follow that structure. Inspect them before calibrating, rather than discarding them automatically. <code><a href="reference/rospca.html">rospca()</a></code> gives sparse loadings, and <code><a href="reference/macropca.html">macropca()</a></code> also handles outlying cells and missing values; <code><a href="reference/plot_cell_map.html">plot_cell_map()</a></code> shows which cells deviate.</p>
 </div>
 <div class="section level3">
@@ -388,11 +391,11 @@
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://tune.tidymodels.org/reference/show_best.html" class="external-link">show_best</a></span><span class="op">(</span><span class="va">tuned</span>, metric <span class="op">=</span> <span class="st">"rmse"</span>, n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 3 × 8</span></span>
-<span><span class="co">#&gt;   num_comp filter .metric .estimator  mean     n std_err .config             </span></span>
-<span><span class="co">#&gt;      &lt;int&gt;  &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               </span></span>
-<span><span class="co">#&gt; 1        5      2 rmse    standard    7.20     5   0.924 Preprocessor2_Model5</span></span>
-<span><span class="co">#&gt; 2        6      1 rmse    standard    7.20     5   0.925 Preprocessor1_Model6</span></span>
-<span><span class="co">#&gt; 3        6      2 rmse    standard    7.25     5   0.848 Preprocessor2_Model6</span></span></code></pre></div>
+<span><span class="co">#&gt;   num_comp filter .metric .estimator  mean     n std_err .config        </span></span>
+<span><span class="co">#&gt;      &lt;int&gt;  &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;          </span></span>
+<span><span class="co">#&gt; 1        5      2 rmse    standard    7.20     5   0.924 pre2_mod5_post0</span></span>
+<span><span class="co">#&gt; 2        6      1 rmse    standard    7.20     5   0.925 pre1_mod6_post0</span></span>
+<span><span class="co">#&gt; 3        6      2 rmse    standard    7.25     5   0.848 pre2_mod6_post0</span></span></code></pre></div>
 <p>A supervised filter such as OSC must be refitted inside each fold, which the recipe guarantees. Fitted once on all the data before cross-validating, it biases the estimated prediction error downward. The <code>calibration</code> and <code>orthogonalization</code> vignettes develop this in detail.</p>
 </div>
 </div>

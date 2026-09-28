@@ -203,17 +203,37 @@ self-absorbed, as shown at the end of this vignette.
 ### Line intensities
 
 The spectrometer’s wavelength scale is offset from the NIST wavelengths
-by about one channel in places, so each line area is summed over ±0.15
-nm around the observed peak within 0.2 nm of the tabulated wavelength:
+by about one channel in places.
+[`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md)
+therefore searches the peak of each line within 0.2 nm of its tabulated
+wavelength (`search`), and integrates it over ±0.15 nm around the peak
+(`half_width`). It keeps the columns of the table of lines and adds the
+measured `intensity`, so the result goes directly into the Boltzmann
+plots:
 
 ``` r
 
-line_area <- function(center, search = 0.2, half_width = 0.15) {
-  near <- abs(wl - center) <= search
-  peak <- wl[near][which.max(spectrum[near])]
-  sum(spectrum[abs(wl - peak) <= half_width])
-}
-lines <- atomic |> mutate(intensity = sapply(wavelength, line_area))
+lines <- line_intensities(spectrum, atomic)
+lines |> select(species, wavelength, peak_wavelength, intensity, snr)
+#> # A tibble: 16 × 5
+#>    species wavelength peak_wavelength intensity   snr
+#>    <chr>        <dbl>           <dbl>     <dbl> <dbl>
+#>  1 Ca I          428.            428.      56.2  50.1
+#>  2 Ca I          430.            430.     104.   91.5
+#>  3 Ca I          432.            432.      65.3  51.3
+#>  4 Ca I          443.            443.      58.6  46.7
+#>  5 Ca I          445.            445.     132.   95.1
+#>  6 Ca I          559.            559.     103.   70.6
+#>  7 Ca I          610.            610.      35.6  24.9
+#>  8 Ca I          612.            612.      99.2  68.4
+#>  9 Ca I          616.            616.     170.  119. 
+#> 10 Ca I          644.            644.     135.   97.8
+#> 11 Ca I          646.            646.      98.6  70.1
+#> 12 Ca I          649.            649.      36.5  29.2
+#> 13 Ca II         316.            316.      93.3  56.8
+#> 14 Ca II         318.            318.     182.  119. 
+#> 15 Ca II         371.            371.      55.5  38.4
+#> 16 Ca II         374.            374.     188.  132.
 ```
 
 ### Boltzmann plot of the neutral atom
@@ -224,8 +244,8 @@ neutral <- boltzmann_plot(filter(lines, stage == 1))
 neutral
 #> Boltzmann plot (12 lines)
 #> 
-#> Temperature:  4802 +/- 594 K
-#> R-squared:    0.8671
+#> Temperature:  4991 +/- 611 K
+#> R-squared:    0.8697
 ```
 
 ``` r
@@ -247,8 +267,8 @@ saha <- saha_boltzmann_plot(lines, ionization_energy = ionization_energy, electr
 saha
 #> Saha-Boltzmann plot (16 lines)
 #> 
-#> Temperature:  8791 +/- 246 K
-#> R-squared:    0.9891
+#> Temperature:  8747 +/- 234 K
+#> R-squared:    0.99
 #> Ne:           1.8e+17 cm-3
 ```
 
@@ -262,13 +282,13 @@ plot_boltzmann(saha)
 The Ca I lines come from upper levels between 3.9 and 4.8 eV. Over such
 a narrow range, the slope of the Boltzmann plot is sensitive to errors
 in a few intensities or transition probabilities (graded C and D, that
-is, uncertain by 25 to 50%): its temperature, 4800 ± 590 K, is far below
+is, uncertain by 25 to 50%): its temperature, 4990 ± 610 K, is far below
 the Saha-Boltzmann estimate. This is the usual problem of Boltzmann
 plots with lines of a single species.
 
 The ionic points extend the abscissa by the ionization energy, to about
-13 eV, and the Saha-Boltzmann fit gives T \approx 8800 K with a standard
-error of 250 K. The standard error reflects the scatter of the points,
+13 eV, and the Saha-Boltzmann fit gives T \approx 8700 K with a standard
+error of 230 K. The standard error reflects the scatter of the points,
 not the systematic errors of the transition probabilities, the spectral
 response, or the density.
 
@@ -285,7 +305,7 @@ lte
 #> # A tibble: 1 × 5
 #>   temperature delta_e minimum_density electron_density satisfied
 #>         <dbl>   <dbl>           <dbl>            <dbl> <lgl>    
-#> 1       8791.    3.15         4.69e15          1.80e17 TRUE
+#> 1       8747.    3.15         4.68e15          1.80e17 TRUE
 ```
 
 The measured density is 38 times the minimum. The criterion is necessary
@@ -312,15 +332,7 @@ if (is.null(stark)) {
 } else {
   stark |> filter(density == 1e17) |> select(wavelength, upper, lower, temperature, width, shift)
 }
-#> # A tibble: 6 × 6
-#>   wavelength upper      lower     temperature  width    shift
-#>        <dbl> <chr>      <chr>           <dbl>  <dbl>    <dbl>
-#> 1       395. 3p6.4p 2Po 3p6.4s 2S        5000 0.0296 -0.00507
-#> 2       395. 3p6.4p 2Po 3p6.4s 2S       10000 0.0228 -0.00418
-#> 3       395. 3p6.4p 2Po 3p6.4s 2S       20000 0.0188 -0.00324
-#> 4       395. 3p6.4p 2Po 3p6.4s 2S       30000 0.0177 -0.00275
-#> 5       395. 3p6.4p 2Po 3p6.4s 2S       50000 0.0171 -0.00257
-#> 6       395. 3p6.4p 2Po 3p6.4s 2S      100000 0.0166 -0.00214
+#> STARK-B could not be reached; the sections that need it are skipped.
 ```
 
 STARK-B tabulates the Ca II 4s–4p multiplet at its mean wavelength.
@@ -334,11 +346,6 @@ line with the \lambda^2 rule:
 thin <- stark_width(stark, wavelength = 393.366, temperature = saha$temperature,
                     density = ne, tolerance = 2)
 thin
-#> # A tibble: 1 × 9
-#>   wavelength tabulated_wavelength upper      lower perturber temperature density
-#>        <dbl>                <dbl> <chr>      <chr> <chr>           <dbl>   <dbl>
-#> 1       393.                 395. 3p6.4p 2Po 3p6.… electron        8791. 1.80e17
-#> # ℹ 2 more variables: width <dbl>, shift <dbl>
 ```
 
 If the service is not available, a table saved earlier can be read with
@@ -382,21 +389,11 @@ ca_fit <- as_tibble(as.list(spectrum[ca_window])) |>
   multipeak_fit(peaks = c(393.37, 394.40, 396.15, 396.85), profiles = "voigt")
 measured <- ca_fit$tidied[[1]] |> filter(term == "wL_1")
 measured
-#> # A tibble: 1 × 5
-#>   term  estimate std.error statistic  p.value
-#>   <chr>    <dbl>     <dbl>     <dbl>    <dbl>
-#> 1 wL_1     0.102    0.0260      3.90 0.000399
 self_absorption(width = measured$estimate, thin_width = thin$width)
-#> # A tibble: 1 × 4
-#>   width thin_width    SA intensity_correction
-#>   <dbl>      <dbl> <dbl>                <dbl>
-#> 1 0.102     0.0428 0.202                 4.95
 ```
 
-The measured Lorentzian width, 0.102 nm, is 2.4 times the optically thin
-width of 0.043 nm, which gives SA of about 0.2: only a fraction of the
-peak intensity escapes the plasma. The Lorentzian width of a line only a
-few channels wide is uncertain (see its standard error), so this
+(This section needs the STARK-B service.) The Lorentzian width of a line
+only a few channels wide is uncertain (see its standard error), so this
 coefficient is an order of magnitude rather than a correction factor. It
 confirms what the saturation of the same line in the forage spectra
 already suggested: the Ca II resonance lines are unsuitable for
@@ -424,6 +421,7 @@ as above:
 forage_channels <- names(fourrage)[-(1:14)]
 forage_wl <- as.numeric(forage_channels)
 forage <- as.matrix(baseline_arpls(fourrage[forage_channels], lambda = 1e5, max.iter = 20)$correction)
+colnames(forage) <- forage_channels
 forage_mean <- colMeans(forage)
 
 forage_halpha <- forage_mean[forage_channels[forage_wl > 654.6 & forage_wl < 658.3]]
@@ -532,26 +530,20 @@ energy range than the Boltzmann plot of a single species:
 
 ``` r
 
-forage_area <- function(s, center, search = 0.2, half_width = 0.15) {
-  near <- abs(forage_wl - center) <= search
-  peak <- forage_wl[near][which.max(s[near])]
-  sum(s[abs(forage_wl - peak) <= half_width])
-}
-cf_mean <- cf_atomic |>
-  mutate(intensity = sapply(wavelength, \(w) forage_area(forage_mean, w))) |>
+cf_mean <- line_intensities(forage_mean, cf_atomic) |>
   cf_libs(electron_density = ne_forage, partition = partition, ionization_energy = cf_ionization)
 cf_mean
 #> Calibration-free LIBS (24 lines, 6 species; Saha-Boltzmann plots)
 #> 
-#> Temperature:  8926 +/- 216 K
+#> Temperature:  8902 +/- 215 K
 #> Ne:           1.58e+17 cm-3
 #> Normalization: closure
 #> 
 #>  element atomic_fraction mass_fraction stages      
-#>  Ca      0.0945          0.1022        I, II       
-#>  Mg      0.0815          0.0535        I, II       
-#>  K       0.7662          0.8085        I, II (Saha)
-#>  Na      0.0579          0.0359        I, II (Saha)
+#>  Ca      0.0987          0.1067        I, II       
+#>  Mg      0.0857          0.0562        I, II       
+#>  K       0.7628          0.8044        I, II (Saha)
+#>  Na      0.0528          0.0327        I, II (Saha)
 ```
 
 ``` r
@@ -562,7 +554,7 @@ plot_boltzmann(cf_mean)
 ![](plasma-diagnostics_files/figure-html/cf-plot-1.png)
 
 The four plots are parallel within the scatter of their points, at T
-\approx 8930 K. The closure applies to the four measured elements only:
+\approx 8900 K. The closure applies to the four measured elements only:
 the forage is mostly C, H, O and N, whose lines are not used here, so
 the fractions describe the relative composition of these four elements,
 which we compare with the laboratory values on the same basis:
@@ -578,11 +570,57 @@ cf_mean$composition |>
 #> # A tibble: 4 × 4
 #>   element cf_libs laboratory ratio
 #>   <chr>     <dbl>      <dbl> <dbl>
-#> 1 Ca       0.102      0.222  0.461
-#> 2 Mg       0.0535     0.0702 0.761
-#> 3 K        0.808      0.698  1.16 
-#> 4 Na       0.0359     0.0101 3.55
+#> 1 Ca       0.107      0.222  0.481
+#> 2 Mg       0.0562     0.0702 0.800
+#> 3 K        0.804      0.698  1.15 
+#> 4 Na       0.0327     0.0101 3.23
 ```
+
+### Self-absorption of the resonance lines
+
+The K I resonance doublet at 766.49 and 769.90 nm is the strongest K
+feature of these spectra, and it is not saturated. Why not use it?
+[`correct_self_absorption()`](https://christiangoueguel.com/specProc/reference/correct_self_absorption.md)
+answers by comparing each line with a reference line of the same species
+that is little absorbed (Sun and Yu, 2009). By default, the reference is
+the line of smallest optical depth, which needs the lower-level energies
+`Ei` of
+[`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md):
+
+``` r
+
+k_lines <- tribble(
+  ~species, ~wavelength, ~Aki,      ~Ei,      ~Ek,      ~gk,
+  "K I",    404.414,     1.150e+06, 0,        3.064907, 4,
+  "K I",    404.721,     1.070e+06, 0,        3.062581, 2,
+  "K I",    691.108,     2.500e+06, 1.609958, 3.403454, 2,
+  "K I",    693.877,     4.956e+06, 1.617113, 3.403454, 2,
+  "K I",    766.490,     3.779e+07, 0,        1.617113, 4,
+  "K I",    769.896,     3.734e+07, 0,        1.609958, 2
+)
+line_intensities(forage_mean, k_lines) |>
+  correct_self_absorption(temperature = cf_mean$temperature) |>
+  select(wavelength, measured_intensity, SA, reference)
+#> # A tibble: 6 × 4
+#>   wavelength measured_intensity    SA reference
+#>        <dbl>              <dbl> <dbl> <lgl>    
+#> 1       404.               191. 0.660 FALSE    
+#> 2       405.               135. 1     TRUE     
+#> 3       691.               123. 1.04  FALSE    
+#> 4       694.               138. 0.592 FALSE    
+#> 5       766.              5172. 0.156 FALSE    
+#> 6       770.              6899. 0.419 FALSE
+```
+
+The resonance lines keep only a fraction of the intensity they would
+have in an optically thin plasma. The clearest sign needs no model: the
+766.49 nm line has twice the g_k A\_{ki} of the 769.90 nm line, so it
+should be twice as intense, yet it is weaker. The coefficients of the
+weaker lines, between about 0.6 and 1, show the precision of the method
+on these data: it inherits the noise of the reference line, blends, and
+the errors of the transition probabilities. The correction is therefore
+large and uncertain for the resonance lines, which is why the CF-LIBS
+analysis above leaves them out.
 
 ### Every measurement
 
@@ -591,16 +629,16 @@ variation of the composition between samples:
 
 ``` r
 
-cf_each <- lapply(seq_len(nrow(forage)), function(i) {
-  fit <- cf_atomic |>
-    mutate(intensity = sapply(wavelength, \(w) forage_area(forage[i, ], w))) |>
-    cf_libs(electron_density = ne_forage, partition = partition,
-            ionization_energy = cf_ionization)
-  fit$composition |>
-    select(element, cf_libs = mass_fraction) |>
-    mutate(measurement = i, temperature = fit$temperature)
-}) |>
-  bind_rows()
+cf_each <- line_intensities(forage, cf_atomic) |>
+  group_by(measurement = spectrum) |>
+  group_modify(\(lines, key) {
+    fit <- cf_libs(lines, electron_density = ne_forage, partition = partition,
+                   ionization_energy = cf_ionization)
+    fit$composition |>
+      select(element, cf_libs = mass_fraction) |>
+      mutate(temperature = fit$temperature)
+  }) |>
+  ungroup()
 
 lab_fractions <- fourrage |>
   mutate(measurement = row_number(), total = Ca + Mg + K + Na) |>
@@ -613,7 +651,7 @@ cf_scores <- cf_each |>
 
 summary(distinct(cf_each, measurement, temperature)$temperature)
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#>    8723    8890    8931    8935    8977    9189
+#>    8694    8868    8909    8912    8952    9171
 cf_scores |>
   group_by(element) |>
   summarise(correlation = cor(log(cf_libs), log(laboratory)),
@@ -621,10 +659,10 @@ cf_scores |>
 #> # A tibble: 4 × 3
 #>   element correlation median_ratio
 #>   <chr>         <dbl>        <dbl>
-#> 1 Ca            0.884        0.488
-#> 2 K             0.861        1.14 
-#> 3 Mg            0.866        0.773
-#> 4 Na            0.528        4.47
+#> 1 Ca            0.884        0.509
+#> 2 K             0.868        1.13 
+#> 3 Mg            0.862        0.812
+#> 4 Na            0.541        4.05
 ```
 
 ``` r
@@ -648,11 +686,11 @@ analysis on these data:
   the CF-LIBS fractions correlate with the laboratory values (r \approx
   0.87 on log scales), without any calibration.
 - **The values are biased.** Ca is underestimated by about half, Mg by
-  about a quarter, and K is slightly overestimated. The main suspects
-  are the spectral response of the instrument, which is not corrected
-  here (the lines of each element lie in different parts of the
-  spectrum), and the transition probabilities of the Ca lines, graded C
-  (uncertain by up to 25%).
+  about a fifth, and K is slightly overestimated. The main suspects are
+  the spectral response of the instrument, which is not corrected here
+  (the lines of each element lie in different parts of the spectrum),
+  and the transition probabilities of the Ca lines, graded C (uncertain
+  by up to 25%).
 - **Na fails.** Its two lines are weak, their residuals on the Boltzmann
   plot are large, and its content is often near the detection limit, so
   its fraction is overestimated several times over.
@@ -708,6 +746,9 @@ of one element (an internal reference) instead of closure.
 - Sahal-Bréchot, S., Dimitrijević, M.S., Moreau, N. STARK-B database,
   <https://stark-b.obspm.fr>. Observatoire de Paris and Astronomical
   Observatory of Belgrade.
+- Sun, L., Yu, H. (2009). Correction of self-absorption effect in
+  calibration-free laser-induced breakdown spectroscopy by an internal
+  reference method. *Talanta*, 79(2):388–395.
 - Tognoni, E., Cristoforetti, G., Legnaioli, S., Palleschi, V. (2010).
   Calibration-free laser-induced breakdown spectroscopy: state of the
   art. *Spectrochimica Acta Part B*, 65(1):1–14.

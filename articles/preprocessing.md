@@ -63,20 +63,25 @@ Two features of the data shape everything that follows:
   normalization computed on uncorrected counts is diluted by this
   offset.
 
-We track five emission lines throughout, measured as the summed
-intensity within ±0.15 nm of the line center:
+We track five emission lines throughout, measured with
+[`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md)
+as the area within ±0.15 nm of the line center (`search = 0` keeps the
+window at the tabulated wavelength rather than at the peak of each
+spectrum):
 
 ``` r
 
 lines <- c(`Mg II 279.55` = 279.55, `Si I 288.16` = 288.16, `Ca II 393.37` = 393.37,
            `Al I 396.15` = 396.15, `K I 766.49` = 766.49)
 
-# Line areas of a table of spectra that has a Sample column
+# Line areas of a table of spectra that has a Sample column, one column per line
 line_areas <- function(spectra) {
-  areas <- lapply(lines, function(center) {
-    rowSums(spectra[channels[abs(wl - center) < 0.15]])
-  })
-  bind_cols(select(spectra, Sample), as_tibble(areas))
+  areas <- line_intensities(spectra[c("Sample", channels)], lines, search = 0)
+  areas |>
+    mutate(row = cumsum(line == names(lines)[1])) |>
+    select(row, Sample, line, intensity) |>
+    pivot_wider(names_from = line, values_from = intensity) |>
+    select(-row)
 }
 ```
 
@@ -147,11 +152,11 @@ sensitivity |>
 #> # A tibble: 5 × 6
 #>   lambda `Mg II 279.55` `Si I 288.16` `Ca II 393.37` `Al I 396.15` `K I 766.49`
 #>   <chr>           <dbl>         <dbl>          <dbl>         <dbl>        <dbl>
-#> 1 1e+03           48336         20437          45902         28128         3313
-#> 2 1e+04           48423         20509          46114         28182         3325
-#> 3 1e+05           48648         20484          46151         28282         3328
-#> 4 1e+06           49153         20438          46155         28281         3405
-#> 5 1e+07           49500         20503          46204         28311         3445
+#> 1 1e+03            1692          1245           2757          1511          184
+#> 2 1e+04            1695          1249           2769          1514          185
+#> 3 1e+05            1705          1247           2771          1518          185
+#> 4 1e+06            1726          1245           2771          1518          189
+#> 5 1e+07            1740          1248           2774          1519          192
 ```
 
 Across four orders of magnitude of `lambda`, the areas of the strong
@@ -258,27 +263,27 @@ wide <- function(stat) {
 }
 wide("RSD")   # median within-sample RSD (%)
 #>        normalization Mg II 279.55 Si I 288.16 Ca II 393.37 Al I 396.15
-#> 1      baseline only         5.66        8.19         6.73        7.07
-#> 2               area         4.60        6.67         5.44        5.28
-#> 3                SNV         3.26        5.66         3.79        4.36
-#> 4                MSC         3.29        5.55         3.80        4.17
-#> 5 internal std. (Si)         6.66        0.84         7.60        6.49
+#> 1      baseline only         5.94        8.36         7.06        7.60
+#> 2               area         4.57        7.00         5.51        5.59
+#> 3                SNV         4.17        5.99         4.05        5.05
+#> 4                MSC         4.10        5.90         4.02        4.91
+#> 5 internal std. (Si)         6.55        0.00         7.70        6.55
 #>   K I 766.49
-#> 1      12.33
-#> 2      12.63
-#> 3      15.56
-#> 4      12.61
-#> 5      13.50
+#> 1      12.35
+#> 2      13.51
+#> 3      17.18
+#> 4      13.46
+#> 5      13.47
 wide("ICC")   # fraction of variance between samples
 #>        normalization Mg II 279.55 Si I 288.16 Ca II 393.37 Al I 396.15
-#> 1      baseline only         0.90        0.77         0.81        0.79
-#> 2               area         0.56        0.63         0.70        0.68
-#> 3                SNV         0.80        0.49         0.60        0.61
-#> 4                MSC         0.79        0.54         0.66        0.64
-#> 5 internal std. (Si)         0.76        0.28         0.41        0.32
+#> 1      baseline only         0.90        0.76         0.81        0.77
+#> 2               area         0.63        0.64         0.69        0.73
+#> 3                SNV         0.81        0.51         0.60        0.67
+#> 4                MSC         0.80        0.56         0.66        0.70
+#> 5 internal std. (Si)         0.79          NA         0.41        0.33
 #>   K I 766.49
 #> 1       0.86
-#> 2       0.47
+#> 2       0.48
 #> 3       0.54
 #> 4       0.51
 #> 5       0.66
@@ -287,8 +292,8 @@ wide("ICC")   # fraction of variance between samples
 The two criteria disagree, and the disagreement is informative:
 
 - **SNV and MSC give the best repeatability.** They reduce the replicate
-  RSD of the Mg, Ca and Al lines by about 40% compared with baseline
-  correction alone.
+  RSD of the Mg, Ca and Al lines by a third or more compared with
+  baseline correction alone.
 - **They also lower the ICC.** A lower ICC means the between-sample
   variance shrank even more than the within-sample variance.
   Normalization removes multiplicative variation, and part of the
@@ -303,12 +308,11 @@ The two criteria disagree, and the disagreement is informative:
 - **The weak K line is a special case.** SNV increases its RSD: dividing
   by the whole-spectrum standard deviation adds that statistic’s noise
   to a line that is itself noisy.
-- **Internal standardization by Si is not usable here.** It makes the Si
-  line nearly constant (the residual RSD comes from the slightly
-  different windows of the step and of our line areas), so its own RSD
-  and ICC are meaningless. It also assumes the silicon content is
-  constant across samples, which is false for soils ranging from clay to
-  sand. It lowers the ICC of every other line.
+- **Internal standardization by Si is not usable here.** It sets the Si
+  line to a constant, so its own RSD and ICC are meaningless. It also
+  assumes the silicon content is constant across samples, which is false
+  for soils ranging from clay to sand. It lowers the ICC of every other
+  line.
 
 No normalization is universally best, so choose one on data from the
 matrix at hand, and confirm the choice against the end goal. We continue
@@ -366,8 +370,8 @@ count(screen, flagged = outlier)
 #> # A tibble: 2 × 2
 #>   flagged     n
 #>   <lgl>   <int>
-#> 1 FALSE     356
-#> 2 TRUE       44
+#> 1 FALSE     352
+#> 2 TRUE       48
 ```
 
 That is about 11% of the shots, far more than the few gross errors one
@@ -419,21 +423,21 @@ shots |> filter(!flagged) |> count(Sample, name = "shots_kept") |> count(shots_k
 #> # A tibble: 6 × 2
 #>   shots_kept     n
 #>        <int> <int>
-#> 1          2     1
+#> 1          3     1
 #> 2          4     2
-#> 3          5     2
-#> 4          6     2
-#> 5          7     2
-#> 6          8    41
+#> 3          5     1
+#> 4          6     3
+#> 5          7     4
+#> 6          8    39
 shots |> filter(flagged) |> count(Sample, sort = TRUE) |> head(5)
 #> # A tibble: 5 × 2
 #>   Sample     n
 #>   <chr>  <int>
-#> 1 MRI007     6
+#> 1 MRI007     5
 #> 2 MRI001     4
 #> 3 MRI004     4
-#> 4 MRI010     3
-#> 5 MRI016     3
+#> 4 MRI016     3
+#> 5 MRI009     2
 ```
 
 Most samples keep all 8 shots. The few samples that lose several shots
@@ -467,10 +471,10 @@ count(whole, lines = shots$flagged, whole_spectrum = .rejected)
 #> # A tibble: 4 × 3
 #>   lines whole_spectrum     n
 #>   <lgl> <lgl>          <int>
-#> 1 FALSE FALSE            351
-#> 2 FALSE TRUE              23
-#> 3 TRUE  FALSE             18
-#> 4 TRUE  TRUE               8
+#> 1 FALSE FALSE            352
+#> 2 FALSE TRUE              22
+#> 3 TRUE  FALSE             17
+#> 4 TRUE  TRUE               9
 ```
 
 The two screens flag different shots, because they look at different
