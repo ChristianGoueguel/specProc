@@ -39,7 +39,7 @@ for the same results in scripts.
 The app offers:
 
 - a clickable periodic table; elements without lines in the wavelength
-  range of the spectra are greyed out once queried;
+  range of the spectra are grayed out once queried;
 
 - the ionization stages to show (I, II, III);
 

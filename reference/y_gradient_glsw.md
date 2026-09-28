@@ -46,7 +46,7 @@ because it utilizes a gradient of the sorted \\\textbf{X}\\- and
 
 The samples are sorted by increasing \\\textbf{y}\\, and the first
 derivatives of \\\textbf{X}\\ and \\\textbf{y}\\ along the sample axis
-are computed with a Savitzky-Golay filter. Samples whose neighbours have
+are computed with a Savitzky-Golay filter. Samples whose neighbors have
 similar \\\textbf{y}\\ values receive large weights \\w_i = 2^{-\Delta
 y_i / s\_{\Delta y}}\\, so the differences between their spectra,
 \\\Delta\textbf{X}\\, describe variation unrelated to \\\textbf{y}\\.

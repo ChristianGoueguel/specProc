@@ -74,7 +74,7 @@ that a cutoff of \|z\| \> 2.5 is also often used).
   University, Boston.
 
 - Stahel, W., (1981). Robuste Schätzungen: infinitesimale Optimalität
-  und Schätzungen vonKovarianzmatrizen. PhD thesis, ETH Zürich.
+  und Schätzungen von Kovarianzmatrizen. PhD thesis, ETH Zürich.
 
 ## Author
 
