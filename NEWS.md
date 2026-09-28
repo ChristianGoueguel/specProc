@@ -1,3 +1,47 @@
+# specProc 0.4.0
+
+This release adds robust PCA, a proper net analyte signal with figures of
+merit, and rewrites the documentation around tidymodels.
+
+## Breaking changes
+
+* `nas()` now computes the net analyte signal (Lorber, Faber and Kowalski,
+  1997; Faber, 1998) of an inverse PLS or PCR calibration model, with its
+  figures of merit: sensitivity, selectivity and, given the noise level,
+  analytical sensitivity, limits of detection and quantification, and
+  signal-to-noise ratios. A `predict()` method gives the NAS, selectivity and
+  predicted concentration of new samples. Previously, `nas()` returned
+  spectra filtered by direct orthogonalization, identical to
+  `direct_orthogonal()`, which remains available for that purpose.
+
+## New features
+
+* Robust PCA: `robpca()` (ROBPCA, Hubert, Rousseeuw and Vanden Branden,
+  2005) and `rospca()` (robust sparse PCA, Hubert, Reynkens, Schmitt and
+  Verdonck, 2016), implemented from the published algorithms with C++
+  kernels for the Stahel-Donoho outlyingness, FAST-MCD and the grid-search
+  sparse PCA; and `macropca()`, a wrapper around `cellWise::MacroPCA()` for
+  cellwise outliers and missing values. All three return score and
+  orthogonal distances with cut-offs, an outlier classification, and a
+  `predict()` method for new observations.
+* `plot_outlier_map()` draws the outlier map (score distance against
+  orthogonal distance) of any of the three, optionally with new
+  observations; `plot_cell_map()` draws the cell map of a MacroPCA fit.
+* New recipe steps `step_robpca()`, `step_rospca()` and `step_macropca()`,
+  robust counterparts of `recipes::step_pca()` that can also add the score
+  and orthogonal distances as columns, and `step_robust_bcyj()`, a robust
+  counterpart of `recipes::step_BoxCox()` and `recipes::step_YeoJohnson()`.
+
+## Documentation
+
+* The four vignettes and the README use recipe steps, tidymodels
+  (workflows, tune, rsample) and the tidyverse. Preprocessing pipelines are
+  written as recipes; the calibration vignette runs its repeated nested
+  cross-validation with `rsample::nested_cv()` and `tune::tune_grid()`, and
+  the orthogonalization vignette tunes every filter together with the PLS
+  model. Vignettes that need suggested packages stop with a message when
+  those are not installed.
+
 # specProc 0.3.0
 
 This release connects specProc to the tidymodels framework. Preprocessing and

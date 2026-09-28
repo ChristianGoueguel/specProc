@@ -2,62 +2,159 @@
 % Please edit documentation in R/nas.R
 \name{nas}
 \alias{nas}
-\title{Net Analyte Signal}
+\title{Net Analyte Signal and Figures of Merit}
 \usage{
-nas(x, y, ncomp = 5, center = TRUE, scale = FALSE)
+nas(
+  x,
+  y,
+  ncomp = 5,
+  method = "pls",
+  center = TRUE,
+  scale = FALSE,
+  noise = NULL
+)
 }
 \arguments{
-\item{x}{A matrix or data frame of the predictor variables}
+\item{x}{A numeric matrix or data frame of calibration spectra (one per
+row).}
 
-\item{y}{A vector, matrix or data frame of the response variable(s)}
+\item{y}{A numeric vector (or one-column matrix or data frame) of analyte
+concentrations.}
 
-\item{ncomp}{An integer specifying the number of principal components to retain for orthogonal processing. Default is 5; it is reduced if larger than the rank of the interferent space.}
+\item{ncomp}{A positive integer giving the number of latent variables of
+the calibration model. Default is 5.}
 
-\item{center}{A logical value specifying whether to center the data. Default is \code{TRUE}.}
+\item{method}{The inverse calibration model: \code{"pls"} (default, SIMPLS)
+or \code{"pcr"}.}
 
-\item{scale}{A logical value specifying whether to scale the data. Default is \code{FALSE}.}
+\item{center}{A logical value indicating whether to mean-center \code{x} and
+\code{y}. Default is \code{TRUE}.}
+
+\item{scale}{A logical value indicating whether to scale the columns of
+\code{x} to unit variance. Default is \code{FALSE}. The figures of merit are then
+expressed in scaled units.}
+
+\item{noise}{An optional positive number: the standard deviation of the
+instrumental noise, in the units of \code{x}. Needed for the analytical
+sensitivity, LOD, LOQ and signal-to-noise ratios.}
 }
 \value{
-A tibble containing the corrected predictor variables. The
-interferent loadings are stored in the \code{"loadings"} attribute.
+An object of class \code{specproc_nas}, a list with:
+\itemize{
+\item \code{nas}: A tibble with one row per calibration sample: the scalar
+\code{nas}, the \code{selectivity}, the fitted concentration \code{fitted} and, if
+\code{noise} is given, the signal-to-noise ratio \code{snr}.
+\item \code{figures_of_merit}: A named vector with the \code{sensitivity}, the mean
+selectivity (\code{selectivity}) and, if \code{noise} is given,
+\code{analytical_sensitivity}, \code{lod} and \code{loq}.
+\item \code{nas_vectors}: A tibble of the NAS vectors \eqn{\textbf{r}_i^*} of the
+calibration samples.
+\item \code{coefficients}: The regression vector \eqn{\textbf{b}}.
+\item \code{ncomp}, \code{method}, \code{noise}, \code{center}, \code{scale} and \code{y_center}: the model
+settings and preprocessing parameters.
+}
+
+Use \link[=predict.specproc_nas]{predict()} to compute the NAS, selectivity and
+predicted concentration of new samples.
 }
 \description{
-This function implements the Net Analyte Signal (NAS) algorithm, as proposed
-by Lorber (1997), which involves the concentration matrix. NAS aims to remove
-information from the predictor variables, that is orthogonal or irrelevant to
-the response variable(s) by orthogonal projection.
+This function computes the net analyte signal (NAS) of each sample for a
+multivariate inverse calibration model (PLS or PCR), following Lorber
+(1997) and Faber (1998), and the figures of merit derived from it:
+sensitivity, selectivity and, when the instrumental noise is known,
+analytical sensitivity, limits of detection and quantification, and
+signal-to-noise ratios.
 }
 \details{
-The NAS algorithm aims to obtain a corrected matrix that contains
-only the information relevant to the response variable \eqn{\textbf{Y}}. The
-part of \eqn{\textbf{X}} that cannot be explained by \eqn{\textbf{Y}},
-\eqn{\textbf{Z} = (\textbf{I} - \textbf{Y}\textbf{Y}^{+})\textbf{X}}, spans the
-interferent space. Its first \code{ncomp} principal component loadings
-\eqn{\textbf{P}} are used to project \eqn{\textbf{X}} onto the subspace
-orthogonal to the interferents:
-\eqn{\textbf{X}_{NAS} = \textbf{X}(\textbf{I} - \textbf{PP}^T)}.
+The net analyte signal is the part of a spectrum that is unique to the
+analyte, i.e. orthogonal to the spectral contributions of all other
+constituents (the interferents). In an inverse calibration model
+\eqn{\hat{y} = \bar{y} + (\textbf{x} - \bar{\textbf{x}})^T\textbf{b}} with
+\eqn{A} latent variables, the interferent space is spanned by the
+calibration spectra reconstructed from the model, from which the part
+explained by \eqn{\hat{\textbf{y}}} has been removed. The regression vector
+\eqn{\textbf{b}} is orthogonal to this space, so the NAS space within the
+model is one-dimensional and spanned by \eqn{\textbf{b}} (Faber, 1998;
+Bro and Andersen, 2003). The NAS vector of sample \eqn{i} is therefore
+\deqn{\textbf{r}_i^* = \frac{(\textbf{x}_i - \bar{\textbf{x}})^T\textbf{b}}{\|\textbf{b}\|^2}\,\textbf{b}}
+and its signed length, the scalar NAS, is
+\deqn{\mathrm{NAS}_i = \frac{(\textbf{x}_i - \bar{\textbf{x}})^T\textbf{b}}{\|\textbf{b}\|} = \frac{\hat{y}_i - \bar{y}}{\|\textbf{b}\|}}
+
+The figures of merit follow Olivieri \emph{et al.} (2006):
+\itemize{
+\item \strong{Sensitivity}, \eqn{\mathrm{SEN} = 1 / \|\textbf{b}\|}: the NAS
+produced by a unit change in concentration, in signal units per
+concentration unit.
+\item \strong{Selectivity} of sample \eqn{i},
+\eqn{\mathrm{SEL}_i = |\mathrm{NAS}_i| / \|\textbf{x}_i - \bar{\textbf{x}}\|}:
+the fraction of the (centered) signal that is used for prediction,
+between 0 and 1.
+\item With the standard deviation of the instrumental noise \eqn{\sigma_x}
+(\code{noise}): the \strong{analytical sensitivity}
+\eqn{\gamma = \mathrm{SEN} / \sigma_x}, whose inverse is the smallest
+concentration difference that can be distinguished; the \strong{limit of
+detection} \eqn{\mathrm{LOD} = 3.3\,\sigma_x / \mathrm{SEN}}; the
+\strong{limit of quantification} \eqn{\mathrm{LOQ} = 10\,\sigma_x / \mathrm{SEN}};
+and the \strong{signal-to-noise ratio} of each sample,
+\eqn{\mathrm{NAS}_i / \sigma_x}.
+}
+
+The LOD and LOQ above account for the instrumental noise only, not for
+the uncertainty of the calibration model or of the reference values, so
+they are lower bounds. The noise level must be estimated independently,
+for example as the standard deviation of the differences between repeated
+spectra of the same sample divided by \eqn{\sqrt{2}}, in the same units
+(and after the same preprocessing) as \code{x}.
+
+All quantities depend on the number of latent variables \code{ncomp}, which
+should be chosen by validation beforehand.
+
+Before specProc 0.4.0, \code{nas()} returned spectra filtered by direct
+orthogonalization; that correction is available from
+\code{\link[=direct_orthogonal]{direct_orthogonal()}}.
 }
 \examples{
+# Three constituents with overlapping lines; the analyte is the first one
 set.seed(1)
-x <- matrix(rnorm(20 * 50), 20, 50)
-y <- x[, 1] + rnorm(20, sd = 0.1)
-x_nas <- nas(x, y, ncomp = 2)
+wl <- seq(390, 400, length.out = 200)
+line <- function(center) exp(-(wl - center)^2 / 0.1)
+pure <- rbind(line(393.4) + 0.3 * line(396.8), line(393.8), line(396.5))
+conc <- matrix(runif(30 * 3, 0, 1), 30, 3)
+x <- conc \%*\% pure + matrix(rnorm(30 * 200, sd = 0.002), 30)
+
+fit <- nas(x, conc[, 1], ncomp = 3, noise = 0.002)
+fit
+head(fit$nas)
+
+# the sensitivity equals the length of the analyte spectrum orthogonal
+# to the interferent spectra
+interf <- t(pure[2:3, ])
+net <- pure[1, ] - interf \%*\% qr.solve(interf, pure[1, ])
+c(model = fit$figures_of_merit[["sensitivity"]], theory = sqrt(sum(net^2)))
 
 }
 \references{
 \itemize{
-\item Lorber, A., (1997).
-Net analyte signal calculation in multivariate calibration.
-Anal. Chem., 69(8):1620-1626
-\item Faber, N.M., (1998).
-Efficient computation of net analyte signal vector in inverse
-multivariate calibration models.
-Anal. Chem., 70(23):5108-5110
+\item Lorber, A. (1986). Error propagation and figures of merit for
+quantification by solving matrix equations. Analytical Chemistry,
+58(6):1167-1172.
+\item Lorber, A., Faber, K., Kowalski, B.R. (1997). Net analyte signal
+calculation in multivariate calibration. Analytical Chemistry,
+69(8):1620-1626.
+\item Faber, N.M. (1998). Efficient computation of net analyte signal vector
+in inverse multivariate calibration models. Analytical Chemistry,
+70(23):5108-5110.
+\item Bro, R., Andersen, C.M. (2003). Theory of net analyte signal vectors in
+inverse regression. Journal of Chemometrics, 17(12):646-652.
+\item Olivieri, A.C., Faber, N.M., Ferré, J., Boqué, R., Kalivas, J.H.,
+Mark, H. (2006). Uncertainty estimation and figures of merit for
+multivariate calibration (IUPAC Technical Report). Pure and Applied
+Chemistry, 78(3):633-661.
 }
 }
 \seealso{
-\code{\link[=direct_orthogonal]{direct_orthogonal()}}, which computes the same correction and returns a
-filter that \code{\link[=predict.specproc_filter]{predict.specproc_filter()}} can apply to new spectra.
+\code{\link[=direct_orthogonal]{direct_orthogonal()}} for the filter formerly returned by
+\code{nas()}.
 }
 \author{
 Christian L. Goueguel

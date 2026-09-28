@@ -55,7 +55,7 @@ sequence of existing steps.
 \description{
 \code{step_direct_orthogonal()} creates a \emph{specification} of a recipe step that
 removes response-orthogonal variation from the selected predictors with
-\code{\link[=direct_orthogonal]{direct_orthogonal()}} (equivalent to \code{\link[=nas]{nas()}}).
+\code{\link[=direct_orthogonal]{direct_orthogonal()}}.
 }
 \details{
 The selected columns are replaced by the corrected values, which are
