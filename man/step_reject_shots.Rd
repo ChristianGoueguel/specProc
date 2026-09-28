@@ -28,8 +28,9 @@ columns (named by their wavelengths, see \code{\link[=reject_shots]{reject_shots
 name or a selector. Give it the \code{"id"} role (see
 \code{\link[recipes:update_role]{recipes::update_role()}}) so that it is not used as a predictor.}
 
-\item{method}{The baseline algorithm: \code{"arpls"} (default), \code{"als"} or
-\code{"lsp"}.}
+\item{method}{The criteria: one or more of \code{"intensity"},
+\code{"correlation"} (both by default) and \code{"distance"} (see
+\code{\link[=reject_shots]{reject_shots()}}).}
 
 \item{cutoff}{The robust z-score above which a shot is rejected. Default
 is 3.5.}
