@@ -1,3 +1,40 @@
+# specProc 0.5.0
+
+This release adds plasma diagnostics for LIBS: electron density from Stark
+broadening, excitation temperature from Boltzmann and Saha-Boltzmann plots,
+and checks of LTE, self-absorption and detector saturation, with atomic data
+from the NIST Atomic Spectra Database and Stark parameters from STARK-B.
+
+## New features
+
+* Plasma diagnostics for LIBS:
+  - `starkb_lines()` retrieves Stark widths and shifts of the lines of an
+    atom or ion from the STARK-B database (Sahal-Bréchot, Dimitrijević and
+    Moreau) through its VAMDC service, on demand; `read_starkb()` reads
+    STARK-B data saved as XSAMS files, for offline and reproducible work;
+    `stark_table()` builds the same table from user-supplied widths or from
+    fitted temperature laws. `stark_width()` interpolates the width at a
+    given temperature and electron density, and scales multiplet data to a
+    line of the multiplet (lambda-squared rule).
+  - `electron_density()` estimates the electron density from the Stark
+    (Lorentzian) width of a line, with STARK-B data or a reference width, or
+    from the H-alpha line (Gigosos et al., 2003).
+  - `boltzmann_plot()` and `saha_boltzmann_plot()` estimate the excitation
+    temperature from line intensities and atomic data, and
+    `plot_boltzmann()` draws the plots.
+  - `mcwhirter_criterion()` checks the McWhirter criterion for LTE, and
+    `self_absorption()` computes self-absorption coefficients from line
+    widths (El Sherbini et al., 2005).
+  - `saturation_summary()` finds channels at the saturation limit of the
+    detector.
+  - `nist_lines()` and `nist_ionization_energy()` retrieve transition
+    probabilities, level energies, statistical weights and ionization
+    energies from the NIST Atomic Spectra Database, on demand.
+* `voigt_fwhm()` computes the full width at half maximum of a Voigt profile
+  (Olivero and Longbothum, 1977).
+* New vignette "Plasma diagnostics: electron density, temperature and
+  self-absorption", on `specLIBS` and `fourrage` spectra.
+
 # specProc 0.4.0
 
 This release adds robust PCA, a proper net analyte signal with figures of
