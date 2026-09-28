@@ -20,3 +20,7 @@ Useful links:
 ## Author
 
 **Maintainer**: Christian L. Goueguel <christian.goueguel@gmail.com>
+
+Authors:
+
+- Christian L. Goueguel <christian.goueguel@gmail.com>

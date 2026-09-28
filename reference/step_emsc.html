@@ -11,7 +11,7 @@ optionally, known interferents, with emsc()."><meta property="og:image" content=
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -143,7 +143,7 @@ sequence of existing steps.</p>
 recipe is prepped, and new spectra are corrected with the same reference,
 polynomials and interferents when they are baked. The selected columns
 form one spectrum per row and are replaced by the corrected values.</p>
-<p><code>degree</code> can be tuned with <code><a href="https://tune.tidymodels.org/reference/reexports.html" class="external-link">tune::tune()</a></code>, using <code><a href="https://dials.tidymodels.org/reference/degree.html" class="external-link">dials::degree_int()</a></code>
+<p><code>degree</code> can be tuned with <code><a href="https://hardhat.tidymodels.org/reference/tune.html" class="external-link">tune::tune()</a></code>, using <code><a href="https://dials.tidymodels.org/reference/degree.html" class="external-link">dials::degree_int()</a></code>
 with values 0 to 4. <a href="https://recipes.tidymodels.org/reference/tidy.recipe.html" class="external-link">tidy()</a> returns the selected
 <code>terms</code>, the <code>reference</code> value of each (<code>NA</code> before the step is trained)
 and <code>id</code>.</p>

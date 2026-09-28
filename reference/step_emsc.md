@@ -101,7 +101,7 @@ selected columns form one spectrum per row and are replaced by the
 corrected values.
 
 `degree` can be tuned with
-[`tune::tune()`](https://tune.tidymodels.org/reference/reexports.html),
+[`tune::tune()`](https://hardhat.tidymodels.org/reference/tune.html),
 using
 [`dials::degree_int()`](https://dials.tidymodels.org/reference/degree.html)
 with values 0 to 4.

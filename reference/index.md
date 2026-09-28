@@ -137,6 +137,18 @@ and can be tuned within a tidymodels workflow.
 - [`glsw_alpha()`](https://christiangoueguel.com/specProc/reference/glsw_alpha.md)
   : Relative GLSW Weighting Parameter
 
+## Line identification
+
+Candidate emission lines from the NIST Atomic Spectra Database, overlaid
+on spectra, and an interactive app to identify lines.
+
+- [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md)
+  : Interactive Identification of Emission Lines
+- [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md)
+  : Candidate Emission Lines for LIBS Spectra
+- [`plot_lines()`](https://christiangoueguel.com/specProc/reference/plot_lines.md)
+  : Overlay Emission Lines on a Spectrum
+
 ## Plasma diagnostics
 
 Electron density from Stark broadening (with the STARK-B database),

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,6 +39,16 @@
       <small>Source: <a href="https://github.com/ChristianGoueguel/specProc/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="specproc-development-version">specProc (development version)<a class="anchor" aria-label="anchor" href="#specproc-development-version"></a></h2>
+<div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/line_finder.html">line_finder()</a></code>: a Shiny app to identify the emission lines of LIBS spectra. Elements are selected on a periodic table, and the strongest lines of their ionization stages, from the NIST Atomic Spectra Database, are overlaid on a spectrum in an interactive plotly graph (one color per stage), with controls for the temperature, wavelength range, number of lines, wavelength shift and spectrum (mean, group mean or single spectrum). Fetched lines can be saved and reloaded for offline use.</li>
+<li>
+<code><a href="../reference/libs_lines.html">libs_lines()</a></code> lists the lines of selected species expected to be the strongest in a plasma at a given temperature (relative intensities in LTE), and <code><a href="../reference/plot_lines.html">plot_lines()</a></code> overlays them on a spectrum (plotly or ggplot2).</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.0" id="specproc-050">specProc 0.5.0<a class="anchor" aria-label="anchor" href="#specproc-050"></a></h2>
 <p>This release adds plasma diagnostics for LIBS: electron density from Stark broadening, excitation temperature from Boltzmann and Saha-Boltzmann plots, and checks of LTE, self-absorption and detector saturation, with atomic data from the NIST Atomic Spectra Database and Stark parameters from STARK-B.</p>

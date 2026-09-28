@@ -106,7 +106,7 @@ of existing steps.
 As
 [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md),
 with sparse loadings. `num_comp` and `lambda` can be tuned with
-[`tune::tune()`](https://tune.tidymodels.org/reference/reexports.html);
+[`tune::tune()`](https://hardhat.tidymodels.org/reference/tune.html);
 `lambda` uses
 [`dials::penalty()`](https://dials.tidymodels.org/reference/penalty.html)
 with a range of 0.01 to 100.

@@ -92,7 +92,7 @@ outcome is not used.
 
 The selected columns are replaced by the corrected values (not
 centered). `num_comp` can be tuned with
-[`tune::tune()`](https://tune.tidymodels.org/reference/reexports.html).
+[`tune::tune()`](https://hardhat.tidymodels.org/reference/tune.html).
 [tidy()](https://recipes.tidymodels.org/reference/tidy.recipe.html)
 returns the selected `terms`, `num_comp` and `id`.
 

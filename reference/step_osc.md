@@ -119,7 +119,7 @@ down-weights variation between samples with similar outcomes.
 ## Tuning
 
 `num_comp` can be tuned with
-[`tune::tune()`](https://tune.tidymodels.org/reference/reexports.html);
+[`tune::tune()`](https://hardhat.tidymodels.org/reference/tune.html);
 its default range is
 [`dials::num_comp()`](https://dials.tidymodels.org/reference/num_comp.html)
 with values 1 to 4. When the model also has a `num_comp` argument (for

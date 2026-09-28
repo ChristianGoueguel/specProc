@@ -108,7 +108,7 @@ are removed unless `keep_original_cols = TRUE`.
 ## Tuning
 
 `num_comp` can be tuned with
-[`tune::tune()`](https://tune.tidymodels.org/reference/reexports.html),
+[`tune::tune()`](https://hardhat.tidymodels.org/reference/tune.html),
 using
 [`dials::num_comp()`](https://dials.tidymodels.org/reference/num_comp.html)
 with values 1 to 4.

@@ -96,7 +96,7 @@ The filter is stored in factored form, so its memory use grows with the
 number of predictors rather than its square. The selected columns are
 replaced by the filtered values (not centered). `alpha` can be tuned
 with
-[`tune::tune()`](https://tune.tidymodels.org/reference/reexports.html),
+[`tune::tune()`](https://hardhat.tidymodels.org/reference/tune.html),
 using
 [`glsw_alpha()`](https://christiangoueguel.com/specProc/reference/glsw_alpha.md).
 [tidy()](https://recipes.tidymodels.org/reference/tidy.recipe.html)

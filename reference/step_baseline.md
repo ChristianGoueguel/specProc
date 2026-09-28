@@ -102,7 +102,7 @@ selected columns are replaced by the corrected values.
 ## Tuning
 
 `lambda` (methods `"arpls"` and `"als"`) can be tuned with
-[`tune::tune()`](https://tune.tidymodels.org/reference/reexports.html),
+[`tune::tune()`](https://hardhat.tidymodels.org/reference/tune.html),
 using
 [`baseline_lambda()`](https://christiangoueguel.com/specProc/reference/baseline_lambda.md),
 and `degree` (method `"lsp"`) using
