@@ -71,7 +71,7 @@ recipe is prepped, and new spectra are corrected with the same reference,
 polynomials and interferents when they are baked. The selected columns
 form one spectrum per row and are replaced by the corrected values.
 
-\code{degree} can be tuned with \code{\link[tune:reexports]{tune::tune()}}, using \code{\link[dials:degree]{dials::degree_int()}}
+\code{degree} can be tuned with \code{\link[tune:tune]{tune::tune()}}, using \code{\link[dials:degree_int]{dials::degree_int()}}
 with values 0 to 4. \link[recipes:tidy.recipe]{tidy()} returns the selected
 \code{terms}, the \code{reference} value of each (\code{NA} before the step is trained)
 and \code{id}.

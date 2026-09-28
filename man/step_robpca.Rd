@@ -75,7 +75,7 @@ observation, which can be used to screen outliers. The selected columns
 are removed unless \code{keep_original_cols = TRUE}.
 }
 \section{Tuning}{
-\code{num_comp} can be tuned with \code{\link[tune:reexports]{tune::tune()}}, using \code{\link[dials:num_comp]{dials::num_comp()}}
+\code{num_comp} can be tuned with \code{\link[tune:tune]{tune::tune()}}, using \code{\link[dials:num_comp]{dials::num_comp()}}
 with values 1 to 4.
 }
 
@@ -85,7 +85,7 @@ columns \code{terms}, \code{value}, \code{component} and \code{id}.
 }
 
 \examples{
-\dontshow{if (rlang::is_installed("recipes")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
 library(recipes)
 set.seed(1)
 x <- matrix(rnorm(80 * 10), 80, 10) \%*\% diag(10:1)

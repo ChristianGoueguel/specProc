@@ -77,7 +77,7 @@ external clutter, and \code{\link[=step_y_gradient_glsw]{step_y_gradient_glsw()}
 between samples with similar outcomes.
 }
 \section{Tuning}{
-\code{num_comp} can be tuned with \code{\link[tune:reexports]{tune::tune()}}; its default range is
+\code{num_comp} can be tuned with \code{\link[tune:tune]{tune::tune()}}; its default range is
 \code{\link[dials:num_comp]{dials::num_comp()}} with values 1 to 4. When the model also has a
 \code{num_comp} argument (for example, \code{\link[parsnip:pls]{parsnip::pls()}}), give the step's
 parameter its own id, such as \code{num_comp = tune("filter_comp")}, so that
@@ -99,7 +99,7 @@ selected predictors), \code{num_comp} and \code{id}.
 }
 
 \examples{
-\dontshow{if (rlang::is_installed("recipes")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
 library(recipes)
 set.seed(1)
 x <- matrix(rnorm(60 * 20), 60, 20, dimnames = list(NULL, paste0("wl", 1:20)))

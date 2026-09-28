@@ -22,5 +22,10 @@ Useful links:
 \author{
 \strong{Maintainer}: Christian L. Goueguel \email{christian.goueguel@gmail.com}
 
+Authors:
+\itemize{
+  \item Christian L. Goueguel \email{christian.goueguel@gmail.com}
+}
+
 }
 \keyword{internal}

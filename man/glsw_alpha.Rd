@@ -21,7 +21,7 @@ A \link[dials:dials-package]{dials} parameter for the \code{alpha} argument of
 \code{\link[=step_glsw]{step_glsw()}} and \code{\link[=step_y_gradient_glsw]{step_y_gradient_glsw()}}, on a log10 scale.
 }
 \examples{
-\dontshow{if (rlang::is_installed("dials")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("dials")) withAutoprint(\{ # examplesIf}
 glsw_alpha()
 dials::value_seq(glsw_alpha(), 5)
 \dontshow{\}) # examplesIf}

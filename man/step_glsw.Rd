@@ -67,7 +67,7 @@ data nearly unchanged.
 The filter is stored in factored form, so its memory use grows with the
 number of predictors rather than its square. The selected columns are
 replaced by the filtered values (not centered). \code{alpha} can be tuned with
-\code{\link[tune:reexports]{tune::tune()}}, using \code{\link[=glsw_alpha]{glsw_alpha()}}. \link[recipes:tidy.recipe]{tidy()}
+\code{\link[tune:tune]{tune::tune()}}, using \code{\link[=glsw_alpha]{glsw_alpha()}}. \link[recipes:tidy.recipe]{tidy()}
 returns the selected \code{terms}, \code{alpha} (relative) and \code{id}.
 }
 \seealso{

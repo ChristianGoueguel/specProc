@@ -512,6 +512,7 @@ website](https://christiangoueguel.com/specProc/articles/).
 | Recipe steps (tidymodels) | `step_baseline()`, `step_snv()`, `step_msc()`, `step_emsc()`, `step_pareto_scale()`, `step_poisson_scale()`, `step_epo()`, `step_glsw()`, `step_osc()`, `step_direct_orthogonal()`, `step_direct_osc()`, `step_projected_osc()`, `step_y_gradient_glsw()`, `step_robust_bcyj()`, `step_robpca()`, `step_rospca()`, `step_macropca()` |
 | Line profiles | `voigt_profile()`, `pseudo_voigt_profile()`, `gaussian_profile()`, `lorentzian_profile()` |
 | Line fitting | `peak_fit()`, `multipeak_fit()`, `plot_fit()`, `voigt_fwhm()` |
+| Line identification | `line_finder()` (Shiny app), `libs_lines()`, `plot_lines()` |
 | Plasma diagnostics | `nist_lines()`, `nist_ionization_energy()`, `starkb_lines()`, `read_starkb()`, `stark_table()`, `stark_width()`, `electron_density()`, `boltzmann_plot()`, `saha_boltzmann_plot()`, `plot_boltzmann()`, `mcwhirter_criterion()`, `self_absorption()`, `saturation_summary()` |
 | Location and scale | `biweight_location()`, `biweight_scale()`, `biweight_midvariance()`, `rousseeuw_croux()`, `umad()` |
 | Association | `correlation()`, `biweight_midcovariance()`, `biweight_midcorrelation()` |

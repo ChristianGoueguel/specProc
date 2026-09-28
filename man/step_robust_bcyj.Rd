@@ -78,7 +78,7 @@ constant ones) are left unchanged.
 \code{lambda}, \code{method} (\code{"BC"} or \code{"YJ"}) and \code{id}.
 }
 \examples{
-\dontshow{if (rlang::is_installed("recipes")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
 library(recipes)
 set.seed(1)
 dat <- data.frame(a = rlnorm(100), b = rexp(100), c = rnorm(100))
