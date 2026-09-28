@@ -178,10 +178,11 @@ saha_boltzmann_plot <- function(lines, ionization_energy, electron_density, unit
 #'
 #' @description
 #' Plots the points and the fitted line of [boltzmann_plot()] or
-#' [saha_boltzmann_plot()], with the estimated temperature.
+#' [saha_boltzmann_plot()], with the estimated temperature, or the parallel
+#' Boltzmann plots of the species of [cf_libs()].
 #'
-#' @param object An object returned by [boltzmann_plot()] or
-#'   [saha_boltzmann_plot()].
+#' @param object An object returned by [boltzmann_plot()],
+#'   [saha_boltzmann_plot()] or [cf_libs()].
 #' @param title The plot title. By default, the method and temperature.
 #'
 #' @return A ggplot object.
@@ -195,8 +196,12 @@ saha_boltzmann_plot <- function(lines, ionization_energy, electron_density, unit
 #' lines$intensity <- with(lines, gk * Aki / wavelength * exp(-Ek / (kB * 9000)))
 #' plot_boltzmann(boltzmann_plot(lines))
 plot_boltzmann <- function(object, title = NULL) {
+  if (inherits(object, "specproc_cflibs")) {
+    return(plot_cf_libs(object, title))
+  }
   if (!inherits(object, "specproc_boltzmann")) {
-    stop("'object' must be returned by boltzmann_plot() or saha_boltzmann_plot().", call. = FALSE)
+    stop("'object' must be returned by boltzmann_plot(), saha_boltzmann_plot() or cf_libs().",
+         call. = FALSE)
   }
   if (is.null(title)) {
     title <- sprintf("%s plot: T = %.0f +/- %.0f K", object$method, object$temperature,
@@ -226,6 +231,39 @@ plot_boltzmann <- function(object, title = NULL) {
                   y = ylab, title = title) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = if (length(unique(df$stage)) > 1) "bottom" else "none")
+}
+
+# Parallel Boltzmann (or Saha-Boltzmann) plots of a CF-LIBS fit.
+plot_cf_libs <- function(object, title) {
+  saha_plane <- object$method == "saha-boltzmann"
+  if (is.null(title)) {
+    title <- sprintf("CF-LIBS %s plots: T = %.0f%s K",
+                     if (saha_plane) "Saha-Boltzmann" else "Boltzmann", object$temperature,
+                     if (is.finite(object$temperature_se)) sprintf(" +/- %.0f", object$temperature_se) else "")
+  }
+  slope <- -1 / (k_boltzmann_ev * object$temperature)
+  fitted <- data.frame(group = factor(names(object$intercept), levels = levels(object$points$group)),
+                       intercept = as.vector(object$intercept), slope = slope)
+  ylab <- if (object$units == "photons") {
+    quote(ln(I / (g[k] * A[ki])))
+  } else {
+    quote(ln(I * lambda / (g[k] * A[ki])))
+  }
+  if (saha_plane) {
+    ylab <- bquote(.(ylab) ~ "(Saha-corrected for ions)")
+  }
+  df <- object$points
+  df$stage <- factor(ifelse(df$stage == 2, "ion", "neutral"), levels = c("neutral", "ion"))
+  ggplot2::ggplot(df, ggplot2::aes(x = .data$x, y = .data$y, colour = .data$group)) +
+    ggplot2::geom_abline(data = fitted, ggplot2::aes(intercept = .data$intercept, slope = .data$slope,
+                                                     colour = .data$group), alpha = 0.6) +
+    ggplot2::geom_point(ggplot2::aes(shape = .data$stage), size = 2.5) +
+    ggplot2::scale_shape_manual(values = c(neutral = 16, ion = 17), drop = TRUE) +
+    ggplot2::labs(x = if (saha_plane) "Upper-level energy (+ ionization energy for ions), eV"
+                  else "Upper-level energy, eV",
+                  y = as.expression(ylab), colour = NULL, shape = NULL, title = title) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(legend.position = "bottom")
 }
 
 #' @export
