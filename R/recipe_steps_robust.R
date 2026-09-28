@@ -206,9 +206,12 @@ robust_titles <- c(
   macropca = "MacroPCA on "
 )
 
-# Keeps only what transfo_newdata() needs.
+# Keeps only what transfo_newdata() needs. Recent cellWise versions read the
+# variable names from the transformed training data `Y`, so a zero-row copy
+# of it is kept.
 strip_transfo <- function(fit) {
-  fit[c("Xt", "Y", "weights", "remX", "rowInAnalysis", "namesCaseNumber")] <- NULL
+  if (!is.null(fit$Y)) fit$Y <- fit$Y[0, , drop = FALSE]
+  fit[c("Xt", "weights", "remX", "rowInAnalysis", "namesCaseNumber")] <- NULL
   fit
 }
 
