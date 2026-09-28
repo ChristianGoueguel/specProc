@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 ```
 
 Integrating the counts in a fixed window around a line is simple, but it
-mixes the line with its neighbours and the local background. Fitting a
+mixes the line with its neighbors and the local background. Fitting a
 line profile separates overlapping lines and gives the line area, center
 and widths as parameters, with standard errors. This vignette shows how
 to fit single and overlapping lines with specProc, how to choose a

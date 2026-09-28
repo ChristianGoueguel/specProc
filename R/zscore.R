@@ -23,7 +23,7 @@
 #'   Breakdown properties of multivariate location estimators.
 #'   Ph.D. Qualifying paper, Dept. Statistics, Harvard University, Boston.
 #' - Stahel, W., (1981).
-#'   Robuste Schätzungen: infinitesimale Optimalität und Schätzungen vonKovarianzmatrizen.
+#'   Robuste Schätzungen: infinitesimale Optimalität und Schätzungen von Kovarianzmatrizen.
 #'   PhD thesis, ETH Zürich.
 #'
 #' @author Christian L. Goueguel
