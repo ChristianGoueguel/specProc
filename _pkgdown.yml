@@ -94,6 +94,26 @@ reference:
   - baseline_lambda
   - glsw_alpha
 
+- title: Plasma diagnostics
+  desc: >
+    Electron density from Stark broadening (with the STARK-B database),
+    excitation temperature from Boltzmann and Saha-Boltzmann plots, and
+    checks of LTE, self-absorption and detector saturation.
+  contents:
+  - nist_lines
+  - nist_ionization_energy
+  - starkb_lines
+  - read_starkb
+  - stark_table
+  - stark_width
+  - electron_density
+  - boltzmann_plot
+  - saha_boltzmann_plot
+  - plot_boltzmann
+  - mcwhirter_criterion
+  - self_absorption
+  - saturation_summary
+
 - title: Peak fitting
   desc: >
     Functions used to characterize spectral lines.
@@ -102,6 +122,7 @@ reference:
   contents:
   - peak_fit
   - multipeak_fit
+  - voigt_fwhm
 
 - title: Data visualization
   desc: >

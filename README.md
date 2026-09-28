@@ -37,6 +37,10 @@ ready for modeling:
 - **Calibration transfer** between instruments: PDS, GLSW.
 - **Line fitting**: exact Voigt, pseudo-Voigt, Gaussian and Lorentzian
   profiles, for single or overlapping lines.
+- **Plasma diagnostics**: electron density from Stark broadening, with
+  widths from the STARK-B database, or from H-alpha; temperature from
+  Boltzmann and Saha-Boltzmann plots; McWhirter criterion,
+  self-absorption and detector saturation.
 - **Robust statistics and outlier detection**: biweight estimators,
   Rousseeuw–Croux Sn/Qn, bias-corrected MAD, medcouple-based skewness
   and tail weights, adjusted and generalized boxplots, directional
@@ -485,6 +489,10 @@ The vignettes develop the example above in more depth:
   orthogonalization method removes from LIBS spectra of forage samples,
   whether it improves potassium predictions, the net analyte signal and
   figures of merit, and the same analysis as a tidymodels workflow.
+- `vignette("plasma-diagnostics", package = "specProc")`: detector
+  saturation, electron density from H-alpha and Stark broadening,
+  Boltzmann and Saha-Boltzmann temperatures with NIST atomic data, and
+  self-absorption.
 
 They are also available as [articles on the package
 website](https://christiangoueguel.com/specProc/articles/).
@@ -503,7 +511,8 @@ website](https://christiangoueguel.com/specProc/articles/).
 | Figures of merit | `nas()` |
 | Recipe steps (tidymodels) | `step_baseline()`, `step_snv()`, `step_msc()`, `step_emsc()`, `step_pareto_scale()`, `step_poisson_scale()`, `step_epo()`, `step_glsw()`, `step_osc()`, `step_direct_orthogonal()`, `step_direct_osc()`, `step_projected_osc()`, `step_y_gradient_glsw()`, `step_robust_bcyj()`, `step_robpca()`, `step_rospca()`, `step_macropca()` |
 | Line profiles | `voigt_profile()`, `pseudo_voigt_profile()`, `gaussian_profile()`, `lorentzian_profile()` |
-| Line fitting | `peak_fit()`, `multipeak_fit()`, `plot_fit()` |
+| Line fitting | `peak_fit()`, `multipeak_fit()`, `plot_fit()`, `voigt_fwhm()` |
+| Plasma diagnostics | `nist_lines()`, `nist_ionization_energy()`, `starkb_lines()`, `read_starkb()`, `stark_table()`, `stark_width()`, `electron_density()`, `boltzmann_plot()`, `saha_boltzmann_plot()`, `plot_boltzmann()`, `mcwhirter_criterion()`, `self_absorption()`, `saturation_summary()` |
 | Location and scale | `biweight_location()`, `biweight_scale()`, `biweight_midvariance()`, `rousseeuw_croux()`, `umad()` |
 | Association | `correlation()`, `biweight_midcovariance()`, `biweight_midcorrelation()` |
 | Skewness and tail weight | `medcouple_weight()`, `quantile_weight()`, `tukey_gh()` |
