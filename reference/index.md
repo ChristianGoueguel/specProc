@@ -137,6 +137,39 @@ and can be tuned within a tidymodels workflow.
 - [`glsw_alpha()`](https://christiangoueguel.com/specProc/reference/glsw_alpha.md)
   : Relative GLSW Weighting Parameter
 
+## Plasma diagnostics
+
+Electron density from Stark broadening (with the STARK-B database),
+excitation temperature from Boltzmann and Saha-Boltzmann plots, and
+checks of LTE, self-absorption and detector saturation.
+
+- [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md)
+  : Atomic Line Data from the NIST Atomic Spectra Database
+- [`nist_ionization_energy()`](https://christiangoueguel.com/specProc/reference/nist_ionization_energy.md)
+  : Ionization Energies from the NIST Atomic Spectra Database
+- [`starkb_lines()`](https://christiangoueguel.com/specProc/reference/starkb_lines.md)
+  : Stark Broadening Parameters from the STARK-B Database
+- [`read_starkb()`](https://christiangoueguel.com/specProc/reference/read_starkb.md)
+  : Read Saved STARK-B Data
+- [`stark_table()`](https://christiangoueguel.com/specProc/reference/stark_table.md)
+  : Build a Table of Stark Broadening Parameters
+- [`stark_width()`](https://christiangoueguel.com/specProc/reference/stark_width.md)
+  : Stark Width of a Line at Given Plasma Conditions
+- [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md)
+  : Electron Density from Stark Broadening
+- [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md)
+  : Plasma Temperature from a Boltzmann Plot
+- [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md)
+  : Plasma Temperature from a Saha-Boltzmann Plot
+- [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md)
+  : Draw a Boltzmann or Saha-Boltzmann Plot
+- [`mcwhirter_criterion()`](https://christiangoueguel.com/specProc/reference/mcwhirter_criterion.md)
+  : McWhirter Criterion for Local Thermodynamic Equilibrium
+- [`self_absorption()`](https://christiangoueguel.com/specProc/reference/self_absorption.md)
+  : Self-Absorption Coefficient from Line Widths
+- [`saturation_summary()`](https://christiangoueguel.com/specProc/reference/saturation_summary.md)
+  : Detect Saturated Channels in Spectra
+
 ## Peak fitting
 
 Functions used to characterize spectral lines. The choice of the fitting
@@ -147,6 +180,8 @@ conditions of the emitting environment.
   : Peak Fitting
 - [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md)
   : Multiple Peaks Fitting
+- [`voigt_fwhm()`](https://christiangoueguel.com/specProc/reference/voigt_fwhm.md)
+  : Full Width at Half Maximum of a Voigt Profile
 
 ## Data visualization
 

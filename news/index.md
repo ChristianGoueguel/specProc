@@ -1,5 +1,60 @@
 # Changelog
 
+## specProc 0.5.0
+
+This release adds plasma diagnostics for LIBS: electron density from
+Stark broadening, excitation temperature from Boltzmann and
+Saha-Boltzmann plots, and checks of LTE, self-absorption and detector
+saturation, with atomic data from the NIST Atomic Spectra Database and
+Stark parameters from STARK-B.
+
+### New features
+
+- Plasma diagnostics for LIBS:
+  - [`starkb_lines()`](https://christiangoueguel.com/specProc/reference/starkb_lines.md)
+    retrieves Stark widths and shifts of the lines of an atom or ion
+    from the STARK-B database (Sahal-Bréchot, Dimitrijević and Moreau)
+    through its VAMDC service, on demand;
+    [`read_starkb()`](https://christiangoueguel.com/specProc/reference/read_starkb.md)
+    reads STARK-B data saved as XSAMS files, for offline and
+    reproducible work;
+    [`stark_table()`](https://christiangoueguel.com/specProc/reference/stark_table.md)
+    builds the same table from user-supplied widths or from fitted
+    temperature laws.
+    [`stark_width()`](https://christiangoueguel.com/specProc/reference/stark_width.md)
+    interpolates the width at a given temperature and electron density,
+    and scales multiplet data to a line of the multiplet (lambda-squared
+    rule).
+  - [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md)
+    estimates the electron density from the Stark (Lorentzian) width of
+    a line, with STARK-B data or a reference width, or from the H-alpha
+    line (Gigosos et al., 2003).
+  - [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md)
+    and
+    [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md)
+    estimate the excitation temperature from line intensities and atomic
+    data, and
+    [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md)
+    draws the plots.
+  - [`mcwhirter_criterion()`](https://christiangoueguel.com/specProc/reference/mcwhirter_criterion.md)
+    checks the McWhirter criterion for LTE, and
+    [`self_absorption()`](https://christiangoueguel.com/specProc/reference/self_absorption.md)
+    computes self-absorption coefficients from line widths (El Sherbini
+    et al., 2005).
+  - [`saturation_summary()`](https://christiangoueguel.com/specProc/reference/saturation_summary.md)
+    finds channels at the saturation limit of the detector.
+  - [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md)
+    and
+    [`nist_ionization_energy()`](https://christiangoueguel.com/specProc/reference/nist_ionization_energy.md)
+    retrieve transition probabilities, level energies, statistical
+    weights and ionization energies from the NIST Atomic Spectra
+    Database, on demand.
+- [`voigt_fwhm()`](https://christiangoueguel.com/specProc/reference/voigt_fwhm.md)
+  computes the full width at half maximum of a Voigt profile (Olivero
+  and Longbothum, 1977).
+- New vignette “Plasma diagnostics: electron density, temperature and
+  self-absorption”, on `specLIBS` and `fourrage` spectra.
+
 ## specProc 0.4.0
 
 This release adds robust PCA, a proper net analyte signal with figures

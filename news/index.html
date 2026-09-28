@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,6 +21,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calibration.html">Predicting soil clay content from LIBS spectra</a></li>
     <li><a class="dropdown-item" href="../articles/line-fitting.html">Fitting emission lines</a></li>
     <li><a class="dropdown-item" href="../articles/orthogonalization.html">Removing unwanted variation: a comparison of orthogonalization methods</a></li>
+    <li><a class="dropdown-item" href="../articles/plasma-diagnostics.html">Plasma diagnostics: electron density, temperature and self-absorption</a></li>
     <li><a class="dropdown-item" href="../articles/preprocessing.html">Preprocessing LIBS spectra</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -38,6 +39,30 @@
       <small>Source: <a href="https://github.com/ChristianGoueguel/specProc/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.5.0" id="specproc-050">specProc 0.5.0<a class="anchor" aria-label="anchor" href="#specproc-050"></a></h2>
+<p>This release adds plasma diagnostics for LIBS: electron density from Stark broadening, excitation temperature from Boltzmann and Saha-Boltzmann plots, and checks of LTE, self-absorption and detector saturation, with atomic data from the NIST Atomic Spectra Database and Stark parameters from STARK-B.</p>
+<div class="section level3">
+<h3 id="new-features-0-5-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-5-0"></a></h3>
+<ul><li>Plasma diagnostics for LIBS:
+<ul><li>
+<code><a href="../reference/starkb_lines.html">starkb_lines()</a></code> retrieves Stark widths and shifts of the lines of an atom or ion from the STARK-B database (Sahal-Bréchot, Dimitrijević and Moreau) through its VAMDC service, on demand; <code><a href="../reference/read_starkb.html">read_starkb()</a></code> reads STARK-B data saved as XSAMS files, for offline and reproducible work; <code><a href="../reference/stark_table.html">stark_table()</a></code> builds the same table from user-supplied widths or from fitted temperature laws. <code><a href="../reference/stark_width.html">stark_width()</a></code> interpolates the width at a given temperature and electron density, and scales multiplet data to a line of the multiplet (lambda-squared rule).</li>
+<li>
+<code><a href="../reference/electron_density.html">electron_density()</a></code> estimates the electron density from the Stark (Lorentzian) width of a line, with STARK-B data or a reference width, or from the H-alpha line (Gigosos et al., 2003).</li>
+<li>
+<code><a href="../reference/boltzmann_plot.html">boltzmann_plot()</a></code> and <code><a href="../reference/saha_boltzmann_plot.html">saha_boltzmann_plot()</a></code> estimate the excitation temperature from line intensities and atomic data, and <code><a href="../reference/plot_boltzmann.html">plot_boltzmann()</a></code> draws the plots.</li>
+<li>
+<code><a href="../reference/mcwhirter_criterion.html">mcwhirter_criterion()</a></code> checks the McWhirter criterion for LTE, and <code><a href="../reference/self_absorption.html">self_absorption()</a></code> computes self-absorption coefficients from line widths (El Sherbini et al., 2005).</li>
+<li>
+<code><a href="../reference/saturation_summary.html">saturation_summary()</a></code> finds channels at the saturation limit of the detector.</li>
+<li>
+<code><a href="../reference/nist_lines.html">nist_lines()</a></code> and <code><a href="../reference/nist_ionization_energy.html">nist_ionization_energy()</a></code> retrieve transition probabilities, level energies, statistical weights and ionization energies from the NIST Atomic Spectra Database, on demand.</li>
+</ul></li>
+<li>
+<code><a href="../reference/voigt_fwhm.html">voigt_fwhm()</a></code> computes the full width at half maximum of a Voigt profile (Olivero and Longbothum, 1977).</li>
+<li>New vignette “Plasma diagnostics: electron density, temperature and self-absorption”, on <code>specLIBS</code> and <code>fourrage</code> spectra.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.0" id="specproc-040">specProc 0.4.0<a class="anchor" aria-label="anchor" href="#specproc-040"></a></h2>
 <p>This release adds robust PCA, a proper net analyte signal with figures of merit, and rewrites the documentation around tidymodels.</p>

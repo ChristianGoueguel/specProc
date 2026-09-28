@@ -29,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,7 @@
 <li><a class="dropdown-item" href="articles/calibration.html">Predicting soil clay content from LIBS spectra</a></li>
     <li><a class="dropdown-item" href="articles/line-fitting.html">Fitting emission lines</a></li>
     <li><a class="dropdown-item" href="articles/orthogonalization.html">Removing unwanted variation: a comparison of orthogonalization methods</a></li>
+    <li><a class="dropdown-item" href="articles/plasma-diagnostics.html">Plasma diagnostics: electron density, temperature and self-absorption</a></li>
     <li><a class="dropdown-item" href="articles/preprocessing.html">Preprocessing LIBS spectra</a></li>
   </ul>
 </li>
@@ -87,6 +88,8 @@
 <strong>Calibration transfer</strong> between instruments: PDS, GLSW.</li>
 <li>
 <strong>Line fitting</strong>: exact Voigt, pseudo-Voigt, Gaussian and Lorentzian profiles, for single or overlapping lines.</li>
+<li>
+<strong>Plasma diagnostics</strong>: electron density from Stark broadening, with widths from the STARK-B database, or from H-alpha; temperature from Boltzmann and Saha-Boltzmann plots; McWhirter criterion, self-absorption and detector saturation.</li>
 <li>
 <strong>Robust statistics and outlier detection</strong>: biweight estimators, Rousseeuw–Croux Sn/Qn, bias-corrected MAD, medcouple-based skewness and tail weights, adjusted and generalized boxplots, directional outlyingness.</li>
 </ul>
@@ -406,6 +409,8 @@
 <code><a href="articles/calibration.html">vignette("calibration", package = "specProc")</a></code>: predicting soil clay content with a compositional (log-ratio) PLS model, and estimating prediction error without leakage.</li>
 <li>
 <code><a href="articles/orthogonalization.html">vignette("orthogonalization", package = "specProc")</a></code>: what each orthogonalization method removes from LIBS spectra of forage samples, whether it improves potassium predictions, the net analyte signal and figures of merit, and the same analysis as a tidymodels workflow.</li>
+<li>
+<code><a href="articles/plasma-diagnostics.html">vignette("plasma-diagnostics", package = "specProc")</a></code>: detector saturation, electron density from H-alpha and Stark broadening, Boltzmann and Saha-Boltzmann temperatures with NIST atomic data, and self-absorption.</li>
 </ul>
 <p>They are also available as <a href="https://christiangoueguel.com/specProc/articles/">articles on the package website</a>.</p>
 </div>
@@ -481,7 +486,13 @@
 <tr>
 <td>Line fitting</td>
 <td>
-<code><a href="reference/peak_fit.html">peak_fit()</a></code>, <code><a href="reference/multipeak_fit.html">multipeak_fit()</a></code>, <code><a href="reference/plot_fit.html">plot_fit()</a></code>
+<code><a href="reference/peak_fit.html">peak_fit()</a></code>, <code><a href="reference/multipeak_fit.html">multipeak_fit()</a></code>, <code><a href="reference/plot_fit.html">plot_fit()</a></code>, <code><a href="reference/voigt_fwhm.html">voigt_fwhm()</a></code>
+</td>
+</tr>
+<tr>
+<td>Plasma diagnostics</td>
+<td>
+<code><a href="reference/nist_lines.html">nist_lines()</a></code>, <code><a href="reference/nist_ionization_energy.html">nist_ionization_energy()</a></code>, <code><a href="reference/starkb_lines.html">starkb_lines()</a></code>, <code><a href="reference/read_starkb.html">read_starkb()</a></code>, <code><a href="reference/stark_table.html">stark_table()</a></code>, <code><a href="reference/stark_width.html">stark_width()</a></code>, <code><a href="reference/electron_density.html">electron_density()</a></code>, <code><a href="reference/boltzmann_plot.html">boltzmann_plot()</a></code>, <code><a href="reference/saha_boltzmann_plot.html">saha_boltzmann_plot()</a></code>, <code><a href="reference/plot_boltzmann.html">plot_boltzmann()</a></code>, <code><a href="reference/mcwhirter_criterion.html">mcwhirter_criterion()</a></code>, <code><a href="reference/self_absorption.html">self_absorption()</a></code>, <code><a href="reference/saturation_summary.html">saturation_summary()</a></code>
 </td>
 </tr>
 <tr>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.5.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,6 +21,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/calibration.html">Predicting soil clay content from LIBS spectra</a></li>
     <li><a class="dropdown-item" href="../articles/line-fitting.html">Fitting emission lines</a></li>
     <li><a class="dropdown-item" href="../articles/orthogonalization.html">Removing unwanted variation: a comparison of orthogonalization methods</a></li>
+    <li><a class="dropdown-item" href="../articles/plasma-diagnostics.html">Plasma diagnostics: electron density, temperature and self-absorption</a></li>
     <li><a class="dropdown-item" href="../articles/preprocessing.html">Preprocessing LIBS spectra</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -416,6 +417,106 @@
         </dt>
         <dd>Relative GLSW Weighting Parameter</dd>
       </dl></div><div class="section level2">
+      <h2 id="plasma-diagnostics">Plasma diagnostics<a class="anchor" aria-label="anchor" href="#plasma-diagnostics"></a></h2>
+
+      <div class="section-desc"><p>Electron density from Stark broadening (with the STARK-B database), excitation temperature from Boltzmann and Saha-Boltzmann plots, and checks of LTE, self-absorption and detector saturation.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="nist_lines.html">nist_lines()</a></code>
+
+        </dt>
+        <dd>Atomic Line Data from the NIST Atomic Spectra Database</dd>
+
+        <dt>
+
+          <code><a href="nist_ionization_energy.html">nist_ionization_energy()</a></code>
+
+        </dt>
+        <dd>Ionization Energies from the NIST Atomic Spectra Database</dd>
+
+        <dt>
+
+          <code><a href="starkb_lines.html">starkb_lines()</a></code>
+
+        </dt>
+        <dd>Stark Broadening Parameters from the STARK-B Database</dd>
+
+        <dt>
+
+          <code><a href="read_starkb.html">read_starkb()</a></code>
+
+        </dt>
+        <dd>Read Saved STARK-B Data</dd>
+
+        <dt>
+
+          <code><a href="stark_table.html">stark_table()</a></code>
+
+        </dt>
+        <dd>Build a Table of Stark Broadening Parameters</dd>
+
+        <dt>
+
+          <code><a href="stark_width.html">stark_width()</a></code>
+
+        </dt>
+        <dd>Stark Width of a Line at Given Plasma Conditions</dd>
+
+        <dt>
+
+          <code><a href="electron_density.html">electron_density()</a></code>
+
+        </dt>
+        <dd>Electron Density from Stark Broadening</dd>
+
+        <dt>
+
+          <code><a href="boltzmann_plot.html">boltzmann_plot()</a></code>
+
+        </dt>
+        <dd>Plasma Temperature from a Boltzmann Plot</dd>
+
+        <dt>
+
+          <code><a href="saha_boltzmann_plot.html">saha_boltzmann_plot()</a></code>
+
+        </dt>
+        <dd>Plasma Temperature from a Saha-Boltzmann Plot</dd>
+
+        <dt>
+
+          <code><a href="plot_boltzmann.html">plot_boltzmann()</a></code>
+
+        </dt>
+        <dd>Draw a Boltzmann or Saha-Boltzmann Plot</dd>
+
+        <dt>
+
+          <code><a href="mcwhirter_criterion.html">mcwhirter_criterion()</a></code>
+
+        </dt>
+        <dd>McWhirter Criterion for Local Thermodynamic Equilibrium</dd>
+
+        <dt>
+
+          <code><a href="self_absorption.html">self_absorption()</a></code>
+
+        </dt>
+        <dd>Self-Absorption Coefficient from Line Widths</dd>
+
+        <dt>
+
+          <code><a href="saturation_summary.html">saturation_summary()</a></code>
+
+        </dt>
+        <dd>Detect Saturated Channels in Spectra</dd>
+      </dl></div><div class="section level2">
       <h2 id="peak-fitting">Peak fitting<a class="anchor" aria-label="anchor" href="#peak-fitting"></a></h2>
 
       <div class="section-desc"><p>Functions used to characterize spectral lines. The choice of the fitting function depends on the specific broadening mechanisms and physical conditions of the emitting environment.</p></div>
@@ -438,6 +539,13 @@
 
         </dt>
         <dd>Multiple Peaks Fitting</dd>
+
+        <dt>
+
+          <code><a href="voigt_fwhm.html">voigt_fwhm()</a></code>
+
+        </dt>
+        <dd>Full Width at Half Maximum of a Voigt Profile</dd>
       </dl></div><div class="section level2">
       <h2 id="data-visualization">Data visualization<a class="anchor" aria-label="anchor" href="#data-visualization"></a></h2>
 

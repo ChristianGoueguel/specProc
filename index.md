@@ -23,6 +23,10 @@ ready for modeling:
 - **Calibration transfer** between instruments: PDS, GLSW.
 - **Line fitting**: exact Voigt, pseudo-Voigt, Gaussian and Lorentzian
   profiles, for single or overlapping lines.
+- **Plasma diagnostics**: electron density from Stark broadening, with
+  widths from the STARK-B database, or from H-alpha; temperature from
+  Boltzmann and Saha-Boltzmann plots; McWhirter criterion,
+  self-absorption and detector saturation.
 - **Robust statistics and outlier detection**: biweight estimators,
   Rousseeuw–Croux Sn/Qn, bias-corrected MAD, medcouple-based skewness
   and tail weights, adjusted and generalized boxplots, directional
@@ -506,6 +510,10 @@ The vignettes develop the example above in more depth:
   samples, whether it improves potassium predictions, the net analyte
   signal and figures of merit, and the same analysis as a tidymodels
   workflow.
+- [`vignette("plasma-diagnostics", package = "specProc")`](https://christiangoueguel.com/specProc/articles/plasma-diagnostics.md):
+  detector saturation, electron density from H-alpha and Stark
+  broadening, Boltzmann and Saha-Boltzmann temperatures with NIST atomic
+  data, and self-absorption.
 
 They are also available as [articles on the package
 website](https://christiangoueguel.com/specProc/articles/).
@@ -524,7 +532,8 @@ website](https://christiangoueguel.com/specProc/articles/).
 | Figures of merit | [`nas()`](https://christiangoueguel.com/specProc/reference/nas.md) |
 | Recipe steps (tidymodels) | [`step_baseline()`](https://christiangoueguel.com/specProc/reference/step_baseline.md), [`step_snv()`](https://christiangoueguel.com/specProc/reference/step_snv.md), [`step_msc()`](https://christiangoueguel.com/specProc/reference/step_msc.md), [`step_emsc()`](https://christiangoueguel.com/specProc/reference/step_emsc.md), [`step_pareto_scale()`](https://christiangoueguel.com/specProc/reference/step_pareto_scale.md), [`step_poisson_scale()`](https://christiangoueguel.com/specProc/reference/step_poisson_scale.md), [`step_epo()`](https://christiangoueguel.com/specProc/reference/step_epo.md), [`step_glsw()`](https://christiangoueguel.com/specProc/reference/step_glsw.md), [`step_osc()`](https://christiangoueguel.com/specProc/reference/step_osc.md), [`step_direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/step_direct_orthogonal.md), [`step_direct_osc()`](https://christiangoueguel.com/specProc/reference/step_direct_osc.md), [`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md), [`step_y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/step_y_gradient_glsw.md), [`step_robust_bcyj()`](https://christiangoueguel.com/specProc/reference/step_robust_bcyj.md), [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md), [`step_rospca()`](https://christiangoueguel.com/specProc/reference/step_rospca.md), [`step_macropca()`](https://christiangoueguel.com/specProc/reference/step_macropca.md) |
 | Line profiles | [`voigt_profile()`](https://christiangoueguel.com/specProc/reference/voigt_profile.md), [`pseudo_voigt_profile()`](https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.md), [`gaussian_profile()`](https://christiangoueguel.com/specProc/reference/gaussian_profile.md), [`lorentzian_profile()`](https://christiangoueguel.com/specProc/reference/lorentzian_profile.md) |
-| Line fitting | [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md), [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md), [`plot_fit()`](https://christiangoueguel.com/specProc/reference/plot_fit.md) |
+| Line fitting | [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md), [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md), [`plot_fit()`](https://christiangoueguel.com/specProc/reference/plot_fit.md), [`voigt_fwhm()`](https://christiangoueguel.com/specProc/reference/voigt_fwhm.md) |
+| Plasma diagnostics | [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md), [`nist_ionization_energy()`](https://christiangoueguel.com/specProc/reference/nist_ionization_energy.md), [`starkb_lines()`](https://christiangoueguel.com/specProc/reference/starkb_lines.md), [`read_starkb()`](https://christiangoueguel.com/specProc/reference/read_starkb.md), [`stark_table()`](https://christiangoueguel.com/specProc/reference/stark_table.md), [`stark_width()`](https://christiangoueguel.com/specProc/reference/stark_width.md), [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md), [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md), [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md), [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md), [`mcwhirter_criterion()`](https://christiangoueguel.com/specProc/reference/mcwhirter_criterion.md), [`self_absorption()`](https://christiangoueguel.com/specProc/reference/self_absorption.md), [`saturation_summary()`](https://christiangoueguel.com/specProc/reference/saturation_summary.md) |
 | Location and scale | [`biweight_location()`](https://christiangoueguel.com/specProc/reference/biweight_location.md), [`biweight_scale()`](https://christiangoueguel.com/specProc/reference/biweight_scale.md), [`biweight_midvariance()`](https://christiangoueguel.com/specProc/reference/biweight_midvariance.md), [`rousseeuw_croux()`](https://christiangoueguel.com/specProc/reference/rousseeuw_croux.md), [`umad()`](https://christiangoueguel.com/specProc/reference/umad.md) |
 | Association | [`correlation()`](https://christiangoueguel.com/specProc/reference/correlation.md), [`biweight_midcovariance()`](https://christiangoueguel.com/specProc/reference/biweight_midcovariance.md), [`biweight_midcorrelation()`](https://christiangoueguel.com/specProc/reference/biweight_midcorrelation.md) |
 | Skewness and tail weight | [`medcouple_weight()`](https://christiangoueguel.com/specProc/reference/medcouple_weight.md), [`quantile_weight()`](https://christiangoueguel.com/specProc/reference/quantile_weight.md), [`tukey_gh()`](https://christiangoueguel.com/specProc/reference/tukey_gh.md) |
