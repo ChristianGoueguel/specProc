@@ -56,3 +56,31 @@ test_that("nist_lines and nist_ionization_energy query the NIST database", {
                  error = function(e) skip(paste("NIST unavailable:", conditionMessage(e))))
   expect_equal(unname(ie), 6.11, tolerance = 0.01)
 })
+
+test_that("parse_nist_levels reads levels and drops the limit rows", {
+  levels_csv <- c(
+    'Configuration,Term,J,g,Prefix,Level (eV),Suffix,Uncertainty (eV),Splitting,Reference',
+    '"=""4s2""","=""1S""","=""0""",1,"=""""","=""0.0000000""","=""""","=""0""","=""""","=""L1"""',
+    '"=""4s.4p""","=""3P*""","=""1""",3,"=""""","=""1.8858075""","=""""","=""""","=""""","=""L1"""',
+    '"=""4s.5s""","=""3S""","=""1""",3,"=""[""","=""3.9103""","=""]""","=""""","=""""","=""L1"""',
+    '"=""Xx II (4s 2S<1/2>)""","=""Limit""","=""---""",,"=""""","=""6.1131549""","=""""","=""""","=""""","=""L2"""',
+    '"=""3d.4d""","=""1S""","=""0""",1,"=""""","=""6.5000""","=""""","=""""","=""""","=""L1"""',
+    '"=""4p.4d""","=""""","=""""",,"=""""","=""6.9000""","=""""","=""""","=""""","=""L1"""',
+    '',
+    'Partition function for Te = 0.8617 eV: Z = 1.23'
+  )
+  lev <- parse_nist_levels(levels_csv, "Xx I")
+  expect_equal(lev$energy, c(0, 1.8858075, 3.9103, 6.5))   # brackets removed, no g dropped
+  expect_equal(lev$g, c(1, 3, 3, 1))
+  expect_equal(lev$term[2], "3P*")
+  pf <- partition_function(lev, c(5000, 10000))
+  kt <- 8.617333262e-5 * c(5000, 10000)
+  expect_equal(pf$partition, vapply(kt, function(k) sum(lev$g * exp(-lev$energy / k)), numeric(1)))
+  expect_equal(pf$temperature, c(5000, 10000))
+  cut <- partition_function(lev, 10000, max_energy = c("Xx I" = 6))
+  expect_equal(cut$partition, sum((lev$g * exp(-lev$energy / kt[2]))[lev$energy <= 6]))
+  expect_equal(partition_function(lev, 10000, max_energy = c("Yy I" = 0))$partition, pf$partition[2])
+  expect_error(partition_function(lev, 1000, max_energy = "a"), "numeric")
+  expect_error(partition_function(lev, -1), "positive")
+  expect_error(partition_function(data.frame(g = 1), 1000), "columns")
+})

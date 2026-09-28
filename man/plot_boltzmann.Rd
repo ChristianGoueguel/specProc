@@ -7,8 +7,8 @@
 plot_boltzmann(object, title = NULL)
 }
 \arguments{
-\item{object}{An object returned by \code{\link[=boltzmann_plot]{boltzmann_plot()}} or
-\code{\link[=saha_boltzmann_plot]{saha_boltzmann_plot()}}.}
+\item{object}{An object returned by \code{\link[=boltzmann_plot]{boltzmann_plot()}},
+\code{\link[=saha_boltzmann_plot]{saha_boltzmann_plot()}} or \code{\link[=cf_libs]{cf_libs()}}.}
 
 \item{title}{The plot title. By default, the method and temperature.}
 }
@@ -17,7 +17,8 @@ A ggplot object.
 }
 \description{
 Plots the points and the fitted line of \code{\link[=boltzmann_plot]{boltzmann_plot()}} or
-\code{\link[=saha_boltzmann_plot]{saha_boltzmann_plot()}}, with the estimated temperature.
+\code{\link[=saha_boltzmann_plot]{saha_boltzmann_plot()}}, with the estimated temperature, or the parallel
+Boltzmann plots of the species of \code{\link[=cf_libs]{cf_libs()}}.
 }
 \examples{
 kB <- 8.617333262e-5

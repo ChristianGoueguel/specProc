@@ -72,6 +72,11 @@ reference:
   - step_pareto_scale
   - step_poisson_scale
 
+- subtitle: LIBS shots and internal standard
+  contents:
+  - step_reject_shots
+  - step_line_ratio
+
 - subtitle: robust transformation and PCA
   contents:
   - step_robust_bcyj
@@ -111,6 +116,7 @@ reference:
   contents:
   - nist_lines
   - nist_ionization_energy
+  - nist_levels
   - starkb_lines
   - read_starkb
   - stark_table
@@ -122,6 +128,13 @@ reference:
   - mcwhirter_criterion
   - self_absorption
   - saturation_summary
+
+- title: Calibration-free quantification
+  desc: >
+    Elemental composition from line intensities without calibration
+    standards (CF-LIBS).
+  contents:
+  - cf_libs
 
 - title: Peak fitting
   desc: >
@@ -148,6 +161,7 @@ reference:
     Functions used to increase the signal-to-noise ratio.
   contents:
   - average
+  - reject_shots
 
 - title: Baseline correction
   desc: >

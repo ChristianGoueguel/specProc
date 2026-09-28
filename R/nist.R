@@ -128,6 +128,110 @@ nist_ionization_energy <- function(species, timeout = 120) {
   stats::setNames(out, vapply(parsed, `[[`, character(1), "label"))
 }
 
+#' @title Energy Levels and Partition Functions from the NIST Atomic Spectra Database
+#'
+#' @author Christian L. Goueguel
+#'
+#' @description
+#' `nist_levels()` retrieves the energy levels of an atom or ion from the
+#' NIST Atomic Spectra Database, and `partition_function()` computes the
+#' internal partition function of a species from its levels, as needed by
+#' [cf_libs()].
+#'
+#' @details
+#' All the levels listed by the ASD are returned, including the
+#' autoionizing levels above the first ionization limit, as in the partition
+#' functions computed by the ASD; levels without a statistical weight are
+#' dropped. The partition function
+#' \deqn{U(T) = \sum_i g_i \exp\left(-\frac{E_i}{k_B T}\right)}
+#' is summed over the levels given, up to `max_energy`. In a plasma, the
+#' ionization energy is lowered by the surrounding charges, and the levels
+#' above the lowered limit do not exist: truncating the sum there matters
+#' for atoms with many high Rydberg levels close to the limit, such as the
+#' alkali metals (see [cf_libs()], which does it). Without truncation, the
+#' result equals the partition function computed by the ASD.
+#'
+#' The results of a query are cached for the R session. Cite the database
+#' when you use these data (see [nist_lines()]).
+#'
+#' @param species A character vector of species in spectroscopic notation,
+#'   such as `"Ca I"`.
+#' @param timeout The download timeout, in seconds. Default is 120.
+#'
+#' @return `nist_levels()`: a tibble with one row per level and columns
+#'   `species`, `configuration`, `term`, `J`, `g` (statistical weight) and
+#'   `energy` (eV).
+#'
+#' @seealso [cf_libs()], [nist_lines()], [nist_ionization_energy()]
+#' @export nist_levels
+#'
+#' @examples
+#' \donttest{
+#' # needs an internet connection
+#' ca <- try(nist_levels("Ca I"))
+#' if (!inherits(ca, "try-error")) partition_function(ca, temperature = c(8000, 10000))
+#' }
+nist_levels <- function(species, timeout = 120) {
+  if (!is.character(species) || length(species) == 0) {
+    stop("'species' must be a character vector, such as \"Ca I\".")
+  }
+  check_number(timeout, "timeout", lower = 0, lower_open = TRUE)
+  tables <- lapply(species, function(s) {
+    sp <- parse_species(s)
+    key <- paste("levels", sp$label)
+    table <- nist_cache[[key]]
+    if (is.null(table)) {
+      query <- list(de = 0, spectrum = sp$label, submit = "Retrieve Data", units = 1, format = 2,
+                    output = 0, page_size = 15, multiplet_ordered = 0, conf_out = "on",
+                    term_out = "on", level_out = "on", unc_out = 1, j_out = "on", g_out = "on",
+                    lande_out = "on", perc_out = "on", biblio = "on", splitting = 1, temp = "")
+      text <- nist_download("https://physics.nist.gov/cgi-bin/ASD/energy1.pl", query, sp$label,
+                            timeout)
+      table <- parse_nist_levels(text, sp$label)
+      assign(key, table, envir = nist_cache)
+    }
+    table
+  })
+  do.call(rbind, tables)
+}
+
+#' @rdname nist_levels
+#' @param levels A data frame of levels with columns `species`, `g` and
+#'   `energy` (eV), such as returned by `nist_levels()`.
+#' @param temperature The temperature(s), in K.
+#' @param max_energy The highest level energy included, in eV: one value, or
+#'   a vector named by species. Default is `Inf` (all levels).
+#' @return `partition_function()`: a tibble with the `species`, the
+#'   `temperature` and the `partition` function, for each species and
+#'   temperature.
+#' @export partition_function
+partition_function <- function(levels, temperature, max_energy = Inf) {
+  if (!is.data.frame(levels) || !all(c("species", "g", "energy") %in% names(levels))) {
+    stop("'levels' must be a data frame with columns species, g and energy (eV).", call. = FALSE)
+  }
+  if (!is.numeric(temperature) || length(temperature) == 0 || anyNA(temperature) ||
+      any(temperature <= 0)) {
+    stop("'temperature' must contain positive values (K).", call. = FALSE)
+  }
+  ok <- is.finite(levels$g) & is.finite(levels$energy)
+  species <- unique(levels$species)
+  if (!is.numeric(max_energy) || anyNA(max_energy) || length(max_energy) == 0) {
+    stop("'max_energy' must be numeric (eV).", call. = FALSE)
+  }
+  cut <- if (is.null(names(max_energy))) {
+    stats::setNames(rep_len(max_energy, length(species)), species)
+  } else {
+    stats::setNames(ifelse(species %in% names(max_energy), max_energy[species], Inf), species)
+  }
+  grid <- expand.grid(temperature = temperature, species = species, stringsAsFactors = FALSE)
+  grid$partition <- mapply(function(sp, t) {
+    keep <- ok & levels$species == sp & levels$energy <= cut[[sp]]
+    sum(levels$g[keep] * exp(-levels$energy[keep] / (k_boltzmann_ev * t)))
+  }, grid$species, grid$temperature)
+  tibble::tibble(species = grid$species, temperature = grid$temperature,
+                 partition = grid$partition)
+}
+
 # ---- internals ---------------------------------------------------------------
 
 nist_cache <- new.env(parent = emptyenv())
@@ -210,4 +314,28 @@ parse_nist_ie <- function(text) {
     stop("Unexpected format of the NIST ionization energy table.", call. = FALSE)
   }
   data.frame(species = df[[name]], energy = nist_number(df[[energy]]), stringsAsFactors = FALSE)
+}
+
+parse_nist_levels <- function(text, label) {
+  text <- text[!grepl("^\\s*Partition function", text)]
+  df <- read_nist_csv(text)
+  column <- function(pattern) {
+    hit <- grep(pattern, names(df))
+    if (length(hit) == 0) rep(NA_character_, nrow(df)) else df[[hit[1]]]
+  }
+  term <- column("^Term")
+  bound <- which(term != "Limit")   # the ionization limits are listed as rows too
+  out <- tibble::tibble(
+    species = label,
+    configuration = column("^Configuration")[bound],
+    term = term[bound],
+    J = column("^J")[bound],
+    g = nist_number(column("^g")[bound]),
+    energy = nist_number(column("^Level")[bound])
+  )
+  out <- out[is.finite(out$g) & is.finite(out$energy), , drop = FALSE]
+  if (nrow(out) == 0) {
+    stop("No energy levels for ", label, " in the NIST database.", call. = FALSE)
+  }
+  out
 }
