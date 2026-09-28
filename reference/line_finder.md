@@ -79,7 +79,7 @@ Christian L. Goueguel
 
 ``` r
 if (interactive() && rlang::is_installed(c("shiny", "plotly", "bslib"))) {
-  data(specLIBS)
-  line_finder(specLIBS)
+  data(soilLIBS)
+  line_finder(soilLIBS)
 }
 ```

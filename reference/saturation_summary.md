@@ -42,8 +42,8 @@ A list with two tibbles:
 ## Examples
 
 ``` r
-data(specLIBS)
-sat <- saturation_summary(specLIBS[-(1:8)], limit = 28000)
+data(soilLIBS)
+sat <- saturation_summary(soilLIBS[-(1:8)], limit = 28000)
 sat$channels
 #> # A tibble: 1 × 4
 #>   wavelength index n_spectra fraction

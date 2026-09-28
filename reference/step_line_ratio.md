@@ -143,9 +143,9 @@ Christian L. Goueguel
 
 ``` r
 if (rlang::is_installed("recipes")) {
-  data(specLIBS)
+  data(soilLIBS)
   # normalize to the Ca II 393.37 nm line
-  rec <- recipes::recipe(~ ., data = specLIBS[-(2:8)]) |>
+  rec <- recipes::recipe(~ ., data = soilLIBS[-(2:8)]) |>
     step_line_ratio(recipes::all_numeric(), reference = 393.37, window = 0.3) |>
     recipes::prep()
   recipes::tidy(rec, number = 1)

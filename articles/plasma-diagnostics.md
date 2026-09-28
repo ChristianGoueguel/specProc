@@ -7,8 +7,8 @@ how to measure the two quantities that describe the plasma: the electron
 density N_e, from the Stark broadening of a line, and the excitation
 temperature T, from Boltzmann and Saha-Boltzmann plots. It ends with a
 calibration-free estimate of the composition of the forage samples,
-compared with their laboratory values. It uses the spectra of `specLIBS`
-and `fourrage`, atomic data from the NIST Atomic Spectra Database, and
+compared with their laboratory values. It uses the spectra of `soilLIBS`
+and `forageLIBS`, atomic data from the NIST Atomic Spectra Database, and
 Stark broadening parameters from the STARK-B database.
 
 Two limitations of these data affect every number below:
@@ -28,9 +28,9 @@ library(tidyr)
 library(tibble)
 library(ggplot2)
 
-data(specLIBS)
+data(soilLIBS)
 meta_cols <- c("Sample", "Location", "Clay", "Sand", "Silt", "Texture", "Structure", "Type")
-channels <- setdiff(names(specLIBS), meta_cols)
+channels <- setdiff(names(soilLIBS), meta_cols)
 wl <- as.numeric(channels)
 ```
 
@@ -40,14 +40,14 @@ A saturated line is clipped at the detector’s maximum count: its area
 and width are wrong, and it no longer grows with concentration. It must
 be excluded from any diagnostic.
 [`saturation_summary()`](https://christiangoueguel.com/specProc/reference/saturation_summary.md)
-lists the saturated channels. The `fourrage` spectra are means of 8
+lists the saturated channels. The `forageLIBS` spectra are means of 8
 shots, so we count as saturated the channels whose mean is within 1% of
 the 16-bit limit (65535), that is, saturated in nearly every shot:
 
 ``` r
 
-data(fourrage)
-saturated <- saturation_summary(fourrage[-(1:14)], limit = 65535, tolerance = 655)
+data(forageLIBS)
+saturated <- saturation_summary(forageLIBS[-(1:14)], limit = 65535, tolerance = 655)
 
 # adjacent saturated channels belong to the same line
 saturated$channels |>
@@ -76,21 +76,21 @@ saturated$channels |>
 The strongest lines of the forage spectra are saturated in a large share
 of the measurements: Ca II 393.37 and 396.85 nm, Mg II 279.55 and 280.27
 nm, the Ca I resonance line at 422.67 nm, and some Na and K lines. None
-of them can be used for plasma diagnostics in these data. The `specLIBS`
+of them can be used for plasma diagnostics in these data. The `soilLIBS`
 spectra peak at 28446 counts, well below the limit:
 
 ``` r
 
-nrow(saturation_summary(specLIBS[channels], limit = 65535)$channels)
+nrow(saturation_summary(soilLIBS[channels], limit = 65535)$channels)
 #> [1] 0
 ```
 
-We use `specLIBS` below, averaged over all 400 spectra after baseline
+We use `soilLIBS` below, averaged over all 400 spectra after baseline
 correction, which gives a single high signal-to-noise spectrum:
 
 ``` r
 
-spectrum <- baseline_arpls(specLIBS[channels], lambda = 1e5, max.iter = 20)$correction |>
+spectrum <- baseline_arpls(soilLIBS[channels], lambda = 1e5, max.iter = 20)$correction |>
   colMeans()
 ```
 
@@ -123,7 +123,7 @@ halpha_fit$tidied[[1]]
 
 ``` r
 
-plot_fit(halpha_fit, title = "H-alpha line, mean of all specLIBS spectra")
+plot_fit(halpha_fit, title = "H-alpha line, mean of all soilLIBS spectra")
 ```
 
 ![](plasma-diagnostics_files/figure-html/halpha-plot-1.png)
@@ -441,9 +441,9 @@ as above:
 
 ``` r
 
-forage_channels <- names(fourrage)[-(1:14)]
+forage_channels <- names(forageLIBS)[-(1:14)]
 forage_wl <- as.numeric(forage_channels)
-forage <- as.matrix(baseline_arpls(fourrage[forage_channels], lambda = 1e5, max.iter = 20)$correction)
+forage <- as.matrix(baseline_arpls(forageLIBS[forage_channels], lambda = 1e5, max.iter = 20)$correction)
 colnames(forage) <- forage_channels
 forage_mean <- colMeans(forage)
 
@@ -584,7 +584,7 @@ which we compare with the laboratory values on the same basis:
 
 ``` r
 
-lab <- fourrage |>
+lab <- forageLIBS |>
   summarise(across(c(Ca, Mg, K, Na), \(v) mean(v, na.rm = TRUE)))
 cf_mean$composition |>
   select(element, cf_libs = mass_fraction) |>
@@ -663,7 +663,7 @@ cf_each <- line_intensities(forage, cf_atomic) |>
   }) |>
   ungroup()
 
-lab_fractions <- fourrage |>
+lab_fractions <- forageLIBS |>
   mutate(measurement = row_number(), total = Ca + Mg + K + Na) |>
   pivot_longer(c(Ca, Mg, K, Na), names_to = "element", values_to = "content") |>
   transmute(measurement, element, laboratory = content / total)

@@ -102,8 +102,8 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-data(specLIBS)
-shots <- reject_shots(specLIBS[-(2:8)], Sample)
+data(soilLIBS)
+shots <- reject_shots(soilLIBS[-(2:8)], Sample)
 table(shots$.rejected)
 #> 
 #> FALSE  TRUE 
@@ -120,7 +120,7 @@ head(shots[shots$.rejected, c("Sample", ".reason", ".intensity_z", ".correlation
 #> 6 LSG-S18-0010 intensity, correlation         7.29         18.2  
 
 # mean spectrum of each sample, without the rejected shots
-means <- average(reject_shots(specLIBS[-(2:8)], Sample, drop = TRUE), Sample)
+means <- average(reject_shots(soilLIBS[-(2:8)], Sample, drop = TRUE), Sample)
 dim(means)
 #> [1]   50 7153
 ```

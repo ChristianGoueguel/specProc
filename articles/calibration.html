@@ -77,7 +77,7 @@
 <p>Preprocessing is only useful if it improves the analysis it serves.
 This vignette uses a concrete goal to evaluate preprocessing choices:
 predicting the clay content of the 50 soil samples in
-<code>specLIBS</code> with partial least squares (PLS) regression,
+<code>soilLIBS</code> with partial least squares (PLS) regression,
 fitted and validated with the <a href="https://www.tidymodels.org" class="external-link">tidymodels</a> framework.</p>
 <p>Two statistical issues shape the analysis:</p>
 <ul>
@@ -107,14 +107,14 @@ downward; the vignette quantifies two of them.</li>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">specLIBS</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">soilLIBS</span><span class="op">)</span></span>
 <span><span class="va">meta_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sample"</span>, <span class="st">"Location"</span>, <span class="st">"Clay"</span>, <span class="st">"Sand"</span>, <span class="st">"Silt"</span>, <span class="st">"Texture"</span>, <span class="st">"Structure"</span>, <span class="st">"Type"</span><span class="op">)</span></span>
-<span><span class="va">channels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">specLIBS</span><span class="op">)</span>, <span class="va">meta_cols</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">channels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">soilLIBS</span><span class="op">)</span>, <span class="va">meta_cols</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="the-target-a-composition">The target: a composition<a class="anchor" aria-label="anchor" href="#the-target-a-composition"></a>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">texture</span> <span class="op">&lt;-</span> <span class="va">specLIBS</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="va">Clay</span>, <span class="va">Sand</span>, <span class="va">Silt</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">texture</span> <span class="op">&lt;-</span> <span class="va">soilLIBS</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="va">Clay</span>, <span class="va">Sand</span>, <span class="va">Silt</span><span class="op">)</span></span>
 <span><span class="va">texture</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">Sample</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       Clay            Sand            Silt      </span></span>
 <span><span class="co">#&gt;  Min.   : 1.10   Min.   : 5.00   Min.   : 4.00  </span></span>
@@ -210,7 +210,7 @@ automatically.</li>
 <p>We apply the per-spectrum steps to the 400 shots now, and average the
 8 shots of each sample:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">shot_recipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">specLIBS</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">shot_recipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">soilLIBS</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://recipes.tidymodels.org/reference/roles.html" class="external-link">update_role</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">meta_cols</span><span class="op">)</span>, new_role <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/step_baseline.html">step_baseline</a></span><span class="op">(</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -224,7 +224,7 @@ automatically.</li>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">targets</span>, by <span class="op">=</span> <span class="st">"Sample"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/relocate.html" class="external-link">relocate</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="va">clay</span>, <span class="va">clay_silt</span>, <span class="va">sand_silt</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
-<span><span class="va">raw_s</span> <span class="op">&lt;-</span> <span class="fu">sample_means</span><span class="op">(</span><span class="va">specLIBS</span><span class="op">)</span></span>
+<span><span class="va">raw_s</span> <span class="op">&lt;-</span> <span class="fu">sample_means</span><span class="op">(</span><span class="va">soilLIBS</span><span class="op">)</span></span>
 <span><span class="va">base_s</span> <span class="op">&lt;-</span> <span class="fu">sample_means</span><span class="op">(</span><span class="va">baselined_shots</span><span class="op">)</span></span>
 <span><span class="va">snv_s</span> <span class="op">&lt;-</span> <span class="fu">sample_means</span><span class="op">(</span><span class="va">snv_shots</span><span class="op">)</span></span></code></pre></div>
 </div>

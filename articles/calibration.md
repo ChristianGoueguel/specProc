@@ -2,7 +2,7 @@
 
 Preprocessing is only useful if it improves the analysis it serves. This
 vignette uses a concrete goal to evaluate preprocessing choices:
-predicting the clay content of the 50 soil samples in `specLIBS` with
+predicting the clay content of the 50 soil samples in `soilLIBS` with
 partial least squares (PLS) regression, fitted and validated with the
 [tidymodels](https://www.tidymodels.org) framework.
 
@@ -33,16 +33,16 @@ library(tidyr)
 library(purrr)
 library(ggplot2)
 
-data(specLIBS)
+data(soilLIBS)
 meta_cols <- c("Sample", "Location", "Clay", "Sand", "Silt", "Texture", "Structure", "Type")
-channels <- setdiff(names(specLIBS), meta_cols)
+channels <- setdiff(names(soilLIBS), meta_cols)
 ```
 
 ## The target: a composition
 
 ``` r
 
-texture <- specLIBS |> distinct(Sample, Clay, Sand, Silt)
+texture <- soilLIBS |> distinct(Sample, Clay, Sand, Silt)
 texture |> select(-Sample) |> summary()
 #>       Clay            Sand            Silt      
 #>  Min.   : 1.10   Min.   : 5.00   Min.   : 4.00  
@@ -137,7 +137,7 @@ shots of each sample:
 
 ``` r
 
-shot_recipe <- recipe(~ ., data = specLIBS) |>
+shot_recipe <- recipe(~ ., data = soilLIBS) |>
   update_role(all_of(meta_cols), new_role = "id") |>
   step_baseline(all_predictors(), lambda = 1e5, options = list(max.iter = 20))
 
@@ -151,7 +151,7 @@ sample_means <- function(shots) {
     inner_join(targets, by = "Sample") |>
     relocate(Sample, clay, clay_silt, sand_silt)
 }
-raw_s <- sample_means(specLIBS)
+raw_s <- sample_means(soilLIBS)
 base_s <- sample_means(baselined_shots)
 snv_s <- sample_means(snv_shots)
 ```

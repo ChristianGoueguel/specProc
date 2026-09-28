@@ -47,15 +47,15 @@ library(tidyr)
 library(purrr)
 library(ggplot2)
 
-data(fourrage)
+data(forageLIBS)
 elements <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
-raw_channels <- setdiff(names(fourrage), c("Measurement", "Sample", elements))
+raw_channels <- setdiff(names(forageLIBS), c("Measurement", "Sample", elements))
 wl <- as.numeric(raw_channels)
-dim(fourrage)
+dim(forageLIBS)
 #> [1]  368 7166
 ```
 
-`fourrage` contains 368 measurements of 365 forage samples (three
+`forageLIBS` contains 368 measurements of 365 forage samples (three
 samples were measured twice). Each measurement is the mean of 8 laser
 shots. The target is potassium, which is available for every measurement
 and spans 0.5 to 4%.
@@ -88,13 +88,13 @@ bin <- ceiling(seq_len(sum(keep)) / 4)
 wlb <- as.vector(tapply(wl[keep], bin, mean))
 channels <- sprintf("%.3f", wlb)
 
-binned <- as.matrix(fourrage[raw_channels[keep]]) |>
+binned <- as.matrix(forageLIBS[raw_channels[keep]]) |>
   t() |> rowsum(bin) |> t() |>
   as_tibble(.name_repair = \(nm) channels)
 
-unprocessed <- fourrage |>
+unprocessed <- forageLIBS |>
   select(Sample, all_of(elements)) |>
-  mutate(total = rowSums(fourrage[raw_channels])) |>
+  mutate(total = rowSums(forageLIBS[raw_channels])) |>
   bind_cols(binned)
 
 spectra <- recipe(K ~ ., data = unprocessed) |>
@@ -465,7 +465,7 @@ comparison
 #>  6 OSC (Fearn)       4            7  0.294 0.283   -0.006     0.01 
 #>  7 DO                1            9  0.294 0.284    0.001     0.004
 #>  8 DOSC              1            5  0.307 0.281   -0.022     0.023
-#>  9 POSC / OPLS       4            6  0.294 0.282    0         0    
+#>  9 POSC / OPLS       1            9  0.294 0.282    0         0    
 #> 10 y-gradient GLSW   0.01         2  0.29  0.275   -0.019     0.006
 c(null_RMSEP = round(sqrt(mean((mean(calibration$K) - test$K)^2)), 3))
 #> null_RMSEP 

@@ -16,13 +16,13 @@ library(tidyr)
 library(purrr)
 library(ggplot2)
 
-data(specLIBS)
+data(soilLIBS)
 meta_cols <- c("Sample", "Location", "Clay", "Sand", "Silt", "Texture", "Structure", "Type")
-channels <- setdiff(names(specLIBS), meta_cols)
+channels <- setdiff(names(soilLIBS), meta_cols)
 wl <- as.numeric(channels)
 
 # Baseline-corrected counts (see vignette("preprocessing"))
-baselined <- recipe(~ ., data = specLIBS) |>
+baselined <- recipe(~ ., data = soilLIBS) |>
   update_role(all_of(meta_cols), new_role = "id") |>
   step_baseline(all_predictors(), lambda = 1e5, options = list(max.iter = 20)) |>
   prep() |>

@@ -120,8 +120,8 @@ returns the `line` names, their `wavelength`, the `method` and `id`.
 
 ``` r
 if (rlang::is_installed("recipes")) {
-  data(specLIBS)
-  rec <- recipes::recipe(Clay ~ ., data = specLIBS[-c(1:2, 4:8)]) |>
+  data(soilLIBS)
+  rec <- recipes::recipe(Clay ~ ., data = soilLIBS[-c(1:2, 4:8)]) |>
     step_line_intensities(recipes::all_predictors(),
                           lines = c(Mg = 279.55, Ca = 393.37, Al = 396.15)) |>
     recipes::prep()

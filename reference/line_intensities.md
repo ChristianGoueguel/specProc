@@ -135,8 +135,8 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-data(specLIBS)
-spectra <- specLIBS[1:8, -(2:8)]
+data(soilLIBS)
+spectra <- soilLIBS[1:8, -(2:8)]
 ca <- c(`Ca II 393.37` = 393.37, `Ca II 396.85` = 396.85, `Ca I 422.67` = 422.67)
 line_intensities(spectra, ca, baseline = TRUE)
 #> # A tibble: 24 × 10
@@ -159,7 +159,7 @@ line_intensities(spectra, ca, baseline = TRUE)
 lines <- data.frame(wavelength = c(428.30, 430.25, 443.50, 445.48),
                     Aki = c(4.34e7, 1.36e8, 6.70e7, 8.70e7), gk = c(5, 5, 5, 7),
                     Ek = c(4.78, 4.78, 4.68, 4.68))
-mean_spectrum <- colMeans(specLIBS[-(1:8)])
+mean_spectrum <- colMeans(soilLIBS[-(1:8)])
 line_intensities(mean_spectrum, lines, baseline = TRUE)
 #> # A tibble: 4 × 11
 #>   wavelength      Aki    gk    Ek peak_wavelength   shift height intensity   snr

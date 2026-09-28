@@ -1,6 +1,6 @@
 # Preprocessing LIBS spectra
 
-This vignette takes the raw spectra of the `specLIBS` data set through a
+This vignette takes the raw spectra of the `soilLIBS` data set through a
 preprocessing pipeline: baseline correction, normalization, screening
 for outlying shots, and averaging of replicates. Every step is a
 modeling choice. For each one, the vignette shows how to check the
@@ -24,27 +24,27 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 
-data(specLIBS)
+data(soilLIBS)
 meta_cols <- c("Sample", "Location", "Clay", "Sand", "Silt", "Texture", "Structure", "Type")
-channels <- setdiff(names(specLIBS), meta_cols)
+channels <- setdiff(names(soilLIBS), meta_cols)
 wl <- as.numeric(channels)
 ```
 
 ## The data and its structure
 
-`specLIBS` contains 400 spectra of 50 soil samples. Each sample was
+`soilLIBS` contains 400 spectra of 50 soil samples. Each sample was
 measured at 8 locations, and each spectrum has 7152 channels between 199
 and 822 nm, stored as raw detector counts.
 
 ``` r
 
-specLIBS |> count(Sample, name = "locations") |> count(locations, name = "samples")
+soilLIBS |> count(Sample, name = "locations") |> count(locations, name = "samples")
 #> # A tibble: 1 × 2
 #>   locations samples
 #>       <int>   <int>
 #> 1         8      50
 
-specLIBS |>
+soilLIBS |>
   select(all_of(channels)) |>
   unlist(use.names = FALSE) |>
   summary()
@@ -100,7 +100,7 @@ on the first spectrum:
 
 ``` r
 
-spectrum1 <- specLIBS[1, channels]
+spectrum1 <- soilLIBS[1, channels]
 fitted_baselines <- lapply(c(`1e2` = 1e2, `1e4` = 1e4, `1e6` = 1e6), function(l) {
   unlist(baseline_arpls(spectrum1, lambda = l, max.iter = 20)$background)
 })
@@ -129,7 +129,7 @@ the first sample’s 8 spectra through a one-step recipe for each value:
 
 ``` r
 
-first_sample <- specLIBS |> filter(Sample == first(Sample))
+first_sample <- soilLIBS |> filter(Sample == first(Sample))
 
 baseline_recipe <- function(data, lambda) {
   recipe(~ ., data = data) |>
@@ -169,7 +169,7 @@ data, run the same check on a few representative spectra.
 
 ``` r
 
-baselined <- baseline_recipe(specLIBS, 1e5) |>
+baselined <- baseline_recipe(soilLIBS, 1e5) |>
   prep() |>
   bake(new_data = NULL)
 ```
@@ -228,7 +228,7 @@ steps added after the baseline; area normalization uses
 ``` r
 
 normalized <- function(step, ...) {
-  baseline_recipe(specLIBS, 1e5) |>
+  baseline_recipe(soilLIBS, 1e5) |>
     step(all_predictors(), ...) |>
     prep() |>
     bake(new_data = NULL)
@@ -516,7 +516,7 @@ analysis or calibration:
 
 zoom <- channels[wl > 380 & wl < 400]
 sample_spectra |>
-  left_join(distinct(specLIBS, Sample, Type), by = "Sample") |>
+  left_join(distinct(soilLIBS, Sample, Type), by = "Sample") |>
   select(Type, all_of(zoom)) |>
   average(Type) |>
   plot_spectra(id = Type) +
@@ -542,7 +542,7 @@ draws either map:
 
 ``` r
 
-sample_info <- distinct(specLIBS, Sample, Texture, Clay)
+sample_info <- distinct(soilLIBS, Sample, Texture, Clay)
 map_data <- sample_spectra |> left_join(sample_info, by = "Sample")
 
 map_recipe <- recipe(~ ., data = map_data) |>
@@ -600,7 +600,7 @@ calibration spectra and applied to new ones:
 
 ``` r
 
-pipeline <- recipe(~ ., data = specLIBS) |>
+pipeline <- recipe(~ ., data = soilLIBS) |>
   update_role(all_of(meta_cols), new_role = "id") |>
   step_baseline(all_predictors(), lambda = 1e5, options = list(max.iter = 20)) |>
   step_reject_shots(all_predictors(), sample = Sample) |>

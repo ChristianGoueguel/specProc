@@ -82,9 +82,9 @@ density <span class="math inline">N_e</span>, from the Stark broadening
 of a line, and the excitation temperature <span class="math inline">T</span>, from Boltzmann and Saha-Boltzmann plots.
 It ends with a calibration-free estimate of the composition of the
 forage samples, compared with their laboratory values. It uses the
-spectra of <code>specLIBS</code> and <code>fourrage</code>, atomic data
-from the NIST Atomic Spectra Database, and Stark broadening parameters
-from the STARK-B database.</p>
+spectra of <code>soilLIBS</code> and <code>forageLIBS</code>, atomic
+data from the NIST Atomic Spectra Database, and Stark broadening
+parameters from the STARK-B database.</p>
 <p>Two limitations of these data affect every number below:</p>
 <ul>
 <li>
@@ -103,9 +103,9 @@ gate.</li>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">specLIBS</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">soilLIBS</span><span class="op">)</span></span>
 <span><span class="va">meta_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sample"</span>, <span class="st">"Location"</span>, <span class="st">"Clay"</span>, <span class="st">"Sand"</span>, <span class="st">"Silt"</span>, <span class="st">"Texture"</span>, <span class="st">"Structure"</span>, <span class="st">"Type"</span><span class="op">)</span></span>
-<span><span class="va">channels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">specLIBS</span><span class="op">)</span>, <span class="va">meta_cols</span><span class="op">)</span></span>
+<span><span class="va">channels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">soilLIBS</span><span class="op">)</span>, <span class="va">meta_cols</span><span class="op">)</span></span>
 <span><span class="va">wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">channels</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="detector-saturation">Detector saturation<a class="anchor" aria-label="anchor" href="#detector-saturation"></a>
@@ -113,12 +113,13 @@ gate.</li>
 <p>A saturated line is clipped at the detector’s maximum count: its area
 and width are wrong, and it no longer grows with concentration. It must
 be excluded from any diagnostic. <code><a href="../reference/saturation_summary.html">saturation_summary()</a></code> lists
-the saturated channels. The <code>fourrage</code> spectra are means of 8
-shots, so we count as saturated the channels whose mean is within 1% of
-the 16-bit limit (65535), that is, saturated in nearly every shot:</p>
+the saturated channels. The <code>forageLIBS</code> spectra are means of
+8 shots, so we count as saturated the channels whose mean is within 1%
+of the 16-bit limit (65535), that is, saturated in nearly every
+shot:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">fourrage</span><span class="op">)</span></span>
-<span><span class="va">saturated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/saturation_summary.html">saturation_summary</a></span><span class="op">(</span><span class="va">fourrage</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span>, limit <span class="op">=</span> <span class="fl">65535</span>, tolerance <span class="op">=</span> <span class="fl">655</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span>
+<span><span class="va">saturated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/saturation_summary.html">saturation_summary</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span>, limit <span class="op">=</span> <span class="fl">65535</span>, tolerance <span class="op">=</span> <span class="fl">655</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># adjacent saturated channels belong to the same line</span></span>
 <span><span class="va">saturated</span><span class="op">$</span><span class="va">channels</span> <span class="op">|&gt;</span></span>
@@ -146,16 +147,16 @@ the 16-bit limit (65535), that is, saturated in nearly every shot:</p>
 share of the measurements: Ca II 393.37 and 396.85 nm, Mg II 279.55 and
 280.27 nm, the Ca I resonance line at 422.67 nm, and some Na and K
 lines. None of them can be used for plasma diagnostics in these data.
-The <code>specLIBS</code> spectra peak at 28446 counts, well below the
+The <code>soilLIBS</code> spectra peak at 28446 counts, well below the
 limit:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="../reference/saturation_summary.html">saturation_summary</a></span><span class="op">(</span><span class="va">specLIBS</span><span class="op">[</span><span class="va">channels</span><span class="op">]</span>, limit <span class="op">=</span> <span class="fl">65535</span><span class="op">)</span><span class="op">$</span><span class="va">channels</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="../reference/saturation_summary.html">saturation_summary</a></span><span class="op">(</span><span class="va">soilLIBS</span><span class="op">[</span><span class="va">channels</span><span class="op">]</span>, limit <span class="op">=</span> <span class="fl">65535</span><span class="op">)</span><span class="op">$</span><span class="va">channels</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0</span></span></code></pre></div>
-<p>We use <code>specLIBS</code> below, averaged over all 400 spectra
+<p>We use <code>soilLIBS</code> below, averaged over all 400 spectra
 after baseline correction, which gives a single high signal-to-noise
 spectrum:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">spectrum</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/baseline_arpls.html">baseline_arpls</a></span><span class="op">(</span><span class="va">specLIBS</span><span class="op">[</span><span class="va">channels</span><span class="op">]</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">spectrum</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/baseline_arpls.html">baseline_arpls</a></span><span class="op">(</span><span class="va">soilLIBS</span><span class="op">[</span><span class="va">channels</span><span class="op">]</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -184,7 +185,7 @@ shape, and use its total FWHM:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> wL       1.18     0.731      1.61  1.16<span style="color: #949494;">e</span><span style="color: #BB0000;">-  1</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> A      379.     130.         2.92  5.78<span style="color: #949494;">e</span><span style="color: #BB0000;">-  3</span></span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_fit.html">plot_fit</a></span><span class="op">(</span><span class="va">halpha_fit</span>, title <span class="op">=</span> <span class="st">"H-alpha line, mean of all specLIBS spectra"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_fit.html">plot_fit</a></span><span class="op">(</span><span class="va">halpha_fit</span>, title <span class="op">=</span> <span class="st">"H-alpha line, mean of all soilLIBS spectra"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="plasma-diagnostics_files/figure-html/halpha-plot-1.png" class="r-plt" alt="" width="100%"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">widths</span> <span class="op">&lt;-</span> <span class="va">halpha_fit</span><span class="op">$</span><span class="va">tidied</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">term</span>, <span class="va">estimate</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/enframe.html" class="external-link">deframe</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -452,9 +453,9 @@ densities of the elements to fractions that sum to one.</p>
 Na, so we can check the method against them. We baseline-correct the
 measurements and measure the electron density on H<span class="math inline">\alpha</span> of their mean, as above:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">forage_channels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fourrage</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">forage_channels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="va">forage_wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">forage_channels</span><span class="op">)</span></span>
-<span><span class="va">forage</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="../reference/baseline_arpls.html">baseline_arpls</a></span><span class="op">(</span><span class="va">fourrage</span><span class="op">[</span><span class="va">forage_channels</span><span class="op">]</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span></span>
+<span><span class="va">forage</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="../reference/baseline_arpls.html">baseline_arpls</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">[</span><span class="va">forage_channels</span><span class="op">]</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">forage</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">forage_channels</span></span>
 <span><span class="va">forage_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">forage</span><span class="op">)</span></span>
 <span></span>
@@ -575,7 +576,7 @@ whose lines are not used here, so the fractions describe the relative
 composition of these four elements, which we compare with the laboratory
 values on the same basis:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">lab</span> <span class="op">&lt;-</span> <span class="va">fourrage</span> <span class="op">|&gt;</span></span>
+<code class="sourceCode R"><span><span class="va">lab</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Ca</span>, <span class="va">Mg</span>, <span class="va">K</span>, <span class="va">Na</span><span class="op">)</span>, \<span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">v</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">cf_mean</span><span class="op">$</span><span class="va">composition</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">element</span>, cf_libs <span class="op">=</span> <span class="va">mass_fraction</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -649,7 +650,7 @@ variation of the composition between samples:</p>
 <span>  <span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">lab_fractions</span> <span class="op">&lt;-</span> <span class="va">fourrage</span> <span class="op">|&gt;</span></span>
+<span><span class="va">lab_fractions</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>measurement <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span>, total <span class="op">=</span> <span class="va">Ca</span> <span class="op">+</span> <span class="va">Mg</span> <span class="op">+</span> <span class="va">K</span> <span class="op">+</span> <span class="va">Na</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Ca</span>, <span class="va">Mg</span>, <span class="va">K</span>, <span class="va">Na</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"element"</span>, values_to <span class="op">=</span> <span class="st">"content"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span><span class="va">measurement</span>, <span class="va">element</span>, laboratory <span class="op">=</span> <span class="va">content</span> <span class="op">/</span> <span class="va">total</span><span class="op">)</span></span>
