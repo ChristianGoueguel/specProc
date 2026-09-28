@@ -199,14 +199,23 @@ plot_boltzmann <- function(object, title = NULL) {
     stop("'object' must be returned by boltzmann_plot() or saha_boltzmann_plot().", call. = FALSE)
   }
   if (is.null(title)) {
-    title <- sprintf("%s plot: T = %.0f \u00b1 %.0f K", object$method, object$temperature,
+    title <- sprintf("%s plot: T = %.0f +/- %.0f K", object$method, object$temperature,
                      object$temperature_se)
   }
   df <- object$points
   df$stage <- factor(ifelse(df$stage == 2, "ion", "neutral"), levels = c("neutral", "ion"))
   coefs <- stats::coef(object$fit)
-  ylab <- if (object$units == "photons") "ln(I / (g A))" else "ln(I \u03bb / (g A))"
-  if (object$method == "Saha-Boltzmann") ylab <- paste(ylab, "(Saha-corrected for ions)")
+  # plotmath expressions draw the symbols on every graphics device, whatever
+  # the font encoding (a literal lambda fails on the pdf device in some locales)
+  ylab <- if (object$units == "photons") {
+    quote(ln(I / (g[k] * A[ki])))
+  } else {
+    quote(ln(I * lambda / (g[k] * A[ki])))
+  }
+  if (object$method == "Saha-Boltzmann") {
+    ylab <- bquote(.(ylab) ~ "(Saha-corrected for ions)")
+  }
+  ylab <- as.expression(ylab)
   ggplot2::ggplot(df, ggplot2::aes(x = .data$x, y = .data$y)) +
     ggplot2::geom_abline(intercept = coefs[[1]], slope = coefs[[2]], colour = "grey40") +
     ggplot2::geom_point(ggplot2::aes(colour = .data$stage), size = 2.5) +
@@ -222,7 +231,7 @@ plot_boltzmann <- function(object, title = NULL) {
 #' @export
 print.specproc_boltzmann <- function(x, ...) {
   cat(x$method, " plot (", nrow(x$points), " lines)\n\n", sep = "")
-  cat("Temperature:  ", format(round(x$temperature)), " \u00b1 ", format(round(x$temperature_se)),
+  cat("Temperature:  ", format(round(x$temperature)), " +/- ", format(round(x$temperature_se)),
       " K\n", sep = "")
   cat("R-squared:    ", format(x$r_squared, digits = 4), "\n", sep = "")
   if (!is.null(x$electron_density)) {
