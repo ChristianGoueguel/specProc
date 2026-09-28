@@ -11,6 +11,10 @@ plot_embedding(
   colour = NULL,
   size = 2,
   alpha = 0.8,
+  ellipse = FALSE,
+  conf_level = 0.95,
+  robust = FALSE,
+  distribution = "normal",
   title = NULL
 )
 }
@@ -26,6 +30,16 @@ the first two embedding coordinates (see details).}
 (unquoted or as a string), or a vector with one value per sample.}
 
 \item{size, alpha}{The size and opacity of the points.}
+
+\item{ellipse}{A logical: draw confidence ellipses (\code{FALSE}, default).
+Needs the ConfidenceEllipse package.}
+
+\item{conf_level}{The confidence level of the ellipses. Default is 0.95.}
+
+\item{robust}{A logical: robust ellipses (\code{FALSE}, default).}
+
+\item{distribution}{The quantile of the ellipses: \code{"normal"} (default,
+chi-square) or \code{"hotelling"}.}
 
 \item{title}{The plot title.}
 }
@@ -44,6 +58,20 @@ coordinates (\code{UMAP1}, \code{PC1}, \code{Comp1}, ...; the name followed by a
 number), or else the first two numeric columns. A numeric \code{colour} uses
 a continuous viridis scale, other types a discrete palette.
 
+With \code{ellipse = TRUE}, a confidence ellipse is drawn for each group of a
+discrete \code{colour} (or for all the samples otherwise), with
+\code{\link[ConfidenceEllipse:confidence_ellipse]{ConfidenceEllipse::confidence_ellipse()}}. It covers the region expected
+to hold \code{conf_level} of the samples of the group if they follow a
+bivariate normal distribution, from their mean and covariance, or from
+robust estimates (MCD) with \code{robust = TRUE}, which resist outlying
+samples. \code{distribution = "hotelling"} uses the quantile of Hotelling's
+\eqn{T^2} distribution, which accounts for the uncertainty of the
+estimates and suits small groups. Robust estimates need larger groups
+(the MCD fits a subset of about three quarters of the samples): with
+fewer than about 10 samples per group, their ellipses can be flat or
+leave out several samples. Groups with fewer than 4 samples get no
+ellipse.
+
 In a UMAP embedding, only the neighborhoods are meaningful: the sizes of
 the clusters and the distances between them are not, and they change
 with \code{neighbors} and \code{min_dist}. Read the plot as a map of which samples
@@ -52,9 +80,22 @@ are similar, not as a quantitative projection.
 \examples{
 data(soilLIBS)
 spectra <- average(soilLIBS[-(2:8)], Sample)
+
+# soil texture in three classes (USDA general terms: coarse = sands and
+# sandy loams, medium = loams and silty loams, fine = clays and clay loams)
+classes <- c(Sand = "coarse", `Loamy Sand` = "coarse", `Sandy Loam` = "coarse",
+             Loam = "medium", `Silt Loam` = "medium", Silt = "medium",
+             `Clay Loam` = "fine", `Silty Clay Loam` = "fine", `Sandy Clay Loam` = "fine",
+             Clay = "fine", `Silty Clay` = "fine", `Sandy Clay` = "fine")
 texture <- soilLIBS$Texture[match(spectra$Sample, soilLIBS$Sample)]
+texture <- factor(classes[as.character(texture)], levels = c("fine", "medium", "coarse"))
+
 pca <- stats::prcomp(spectra[-1], scale. = TRUE)
 plot_embedding(pca, colour = texture, title = "PCA of the sample spectra")
+
+if (rlang::is_installed("ConfidenceEllipse")) {
+  plot_embedding(pca, colour = texture, ellipse = TRUE, distribution = "hotelling")
+}
 
 if (rlang::is_installed(c("recipes", "embed"))) {
   set.seed(1)

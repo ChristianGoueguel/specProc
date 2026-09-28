@@ -36,6 +36,7 @@ Imports:
 Suggests:
     bslib,
     cli,
+    ConfidenceEllipse,
     dials,
     embed,
     generics,

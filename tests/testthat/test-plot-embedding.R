@@ -29,3 +29,28 @@ test_that("plot_embedding takes prcomp fits, robust PCA and matrices", {
   expect_equal(plot_embedding(x)$labels$x, "Dim1")
   expect_error(plot_embedding("a"), "data frame")
 })
+
+test_that("plot_embedding draws confidence ellipses", {
+  skip_if_not_installed("ConfidenceEllipse")
+  set.seed(3)
+  df <- data.frame(PC1 = c(rnorm(20), rnorm(20, 5), rnorm(3, 10)),
+                   PC2 = c(rnorm(20), rnorm(20, 5), rnorm(3, 10)),
+                   group = factor(rep(c("a", "b", "c"), c(20, 20, 3))))
+  expect_warning(p <- plot_embedding(df, colour = group, ellipse = TRUE), "fewer than 4 samples: c")
+  layers <- vapply(p$layers, function(l) class(l$geom)[1], character(1))
+  expect_true("GeomPolygon" %in% layers)
+  poly <- p$layers[[which(layers == "GeomPolygon")]]$data
+  expect_setequal(unique(as.character(poly$.colour)), c("a", "b"))
+  # the ellipse of group a matches ConfidenceEllipse
+  ref <- ConfidenceEllipse::confidence_ellipse(data.frame(.x = df$PC1[1:20], .y = df$PC2[1:20]),
+                                               ".x", ".y", distribution = "hotelling")
+  p2 <- suppressWarnings(plot_embedding(df, colour = group, ellipse = TRUE,
+                                        distribution = "hotelling"))
+  poly2 <- p2$layers[[which(layers == "GeomPolygon")]]$data
+  expect_equal(poly2$x[poly2$.colour == "a"], ref$x)
+  # one ellipse without discrete groups
+  one <- plot_embedding(df, ellipse = TRUE, robust = TRUE)
+  expect_true(any(vapply(one$layers, function(l) inherits(l$geom, "GeomPolygon"), logical(1))))
+  expect_error(plot_embedding(df, ellipse = TRUE, distribution = "t"))
+  expect_error(plot_embedding(df, ellipse = TRUE, conf_level = 1), "conf_level")
+})
