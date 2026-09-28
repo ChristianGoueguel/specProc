@@ -158,6 +158,7 @@ reference:
   contents:
   - plot_fit
   - plot_spectra
+  - plot_embedding
   - plot_outliers
   - adjusted_boxplot
   - generalized_boxplot

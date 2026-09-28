@@ -1,3 +1,12 @@
+# specProc (development version)
+
+## New features
+
+* `plot_embedding()` draws two-dimensional embeddings (UMAP from
+  `embed::step_umap()`, principal components from `recipes::step_pca()`,
+  `prcomp()` or `robpca()`), colored by a variable. The preprocessing
+  vignette uses it to compare PCA and UMAP maps of the samples.
+
 # specProc 0.6.0
 
 ## New features
