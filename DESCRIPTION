@@ -1,7 +1,7 @@
 Package: specProc
 Type: Package
 Title: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy (LIBS) Spectra
-Version: 0.5.0.9000
+Version: 0.6.0
 Authors@R:
     person("Christian L.", "Goueguel", , "christian.goueguel@gmail.com", role = c("aut", "cre"))
 Description: A collection of functions for preprocessing spectra in optical

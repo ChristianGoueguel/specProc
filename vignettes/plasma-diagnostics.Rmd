@@ -181,16 +181,15 @@ self-absorbed, as shown at the end of this vignette.
 ### Line intensities
 
 The spectrometer's wavelength scale is offset from the NIST wavelengths by
-about one channel in places, so each line area is summed over ±0.15 nm
-around the observed peak within 0.2 nm of the tabulated wavelength:
+about one channel in places. `line_intensities()` therefore searches the
+peak of each line within 0.2 nm of its tabulated wavelength (`search`),
+and integrates it over ±0.15 nm around the peak (`half_width`). It keeps
+the columns of the table of lines and adds the measured `intensity`, so
+the result goes directly into the Boltzmann plots:
 
 ```{r line-areas}
-line_area <- function(center, search = 0.2, half_width = 0.15) {
-  near <- abs(wl - center) <= search
-  peak <- wl[near][which.max(spectrum[near])]
-  sum(spectrum[abs(wl - peak) <= half_width])
-}
-lines <- atomic |> mutate(intensity = sapply(wavelength, line_area))
+lines <- line_intensities(spectrum, atomic)
+lines |> select(species, wavelength, peak_wavelength, intensity, snr)
 ```
 
 ### Boltzmann plot of the neutral atom
@@ -348,6 +347,7 @@ mean, as above:
 forage_channels <- names(fourrage)[-(1:14)]
 forage_wl <- as.numeric(forage_channels)
 forage <- as.matrix(baseline_arpls(fourrage[forage_channels], lambda = 1e5, max.iter = 20)$correction)
+colnames(forage) <- forage_channels
 forage_mean <- colMeans(forage)
 
 forage_halpha <- forage_mean[forage_channels[forage_wl > 654.6 & forage_wl < 658.3]]
@@ -444,13 +444,7 @@ one Saha-Boltzmann plot per element, which spans a much wider energy range
 than the Boltzmann plot of a single species:
 
 ```{r cf-mean}
-forage_area <- function(s, center, search = 0.2, half_width = 0.15) {
-  near <- abs(forage_wl - center) <= search
-  peak <- forage_wl[near][which.max(s[near])]
-  sum(s[abs(forage_wl - peak) <= half_width])
-}
-cf_mean <- cf_atomic |>
-  mutate(intensity = sapply(wavelength, \(w) forage_area(forage_mean, w))) |>
+cf_mean <- line_intensities(forage_mean, cf_atomic) |>
   cf_libs(electron_density = ne_forage, partition = partition, ionization_energy = cf_ionization)
 cf_mean
 ```
@@ -475,22 +469,56 @@ cf_mean$composition |>
          ratio = cf_libs / laboratory)
 ```
 
+### Self-absorption of the resonance lines
+
+The K I resonance doublet at 766.49 and 769.90 nm is the strongest K
+feature of these spectra, and it is not saturated. Why not use it?
+`correct_self_absorption()` answers by comparing each line with a
+reference line of the same species that is little absorbed (Sun and Yu,
+2009). By default, the reference is the line of smallest optical depth,
+which needs the lower-level energies `Ei` of `nist_lines()`:
+
+```{r self-absorption-k}
+k_lines <- tribble(
+  ~species, ~wavelength, ~Aki,      ~Ei,      ~Ek,      ~gk,
+  "K I",    404.414,     1.150e+06, 0,        3.064907, 4,
+  "K I",    404.721,     1.070e+06, 0,        3.062581, 2,
+  "K I",    691.108,     2.500e+06, 1.609958, 3.403454, 2,
+  "K I",    693.877,     4.956e+06, 1.617113, 3.403454, 2,
+  "K I",    766.490,     3.779e+07, 0,        1.617113, 4,
+  "K I",    769.896,     3.734e+07, 0,        1.609958, 2
+)
+line_intensities(forage_mean, k_lines) |>
+  correct_self_absorption(temperature = cf_mean$temperature) |>
+  select(wavelength, measured_intensity, SA, reference)
+```
+
+The resonance lines keep only a fraction of the intensity they would have
+in an optically thin plasma. The clearest sign needs no model: the 766.49
+nm line has twice the \(g_k A_{ki}\) of the 769.90 nm line, so it should be
+twice as intense, yet it is weaker. The coefficients of the weaker lines,
+between about 0.6 and 1, show the precision of the method on these data:
+it inherits the noise of the reference line, blends, and the errors of
+the transition probabilities. The correction is therefore large and
+uncertain for the resonance lines, which is why the CF-LIBS analysis above
+leaves them out.
+
 ### Every measurement
 
 Applied to each of the `r nrow(fourrage)` measurements, the method follows
 the variation of the composition between samples:
 
 ```{r cf-each}
-cf_each <- lapply(seq_len(nrow(forage)), function(i) {
-  fit <- cf_atomic |>
-    mutate(intensity = sapply(wavelength, \(w) forage_area(forage[i, ], w))) |>
-    cf_libs(electron_density = ne_forage, partition = partition,
-            ionization_energy = cf_ionization)
-  fit$composition |>
-    select(element, cf_libs = mass_fraction) |>
-    mutate(measurement = i, temperature = fit$temperature)
-}) |>
-  bind_rows()
+cf_each <- line_intensities(forage, cf_atomic) |>
+  group_by(measurement = spectrum) |>
+  group_modify(\(lines, key) {
+    fit <- cf_libs(lines, electron_density = ne_forage, partition = partition,
+                   ionization_energy = cf_ionization)
+    fit$composition |>
+      select(element, cf_libs = mass_fraction) |>
+      mutate(temperature = fit$temperature)
+  }) |>
+  ungroup()
 
 lab_fractions <- fourrage |>
   mutate(measurement = row_number(), total = Ca + Mg + K + Na) |>
@@ -526,7 +554,7 @@ analysis on these data:
     the CF-LIBS fractions correlate with the laboratory values
     (\(r \approx 0.87\) on log scales), without any calibration.
 -   **The values are biased.** Ca is underestimated by about half, Mg by
-    about a quarter, and K is slightly overestimated. The main suspects are
+    about a fifth, and K is slightly overestimated. The main suspects are
     the spectral response of the instrument, which is not corrected here
     (the lines of each element lie in different parts of the spectrum),
     and the transition probabilities of the Ca lines, graded C (uncertain
@@ -585,6 +613,9 @@ element (an internal reference) instead of closure.
 -   Sahal-Bréchot, S., Dimitrijević, M.S., Moreau, N. STARK-B database,
     <https://stark-b.obspm.fr>. Observatoire de Paris and Astronomical
     Observatory of Belgrade.
+-   Sun, L., Yu, H. (2009). Correction of self-absorption effect in
+    calibration-free laser-induced breakdown spectroscopy by an internal
+    reference method. *Talanta*, 79(2):388–395.
 -   Tognoni, E., Cristoforetti, G., Legnaioli, S., Palleschi, V. (2010).
     Calibration-free laser-induced breakdown spectroscopy: state of the
     art. *Spectrochimica Acta Part B*, 65(1):1–14.

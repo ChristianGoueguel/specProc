@@ -106,6 +106,9 @@ step_line_ratio <- function(recipe, ..., reference, window = 0.1, method = "area
 #'
 #' @inheritParams step_baseline
 #' @inheritParams reject_shots
+#' @param method The criteria: one or more of `"intensity"`,
+#'   `"correlation"` (both by default) and `"distance"` (see
+#'   [reject_shots()]).
 #' @param ... One or more selector functions to choose the spectral
 #'   columns (named by their wavelengths, see [reject_shots()]).
 #' @param sample The column identifying the sample of each shot, as a bare
