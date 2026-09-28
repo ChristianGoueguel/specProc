@@ -72,10 +72,11 @@ reference:
   - step_pareto_scale
   - step_poisson_scale
 
-- subtitle: LIBS shots and internal standard
+- subtitle: LIBS lines and shots
   contents:
-  - step_reject_shots
+  - step_line_intensities
   - step_line_ratio
+  - step_reject_shots
 
 - subtitle: robust transformation and PCA
   contents:
@@ -127,13 +128,18 @@ reference:
   - plot_boltzmann
   - mcwhirter_criterion
   - self_absorption
+  - correct_self_absorption
   - saturation_summary
 
-- title: Calibration-free quantification
+- title: Line intensities and quantification
   desc: >
-    Elemental composition from line intensities without calibration
-    standards (CF-LIBS).
+    Intensities of emission lines, univariate calibration curves with
+    limits of detection, and calibration-free composition (CF-LIBS).
   contents:
+  - line_intensities
+  - calibration_curve
+  - predict.specproc_calibration
+  - plot_calibration
   - cf_libs
 
 - title: Peak fitting

@@ -1,4 +1,4 @@
-# specProc (development version)
+# specProc 0.6.0
 
 ## New features
 
@@ -19,6 +19,19 @@
 * `reject_shots()` flags the outlying laser shots of each sample (total
   intensity, correlation with or distance to the median spectrum, by robust
   z-scores), before they are averaged with `average()`.
+* `line_intensities()` measures the area (or height, or Voigt-fitted area)
+  of emission lines in spectra, searching each peak near its tabulated
+  wavelength, with a signal-to-noise ratio and saturation check. It keeps
+  the columns of a table of lines, so its result feeds `boltzmann_plot()`,
+  `cf_libs()` and `calibration_curve()`. `step_line_intensities()` does the
+  same in a recipe.
+* `correct_self_absorption()` corrects line intensities for
+  self-absorption by the internal reference method of Sun and Yu (2009),
+  with the temperature given or estimated from a Saha-Boltzmann plot.
+* `calibration_curve()` fits univariate (linear or quadratic, optionally
+  weighted) calibration curves, with the sensitivity, LOD and LOQ, Mandel's
+  and lack-of-fit tests of linearity, inverse prediction of concentrations
+  with confidence intervals (`predict()`) and `plot_calibration()`.
 * New recipe steps: `step_reject_shots()` removes the outlying shots from
   the training data (skipped on new data), and `step_line_ratio()`
   normalizes each spectrum to the area or height of a reference line

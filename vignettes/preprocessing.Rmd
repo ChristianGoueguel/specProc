@@ -76,19 +76,23 @@ Two features of the data shape everything that follows:
     about 630, not zero. Any ratio, relative standard deviation or
     normalization computed on uncorrected counts is diluted by this offset.
 
-We track five emission lines throughout, measured as the summed
-intensity within ±0.15 nm of the line center:
+We track five emission lines throughout, measured with
+`line_intensities()` as the area within ±0.15 nm of the line center
+(`search = 0` keeps the window at the tabulated wavelength rather than at
+the peak of each spectrum):
 
 ```{r lines}
 lines <- c(`Mg II 279.55` = 279.55, `Si I 288.16` = 288.16, `Ca II 393.37` = 393.37,
            `Al I 396.15` = 396.15, `K I 766.49` = 766.49)
 
-# Line areas of a table of spectra that has a Sample column
+# Line areas of a table of spectra that has a Sample column, one column per line
 line_areas <- function(spectra) {
-  areas <- lapply(lines, function(center) {
-    rowSums(spectra[channels[abs(wl - center) < 0.15]])
-  })
-  bind_cols(select(spectra, Sample), as_tibble(areas))
+  areas <- line_intensities(spectra[c("Sample", channels)], lines, search = 0)
+  areas |>
+    mutate(row = cumsum(line == names(lines)[1])) |>
+    select(row, Sample, line, intensity) |>
+    pivot_wider(names_from = line, values_from = intensity) |>
+    select(-row)
 }
 ```
 
@@ -249,8 +253,8 @@ wide("ICC")   # fraction of variance between samples
 The two criteria disagree, and the disagreement is informative:
 
 -   **SNV and MSC give the best repeatability.** They reduce the
-    replicate RSD of the Mg, Ca and Al lines by about 40% compared with baseline
-    correction alone.
+    replicate RSD of the Mg, Ca and Al lines by a third or more compared
+    with baseline correction alone.
 -   **They also lower the ICC.** A lower ICC means the between-sample
     variance shrank even more than the within-sample variance. Normalization
     removes multiplicative variation, and part of the multiplicative
@@ -264,10 +268,8 @@ The two criteria disagree, and the disagreement is informative:
 -   **The weak K line is a special case.** SNV increases its RSD: dividing
     by the whole-spectrum standard deviation adds that statistic's noise to
     a line that is itself noisy.
--   **Internal standardization by Si is not usable here.** It makes the Si
-    line nearly constant (the residual RSD comes from the slightly
-    different windows of the step and of our line areas), so its own RSD
-    and ICC are meaningless. It also
+-   **Internal standardization by Si is not usable here.** It sets the Si
+    line to a constant, so its own RSD and ICC are meaningless. It also
     assumes the silicon content is constant across samples, which is false
     for soils ranging from clay to sand. It lowers the ICC of every other
     line.

@@ -188,8 +188,9 @@ locations of a sample measures how well it works. The lower the RSD, the
 more repeatable the measurement:
 
 ```{r normalization}
-line_area <- function(spectra, center, half_width = 0.15) {
-  rowSums(spectra[channels[abs(wl - center) < half_width]])
+# area of a line in each spectrum, within 0.15 nm of its wavelength
+line_area <- function(spectra, center) {
+  line_intensities(spectra, center, search = 0)$intensity
 }
 within_rsd <- function(area) {
   tibble(Sample = specLIBS$Sample, area = area) |>
