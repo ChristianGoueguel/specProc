@@ -465,7 +465,7 @@ comparison
 #>  6 OSC (Fearn)       4            7  0.294 0.283   -0.006     0.01 
 #>  7 DO                1            9  0.294 0.284    0.001     0.004
 #>  8 DOSC              1            5  0.307 0.281   -0.022     0.023
-#>  9 POSC / OPLS       1            9  0.294 0.282    0         0    
+#>  9 POSC / OPLS       4            6  0.294 0.282    0         0    
 #> 10 y-gradient GLSW   0.01         2  0.29  0.275   -0.019     0.006
 c(null_RMSEP = round(sqrt(mean((mean(calibration$K) - test$K)^2)), 3))
 #> null_RMSEP 

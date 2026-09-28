@@ -53,9 +53,9 @@ The app offers:
   the mean of a group (from the first character or factor column of
   `spectra`), or a single spectrum;
 
-- a table of the displayed lines, downloadable as CSV, and buttons to
-  save and reload the lines fetched so far, so that a session can
-  continue offline.
+- a download of the displayed lines as CSV, and buttons to save and
+  reload the lines fetched so far, so that a session can continue
+  offline.
 
 Each species is downloaded from NIST once per R session (see
 [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md));
