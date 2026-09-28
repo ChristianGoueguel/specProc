@@ -29,7 +29,16 @@ test_that("boltzmann_plot recovers the temperature", {
   expect_equal(boltzmann_plot(photons, units = "photons")$temperature, 9000)
 
   expect_output(print(fit), "Temperature:  9000")
-  expect_s3_class(plot_boltzmann(fit), "ggplot")
+  p <- plot_boltzmann(fit)
+  expect_s3_class(p, "ggplot")
+  # the labels are plotmath expressions or ASCII text, so every device can draw them
+  expect_true(is.expression(p$labels$y))
+  expect_false(grepl("[^ -~]", p$labels$title))
+  file <- tempfile(fileext = ".pdf")
+  grDevices::pdf(file)
+  on.exit(unlink(file), add = TRUE)
+  expect_no_error(print(p))
+  grDevices::dev.off()
 })
 
 test_that("boltzmann_plot gives a standard error with noisy intensities", {
