@@ -38,9 +38,8 @@ local thermodynamic equilibrium, see \code{\link[=libs_lines]{libs_lines()}});
 the spectrometer, and the spectrum to show: the mean of all spectra, the
 mean of a group (from the first character or factor column of
 \code{spectra}), or a single spectrum;
-\item a table of the displayed lines, downloadable as CSV, and buttons to save
-and reload the lines fetched so far, so that a session can continue
-offline.
+\item a download of the displayed lines as CSV, and buttons to save and reload
+the lines fetched so far, so that a session can continue offline.
 }
 
 Each species is downloaded from NIST once per R session (see
