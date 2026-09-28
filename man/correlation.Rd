@@ -9,8 +9,9 @@ correlation(
   var,
   method = "pearson",
   plot = FALSE,
-  color = "#111D71",
-  interactive = FALSE
+  color = c("#1f4e79", "#c0392b"),
+  interactive = FALSE,
+  top = NULL
 )
 }
 \arguments{
@@ -22,9 +23,13 @@ correlation(
 
 \item{plot}{A logical value indicating whether to produce a visualization of the correlations. Default is FALSE (no plot).}
 
-\item{color}{A character string specifying the color to use for the plot. Default is "#111D71".}
+\item{color}{The colors of the plot: one color, or two for positive and
+negative correlations. Default is \code{c("#1f4e79", "#c0392b")}.}
 
 \item{interactive}{A logical value indicating whether to create an interactive plot using plotly. Default is FALSE (static ggplot2 plot).}
+
+\item{top}{For a bar chart, the number of variables with the largest
+absolute correlations to show. Default is \code{NULL} (all).}
 }
 \value{
 \itemize{
@@ -55,6 +60,19 @@ from normality.
 Missing values are handled pairwise: each coefficient uses the observations where both
 the response and the other variable are available.
 }
+\section{Plots}{
+
+When the variables are named by wavelengths (the channels of spectra),
+the plot is a correlation spectrum: the correlation at each wavelength,
+with the thresholds of significance at the 5\% level (for the Pearson,
+Spearman and biweight coefficients, from the t distribution; not
+corrected for multiple testing). Otherwise, it is a chart of the
+correlation of each variable, sorted, colored by sign and labeled with
+its value. The interactive versions show the variable and its
+correlation on hover; the correlation spectrum uses WebGL, so it stays
+fast with thousands of channels.
+}
+
 \examples{
 set.seed(1)
 df <- data.frame(y = rnorm(50))
@@ -63,6 +81,12 @@ df$b <- -df$y + rnorm(50)
 df$c <- rnorm(50)
 correlation(df, y)
 correlation(df, "y", method = "bicor")
+correlation(df, y, plot = TRUE)$plot
+
+# a correlation spectrum: clay content against every channel
+data(soilLIBS)
+clay <- average(soilLIBS[c(1, 3, 9:7160)], Sample)
+correlation(clay[-1], Clay, plot = TRUE)$plot
 
 }
 \references{

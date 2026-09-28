@@ -50,9 +50,9 @@ with \code{neighbors} and \code{min_dist}. Read the plot as a map of which sampl
 are similar, not as a quantitative projection.
 }
 \examples{
-data(specLIBS)
-spectra <- average(specLIBS[-(2:8)], Sample)
-texture <- specLIBS$Texture[match(spectra$Sample, specLIBS$Sample)]
+data(soilLIBS)
+spectra <- average(soilLIBS[-(2:8)], Sample)
+texture <- soilLIBS$Texture[match(spectra$Sample, soilLIBS$Sample)]
 pca <- stats::prcomp(spectra[-1], scale. = TRUE)
 plot_embedding(pca, colour = texture, title = "PCA of the sample spectra")
 

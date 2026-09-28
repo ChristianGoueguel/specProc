@@ -82,8 +82,8 @@ using \code{\link[=baseline_lambda]{baseline_lambda()}}, and \code{degree} (meth
 \examples{
 \dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
 library(recipes)
-data(specLIBS)
-spectra <- specLIBS[c(1, 9:400)]  # sample id and spectral channels
+data(soilLIBS)
+spectra <- soilLIBS[c(1, 9:400)]  # sample id and spectral channels
 
 rec <- recipe(~ ., data = spectra[1:16, ]) |>
   update_role(Sample, new_role = "id") |>

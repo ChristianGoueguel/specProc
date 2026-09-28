@@ -33,7 +33,7 @@ intensity and width are wrong and they respond nonlinearly to
 concentration.
 }
 \examples{
-data(specLIBS)
-sat <- saturation_summary(specLIBS[-(1:8)], limit = 28000)
+data(soilLIBS)
+sat <- saturation_summary(soilLIBS[-(1:8)], limit = 28000)
 sat$channels
 }

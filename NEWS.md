@@ -1,6 +1,20 @@
 # specProc (development version)
 
+## Breaking changes
+
+* The data sets are renamed: `specLIBS` is now `soilLIBS`, and `fourrage`
+  is now `forageLIBS`. Replace `data(specLIBS)` with `data(soilLIBS)` and
+  `data(fourrage)` with `data(forageLIBS)`.
+
 ## New features
+
+* The plots of `correlation()` are redesigned. For spectra (variables named
+  by wavelength), the plot is a correlation spectrum with the 5%
+  significance thresholds; otherwise, a sorted chart colored by sign and
+  labeled with the values, with `top` to show only the strongest
+  correlations. The interactive versions are built directly with plotly
+  (WebGL for spectra) instead of converted from ggplot2. `color` now takes
+  one color or two (positive and negative correlations).
 
 * `plot_embedding()` draws two-dimensional embeddings (UMAP from
   `embed::step_umap()`, principal components from `recipes::step_pca()`,

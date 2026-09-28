@@ -1,8 +1,8 @@
-# Builds data/specLIBS.rda from the raw CSV export.
-# Run from the package root: source("data-raw/specLIBS.R")
+# Builds data/soilLIBS.rda from the raw CSV export.
+# Run from the package root: source("data-raw/soilLIBS.R")
 
 raw <- utils::read.csv(
-  "data-raw/specLIBS.csv",
+  "data-raw/soilLIBS.csv",
   check.names = FALSE,
   fileEncoding = "UTF-8-BOM",
   stringsAsFactors = FALSE
@@ -15,7 +15,7 @@ spectra <- raw[setdiff(names(raw), meta_cols)]
 stopifnot(!anyNA(spectra), all(vapply(spectra, function(v) all(v == round(v)), logical(1))))
 spectra[] <- lapply(spectra, as.integer)
 
-specLIBS <- tibble::as_tibble(cbind(
+soilLIBS <- tibble::as_tibble(cbind(
   data.frame(
     Sample = raw$Sample,
     Location = as.integer(raw$Location),
@@ -30,4 +30,4 @@ specLIBS <- tibble::as_tibble(cbind(
   spectra
 ))
 
-save(specLIBS, file = "data/specLIBS.rda", compress = "xz", version = 3)
+save(soilLIBS, file = "data/soilLIBS.rda", compress = "xz", version = 3)

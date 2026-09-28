@@ -39,16 +39,16 @@
 #' @source Laboratory LIBS measurements provided by Christian L. Goueguel.
 #'
 #' @examples
-#' data(specLIBS)
-#' dim(specLIBS)
-#' table(specLIBS$Type) / 8 # samples per soil type
+#' data(soilLIBS)
+#' dim(soilLIBS)
+#' table(soilLIBS$Type) / 8 # samples per soil type
 #'
 #' # Ca II doublet of the first sample, all 8 locations
-#' wl <- as.numeric(names(specLIBS)[-(1:8)])
-#' keep <- names(specLIBS)[-(1:8)][wl > 392 & wl < 398]
-#' plot_spectra(specLIBS[1:8, c("Location", keep)], id = Location)
+#' wl <- as.numeric(names(soilLIBS)[-(1:8)])
+#' keep <- names(soilLIBS)[-(1:8)][wl > 392 & wl < 398]
+#' plot_spectra(soilLIBS[1:8, c("Location", keep)], id = Location)
 #'
-"specLIBS"
+"soilLIBS"
 
 #' @title LIBS Spectra of Forage Samples
 #'
@@ -65,7 +65,7 @@
 #' calibration and validation sets.
 #'
 #' The spectra were recorded with the same instrument and wavelength grid as
-#' [specLIBS]: 199.4 to 822.2 nm in 7152 channels, with an overlap of two
+#' [soilLIBS]: 199.4 to 822.2 nm in 7152 channels, with an overlap of two
 #' spectrometers near 766 nm and gaps between 781.5 and 789.2 nm and between
 #' 800.7 and 813.9 nm. They are raw detector counts (no background
 #' subtraction or normalization). The detector saturates at 65535 counts: the
@@ -87,17 +87,17 @@
 #' }
 #'
 #' @source Laboratory LIBS measurements provided by Christian L. Goueguel.
-#'   The script `data-raw/fourrage.R` in the package source builds the data
+#'   The script `data-raw/forageLIBS.R` in the package source builds the data
 #'   set from the shot-level export.
 #'
 #' @examples
-#' data(fourrage)
-#' dim(fourrage)
-#' colSums(!is.na(fourrage[3:14])) # available reference values per element
+#' data(forageLIBS)
+#' dim(forageLIBS)
+#' colSums(!is.na(forageLIBS[3:14])) # available reference values per element
 #'
 #' # K I doublet of the first three measurements
-#' wl <- as.numeric(names(fourrage)[-(1:14)])
-#' keep <- names(fourrage)[-(1:14)][wl > 403.5 & wl < 405.5]
-#' plot_spectra(fourrage[1:3, c("Measurement", keep)], id = Measurement)
+#' wl <- as.numeric(names(forageLIBS)[-(1:14)])
+#' keep <- names(forageLIBS)[-(1:14)][wl > 403.5 & wl < 405.5]
+#' plot_spectra(forageLIBS[1:3, c("Measurement", keep)], id = Measurement)
 #'
-"fourrage"
+"forageLIBS"

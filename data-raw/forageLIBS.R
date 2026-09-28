@@ -1,14 +1,14 @@
-# Builds data/fourrage.rda from the raw CSV export.
-# Run from the package root: source("data-raw/fourrage.R")
+# Builds data/forageLIBS.rda from the raw CSV export.
+# Run from the package root: source("data-raw/forageLIBS.R")
 #
-# The export (data-raw/fourrage.csv, ~170 MB, not tracked by git) holds one
+# The export (data-raw/forageLIBS.csv, ~170 MB, not tracked by git) holds one
 # row per laser shot: 8 shots for each of 368 measurements. It also contains
 # empty trailing rows and, after the last wavelength, stray columns from a
 # semicolon-separated export; both are dropped here. To keep the package
 # small, the 8 shots of each measurement are averaged.
 
 raw <- utils::read.csv(
-  "data-raw/fourrage.csv",
+  "data-raw/forageLIBS.csv",
   check.names = FALSE,
   fileEncoding = "UTF-8-BOM",
   stringsAsFactors = FALSE
@@ -40,7 +40,7 @@ storage.mode(shots) <- "integer"
 first <- raw[!duplicated(raw$spectre), ]
 stopifnot(identical(rownames(shots), as.character(first$spectre)))
 
-fourrage <- tibble::as_tibble(cbind(
+forageLIBS <- tibble::as_tibble(cbind(
   data.frame(
     Measurement = as.integer(first$spectre),
     Sample = first$Info,
@@ -52,4 +52,4 @@ fourrage <- tibble::as_tibble(cbind(
   as.data.frame(shots, check.names = FALSE)
 ))
 
-save(fourrage, file = "data/fourrage.rda", compress = "xz", version = 3)
+save(forageLIBS, file = "data/forageLIBS.rda", compress = "xz", version = 3)

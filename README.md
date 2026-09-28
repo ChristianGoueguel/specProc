@@ -91,7 +91,7 @@ the Bioconductor package ropls: `BiocManager::install("ropls")`.
 
 ## Example data
 
-The package ships with `specLIBS`: LIBS spectra of **50 soil samples**,
+The package ships with `soilLIBS`: LIBS spectra of **50 soil samples**,
 each measured at **8 locations**. The spectra have 7152 channels between
 199 and 822 nm, stored as raw counts, together with the clay, sand and
 silt content of each sample. The examples below use the tidyverse and
@@ -105,14 +105,14 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 
-data(specLIBS)
+data(soilLIBS)
 meta_cols <- c("Sample", "Location", "Clay", "Sand", "Silt", "Texture", "Structure", "Type")
-channels <- setdiff(names(specLIBS), meta_cols)   # the 7152 wavelengths (nm)
+channels <- setdiff(names(soilLIBS), meta_cols)   # the 7152 wavelengths (nm)
 wl <- as.numeric(channels)
 
-dim(specLIBS)
+dim(soilLIBS)
 #> [1]  400 7160
-specLIBS |> distinct(Sample, Type) |> count(Type)   # samples per soil type
+soilLIBS |> distinct(Sample, Type) |> count(Type)   # samples per soil type
 #> # A tibble: 3 × 2
 #>   Type      n
 #>   <fct> <int>
@@ -128,7 +128,7 @@ size and biases cross-validated errors downward. The worked example
 below uses the sample as the unit of analysis wherever it matters.
 
 ``` r
-specLIBS |>
+soilLIBS |>
   select(Type, all_of(channels)) |>
   average(Type) |>
   plot_spectra(id = Type) +
@@ -151,7 +151,7 @@ peaks. The smoothing parameter `lambda` controls how stiff the baseline
 is.
 
 ``` r
-baseline_recipe <- recipe(~ ., data = specLIBS) |>
+baseline_recipe <- recipe(~ ., data = soilLIBS) |>
   update_role(all_of(meta_cols), new_role = "id") |>
   step_baseline(all_predictors(), lambda = 1e5, options = list(max.iter = 20))
 
@@ -178,7 +178,7 @@ line_area <- function(spectra, center) {
   line_intensities(spectra, center, search = 0)$intensity
 }
 within_rsd <- function(area) {
-  tibble(Sample = specLIBS$Sample, area = area) |>
+  tibble(Sample = soilLIBS$Sample, area = area) |>
     group_by(Sample) |>
     summarise(rsd = sd(area) / mean(area) * 100) |>
     summarise(median(rsd)) |>
@@ -188,7 +188,7 @@ within_rsd <- function(area) {
 snv_normalized <- baseline_recipe |> step_snv(all_predictors()) |> prep() |> bake(new_data = NULL)
 area_normalized <- normalize(baselined[channels], method = "area")
 
-list(raw = specLIBS, baseline = baselined, `baseline + area` = area_normalized,
+list(raw = soilLIBS, baseline = baselined, `baseline + area` = area_normalized,
      `baseline + SNV` = snv_normalized) |>
   sapply(\(spectra) within_rsd(line_area(spectra, 393.37))) |>
   round(2) |>
@@ -221,7 +221,7 @@ z-score (median and MAD) of the total emitted intensity:
 
 ``` r
 shots <- snv_normalized |>
-  mutate(total = rowSums(specLIBS[channels])) |>
+  mutate(total = rowSums(soilLIBS[channels])) |>
   group_by(Sample) |>
   mutate(robust_z = (total - median(total)) / mad(total)) |>
   ungroup()
@@ -249,7 +249,7 @@ sample_spectra <- shots |>
   filter(abs(robust_z) <= 3.5) |>
   select(Sample, all_of(channels)) |>
   average(Sample)
-samples <- specLIBS |>
+samples <- soilLIBS |>
   distinct(Sample, Clay, Sand, Silt, Type) |>
   semi_join(sample_spectra, by = "Sample")
 dim(sample_spectra)
@@ -547,7 +547,7 @@ sample.
 
 ## Performance
 
-Timings on the full `specLIBS` data set (400 spectra × 7152 channels) on
+Timings on the full `soilLIBS` data set (400 spectra × 7152 channels) on
 an Apple Silicon desktop:
 
 | Operation                       | Time   |

@@ -40,9 +40,31 @@ test_that("correlation plots", {
   result_plot <- correlation(test_data, y, plot = TRUE)
   expect_named(result_plot, c("correlation", "plot"))
   expect_s3_class(result_plot$plot, "ggplot")
+  # sorted, colored by sign, with significance thresholds
+  built <- ggplot2::ggplot_build(result_plot$plot)
+  expect_equal(levels(result_plot$plot$data$variable),
+               result_plot$correlation$variable[order(result_plot$correlation$.correlation)])
+  expect_match(result_plot$plot$labels$title, "Pearson correlation with y")
+  top <- correlation(test_data, y, plot = TRUE, top = 1)
+  expect_equal(nrow(top$plot$data), 1)
+  expect_equal(nrow(top$correlation), nrow(result_plot$correlation))
+  xi <- correlation(test_data, y, method = "chatterjee", plot = TRUE)
+  expect_null(xi$plot$labels$subtitle)   # no t-based threshold for xi
+  expect_error(correlation(test_data, y, plot = TRUE, color = 1), "color")
+  expect_error(correlation(test_data, y, plot = TRUE, top = 0), "top")
+  # variables named by wavelength: a correlation spectrum
+  set.seed(2)
+  spectra <- as.data.frame(matrix(rnorm(30 * 50), 30, 50, dimnames = list(NULL, seq(400, 449))))
+  spectra$y <- spectra[["420"]] + rnorm(30, sd = 0.2)
+  spec <- correlation(spectra, y, plot = TRUE)
+  expect_equal(spec$plot$labels$x, "Wavelength (nm)")
+  expect_equal(spec$plot$data$wavelength, 400:449)
   skip_if_not_installed("plotly")
   result_interactive <- correlation(test_data, y, plot = TRUE, interactive = TRUE)
   expect_s3_class(result_interactive, "plotly")
+  spec_interactive <- correlation(spectra, y, plot = TRUE, interactive = TRUE)
+  expect_s3_class(spec_interactive, "plotly")
+  expect_equal(plotly::plotly_build(spec_interactive)$x$data[[1]]$type, "scattergl")
 })
 
 test_that("correlation validates its inputs", {

@@ -68,8 +68,8 @@
 #' @export line_intensities
 #'
 #' @examples
-#' data(specLIBS)
-#' spectra <- specLIBS[1:8, -(2:8)]
+#' data(soilLIBS)
+#' spectra <- soilLIBS[1:8, -(2:8)]
 #' ca <- c(`Ca II 393.37` = 393.37, `Ca II 396.85` = 396.85, `Ca I 422.67` = 422.67)
 #' line_intensities(spectra, ca, baseline = TRUE)
 #'
@@ -77,7 +77,7 @@
 #' lines <- data.frame(wavelength = c(428.30, 430.25, 443.50, 445.48),
 #'                     Aki = c(4.34e7, 1.36e8, 6.70e7, 8.70e7), gk = c(5, 5, 5, 7),
 #'                     Ek = c(4.78, 4.78, 4.68, 4.68))
-#' mean_spectrum <- colMeans(specLIBS[-(1:8)])
+#' mean_spectrum <- colMeans(soilLIBS[-(1:8)])
 #' line_intensities(mean_spectrum, lines, baseline = TRUE)
 line_intensities <- function(spectra, lines, half_width = 0.15, search = 0.2, method = "area",
                              baseline = FALSE, fit_width = 3 * half_width, limit = NULL,
@@ -151,8 +151,8 @@ line_intensities <- function(spectra, lines, half_width = 0.15, search = 0.2, me
 #'
 #' @examples
 #' if (rlang::is_installed("recipes")) {
-#'   data(specLIBS)
-#'   rec <- recipes::recipe(Clay ~ ., data = specLIBS[-c(1:2, 4:8)]) |>
+#'   data(soilLIBS)
+#'   rec <- recipes::recipe(Clay ~ ., data = soilLIBS[-c(1:2, 4:8)]) |>
 #'     step_line_intensities(recipes::all_predictors(),
 #'                           lines = c(Mg = 279.55, Ca = 393.37, Al = 396.15)) |>
 #'     recipes::prep()

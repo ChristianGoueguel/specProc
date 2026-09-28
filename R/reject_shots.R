@@ -56,13 +56,13 @@
 #' @export reject_shots
 #'
 #' @examples
-#' data(specLIBS)
-#' shots <- reject_shots(specLIBS[-(2:8)], Sample)
+#' data(soilLIBS)
+#' shots <- reject_shots(soilLIBS[-(2:8)], Sample)
 #' table(shots$.rejected)
 #' head(shots[shots$.rejected, c("Sample", ".reason", ".intensity_z", ".correlation_z")])
 #'
 #' # mean spectrum of each sample, without the rejected shots
-#' means <- average(reject_shots(specLIBS[-(2:8)], Sample, drop = TRUE), Sample)
+#' means <- average(reject_shots(soilLIBS[-(2:8)], Sample, drop = TRUE), Sample)
 #' dim(means)
 reject_shots <- function(data, sample, method = c("intensity", "correlation"), cutoff = 3.5,
                          wavelength = NULL, drop = FALSE) {
