@@ -124,3 +124,16 @@ test_that("the line finder server fetches, caches and ranks the selected species
     expect_equal(nrow(lines()), 0)
   })
 })
+
+test_that("the line finder UI shows the periodic table and the plot only", {
+  skip_if_not_installed("shiny")
+  skip_if_not_installed("plotly")
+  skip_if_not_installed("bslib")
+  pt <- periodic_table()
+  expect_true(all(pt$category %in% names(finder_categories)))
+  wl <- seq(390, 440, by = 0.5)
+  html <- as.character(finder_ui(finder_spectra(matrix(1, 2, length(wl), dimnames = list(NULL, wl)))))
+  expect_equal(lengths(regmatches(html, gregexpr('class="pt-el"', html))), nrow(pt))
+  expect_match(html, 'id="plot"')
+  expect_no_match(html, "lines_table")
+})

@@ -118,7 +118,7 @@ plot_lines <- function(spectrum, lines, shift = 0, scale_markers = TRUE, interac
     p <- plotly::plot_ly()
     p <- plotly::add_trace(p, x = spec$wavelength, y = spec$intensity, type = "scattergl",
                            mode = "lines", name = "spectrum",
-                           line = list(color = "grey35", width = 1), hoverinfo = "x+y")
+                           line = list(color = "#595959", width = 1), hoverinfo = "x+y")
     for (trace in stage_traces(segments)) {
       p <- do.call(plotly::add_trace, c(list(p), trace))
     }

@@ -21,9 +21,8 @@
 #'    the spectrometer, and the spectrum to show: the mean of all spectra, the
 #'    mean of a group (from the first character or factor column of
 #'    `spectra`), or a single spectrum;
-#'  - a table of the displayed lines, downloadable as CSV, and buttons to save
-#'    and reload the lines fetched so far, so that a session can continue
-#'    offline.
+#'  - a download of the displayed lines as CSV, and buttons to save and reload
+#'    the lines fetched so far, so that a session can continue offline.
 #'
 #' Each species is downloaded from NIST once per R session (see
 #' [nist_lines()]); later changes of the settings are computed locally. The
@@ -107,8 +106,8 @@ finder_choices <- function(data) {
   c(choices, stats::setNames(paste0("row:", rows), row_labels))
 }
 
-# Periodic table layout: symbol, row and column (lanthanides and actinides
-# in rows 9 and 10).
+# Periodic table layout: symbol, row, column (lanthanides and actinides in
+# rows 9 and 10) and category.
 periodic_table <- function() {
   symbols <- c(
     "H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S",
@@ -131,21 +130,59 @@ periodic_table <- function() {
   place(19:36, 4, 1:18); place(37:54, 5, 1:18)
   place(55:56, 6, 1:2); place(57:71, 9, 3:17); place(72:86, 6, 4:18)
   place(87:88, 7, 1:2); place(89:103, 10, 3:17)
-  data.frame(z = z, symbol = symbols, row = row, col = col, stringsAsFactors = FALSE)
+  category <- rep("transition metal", length(z))
+  category[c(3, 11, 19, 37, 55, 87)] <- "alkali metal"
+  category[c(4, 12, 20, 38, 56, 88)] <- "alkaline earth metal"
+  category[c(13, 31, 49, 50, 81, 82, 83, 84)] <- "post-transition metal"
+  category[c(5, 14, 32, 33, 51, 52)] <- "metalloid"
+  category[c(1, 6, 7, 8, 15, 16, 34)] <- "nonmetal"
+  category[c(9, 17, 35, 53, 85)] <- "halogen"
+  category[c(2, 10, 18, 36, 54, 86)] <- "noble gas"
+  category[57:71] <- "lanthanide"
+  category[89:103] <- "actinide"
+  data.frame(z = z, symbol = symbols, row = row, col = col, category = category,
+             stringsAsFactors = FALSE)
 }
 
 # ---- UI ----------------------------------------------------------------------
 
+finder_primary <- "#1f4e79"
+
+finder_categories <- c(
+  `alkali metal` = "#f9d8d2", `alkaline earth metal` = "#fce5c6", `transition metal` = "#fbf0c2",
+  `post-transition metal` = "#dbead2", metalloid = "#d2e9e3", nonmetal = "#d5e5f4",
+  halogen = "#dfdcf2", `noble gas` = "#ecdcef", lanthanide = "#ebe5d9", actinide = "#e2e2e2"
+)
+
 finder_css <- "
-.pt-grid { display: grid; grid-template-columns: repeat(18, minmax(26px, 1fr)); gap: 2px; }
-.pt-el { font-size: 11px; padding: 3px 0; border: 1px solid #c8c8c8; background: #f7f7f7;
-         border-radius: 3px; cursor: pointer; text-align: center; line-height: 1.1; }
-.pt-el:hover { border-color: #666; }
-.pt-el small { display: block; font-size: 8px; color: #888; }
-.pt-el.pt-selected { background: #1b9e77; color: white; border-color: #137a5c; }
-.pt-el.pt-selected small { color: #e8f5f0; }
-.pt-el.pt-empty { opacity: 0.35; }
-.pt-gap { grid-column: 1 / span 18; height: 6px; }
+.bslib-page-sidebar > .navbar { background: #14263d; border-bottom: 3px solid #1f4e79; }
+.lf-title { color: #fff; font-size: 1.05rem; font-weight: 600; letter-spacing: .01em; }
+.lf-title .lf-sub { font-weight: 400; color: #a9bdd3; padding-left: .6rem; margin-left: .6rem;
+                    border-left: 1px solid #3d5673; }
+.card-header { background: #fff; font-weight: 600; }
+.lf-header { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.lf-actions .shiny-text-output { font-weight: 400; color: #6c7a89; font-size: .8rem; }
+.lf-actions { display: flex; align-items: center; gap: .5rem; }
+.pt-grid { display: grid; grid-template-columns: repeat(18, minmax(0, 1fr)); gap: 3px;
+           max-width: 900px; margin: 0 auto; }
+.pt-el { height: 24px; display: flex; align-items: center; justify-content: center;
+         font-size: 11.5px; font-weight: 600; color: #1f2933; background: var(--pt-bg);
+         border: 1px solid rgba(0, 0, 0, .07); border-radius: 4px; cursor: pointer;
+         user-select: none; transition: box-shadow .1s, background .1s; }
+.pt-el:hover { box-shadow: 0 0 0 2px rgba(31, 78, 121, .5); }
+.pt-el.pt-selected { background: #1f4e79; color: #fff; border-color: #1f4e79;
+                     box-shadow: 0 1px 3px rgba(0, 0, 0, .3); }
+.pt-el.pt-empty { opacity: .3; }
+.pt-series { height: 24px; display: flex; align-items: center; justify-content: center;
+             font-size: 9px; color: #8a96a3; border: 1px dashed #c9d0d8; border-radius: 4px; }
+.pt-gap { grid-column: 1 / span 18; height: 4px; }
+.pt-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: .25rem .9rem;
+             margin-top: .5rem; font-size: 11px; color: #52606d; }
+.pt-legend span::before { content: ''; display: inline-block; width: 11px; height: 11px;
+                          margin-right: 4px; border-radius: 2px; vertical-align: -1px;
+                          background: var(--pt-bg); border: 1px solid rgba(0, 0, 0, .18); }
+.bslib-sidebar-layout > .sidebar .accordion-button { font-weight: 600; font-size: .85rem; }
+.bslib-sidebar-layout > .sidebar .form-label { font-size: .8rem; color: #52606d; }
 "
 
 finder_js <- "
@@ -166,48 +203,109 @@ Shiny.addCustomMessageHandler('pt-clear', function(x) {
 
 periodic_table_ui <- function() {
   pt <- periodic_table()
+  cell <- function(class, row, col, bg = NULL, ...) {
+    shiny::tags$div(class = class,
+                    style = sprintf("grid-row: %d; grid-column: %d;%s", row, col,
+                                    if (is.null(bg)) "" else paste0(" --pt-bg: ", bg, ";")), ...)
+  }
   cells <- lapply(seq_len(nrow(pt)), function(i) {
-    shiny::tags$div(
-      class = "pt-el", `data-el` = pt$symbol[i], title = paste(pt$symbol[i], "(Z =", pt$z[i], ")"),
-      style = sprintf("grid-row: %d; grid-column: %d;", pt$row[i], pt$col[i]),
-      pt$symbol[i], shiny::tags$small(pt$z[i])
-    )
+    cell("pt-el", pt$row[i], pt$col[i], finder_categories[[pt$category[i]]],
+         `data-el` = pt$symbol[i], title = sprintf("%s (Z = %d), %s", pt$symbol[i], pt$z[i], pt$category[i]),
+         pt$symbol[i])
   })
-  shiny::tags$div(class = "pt-grid", cells, shiny::tags$div(class = "pt-gap", style = "grid-row: 8;"))
+  legend <- lapply(names(finder_categories), function(cat) {
+    shiny::tags$span(style = paste0("--pt-bg: ", finder_categories[[cat]], ";"), cat)
+  })
+  shiny::tagList(
+    shiny::tags$div(class = "pt-grid", cells,
+                    cell("pt-series", 6, 3, NULL, "57-71"), cell("pt-series", 7, 3, NULL, "89-103"),
+                    shiny::tags$div(class = "pt-gap", style = "grid-row: 8;")),
+    shiny::tags$div(class = "pt-legend", legend)
+  )
+}
+
+finder_header <- function(title, status, ...) {
+  bslib::card_header(class = "lf-header", shiny::tags$span(title),
+                     shiny::tags$div(class = "lf-actions", status, ...))
 }
 
 finder_ui <- function(data) {
   range_wl <- range(data$wavelength)
+  small_button <- "btn-sm btn-outline-secondary"
   bslib::page_sidebar(
-    title = "specProc line finder",
+    title = shiny::tags$span(class = "lf-title", "specProc",
+                             shiny::tags$span(class = "lf-sub", "LIBS line finder")),
+    window_title = "specProc line finder",
+    theme = bslib::bs_theme(version = 5, primary = finder_primary, "font-size-base" = "0.875rem"),
     shiny::tags$head(shiny::tags$style(shiny::HTML(finder_css)),
                      shiny::tags$script(shiny::HTML(finder_js))),
     sidebar = bslib::sidebar(
-      width = 300,
-      shiny::selectInput("spectrum", "Spectrum", choices = finder_choices(data)),
-      shiny::checkboxGroupInput("stages", "Ionization stages",
-                                choices = c(I = 1, II = 2, III = 3), selected = c(1, 2), inline = TRUE),
-      shiny::sliderInput("temperature", "Temperature (K)", min = 3000, max = 30000,
-                         value = 10000, step = 500),
-      shiny::sliderInput("wl_range", "Wavelength range (nm)", min = floor(range_wl[1]),
-                         max = ceiling(range_wl[2]), value = c(floor(range_wl[1]), ceiling(range_wl[2])),
-                         step = 0.5),
-      shiny::numericInput("top", "Lines per species", value = 15, min = 1, max = 500, step = 1),
-      shiny::sliderInput("min_relative", "Minimum relative intensity", min = 0, max = 1,
-                         value = 0.01, step = 0.01),
-      shiny::numericInput("shift", "Wavelength shift (nm)", value = 0, step = 0.01),
-      shiny::checkboxInput("scale", "Scale markers by expected intensity", value = TRUE),
-      shiny::actionButton("clear", "Clear selection"),
-      shiny::tags$hr(),
-      shiny::downloadButton("download_lines", "Lines (CSV)"),
-      shiny::downloadButton("save_cache", "Save fetched data"),
-      shiny::fileInput("load_cache", "Load fetched data (.rds)", accept = ".rds")
+      width = 290,
+      bslib::accordion(
+        multiple = TRUE, open = c("Spectrum", "Lines"),
+        bslib::accordion_panel(
+          "Spectrum",
+          shiny::selectInput("spectrum", "Show", choices = finder_choices(data)),
+          shiny::sliderInput("wl_range", "Wavelength range (nm)", min = floor(range_wl[1]),
+                             max = ceiling(range_wl[2]),
+                             value = c(floor(range_wl[1]), ceiling(range_wl[2])), step = 0.5),
+          shiny::numericInput("shift", "Wavelength shift (nm)", value = 0, step = 0.01)
+        ),
+        bslib::accordion_panel(
+          "Lines",
+          shiny::checkboxGroupInput("stages", "Ionization stages", choices = c(I = 1, II = 2, III = 3),
+                                    selected = c(1, 2), inline = TRUE),
+          shiny::sliderInput("temperature", "Temperature (K)", min = 3000, max = 30000,
+                             value = 10000, step = 500),
+          shiny::numericInput("top", "Lines per species", value = 15, min = 1, max = 500, step = 1),
+          shiny::sliderInput("min_relative", "Minimum relative intensity", min = 0, max = 1,
+                             value = 0.01, step = 0.01),
+          shiny::checkboxInput("scale", "Scale markers by expected intensity", value = TRUE)
+        ),
+        bslib::accordion_panel(
+          "Session",
+          shiny::tags$p(class = "small text-muted",
+                        "Save the lines fetched from NIST to continue offline later."),
+          shiny::downloadButton("save_cache", "Save fetched data", class = small_button),
+          shiny::fileInput("load_cache", NULL, accept = ".rds", buttonLabel = "Load...",
+                           placeholder = "fetched data (.rds)")
+        )
+      )
     ),
-    bslib::card(bslib::card_header("Elements"), periodic_table_ui()),
-    bslib::card(full_screen = TRUE, bslib::card_header("Spectrum and candidate lines"),
-                plotly::plotlyOutput("plot", height = "460px")),
-    bslib::card(bslib::card_header("Displayed lines"), shiny::tableOutput("lines_table"))
+    bslib::card(
+      fill = FALSE,
+      finder_header("Elements", shiny::textOutput("selection", inline = TRUE),
+                    shiny::actionButton("clear", "Clear", class = small_button)),
+      periodic_table_ui()
+    ),
+    bslib::card(
+      full_screen = TRUE, min_height = 380,
+      finder_header("Spectrum and candidate lines", shiny::textOutput("n_lines", inline = TRUE),
+                    shiny::downloadButton("download_lines", "CSV", class = small_button)),
+      bslib::card_body(padding = c(4, 8), plotly::plotlyOutput("plot", height = "100%"))
+    )
   )
+}
+
+# Plot styling of the app.
+finder_layout <- function(p, uirevision, empty) {
+  axis <- list(gridcolor = "#eef1f5", zeroline = FALSE, showline = TRUE, linecolor = "#c3cad4",
+               ticks = "outside", tickcolor = "#c3cad4")
+  p <- plotly::layout(
+    p, uirevision = uirevision, paper_bgcolor = "rgba(0,0,0,0)", plot_bgcolor = "#fff",
+    font = list(family = "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", size = 12,
+                color = "#1f2933"),
+    margin = list(l = 64, r = 16, t = 28, b = 48),
+    legend = list(orientation = "h", x = 1, xanchor = "right", y = 1, yanchor = "bottom",
+                  bgcolor = "rgba(0,0,0,0)"),
+    xaxis = c(list(title = "Wavelength (nm)"), axis), yaxis = c(list(title = "Intensity"), axis),
+    annotations = if (empty) list(list(
+      text = "Select elements in the periodic table to overlay their lines", showarrow = FALSE,
+      xref = "paper", yref = "paper", x = 0.5, y = 0.98, font = list(color = "#8a96a3")
+    ))
+  )
+  plotly::config(p, displaylogo = FALSE, modeBarButtonsToRemove = c("lasso2d", "select2d"),
+                 toImageButtonOptions = list(format = "svg", filename = "libs_lines"))
 }
 
 # ---- server ------------------------------------------------------------------
@@ -263,22 +361,23 @@ finder_server <- function(data, fetch) {
       spec <- spectrum()
       wl_range <- input$wl_range %||% fetch_range
       keep <- as.numeric(names(spec)) >= wl_range[1] & as.numeric(names(spec)) <= wl_range[2]
-      p <- plot_lines(spec[keep], lines(), shift = input$shift %||% 0,
+      l <- lines()
+      p <- plot_lines(spec[keep], l, shift = input$shift %||% 0,
                       scale_markers = isTRUE(input$scale %||% TRUE), interactive = TRUE)
       # keep the zoom when the lines change, reset it when the spectrum changes
-      plotly::layout(p, uirevision = paste(input$spectrum, wl_range, collapse = " "))
+      finder_layout(p, uirevision = paste(input$spectrum, wl_range, collapse = " "),
+                    empty = nrow(l) == 0)
     })
 
-    output$lines_table <- shiny::renderTable({
-      l <- lines()
-      if (nrow(l) == 0) return(NULL)
-      data.frame(
-        species = l$species, `wavelength (nm)` = sprintf("%.3f", l$wavelength),
-        `relative intensity` = sprintf("%.3f", l$relative_intensity),
-        `Aki (s-1)` = sprintf("%.2e", l$Aki), `Ek (eV)` = sprintf("%.3f", l$Ek),
-        gk = l$gk, accuracy = l$accuracy, transition = paste(l$lower, "-", l$upper),
-        check.names = FALSE
-      )
+    output$selection <- shiny::renderText({
+      elements <- unlist(input$elements)
+      if (length(elements) == 0) return("No element selected")
+      paste(length(elements), if (length(elements) == 1) "element" else "elements")
+    })
+
+    output$n_lines <- shiny::renderText({
+      n <- nrow(lines())
+      paste(n, if (n == 1) "line" else "lines")
     })
 
     shiny::observeEvent(input$clear, session$sendCustomMessage("pt-clear", TRUE))
