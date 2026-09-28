@@ -80,9 +80,11 @@ of the detector. This vignette shows how to check these conditions and
 how to measure the two quantities that describe the plasma: the electron
 density <span class="math inline">N_e</span>, from the Stark broadening
 of a line, and the excitation temperature <span class="math inline">T</span>, from Boltzmann and Saha-Boltzmann plots.
-It uses the spectra of <code>specLIBS</code> and <code>fourrage</code>,
-atomic data from the NIST Atomic Spectra Database, and Stark broadening
-parameters from the STARK-B database.</p>
+It ends with a calibration-free estimate of the composition of the
+forage samples, compared with their laboratory values. It uses the
+spectra of <code>specLIBS</code> and <code>fourrage</code>, atomic data
+from the NIST Atomic Spectra Database, and Stark broadening parameters
+from the STARK-B database.</p>
 <p>Two limitations of these data affect every number below:</p>
 <ul>
 <li>
@@ -417,6 +419,242 @@ already suggested: the Ca II resonance lines are unsuitable for
 quantification in these plasmas.</p>
 </div>
 <div class="section level2">
+<h2 id="calibration-free-composition">Calibration-free composition<a class="anchor" aria-label="anchor" href="#calibration-free-composition"></a>
+</h2>
+<p>Calibration-free LIBS (CF-LIBS; Ciucci et al., 1999) derives the
+composition of a sample from its line intensities alone, without
+calibration standards. In LTE, the Boltzmann plots of all species share
+the same slope, <span class="math inline">-1/k_B T</span>, and the
+intercept of each plot gives the density of its species.
+<code><a href="../reference/cf_libs.html">cf_libs()</a></code> fits the plots together, adds the ionization
+stages that are not observed with the Saha equation, and normalizes the
+densities of the elements to fractions that sum to one.</p>
+<p>The forage samples have laboratory reference values for Ca, Mg, K and
+Na, so we can check the method against them. We baseline-correct the
+measurements and measure the electron density on H<span class="math inline">\alpha</span> of their mean, as above:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">forage_channels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fourrage</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">forage_wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">forage_channels</span><span class="op">)</span></span>
+<span><span class="va">forage</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="../reference/baseline_arpls.html">baseline_arpls</a></span><span class="op">(</span><span class="va">fourrage</span><span class="op">[</span><span class="va">forage_channels</span><span class="op">]</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span></span>
+<span><span class="va">forage_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">forage</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">forage_halpha</span> <span class="op">&lt;-</span> <span class="va">forage_mean</span><span class="op">[</span><span class="va">forage_channels</span><span class="op">[</span><span class="va">forage_wl</span> <span class="op">&gt;</span> <span class="fl">654.6</span> <span class="op">&amp;</span> <span class="va">forage_wl</span> <span class="op">&lt;</span> <span class="fl">658.3</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="va">forage_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="va">forage_halpha</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/peak_fit.html">peak_fit</a></span><span class="op">(</span>profile <span class="op">=</span> <span class="st">"voigt"</span><span class="op">)</span></span>
+<span><span class="va">forage_widths</span> <span class="op">&lt;-</span> <span class="va">forage_fit</span><span class="op">$</span><span class="va">tidied</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">term</span>, <span class="va">estimate</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/enframe.html" class="external-link">deframe</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">ne_forage</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/electron_density.html">electron_density</a></span><span class="op">(</span><span class="fu"><a href="../reference/voigt_fwhm.html">voigt_fwhm</a></span><span class="op">(</span><span class="va">forage_widths</span><span class="op">[[</span><span class="st">"wG"</span><span class="op">]</span><span class="op">]</span>, <span class="va">forage_widths</span><span class="op">[[</span><span class="st">"wL"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>                              method <span class="op">=</span> <span class="st">"halpha"</span><span class="op">)</span></span>
+<span><span class="va">ne_forage</span></span>
+<span><span class="co">#&gt; [1] 1.575407e+17</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="lines-and-atomic-data">Lines and atomic data<a class="anchor" aria-label="anchor" href="#lines-and-atomic-data"></a>
+</h3>
+<p>The lines must be unsaturated, free of interference, and optically
+thin. In these spectra, that rules out the resonance lines of all four
+elements (Ca II 393/397 nm, Mg I 285 nm, Mg II 280 nm, K I 766/770 nm,
+Na I 589 nm), which are saturated or strongly self-absorbed. The
+remaining lines are fainter, and those of Na are weak.
+<code><a href="../reference/nist_lines.html">nist_lines()</a></code> gives their atomic data.
+<code><a href="../reference/cf_libs.html">cf_libs()</a></code> also needs the partition functions of the
+species, which it computes from the energy levels of
+<code><a href="../reference/nist_levels.html">nist_levels()</a></code>, and the ionization energies:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">species</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ca I"</span>, <span class="st">"Ca II"</span>, <span class="st">"Mg I"</span>, <span class="st">"Mg II"</span>, <span class="st">"K I"</span>, <span class="st">"K II"</span>, <span class="st">"Na I"</span>, <span class="st">"Na II"</span><span class="op">)</span></span>
+<span><span class="va">levels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nist_levels.html">nist_levels</a></span><span class="op">(</span><span class="va">species</span><span class="op">)</span></span>
+<span><span class="va">ionization</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nist_ionization_energy.html">nist_ionization_energy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ca I"</span>, <span class="st">"Mg I"</span>, <span class="st">"K I"</span>, <span class="st">"Na I"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>To run without an internet connection, this vignette includes the
+values retrieved from the NIST ASD. The partition functions come from
+<code><a href="../reference/nist_levels.html">partition_function()</a></code> with the levels truncated at the
+ionization energy lowered for <span class="math inline">N_e = 1.6 \times
+10^{17}</span> cm<span class="math inline">^{-3}</span> (see
+<code><a href="../reference/nist_levels.html">?partition_function</a></code>), and are tabulated from 6000 to 12000
+K:</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cf_atomic</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
+<span>  <span class="op">~</span><span class="va">species</span>, <span class="op">~</span><span class="va">wavelength</span>, <span class="op">~</span><span class="va">Aki</span>,      <span class="op">~</span><span class="va">accuracy</span>, <span class="op">~</span><span class="va">Ek</span>,      <span class="op">~</span><span class="va">gk</span>,</span>
+<span>  <span class="st">"Ca I"</span>,   <span class="fl">428.301</span>,     <span class="fl">4.340e+07</span>, <span class="st">"C+"</span>,      <span class="fl">4.779784</span>, <span class="fl">5</span>,</span>
+<span>  <span class="st">"Ca I"</span>,   <span class="fl">430.253</span>,     <span class="fl">1.360e+08</span>, <span class="st">"C+"</span>,      <span class="fl">4.779784</span>, <span class="fl">5</span>,</span>
+<span>  <span class="st">"Ca I"</span>,   <span class="fl">431.865</span>,     <span class="fl">7.400e+07</span>, <span class="st">"C+"</span>,      <span class="fl">4.769028</span>, <span class="fl">3</span>,</span>
+<span>  <span class="st">"Ca I"</span>,   <span class="fl">443.496</span>,     <span class="fl">6.700e+07</span>, <span class="st">"C"</span>,       <span class="fl">4.680635</span>, <span class="fl">5</span>,</span>
+<span>  <span class="st">"Ca I"</span>,   <span class="fl">445.478</span>,     <span class="fl">8.700e+07</span>, <span class="st">"C"</span>,       <span class="fl">4.681327</span>, <span class="fl">7</span>,</span>
+<span>  <span class="st">"Ca I"</span>,   <span class="fl">616.217</span>,     <span class="fl">4.770e+07</span>, <span class="st">"C"</span>,       <span class="fl">3.910399</span>, <span class="fl">3</span>,</span>
+<span>  <span class="st">"Ca II"</span>,  <span class="fl">315.887</span>,     <span class="fl">3.100e+08</span>, <span class="st">"C"</span>,       <span class="fl">7.047169</span>, <span class="fl">4</span>,</span>
+<span>  <span class="st">"Ca II"</span>,  <span class="fl">317.933</span>,     <span class="fl">3.600e+08</span>, <span class="st">"C"</span>,       <span class="fl">7.049551</span>, <span class="fl">6</span>,</span>
+<span>  <span class="st">"Ca II"</span>,  <span class="fl">370.603</span>,     <span class="fl">8.800e+07</span>, <span class="st">"C"</span>,       <span class="fl">6.467875</span>, <span class="fl">2</span>,</span>
+<span>  <span class="st">"Ca II"</span>,  <span class="fl">373.690</span>,     <span class="fl">1.700e+08</span>, <span class="st">"C"</span>,       <span class="fl">6.467875</span>, <span class="fl">2</span>,</span>
+<span>  <span class="st">"Mg I"</span>,   <span class="fl">383.829</span>,     <span class="fl">1.610e+08</span>, <span class="st">"B+"</span>,      <span class="fl">5.945916</span>, <span class="fl">7</span>,</span>
+<span>  <span class="st">"Mg I"</span>,   <span class="fl">516.732</span>,     <span class="fl">1.130e+07</span>, <span class="st">"B+"</span>,      <span class="fl">5.107827</span>, <span class="fl">3</span>,</span>
+<span>  <span class="st">"Mg I"</span>,   <span class="fl">517.268</span>,     <span class="fl">3.370e+07</span>, <span class="st">"B+"</span>,      <span class="fl">5.107827</span>, <span class="fl">3</span>,</span>
+<span>  <span class="st">"Mg I"</span>,   <span class="fl">518.360</span>,     <span class="fl">5.610e+07</span>, <span class="st">"A"</span>,       <span class="fl">5.107827</span>, <span class="fl">3</span>,</span>
+<span>  <span class="st">"Mg II"</span>,  <span class="fl">279.078</span>,     <span class="fl">4.010e+08</span>, <span class="st">"A"</span>,       <span class="fl">8.863762</span>, <span class="fl">4</span>,</span>
+<span>  <span class="st">"Mg II"</span>,  <span class="fl">279.800</span>,     <span class="fl">4.790e+08</span>, <span class="st">"A"</span>,       <span class="fl">8.863654</span>, <span class="fl">6</span>,</span>
+<span>  <span class="st">"Mg II"</span>,  <span class="fl">292.863</span>,     <span class="fl">1.150e+08</span>, <span class="st">"A"</span>,       <span class="fl">8.654711</span>, <span class="fl">2</span>,</span>
+<span>  <span class="st">"Mg II"</span>,  <span class="fl">293.651</span>,     <span class="fl">2.300e+08</span>, <span class="st">"A"</span>,       <span class="fl">8.654711</span>, <span class="fl">2</span>,</span>
+<span>  <span class="st">"K I"</span>,    <span class="fl">404.414</span>,     <span class="fl">1.150e+06</span>, <span class="st">"A"</span>,       <span class="fl">3.064907</span>, <span class="fl">4</span>,</span>
+<span>  <span class="st">"K I"</span>,    <span class="fl">404.721</span>,     <span class="fl">1.070e+06</span>, <span class="st">"B+"</span>,      <span class="fl">3.062581</span>, <span class="fl">2</span>,</span>
+<span>  <span class="st">"K I"</span>,    <span class="fl">691.108</span>,     <span class="fl">2.500e+06</span>, <span class="st">"AA"</span>,      <span class="fl">3.403454</span>, <span class="fl">2</span>,</span>
+<span>  <span class="st">"K I"</span>,    <span class="fl">693.877</span>,     <span class="fl">4.956e+06</span>, <span class="st">"AA"</span>,      <span class="fl">3.403454</span>, <span class="fl">2</span>,</span>
+<span>  <span class="st">"Na I"</span>,   <span class="fl">818.326</span>,     <span class="fl">4.290e+07</span>, <span class="st">"A+"</span>,      <span class="fl">3.616977</span>, <span class="fl">4</span>,</span>
+<span>  <span class="st">"Na I"</span>,   <span class="fl">819.482</span>,     <span class="fl">5.140e+07</span>, <span class="st">"A+"</span>,      <span class="fl">3.616971</span>, <span class="fl">6</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">cf_ionization</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Ca <span class="op">=</span> <span class="fl">6.113155</span>, Mg <span class="op">=</span> <span class="fl">7.646236</span>, K <span class="op">=</span> <span class="fl">4.340664</span>, Na <span class="op">=</span> <span class="fl">5.139077</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">partition_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
+<span>  <span class="op">~</span><span class="va">species</span>, <span class="op">~</span><span class="va">`6000`</span>, <span class="op">~</span><span class="va">`7000`</span>, <span class="op">~</span><span class="va">`8000`</span>, <span class="op">~</span><span class="va">`9000`</span>, <span class="op">~</span><span class="va">`10000`</span>, <span class="op">~</span><span class="va">`11000`</span>, <span class="op">~</span><span class="va">`12000`</span>,</span>
+<span>  <span class="st">"Ca I"</span>,   <span class="fl">1.407</span>,   <span class="fl">1.798</span>,   <span class="fl">2.401</span>,   <span class="fl">3.281</span>,   <span class="fl">4.499</span>,    <span class="fl">6.184</span>,    <span class="fl">8.356</span>,</span>
+<span>  <span class="st">"Ca II"</span>,  <span class="fl">2.389</span>,   <span class="fl">2.633</span>,   <span class="fl">2.917</span>,   <span class="fl">3.229</span>,   <span class="fl">3.560</span>,    <span class="fl">3.905</span>,    <span class="fl">4.262</span>,</span>
+<span>  <span class="st">"Mg I"</span>,   <span class="fl">1.049</span>,   <span class="fl">1.109</span>,   <span class="fl">1.207</span>,   <span class="fl">1.362</span>,   <span class="fl">1.597</span>,    <span class="fl">1.959</span>,    <span class="fl">2.463</span>,</span>
+<span>  <span class="st">"Mg II"</span>,  <span class="fl">2.001</span>,   <span class="fl">2.004</span>,   <span class="fl">2.010</span>,   <span class="fl">2.020</span>,   <span class="fl">2.036</span>,    <span class="fl">2.058</span>,    <span class="fl">2.087</span>,</span>
+<span>  <span class="st">"K I"</span>,    <span class="fl">2.488</span>,   <span class="fl">3.000</span>,   <span class="fl">3.858</span>,   <span class="fl">5.078</span>,   <span class="fl">6.743</span>,    <span class="fl">8.938</span>,    <span class="fl">11.503</span>,</span>
+<span>  <span class="st">"K II"</span>,   <span class="fl">1</span>,       <span class="fl">1</span>,       <span class="fl">1</span>,       <span class="fl">1</span>,       <span class="fl">1</span>,        <span class="fl">1</span>,        <span class="fl">1</span>,</span>
+<span>  <span class="st">"Na I"</span>,   <span class="fl">2.166</span>,   <span class="fl">2.401</span>,   <span class="fl">2.868</span>,   <span class="fl">3.635</span>,   <span class="fl">4.779</span>,    <span class="fl">6.548</span>,    <span class="fl">8.724</span>,</span>
+<span>  <span class="st">"Na II"</span>,  <span class="fl">1</span>,       <span class="fl">1</span>,       <span class="fl">1</span>,       <span class="fl">1</span>,       <span class="fl">1</span>,        <span class="fl">1</span>,        <span class="fl">1</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># log-linear interpolation of the table, in the form cf_libs() accepts</span></span>
+<span><span class="va">partition</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">species</span>, <span class="va">temperature</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">partition_table</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">vapply</a></span><span class="op">(</span><span class="va">species</span>, <span class="kw">function</span><span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">u</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">partition_table</span><span class="op">[</span><span class="va">partition_table</span><span class="op">$</span><span class="va">species</span> <span class="op">==</span> <span class="va">s</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/approxfun.html" class="external-link">approx</a></span><span class="op">(</span><span class="va">grid</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">u</span><span class="op">)</span>, xout <span class="op">=</span> <span class="va">temperature</span><span class="op">)</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span>
+<span>  <span class="op">}</span>, <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>With <code>partition = NULL</code> (the default),
+<code><a href="../reference/cf_libs.html">cf_libs()</a></code> downloads the levels and computes the partition
+functions itself.</p>
+</div>
+<div class="section level3">
+<h3 id="composition-of-the-mean-spectrum">Composition of the mean spectrum<a class="anchor" aria-label="anchor" href="#composition-of-the-mean-spectrum"></a>
+</h3>
+<p>The line intensities are measured as in the Boltzmann plots above, on
+the mean forage spectrum. With the electron density given,
+<code><a href="../reference/cf_libs.html">cf_libs()</a></code> fits one Saha-Boltzmann plot per element, which
+spans a much wider energy range than the Boltzmann plot of a single
+species:</p>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">forage_area</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">s</span>, <span class="va">center</span>, <span class="va">search</span> <span class="op">=</span> <span class="fl">0.2</span>, <span class="va">half_width</span> <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">near</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">forage_wl</span> <span class="op">-</span> <span class="va">center</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">search</span></span>
+<span>  <span class="va">peak</span> <span class="op">&lt;-</span> <span class="va">forage_wl</span><span class="op">[</span><span class="va">near</span><span class="op">]</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.max</a></span><span class="op">(</span><span class="va">s</span><span class="op">[</span><span class="va">near</span><span class="op">]</span><span class="op">)</span><span class="op">]</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">s</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">forage_wl</span> <span class="op">-</span> <span class="va">peak</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">half_width</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">cf_mean</span> <span class="op">&lt;-</span> <span class="va">cf_atomic</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>intensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">wavelength</span>, \<span class="op">(</span><span class="va">w</span><span class="op">)</span> <span class="fu">forage_area</span><span class="op">(</span><span class="va">forage_mean</span>, <span class="va">w</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/cf_libs.html">cf_libs</a></span><span class="op">(</span>electron_density <span class="op">=</span> <span class="va">ne_forage</span>, partition <span class="op">=</span> <span class="va">partition</span>, ionization_energy <span class="op">=</span> <span class="va">cf_ionization</span><span class="op">)</span></span>
+<span><span class="va">cf_mean</span></span>
+<span><span class="co">#&gt; Calibration-free LIBS (24 lines, 6 species; Saha-Boltzmann plots)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Temperature:  8926 +/- 216 K</span></span>
+<span><span class="co">#&gt; Ne:           1.58e+17 cm-3</span></span>
+<span><span class="co">#&gt; Normalization: closure</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  element atomic_fraction mass_fraction stages      </span></span>
+<span><span class="co">#&gt;  Ca      0.0945          0.1022        I, II       </span></span>
+<span><span class="co">#&gt;  Mg      0.0815          0.0535        I, II       </span></span>
+<span><span class="co">#&gt;  K       0.7662          0.8085        I, II (Saha)</span></span>
+<span><span class="co">#&gt;  Na      0.0579          0.0359        I, II (Saha)</span></span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boltzmann.html">plot_boltzmann</a></span><span class="op">(</span><span class="va">cf_mean</span><span class="op">)</span></span></code></pre></div>
+<p><img src="plasma-diagnostics_files/figure-html/cf-plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p>The four plots are parallel within the scatter of their points, at
+<span class="math inline">T \approx</span> 8930 K. The closure applies
+to the four measured elements only: the forage is mostly C, H, O and N,
+whose lines are not used here, so the fractions describe the relative
+composition of these four elements, which we compare with the laboratory
+values on the same basis:</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">lab</span> <span class="op">&lt;-</span> <span class="va">fourrage</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Ca</span>, <span class="va">Mg</span>, <span class="va">K</span>, <span class="va">Na</span><span class="op">)</span>, \<span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">v</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">cf_mean</span><span class="op">$</span><span class="va">composition</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">element</span>, cf_libs <span class="op">=</span> <span class="va">mass_fraction</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>laboratory <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">lab</span><span class="op">[</span><span class="va">element</span><span class="op">]</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">lab</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>         ratio <span class="op">=</span> <span class="va">cf_libs</span> <span class="op">/</span> <span class="va">laboratory</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 4</span></span></span>
+<span><span class="co">#&gt;   element cf_libs laboratory ratio</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Ca       0.102      0.222  0.461</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Mg       0.053<span style="text-decoration: underline;">5</span>     0.070<span style="text-decoration: underline;">2</span> 0.761</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> K        0.808      0.698  1.16 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Na       0.035<span style="text-decoration: underline;">9</span>     0.010<span style="text-decoration: underline;">1</span> 3.55</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="every-measurement">Every measurement<a class="anchor" aria-label="anchor" href="#every-measurement"></a>
+</h3>
+<p>Applied to each of the 368 measurements, the method follows the
+variation of the composition between samples:</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cf_each</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">forage</span><span class="op">)</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="va">cf_atomic</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>intensity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">wavelength</span>, \<span class="op">(</span><span class="va">w</span><span class="op">)</span> <span class="fu">forage_area</span><span class="op">(</span><span class="va">forage</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span>, <span class="va">w</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="../reference/cf_libs.html">cf_libs</a></span><span class="op">(</span>electron_density <span class="op">=</span> <span class="va">ne_forage</span>, partition <span class="op">=</span> <span class="va">partition</span>,</span>
+<span>            ionization_energy <span class="op">=</span> <span class="va">cf_ionization</span><span class="op">)</span></span>
+<span>  <span class="va">fit</span><span class="op">$</span><span class="va">composition</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">element</span>, cf_libs <span class="op">=</span> <span class="va">mass_fraction</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>measurement <span class="op">=</span> <span class="va">i</span>, temperature <span class="op">=</span> <span class="va">fit</span><span class="op">$</span><span class="va">temperature</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">lab_fractions</span> <span class="op">&lt;-</span> <span class="va">fourrage</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>measurement <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span>, total <span class="op">=</span> <span class="va">Ca</span> <span class="op">+</span> <span class="va">Mg</span> <span class="op">+</span> <span class="va">K</span> <span class="op">+</span> <span class="va">Na</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Ca</span>, <span class="va">Mg</span>, <span class="va">K</span>, <span class="va">Na</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"element"</span>, values_to <span class="op">=</span> <span class="st">"content"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span><span class="va">measurement</span>, <span class="va">element</span>, laboratory <span class="op">=</span> <span class="va">content</span> <span class="op">/</span> <span class="va">total</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cf_scores</span> <span class="op">&lt;-</span> <span class="va">cf_each</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">lab_fractions</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"measurement"</span>, <span class="st">"element"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">laboratory</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">cf_each</span>, <span class="va">measurement</span>, <span class="va">temperature</span><span class="op">)</span><span class="op">$</span><span class="va">temperature</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;    8723    8890    8931    8935    8977    9189</span></span>
+<span><span class="va">cf_scores</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">element</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>correlation <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/cor.html" class="external-link">cor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">cf_libs</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">laboratory</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>            median_ratio <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">cf_libs</span> <span class="op">/</span> <span class="va">laboratory</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 3</span></span></span>
+<span><span class="co">#&gt;   element correlation median_ratio</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Ca            0.884        0.488</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> K             0.861        1.14 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Mg            0.866        0.773</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Na            0.528        4.47</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">cf_scores</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">laboratory</span>, <span class="va">cf_libs</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_abline</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"grey50"</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.4</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">element</span>, nrow <span class="op">=</span> <span class="fl">1</span>, scales <span class="op">=</span> <span class="st">"free"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Laboratory (mass fraction of Ca + Mg + K + Na)"</span>, y <span class="op">=</span> <span class="st">"CF-LIBS"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="plasma-diagnostics_files/figure-html/cf-each-plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p>The results show both the promise and the limits of calibration-free
+analysis on these data:</p>
+<ul>
+<li>
+<strong>The variation between samples is well captured.</strong> For
+Ca, Mg and K, the CF-LIBS fractions correlate with the laboratory values
+(<span class="math inline">r \approx 0.87</span> on log scales), without
+any calibration.</li>
+<li>
+<strong>The values are biased.</strong> Ca is underestimated by
+about half, Mg by about a quarter, and K is slightly overestimated. The
+main suspects are the spectral response of the instrument, which is not
+corrected here (the lines of each element lie in different parts of the
+spectrum), and the transition probabilities of the Ca lines, graded C
+(uncertain by up to 25%).</li>
+<li>
+<strong>Na fails.</strong> Its two lines are weak, their residuals
+on the Boltzmann plot are large, and its content is often near the
+detection limit, so its fraction is overestimated several times
+over.</li>
+</ul>
+<p>A correction of the spectral response would reduce the bias. With one
+standard of known composition, the remaining bias can also be measured
+and removed for each element. In a matrix whose major elements are not
+all measured, <code>reference</code> scales the result to the known
+concentration of one element (an internal reference) instead of
+closure.</p>
+</div>
+</div>
+<div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
 <ul>
@@ -437,12 +675,21 @@ the spectral response when a calibration is available.</li>
 <strong>Check LTE and self-absorption</strong> before trusting
 intensities: the McWhirter criterion is a minimum requirement, and
 resonance lines are often strongly self-absorbed.</li>
+<li>
+<strong>Calibration-free LIBS is semi-quantitative without a
+response correction.</strong> It follows the composition of the samples
+closely, but its absolute values carry the biases of the spectral
+response and of the atomic data.</li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <ul>
+<li>Ciucci, A., Corsi, M., Palleschi, V., Rastelli, S., Salvetti, A.,
+Tognoni, E. (1999). New procedure for quantitative elemental analysis by
+laser-induced plasma spectroscopy. <em>Applied Spectroscopy</em>,
+53(8):960–964.</li>
 <li>Cristoforetti, G., De Giacomo, A., Dell’Aglio, M., Legnaioli, S.,
 Tognoni, E., Palleschi, V., Omenetto, N. (2010). Local thermodynamic
 equilibrium in laser-induced breakdown spectroscopy: beyond the
@@ -464,6 +711,9 @@ Radiative Transfer</em>, 17(2):233–236.</li>
 <li>Sahal-Bréchot, S., Dimitrijević, M.S., Moreau, N. STARK-B database,
 <a href="https://stark-b.obspm.fr" class="external-link uri">https://stark-b.obspm.fr</a>. Observatoire de Paris and
 Astronomical Observatory of Belgrade.</li>
+<li>Tognoni, E., Cristoforetti, G., Legnaioli, S., Palleschi, V. (2010).
+Calibration-free laser-induced breakdown spectroscopy: state of the art.
+<em>Spectrochimica Acta Part B</em>, 65(1):1–14.</li>
 </ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -23,6 +23,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/biweight_scale.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/boltzmann_plot.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/center.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/cf_libs.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/correlation.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/direct_orthogonal.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/direct_osc.html</loc></url>
@@ -48,6 +49,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/multipeak_fit.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/nas.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/nist_ionization_energy.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/nist_levels.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/nist_lines.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/normalize.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/o2pls.html</loc></url>
@@ -73,6 +75,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/quantile_weight.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/read_starkb.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/reject_shots.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/robpca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/robust_bcyj.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/rospca.html</loc></url>
@@ -93,12 +96,14 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/step_emsc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_epo.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_glsw.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/step_line_ratio.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_macropca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_msc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_osc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_pareto_scale.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_poisson_scale.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_projected_osc.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/step_reject_shots.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_robpca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_robust_bcyj.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_rospca.html</loc></url>

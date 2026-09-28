@@ -4,6 +4,35 @@
 
 ### New features
 
+- [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md):
+  calibration-free LIBS quantification (Ciucci et al., 1999). The
+  temperature is estimated from the common slope of parallel Boltzmann
+  plots (one per species) or, when the electron density is known,
+  Saha-Boltzmann plots (one per element, much more precise). The
+  densities follow from the intercepts and the partition functions, and
+  the ionization stages not observed from the Saha equation. The
+  composition (atomic and mass fractions) is normalized by closure or by
+  the known concentration of one element.
+  [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md)
+  draws the plots of the fit. The plasma diagnostics vignette applies it
+  to the forage samples and compares it with their laboratory values.
+- [`nist_levels()`](https://christiangoueguel.com/specProc/reference/nist_levels.md)
+  retrieves energy levels from the NIST Atomic Spectra Database, and
+  [`partition_function()`](https://christiangoueguel.com/specProc/reference/nist_levels.md)
+  computes partition functions from them, optionally truncated at a
+  maximum energy (such as the lowered ionization energy).
+- [`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md)
+  flags the outlying laser shots of each sample (total intensity,
+  correlation with or distance to the median spectrum, by robust
+  z-scores), before they are averaged with
+  [`average()`](https://christiangoueguel.com/specProc/reference/average.md).
+- New recipe steps:
+  [`step_reject_shots()`](https://christiangoueguel.com/specProc/reference/step_reject_shots.md)
+  removes the outlying shots from the training data (skipped on new
+  data), and
+  [`step_line_ratio()`](https://christiangoueguel.com/specProc/reference/step_line_ratio.md)
+  normalizes each spectrum to the area or height of a reference line
+  (internal standard).
 - [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md):
   a Shiny app to identify the emission lines of LIBS spectra. Elements
   are selected on a periodic table, and the strongest lines of their

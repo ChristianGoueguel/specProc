@@ -4,7 +4,9 @@ Plots the points and the fitted line of
 [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md)
 or
 [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md),
-with the estimated temperature.
+with the estimated temperature, or the parallel Boltzmann plots of the
+species of
+[`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md).
 
 ## Usage
 
@@ -17,9 +19,10 @@ plot_boltzmann(object, title = NULL)
 - object:
 
   An object returned by
-  [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md)
+  [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md),
+  [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md)
   or
-  [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md).
+  [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md).
 
 - title:
 

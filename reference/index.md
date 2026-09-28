@@ -102,6 +102,13 @@ and can be tuned within a tidymodels workflow.
 - [`step_poisson_scale()`](https://christiangoueguel.com/specProc/reference/step_poisson_scale.md)
   : Poisson Scaling Recipe Step
 
+### LIBS shots and internal standard
+
+- [`step_reject_shots()`](https://christiangoueguel.com/specProc/reference/step_reject_shots.md)
+  : Shot Rejection Recipe Step
+- [`step_line_ratio()`](https://christiangoueguel.com/specProc/reference/step_line_ratio.md)
+  : Internal Standard Normalization Recipe Step
+
 ### robust transformation and PCA
 
 - [`step_robust_bcyj()`](https://christiangoueguel.com/specProc/reference/step_robust_bcyj.md)
@@ -159,6 +166,10 @@ checks of LTE, self-absorption and detector saturation.
   : Atomic Line Data from the NIST Atomic Spectra Database
 - [`nist_ionization_energy()`](https://christiangoueguel.com/specProc/reference/nist_ionization_energy.md)
   : Ionization Energies from the NIST Atomic Spectra Database
+- [`nist_levels()`](https://christiangoueguel.com/specProc/reference/nist_levels.md)
+  [`partition_function()`](https://christiangoueguel.com/specProc/reference/nist_levels.md)
+  : Energy Levels and Partition Functions from the NIST Atomic Spectra
+  Database
 - [`starkb_lines()`](https://christiangoueguel.com/specProc/reference/starkb_lines.md)
   : Stark Broadening Parameters from the STARK-B Database
 - [`read_starkb()`](https://christiangoueguel.com/specProc/reference/read_starkb.md)
@@ -181,6 +192,14 @@ checks of LTE, self-absorption and detector saturation.
   : Self-Absorption Coefficient from Line Widths
 - [`saturation_summary()`](https://christiangoueguel.com/specProc/reference/saturation_summary.md)
   : Detect Saturated Channels in Spectra
+
+## Calibration-free quantification
+
+Elemental composition from line intensities without calibration
+standards (CF-LIBS).
+
+- [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md)
+  : Calibration-Free LIBS Quantification
 
 ## Peak fitting
 
@@ -216,6 +235,8 @@ Functions used to increase the signal-to-noise ratio.
 
 - [`average()`](https://christiangoueguel.com/specProc/reference/average.md)
   : Fast Average for Large Spectral Dataset
+- [`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md)
+  : Rejection of Outlying Laser Shots
 
 ## Baseline correction
 

@@ -10,7 +10,9 @@ The preprocessing steps are written as
 [recipes](https://recipes.tidymodels.org) steps
 ([`step_baseline()`](https://christiangoueguel.com/specProc/reference/step_baseline.md),
 [`step_snv()`](https://christiangoueguel.com/specProc/reference/step_snv.md),
-[`step_msc()`](https://christiangoueguel.com/specProc/reference/step_msc.md)),
+[`step_msc()`](https://christiangoueguel.com/specProc/reference/step_msc.md),
+[`step_line_ratio()`](https://christiangoueguel.com/specProc/reference/step_line_ratio.md),
+[`step_reject_shots()`](https://christiangoueguel.com/specProc/reference/step_reject_shots.md)),
 so the same pipeline can later be estimated on calibration data and
 applied to new spectra, or tuned within a tidymodels workflow.
 
@@ -211,9 +213,11 @@ rsd <- function(v, group) {
 ```
 
 We compare no normalization, total-area normalization, SNV, MSC, and
-internal standardization to the Si I 288.16 nm line. SNV and MSC are
-recipe steps added after the baseline; area and internal-standard
-normalization use
+internal standardization to the Si I 288.16 nm line. SNV, MSC and the
+internal standard
+([`step_line_ratio()`](https://christiangoueguel.com/specProc/reference/step_line_ratio.md),
+which divides each spectrum by the area of a reference line) are recipe
+steps added after the baseline; area normalization uses
 [`normalize()`](https://christiangoueguel.com/specProc/reference/normalize.md):
 
 ``` r
@@ -224,17 +228,13 @@ normalized <- function(step, ...) {
     prep() |>
     bake(new_data = NULL)
 }
-si_cols <- channels[abs(wl - 288.16) < 0.15]
-
 candidates <- list(
   `baseline only` = baselined,
   `area` = bind_cols(select(baselined, Sample),
                      normalize(baselined[channels], method = "area")),
   `SNV` = normalized(step_snv),
   `MSC` = normalized(step_msc),
-  `internal std. (Si)` = bind_cols(select(baselined, Sample),
-                                   normalize(baselined[channels], method = "internal",
-                                             wlength = si_cols))
+  `internal std. (Si)` = normalized(step_line_ratio, reference = 288.16, window = 0.15)
 )
 
 scores <- candidates |>
@@ -262,20 +262,20 @@ wide("RSD")   # median within-sample RSD (%)
 #> 2               area         4.60        6.67         5.44        5.28
 #> 3                SNV         3.26        5.66         3.79        4.36
 #> 4                MSC         3.29        5.55         3.80        4.17
-#> 5 internal std. (Si)         6.31        0.00         7.42        6.37
+#> 5 internal std. (Si)         6.66        0.84         7.60        6.49
 #>   K I 766.49
 #> 1      12.33
 #> 2      12.63
 #> 3      15.56
 #> 4      12.61
-#> 5      13.14
+#> 5      13.50
 wide("ICC")   # fraction of variance between samples
 #>        normalization Mg II 279.55 Si I 288.16 Ca II 393.37 Al I 396.15
 #> 1      baseline only         0.90        0.77         0.81        0.79
 #> 2               area         0.56        0.63         0.70        0.68
 #> 3                SNV         0.80        0.49         0.60        0.61
 #> 4                MSC         0.79        0.54         0.66        0.64
-#> 5 internal std. (Si)         0.76          NA         0.41        0.33
+#> 5 internal std. (Si)         0.76        0.28         0.41        0.32
 #>   K I 766.49
 #> 1       0.86
 #> 2       0.47
@@ -303,11 +303,12 @@ The two criteria disagree, and the disagreement is informative:
 - **The weak K line is a special case.** SNV increases its RSD: dividing
   by the whole-spectrum standard deviation adds that statistic’s noise
   to a line that is itself noisy.
-- **Internal standardization by Si is not usable here.** It sets the Si
-  line to a constant, so its own RSD and ICC are meaningless. It also
-  assumes the silicon content is constant across samples, which is false
-  for soils ranging from clay to sand. It lowers the ICC of every other
-  line.
+- **Internal standardization by Si is not usable here.** It makes the Si
+  line nearly constant (the residual RSD comes from the slightly
+  different windows of the step and of our line areas), so its own RSD
+  and ICC are meaningless. It also assumes the silicon content is
+  constant across samples, which is false for soils ranging from clay to
+  sand. It lowers the ICC of every other line.
 
 No normalization is universally best, so choose one on data from the
 matrix at hand, and confirm the choice against the end goal. We continue
@@ -439,6 +440,47 @@ Most samples keep all 8 shots. The few samples that lose several shots
 are heterogeneous and deserve inspection: their mean spectrum rests on
 fewer measurements and is less certain.
 
+### Whole-spectrum screening with `reject_shots()`
+
+The screen above looks at five lines.
+[`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md)
+looks at whole spectra instead, with two robust z-scores computed within
+each sample: the total intensity of each shot, which flags weak or
+missed plasmas, and its correlation with the median spectrum of the
+sample, which flags shots of a different shape (another mineral grain, a
+contaminated spot). The total intensity is meaningful only before
+normalization, since SNV gives every spectrum a mean of zero, so we
+screen the baseline-corrected spectra:
+
+``` r
+
+whole <- reject_shots(baselined, Sample)
+count(whole, .reason)
+#> # A tibble: 4 × 2
+#>   .reason                    n
+#>   <chr>                  <int>
+#> 1 correlation               21
+#> 2 intensity                  4
+#> 3 intensity, correlation     6
+#> 4 NA                       369
+count(whole, lines = shots$flagged, whole_spectrum = .rejected)
+#> # A tibble: 4 × 3
+#>   lines whole_spectrum     n
+#>   <lgl> <lgl>          <int>
+#> 1 FALSE FALSE            351
+#> 2 FALSE TRUE              23
+#> 3 TRUE  FALSE             18
+#> 4 TRUE  TRUE               8
+```
+
+The two screens flag different shots, because they look at different
+things: a shot can have normal intensities for the five lines and a
+different spectrum elsewhere, or the reverse. With 8 shots per sample,
+the median and MAD of each sample are themselves uncertain, so a cutoff
+of 3.5 (the default) still flags some legitimate heterogeneity; raise
+`cutoff` to keep only the gross outliers. Whatever the screen, report
+how many shots it removed.
+
 ## Step 4: Averaging replicates
 
 With the screened shots,
@@ -488,6 +530,7 @@ calibration spectra and applied to new ones:
 pipeline <- recipe(~ ., data = specLIBS) |>
   update_role(all_of(meta_cols), new_role = "id") |>
   step_baseline(all_predictors(), lambda = 1e5, options = list(max.iter = 20)) |>
+  step_reject_shots(all_predictors(), sample = Sample) |>
   step_snv(all_predictors())
 pipeline
 #> 
@@ -500,8 +543,17 @@ pipeline
 #> 
 #> ── Operations
 #> • Baseline correction on: all_predictors()
+#> • Shot rejection (intensity, correlation) on: all_predictors()
 #> • Standard normal variate on: all_predictors()
 ```
+
+[`step_reject_shots()`](https://christiangoueguel.com/specProc/reference/step_reject_shots.md)
+removes rows, so it is skipped when new data are baked (`skip = TRUE`):
+the rejected shots are left out of the model fit, but a prediction is
+still made for every new spectrum. Keep the shots of a sample together
+when resampling, for example with
+`rsample::group_vfold_cv(group = Sample)`. To model sample means rather
+than shots, screen and average before the recipe, as in Steps 3 and 4.
 
 The companion vignettes use this pipeline to fit emission lines
 ([`vignette("line-fitting", package = "specProc")`](https://christiangoueguel.com/specProc/articles/line-fitting.md))
