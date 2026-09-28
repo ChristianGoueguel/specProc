@@ -13,6 +13,25 @@ Functions used to assess individual variables or features independently.
 
 ## Multivariate filtering
 
+### robust PCA
+
+Principal component analysis that resists outlying observations (and,
+for MacroPCA, outlying cells and missing values).
+
+- [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
+  : Robust Principal Component Analysis (ROBPCA)
+- [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
+  : Robust Sparse Principal Component Analysis (ROSPCA)
+- [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  : Robust PCA for Cellwise and Casewise Outliers (MacroPCA)
+- [`predict(`*`<specproc_robpca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
+  [`predict(`*`<specproc_macropca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
+  : Scores and Distances of New Observations
+- [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
+  : Outlier Map of a Robust PCA
+- [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
+  : Cell Map of a MacroPCA Fit
+
 ### orthogonalization methods
 
 Functions used to identify and remove unwanted covariance structures and
@@ -22,8 +41,6 @@ sources of variance from the multivariate data.
   External Parameter Orthogonalization
 - [`osc()`](https://christiangoueguel.com/specProc/reference/osc.md) :
   Orthogonal Signal Correction
-- [`nas()`](https://christiangoueguel.com/specProc/reference/nas.md) :
-  Net Analyte Signal
 - [`opls()`](https://christiangoueguel.com/specProc/reference/opls.md) :
   Orthogonal Projections to Latent Structures
 - [`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md)
@@ -43,6 +60,16 @@ sources of variance from the multivariate data.
   [`predict(`*`<specproc_projected_osc>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
   [`predict(`*`<o2pls>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
   : Apply an Orthogonalization Filter to New Spectra
+
+### figures of merit
+
+Net analyte signal of a multivariate calibration model, with its
+sensitivity, selectivity and limits of detection and quantification.
+
+- [`nas()`](https://christiangoueguel.com/specProc/reference/nas.md) :
+  Net Analyte Signal and Figures of Merit
+- [`predict(`*`<specproc_nas>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_nas.md)
+  : Net Analyte Signal of New Samples
 
 ### calibration transfer
 
@@ -74,6 +101,17 @@ and can be tuned within a tidymodels workflow.
   : Pareto Scaling Recipe Step
 - [`step_poisson_scale()`](https://christiangoueguel.com/specProc/reference/step_poisson_scale.md)
   : Poisson Scaling Recipe Step
+
+### robust transformation and PCA
+
+- [`step_robust_bcyj()`](https://christiangoueguel.com/specProc/reference/step_robust_bcyj.md)
+  : Robust Box-Cox and Yeo-Johnson Transformation Recipe Step
+- [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md)
+  : Robust PCA (ROBPCA) Recipe Step
+- [`step_rospca()`](https://christiangoueguel.com/specProc/reference/step_rospca.md)
+  : Robust Sparse PCA (ROSPCA) Recipe Step
+- [`step_macropca()`](https://christiangoueguel.com/specProc/reference/step_macropca.md)
+  : MacroPCA Recipe Step
 
 ### orthogonalization
 

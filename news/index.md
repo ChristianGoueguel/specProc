@@ -1,5 +1,77 @@
 # Changelog
 
+## specProc 0.4.0
+
+This release adds robust PCA, a proper net analyte signal with figures
+of merit, and rewrites the documentation around tidymodels.
+
+### Breaking changes
+
+- [`nas()`](https://christiangoueguel.com/specProc/reference/nas.md) now
+  computes the net analyte signal (Lorber, Faber and Kowalski, 1997;
+  Faber, 1998) of an inverse PLS or PCR calibration model, with its
+  figures of merit: sensitivity, selectivity and, given the noise level,
+  analytical sensitivity, limits of detection and quantification, and
+  signal-to-noise ratios. A
+  [`predict()`](https://rdrr.io/r/stats/predict.html) method gives the
+  NAS, selectivity and predicted concentration of new samples.
+  Previously,
+  [`nas()`](https://christiangoueguel.com/specProc/reference/nas.md)
+  returned spectra filtered by direct orthogonalization, identical to
+  [`direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/direct_orthogonal.md),
+  which remains available for that purpose.
+
+### New features
+
+- Robust PCA:
+  [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
+  (ROBPCA, Hubert, Rousseeuw and Vanden Branden,
+  2005. and
+        [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
+        (robust sparse PCA, Hubert, Reynkens, Schmitt and Verdonck,
+        2016), implemented from the published algorithms with C++
+        kernels for the Stahel-Donoho outlyingness, FAST-MCD and the
+        grid-search sparse PCA; and
+        [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
+        a wrapper around
+        [`cellWise::MacroPCA()`](https://rdrr.io/pkg/cellWise/man/MacroPCA.html)
+        for cellwise outliers and missing values. All three return score
+        and orthogonal distances with cut-offs, an outlier
+        classification, and a
+        [`predict()`](https://rdrr.io/r/stats/predict.html) method for
+        new observations.
+- [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
+  draws the outlier map (score distance against orthogonal distance) of
+  any of the three, optionally with new observations;
+  [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
+  draws the cell map of a MacroPCA fit.
+- New recipe steps
+  [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md),
+  [`step_rospca()`](https://christiangoueguel.com/specProc/reference/step_rospca.md)
+  and
+  [`step_macropca()`](https://christiangoueguel.com/specProc/reference/step_macropca.md),
+  robust counterparts of
+  [`recipes::step_pca()`](https://recipes.tidymodels.org/reference/step_pca.html)
+  that can also add the score and orthogonal distances as columns, and
+  [`step_robust_bcyj()`](https://christiangoueguel.com/specProc/reference/step_robust_bcyj.md),
+  a robust counterpart of
+  [`recipes::step_BoxCox()`](https://recipes.tidymodels.org/reference/step_BoxCox.html)
+  and
+  [`recipes::step_YeoJohnson()`](https://recipes.tidymodels.org/reference/step_YeoJohnson.html).
+
+### Documentation
+
+- The four vignettes and the README use recipe steps, tidymodels
+  (workflows, tune, rsample) and the tidyverse. Preprocessing pipelines
+  are written as recipes; the calibration vignette runs its repeated
+  nested cross-validation with
+  [`rsample::nested_cv()`](https://rsample.tidymodels.org/reference/nested_cv.html)
+  and
+  [`tune::tune_grid()`](https://tune.tidymodels.org/reference/tune_grid.html),
+  and the orthogonalization vignette tunes every filter together with
+  the PLS model. Vignettes that need suggested packages stop with a
+  message when those are not installed.
+
 ## specProc 0.3.0
 
 This release connects specProc to the tidymodels framework.

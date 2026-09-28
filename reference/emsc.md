@@ -38,8 +38,9 @@ emsc(
 
 - interferents:
 
-  An optional numeric matrix or data frame of interferent spectra, one
-  per row, with the same number of columns as `x`.
+  An optional numeric vector (a single spectrum), matrix or data frame
+  of interferent spectra, one per row, with the same number of columns
+  as `x`.
 
 - wavelength:
 

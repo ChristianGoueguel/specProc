@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,28 @@
       <small>Source: <a href="https://github.com/ChristianGoueguel/specProc/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.0" id="specproc-040">specProc 0.4.0<a class="anchor" aria-label="anchor" href="#specproc-040"></a></h2>
+<p>This release adds robust PCA, a proper net analyte signal with figures of merit, and rewrites the documentation around tidymodels.</p>
+<div class="section level3">
+<h3 id="breaking-changes-0-4-0">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-4-0"></a></h3>
+<ul><li>
+<code><a href="../reference/nas.html">nas()</a></code> now computes the net analyte signal (Lorber, Faber and Kowalski, 1997; Faber, 1998) of an inverse PLS or PCR calibration model, with its figures of merit: sensitivity, selectivity and, given the noise level, analytical sensitivity, limits of detection and quantification, and signal-to-noise ratios. A <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method gives the NAS, selectivity and predicted concentration of new samples. Previously, <code><a href="../reference/nas.html">nas()</a></code> returned spectra filtered by direct orthogonalization, identical to <code><a href="../reference/direct_orthogonal.html">direct_orthogonal()</a></code>, which remains available for that purpose.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-4-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-4-0"></a></h3>
+<ul><li>Robust PCA: <code><a href="../reference/robpca.html">robpca()</a></code> (ROBPCA, Hubert, Rousseeuw and Vanden Branden,
+<ol start="2005" style="list-style-type: decimal"><li>and <code><a href="../reference/rospca.html">rospca()</a></code> (robust sparse PCA, Hubert, Reynkens, Schmitt and Verdonck, 2016), implemented from the published algorithms with C++ kernels for the Stahel-Donoho outlyingness, FAST-MCD and the grid-search sparse PCA; and <code><a href="../reference/macropca.html">macropca()</a></code>, a wrapper around <code><a href="https://rdrr.io/pkg/cellWise/man/MacroPCA.html" class="external-link">cellWise::MacroPCA()</a></code> for cellwise outliers and missing values. All three return score and orthogonal distances with cut-offs, an outlier classification, and a <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method for new observations.</li>
+</ol></li>
+<li>
+<code><a href="../reference/plot_outlier_map.html">plot_outlier_map()</a></code> draws the outlier map (score distance against orthogonal distance) of any of the three, optionally with new observations; <code><a href="../reference/plot_cell_map.html">plot_cell_map()</a></code> draws the cell map of a MacroPCA fit.</li>
+<li>New recipe steps <code><a href="../reference/step_robpca.html">step_robpca()</a></code>, <code><a href="../reference/step_rospca.html">step_rospca()</a></code> and <code><a href="../reference/step_macropca.html">step_macropca()</a></code>, robust counterparts of <code><a href="https://recipes.tidymodels.org/reference/step_pca.html" class="external-link">recipes::step_pca()</a></code> that can also add the score and orthogonal distances as columns, and <code><a href="../reference/step_robust_bcyj.html">step_robust_bcyj()</a></code>, a robust counterpart of <code><a href="https://recipes.tidymodels.org/reference/step_BoxCox.html" class="external-link">recipes::step_BoxCox()</a></code> and <code><a href="https://recipes.tidymodels.org/reference/step_YeoJohnson.html" class="external-link">recipes::step_YeoJohnson()</a></code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="documentation-0-4-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-4-0"></a></h3>
+<ul><li>The four vignettes and the README use recipe steps, tidymodels (workflows, tune, rsample) and the tidyverse. Preprocessing pipelines are written as recipes; the calibration vignette runs its repeated nested cross-validation with <code><a href="https://rsample.tidymodels.org/reference/nested_cv.html" class="external-link">rsample::nested_cv()</a></code> and <code><a href="https://tune.tidymodels.org/reference/tune_grid.html" class="external-link">tune::tune_grid()</a></code>, and the orthogonalization vignette tunes every filter together with the PLS model. Vignettes that need suggested packages stop with a message when those are not installed.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="specproc-030">specProc 0.3.0<a class="anchor" aria-label="anchor" href="#specproc-030"></a></h2>
 <p>This release connects specProc to the tidymodels framework. Preprocessing and orthogonalization can now be estimated on calibration data and applied to new spectra, either directly with <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> or as recipe steps that are re-estimated on every resample and tuned together with the model.</p>

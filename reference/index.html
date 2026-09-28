@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,6 +74,57 @@
 
       <dl></dl></div><div class="section level2">
 
+      <h3 id="robust-pca">robust PCA<a class="anchor" aria-label="anchor" href="#robust-pca"></a></h3>
+      <div class="section-desc"><p>Principal component analysis that resists outlying observations (and, for MacroPCA, outlying cells and missing values).</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="robpca.html">robpca()</a></code>
+
+        </dt>
+        <dd>Robust Principal Component Analysis (ROBPCA)</dd>
+
+        <dt>
+
+          <code><a href="rospca.html">rospca()</a></code>
+
+        </dt>
+        <dd>Robust Sparse Principal Component Analysis (ROSPCA)</dd>
+
+        <dt>
+
+          <code><a href="macropca.html">macropca()</a></code>
+
+        </dt>
+        <dd>Robust PCA for Cellwise and Casewise Outliers (MacroPCA)</dd>
+
+        <dt>
+
+          <code><a href="predict.specproc_robpca.html">predict(<i>&lt;specproc_robpca&gt;</i>)</a></code> <code><a href="predict.specproc_robpca.html">predict(<i>&lt;specproc_macropca&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Scores and Distances of New Observations</dd>
+
+        <dt>
+
+          <code><a href="plot_outlier_map.html">plot_outlier_map()</a></code>
+
+        </dt>
+        <dd>Outlier Map of a Robust PCA</dd>
+
+        <dt>
+
+          <code><a href="plot_cell_map.html">plot_cell_map()</a></code>
+
+        </dt>
+        <dd>Cell Map of a MacroPCA Fit</dd>
+      </dl></div><div class="section level2">
+
       <h3 id="orthogonalization-methods">orthogonalization methods<a class="anchor" aria-label="anchor" href="#orthogonalization-methods"></a></h3>
       <div class="section-desc"><p>Functions used to identify and remove unwanted covariance structures and sources of variance from the multivariate data.</p></div>
 
@@ -95,13 +146,6 @@
 
         </dt>
         <dd>Orthogonal Signal Correction</dd>
-
-        <dt>
-
-          <code><a href="nas.html">nas()</a></code>
-
-        </dt>
-        <dd>Net Analyte Signal</dd>
 
         <dt>
 
@@ -151,6 +195,29 @@
 
         </dt>
         <dd>Apply an Orthogonalization Filter to New Spectra</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="figures-of-merit">figures of merit<a class="anchor" aria-label="anchor" href="#figures-of-merit"></a></h3>
+      <div class="section-desc"><p>Net analyte signal of a multivariate calibration model, with its sensitivity, selectivity and limits of detection and quantification.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="nas.html">nas()</a></code>
+
+        </dt>
+        <dd>Net Analyte Signal and Figures of Merit</dd>
+
+        <dt>
+
+          <code><a href="predict.specproc_nas.html">predict(<i>&lt;specproc_nas&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Net Analyte Signal of New Samples</dd>
       </dl></div><div class="section level2">
 
       <h3 id="calibration-transfer">calibration transfer<a class="anchor" aria-label="anchor" href="#calibration-transfer"></a></h3>
@@ -230,6 +297,43 @@
 
         </dt>
         <dd>Poisson Scaling Recipe Step</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="robust-transformation-and-pca">robust transformation and PCA<a class="anchor" aria-label="anchor" href="#robust-transformation-and-pca"></a></h3>
+
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="step_robust_bcyj.html">step_robust_bcyj()</a></code>
+
+        </dt>
+        <dd>Robust Box-Cox and Yeo-Johnson Transformation Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_robpca.html">step_robpca()</a></code>
+
+        </dt>
+        <dd>Robust PCA (ROBPCA) Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_rospca.html">step_rospca()</a></code>
+
+        </dt>
+        <dd>Robust Sparse PCA (ROSPCA) Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_macropca.html">step_macropca()</a></code>
+
+        </dt>
+        <dd>MacroPCA Recipe Step</dd>
       </dl></div><div class="section level2">
 
       <h3 id="orthogonalization">orthogonalization<a class="anchor" aria-label="anchor" href="#orthogonalization"></a></h3>

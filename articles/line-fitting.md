@@ -10,14 +10,23 @@ profile, and how far the fitted standard errors can be trusted.
 ``` r
 
 library(specProc)
-data(specLIBS)
+library(recipes)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
 
-meta <- specLIBS[1:8]
-X <- as.matrix(specLIBS[-(1:8)])
-wl <- as.numeric(colnames(X))
+data(specLIBS)
+meta_cols <- c("Sample", "Location", "Clay", "Sand", "Silt", "Texture", "Structure", "Type")
+channels <- setdiff(names(specLIBS), meta_cols)
+wl <- as.numeric(channels)
 
 # Baseline-corrected counts (see vignette("preprocessing"))
-Xb <- as.matrix(baseline_arpls(X, lambda = 1e5, max.iter = 20)$correction)
+baselined <- recipe(~ ., data = specLIBS) |>
+  update_role(all_of(meta_cols), new_role = "id") |>
+  step_baseline(all_predictors(), lambda = 1e5, options = list(max.iter = 20)) |>
+  prep() |>
+  bake(new_data = NULL)
 ```
 
 ## Line profiles
@@ -42,28 +51,34 @@ approximation:
 
 ``` r
 
-x <- seq(-1.5, 1.5, length.out = 500)
-v <- voigt_profile(x, y0 = 0, xc = 0, wG = 0.3, wL = 0.3, A = 1)
-pv <- pseudo_voigt_profile(x, y0 = 0, xc = 0, wG = 0.3, wL = 0.3, A = 1)$y
+profiles_df <- tibble(x = seq(-1.5, 1.5, length.out = 500)) |>
+  mutate(
+    Voigt = voigt_profile(x, y0 = 0, xc = 0, wG = 0.3, wL = 0.3, A = 1),
+    Gaussian = gaussian_profile(x, 0, 0, 0.3, 1),
+    Lorentzian = lorentzian_profile(x, 0, 0, 0.3, 1),
+    pseudo_voigt = pseudo_voigt_profile(x, y0 = 0, xc = 0, wG = 0.3, wL = 0.3, A = 1)$y
+  )
 
-op <- par(mfrow = c(1, 2), mar = c(4, 4, 2, 1))
-plot(x, v, type = "l", lwd = 2, ylim = c(0, max(gaussian_profile(x, 0, 0, 0.3, 1))),
-     xlab = "x - xc", ylab = "Profile", main = "Voigt profile")
-lines(x, gaussian_profile(x, 0, 0, 0.3, 1), lty = 2, col = "blue")
-lines(x, lorentzian_profile(x, 0, 0, 0.3, 1), lty = 3, col = "red")
-legend("topright", c("Voigt", "Gaussian", "Lorentzian"), lty = 1:3,
-       col = c("black", "blue", "red"), bty = "n", cex = 0.8)
-plot(x, (pv - v) / max(v) * 100, type = "l", xlab = "x - xc",
-     ylab = "Error (% of peak)", main = "Pseudo-Voigt error")
-abline(h = 0, col = "grey")
+bind_rows(
+  profiles_df |>
+    pivot_longer(c(Voigt, Gaussian, Lorentzian), names_to = "curve") |>
+    mutate(panel = "Voigt profile"),
+  profiles_df |>
+    transmute(x, curve = "Pseudo-Voigt error", value = (pseudo_voigt - Voigt) / max(Voigt) * 100,
+              panel = "Pseudo-Voigt error (% of peak)")
+) |>
+  ggplot(aes(x, value, colour = curve, linetype = curve)) +
+  geom_hline(yintercept = 0, colour = "grey80") +
+  geom_line() +
+  facet_wrap(~ panel, scales = "free_y") +
+  scale_colour_manual(values = c(Voigt = "black", Gaussian = "blue", Lorentzian = "red",
+                                 `Pseudo-Voigt error` = "black")) +
+  labs(x = "x - xc", y = NULL, colour = NULL, linetype = NULL) +
+  theme_bw() +
+  theme(legend.position = "top")
 ```
 
 ![](line-fitting_files/figure-html/profiles-1.png)
-
-``` r
-
-par(op)
-```
 
 For equal Gaussian and Lorentzian widths, the pseudo-Voigt deviates from
 the exact profile by about 1% of the peak height. That is small, but it
@@ -83,24 +98,23 @@ sample, using each of the four profiles:
 
 ``` r
 
-first <- meta$Sample == meta$Sample[1]
-window <- wl > 392.6 & wl < 393.9
-line_data <- as.data.frame(t(colMeans(Xb[first, window])))
-names(line_data) <- wl[window]
+first_sample <- baselined |> filter(Sample == first(Sample))
+window <- channels[wl > 392.6 & wl < 393.9]
+line_data <- first_sample |> summarise(across(all_of(window), mean))
 
 profiles <- c("gaussian", "lorentzian", "pseudo_voigt", "voigt")
-fits <- lapply(profiles, function(p) peak_fit(line_data, profile = p))
-names(fits) <- profiles
+fits <- profiles |>
+  set_names() |>
+  map(\(p) peak_fit(line_data, profile = p))
 
-comparison <- data.frame(
+comparison <- tibble(
   profile = profiles,
-  parameters = sapply(fits, function(f) length(stats::coef(f$fit[[1]]))),
-  AIC = sapply(fits, function(f) round(stats::AIC(f$fit[[1]]), 1)),
-  area = sapply(fits, function(f) round(stats::coef(f$fit[[1]])[["A"]])),
-  area_SE = sapply(fits, function(f) round(summary(f$fit[[1]])$coefficients["A", 2])),
-  row.names = NULL
+  parameters = map_int(fits, \(f) length(stats::coef(f$fit[[1]]))),
+  AIC = map_dbl(fits, \(f) round(stats::AIC(f$fit[[1]]), 1)),
+  area = map_dbl(fits, \(f) round(stats::coef(f$fit[[1]])[["A"]])),
+  area_SE = map_dbl(fits, \(f) round(summary(f$fit[[1]])$coefficients["A", 2]))
 )
-comparison
+as.data.frame(comparison)
 #>        profile parameters   AIC area area_SE
 #> 1     gaussian          4 270.7 4572     225
 #> 2   lorentzian          4 269.6 6567     446
@@ -158,27 +172,32 @@ section):
 
 ``` r
 
-window2 <- wl > 392.9 & wl < 397.3
-shots <- as.data.frame(Xb[first, window2])
-names(shots) <- wl[window2]
-shots$shot <- seq_len(nrow(shots))
+window2 <- channels[wl > 392.9 & wl < 397.3]
 centers <- c(393.37, 394.40, 396.15, 396.85)
-per_shot <- multipeak_fit(shots, peaks = centers, profiles = "voigt", id = "shot")
+line_names <- c(A_1 = "Ca II 393.37", A_2 = "Al I 394.40", A_3 = "Al I 396.15", A_4 = "Ca II 396.85")
 
-get <- function(term, what) sapply(per_shot$tidied, function(t) t[[what]][t$term == term])
-precision <- data.frame(
-  line = c("Ca II 393.37", "Al I 394.40", "Al I 396.15", "Ca II 396.85"),
-  mean_area = sapply(paste0("A_", 1:4), function(a) mean(get(a, "estimate"))),
-  model_SE = sapply(paste0("A_", 1:4), function(a) median(get(a, "std.error"))),
-  replicate_SD = sapply(paste0("A_", 1:4), function(a) sd(get(a, "estimate"))),
-  row.names = NULL
-)
-precision[-1] <- round(precision[-1])
-precision
-#>           line mean_area model_SE replicate_SD
+per_shot <- first_sample |>
+  select(all_of(window2)) |>
+  mutate(shot = row_number()) |>
+  multipeak_fit(peaks = centers, profiles = "voigt", id = "shot")
+
+per_shot$tidied |>
+  bind_rows(.id = "shot") |>
+  filter(term %in% names(line_names)) |>
+  group_by(line = line_names[term]) |>
+  summarise(
+    mean_area = mean(estimate),
+    model_SE = median(std.error),
+    replicate_SD = sd(estimate)
+  ) |>
+  arrange(match(line, line_names)) |>
+  mutate(across(-line, round))
+#> # A tibble: 4 × 4
+#>   line         mean_area model_SE replicate_SD
+#>   <chr>            <dbl>    <dbl>        <dbl>
 #> 1 Ca II 393.37      5723      335          204
-#> 2  Al I 394.40      1947      292           67
-#> 3  Al I 396.15      2788      333          154
+#> 2 Al I 394.40       1947      292           67
+#> 3 Al I 396.15       2788      333          154
 #> 4 Ca II 396.85      2920      295           76
 ```
 
@@ -218,10 +237,9 @@ parameters of line i carry the suffix `_i`:
 
 ``` r
 
-region <- as.data.frame(t(colMeans(Xb[first, window2])))
-names(region) <- wl[window2]
-
-multi <- multipeak_fit(region, peaks = centers, profiles = "voigt")
+multi <- first_sample |>
+  summarise(across(all_of(window2), mean)) |>
+  multipeak_fit(peaks = centers, profiles = "voigt")
 multi$tidied[[1]]
 #> # A tibble: 17 × 5
 #>    term   estimate std.error  statistic   p.value

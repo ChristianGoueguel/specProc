@@ -3,9 +3,7 @@
 `step_direct_orthogonal()` creates a *specification* of a recipe step
 that removes response-orthogonal variation from the selected predictors
 with
-[`direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/direct_orthogonal.md)
-(equivalent to
-[`nas()`](https://christiangoueguel.com/specProc/reference/nas.md)).
+[`direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/direct_orthogonal.md).
 
 ## Usage
 

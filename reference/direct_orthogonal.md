@@ -86,9 +86,10 @@ To correct new data, preprocess it with the returned `center` and
 [`predict.specproc_filter()`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
 to correct new spectra with the fitted filter,
 [`step_direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/step_direct_orthogonal.md)
-to use it in a tidymodels recipe, and
-[`nas()`](https://christiangoueguel.com/specProc/reference/nas.md),
-which computes the same correction.
+to use it in a tidymodels recipe. Before specProc 0.4.0,
+[`nas()`](https://christiangoueguel.com/specProc/reference/nas.md)
+returned the same correction; it now computes the net analyte signal and
+figures of merit.
 
 ## Author
 
