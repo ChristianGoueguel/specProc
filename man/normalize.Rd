@@ -9,7 +9,7 @@ normalize(x, method = "area", bkg = NULL, wlength = NULL, drop.na = TRUE)
 \arguments{
 \item{x}{A numeric matrix or data frame containing the spectra.}
 
-\item{method}{A character vector specifying the normalization method to apply. Available methods are: "area", "background", and "internal".}
+\item{method}{A character vector specifying the normalization method to apply. Available methods are: "area", "l1", "l2", "max", "background", and "internal". Spectra whose L1, L2 or maximum norm is zero are set to \code{NA}, with a warning.}
 
 \item{bkg}{A numeric matrix or data frame of the same dimension as \code{x}, specifying the intensity of the continuum radiation (background emission) used for normalizing \code{x}. Required for "background" method.}
 
@@ -22,7 +22,8 @@ A tibble of normalized spectra.
 }
 \description{
 This function implements normalization methods based on background,
-total area, and internal standard.
+total area, internal standard, and the L1, L2 and maximum norms of each
+spectrum.
 }
 \details{
 The three normalization methods:
@@ -34,6 +35,16 @@ dark current be subtracted prior to the normalization.
 area of the spectrum over the whole spectral range. The detector dark current
 must be subtracted prior to this normalization. The total area is calculated
 as the sum of all intensity levels.
+\item \strong{L1 normalization} (\code{"l1"}): each spectrum is divided by the sum of
+the absolute values of its intensities. It equals the total area for
+non-negative spectra, and also suits derivative spectra, whose values
+change sign.
+\item \strong{L2 (vector) normalization} (\code{"l2"}): each spectrum is divided by
+its Euclidean norm, so that its sum of squares is 1. Unlike SNV, the
+spectrum is not centered.
+\item \strong{Maximum normalization} (\code{"max"}): each spectrum is divided by its
+largest absolute intensity, so that its strongest feature is 1 (or
+-1).
 \item \strong{Normalization to an internal standard:} The peak intensity (or area) of the
 emission line related to the analyte is divided by the peak intensity (or area)
 of a selected emission line related to the internal standard. The internal
@@ -43,6 +54,7 @@ standard concentration is assumed constant or known.
 \examples{
 x <- data.frame(`400` = c(1, 2), `401` = c(3, 6), `402` = c(1, 2), check.names = FALSE)
 normalize(x, method = "area")
+normalize(x, method = "l2")
 normalize(x, method = "internal", wlength = "401")
 
 }

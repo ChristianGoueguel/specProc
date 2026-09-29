@@ -69,6 +69,7 @@ reference:
   - step_savgol
   - step_wavelet
   - step_snv
+  - step_spectral_norm
   - step_msc
   - step_emsc
   - step_pareto_scale
@@ -103,6 +104,7 @@ reference:
   - glsw_alpha
   - savgol_derivative
   - wavelet_level
+  - spectral_norm_method
 
 - title: Line identification
   desc: >

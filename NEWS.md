@@ -13,6 +13,10 @@
   edges) and filtering the segments between detector gaps separately. The
   window, polynomial order and derivative are tunable (new dials parameter
   `savgol_derivative()`).
+* `normalize()` gains the L1 (`"l1"`), L2 or vector (`"l2"`) and maximum
+  (`"max"`) norms, and `step_spectral_norm()` normalizes each spectrum in a
+  recipe by its L1 norm, total area, L2 norm or maximum, with the method
+  tunable (new dials parameter `spectral_norm_method()`).
 * `wavelet_features()` and `step_wavelet()`: discrete wavelet transform of
   spectra (Haar, Daubechies d4/d6/d8 and least asymmetric la8 wavelets) as
   compressed features: the approximation at a level or all coefficients,

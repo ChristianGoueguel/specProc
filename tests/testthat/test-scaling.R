@@ -122,3 +122,17 @@ test_that("tukey_gh distribution functions are consistent", {
   expect_error(tukey_gh(1, type = "z"), "Invalid 'type'")
   expect_error(tukey_gh(1, h = -1), "Negative kurtosis")
 })
+
+test_that("normalize implements the L1, L2 and maximum norms", {
+  x <- data.frame(`400` = c(1, -2), `401` = c(3, 6), `402` = c(4, 2), check.names = FALSE)
+  m <- as.matrix(x)
+  expect_equal(as.matrix(normalize(x, "l1")), m / rowSums(abs(m)), ignore_attr = TRUE)
+  expect_equal(rowSums(as.matrix(normalize(x, "l2"))^2), c(1, 1))
+  expect_equal(as.matrix(normalize(x, "max")), m / c(4, 6), ignore_attr = TRUE)
+  expect_named(normalize(x, "l2"), names(x))
+  # L1 differs from the area when the spectrum changes sign
+  expect_false(isTRUE(all.equal(normalize(x, "l1"), normalize(x, "area"))))
+  zero <- rbind(x, 0)
+  expect_warning(out <- normalize(zero, "l2"), "zero or missing l2 norm")
+  expect_true(all(is.na(unlist(out[3, ]))))
+})
