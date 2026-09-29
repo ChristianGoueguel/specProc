@@ -4,7 +4,7 @@ Computes, for each sample, the two distances used to monitor a principal
 component analysis (PCA) model: Hotelling's \\T^2\\, the distance within
 the model plane of the first `k` components, and the Q residual (squared
 prediction error, SPE), the squared distance to that plane, with their
-95% and 99% limits.
+limits at one or more confidence levels.
 
 ## Usage
 
@@ -13,7 +13,9 @@ q_residuals(
   model,
   k,
   newdata = NULL,
+  conf_level = c(0.95, 0.99),
   method = "jackson",
+  t2_method = "f",
   center = TRUE,
   scale = FALSE
 )
@@ -39,9 +41,20 @@ q_residuals(
   model), whose distances are computed instead of those of the
   calibration samples.
 
+- conf_level:
+
+  The confidence level(s) of the limits: one or more values between 0
+  and 1. Default is `c(0.95, 0.99)`.
+
 - method:
 
   The limit of Q: `"jackson"` (default, Jackson-Mudholkar) or `"box"`.
+
+- t2_method:
+
+  The distribution of the \\T^2\\ limit of the samples of the model:
+  `"f"` (default) or `"beta"` (see
+  [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)).
 
 - center, scale:
 
@@ -51,10 +64,11 @@ q_residuals(
 ## Value
 
 A tibble of class `specproc_influence`, with one row per sample:
-`sample` (row number), `t2`, `q`, their limits (`t2_limit_95`,
-`t2_limit_99`, `q_limit_95`, `q_limit_99`) and `outlier`, the type of
-the sample at the 99% limits: `"regular"`, `"extreme"` (high \\T^2\\
-only), `"residual"` (high Q only) or `"both"`. Draw it with
+`sample` (row number), `t2`, its limits at each confidence level (in %,
+e.g. `t2_limit_95`), `q`, its limits (`q_limit_95`, ...) and `outlier`,
+the type of the sample at the highest confidence level: `"regular"`,
+`"extreme"` (high \\T^2\\ only), `"residual"` (high Q only) or `"both"`.
+Draw it with
 [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md).
 
 ## Details
@@ -65,20 +79,24 @@ With scores \\t\_{ia}\\ and eigenvalues \\\lambda_a\\, \$\$T^2_i =
 the (centered and scaled) sample from the `k` components. A high \\T^2\\
 is an extreme but well-modeled sample (for example, a high
 concentration); a high Q is a sample the model does not describe
-(another matrix, a contamination, an instrumental problem). The limit of
-\\T^2\\ is \\k(n-1)/(n-k)\\F(k, n-k)\\ for the calibration samples and
-\\k(n+1)(n-1)/(n(n-k))\\F(k, n-k)\\ for new samples. The limit of Q is
-that of Jackson and Mudholkar (1979), from the eigenvalues of the
-components left out, or Box's (1954) scaled chi-square approximation
-(`method = "box"`). Both approximate the distribution of Q from the
-eigenvalues of the calibration samples, and tend to be slightly
-conservative (fewer false alarms than the nominal level).
+(another matrix, a contamination, an instrumental problem).
+
+For the samples of the model, \\T^2\\ and its limits come from
+[`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)
+(F or Beta distribution, `t2_method`). For new samples, the limit is
+that of a new observation, \\k(n+1)(n-1)/(n(n-k))\\F(k, n-k)\\. The
+limit of Q is that of Jackson and Mudholkar (1979), from the eigenvalues
+of the components left out, or Box's (1954) scaled chi-square
+approximation (`method = "box"`); both tend to be slightly conservative.
+Samples are classified at the highest confidence level.
 
 These are classical estimates, themselves affected by outliers: see
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
 and
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
 for robust score and orthogonal distances.
+[`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md)
+gives the residual distance in SIMCA's form.
 
 ## References
 
@@ -95,6 +113,7 @@ for robust score and orthogonal distances.
 
 ## See also
 
+[`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md),
 [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md),
 [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md),
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
@@ -106,14 +125,14 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-data(soilLIBS)
-spectra <- average(soilLIBS[-(2:8)], Sample)
-pca <- stats::prcomp(spectra[-1], scale. = TRUE)
-influence <- q_residuals(pca, k = 3)
-influence[influence$outlier != "regular", ]
-#> # A tibble: 1 × 8
-#>   sample    t2     q t2_limit_95 t2_limit_99 q_limit_95 q_limit_99 outlier
-#>    <int> <dbl> <dbl>       <dbl>       <dbl>      <dbl>      <dbl> <fct>  
-#> 1     18  17.7 1800.        8.76        13.2      2586.      2960. extreme
-plot_influence(influence, label = spectra$Sample)
+if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
+  data(soilLIBS)
+  spectra <- average(soilLIBS[-(2:8)], Sample)
+  pca <- stats::prcomp(spectra[-1], scale. = TRUE)
+  influence <- q_residuals(pca, k = 3)
+  influence[influence$outlier != "regular", ]
+  plot_influence(influence, label = spectra$Sample)
+  # a single limit
+  plot_influence(q_residuals(pca, k = 3, conf_level = 0.99))
+}
 ```

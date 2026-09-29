@@ -10,6 +10,31 @@
 
 ### New features
 
+- [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md)
+  computes the distance to the model in the space of the variables
+  (DModX, as in SIMCA) of a PCA model, normalized or absolute, for the
+  calibration samples or new ones. Its limits use the effective number
+  of residual dimensions by default (`df = "effective"`), because
+  SIMCA’s degrees of freedom (`df = "simca"`) flag a large share of
+  ordinary samples when spectra have far more channels than samples.
+  [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
+  draws DModX or Q against T-squared.
+
+- [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md),
+  [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md),
+  [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md),
+  [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
+  and the T-squared ellipses of
+  [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
+  take any confidence level(s) (`conf_level`, `t2_level`;
+  `c(0.95, 0.99)` by default, or a single one), and the Beta
+  distribution of T-squared for the samples of the model
+  (`method = "beta"`).
+  [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)
+  and the T-squared ellipses of
+  [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
+  now use the HotellingEllipse package (1.3.0 or later).
+
 - [`wavelength_calibration()`](https://christiangoueguel.com/specProc/reference/wavelength_calibration.md)
   fits a correction of the wavelength axis from reference lines (for
   example, from the NIST database), located to a fraction of a channel

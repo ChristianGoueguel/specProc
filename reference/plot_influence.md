@@ -1,9 +1,13 @@
 # Influence Plot of a PCA Model
 
-Plots the Q residual of each sample against its Hotelling's \\T^2\\,
-with their 95% (dashed) and 99% (solid) limits, from
-[`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md).
-The samples beyond a 99% limit are colored by type and labeled.
+Plots the residual distance of each sample to a PCA model (Q residual or
+DModX) against its Hotelling's \\T^2\\, with their limits at each
+confidence level, from
+[`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md)
+or
+[`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md).
+The samples beyond a limit at the highest confidence level are colored
+by type and labeled.
 
 ## Usage
 
@@ -16,7 +20,9 @@ plot_influence(x, label = NULL, log = FALSE, title = NULL)
 - x:
 
   The result of
-  [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md).
+  [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md)
+  or
+  [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md).
 
 - label:
 
@@ -36,7 +42,13 @@ plot_influence(x, label = NULL, log = FALSE, title = NULL)
 
 A ggplot object.
 
+## Details
+
+The limit at the highest confidence level is drawn as a solid line, the
+others as dashed, dotted, ... lines.
+
 ## See also
 
 [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md),
+[`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md),
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)

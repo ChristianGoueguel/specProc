@@ -2,14 +2,23 @@
 
 Computes Hotelling's \\T^2\\ statistic of each sample from its scores on
 the first `k` components of an embedding (such as PCA or PLS scores),
-with the 95% and 99% limits, for all the samples together or within
-groups. Samples beyond the limits are far from the center of the data
-(or of their group) given its covariance: candidate outliers.
+with its limits at one or more confidence levels, for all the samples
+together or within groups, with
+[`HotellingEllipse::ellipseParam()`](https://pkgdown.r-lib.org,%20https://github.com/ChristianGoueguel/HotellingEllipse/reference/ellipseParam.html).
+Samples beyond a limit are far from the center of the data (or of their
+group) given its covariance: candidate outliers.
 
 ## Usage
 
 ``` r
-hotelling_t2(data, columns = NULL, k = 2, group = NULL)
+hotelling_t2(
+  data,
+  columns = NULL,
+  k = 2,
+  group = NULL,
+  conf_level = c(0.95, 0.99),
+  method = "f"
+)
 ```
 
 ## Arguments
@@ -39,22 +48,40 @@ hotelling_t2(data, columns = NULL, k = 2, group = NULL)
   An optional grouping: a column of `data` (unquoted or as a string), or
   a vector with one value per sample.
 
+- conf_level:
+
+  The confidence level(s) of the limits: one or more values between 0
+  and 1. Default is `c(0.95, 0.99)`.
+
+- method:
+
+  The distribution of the limits: `"f"` (default) or `"beta"`.
+
 ## Value
 
 A tibble with one row per sample: its row number `sample`, the `group`
-(with `group`), `t2`, the limits `limit_95` and `limit_99`, `outlier_95`
-and `outlier_99`, and the number of samples `n` of its group (or of the
-data).
+(with `group`), `t2`, then for each confidence level (in %, e.g. 95) its
+limit `limit_95` and whether the sample exceeds it, `outlier_95`, and
+the number of samples `n` of its group (or of the data).
 
 ## Details
 
 \\T^2\\ is the squared Mahalanobis distance of a sample to the mean of
 the scores, with their covariance. Its limit at the confidence level
-\\1 - \alpha\\ is \\k(n - 1)/(n - k)\\ F\_{1-\alpha}(k, n - k)\\ for
-\\n\\ samples. Within groups (`group`), each group gets its own mean,
-covariance and limits, which tells whether a sample is typical of its
-own group rather than of the whole data set; each group needs more than
-`k + 1` samples.
+\\1 - \alpha\\, for \\n\\ samples, is
+
+- `method = "f"` (default): \\k(n - 1)/(n - k)\\ F\_{1-\alpha}(k, n -
+  k)\\, the limit for a new sample, more conservative;
+
+- `method = "beta"`: \\(n - 1)^2/n\\ B\_{1-\alpha}(k/2, (n - k -
+  1)/2)\\, the exact distribution for the samples that estimated the
+  mean and covariance (Tracy, Young and Mason, 1992); the F limit can
+  even exceed the largest \\T^2\\ a sample can reach, \\(n - 1)^2 / n\\,
+  for small \\n\\.
+
+Within groups (`group`), each group gets its own mean, covariance and
+limits, which tells whether a sample is typical of its own group rather
+than of the whole data set; each group needs more than `k + 1` samples.
 
 The statistic uses the `k` components given, not only the two shown on a
 plot: a sample can lie inside the ellipse of two components and still
@@ -68,14 +95,18 @@ of
 - Hotelling, H. (1931). The generalization of Student's ratio. The
   Annals of Mathematical Statistics, 2(3):360-378.
 
+- Tracy, N.D., Young, J.C., Mason, R.L. (1992). Multivariate control
+  charts for individual observations. Journal of Quality Technology,
+  24(2):88-95.
+
 - Jackson, J.E. (1991). A User's Guide to Principal Components. Wiley,
   New York.
 
 ## See also
 
 [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md),
-[`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
-[`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
+[`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md),
+[`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
 
 ## Author
 
@@ -84,13 +115,27 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-data(soilLIBS)
-spectra <- average(soilLIBS[-(2:8)], Sample)
-pca <- stats::prcomp(spectra[-1], scale. = TRUE)
-t2 <- hotelling_t2(pca, k = 3)
-t2[t2$outlier_95, ]
-#> # A tibble: 1 × 7
-#>   sample    t2 limit_95 limit_99 outlier_95 outlier_99     n
-#>    <int> <dbl>    <dbl>    <dbl> <lgl>      <lgl>      <int>
-#> 1     18  17.7     8.76     13.2 TRUE       TRUE          50
+if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
+  data(soilLIBS)
+  spectra <- average(soilLIBS[-(2:8)], Sample)
+  pca <- stats::prcomp(spectra[-1], scale. = TRUE)
+  t2 <- hotelling_t2(pca, k = 3)
+  t2[t2$outlier_95, ]
+  # a single limit, with the exact distribution of the calibration samples
+  hotelling_t2(pca, k = 3, conf_level = 0.975, method = "beta")
+}
+#> # A tibble: 50 × 5
+#>    sample    t2 limit_97.5 outlier_97.5     n
+#>     <int> <dbl>      <dbl> <lgl>        <int>
+#>  1      1 4.27        8.75 FALSE           50
+#>  2      2 5.54        8.75 FALSE           50
+#>  3      3 5.72        8.75 FALSE           50
+#>  4      4 6.58        8.75 FALSE           50
+#>  5      5 2.54        8.75 FALSE           50
+#>  6      6 0.947       8.75 FALSE           50
+#>  7      7 1.17        8.75 FALSE           50
+#>  8      8 0.661       8.75 FALSE           50
+#>  9      9 1.06        8.75 FALSE           50
+#> 10     10 2.72        8.75 FALSE           50
+#> # ℹ 40 more rows
 ```

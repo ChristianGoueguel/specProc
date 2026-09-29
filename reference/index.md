@@ -261,6 +261,8 @@ Functions that help assess data visually.
   : Hotelling's T-squared Statistic of Samples in an Embedding
 - [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md)
   : Hotelling's T-squared and Q Residuals of a PCA Model
+- [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md)
+  : Distance to the Model (DModX) of a PCA Model
 - [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
   : Influence Plot of a PCA Model
 - [`plot_outliers()`](https://christiangoueguel.com/specProc/reference/plot_outliers.md)

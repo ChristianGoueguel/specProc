@@ -25,6 +25,8 @@ plot_embedding(
   distribution = "normal",
   hotelling = "none",
   k = 2,
+  t2_level = c(0.95, 0.99),
+  t2_method = "f",
   label = NULL,
   title = NULL
 )
@@ -78,12 +80,24 @@ plot_embedding(
 
   Hotelling's \\T^2\\ ellipses and outliers: `"none"` (default), `"all"`
   (all samples) or `"group"` (within the groups of a discrete `colour`).
-  Needs the ConfidenceEllipse package.
+  Needs the HotellingEllipse package (1.3.0 or later).
 
 - k:
 
   The number of components of \\T^2\\: the two axes, then the next
   embedding coordinates. Default is 2.
+
+- t2_level:
+
+  The confidence level(s) of the \\T^2\\ ellipses: one or more values
+  between 0 and 1. Default is `c(0.95, 0.99)`. The samples are flagged
+  at the highest level.
+
+- t2_method:
+
+  The distribution of the \\T^2\\ limits: `"f"` (default) or `"beta"`
+  (see
+  [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)).
 
 - label:
 
@@ -119,11 +133,13 @@ samples): with fewer than about 10 samples per group, their ellipses can
 be flat or leave out several samples. Groups with fewer than 4 samples
 get no ellipse.
 
-With `hotelling = "all"`, the 95% and 99% ellipses of Hotelling's
-\\T^2\\ are drawn for all the samples (contours of \\T^2\\ on the two
-components shown, from their mean and covariance, with
-[`ConfidenceEllipse::confidence_ellipse()`](https://christiangoueguel.github.io/ConfidenceEllipse/reference/confidence_ellipse.html)),
-and the samples beyond the 99% limit of \\T^2\\ on `k` components (see
+With `hotelling = "all"`, the ellipses of Hotelling's \\T^2\\ at each
+level of `t2_level` (95% and 99% by default) are drawn for all the
+samples (contours of \\T^2\\ on the two components shown, from their
+mean and covariance, with
+[`HotellingEllipse::ellipseCoord()`](https://pkgdown.r-lib.org,%20https://github.com/ChristianGoueguel/HotellingEllipse/reference/ellipseCoord.html)),
+and the samples beyond the limit at the highest level of \\T^2\\ on `k`
+components (see
 [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md))
 are circled and labeled: the classical outlier limits of a score plot.
 With `hotelling = "group"`, each group of a discrete `colour` gets its
