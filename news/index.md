@@ -19,6 +19,14 @@
   order and derivative are tunable (new dials parameter
   [`savgol_derivative()`](https://christiangoueguel.com/specProc/reference/savgol_derivative.md)).
 
+- [`normalize()`](https://christiangoueguel.com/specProc/reference/normalize.md)
+  gains the L1 (`"l1"`), L2 or vector (`"l2"`) and maximum (`"max"`)
+  norms, and
+  [`step_spectral_norm()`](https://christiangoueguel.com/specProc/reference/step_spectral_norm.md)
+  normalizes each spectrum in a recipe by its L1 norm, total area, L2
+  norm or maximum, with the method tunable (new dials parameter
+  [`spectral_norm_method()`](https://christiangoueguel.com/specProc/reference/spectral_norm_method.md)).
+
 - [`wavelet_features()`](https://christiangoueguel.com/specProc/reference/wavelet_features.md)
   and
   [`step_wavelet()`](https://christiangoueguel.com/specProc/reference/step_wavelet.md):

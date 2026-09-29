@@ -218,12 +218,13 @@ rsd <- function(v, group) {
 ```
 
 We compare no normalization, total-area normalization, SNV, MSC, and
-internal standardization to the Si I 288.16 nm line. SNV, MSC and the
-internal standard
-([`step_line_ratio()`](https://christiangoueguel.com/specProc/reference/step_line_ratio.md),
-which divides each spectrum by the area of a reference line) are recipe
-steps added after the baseline; area normalization uses
-[`normalize()`](https://christiangoueguel.com/specProc/reference/normalize.md):
+internal standardization to the Si I 288.16 nm line. All are recipe
+steps added after the baseline:
+[`step_spectral_norm()`](https://christiangoueguel.com/specProc/reference/step_spectral_norm.md)
+divides each spectrum by its total area (or its L1, L2 or maximum norm),
+and
+[`step_line_ratio()`](https://christiangoueguel.com/specProc/reference/step_line_ratio.md)
+by the area of a reference line:
 
 ``` r
 
@@ -235,8 +236,7 @@ normalized <- function(step, ...) {
 }
 candidates <- list(
   `baseline only` = baselined,
-  `area` = bind_cols(select(baselined, Sample),
-                     normalize(baselined[channels], method = "area")),
+  `area` = normalized(step_spectral_norm, method = "area"),
   `SNV` = normalized(step_snv),
   `MSC` = normalized(step_msc),
   `internal std. (Si)` = normalized(step_line_ratio, reference = 288.16, window = 0.15)

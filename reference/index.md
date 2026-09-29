@@ -97,6 +97,8 @@ and can be tuned within a tidymodels workflow.
   : Wavelet Features Recipe Step
 - [`step_snv()`](https://christiangoueguel.com/specProc/reference/step_snv.md)
   : Standard Normal Variate Recipe Step
+- [`step_spectral_norm()`](https://christiangoueguel.com/specProc/reference/step_spectral_norm.md)
+  : Spectral Normalization Recipe Step
 - [`step_msc()`](https://christiangoueguel.com/specProc/reference/step_msc.md)
   : Multiplicative Scatter Correction Recipe Step
 - [`step_emsc()`](https://christiangoueguel.com/specProc/reference/step_emsc.md)
@@ -153,6 +155,8 @@ and can be tuned within a tidymodels workflow.
   : Derivative Order of a Savitzky-Golay Filter
 - [`wavelet_level()`](https://christiangoueguel.com/specProc/reference/wavelet_level.md)
   : Number of Levels of a Wavelet Decomposition
+- [`spectral_norm_method()`](https://christiangoueguel.com/specProc/reference/spectral_norm_method.md)
+  : Norm of a Spectral Normalization
 
 ## Line identification
 

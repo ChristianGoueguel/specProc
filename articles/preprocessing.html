@@ -261,10 +261,10 @@ random-effects ANOVA:</p>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tapply.html" class="external-link">tapply</a></span><span class="op">(</span><span class="va">v</span>, <span class="va">group</span>, <span class="kw">function</span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>We compare no normalization, total-area normalization, SNV, MSC, and
-internal standardization to the Si I 288.16 nm line. SNV, MSC and the
-internal standard (<code><a href="../reference/step_line_ratio.html">step_line_ratio()</a></code>, which divides each
-spectrum by the area of a reference line) are recipe steps added after
-the baseline; area normalization uses <code><a href="../reference/normalize.html">normalize()</a></code>:</p>
+internal standardization to the Si I 288.16 nm line. All are recipe
+steps added after the baseline: <code><a href="../reference/step_spectral_norm.html">step_spectral_norm()</a></code>
+divides each spectrum by its total area (or its L1, L2 or maximum norm),
+and <code><a href="../reference/step_line_ratio.html">step_line_ratio()</a></code> by the area of a reference line:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">normalized</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">step</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">baseline_recipe</span><span class="op">(</span><span class="va">soilLIBS</span>, <span class="fl">1e5</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -274,8 +274,7 @@ the baseline; area normalization uses <code><a href="../reference/normalize.html
 <span><span class="op">}</span></span>
 <span><span class="va">candidates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  `baseline only` <span class="op">=</span> <span class="va">baselined</span>,</span>
-<span>  `area` <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">baselined</span>, <span class="va">Sample</span><span class="op">)</span>,</span>
-<span>                     <span class="fu"><a href="../reference/normalize.html">normalize</a></span><span class="op">(</span><span class="va">baselined</span><span class="op">[</span><span class="va">channels</span><span class="op">]</span>, method <span class="op">=</span> <span class="st">"area"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  `area` <span class="op">=</span> <span class="fu">normalized</span><span class="op">(</span><span class="va">step_spectral_norm</span>, method <span class="op">=</span> <span class="st">"area"</span><span class="op">)</span>,</span>
 <span>  `SNV` <span class="op">=</span> <span class="fu">normalized</span><span class="op">(</span><span class="va">step_snv</span><span class="op">)</span>,</span>
 <span>  `MSC` <span class="op">=</span> <span class="fu">normalized</span><span class="op">(</span><span class="va">step_msc</span><span class="op">)</span>,</span>
 <span>  `internal std. (Si)` <span class="op">=</span> <span class="fu">normalized</span><span class="op">(</span><span class="va">step_line_ratio</span>, reference <span class="op">=</span> <span class="fl">288.16</span>, window <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span></span>

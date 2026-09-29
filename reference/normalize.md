@@ -1,7 +1,8 @@
 # Spectra Normalization
 
 This function implements normalization methods based on background,
-total area, and internal standard.
+total area, internal standard, and the L1, L2 and maximum norms of each
+spectrum.
 
 ## Usage
 
@@ -18,7 +19,9 @@ normalize(x, method = "area", bkg = NULL, wlength = NULL, drop.na = TRUE)
 - method:
 
   A character vector specifying the normalization method to apply.
-  Available methods are: "area", "background", and "internal".
+  Available methods are: "area", "l1", "l2", "max", "background", and
+  "internal". Spectra whose L1, L2 or maximum norm is zero are set to
+  `NA`, with a warning.
 
 - bkg:
 
@@ -56,6 +59,19 @@ The three normalization methods:
   dark current must be subtracted prior to this normalization. The total
   area is calculated as the sum of all intensity levels.
 
+- **L1 normalization** (`"l1"`): each spectrum is divided by the sum of
+  the absolute values of its intensities. It equals the total area for
+  non-negative spectra, and also suits derivative spectra, whose values
+  change sign.
+
+- **L2 (vector) normalization** (`"l2"`): each spectrum is divided by
+  its Euclidean norm, so that its sum of squares is 1. Unlike SNV, the
+  spectrum is not centered.
+
+- **Maximum normalization** (`"max"`): each spectrum is divided by its
+  largest absolute intensity, so that its strongest feature is 1 (or
+  -1).
+
 - **Normalization to an internal standard:** The peak intensity (or
   area) of the emission line related to the analyte is divided by the
   peak intensity (or area) of a selected emission line related to the
@@ -91,6 +107,12 @@ normalize(x, method = "area")
 #>   <dbl> <dbl> <dbl>
 #> 1   0.2   0.6   0.2
 #> 2   0.2   0.6   0.2
+normalize(x, method = "l2")
+#> # A tibble: 2 × 3
+#>   `400` `401` `402`
+#>   <dbl> <dbl> <dbl>
+#> 1 0.302 0.905 0.302
+#> 2 0.302 0.905 0.302
 normalize(x, method = "internal", wlength = "401")
 #> # A tibble: 2 × 3
 #>   `400` `401` `402`
