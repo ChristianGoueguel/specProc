@@ -23,6 +23,9 @@ plot_embedding(
   conf_level = 0.95,
   robust = FALSE,
   distribution = "normal",
+  hotelling = "none",
+  k = 2,
+  label = NULL,
   title = NULL
 )
 ```
@@ -71,6 +74,22 @@ plot_embedding(
   The quantile of the ellipses: `"normal"` (default, chi-square) or
   `"hotelling"`.
 
+- hotelling:
+
+  Hotelling's \\T^2\\ ellipses and outliers: `"none"` (default), `"all"`
+  (all samples) or `"group"` (within the groups of a discrete `colour`).
+  Needs the ConfidenceEllipse package.
+
+- k:
+
+  The number of components of \\T^2\\: the two axes, then the next
+  embedding coordinates. Default is 2.
+
+- label:
+
+  The labels of the outlying samples: a column of `data` or a vector
+  with one value per sample. By default, their row numbers.
+
 - title:
 
   The plot title.
@@ -100,6 +119,20 @@ samples): with fewer than about 10 samples per group, their ellipses can
 be flat or leave out several samples. Groups with fewer than 4 samples
 get no ellipse.
 
+With `hotelling = "all"`, the 95% and 99% ellipses of Hotelling's
+\\T^2\\ are drawn for all the samples (contours of \\T^2\\ on the two
+components shown, from their mean and covariance, with
+[`ConfidenceEllipse::confidence_ellipse()`](https://christiangoueguel.github.io/ConfidenceEllipse/reference/confidence_ellipse.html)),
+and the samples beyond the 99% limit of \\T^2\\ on `k` components (see
+[`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md))
+are circled and labeled: the classical outlier limits of a score plot.
+With `hotelling = "group"`, each group of a discrete `colour` gets its
+own ellipses and limits, which flags the samples atypical of their own
+group. The ellipses are drawn for the two components shown, while the
+limits use `k` components, so with `k > 2` a flagged sample can lie
+inside the ellipses. \\T^2\\ suits linear scores such as PCA or PLS; on
+a UMAP map, whose distances are not meaningful, prefer `ellipse`.
+
 In a UMAP embedding, only the neighborhoods are meaningful: the sizes of
 the clusters and the distances between them are not, and they change
 with `neighbors` and `min_dist`. Read the plot as a map of which samples
@@ -107,6 +140,7 @@ are similar, not as a quantitative projection.
 
 ## See also
 
+[`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md),
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md),
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
 
@@ -139,6 +173,12 @@ if (rlang::is_installed("ConfidenceEllipse")) {
 #> Warning: RGL: unable to open X11 display
 #> Warning: 'rgl.init' failed, will use the null device.
 #> See '?rgl.useNULL' for ways to avoid this warning.
+
+
+# Hotelling's T-squared limits of the score plot, on 3 components
+if (rlang::is_installed("ConfidenceEllipse")) {
+  plot_embedding(pca, colour = texture, hotelling = "all", k = 3, label = spectra$Sample)
+}
 
 
 if (rlang::is_installed(c("recipes", "embed"))) {

@@ -38,8 +38,15 @@
   [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)),
   colored by a variable, with optional confidence ellipses per group
   (classical or robust, normal or Hotelling quantiles) from the
-  ConfidenceEllipse package. The preprocessing vignette uses it to
-  compare PCA and UMAP maps of the samples.
+  ConfidenceEllipse package, and Hotelling’s T-squared 95% and 99%
+  ellipses with the outlying samples labeled (`hotelling`, for all
+  samples or within groups, on `k` components). The preprocessing
+  vignette uses it to compare PCA and UMAP maps of the samples.
+
+- [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)
+  computes Hotelling’s T-squared of each sample on `k` components of an
+  embedding, with its 95% and 99% limits, for all samples or within
+  groups.
 
 ## specProc 0.6.0
 

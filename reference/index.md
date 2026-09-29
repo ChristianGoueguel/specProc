@@ -236,6 +236,8 @@ Functions that help assess data visually.
   : Plotting of Spectra
 - [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
   : Plot a Two-Dimensional Embedding
+- [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)
+  : Hotelling's T-squared Statistic of Samples in an Embedding
 - [`plot_outliers()`](https://christiangoueguel.com/specProc/reference/plot_outliers.md)
   : Univariate Representation of Multivariate Outliers
 - [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md)
