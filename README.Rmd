@@ -22,55 +22,28 @@ knitr::opts_chunk$set(
 # specProc <img src="man/figures/logo.png" align="right" height="160"/>
 
 <!-- badges: start -->
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![R-CMD-check](https://github.com/ChristianGoueguel/specProc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ChristianGoueguel/specProc/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ChristianGoueguel/specProc?branch=main)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Codecov test
+coverage](https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ChristianGoueguel/specProc?branch=main)
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 <!-- badges: end -->
 
-**specProc** is an R package for preprocessing and exploring emission
-spectra, with a focus on laser-induced breakdown spectroscopy (LIBS). It
-covers the full chain between raw detector counts and a data matrix
-ready for modeling:
-
--   **Baseline correction**: asymmetric least squares, arPLS, and iterative
-    polynomial fitting.
--   **Normalization and scaling**: SNV, MSC, extended MSC (EMSC), area,
-    background and internal-standard normalization; Pareto, Poisson and
-    min-max scaling.
--   **Removing unwanted variation**: OSC (three algorithms), direct
-    orthogonalization, DOSC, O2PLS, projected OSC, EPO, GLSW.
--   **Robust PCA**: ROBPCA, robust sparse PCA (ROSPCA) and MacroPCA, with
-    outlier maps and cell maps.
--   **Figures of merit**: net analyte signal, sensitivity, selectivity,
-    analytical sensitivity, limits of detection and quantification.
--   **tidymodels integration**: recipe steps for baseline correction,
-    SNV, MSC, EMSC, scaling and every orthogonalization filter, so that
-    preprocessing is re-estimated on each resample and tuned with the
-    model.
--   **Calibration transfer** between instruments: PDS, GLSW.
--   **Line fitting**: exact Voigt, pseudo-Voigt, Gaussian and Lorentzian
-    profiles, for single or overlapping lines.
--   **Line identification**: candidate lines from the NIST Atomic Spectra
-    Database overlaid on spectra, and an interactive app (`line_finder()`)
-    with a periodic table to select the elements.
--   **Plasma diagnostics**: electron density from Stark broadening, with
-    widths from the STARK-B database, or from H-alpha; temperature from
-    Boltzmann and Saha-Boltzmann plots; McWhirter criterion,
-    self-absorption and detector saturation.
--   **Robust statistics and outlier detection**: biweight estimators,
-    Rousseeuw–Croux Sn/Qn, bias-corrected MAD, medcouple-based skewness
-    and tail weights, adjusted and generalized boxplots, directional
-    outlyingness.
-
-The computationally heavy steps are written in C++: penalized baselines
-use a banded solver, the Voigt profile uses the Faddeeva function, and the
-large matrix decompositions use Eigen. This keeps the package practical
-for data sets with thousands of spectra and channels.
+**specProc** preprocesses and explores spectroscopic data. It was
+developed for laser-induced breakdown spectroscopy (LIBS) but works with
+other techniques such as Raman, infrared, and inductively coupled plasma
+optical emission spectroscopy. It takes raw detector counts through to a
+data matrix ready for modeling. Its computationally heavy steps run in
+C++ (via Rcpp), so it stays fast on data sets with thousands of spectra
+and high-resolution wavelength channels.
 
 ## Installation
 
-specProc is not yet on CRAN. Install the development version from GitHub:
+Install the development version from GitHub:
 
 ``` r
 # install.packages("remotes")
@@ -83,370 +56,48 @@ the Bioconductor package ropls: `BiocManager::install("ropls")`.
 
 ## Design principles
 
--   **Tidy in, tidy out.** Spectra are stored one per row, and the column
-    names are the wavelengths. Functions accept matrices, data frames or
-    tibbles and return tibbles.
--   **Built for tidymodels.** Preprocessing, filtering and robust PCA are
-    available as recipe steps, so they are estimated on training data only
-    and can be tuned with the model.
--   **Preprocessing parameters are returned, not hidden.** Centers, scales,
-    reference spectra, filter matrices and loadings come back with the
-    result. You can then estimate a transformation on calibration data and
-    apply exactly the same transformation to new data.
--   **Robust alternatives are available alongside the classical estimators.**
-    Emission spectra contain outlying shots, saturated channels and heavy
-    tails, and the robust estimators are designed for them.
--   **The numerics are tested against references.** The test suite (more
-    than 400 expectations) checks results against analytic values, dense
-    reference solvers and independent implementations, such as the
-    Bioconductor ropls package for OPLS.
-
-## Example data
-
-The package ships with `soilLIBS`: LIBS spectra of **50 soil samples**,
-each measured at **8 locations**. The spectra have 7152 channels between
-199 and 822 nm, stored as raw counts, together with the clay, sand and
-silt content of each sample. The examples below use the tidyverse and
-tidymodels.
-
-```{r data, message = FALSE}
-suppressPackageStartupMessages(library(mixOmics))  # PLS engine; attach before dplyr
-library(specProc)
-library(recipes)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-
-data(soilLIBS)
-meta_cols <- c("Sample", "Location", "Clay", "Sand", "Silt", "Texture", "Structure", "Type")
-channels <- setdiff(names(soilLIBS), meta_cols)   # the 7152 wavelengths (nm)
-wl <- as.numeric(channels)
-
-dim(soilLIBS)
-soilLIBS |> distinct(Sample, Type) |> count(Type)   # samples per soil type
-```
-
-The design is **nested**: the 8 spectra of a sample are repeated
-measurements of the same material, not independent observations. Treating
-them as 400 independent samples inflates the apparent sample size and
-biases cross-validated errors downward. The worked example below uses
-the sample as the unit of analysis wherever it matters.
-
-```{r overview, fig.height = 4}
-soilLIBS |>
-  select(Type, all_of(channels)) |>
-  average(Type) |>
-  plot_spectra(id = Type) +
-  theme(legend.position = "top") +
-  labs(color = NULL, title = "Mean spectrum by soil type")
-```
-
-## A worked example
-
-### 1. Baseline correction
-
-LIBS spectra sit on a continuum from bremsstrahlung and recombination
-radiation. `step_baseline()` estimates it for each spectrum, by default
-with asymmetrically reweighted penalized least squares (`baseline_arpls()`).
-Positive residuals (the emission lines) are downweighted, so the baseline
-follows the continuum instead of the peaks. The smoothing parameter
-`lambda` controls how stiff the baseline is.
-
-```{r baseline}
-baseline_recipe <- recipe(~ ., data = soilLIBS) |>
-  update_role(all_of(meta_cols), new_role = "id") |>
-  step_baseline(all_predictors(), lambda = 1e5, options = list(max.iter = 20))
-
-baselined <- baseline_recipe |> prep() |> bake(new_data = NULL)
-```
-
-```{r baseline-plot, fig.height = 4, echo = FALSE}
-background <- unlist(baseline_arpls(soilLIBS[1, channels], lambda = 1e5, max.iter = 20)$background)
-tibble(wavelength = wl, `raw spectrum` = unlist(soilLIBS[1, channels]),
-       `estimated baseline` = background) |>
-  filter(wavelength > 370, wavelength < 420) |>
-  pivot_longer(-wavelength, names_to = "curve", values_to = "intensity") |>
-  ggplot(aes(wavelength, intensity, colour = curve)) +
-  geom_line() +
-  scale_colour_manual(values = c(`raw spectrum` = "grey30", `estimated baseline` = "red")) +
-  labs(x = "Wavelength [nm]", y = "Intensity [counts]", colour = NULL,
-       title = "arPLS baseline (first spectrum, 370-420 nm)") +
-  theme_bw() +
-  theme(legend.position = "top")
-```
-
-The baseline is a model estimate, and the choice of `lambda` propagates
-into line areas. Report the value you used, and check how sensitive your
-downstream results are to it.
-
-### 2. Normalization and shot-to-shot repeatability
-
-Laser–sample coupling changes from shot to shot, so the whole spectrum
-fluctuates in intensity. Normalization aims to remove this multiplicative
-effect. The relative standard deviation (RSD) of a line across the 8
-locations of a sample measures how well it works. The lower the RSD, the
-more repeatable the measurement:
-
-```{r normalization}
-# area of a line in each spectrum, within 0.15 nm of its wavelength
-line_area <- function(spectra, center) {
-  line_intensities(spectra, center, search = 0)$intensity
-}
-within_rsd <- function(area) {
-  tibble(Sample = soilLIBS$Sample, area = area) |>
-    group_by(Sample) |>
-    summarise(rsd = sd(area) / mean(area) * 100) |>
-    summarise(median(rsd)) |>
-    pull()
-}
-
-snv_normalized <- baseline_recipe |> step_snv(all_predictors()) |> prep() |> bake(new_data = NULL)
-area_normalized <- normalize(baselined[channels], method = "area")
-
-list(raw = soilLIBS, baseline = baselined, `baseline + area` = area_normalized,
-     `baseline + SNV` = snv_normalized) |>
-  sapply(\(spectra) within_rsd(line_area(spectra, 393.37))) |>
-  round(2) |>
-  tibble::enframe(name = "preprocessing", value = "median RSD of Ca II 393.37 nm (%)")
-```
-
-On this data set, SNV reduces the typical shot-to-shot RSD of the Ca II
-line by about 40%. Baseline subtraction alone slightly increases the
-RSD. This is expected: the raw line area includes the detector offset
-and continuum, a large and relatively stable component that dilutes the
-relative variation. Removing it exposes the true variability of the line,
-which normalization then has to correct. Which normalization works best
-depends on the matrix and the line, so compare the options on replicate
-spectra rather than assuming one. `step_msc()` and `step_emsc()` provide
-(extended) multiplicative scatter correction in the same way.
-
-### 3. Screening outlying shots
-
-A misfired or defocused shot can bias a sample's mean spectrum. Compare
-each shot with the other shots of the same sample, using a robust z-score
-(median and MAD) of the total emitted intensity:
-
-```{r outliers}
-shots <- snv_normalized |>
-  mutate(total = rowSums(soilLIBS[channels])) |>
-  group_by(Sample) |>
-  mutate(robust_z = (total - median(total)) / mad(total)) |>
-  ungroup()
-count(shots, flagged = abs(robust_z) > 3.5)
-```
-
-The median and MAD are used because, with 8 shots per sample, a single
-aberrant shot shifts the mean and inflates the standard deviation enough
-to hide itself. `zscore(robust = TRUE)`, `iqr_outliers(skew = TRUE)`
-(medcouple-adjusted fences) and `directional_outlyingness()` provide the
-same screening for a single vector.
-
-### 4. Averaging replicates
-
-After screening, reduce each sample to one spectrum. `average()` computes
-group means in C++:
-
-```{r average}
-sample_spectra <- shots |>
-  filter(abs(robust_z) <= 3.5) |>
-  select(Sample, all_of(channels)) |>
-  average(Sample)
-samples <- soilLIBS |>
-  distinct(Sample, Clay, Sand, Silt, Type) |>
-  semi_join(sample_spectra, by = "Sample")
-dim(sample_spectra)
-```
-
-### 5. Fitting emission lines
-
-The Ca II 393.37 / 396.85 nm and Al I 394.40 / 396.15 nm lines overlap
-in the 393–397 nm window. `multipeak_fit()` fits them jointly as a sum
-of exact Voigt profiles on a common baseline. Each line's center, Gaussian
-and Lorentzian widths (FWHM) and area are estimated by Levenberg–Marquardt
-least squares.
-
-```{r multipeak}
-window <- channels[wl > 392.9 & wl < 397.3]
-fit <- sample_spectra |>
-  slice(1) |>
-  select(Sample, all_of(window)) |>
-  multipeak_fit(peaks = c(393.37, 394.40, 396.15, 396.85), profiles = "voigt", id = "Sample")
-fit$tidied[[1]]
-```
-
-```{r multipeak-plot, fig.height = 5}
-plot_fit(fit, title = "Ca II and Al I lines, sample LSG-S18-0001 (mean of 8 locations)")
-```
-
-Read the parameter table critically:
-
--   **The standard errors are conditional on the model.** They assume
-    independent, homoscedastic Gaussian errors. LIBS noise is closer to
-    Poisson, and residuals are correlated along the wavelength axis, so
-    treat these standard errors as lower bounds. The spread of the
-    parameters across the 8 replicate locations is a more honest measure
-    of uncertainty.
--   **Some parameters are poorly identified.** The Lorentzian widths of the
-    weaker lines are not significantly different from zero. The data
-    cannot separate Stark from Doppler/instrumental broadening for those
-    lines. Consider fixing them, or using a simpler profile.
-
-The exact Voigt profile is also available directly. `voigt_profile()`
-uses the Faddeeva function and is accurate to about 1e-10. The faster
-`pseudo_voigt_profile()` approximation deviates from it by up to about 1%:
-
-```{r voigt, fig.height = 3.5}
-profiles <- tibble(x = seq(-2, 2, length.out = 400)) |>
-  mutate(voigt = voigt_profile(x, y0 = 0, xc = 0, wG = 0.6, wL = 0.4, A = 1),
-         pseudo_voigt = pseudo_voigt_profile(x, y0 = 0, xc = 0, wG = 0.6, wL = 0.4, A = 1)$y)
-profiles |> summarise(max_relative_error = max(abs(voigt - pseudo_voigt)) / max(voigt))
-```
-
-### 6. Descriptive statistics: classical and robust
-
-The texture fractions are bounded (0–100%), skewed, and contain a few
-extreme samples. The robust summary reports the median, MAD, Sn and Qn,
-biweight estimators, and medcouple-based measures of skewness and tail
-weight:
-
-```{r summary}
-fractions <- select(samples, Clay, Sand, Silt)
-summary_stats(fractions)
-summary_stats(fractions, robust = TRUE)
-```
-
-The medcouple (MC) is a robust measure of skewness, bounded in [−1, 1].
-For Clay and Silt it is strongly negative (left skew). Where the mean and
-median, or the SD and robust scale, disagree, a few observations are
-driving the classical estimates.
-
-The generalized boxplot (Bruffaerts et al., 2014) fits a Tukey g-and-h
-distribution, so its whiskers adapt to both skewness (*g*) and tail
-heaviness (*h*). Its fences are placed so that, under the fitted model,
-the chosen proportion `alpha` of observations falls outside them:
-
-```{r boxplot, fig.height = 3.5}
-generalized_boxplot(fractions, xlabels.angle = 0) +
-  coord_flip() +
-  labs(title = "Particle-size fractions (%), generalized boxplot")
-```
-
-### 7. Correlation: why robustness matters
-
-How strongly do line intensities track clay content? Compare Pearson's
-correlation with the biweight midcorrelation, which downweights
-observations far from the bulk of the data:
-
-```{r correlation}
-lines_df <- samples |>
-  select(Sample, Clay) |>
-  inner_join(sample_spectra, by = "Sample") |>
-  transmute(
-    Clay,
-    `Mg II 279.55` = line_area(pick(everything()), 279.55),
-    `Si I 288.16` = line_area(pick(everything()), 288.16),
-    `Ca II 393.37` = line_area(pick(everything()), 393.37),
-    `Al I 396.15` = line_area(pick(everything()), 396.15),
-    `K I 766.49` = line_area(pick(everything()), 766.49)
-  )
-inner_join(correlation(lines_df, Clay)[1:2], correlation(lines_df, Clay, method = "bicor")[1:2],
-           by = "variable", suffix = c("_pearson", "_bicor"))
-```
-
-The two coefficients disagree sharply for some lines, notably Mg, which
-means a handful of extreme-texture samples drive the Pearson values.
-Neither number is "the" correlation. The gap tells you to look at the
-scatter plots, and to be cautious about extrapolating to the bulk of the
-data. `correlation()` also provides Spearman, Kendall and Chatterjee's ξ,
-which captures non-monotonic dependence.
-
-### 8. Screening samples with robust PCA
-
-`robpca()` fits a PCA that resists outlying observations, and
-`plot_outlier_map()` classifies every sample by its score distance
-(within the PCA subspace) and orthogonal distance (to it):
-
-```{r robpca, fig.height = 4.5}
-set.seed(1)
-pca <- robpca(select(sample_spectra, -Sample), k = 3)
-plot_outlier_map(pca)
-```
-
-Samples to the right of the vertical cut-off are far from the center but
-follow the main structure of the data (good leverage points); samples
-above the horizontal cut-off do not follow that structure. Inspect them
-before calibrating, rather than discarding them automatically.
-`rospca()` gives sparse loadings, and `macropca()` also handles outlying
-cells and missing values; `plot_cell_map()` shows which cells deviate.
-
-### 9. Modeling with tidymodels
-
-Every preprocessing and filtering method is also a recipe step, so a
-complete pipeline can be tuned and validated without leakage: each step is
-re-estimated on the analysis set of every resample. Here, SNV and an
-orthogonal signal correction filter feed a PLS model of clay content, and
-the filter and the model are tuned together by cross-validation over
-samples:
-
-```{r tidymodels, message = FALSE}
-library(parsnip)
-library(workflows)
-library(tune)
-library(rsample)
-library(plsmod)
-
-clay_data <- samples |>
-  select(Sample, Clay) |>
-  inner_join(sample_spectra, by = "Sample")
-
-clay_recipe <- recipe(Clay ~ ., data = clay_data) |>
-  update_role(Sample, new_role = "id") |>
-  step_osc(all_predictors(), method = "fearn", num_comp = tune("filter"))
-clay_model <- pls(num_comp = tune()) |>
-  set_mode("regression") |>
-  set_engine("mixOmics", scale = FALSE)
-
-set.seed(2024)
-tuned <- tune_grid(
-  workflow(clay_recipe, clay_model),
-  resamples = vfold_cv(clay_data, v = 5),
-  grid = expand_grid(filter = 1:2, num_comp = 1:6)
-)
-show_best(tuned, metric = "rmse", n = 3)
-```
-
-A supervised filter such as OSC must be refitted inside each fold, which
-the recipe guarantees. Fitted once on all the data before
-cross-validating, it biases the estimated prediction error downward. The
-`calibration` and `orthogonalization` vignettes develop this in detail.
+- **Tidy in, tidy out.** Spectra are stored one per row, and the column
+  names are the wavelengths. Functions accept matrices, data frames or
+  tibbles and return tibbles.
+- **Built for tidymodels.** Preprocessing, filtering and robust PCA are
+  available as recipe steps, so they are estimated on training data only
+  and can be tuned with the model.
+- **Preprocessing parameters are returned, not hidden.** Centers,
+  scales, reference spectra, filter matrices and loadings come back with
+  the result. You can then estimate a transformation on calibration data
+  and apply exactly the same transformation to new data.
+- **Robust alternatives are available alongside the classical
+  estimators.** Emission spectra contain outlying shots, saturated
+  channels and heavy tails, and the robust estimators are designed for
+  them.
 
 ## Learn more
 
 The vignettes develop the example above in more depth:
 
--   `vignette("preprocessing", package = "specProc")`: choosing and
-    checking each preprocessing step against replicate data.
--   `vignette("line-fitting", package = "specProc")`: choosing a line
-    profile, and the sources of uncertainty in fitted line areas.
--   `vignette("calibration", package = "specProc")`: predicting soil clay
-    content with a compositional (log-ratio) PLS model, and estimating
-    prediction error without leakage.
--   `vignette("orthogonalization", package = "specProc")`: what each
-    orthogonalization method removes from LIBS spectra of forage samples,
-    whether it improves potassium predictions, the net analyte signal and
-    figures of merit, and the same analysis as a tidymodels workflow.
--   `vignette("plasma-diagnostics", package = "specProc")`: detector
-    saturation, electron density from H-alpha and Stark broadening,
-    Boltzmann and Saha-Boltzmann temperatures with NIST atomic data, and
-    self-absorption.
+- `vignette("preprocessing", package = "specProc")`: choosing and
+  checking each preprocessing step against replicate data.
+- `vignette("line-fitting", package = "specProc")`: choosing a line
+  profile, and the sources of uncertainty in fitted line areas.
+- `vignette("calibration", package = "specProc")`: predicting soil clay
+  content with a compositional (log-ratio) PLS model, and estimating
+  prediction error without leakage.
+- `vignette("orthogonalization", package = "specProc")`: what each
+  orthogonalization method removes from LIBS spectra of forage samples,
+  whether it improves potassium predictions, the net analyte signal and
+  figures of merit, and the same analysis as a tidymodels workflow.
+- `vignette("plasma-diagnostics", package = "specProc")`: detector
+  saturation, electron density from H-alpha and Stark broadening,
+  Boltzmann and Saha-Boltzmann temperatures with NIST atomic data, and
+  self-absorption.
 
-They are also available as
-[articles on the package website](https://christiangoueguel.com/specProc/articles/).
+They are also available as [articles on the package
+website](https://christiangoueguel.com/specProc/articles/).
 
 ## Function overview
 
 | Task | Functions |
-|---|---|
+|------------------------------------|------------------------------------|
 | Baseline correction | `baseline_arpls()`, `baseline_als()`, `baseline_lsp()` |
 | Normalization | `snv()`, `msc()`, `emsc()`, `normalize()` |
 | Scaling and centering | `center()`, `pareto_scale()`, `poisson_scale()`, `minmax()` |
@@ -471,10 +122,11 @@ They are also available as
 
 For estimators of scale, the breakdown point is the largest fraction of
 contaminated observations the estimator can tolerate. The efficiency is
-its asymptotic efficiency relative to the standard deviation for normal data.
+its asymptotic efficiency relative to the standard deviation for normal
+data.
 
 | Estimator | Function | Breakdown point | Efficiency |
-|---|---|---|---|
+|------------------|------------------|------------------|------------------|
 | Standard deviation | `stats::sd()` | 0% | 100% |
 | MAD (bias-corrected) | `umad()` | 50% | 37% |
 | Rousseeuw–Croux Sn | `rousseeuw_croux(estimator = "Sn")` | 50% | 58% |
@@ -483,49 +135,33 @@ its asymptotic efficiency relative to the standard deviation for normal data.
 
 `umad()` and `rousseeuw_croux()` include finite-sample bias corrections
 (Park et al., 2020; Akinshin, 2022), so they are also unbiased at the
-normal distribution for small samples, such as the 8 replicates per sample.
-
-## Performance
-
-Timings on the full `soilLIBS` data set (400 spectra × 7152 channels)
-on an Apple Silicon desktop:
-
-| Operation | Time |
-|---|---|
-| `baseline_arpls()`, 400 spectra | 0.6 s |
-| `baseline_als()`, 400 spectra | 0.5 s |
-| `epo(ncomp = 3)` | 0.4 s |
-| `snv()` | 0.08 s |
-| `voigt_profile()`, 10⁶ points | 0.07 s |
-
-For comparison, one iteration of the dense penalized least-squares solve
-for a single 7152-channel spectrum takes about 30 s. The banded solver
-does the same computation in linear time.
+normal distribution for small samples, such as the 8 replicates per
+sample.
 
 ## References
 
 The main methodological references are:
 
--   Baek, S.-J., et al. (2015). Baseline correction using asymmetrically
-    reweighted penalized least squares smoothing. *Analyst*, 140, 250–257.
--   Eilers, P.H.C., Boelens, H.F.M. (2005). Baseline correction with
-    asymmetric least squares smoothing.
--   Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003). EPO-PLS
-    external parameter orthogonalisation of PLS. *Chemometr. Intell.
-    Lab. Syst.*, 66, 191–204.
--   Martens, H., et al. (2003). Pre-whitening of data by
-    covariance-weighted pre-processing. *J. Chemometrics*, 17, 153–165.
--   Trygg, J., Wold, S. (2002). Orthogonal projections to latent
-    structures (O-PLS). *J. Chemometrics*, 16, 119–128.
--   Weideman, J.A.C. (1994). Computation of the complex error function.
-    *SIAM J. Numer. Anal.*, 31, 1497–1518.
--   Rousseeuw, P.J., Croux, C. (1993). Alternatives to the median
-    absolute deviation. *JASA*, 88, 1273–1283.
--   Hubert, M., Vandervieren, E. (2008). An adjusted boxplot for skewed
-    distributions. *Comput. Stat. Data Anal.*, 52, 5186–5201.
--   Bruffaerts, C., Verardi, V., Vermandele, C. (2014). A generalized
-    boxplot for skewed and heavy-tailed distributions. *Stat. Probab.
-    Lett.*, 95, 110–117.
+- Baek, S.-J., et al. (2015). Baseline correction using asymmetrically
+  reweighted penalized least squares smoothing. *Analyst*, 140, 250–257.
+- Eilers, P.H.C., Boelens, H.F.M. (2005). Baseline correction with
+  asymmetric least squares smoothing.
+- Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003). EPO-PLS
+  external parameter orthogonalisation of PLS. *Chemometr. Intell. Lab.
+  Syst.*, 66, 191–204.
+- Martens, H., et al. (2003). Pre-whitening of data by
+  covariance-weighted pre-processing. *J. Chemometrics*, 17, 153–165.
+- Trygg, J., Wold, S. (2002). Orthogonal projections to latent
+  structures (O-PLS). *J. Chemometrics*, 16, 119–128.
+- Weideman, J.A.C. (1994). Computation of the complex error function.
+  *SIAM J. Numer. Anal.*, 31, 1497–1518.
+- Rousseeuw, P.J., Croux, C. (1993). Alternatives to the median absolute
+  deviation. *JASA*, 88, 1273–1283.
+- Hubert, M., Vandervieren, E. (2008). An adjusted boxplot for skewed
+  distributions. *Comput. Stat. Data Anal.*, 52, 5186–5201.
+- Bruffaerts, C., Verardi, V., Vermandele, C. (2014). A generalized
+  boxplot for skewed and heavy-tailed distributions. *Stat. Probab.
+  Lett.*, 95, 110–117.
 
 Each function's help page gives the full references for its method.
 
