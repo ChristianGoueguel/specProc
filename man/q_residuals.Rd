@@ -8,7 +8,9 @@ q_residuals(
   model,
   k,
   newdata = NULL,
+  conf_level = c(0.95, 0.99),
   method = "jackson",
+  t2_method = "f",
   center = TRUE,
   scale = FALSE
 )
@@ -24,26 +26,32 @@ PCA is fitted with \code{center} and \code{scale}.}
 variables of the model), whose distances are computed instead of those
 of the calibration samples.}
 
+\item{conf_level}{The confidence level(s) of the limits: one or more
+values between 0 and 1. Default is \code{c(0.95, 0.99)}.}
+
 \item{method}{The limit of Q: \code{"jackson"} (default, Jackson-Mudholkar) or
 \code{"box"}.}
+
+\item{t2_method}{The distribution of the \eqn{T^2} limit of the samples
+of the model: \code{"f"} (default) or \code{"beta"} (see \code{\link[=hotelling_t2]{hotelling_t2()}}).}
 
 \item{center, scale}{Passed to \code{\link[stats:prcomp]{stats::prcomp()}} when \code{model} is data.
 Default is \code{TRUE} and \code{FALSE}.}
 }
 \value{
 A tibble of class \code{specproc_influence}, with one row per sample:
-\code{sample} (row number), \code{t2}, \code{q}, their limits (\code{t2_limit_95},
-\code{t2_limit_99}, \code{q_limit_95}, \code{q_limit_99}) and \code{outlier}, the type of
-the sample at the 99\% limits: \code{"regular"}, \code{"extreme"} (high \eqn{T^2}
-only), \code{"residual"} (high Q only) or \code{"both"}. Draw it with
-\code{\link[=plot_influence]{plot_influence()}}.
+\code{sample} (row number), \code{t2}, its limits at each confidence level (in \%,
+e.g. \code{t2_limit_95}), \code{q}, its limits (\code{q_limit_95}, ...) and \code{outlier},
+the type of the sample at the highest confidence level: \code{"regular"},
+\code{"extreme"} (high \eqn{T^2} only), \code{"residual"} (high Q only) or
+\code{"both"}. Draw it with \code{\link[=plot_influence]{plot_influence()}}.
 }
 \description{
 Computes, for each sample, the two distances used to monitor a principal
 component analysis (PCA) model: Hotelling's \eqn{T^2}, the distance
 within the model plane of the first \code{k} components, and the Q residual
 (squared prediction error, SPE), the squared distance to that plane, with
-their 95\% and 99\% limits.
+their limits at one or more confidence levels.
 }
 \details{
 With scores \eqn{t_{ia}} and eigenvalues \eqn{\lambda_a},
@@ -53,26 +61,32 @@ where \eqn{\hat{x}_i} is the reconstruction of the (centered and scaled)
 sample from the \code{k} components. A high \eqn{T^2} is an extreme but
 well-modeled sample (for example, a high concentration); a high Q is a
 sample the model does not describe (another matrix, a contamination, an
-instrumental problem). The limit of \eqn{T^2} is
-\eqn{k(n-1)/(n-k)\,F(k, n-k)} for the calibration samples and
-\eqn{k(n+1)(n-1)/(n(n-k))\,F(k, n-k)} for new samples. The limit of Q
-is that of Jackson and Mudholkar (1979), from the eigenvalues of the
-components left out, or Box's (1954) scaled chi-square approximation
-(\code{method = "box"}). Both approximate the distribution of Q from the
-eigenvalues of the calibration samples, and tend to be slightly
-conservative (fewer false alarms than the nominal level).
+instrumental problem).
+
+For the samples of the model, \eqn{T^2} and its limits come from
+\code{\link[=hotelling_t2]{hotelling_t2()}} (F or Beta distribution, \code{t2_method}). For new samples,
+the limit is that of a new observation,
+\eqn{k(n+1)(n-1)/(n(n-k))\,F(k, n-k)}. The limit of Q is that of Jackson
+and Mudholkar (1979), from the eigenvalues of the components left out, or
+Box's (1954) scaled chi-square approximation (\code{method = "box"}); both
+tend to be slightly conservative. Samples are classified at the highest
+confidence level.
 
 These are classical estimates, themselves affected by outliers: see
 \code{\link[=robpca]{robpca()}} and \code{\link[=plot_outlier_map]{plot_outlier_map()}} for robust score and orthogonal
-distances.
+distances. \code{\link[=dmodx]{dmodx()}} gives the residual distance in SIMCA's form.
 }
 \examples{
-data(soilLIBS)
-spectra <- average(soilLIBS[-(2:8)], Sample)
-pca <- stats::prcomp(spectra[-1], scale. = TRUE)
-influence <- q_residuals(pca, k = 3)
-influence[influence$outlier != "regular", ]
-plot_influence(influence, label = spectra$Sample)
+if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
+  data(soilLIBS)
+  spectra <- average(soilLIBS[-(2:8)], Sample)
+  pca <- stats::prcomp(spectra[-1], scale. = TRUE)
+  influence <- q_residuals(pca, k = 3)
+  influence[influence$outlier != "regular", ]
+  plot_influence(influence, label = spectra$Sample)
+  # a single limit
+  plot_influence(q_residuals(pca, k = 3, conf_level = 0.99))
+}
 }
 \references{
 \itemize{
@@ -87,7 +101,7 @@ monitoring batch processes. Technometrics, 37(1):41-59.
 }
 }
 \seealso{
-\code{\link[=plot_influence]{plot_influence()}}, \code{\link[=hotelling_t2]{hotelling_t2()}}, \code{\link[=robpca]{robpca()}}
+\code{\link[=dmodx]{dmodx()}}, \code{\link[=plot_influence]{plot_influence()}}, \code{\link[=hotelling_t2]{hotelling_t2()}}, \code{\link[=robpca]{robpca()}}
 }
 \author{
 Christian L. Goueguel

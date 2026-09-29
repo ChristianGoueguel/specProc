@@ -54,3 +54,24 @@ test_that("plot_embedding draws confidence ellipses", {
   expect_error(plot_embedding(df, ellipse = TRUE, distribution = "t"))
   expect_error(plot_embedding(df, ellipse = TRUE, conf_level = 1), "conf_level")
 })
+
+test_that("plot_embedding draws T-squared ellipses at the chosen levels", {
+  skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
+  set.seed(9)
+  x <- data.frame(PC1 = rnorm(40), PC2 = 0.7 * rnorm(40), id = paste0("s", 1:40))
+  x$PC2 <- x$PC2 + 0.8 * x$PC1                                # correlated components
+  x[5, 1:2] <- c(4, -4)
+  p <- plot_embedding(x, hotelling = "all", t2_level = 0.9, label = id)
+  path <- p$layers[vapply(p$layers, function(l) inherits(l$geom, "GeomPath"), logical(1))][[1]]$data
+  expect_equal(levels(path$limit), "T² 90%")
+  s <- as.matrix(x[1:2])
+  expect_equal(range(stats::mahalanobis(as.matrix(path[c("x", "y")]), colMeans(s), stats::cov(s))),
+               rep(2 * 39 / 38 * stats::qf(0.9, 2, 38), 2), tolerance = 1e-6)
+  expect_match(p$labels$subtitle, "90% limit")
+  b <- plot_embedding(x, hotelling = "all", t2_method = "beta", t2_level = c(0.95, 0.999))
+  bp <- b$layers[vapply(b$layers, function(l) inherits(l$geom, "GeomPath"), logical(1))][[1]]$data
+  on <- as.matrix(bp[bp$limit == "T² 99.9%", c("x", "y")])
+  expect_equal(range(stats::mahalanobis(on, colMeans(s), stats::cov(s))),
+               rep(39^2 / 40 * stats::qbeta(0.999, 1, 18.5), 2), tolerance = 1e-6)
+  expect_error(plot_embedding(x, hotelling = "all", t2_level = 2), "between 0 and 1")
+})

@@ -54,3 +54,22 @@ test_that("plot_embedding draws T-squared ellipses and labels outliers", {
   expect_error(plot_embedding(x, hotelling = "group"), "discrete")
   expect_error(plot_embedding(x, hotelling = "all", k = 3), "fewer than 3")
 })
+
+test_that("hotelling_t2 takes any confidence levels and the Beta limits", {
+  skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
+  set.seed(7)
+  x <- data.frame(PC1 = rnorm(30), PC2 = rnorm(30), PC3 = rnorm(30))
+  one <- hotelling_t2(x, k = 3, conf_level = 0.975)
+  expect_named(one, c("sample", "t2", "limit_97.5", "outlier_97.5", "n"))
+  expect_equal(one$limit_97.5[1], 3 * 29 / 27 * stats::qf(0.975, 3, 27))
+  three <- hotelling_t2(x, k = 3, conf_level = c(0.99, 0.9, 0.95))
+  expect_true(all(c("limit_90", "limit_95", "limit_99") %in% names(three)))
+  beta <- hotelling_t2(x, k = 3, method = "beta")
+  expect_equal(beta$limit_95[1], 29^2 / 30 * stats::qbeta(0.95, 1.5, 13))
+  expect_equal(beta$t2, one$t2)
+  # the same T-squared as HotellingEllipse
+  ref <- HotellingEllipse::ellipseParam(x, k = 3, conf.limit = 0.95)
+  expect_equal(one$t2, ref$Tsquare$value)
+  expect_error(hotelling_t2(x, conf_level = 1), "between 0 and 1")
+  expect_error(hotelling_t2(x, method = "t"))
+})

@@ -7,7 +7,7 @@
 plot_influence(x, label = NULL, log = FALSE, title = NULL)
 }
 \arguments{
-\item{x}{The result of \code{\link[=q_residuals]{q_residuals()}}.}
+\item{x}{The result of \code{\link[=q_residuals]{q_residuals()}} or \code{\link[=dmodx]{dmodx()}}.}
 
 \item{label}{The labels of the samples: a vector with one value per
 sample. By default, their row numbers.}
@@ -21,10 +21,15 @@ few samples are far beyond the limits.}
 A ggplot object.
 }
 \description{
-Plots the Q residual of each sample against its Hotelling's \eqn{T^2},
-with their 95\% (dashed) and 99\% (solid) limits, from \code{\link[=q_residuals]{q_residuals()}}.
-The samples beyond a 99\% limit are colored by type and labeled.
+Plots the residual distance of each sample to a PCA model (Q residual or
+DModX) against its Hotelling's \eqn{T^2}, with their limits at each
+confidence level, from \code{\link[=q_residuals]{q_residuals()}} or \code{\link[=dmodx]{dmodx()}}. The samples beyond a
+limit at the highest confidence level are colored by type and labeled.
+}
+\details{
+The limit at the highest confidence level is drawn as a solid line, the
+others as dashed, dotted, ... lines.
 }
 \seealso{
-\code{\link[=q_residuals]{q_residuals()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}
+\code{\link[=q_residuals]{q_residuals()}}, \code{\link[=dmodx]{dmodx()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}
 }

@@ -8,6 +8,19 @@
 
 ## New features
 
+* `dmodx()` computes the distance to the model in the space of the
+  variables (DModX, as in SIMCA) of a PCA model, normalized or absolute,
+  for the calibration samples or new ones. Its limits use the effective
+  number of residual dimensions by default (`df = "effective"`), because
+  SIMCA's degrees of freedom (`df = "simca"`) flag a large share of
+  ordinary samples when spectra have far more channels than samples.
+  `plot_influence()` draws DModX or Q against T-squared.
+* `hotelling_t2()`, `q_residuals()`, `dmodx()`, `plot_influence()` and the
+  T-squared ellipses of `plot_embedding()` take any confidence level(s)
+  (`conf_level`, `t2_level`; `c(0.95, 0.99)` by default, or a single one),
+  and the Beta distribution of T-squared for the samples of the model
+  (`method = "beta"`). `hotelling_t2()` and the T-squared ellipses of
+  `plot_embedding()` now use the HotellingEllipse package (1.3.0 or later).
 * `wavelength_calibration()` fits a correction of the wavelength axis from
   reference lines (for example, from the NIST database), located to a
   fraction of a channel by Gaussian interpolation, with one correction per

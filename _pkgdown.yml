@@ -172,6 +172,7 @@ reference:
   - plot_embedding
   - hotelling_t2
   - q_residuals
+  - dmodx
   - plot_influence
   - plot_outliers
   - adjusted_boxplot

@@ -73,3 +73,74 @@ test_that("q_residuals checks its inputs and plot_influence draws it", {
   expect_error(plot_influence(res, label = 1:3), "one value per sample")
   expect_error(plot_influence(pca), "q_residuals")
 })
+
+test_that("q_residuals takes any confidence levels and a single one", {
+  skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
+  d <- q_data()
+  pca <- stats::prcomp(d$x)
+  one <- q_residuals(pca, 3, conf_level = 0.9)
+  expect_true(all(c("t2_limit_90", "q_limit_90") %in% names(one)))
+  expect_false("q_limit_95" %in% names(one))
+  expect_equal(one$q_limit_90[1], q_limit(pca$sdev[-(1:3)]^2, 0.9, "jackson"))
+  # the classification uses the highest level
+  both <- q_residuals(pca, 3, conf_level = c(0.9, 0.999))
+  expect_equal(as.character(both$outlier) != "regular",
+               both$t2 > both$t2_limit_99.9 | both$q > both$q_limit_99.9)
+  beta <- q_residuals(pca, 3, t2_method = "beta")
+  expect_equal(beta$t2_limit_95[1], 59^2 / 60 * stats::qbeta(0.95, 1.5, 28))
+  expect_s3_class(plot_influence(one), "ggplot")
+  p <- plot_influence(both)
+  expect_setequal(levels(p$layers[[1]]$data$level), c("90%", "99.9%"))
+})
+
+test_that("dmodx follows the SIMCA formulas", {
+  skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
+  d <- q_data()
+  pca <- stats::prcomp(d$x)
+  a <- 3
+  n <- 60
+  kvar <- 8
+  xs <- scale(d$x, scale = FALSE)
+  p <- pca$rotation[, 1:a]
+  e <- xs - xs %*% p %*% t(p)
+  s0 <- sqrt(sum(e^2) / ((n - a - 1) * (kvar - a)))
+  si <- sqrt(rowSums(e^2) / (kvar - a)) * sqrt(n / (n - a - 1))
+  simca <- dmodx(pca, a, df = "simca")
+  expect_equal(simca$dmodx, unname(si / s0))
+  expect_equal(simca$dmodx_limit_95[1], sqrt(stats::qf(0.95, kvar - a, (n - a - 1) * (kvar - a))))
+  absolute <- dmodx(pca, a, normalized = FALSE, df = "simca")
+  expect_equal(absolute$dmodx, unname(si))
+  expect_equal(absolute$dmodx_limit_99[1], s0 * sqrt(stats::qf(0.99, kvar - a, (n - a - 1) * (kvar - a))))
+  # normalized DModX is a scaled square root of Q
+  q <- q_residuals(pca, a)
+  expect_equal(simca$dmodx^2, n * q$q / sum(q$q))
+  # effective degrees of freedom from the eigenvalues left out
+  rest <- pca$sdev[-(1:a)]^2
+  nu <- sum(rest)^2 / sum(rest^2)
+  eff <- dmodx(pca, a)
+  expect_equal(eff$dmodx, simca$dmodx)
+  expect_equal(eff$dmodx_limit_95[1], sqrt(stats::qf(0.95, nu, (n - a - 1) * nu)))
+  expect_equal(eff$t2, q$t2)
+  expect_equal(attr(eff, "distance"), "dmodx")
+})
+
+test_that("dmodx of new samples uses the calibration s0", {
+  skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
+  d <- q_data()
+  pca <- stats::prcomp(d$x)
+  set.seed(8)
+  new <- matrix(stats::rnorm(3 * 3), 3) %*% d$loadings + matrix(stats::rnorm(3 * 8, sd = 0.2), 3)
+  colnames(new) <- colnames(d$x)
+  new[2, ] <- new[2, ] + c(4, -4, 0, 0, 0, 0, 0, 0)
+  res <- dmodx(pca, 3, newdata = new, conf_level = 0.99)
+  xs <- scale(d$x, scale = FALSE)
+  p <- pca$rotation[, 1:3]
+  s0 <- sqrt(sum((xs - xs %*% p %*% t(p))^2) / (56 * 5))
+  xn <- scale(new, center = pca$center, scale = FALSE)
+  expect_equal(res$dmodx, unname(sqrt(rowSums((xn - xn %*% p %*% t(p))^2) / 5) / s0))
+  expect_equal(as.character(res$outlier[2]), "residual")
+  expect_true(attr(res, "new"))
+  g <- plot_influence(res, label = c("a", "b", "c"))
+  expect_equal(g$labels$y, "DModX (normalized)")
+  expect_error(dmodx(pca, 3, df = "other"))
+})

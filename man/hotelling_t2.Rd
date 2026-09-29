@@ -4,7 +4,14 @@
 \alias{hotelling_t2}
 \title{Hotelling's T-squared Statistic of Samples in an Embedding}
 \usage{
-hotelling_t2(data, columns = NULL, k = 2, group = NULL)
+hotelling_t2(
+  data,
+  columns = NULL,
+  k = 2,
+  group = NULL,
+  conf_level = c(0.95, 0.99),
+  method = "f"
+)
 }
 \arguments{
 \item{data}{The embedding: a data frame, a matrix, a \code{\link[stats:prcomp]{stats::prcomp()}}
@@ -19,52 +26,76 @@ is 2.}
 
 \item{group}{An optional grouping: a column of \code{data} (unquoted or as a
 string), or a vector with one value per sample.}
+
+\item{conf_level}{The confidence level(s) of the limits: one or more
+values between 0 and 1. Default is \code{c(0.95, 0.99)}.}
+
+\item{method}{The distribution of the limits: \code{"f"} (default) or
+\code{"beta"}.}
 }
 \value{
 A tibble with one row per sample: its row number \code{sample}, the
-\code{group} (with \code{group}), \code{t2}, the limits \code{limit_95} and \code{limit_99},
-\code{outlier_95} and \code{outlier_99}, and the number of samples \code{n} of its
-group (or of the data).
+\code{group} (with \code{group}), \code{t2}, then for each confidence level (in \%, e.g.
+95) its limit \code{limit_95} and whether the sample exceeds it,
+\code{outlier_95}, and the number of samples \code{n} of its group (or of the
+data).
 }
 \description{
 Computes Hotelling's \eqn{T^2} statistic of each sample from its scores
 on the first \code{k} components of an embedding (such as PCA or PLS scores),
-with the 95\% and 99\% limits, for all the samples together or within
-groups. Samples beyond the
-limits are far from the center of the data (or of their group) given its
-covariance: candidate outliers.
+with its limits at one or more confidence levels, for all the samples
+together or within groups, with \code{\link[HotellingEllipse:ellipseParam]{HotellingEllipse::ellipseParam()}}.
+Samples beyond a limit are far from the center of the data (or of their
+group) given its covariance: candidate outliers.
 }
 \details{
 \eqn{T^2} is the squared Mahalanobis distance of a sample to the mean of
 the scores, with their covariance. Its limit at the confidence level
-\eqn{1 - \alpha} is \eqn{k(n - 1)/(n - k)\, F_{1-\alpha}(k, n - k)} for
-\eqn{n} samples. Within groups (\code{group}), each group gets its own mean,
-covariance and limits, which tells whether a sample is typical of its
-own group rather than of the whole data set; each group needs more than
-\code{k + 1} samples.
+\eqn{1 - \alpha}, for \eqn{n} samples, is
+\itemize{
+\item \code{method = "f"} (default): \eqn{k(n - 1)/(n - k)\, F_{1-\alpha}(k, n -
+   k)}, the limit for a new sample, more conservative;
+\item \code{method = "beta"}: \eqn{(n - 1)^2/n\, B_{1-\alpha}(k/2, (n - k -
+   1)/2)}, the exact distribution for the samples that estimated the mean
+and covariance (Tracy, Young and Mason, 1992); the F limit can even
+exceed the largest \eqn{T^2} a sample can reach, \eqn{(n - 1)^2 / n},
+for small \eqn{n}.
+}
+
+Within groups (\code{group}), each group gets its own mean, covariance and
+limits, which tells whether a sample is typical of its own group rather
+than of the whole data set; each group needs more than \code{k + 1} samples.
 
 The statistic uses the \code{k} components given, not only the two shown on a
 plot: a sample can lie inside the ellipse of two components and still
-exceed the limit in \code{k} dimensions. Classical estimates are themselves sensitive to outliers; with many
-outliers, prefer the robust distances of \code{\link[=robpca]{robpca()}}.
+exceed the limit in \code{k} dimensions. Classical estimates are themselves
+sensitive to outliers; with many outliers, prefer the robust distances of
+\code{\link[=robpca]{robpca()}}.
 }
 \examples{
-data(soilLIBS)
-spectra <- average(soilLIBS[-(2:8)], Sample)
-pca <- stats::prcomp(spectra[-1], scale. = TRUE)
-t2 <- hotelling_t2(pca, k = 3)
-t2[t2$outlier_95, ]
+if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
+  data(soilLIBS)
+  spectra <- average(soilLIBS[-(2:8)], Sample)
+  pca <- stats::prcomp(spectra[-1], scale. = TRUE)
+  t2 <- hotelling_t2(pca, k = 3)
+  t2[t2$outlier_95, ]
+  # a single limit, with the exact distribution of the calibration samples
+  hotelling_t2(pca, k = 3, conf_level = 0.975, method = "beta")
+}
 }
 \references{
 \itemize{
 \item Hotelling, H. (1931). The generalization of Student's ratio. The
 Annals of Mathematical Statistics, 2(3):360-378.
+\item Tracy, N.D., Young, J.C., Mason, R.L. (1992). Multivariate control
+charts for individual observations. Journal of Quality Technology,
+24(2):88-95.
 \item Jackson, J.E. (1991). A User's Guide to Principal Components. Wiley,
 New York.
 }
 }
 \seealso{
-\code{\link[=plot_embedding]{plot_embedding()}}, \code{\link[=robpca]{robpca()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}
+\code{\link[=plot_embedding]{plot_embedding()}}, \code{\link[=q_residuals]{q_residuals()}}, \code{\link[=robpca]{robpca()}}
 }
 \author{
 Christian L. Goueguel

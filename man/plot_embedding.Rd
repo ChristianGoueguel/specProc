@@ -17,6 +17,8 @@ plot_embedding(
   distribution = "normal",
   hotelling = "none",
   k = 2,
+  t2_level = c(0.95, 0.99),
+  t2_method = "f",
   label = NULL,
   title = NULL
 )
@@ -46,10 +48,18 @@ chi-square) or \code{"hotelling"}.}
 
 \item{hotelling}{Hotelling's \eqn{T^2} ellipses and outliers: \code{"none"}
 (default), \code{"all"} (all samples) or \code{"group"} (within the groups of a
-discrete \code{colour}). Needs the ConfidenceEllipse package.}
+discrete \code{colour}). Needs the HotellingEllipse package (1.3.0 or
+later).}
 
 \item{k}{The number of components of \eqn{T^2}: the two axes, then the
 next embedding coordinates. Default is 2.}
+
+\item{t2_level}{The confidence level(s) of the \eqn{T^2} ellipses: one or
+more values between 0 and 1. Default is \code{c(0.95, 0.99)}. The samples
+are flagged at the highest level.}
+
+\item{t2_method}{The distribution of the \eqn{T^2} limits: \code{"f"}
+(default) or \code{"beta"} (see \code{\link[=hotelling_t2]{hotelling_t2()}}).}
 
 \item{label}{The labels of the outlying samples: a column of \code{data} or a
 vector with one value per sample. By default, their row numbers.}
@@ -85,12 +95,13 @@ fewer than about 10 samples per group, their ellipses can be flat or
 leave out several samples. Groups with fewer than 4 samples get no
 ellipse.
 
-With \code{hotelling = "all"}, the 95\% and 99\% ellipses of Hotelling's
-\eqn{T^2} are drawn for all the samples (contours of \eqn{T^2} on the two
-components shown, from their mean and covariance, with
-\code{\link[ConfidenceEllipse:confidence_ellipse]{ConfidenceEllipse::confidence_ellipse()}}), and the samples beyond the 99\% limit
-of \eqn{T^2} on \code{k} components (see \code{\link[=hotelling_t2]{hotelling_t2()}}) are circled and
-labeled: the classical outlier limits of a score plot. With \code{hotelling = "group"}, each group of a discrete \code{colour} gets its own ellipses and
+With \code{hotelling = "all"}, the ellipses of Hotelling's \eqn{T^2} at each
+level of \code{t2_level} (95\% and 99\% by default) are drawn for all the
+samples (contours of \eqn{T^2} on the two components shown, from their
+mean and covariance, with \code{\link[HotellingEllipse:ellipseCoord]{HotellingEllipse::ellipseCoord()}}), and the
+samples beyond the limit at the highest level of \eqn{T^2} on \code{k}
+components (see \code{\link[=hotelling_t2]{hotelling_t2()}}) are circled and labeled: the classical
+outlier limits of a score plot. With \code{hotelling = "group"}, each group of a discrete \code{colour} gets its own ellipses and
 limits, which flags the samples atypical of their own group. The
 ellipses are drawn for the two components shown, while the limits use
 \code{k} components, so with \code{k > 2} a flagged sample can lie inside the

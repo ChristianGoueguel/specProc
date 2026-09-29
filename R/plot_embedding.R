@@ -28,12 +28,13 @@
 #' leave out several samples. Groups with fewer than 4 samples get no
 #' ellipse.
 #'
-#' With `hotelling = "all"`, the 95% and 99% ellipses of Hotelling's
-#' \eqn{T^2} are drawn for all the samples (contours of \eqn{T^2} on the two
-#' components shown, from their mean and covariance, with
-#' [ConfidenceEllipse::confidence_ellipse()]), and the samples beyond the 99% limit
-#' of \eqn{T^2} on `k` components (see [hotelling_t2()]) are circled and
-#' labeled: the classical outlier limits of a score plot. With `hotelling
+#' With `hotelling = "all"`, the ellipses of Hotelling's \eqn{T^2} at each
+#' level of `t2_level` (95% and 99% by default) are drawn for all the
+#' samples (contours of \eqn{T^2} on the two components shown, from their
+#' mean and covariance, with [HotellingEllipse::ellipseCoord()]), and the
+#' samples beyond the limit at the highest level of \eqn{T^2} on `k`
+#' components (see [hotelling_t2()]) are circled and labeled: the classical
+#' outlier limits of a score plot. With `hotelling
 #' = "group"`, each group of a discrete `colour` gets its own ellipses and
 #' limits, which flags the samples atypical of their own group. The
 #' ellipses are drawn for the two components shown, while the limits use
@@ -62,9 +63,15 @@
 #'   chi-square) or `"hotelling"`.
 #' @param hotelling Hotelling's \eqn{T^2} ellipses and outliers: `"none"`
 #'   (default), `"all"` (all samples) or `"group"` (within the groups of a
-#'   discrete `colour`). Needs the ConfidenceEllipse package.
+#'   discrete `colour`). Needs the HotellingEllipse package (1.3.0 or
+#'   later).
 #' @param k The number of components of \eqn{T^2}: the two axes, then the
 #'   next embedding coordinates. Default is 2.
+#' @param t2_level The confidence level(s) of the \eqn{T^2} ellipses: one or
+#'   more values between 0 and 1. Default is `c(0.95, 0.99)`. The samples
+#'   are flagged at the highest level.
+#' @param t2_method The distribution of the \eqn{T^2} limits: `"f"`
+#'   (default) or `"beta"` (see [hotelling_t2()]).
 #' @param label The labels of the outlying samples: a column of `data` or a
 #'   vector with one value per sample. By default, their row numbers.
 #' @param title The plot title.
@@ -111,7 +118,8 @@
 #' }
 plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, alpha = 0.8,
                            ellipse = FALSE, conf_level = 0.95, robust = FALSE,
-                           distribution = "normal", hotelling = "none", k = 2, label = NULL,
+                           distribution = "normal", hotelling = "none", k = 2,
+                           t2_level = c(0.95, 0.99), t2_method = "f", label = NULL,
                            title = NULL) {
   df <- embedding_data(data)
   colour_quo <- rlang::enquo(colour)
@@ -132,6 +140,8 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
   check_number(conf_level, "conf_level", lower = 0, upper = 1, lower_open = TRUE, upper_open = TRUE)
   distribution <- match.arg(distribution, c("normal", "hotelling"))
   hotelling <- match.arg(hotelling, c("none", "all", "group"))
+  t2_level <- check_conf_level(t2_level)
+  t2_method <- match.arg(t2_method, c("f", "beta"))
 
   colour_info <- embedding_values(colour_quo, df, "colour")
   colour_values <- colour_info$values
@@ -167,8 +177,10 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
     }
     by_group <- hotelling == "group"
     t2 <- hotelling_t2(df, columns = t2_cols[seq_len(k)],
-                       group = if (by_group) colour_values else NULL)
-    limits <- hotelling_ellipses(plot_df, by_group)
+                       group = if (by_group) colour_values else NULL, conf_level = t2_level,
+                       method = t2_method)
+    t2$.flag <- t2[[paste0("outlier_", conf_label(max(t2_level)))]]
+    limits <- hotelling_ellipses(plot_df, by_group, t2_level, t2_method)
     if (!is.null(limits)) {
       p <- p + if (by_group) {
         ggplot2::geom_path(data = limits, ggplot2::aes(.data$x, .data$y, colour = .data$.colour,
@@ -179,8 +191,7 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
         ggplot2::geom_path(data = limits, ggplot2::aes(.data$x, .data$y, linetype = .data$limit),
                            colour = "grey30", linewidth = 0.5, inherit.aes = FALSE)
       }
-      p <- p + ggplot2::scale_linetype_manual(values = stats::setNames(c("dashed", "solid"), t2_labels),
-                                              name = NULL)
+      p <- p + ggplot2::scale_linetype_manual(values = t2_linetypes(t2_level), name = NULL)
     }
   }
   if (is.null(colour_values)) {
@@ -196,10 +207,10 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
       ggplot2::scale_colour_discrete(name = colour_name, aesthetics = c("colour", "fill"))
     }
   }
-  if (!is.null(t2) && any(t2$outlier_99)) {
-    out <- plot_df[t2$sample[t2$outlier_99], , drop = FALSE]
-    out$.label <- if (is.null(label_values)) t2$sample[t2$outlier_99] else
-      label_values[t2$sample[t2$outlier_99]]
+  if (!is.null(t2) && any(t2$.flag)) {
+    out <- plot_df[t2$sample[t2$.flag], , drop = FALSE]
+    out$.label <- if (is.null(label_values)) t2$sample[t2$.flag] else
+      label_values[t2$sample[t2$.flag]]
     p <- p +
       ggplot2::geom_point(data = out, ggplot2::aes(.data$.x, .data$.y), shape = 21, size = size + 2.5,
                           colour = "#c0392b", stroke = 0.8, inherit.aes = FALSE) +
@@ -207,8 +218,9 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
                          vjust = -1.1, size = 3, colour = "#c0392b", inherit.aes = FALSE)
   }
   subtitle <- if (!is.null(t2)) {
-    sprintf("Hotelling T\u00b2 (%d components%s): %d sample(s) beyond the 99%% limit",
-            k, if (hotelling == "group") ", within groups" else "", sum(t2$outlier_99))
+    sprintf("Hotelling T\u00b2 (%d components%s): %d sample(s) beyond the %s%% limit",
+            k, if (hotelling == "group") ", within groups" else "", sum(t2$.flag),
+            conf_label(max(t2_level)))
   }
   p +
     ggplot2::labs(x = x, y = y, title = title, subtitle = subtitle) +
@@ -218,19 +230,26 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
 
 # ---- internals ---------------------------------------------------------------
 
-t2_labels <- c("T\u00b2 95%", "T\u00b2 99%")
+# Legend labels and line types of the T-squared ellipses: the highest level
+# solid, the others dashed, dotted, ...
+t2_names <- function(levels) paste0("T\u00b2 ", conf_label(levels), "%")
+t2_linetypes <- function(levels) {
+  types <- c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash")
+  stats::setNames(types[rev(seq_along(levels))], t2_names(levels))
+}
 
-# Hotelling's T-squared ellipses (95% and 99%) of the groups or of all samples.
-hotelling_ellipses <- function(plot_df, by_group) {
-  rlang::check_installed("ConfidenceEllipse", reason = "to draw Hotelling's T-squared ellipses.")
+# Hotelling's T-squared ellipses of the groups or of all samples, at each level.
+hotelling_ellipses <- function(plot_df, by_group, levels, method) {
+  rlang::check_installed("HotellingEllipse", version = "1.3.0",
+                         reason = "to draw Hotelling's T-squared ellipses.")
   df <- plot_df[stats::complete.cases(plot_df[c(".x", ".y")]), , drop = FALSE]
-  # contours T2 = limit: Hotelling's quantile of ConfidenceEllipse
+  labels <- t2_names(levels)
+  # contours T2 = limit, rotated to the covariance of the two components
   ellipse_of <- function(d) {
-    do.call(rbind, lapply(1:2, function(i) {
-      e <- as.data.frame(ConfidenceEllipse::confidence_ellipse(
-        d[c(".x", ".y")], ".x", ".y", conf_level = c(0.95, 0.99)[i], distribution = "hotelling"
-      ))
-      e$limit <- t2_labels[i]
+    do.call(rbind, lapply(seq_along(levels), function(i) {
+      e <- as.data.frame(HotellingEllipse::ellipseCoord(d[c(".x", ".y")], conf.limit = levels[i],
+                                                        method = method))
+      e$limit <- factor(labels[i], levels = labels)
       e
     }))
   }

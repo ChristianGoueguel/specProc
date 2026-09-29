@@ -1,3 +1,4 @@
+ACS
 ALR
 ALS
 ASD
@@ -54,6 +55,7 @@ Corsi
 Cristoforetti
 Croux
 DDC
+DModX
 DOSC
 DWT
 Daubechies
@@ -73,6 +75,7 @@ Eigen's
 Eilers
 El
 Engelsen
+Eriksson
 Everitt
 FWHM
 Faber
@@ -99,6 +102,7 @@ Hinkley
 Hoaglin
 Hotelling
 Hotelling's
+HotellingEllipse
 Hoy
 Huddlestone
 Høy
@@ -110,10 +114,12 @@ Iglewicz
 Intell
 Interferent
 Interscience
+Johansson
 Jong
 Josefson
 Kalivas
 Kemsley
+Kettaneh
 Kohler
 Konjević
 Kourti
@@ -151,6 +157,7 @@ Massart
 Maurel
 McWhirter
 Medcouple
+Megavariate
 Midcorrelation
 Midcovariance
 Midvariance
@@ -206,6 +213,8 @@ Robuste
 Rousseeuw
 Rtools
 SCP
+SIMCA
+SIMCA's
 SIMPLS
 SNV
 SPC
@@ -223,6 +232,7 @@ Sherbini
 Shupack
 Sjöblom
 Sjöblom's
+Sjöström
 Skrondal
 Smilde
 Sparsification
@@ -242,6 +252,8 @@ Toraya
 Trautmann
 Trygg
 UMAP
+Umetrics
+Umeå
 VAMDC
 Vanden
 Vandervieren
@@ -255,6 +267,7 @@ Weideman
 Weideman's
 Westerhuis
 Whittaker
+Wikström
 XSAMS
 Xcode
 YJ
@@ -324,6 +337,7 @@ multiplet
 multiplets
 multiresolution
 na
+nd
 nm
 nonlinearly
 orthogonalisation
