@@ -15,7 +15,8 @@ calibration_curve(
   model = "linear",
   weights = NULL,
   blank = NULL,
-  lod_method = NULL
+  lod_method = NULL,
+  level = 0.95
 )
 ```
 
@@ -49,11 +50,17 @@ calibration_curve(
   `"intercept"` or `"blank"` (see details). By default, `"blank"` when
   `blank` is given, `"residual"` otherwise.
 
+- level:
+
+  The confidence level of the intervals of the coefficients. Default is
+  0.95.
+
 ## Value
 
 An object of class `specproc_calibration`, a list with
 
-- `coefficients`: a tibble of the estimates and standard errors;
+- `coefficients`: a tibble of the estimates, standard errors and
+  confidence intervals (`lower`, `upper`) at `level`;
 
 - `figures_of_merit`: a tibble with the number of standards `n`, the
   `sensitivity`, `r_squared`, the residual standard deviation `sigma`,
@@ -104,6 +111,15 @@ curvature is significant (as with self-absorption or detector
 saturation). When concentrations are replicated, the lack-of-fit test
 compares the residuals with the pure error of the replicates.
 
+**Intervals.** The confidence band of the curve shows where the mean
+signal lies at each concentration; the prediction band, wider, where a
+single new measurement is expected to fall, since it adds the noise of
+the measurement.
+[`plot_calibration()`](https://christiangoueguel.com/specProc/reference/plot_calibration.md)
+draws either or both, and
+[predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_calibration.md)
+computes them for given concentrations (`type = "signal"`).
+
 **Inverse prediction.** The concentration of a sample is the solution of
 the calibration equation for its signal (for a quadratic curve, the root
 within or nearest to the calibration range). Its standard error, by the
@@ -144,9 +160,9 @@ cal <- calibration_curve(standards, intensity, concentration)
 cal
 #> Linear calibration curve (18 standards)
 #> 
-#>       term estimate std_error
-#>  intercept    152.5    30.854
-#>      slope    878.9     8.185
+#>       term estimate std_error  lower upper
+#>  intercept    152.5    30.854  87.06 217.9
+#>      slope    878.9     8.185 861.51 896.2
 #> 
 #> R-squared:    0.99861
 #> Sensitivity:  878.9

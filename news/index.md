@@ -10,6 +10,15 @@
 
 ### New features
 
+- [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md)
+  gains prediction intervals:
+  [`plot_calibration()`](https://christiangoueguel.com/specProc/reference/plot_calibration.md)
+  draws the confidence band, the prediction band or both (`interval`),
+  and shows new samples (`newdata`) at their predicted concentrations
+  with their intervals; `predict(type = "signal")` gives the expected
+  signal at given concentrations with a confidence or prediction
+  interval; the coefficients have confidence intervals.
+
 - The plots of
   [`correlation()`](https://christiangoueguel.com/specProc/reference/correlation.md)
   are redesigned. For spectra (variables named by wavelength), the plot

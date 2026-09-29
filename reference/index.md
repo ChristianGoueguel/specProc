@@ -207,7 +207,7 @@ of detection, and calibration-free composition (CF-LIBS).
 - [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md)
   : Univariate Calibration Curve
 - [`predict(`*`<specproc_calibration>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_calibration.md)
-  : Predict Concentrations from a Calibration Curve
+  : Predict from a Calibration Curve
 - [`plot_calibration()`](https://christiangoueguel.com/specProc/reference/plot_calibration.md)
   : Plot a Calibration Curve
 - [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md)
