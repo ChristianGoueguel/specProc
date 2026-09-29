@@ -8,7 +8,7 @@
 #' spectrum.
 #'
 #' @details
-#' The three normalization methods:
+#' The normalization methods:
 #'    - **Normalization to the background:** Spectra are divided by the intensity
 #'      of the background emission. Note that it is recommended that the detector
 #'      dark current be subtracted prior to the normalization.
