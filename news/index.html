@@ -42,6 +42,12 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="specproc-development-version">specProc (development version)<a class="anchor" aria-label="anchor" href="#specproc-development-version"></a></h2>
 <div class="section level3">
+<h3 id="performance-development-version">Performance<a class="anchor" aria-label="anchor" href="#performance-development-version"></a></h3>
+<ul><li>Column medians are computed in C++ (<code><a href="../reference/reject_shots.html">reject_shots()</a></code>, <code><a href="../reference/msc.html">msc()</a></code> and <code><a href="../reference/emsc.html">emsc()</a></code> with <code>robust = TRUE</code>, <code>center(method = "median")</code>, <code><a href="../reference/robpca.html">robpca()</a></code>): <code><a href="../reference/reject_shots.html">reject_shots()</a></code> is about 20 times faster on 400 spectra of 7152 channels.</li>
+<li>
+<code><a href="../reference/q_residuals.html">q_residuals()</a></code> and <code><a href="../reference/dmodx.html">dmodx()</a></code> compute the residuals of the calibration samples from the scores of the components left out, without reconstructing the data (about 100 times faster), and <code><a href="../reference/line_intensities.html">line_intensities()</a></code> measures all the spectra of a line at once (about 3 times faster). The results are unchanged.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
 <ul><li>The data sets are renamed: <code>specLIBS</code> is now <code>soilLIBS</code>, and <code>fourrage</code> is now <code>forageLIBS</code>. Replace <code>data(specLIBS)</code> with <code>data(soilLIBS)</code> and <code>data(fourrage)</code> with <code>data(forageLIBS)</code>.</li>
 </ul></div>

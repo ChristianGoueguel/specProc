@@ -2,6 +2,26 @@
 
 ## specProc (development version)
 
+### Performance
+
+- Column medians are computed in C++
+  ([`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md),
+  [`msc()`](https://christiangoueguel.com/specProc/reference/msc.md) and
+  [`emsc()`](https://christiangoueguel.com/specProc/reference/emsc.md)
+  with `robust = TRUE`, `center(method = "median")`,
+  [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)):
+  [`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md)
+  is about 20 times faster on 400 spectra of 7152 channels.
+- [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md)
+  and
+  [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md)
+  compute the residuals of the calibration samples from the scores of
+  the components left out, without reconstructing the data (about 100
+  times faster), and
+  [`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md)
+  measures all the spectra of a line at once (about 3 times faster). The
+  results are unchanged.
+
 ### Breaking changes
 
 - The data sets are renamed: `specLIBS` is now `soilLIBS`, and
