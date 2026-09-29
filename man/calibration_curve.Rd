@@ -11,7 +11,8 @@ calibration_curve(
   model = "linear",
   weights = NULL,
   blank = NULL,
-  lod_method = NULL
+  lod_method = NULL,
+  level = 0.95
 )
 }
 \arguments{
@@ -31,11 +32,15 @@ sample.}
 \item{lod_method}{The estimate of the blank standard deviation:
 \code{"residual"}, \code{"intercept"} or \code{"blank"} (see details). By default,
 \code{"blank"} when \code{blank} is given, \code{"residual"} otherwise.}
+
+\item{level}{The confidence level of the intervals of the coefficients.
+Default is 0.95.}
 }
 \value{
 An object of class \code{specproc_calibration}, a list with
 \itemize{
-\item \code{coefficients}: a tibble of the estimates and standard errors;
+\item \code{coefficients}: a tibble of the estimates, standard errors and
+confidence intervals (\code{lower}, \code{upper}) at \code{level};
 \item \code{figures_of_merit}: a tibble with the number of standards \code{n}, the
 \code{sensitivity}, \code{r_squared}, the residual standard deviation \code{sigma},
 the blank standard deviation used (\code{sigma_blank}), \code{lod} and \code{loq}
@@ -82,6 +87,13 @@ variance with that of a quadratic fit; a small p-value means that the
 curvature is significant (as with self-absorption or detector
 saturation). When concentrations are replicated, the lack-of-fit test
 compares the residuals with the pure error of the replicates.
+
+\strong{Intervals.} The confidence band of the curve shows where the mean
+signal lies at each concentration; the prediction band, wider, where a
+single new measurement is expected to fall, since it adds the noise of
+the measurement. \code{\link[=plot_calibration]{plot_calibration()}} draws either or both, and
+\link[=predict.specproc_calibration]{predict()} computes them for given
+concentrations (\code{type = "signal"}).
 
 \strong{Inverse prediction.} The concentration of a sample is the solution of
 the calibration equation for its signal (for a quadratic curve, the root

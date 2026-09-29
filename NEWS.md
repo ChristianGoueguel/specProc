@@ -8,6 +8,12 @@
 
 ## New features
 
+* `calibration_curve()` gains prediction intervals: `plot_calibration()`
+  draws the confidence band, the prediction band or both (`interval`), and
+  shows new samples (`newdata`) at their predicted concentrations with
+  their intervals; `predict(type = "signal")` gives the expected signal at
+  given concentrations with a confidence or prediction interval; the
+  coefficients have confidence intervals.
 * The plots of `correlation()` are redesigned. For spectra (variables named
   by wavelength), the plot is a correlation spectrum with the 5%
   significance thresholds; otherwise, a sorted chart colored by sign and

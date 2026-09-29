@@ -83,3 +83,43 @@ test_that("calibration_curve handles weights and checks its inputs", {
   expect_error(predict(calibration_curve(d, intensity, concentration), "a"), "numeric")
   expect_error(plot_calibration(1), "calibration_curve")
 })
+
+test_that("confidence and prediction intervals of the signal match lm", {
+  d <- cal_data(sd = 200)
+  cal <- calibration_curve(d, intensity, concentration)
+  expect_equal(c(cal$coefficients$lower, cal$coefficients$upper),
+               as.vector(stats::confint(cal$fit)))
+  new <- data.frame(concentration = c(0.7, 5))
+  for (type in c("prediction", "confidence")) {
+    ours <- predict(cal, c(0.7, 5), type = "signal", interval = type)
+    ref <- stats::predict(stats::lm(intensity ~ concentration, data = d), new, interval = type)
+    expect_equal(ours$signal, unname(ref[, "fit"]))
+    expect_equal(ours$lower, unname(ref[, "lwr"]))
+    expect_equal(ours$upper, unname(ref[, "upr"]))
+  }
+  # a mean of replicates narrows the prediction interval, not the confidence interval
+  expect_lt(predict(cal, 5, type = "signal", replicates = 4)$se, predict(cal, 5, type = "signal")$se)
+  expect_equal(predict(cal, 5, type = "signal", interval = "confidence", replicates = 4)$se,
+               predict(cal, 5, type = "signal", interval = "confidence")$se)
+  expect_equal(predict(cal, data.frame(concentration = 5), type = "signal")$concentration, 5)
+  # weighted: the new signal follows the weight at its concentration
+  pos <- d[d$concentration > 0, ]
+  w <- calibration_curve(pos, intensity, concentration, weights = "1/x")
+  ref <- stats::predict(w$fit, new, interval = "prediction", weights = 1 / new$concentration)
+  expect_equal(predict(w, new$concentration, type = "signal")$lower, unname(ref[, "lwr"]))
+  expect_error(predict(cal, "a", type = "signal"), "numeric concentrations")
+})
+
+test_that("plot_calibration draws the bands and the new samples", {
+  d <- cal_data(sd = 200)
+  cal <- calibration_curve(d, intensity, concentration)
+  ribbons <- function(p) sum(vapply(p$layers, function(l) inherits(l$geom, "GeomRibbon"), logical(1)))
+  expect_equal(ribbons(plot_calibration(cal)), 2)
+  expect_equal(ribbons(plot_calibration(cal, interval = "confidence")), 1)
+  expect_equal(ribbons(plot_calibration(cal, interval = "none")), 0)
+  p <- plot_calibration(cal, newdata = c(1500, 5000), level = 0.9)
+  bars <- p$layers[vapply(p$layers, function(l) inherits(l$geom, "GeomErrorbar"), logical(1))][[1]]$data
+  expect_equal(bars$lower, predict(cal, c(1500, 5000), level = 0.9)$lower)
+  expect_match(p$labels$subtitle, "90%")
+  expect_error(plot_calibration(cal, interval = "foo"))
+})

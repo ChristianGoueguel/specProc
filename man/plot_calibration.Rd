@@ -4,12 +4,30 @@
 \alias{plot_calibration}
 \title{Plot a Calibration Curve}
 \usage{
-plot_calibration(object, level = 0.95, title = NULL)
+plot_calibration(
+  object,
+  interval = "both",
+  level = 0.95,
+  newdata = NULL,
+  replicates = 1,
+  title = NULL
+)
 }
 \arguments{
 \item{object}{A curve fitted with \code{\link[=calibration_curve]{calibration_curve()}}.}
 
-\item{level}{The confidence level of the band. Default is 0.95.}
+\item{interval}{The bands to draw: \code{"both"} (default), \code{"confidence"},
+\code{"prediction"} or \code{"none"}.}
+
+\item{level}{The confidence level of the bands and intervals. Default is
+0.95.}
+
+\item{newdata}{Optional signals of new samples (a numeric vector, or a
+data frame with the signal column) to show with their predicted
+concentrations.}
+
+\item{replicates}{The number of replicate measurements averaged in each
+new signal. Default is 1.}
 
 \item{title}{The plot title. By default, the model and the figures of
 merit.}
@@ -19,8 +37,25 @@ A ggplot object.
 }
 \description{
 Draws the calibration standards, the fitted curve with its confidence
-band, and the limits of detection and quantification.
+and prediction bands, the limits of detection and quantification, and
+optionally the concentrations predicted for new samples.
+}
+\details{
+The confidence band shows where the mean signal lies; the prediction
+band, where a single new measurement (or the mean of \code{replicates}) is
+expected to fall (see \code{\link[=calibration_curve]{calibration_curve()}}). With \code{newdata}, each new
+signal is drawn on the curve at its predicted concentration, with guide
+lines to the axes and a horizontal bar for the interval of the
+concentration from \link[=predict.specproc_calibration]{predict()}.
+}
+\examples{
+set.seed(1)
+standards <- data.frame(concentration = rep(c(0, 0.5, 1, 2, 4, 8), each = 3))
+standards$intensity <- 50 + 1000 * standards$concentration + rnorm(18, sd = 300)
+cal <- calibration_curve(standards, intensity, concentration)
+plot_calibration(cal)
+plot_calibration(cal, newdata = c(800, 3000, 6500))
 }
 \seealso{
-\code{\link[=calibration_curve]{calibration_curve()}}
+\code{\link[=calibration_curve]{calibration_curve()}}, \code{\link[=predict.specproc_calibration]{predict.specproc_calibration()}}
 }

@@ -2,33 +2,72 @@
 % Please edit documentation in R/calibration_curve.R
 \name{predict.specproc_calibration}
 \alias{predict.specproc_calibration}
-\title{Predict Concentrations from a Calibration Curve}
+\title{Predict from a Calibration Curve}
 \usage{
-\method{predict}{specproc_calibration}(object, newdata, replicates = 1, level = 0.95, ...)
+\method{predict}{specproc_calibration}(
+  object,
+  newdata,
+  replicates = 1,
+  level = 0.95,
+  type = "concentration",
+  interval = "prediction",
+  ...
+)
 }
 \arguments{
 \item{object}{A curve fitted with \code{\link[=calibration_curve]{calibration_curve()}}.}
 
-\item{newdata}{The signals of the new samples: a numeric vector, or a
-data frame with the signal column used for the calibration.}
+\item{newdata}{For \code{type = "concentration"}, the signals of the new
+samples: a numeric vector, or a data frame with the signal column used
+for the calibration. For \code{type = "signal"}, their concentrations: a
+numeric vector or a data frame with the concentration column.}
 
 \item{replicates}{The number of replicate measurements averaged in each
 signal. Default is 1.}
 
 \item{level}{The confidence level of the intervals. Default is 0.95.}
 
+\item{type}{\code{"concentration"} (default, inverse prediction) or \code{"signal"}.}
+
+\item{interval}{For \code{type = "signal"}: \code{"prediction"} (default) or
+\code{"confidence"}.}
+
 \item{...}{Not used.}
 }
 \value{
-A tibble with the \code{signal}, the predicted \code{concentration}, its
-standard error \code{se}, the confidence interval (\code{lower}, \code{upper}) and
-whether it is below the limit of detection (\code{below_lod}) or of
-quantification (\code{below_loq}).
+For \code{type = "concentration"}, a tibble with the \code{signal}, the
+predicted \code{concentration}, its standard error \code{se}, the interval
+(\code{lower}, \code{upper}) and whether it is below the limit of detection
+(\code{below_lod}) or of quantification (\code{below_loq}). For \code{type = "signal"}, a tibble with the \code{concentration}, the predicted \code{signal},
+its standard error \code{se} and the interval (\code{lower}, \code{upper}).
 }
 \description{
 Computes the concentrations of new samples from their signal, by inverse
-prediction from a curve fitted with \code{\link[=calibration_curve]{calibration_curve()}}.
+prediction from a curve fitted with \code{\link[=calibration_curve]{calibration_curve()}}, or the
+expected signal at given concentrations, with confidence or prediction
+intervals.
+}
+\details{
+With \code{type = "concentration"} (default), the interval of each
+concentration combines the uncertainty of the curve with the noise of the
+new signal, the mean of \code{replicates} measurements (see
+\code{\link[=calibration_curve]{calibration_curve()}}).
+
+With \code{type = "signal"}, \code{newdata} holds concentrations, and the interval
+is either the confidence interval of the mean signal (\code{interval = "confidence"}) or the prediction interval of a new signal, the mean of
+\code{replicates} measurements (\code{interval = "prediction"}, default). For a
+weighted curve, the noise of a new signal follows the weights at its
+concentration (numeric weights give new samples a weight of 1).
+}
+\examples{
+set.seed(1)
+standards <- data.frame(concentration = rep(c(0, 0.5, 1, 2, 4, 8), each = 3))
+standards$intensity <- 50 + 1000 * standards$concentration + rnorm(18, sd = 30)
+cal <- calibration_curve(standards, intensity, concentration)
+predict(cal, c(800, 3000), replicates = 3)
+predict(cal, c(1, 5), type = "signal")
+predict(cal, c(1, 5), type = "signal", interval = "confidence")
 }
 \seealso{
-\code{\link[=calibration_curve]{calibration_curve()}}
+\code{\link[=calibration_curve]{calibration_curve()}}, \code{\link[=plot_calibration]{plot_calibration()}}
 }
