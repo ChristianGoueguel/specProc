@@ -10,6 +10,29 @@
 
 ### New features
 
+- [`wavelength_calibration()`](https://christiangoueguel.com/specProc/reference/wavelength_calibration.md)
+  fits a correction of the wavelength axis from reference lines (for
+  example, from the NIST database), located to a fraction of a channel
+  by Gaussian interpolation, with one correction per detector segment
+  (constant, linear or quadratic) and automatic rejection of edge, weak,
+  saturated and outlying lines.
+  [`apply_calibration()`](https://christiangoueguel.com/specProc/reference/apply_calibration.md)
+  relabels the wavelengths of spectra without changing their
+  intensities, [`predict()`](https://rdrr.io/r/stats/predict.html)
+  corrects any wavelength, and
+  [`plot_wavelength_calibration()`](https://christiangoueguel.com/specProc/reference/plot_wavelength_calibration.md)
+  draws the offsets and the fit.
+
+- [`savitzky_golay()`](https://christiangoueguel.com/specProc/reference/savitzky_golay.md)
+  also splits the axis where overlapping detectors make the wavelengths
+  step back.
+
+- The periodic table of
+  [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md)
+  can be hidden (button **Hide table**, or `show_table = FALSE` at
+  start) to give the spectrum the whole height of the window; the
+  selected elements stay listed in the panel header.
+
 - [`savitzky_golay()`](https://christiangoueguel.com/specProc/reference/savitzky_golay.md)
   and
   [`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md):

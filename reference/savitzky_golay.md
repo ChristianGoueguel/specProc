@@ -51,8 +51,8 @@ counteracts.
 
 Every channel is kept: at the ends of a spectrum, the values come from
 the polynomial fitted to the first (or last) `window` channels. When
-`segments = TRUE`, the spectrum is split where the channel spacing jumps
-(such as the gaps between the detectors of a multi-spectrometer system,
+`segments = TRUE`, the spectrum is split between the detectors of a
+multi-spectrometer system (where the wavelengths step back, or jump by
 more than 5 times the median spacing), and each segment is filtered on
 its own; segments shorter than `window` are returned as `NA`, with a
 warning.

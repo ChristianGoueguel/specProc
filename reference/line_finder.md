@@ -9,7 +9,7 @@ color per ionization stage.
 ## Usage
 
 ``` r
-line_finder(spectra, launch.browser = interactive())
+line_finder(spectra, launch.browser = interactive(), show_table = TRUE)
 ```
 
 ## Arguments
@@ -26,6 +26,13 @@ line_finder(spectra, launch.browser = interactive())
   [`shiny::runApp()`](https://rdrr.io/pkg/shiny/man/runApp.html).
   Default is `TRUE` when R is interactive.
 
+- show_table:
+
+  A logical: show the periodic table when the app starts (`TRUE`,
+  default). The **Hide table** button of the Elements panel hides or
+  shows it at any time; hiding it gives the spectrum the whole height of
+  the window.
+
 ## Value
 
 Called for its side effect: runs the app. Use
@@ -39,7 +46,9 @@ for the same results in scripts.
 The app offers:
 
 - a clickable periodic table; elements without lines in the wavelength
-  range of the spectra are grayed out once queried;
+  range of the spectra are grayed out once queried. It can be hidden
+  (**Hide table**) to enlarge the spectrum, and the selected elements
+  stay listed in the panel header;
 
 - the ionization stages to show (I, II, III);
 

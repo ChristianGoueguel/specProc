@@ -48,7 +48,7 @@ A tibble of normalized spectra.
 
 ## Details
 
-The three normalization methods:
+The normalization methods:
 
 - **Normalization to the background:** Spectra are divided by the
   intensity of the background emission. Note that it is recommended that

@@ -785,7 +785,8 @@ and can be tuned within a tidymodels workflow.
 ## Line identification
 
 Candidate emission lines from the NIST Atomic Spectra Database, overlaid
-on spectra, and an interactive app to identify lines.
+on spectra, an interactive app to identify lines, and the calibration of
+the wavelength axis on reference lines.
 
 - [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md)
   : Interactive Identification of Emission Lines
@@ -793,6 +794,14 @@ on spectra, and an interactive app to identify lines.
   : Candidate Emission Lines for LIBS Spectra
 - [`plot_lines()`](https://christiangoueguel.com/specProc/reference/plot_lines.md)
   : Overlay Emission Lines on a Spectrum
+- [`wavelength_calibration()`](https://christiangoueguel.com/specProc/reference/wavelength_calibration.md)
+  : Wavelength Calibration from Reference Lines
+- [`apply_calibration()`](https://christiangoueguel.com/specProc/reference/apply_calibration.md)
+  : Apply a Wavelength Calibration
+- [`predict(`*`<specproc_wavelength_calibration>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_wavelength_calibration.md)
+  : Correct Wavelengths with a Wavelength Calibration
+- [`plot_wavelength_calibration()`](https://christiangoueguel.com/specProc/reference/plot_wavelength_calibration.md)
+  : Plot a Wavelength Calibration
 
 ## Plasma diagnostics
 

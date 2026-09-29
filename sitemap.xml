@@ -11,6 +11,7 @@
 <url><loc>https://christiangoueguel.com/specProc/index.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/news/index.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/adjusted_boxplot.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/apply_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/average.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/baseline_als.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/baseline_arpls.html</loc></url>
@@ -73,12 +74,14 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_outlier_map.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_outliers.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_spectra.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/plot_wavelength_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/poisson_scale.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_emsc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_filter.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_nas.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_wavelength_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/projected_osc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/q_residuals.html</loc></url>
@@ -130,6 +133,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/umad.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/voigt_fwhm.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/voigt_profile.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/wavelength_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/wavelet_features.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/wavelet_level.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/y_gradient_glsw.html</loc></url>

@@ -58,7 +58,7 @@ per ionization stage.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">line_finder</span><span class="op">(</span><span class="va">spectra</span>, launch.browser <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">line_finder</span><span class="op">(</span><span class="va">spectra</span>, launch.browser <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span>, show_table <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -75,6 +75,13 @@ are used as labels).</p></dd>
 <dd><p>Passed to <code><a href="https://rdrr.io/pkg/shiny/man/runApp.html" class="external-link">shiny::runApp()</a></code>. Default is <code>TRUE</code>
 when R is interactive.</p></dd>
 
+
+<dt id="arg-show-table">show_table<a class="anchor" aria-label="anchor" href="#arg-show-table"></a></dt>
+<dd><p>A logical: show the periodic table when the app starts
+(<code>TRUE</code>, default). The <strong>Hide table</strong> button of the Elements panel hides
+or shows it at any time; hiding it gives the spectrum the whole height of
+the window.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -84,7 +91,9 @@ when R is interactive.</p></dd>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The app offers:</p><ul><li><p>a clickable periodic table; elements without lines in the wavelength
-range of the spectra are grayed out once queried;</p></li>
+range of the spectra are grayed out once queried. It can be hidden
+(<strong>Hide table</strong>) to enlarge the spectrum, and the selected elements
+stay listed in the panel header;</p></li>
 <li><p>the ionization stages to show (I, II, III);</p></li>
 <li><p>the plasma temperature and the number of lines per species, which set
 the lines kept and the height of their markers (relative intensities in
