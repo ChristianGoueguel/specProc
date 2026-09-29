@@ -159,6 +159,7 @@ reference:
   - plot_fit
   - plot_spectra
   - plot_embedding
+  - hotelling_t2
   - plot_outliers
   - adjusted_boxplot
   - generalized_boxplot

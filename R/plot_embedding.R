@@ -28,6 +28,19 @@
 #' leave out several samples. Groups with fewer than 4 samples get no
 #' ellipse.
 #'
+#' With `hotelling = "all"`, the 95% and 99% ellipses of Hotelling's
+#' \eqn{T^2} are drawn for all the samples (contours of \eqn{T^2} on the two
+#' components shown, from their mean and covariance, with
+#' [ConfidenceEllipse::confidence_ellipse()]), and the samples beyond the 99% limit
+#' of \eqn{T^2} on `k` components (see [hotelling_t2()]) are circled and
+#' labeled: the classical outlier limits of a score plot. With `hotelling
+#' = "group"`, each group of a discrete `colour` gets its own ellipses and
+#' limits, which flags the samples atypical of their own group. The
+#' ellipses are drawn for the two components shown, while the limits use
+#' `k` components, so with `k > 2` a flagged sample can lie inside the
+#' ellipses. \eqn{T^2} suits linear scores such as PCA or PLS; on a UMAP
+#' map, whose distances are not meaningful, prefer `ellipse`.
+#'
 #' In a UMAP embedding, only the neighborhoods are meaningful: the sizes of
 #' the clusters and the distances between them are not, and they change
 #' with `neighbors` and `min_dist`. Read the plot as a map of which samples
@@ -47,10 +60,17 @@
 #' @param robust A logical: robust ellipses (`FALSE`, default).
 #' @param distribution The quantile of the ellipses: `"normal"` (default,
 #'   chi-square) or `"hotelling"`.
+#' @param hotelling Hotelling's \eqn{T^2} ellipses and outliers: `"none"`
+#'   (default), `"all"` (all samples) or `"group"` (within the groups of a
+#'   discrete `colour`). Needs the ConfidenceEllipse package.
+#' @param k The number of components of \eqn{T^2}: the two axes, then the
+#'   next embedding coordinates. Default is 2.
+#' @param label The labels of the outlying samples: a column of `data` or a
+#'   vector with one value per sample. By default, their row numbers.
 #' @param title The plot title.
 #'
 #' @return A ggplot object.
-#' @seealso [plot_outlier_map()], [robpca()]
+#' @seealso [hotelling_t2()], [plot_outlier_map()], [robpca()]
 #' @export plot_embedding
 #'
 #' @examples
@@ -73,6 +93,11 @@
 #'   plot_embedding(pca, colour = texture, ellipse = TRUE, distribution = "hotelling")
 #' }
 #'
+#' # Hotelling's T-squared limits of the score plot, on 3 components
+#' if (rlang::is_installed("ConfidenceEllipse")) {
+#'   plot_embedding(pca, colour = texture, hotelling = "all", k = 3, label = spectra$Sample)
+#' }
+#'
 #' if (rlang::is_installed(c("recipes", "embed"))) {
 #'   set.seed(1)
 #'   umap <- recipes::recipe(~ ., data = spectra) |>
@@ -86,7 +111,8 @@
 #' }
 plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, alpha = 0.8,
                            ellipse = FALSE, conf_level = 0.95, robust = FALSE,
-                           distribution = "normal", title = NULL) {
+                           distribution = "normal", hotelling = "none", k = 2, label = NULL,
+                           title = NULL) {
   df <- embedding_data(data)
   colour_quo <- rlang::enquo(colour)
   x <- embedding_column(rlang::enquo(x), df, "x")
@@ -105,30 +131,21 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
   check_flag(robust, "robust")
   check_number(conf_level, "conf_level", lower = 0, upper = 1, lower_open = TRUE, upper_open = TRUE)
   distribution <- match.arg(distribution, c("normal", "hotelling"))
+  hotelling <- match.arg(hotelling, c("none", "all", "group"))
 
-  colour_name <- NULL
-  colour_values <- NULL
-  if (!rlang::quo_is_null(colour_quo)) {
-    expr <- rlang::quo_get_expr(colour_quo)
-    name <- if (rlang::is_symbol(expr)) rlang::as_string(expr) else if (is.character(expr) && length(expr) == 1) expr
-    if (!is.null(name) && name %in% names(df)) {
-      colour_name <- name
-      colour_values <- df[[name]]
-    } else {
-      colour_values <- rlang::eval_tidy(colour_quo)
-      colour_name <- if (rlang::is_symbol(expr)) rlang::as_string(expr) else "colour"
-      if (length(colour_values) != nrow(df)) {
-        stop("`colour` must be a column of 'data' or have one value per sample (",
-             nrow(df), ").", call. = FALSE)
-      }
-    }
-  }
+  colour_info <- embedding_values(colour_quo, df, "colour")
+  colour_values <- colour_info$values
+  colour_name <- colour_info$name
+  label_values <- embedding_values(rlang::enquo(label), df, "label")$values
   plot_df <- data.frame(.x = df[[x]], .y = df[[y]])
   if (!is.null(colour_values)) plot_df$.colour <- colour_values
+  grouped <- !is.null(colour_values) && !is.numeric(colour_values)
+  if (hotelling == "group" && !grouped) {
+    stop("`hotelling = \"group\"` needs a discrete `colour` to define the groups.", call. = FALSE)
+  }
 
   p <- ggplot2::ggplot(plot_df, ggplot2::aes(.data$.x, .data$.y))
   if (ellipse) {
-    grouped <- !is.null(colour_values) && !is.numeric(colour_values)
     ellipses <- embedding_ellipses(plot_df, grouped, conf_level, robust, distribution)
     if (!is.null(ellipses)) {
       p <- p + if (grouped) {
@@ -139,6 +156,31 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
         ggplot2::geom_polygon(data = ellipses, ggplot2::aes(.data$x, .data$y), colour = "grey40",
                               fill = "grey60", alpha = 0.12, linewidth = 0.5, inherit.aes = FALSE)
       }
+    }
+  }
+  t2 <- NULL
+  if (hotelling != "none") {
+    check_count(k, "k", lower = 2)
+    t2_cols <- unique(c(x, y, embedding_components(df, sum(vapply(df, is.numeric, logical(1))))))
+    if (length(t2_cols) < k) {
+      stop("'data' has fewer than ", k, " numeric columns for the T-squared.", call. = FALSE)
+    }
+    by_group <- hotelling == "group"
+    t2 <- hotelling_t2(df, columns = t2_cols[seq_len(k)],
+                       group = if (by_group) colour_values else NULL)
+    limits <- hotelling_ellipses(plot_df, by_group)
+    if (!is.null(limits)) {
+      p <- p + if (by_group) {
+        ggplot2::geom_path(data = limits, ggplot2::aes(.data$x, .data$y, colour = .data$.colour,
+                                                       linetype = .data$limit,
+                                                       group = interaction(.data$.colour, .data$limit)),
+                           linewidth = 0.5, inherit.aes = FALSE)
+      } else {
+        ggplot2::geom_path(data = limits, ggplot2::aes(.data$x, .data$y, linetype = .data$limit),
+                           colour = "grey30", linewidth = 0.5, inherit.aes = FALSE)
+      }
+      p <- p + ggplot2::scale_linetype_manual(values = stats::setNames(c("dashed", "solid"), t2_labels),
+                                              name = NULL)
     }
   }
   if (is.null(colour_values)) {
@@ -154,13 +196,58 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
       ggplot2::scale_colour_discrete(name = colour_name, aesthetics = c("colour", "fill"))
     }
   }
+  if (!is.null(t2) && any(t2$outlier_99)) {
+    out <- plot_df[t2$sample[t2$outlier_99], , drop = FALSE]
+    out$.label <- if (is.null(label_values)) t2$sample[t2$outlier_99] else
+      label_values[t2$sample[t2$outlier_99]]
+    p <- p +
+      ggplot2::geom_point(data = out, ggplot2::aes(.data$.x, .data$.y), shape = 21, size = size + 2.5,
+                          colour = "#c0392b", stroke = 0.8, inherit.aes = FALSE) +
+      ggplot2::geom_text(data = out, ggplot2::aes(.data$.x, .data$.y, label = .data$.label),
+                         vjust = -1.1, size = 3, colour = "#c0392b", inherit.aes = FALSE)
+  }
+  subtitle <- if (!is.null(t2)) {
+    sprintf("Hotelling T\u00b2 (%d components%s): %d sample(s) beyond the 99%% limit",
+            k, if (hotelling == "group") ", within groups" else "", sum(t2$outlier_99))
+  }
   p +
-    ggplot2::labs(x = x, y = y, title = title) +
+    ggplot2::labs(x = x, y = y, title = title, subtitle = subtitle) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = "right")
 }
 
 # ---- internals ---------------------------------------------------------------
+
+t2_labels <- c("T\u00b2 95%", "T\u00b2 99%")
+
+# Hotelling's T-squared ellipses (95% and 99%) of the groups or of all samples.
+hotelling_ellipses <- function(plot_df, by_group) {
+  rlang::check_installed("ConfidenceEllipse", reason = "to draw Hotelling's T-squared ellipses.")
+  df <- plot_df[stats::complete.cases(plot_df[c(".x", ".y")]), , drop = FALSE]
+  # contours T2 = limit: Hotelling's quantile of ConfidenceEllipse
+  ellipse_of <- function(d) {
+    do.call(rbind, lapply(1:2, function(i) {
+      e <- as.data.frame(ConfidenceEllipse::confidence_ellipse(
+        d[c(".x", ".y")], ".x", ".y", conf_level = c(0.95, 0.99)[i], distribution = "hotelling"
+      ))
+      e$limit <- t2_labels[i]
+      e
+    }))
+  }
+  if (!by_group) {
+    return(if (nrow(df) > 3) ellipse_of(df))
+  }
+  groups <- split(df, as.character(df$.colour))
+  groups <- groups[vapply(groups, nrow, integer(1)) > 3]
+  if (length(groups) == 0) return(NULL)
+  out <- do.call(rbind, lapply(names(groups), function(g) {
+    e <- ellipse_of(groups[[g]])
+    e$.colour <- g
+    e
+  }))
+  if (is.factor(df$.colour)) out$.colour <- factor(out$.colour, levels = levels(df$.colour))
+  out
+}
 
 # Coordinates of the confidence ellipses of the groups (or of all samples).
 embedding_ellipses <- function(plot_df, grouped, conf_level, robust, distribution) {

@@ -15,6 +15,9 @@ plot_embedding(
   conf_level = 0.95,
   robust = FALSE,
   distribution = "normal",
+  hotelling = "none",
+  k = 2,
+  label = NULL,
   title = NULL
 )
 }
@@ -40,6 +43,16 @@ Needs the ConfidenceEllipse package.}
 
 \item{distribution}{The quantile of the ellipses: \code{"normal"} (default,
 chi-square) or \code{"hotelling"}.}
+
+\item{hotelling}{Hotelling's \eqn{T^2} ellipses and outliers: \code{"none"}
+(default), \code{"all"} (all samples) or \code{"group"} (within the groups of a
+discrete \code{colour}). Needs the ConfidenceEllipse package.}
+
+\item{k}{The number of components of \eqn{T^2}: the two axes, then the
+next embedding coordinates. Default is 2.}
+
+\item{label}{The labels of the outlying samples: a column of \code{data} or a
+vector with one value per sample. By default, their row numbers.}
 
 \item{title}{The plot title.}
 }
@@ -72,6 +85,18 @@ fewer than about 10 samples per group, their ellipses can be flat or
 leave out several samples. Groups with fewer than 4 samples get no
 ellipse.
 
+With \code{hotelling = "all"}, the 95\% and 99\% ellipses of Hotelling's
+\eqn{T^2} are drawn for all the samples (contours of \eqn{T^2} on the two
+components shown, from their mean and covariance, with
+\code{\link[ConfidenceEllipse:confidence_ellipse]{ConfidenceEllipse::confidence_ellipse()}}), and the samples beyond the 99\% limit
+of \eqn{T^2} on \code{k} components (see \code{\link[=hotelling_t2]{hotelling_t2()}}) are circled and
+labeled: the classical outlier limits of a score plot. With \code{hotelling = "group"}, each group of a discrete \code{colour} gets its own ellipses and
+limits, which flags the samples atypical of their own group. The
+ellipses are drawn for the two components shown, while the limits use
+\code{k} components, so with \code{k > 2} a flagged sample can lie inside the
+ellipses. \eqn{T^2} suits linear scores such as PCA or PLS; on a UMAP
+map, whose distances are not meaningful, prefer \code{ellipse}.
+
 In a UMAP embedding, only the neighborhoods are meaningful: the sizes of
 the clusters and the distances between them are not, and they change
 with \code{neighbors} and \code{min_dist}. Read the plot as a map of which samples
@@ -97,6 +122,11 @@ if (rlang::is_installed("ConfidenceEllipse")) {
   plot_embedding(pca, colour = texture, ellipse = TRUE, distribution = "hotelling")
 }
 
+# Hotelling's T-squared limits of the score plot, on 3 components
+if (rlang::is_installed("ConfidenceEllipse")) {
+  plot_embedding(pca, colour = texture, hotelling = "all", k = 3, label = spectra$Sample)
+}
+
 if (rlang::is_installed(c("recipes", "embed"))) {
   set.seed(1)
   umap <- recipes::recipe(~ ., data = spectra) |>
@@ -110,7 +140,7 @@ if (rlang::is_installed(c("recipes", "embed"))) {
 }
 }
 \seealso{
-\code{\link[=plot_outlier_map]{plot_outlier_map()}}, \code{\link[=robpca]{robpca()}}
+\code{\link[=hotelling_t2]{hotelling_t2()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}, \code{\link[=robpca]{robpca()}}
 }
 \author{
 Christian L. Goueguel
