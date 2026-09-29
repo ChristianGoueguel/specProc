@@ -4,7 +4,7 @@
 \alias{line_finder}
 \title{Interactive Identification of Emission Lines}
 \usage{
-line_finder(spectra, launch.browser = interactive())
+line_finder(spectra, launch.browser = interactive(), show_table = TRUE)
 }
 \arguments{
 \item{spectra}{Spectra, one per row: a numeric matrix, or a data frame
@@ -13,6 +13,11 @@ are used as labels).}
 
 \item{launch.browser}{Passed to \code{\link[shiny:runApp]{shiny::runApp()}}. Default is \code{TRUE}
 when R is interactive.}
+
+\item{show_table}{A logical: show the periodic table when the app starts
+(\code{TRUE}, default). The \strong{Hide table} button of the Elements panel hides
+or shows it at any time; hiding it gives the spectrum the whole height of
+the window.}
 }
 \value{
 Called for its side effect: runs the app. Use \code{\link[=libs_lines]{libs_lines()}} and
@@ -29,7 +34,9 @@ per ionization stage.
 The app offers:
 \itemize{
 \item a clickable periodic table; elements without lines in the wavelength
-range of the spectra are grayed out once queried;
+range of the spectra are grayed out once queried. It can be hidden
+(\strong{Hide table}) to enlarge the spectrum, and the selected elements
+stay listed in the panel header;
 \item the ionization stages to show (I, II, III);
 \item the plasma temperature and the number of lines per species, which set
 the lines kept and the height of their markers (relative intensities in

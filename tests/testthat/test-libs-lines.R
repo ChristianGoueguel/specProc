@@ -137,3 +137,35 @@ test_that("the line finder UI shows the periodic table and the plot only", {
   expect_match(html, 'id="plot"')
   expect_no_match(html, "lines_table")
 })
+
+test_that("the periodic table can start hidden and be toggled", {
+  skip_if_not_installed("shiny")
+  skip_if_not_installed("plotly")
+  skip_if_not_installed("bslib")
+  wl <- seq(390, 440, by = 0.5)
+  data <- finder_spectra(matrix(1, 2, length(wl), dimnames = list(NULL, wl)))
+  shown <- as.character(finder_ui(data))
+  expect_match(shown, 'id="pt-toggle"')
+  expect_match(shown, "Hide table")
+  expect_no_match(shown, "pt-collapsed")
+  hidden <- as.character(finder_ui(data, show_table = FALSE))
+  expect_match(hidden, "pt-card pt-collapsed")
+  expect_match(hidden, "Show table")
+  expect_error(line_finder(matrix(1, 2, 3), show_table = "no"), "show_table")
+})
+
+test_that("the selection lists the selected elements", {
+  skip_if_not_installed("shiny")
+  skip_if_not_installed("plotly")
+  skip_if_not_installed("bslib")
+  wl <- seq(390, 440, by = 0.5)
+  x <- matrix(1, 2, length(wl), dimnames = list(NULL, wl))
+  app <- line_finder_app(x, fetch = function(species, wavelength) empty_line_list())
+  shiny::testServer(app, {
+    session$setInputs(elements = list("Na", "Ca"), stages = "1", temperature = 10000, top = 5,
+                      min_relative = 0, wl_range = c(390, 440))
+    expect_equal(output$selection, "2 elements: Ca, Na")
+    session$setInputs(elements = as.list(c("H", "He", "Li", "Be", "B", "C", "N", "O", "F")))
+    expect_match(output$selection, "^9 elements: .*, \\.\\.\\.$")
+  })
+})

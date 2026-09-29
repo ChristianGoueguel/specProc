@@ -109,11 +109,16 @@ reference:
 - title: Line identification
   desc: >
     Candidate emission lines from the NIST Atomic Spectra Database, overlaid
-    on spectra, and an interactive app to identify lines.
+    on spectra, an interactive app to identify lines, and the calibration of
+    the wavelength axis on reference lines.
   contents:
   - line_finder
   - libs_lines
   - plot_lines
+  - wavelength_calibration
+  - apply_calibration
+  - predict.specproc_wavelength_calibration
+  - plot_wavelength_calibration
 
 - title: Plasma diagnostics
   desc: >

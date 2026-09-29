@@ -17,8 +17,8 @@
 #'
 #' Every channel is kept: at the ends of a spectrum, the values come from
 #' the polynomial fitted to the first (or last) `window` channels. When
-#' `segments = TRUE`, the spectrum is split where the channel spacing jumps
-#' (such as the gaps between the detectors of a multi-spectrometer system,
+#' `segments = TRUE`, the spectrum is split between the detectors of a
+#' multi-spectrometer system (where the wavelengths step back, or jump by
 #' more than 5 times the median spacing), and each segment is filtered on
 #' its own; segments shorter than `window` are returned as `NA`, with a
 #' warning.
@@ -168,9 +168,7 @@ savgol_matrix <- function(x, window, order, derivative, segments) {
   if (segments && !is.null(colnames(x))) {
     wl <- parse_wavelength(colnames(x))
     if (!anyNA(wl) && ncol(x) > 2) {
-      step <- diff(wl)
-      seg <- cumsum(c(TRUE, abs(step) > 5 * stats::median(abs(step))))
-      bounds <- split(seq_len(ncol(x)), seg)
+      bounds <- split(seq_len(ncol(x)), wavelength_segments(wl))
     }
   }
   weights <- savgol_weights(window, order, derivative)

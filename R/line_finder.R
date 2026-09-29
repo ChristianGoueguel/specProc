@@ -12,7 +12,9 @@
 #' @details
 #' The app offers:
 #'  - a clickable periodic table; elements without lines in the wavelength
-#'    range of the spectra are grayed out once queried;
+#'    range of the spectra are grayed out once queried. It can be hidden
+#'    (**Hide table**) to enlarge the spectrum, and the selected elements
+#'    stay listed in the panel header;
 #'  - the ionization stages to show (I, II, III);
 #'  - the plasma temperature and the number of lines per species, which set
 #'    the lines kept and the height of their markers (relative intensities in
@@ -36,6 +38,10 @@
 #'   are used as labels).
 #' @param launch.browser Passed to [shiny::runApp()]. Default is `TRUE`
 #'   when R is interactive.
+#' @param show_table A logical: show the periodic table when the app starts
+#'   (`TRUE`, default). The **Hide table** button of the Elements panel hides
+#'   or shows it at any time; hiding it gives the spectrum the whole height of
+#'   the window.
 #'
 #' @return Called for its side effect: runs the app. Use [libs_lines()] and
 #'   [plot_lines()] for the same results in scripts.
@@ -48,16 +54,17 @@
 #'   data(soilLIBS)
 #'   line_finder(soilLIBS)
 #' }
-line_finder <- function(spectra, launch.browser = interactive()) {
+line_finder <- function(spectra, launch.browser = interactive(), show_table = TRUE) {
   rlang::check_installed(c("shiny", "plotly", "bslib"), reason = "to run the line finder app.")
-  shiny::runApp(line_finder_app(spectra), launch.browser = launch.browser)
+  check_flag(show_table, "show_table")
+  shiny::runApp(line_finder_app(spectra, show_table = show_table), launch.browser = launch.browser)
 }
 
 # The app object; `fetch(species, wavelength)` returns the NIST lines of a
 # species (replaced by a stub in tests).
-line_finder_app <- function(spectra, fetch = fetch_species_lines) {
+line_finder_app <- function(spectra, fetch = fetch_species_lines, show_table = TRUE) {
   data <- finder_spectra(spectra)
-  shiny::shinyApp(ui = finder_ui(data), server = finder_server(data, fetch))
+  shiny::shinyApp(ui = finder_ui(data, show_table), server = finder_server(data, fetch))
 }
 
 # ---- data --------------------------------------------------------------------
@@ -196,6 +203,7 @@ finder_css <- "
                           background: var(--pt-bg); border: 1px solid rgba(0, 0, 0, .18); }
 .bslib-sidebar-layout > .sidebar .accordion-button { font-weight: 600; font-size: .85rem; }
 .bslib-sidebar-layout > .sidebar .form-label { font-size: .8rem; color: #52606d; }
+.pt-card.pt-collapsed .pt-body { display: none; }
 "
 
 finder_js <- "
@@ -211,6 +219,13 @@ Shiny.addCustomMessageHandler('pt-empty', function(elements) {
 Shiny.addCustomMessageHandler('pt-clear', function(x) {
   $('.pt-el').removeClass('pt-selected');
   Shiny.setInputValue('elements', []);
+});
+// show or hide the periodic table; the plot then resizes to the free space
+$(document).on('click', '#pt-toggle', function() {
+  var card = $('.pt-card').toggleClass('pt-collapsed');
+  var hidden = card.hasClass('pt-collapsed');
+  $(this).text(hidden ? 'Show table' : 'Hide table').attr('aria-expanded', !hidden);
+  setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 50);
 });
 "
 
@@ -242,7 +257,7 @@ finder_header <- function(title, status, ...) {
                      shiny::tags$div(class = "lf-actions", status, ...))
 }
 
-finder_ui <- function(data) {
+finder_ui <- function(data, show_table = TRUE) {
   range_wl <- range(data$wavelength)
   small_button <- "btn-sm btn-outline-secondary"
   bslib::page_sidebar(
@@ -286,10 +301,13 @@ finder_ui <- function(data) {
       )
     ),
     bslib::card(
-      fill = FALSE,
+      fill = FALSE, class = paste("pt-card", if (!show_table) "pt-collapsed"),
       finder_header("Elements", shiny::textOutput("selection", inline = TRUE),
-                    shiny::actionButton("clear", "Clear", class = small_button)),
-      periodic_table_ui()
+                    shiny::actionButton("clear", "Clear", class = small_button),
+                    shiny::tags$button(id = "pt-toggle", type = "button", class = paste("btn", small_button),
+                                       `aria-expanded` = tolower(show_table),
+                                       if (show_table) "Hide table" else "Show table")),
+      bslib::card_body(class = "pt-body", periodic_table_ui())
     ),
     bslib::card(
       full_screen = TRUE, min_height = 380,
@@ -385,7 +403,11 @@ finder_server <- function(data, fetch) {
     output$selection <- shiny::renderText({
       elements <- unlist(input$elements)
       if (length(elements) == 0) return("No element selected")
-      paste(length(elements), if (length(elements) == 1) "element" else "elements")
+      count <- paste(length(elements), if (length(elements) == 1) "element" else "elements")
+      # the names stay visible when the table is hidden
+      shown <- sort(elements)
+      if (length(shown) > 8) shown <- c(shown[1:8], "...")
+      paste0(count, ": ", paste(shown, collapse = ", "))
     })
 
     output$n_lines <- shiny::renderText({

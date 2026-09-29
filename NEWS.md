@@ -8,6 +8,20 @@
 
 ## New features
 
+* `wavelength_calibration()` fits a correction of the wavelength axis from
+  reference lines (for example, from the NIST database), located to a
+  fraction of a channel by Gaussian interpolation, with one correction per
+  detector segment (constant, linear or quadratic) and automatic rejection
+  of edge, weak, saturated and outlying lines. `apply_calibration()`
+  relabels the wavelengths of spectra without changing their intensities,
+  `predict()` corrects any wavelength, and `plot_wavelength_calibration()`
+  draws the offsets and the fit.
+* `savitzky_golay()` also splits the axis where overlapping detectors make
+  the wavelengths step back.
+* The periodic table of `line_finder()` can be hidden (button **Hide
+  table**, or `show_table = FALSE` at start) to give the spectrum the whole
+  height of the window; the selected elements stay listed in the panel
+  header.
 * `savitzky_golay()` and `step_savgol()`: Savitzky-Golay smoothing and first
   or second derivatives, keeping every channel (polynomial fits at the
   edges) and filtering the segments between detector gaps separately. The

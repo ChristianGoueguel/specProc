@@ -26,7 +26,7 @@ total area, internal standard, and the L1, L2 and maximum norms of each
 spectrum.
 }
 \details{
-The three normalization methods:
+The normalization methods:
 \itemize{
 \item \strong{Normalization to the background:} Spectra are divided by the intensity
 of the background emission. Note that it is recommended that the detector
