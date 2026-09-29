@@ -27,8 +27,10 @@
   [`recipes::step_pca()`](https://recipes.tidymodels.org/reference/step_pca.html),
   [`prcomp()`](https://rdrr.io/r/stats/prcomp.html) or
   [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)),
-  colored by a variable. The preprocessing vignette uses it to compare
-  PCA and UMAP maps of the samples.
+  colored by a variable, with optional confidence ellipses per group
+  (classical or robust, normal or Hotelling quantiles) from the
+  ConfidenceEllipse package. The preprocessing vignette uses it to
+  compare PCA and UMAP maps of the samples.
 
 ## specProc 0.6.0
 
