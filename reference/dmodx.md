@@ -13,7 +13,7 @@ dmodx(
   model,
   k,
   newdata = NULL,
-  conf_level = c(0.95, 0.99),
+  conf_level = 0.975,
   normalized = TRUE,
   df = "effective",
   t2_method = "f",
@@ -45,7 +45,7 @@ dmodx(
 - conf_level:
 
   The confidence level(s) of the limits: one or more values between 0
-  and 1. Default is `c(0.95, 0.99)`.
+  and 1. Default is 0.975.
 
 - normalized:
 
@@ -73,7 +73,7 @@ dmodx(
 A tibble of class `specproc_influence`, with one row per sample:
 `sample`, `t2` and its limits (as for
 [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md)),
-`dmodx`, its limits at each confidence level (`dmodx_limit_95`, ...),
+`dmodx`, its limits at each confidence level (`dmodx_limit_97.5`, ...),
 and `outlier`, the type of the sample at the highest confidence level.
 Draw it with
 [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md).

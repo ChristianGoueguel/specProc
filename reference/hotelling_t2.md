@@ -16,7 +16,7 @@ hotelling_t2(
   columns = NULL,
   k = 2,
   group = NULL,
-  conf_level = c(0.95, 0.99),
+  conf_level = 0.975,
   method = "f"
 )
 ```
@@ -51,7 +51,7 @@ hotelling_t2(
 - conf_level:
 
   The confidence level(s) of the limits: one or more values between 0
-  and 1. Default is `c(0.95, 0.99)`.
+  and 1. Default is 0.975.
 
 - method:
 
@@ -60,9 +60,10 @@ hotelling_t2(
 ## Value
 
 A tibble with one row per sample: its row number `sample`, the `group`
-(with `group`), `t2`, then for each confidence level (in %, e.g. 95) its
-limit `limit_95` and whether the sample exceeds it, `outlier_95`, and
-the number of samples `n` of its group (or of the data).
+(with `group`), `t2`, then for each confidence level (in %, e.g. 97.5)
+its limit `limit_97.5` and whether the sample exceeds it,
+`outlier_97.5`, and the number of samples `n` of its group (or of the
+data).
 
 ## Details
 
@@ -120,22 +121,22 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   spectra <- average(soilLIBS[-(2:8)], Sample)
   pca <- stats::prcomp(spectra[-1], scale. = TRUE)
   t2 <- hotelling_t2(pca, k = 3)
-  t2[t2$outlier_95, ]
-  # a single limit, with the exact distribution of the calibration samples
-  hotelling_t2(pca, k = 3, conf_level = 0.975, method = "beta")
+  t2[t2$outlier_97.5, ]
+  # two limits, with the exact distribution of the calibration samples
+  hotelling_t2(pca, k = 3, conf_level = c(0.95, 0.99), method = "beta")
 }
-#> # A tibble: 50 × 5
-#>    sample    t2 limit_97.5 outlier_97.5     n
-#>     <int> <dbl>      <dbl> <lgl>        <int>
-#>  1      1 4.27        8.75 FALSE           50
-#>  2      2 5.54        8.75 FALSE           50
-#>  3      3 5.72        8.75 FALSE           50
-#>  4      4 6.58        8.75 FALSE           50
-#>  5      5 2.54        8.75 FALSE           50
-#>  6      6 0.947       8.75 FALSE           50
-#>  7      7 1.17        8.75 FALSE           50
-#>  8      8 0.661       8.75 FALSE           50
-#>  9      9 1.06        8.75 FALSE           50
-#> 10     10 2.72        8.75 FALSE           50
+#> # A tibble: 50 × 7
+#>    sample    t2 limit_95 limit_99 outlier_95 outlier_99     n
+#>     <int> <dbl>    <dbl>    <dbl> <lgl>      <lgl>      <int>
+#>  1      1 4.27      7.43     10.4 FALSE      FALSE         50
+#>  2      2 5.54      7.43     10.4 FALSE      FALSE         50
+#>  3      3 5.72      7.43     10.4 FALSE      FALSE         50
+#>  4      4 6.58      7.43     10.4 FALSE      FALSE         50
+#>  5      5 2.54      7.43     10.4 FALSE      FALSE         50
+#>  6      6 0.947     7.43     10.4 FALSE      FALSE         50
+#>  7      7 1.17      7.43     10.4 FALSE      FALSE         50
+#>  8      8 0.661     7.43     10.4 FALSE      FALSE         50
+#>  9      9 1.06      7.43     10.4 FALSE      FALSE         50
+#> 10     10 2.72      7.43     10.4 FALSE      FALSE         50
 #> # ℹ 40 more rows
 ```

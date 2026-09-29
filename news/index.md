@@ -26,9 +26,10 @@
   [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
   and the T-squared ellipses of
   [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
-  take any confidence level(s) (`conf_level`, `t2_level`;
-  `c(0.95, 0.99)` by default, or a single one), and the Beta
-  distribution of T-squared for the samples of the model
+  take any confidence level(s) (`conf_level`, 0.975 by default; in
+  [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md),
+  one `conf_level` sets both its confidence and T-squared ellipses), and
+  the Beta distribution of T-squared for the samples of the model
   (`method = "beta"`).
   [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)
   and the T-squared ellipses of

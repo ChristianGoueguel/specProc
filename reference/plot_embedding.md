@@ -20,12 +20,11 @@ plot_embedding(
   size = 2,
   alpha = 0.8,
   ellipse = FALSE,
-  conf_level = 0.95,
+  conf_level = 0.975,
   robust = FALSE,
   distribution = "normal",
   hotelling = "none",
   k = 2,
-  t2_level = c(0.95, 0.99),
   t2_method = "f",
   label = NULL,
   title = NULL
@@ -65,7 +64,9 @@ plot_embedding(
 
 - conf_level:
 
-  The confidence level of the ellipses. Default is 0.95.
+  The confidence level(s) of the ellipses, confidence and \\T^2\\: one
+  or more values between 0 and 1. Default is 0.975. The samples beyond a
+  \\T^2\\ limit are flagged at the highest level.
 
 - robust:
 
@@ -86,12 +87,6 @@ plot_embedding(
 
   The number of components of \\T^2\\: the two axes, then the next
   embedding coordinates. Default is 2.
-
-- t2_level:
-
-  The confidence level(s) of the \\T^2\\ ellipses: one or more values
-  between 0 and 1. Default is `c(0.95, 0.99)`. The samples are flagged
-  at the highest level.
 
 - t2_method:
 
@@ -121,22 +116,23 @@ a continuous viridis scale, other types a discrete palette.
 
 With `ellipse = TRUE`, a confidence ellipse is drawn for each group of a
 discrete `colour` (or for all the samples otherwise), with
-[`ConfidenceEllipse::confidence_ellipse()`](https://christiangoueguel.github.io/ConfidenceEllipse/reference/confidence_ellipse.html).
-It covers the region expected to hold `conf_level` of the samples of the
-group if they follow a bivariate normal distribution, from their mean
-and covariance, or from robust estimates (MCD) with `robust = TRUE`,
-which resist outlying samples. `distribution = "hotelling"` uses the
-quantile of Hotelling's \\T^2\\ distribution, which accounts for the
-uncertainty of the estimates and suits small groups. Robust estimates
-need larger groups (the MCD fits a subset of about three quarters of the
-samples): with fewer than about 10 samples per group, their ellipses can
-be flat or leave out several samples. Groups with fewer than 4 samples
-get no ellipse.
+[`ConfidenceEllipse::confidence_ellipse()`](https://christiangoueguel.github.io/ConfidenceEllipse/reference/confidence_ellipse.html),
+at each level of `conf_level` (0.975 by default). It covers the region
+expected to hold that share of the samples of the group if they follow a
+bivariate normal distribution, from their mean and covariance, or from
+robust estimates (MCD) with `robust = TRUE`, which resist outlying
+samples. `distribution = "hotelling"` uses the quantile of Hotelling's
+\\T^2\\ distribution, which accounts for the uncertainty of the
+estimates and suits small groups. Robust estimates need larger groups
+(the MCD fits a subset of about three quarters of the samples): with
+fewer than about 10 samples per group, their ellipses can be flat or
+leave out several samples. Groups with fewer than 4 samples get no
+ellipse.
 
 With `hotelling = "all"`, the ellipses of Hotelling's \\T^2\\ at each
-level of `t2_level` (95% and 99% by default) are drawn for all the
-samples (contours of \\T^2\\ on the two components shown, from their
-mean and covariance, with
+level of `conf_level` (97.5% by default) are drawn for all the samples
+(contours of \\T^2\\ on the two components shown, from their mean and
+covariance, with
 [`HotellingEllipse::ellipseCoord()`](https://pkgdown.r-lib.org,%20https://github.com/ChristianGoueguel/HotellingEllipse/reference/ellipseCoord.html)),
 and the samples beyond the limit at the highest level of \\T^2\\ on `k`
 components (see

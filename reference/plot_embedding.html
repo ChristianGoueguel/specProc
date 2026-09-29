@@ -63,12 +63,11 @@ variable.</p>
 <span>  size <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  ellipse <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  conf_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  conf_level <span class="op">=</span> <span class="fl">0.975</span>,</span>
 <span>  robust <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  distribution <span class="op">=</span> <span class="st">"normal"</span>,</span>
 <span>  hotelling <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  k <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  t2_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.95</span>, <span class="fl">0.99</span><span class="op">)</span>,</span>
 <span>  t2_method <span class="op">=</span> <span class="st">"f"</span>,</span>
 <span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -105,7 +104,9 @@ Needs the ConfidenceEllipse package.</p></dd>
 
 
 <dt id="arg-conf-level">conf_level<a class="anchor" aria-label="anchor" href="#arg-conf-level"></a></dt>
-<dd><p>The confidence level of the ellipses. Default is 0.95.</p></dd>
+<dd><p>The confidence level(s) of the ellipses, confidence
+and \(T^2\): one or more values between 0 and 1. Default is 0.975.
+The samples beyond a \(T^2\) limit are flagged at the highest level.</p></dd>
 
 
 <dt id="arg-robust">robust<a class="anchor" aria-label="anchor" href="#arg-robust"></a></dt>
@@ -127,12 +128,6 @@ later).</p></dd>
 <dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
 <dd><p>The number of components of \(T^2\): the two axes, then the
 next embedding coordinates. Default is 2.</p></dd>
-
-
-<dt id="arg-t-level">t2_level<a class="anchor" aria-label="anchor" href="#arg-t-level"></a></dt>
-<dd><p>The confidence level(s) of the \(T^2\) ellipses: one or
-more values between 0 and 1. Default is <code>c(0.95, 0.99)</code>. The samples
-are flagged at the highest level.</p></dd>
 
 
 <dt id="arg-t-method">t2_method<a class="anchor" aria-label="anchor" href="#arg-t-method"></a></dt>
@@ -161,8 +156,9 @@ number), or else the first two numeric columns. A numeric <code>colour</code> us
 a continuous viridis scale, other types a discrete palette.</p>
 <p>With <code>ellipse = TRUE</code>, a confidence ellipse is drawn for each group of a
 discrete <code>colour</code> (or for all the samples otherwise), with
-<code><a href="https://christiangoueguel.github.io/ConfidenceEllipse/reference/confidence_ellipse.html" class="external-link">ConfidenceEllipse::confidence_ellipse()</a></code>. It covers the region expected
-to hold <code>conf_level</code> of the samples of the group if they follow a
+<code><a href="https://christiangoueguel.github.io/ConfidenceEllipse/reference/confidence_ellipse.html" class="external-link">ConfidenceEllipse::confidence_ellipse()</a></code>, at each level of <code>conf_level</code>
+(0.975 by default). It covers the region expected to hold that share of
+the samples of the group if they follow a
 bivariate normal distribution, from their mean and covariance, or from
 robust estimates (MCD) with <code>robust = TRUE</code>, which resist outlying
 samples. <code>distribution = "hotelling"</code> uses the quantile of Hotelling's
@@ -173,7 +169,7 @@ fewer than about 10 samples per group, their ellipses can be flat or
 leave out several samples. Groups with fewer than 4 samples get no
 ellipse.</p>
 <p>With <code>hotelling = "all"</code>, the ellipses of Hotelling's \(T^2\) at each
-level of <code>t2_level</code> (95% and 99% by default) are drawn for all the
+level of <code>conf_level</code> (97.5% by default) are drawn for all the
 samples (contours of \(T^2\) on the two components shown, from their
 mean and covariance, with <code><a href="https://pkgdown.r-lib.org,%20https://github.com/ChristianGoueguel/HotellingEllipse/reference/ellipseCoord.html" class="external-link">HotellingEllipse::ellipseCoord()</a></code>), and the
 samples beyond the limit at the highest level of \(T^2\) on <code>k</code>
