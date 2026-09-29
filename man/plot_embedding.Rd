@@ -12,12 +12,11 @@ plot_embedding(
   size = 2,
   alpha = 0.8,
   ellipse = FALSE,
-  conf_level = 0.95,
+  conf_level = 0.975,
   robust = FALSE,
   distribution = "normal",
   hotelling = "none",
   k = 2,
-  t2_level = c(0.95, 0.99),
   t2_method = "f",
   label = NULL,
   title = NULL
@@ -39,7 +38,9 @@ the first two embedding coordinates (see details).}
 \item{ellipse}{A logical: draw confidence ellipses (\code{FALSE}, default).
 Needs the ConfidenceEllipse package.}
 
-\item{conf_level}{The confidence level of the ellipses. Default is 0.95.}
+\item{conf_level}{The confidence level(s) of the ellipses, confidence
+and \eqn{T^2}: one or more values between 0 and 1. Default is 0.975.
+The samples beyond a \eqn{T^2} limit are flagged at the highest level.}
 
 \item{robust}{A logical: robust ellipses (\code{FALSE}, default).}
 
@@ -53,10 +54,6 @@ later).}
 
 \item{k}{The number of components of \eqn{T^2}: the two axes, then the
 next embedding coordinates. Default is 2.}
-
-\item{t2_level}{The confidence level(s) of the \eqn{T^2} ellipses: one or
-more values between 0 and 1. Default is \code{c(0.95, 0.99)}. The samples
-are flagged at the highest level.}
 
 \item{t2_method}{The distribution of the \eqn{T^2} limits: \code{"f"}
 (default) or \code{"beta"} (see \code{\link[=hotelling_t2]{hotelling_t2()}}).}
@@ -83,8 +80,9 @@ a continuous viridis scale, other types a discrete palette.
 
 With \code{ellipse = TRUE}, a confidence ellipse is drawn for each group of a
 discrete \code{colour} (or for all the samples otherwise), with
-\code{\link[ConfidenceEllipse:confidence_ellipse]{ConfidenceEllipse::confidence_ellipse()}}. It covers the region expected
-to hold \code{conf_level} of the samples of the group if they follow a
+\code{\link[ConfidenceEllipse:confidence_ellipse]{ConfidenceEllipse::confidence_ellipse()}}, at each level of \code{conf_level}
+(0.975 by default). It covers the region expected to hold that share of
+the samples of the group if they follow a
 bivariate normal distribution, from their mean and covariance, or from
 robust estimates (MCD) with \code{robust = TRUE}, which resist outlying
 samples. \code{distribution = "hotelling"} uses the quantile of Hotelling's
@@ -96,7 +94,7 @@ leave out several samples. Groups with fewer than 4 samples get no
 ellipse.
 
 With \code{hotelling = "all"}, the ellipses of Hotelling's \eqn{T^2} at each
-level of \code{t2_level} (95\% and 99\% by default) are drawn for all the
+level of \code{conf_level} (97.5\% by default) are drawn for all the
 samples (contours of \eqn{T^2} on the two components shown, from their
 mean and covariance, with \code{\link[HotellingEllipse:ellipseCoord]{HotellingEllipse::ellipseCoord()}}), and the
 samples beyond the limit at the highest level of \eqn{T^2} on \code{k}

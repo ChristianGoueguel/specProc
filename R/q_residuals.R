@@ -40,7 +40,7 @@
 #'   variables of the model), whose distances are computed instead of those
 #'   of the calibration samples.
 #' @param conf_level The confidence level(s) of the limits: one or more
-#'   values between 0 and 1. Default is `c(0.95, 0.99)`.
+#'   values between 0 and 1. Default is 0.975.
 #' @param method The limit of Q: `"jackson"` (default, Jackson-Mudholkar) or
 #'   `"box"`.
 #' @param t2_method The distribution of the \eqn{T^2} limit of the samples
@@ -50,7 +50,7 @@
 #'
 #' @return A tibble of class `specproc_influence`, with one row per sample:
 #'   `sample` (row number), `t2`, its limits at each confidence level (in %,
-#'   e.g. `t2_limit_95`), `q`, its limits (`q_limit_95`, ...) and `outlier`,
+#'   e.g. `t2_limit_97.5`), `q`, its limits (`q_limit_97.5`, ...) and `outlier`,
 #'   the type of the sample at the highest confidence level: `"regular"`,
 #'   `"extreme"` (high \eqn{T^2} only), `"residual"` (high Q only) or
 #'   `"both"`. Draw it with [plot_influence()].
@@ -76,10 +76,10 @@
 #'   influence <- q_residuals(pca, k = 3)
 #'   influence[influence$outlier != "regular", ]
 #'   plot_influence(influence, label = spectra$Sample)
-#'   # a single limit
-#'   plot_influence(q_residuals(pca, k = 3, conf_level = 0.99))
+#'   # several limits
+#'   plot_influence(q_residuals(pca, k = 3, conf_level = c(0.95, 0.99)))
 #' }
-q_residuals <- function(model, k, newdata = NULL, conf_level = c(0.95, 0.99), method = "jackson",
+q_residuals <- function(model, k, newdata = NULL, conf_level = 0.975, method = "jackson",
                         t2_method = "f", center = TRUE, scale = FALSE) {
   method <- match.arg(method, c("jackson", "box"))
   parts <- pca_parts(model, k, newdata, conf_level, t2_method, center, scale)
@@ -134,7 +134,7 @@ q_residuals <- function(model, k, newdata = NULL, conf_level = c(0.95, 0.99), me
 #'
 #' @return A tibble of class `specproc_influence`, with one row per sample:
 #'   `sample`, `t2` and its limits (as for [q_residuals()]), `dmodx`, its
-#'   limits at each confidence level (`dmodx_limit_95`, ...), and `outlier`,
+#'   limits at each confidence level (`dmodx_limit_97.5`, ...), and `outlier`,
 #'   the type of the sample at the highest confidence level. Draw it with
 #'   [plot_influence()].
 #'
@@ -162,7 +162,7 @@ q_residuals <- function(model, k, newdata = NULL, conf_level = c(0.95, 0.99), me
 #'   d[d$outlier != "regular", ]
 #'   plot_influence(d, label = spectra$Sample)
 #' }
-dmodx <- function(model, k, newdata = NULL, conf_level = c(0.95, 0.99), normalized = TRUE,
+dmodx <- function(model, k, newdata = NULL, conf_level = 0.975, normalized = TRUE,
                   df = "effective", t2_method = "f", center = TRUE, scale = FALSE) {
   check_flag(normalized, "normalized")
   df <- match.arg(df, c("effective", "simca"))

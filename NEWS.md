@@ -17,7 +17,8 @@
   `plot_influence()` draws DModX or Q against T-squared.
 * `hotelling_t2()`, `q_residuals()`, `dmodx()`, `plot_influence()` and the
   T-squared ellipses of `plot_embedding()` take any confidence level(s)
-  (`conf_level`, `t2_level`; `c(0.95, 0.99)` by default, or a single one),
+  (`conf_level`, 0.975 by default; in `plot_embedding()`, one `conf_level`
+  sets both its confidence and T-squared ellipses),
   and the Beta distribution of T-squared for the samples of the model
   (`method = "beta"`). `hotelling_t2()` and the T-squared ellipses of
   `plot_embedding()` now use the HotellingEllipse package (1.3.0 or later).

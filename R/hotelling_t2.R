@@ -42,14 +42,14 @@
 #' @param group An optional grouping: a column of `data` (unquoted or as a
 #'   string), or a vector with one value per sample.
 #' @param conf_level The confidence level(s) of the limits: one or more
-#'   values between 0 and 1. Default is `c(0.95, 0.99)`.
+#'   values between 0 and 1. Default is 0.975.
 #' @param method The distribution of the limits: `"f"` (default) or
 #'   `"beta"`.
 #'
 #' @return A tibble with one row per sample: its row number `sample`, the
 #'   `group` (with `group`), `t2`, then for each confidence level (in %, e.g.
-#'   95) its limit `limit_95` and whether the sample exceeds it,
-#'   `outlier_95`, and the number of samples `n` of its group (or of the
+#'   97.5) its limit `limit_97.5` and whether the sample exceeds it,
+#'   `outlier_97.5`, and the number of samples `n` of its group (or of the
 #'   data).
 #'
 #' @references
@@ -70,11 +70,11 @@
 #'   spectra <- average(soilLIBS[-(2:8)], Sample)
 #'   pca <- stats::prcomp(spectra[-1], scale. = TRUE)
 #'   t2 <- hotelling_t2(pca, k = 3)
-#'   t2[t2$outlier_95, ]
-#'   # a single limit, with the exact distribution of the calibration samples
-#'   hotelling_t2(pca, k = 3, conf_level = 0.975, method = "beta")
+#'   t2[t2$outlier_97.5, ]
+#'   # two limits, with the exact distribution of the calibration samples
+#'   hotelling_t2(pca, k = 3, conf_level = c(0.95, 0.99), method = "beta")
 #' }
-hotelling_t2 <- function(data, columns = NULL, k = 2, group = NULL, conf_level = c(0.95, 0.99),
+hotelling_t2 <- function(data, columns = NULL, k = 2, group = NULL, conf_level = 0.975,
                          method = "f") {
   rlang::check_installed("HotellingEllipse", version = "1.3.0",
                          reason = "to compute Hotelling's T-squared.")

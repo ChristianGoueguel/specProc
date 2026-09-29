@@ -2,7 +2,7 @@ test_that("hotelling_t2 matches the Mahalanobis distance and the F limits", {
   set.seed(4)
   x <- data.frame(PC1 = rnorm(40), PC2 = rnorm(40), PC3 = rnorm(40), other = 1:40)
   x[1, 1:3] <- c(6, 6, 6)
-  t2 <- hotelling_t2(x, k = 3)
+  t2 <- hotelling_t2(x, k = 3, conf_level = c(0.95, 0.99))
   s <- as.matrix(x[1:3])
   expect_equal(t2$t2, unname(stats::mahalanobis(s, colMeans(s), stats::cov(s))))
   expect_equal(t2$limit_95[1], 3 * 39 / 37 * stats::qf(0.95, 3, 37))
@@ -21,7 +21,7 @@ test_that("hotelling_t2 works within groups", {
   x <- data.frame(PC1 = c(rnorm(20), rnorm(20, 10), 1, 2),
                   PC2 = c(rnorm(20), rnorm(20, 10), 1, 2),
                   g = rep(c("a", "b", "c"), c(20, 20, 2)))
-  expect_warning(t2 <- hotelling_t2(x, group = g), "group c")
+  expect_warning(t2 <- hotelling_t2(x, group = g, conf_level = c(0.95, 0.99)), "group c")
   a <- as.matrix(x[x$g == "a", 1:2])
   expect_equal(t2$t2[t2$group == "a"], unname(stats::mahalanobis(a, colMeans(a), stats::cov(a))))
   expect_true(all(is.na(t2$t2[t2$group == "c"])))
@@ -38,7 +38,7 @@ test_that("plot_embedding draws T-squared ellipses and labels outliers", {
   x <- data.frame(PC1 = rnorm(40), PC2 = rnorm(40), group = rep(c("a", "b"), 20),
                   id = paste0("s", 1:40))
   x[3, 1:2] <- c(8, -8)
-  p <- plot_embedding(x, hotelling = "all", label = id)
+  p <- plot_embedding(x, hotelling = "all", conf_level = c(0.95, 0.99), label = id)
   paths <- p$layers[vapply(p$layers, function(l) inherits(l$geom, "GeomPath"), logical(1))][[1]]$data
   # the 95% contour lies at the T-squared limit
   s <- as.matrix(x[1:2])
@@ -64,7 +64,7 @@ test_that("hotelling_t2 takes any confidence levels and the Beta limits", {
   expect_equal(one$limit_97.5[1], 3 * 29 / 27 * stats::qf(0.975, 3, 27))
   three <- hotelling_t2(x, k = 3, conf_level = c(0.99, 0.9, 0.95))
   expect_true(all(c("limit_90", "limit_95", "limit_99") %in% names(three)))
-  beta <- hotelling_t2(x, k = 3, method = "beta")
+  beta <- hotelling_t2(x, k = 3, method = "beta", conf_level = c(0.95, 0.99))
   expect_equal(beta$limit_95[1], 29^2 / 30 * stats::qbeta(0.95, 1.5, 13))
   expect_equal(beta$t2, one$t2)
   # the same T-squared as HotellingEllipse
@@ -72,4 +72,17 @@ test_that("hotelling_t2 takes any confidence levels and the Beta limits", {
   expect_equal(one$t2, ref$Tsquare$value)
   expect_error(hotelling_t2(x, conf_level = 1), "between 0 and 1")
   expect_error(hotelling_t2(x, method = "t"))
+})
+
+test_that("the default confidence level is 0.975", {
+  skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
+  set.seed(11)
+  x <- data.frame(PC1 = rnorm(30), PC2 = rnorm(30))
+  t2 <- hotelling_t2(x)
+  expect_named(t2, c("sample", "t2", "limit_97.5", "outlier_97.5", "n"))
+  expect_equal(t2$limit_97.5[1], 2 * 29 / 28 * stats::qf(0.975, 2, 28))
+  pca <- stats::prcomp(matrix(rnorm(30 * 5), 30))
+  expect_true(all(c("t2_limit_97.5", "q_limit_97.5") %in% names(q_residuals(pca, 2))))
+  expect_true("dmodx_limit_97.5" %in% names(dmodx(pca, 2)))
+  expect_equal(formals(plot_embedding)$conf_level, 0.975)
 })

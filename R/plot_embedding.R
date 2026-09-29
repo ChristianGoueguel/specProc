@@ -16,8 +16,9 @@
 #'
 #' With `ellipse = TRUE`, a confidence ellipse is drawn for each group of a
 #' discrete `colour` (or for all the samples otherwise), with
-#' [ConfidenceEllipse::confidence_ellipse()]. It covers the region expected
-#' to hold `conf_level` of the samples of the group if they follow a
+#' [ConfidenceEllipse::confidence_ellipse()], at each level of `conf_level`
+#' (0.975 by default). It covers the region expected to hold that share of
+#' the samples of the group if they follow a
 #' bivariate normal distribution, from their mean and covariance, or from
 #' robust estimates (MCD) with `robust = TRUE`, which resist outlying
 #' samples. `distribution = "hotelling"` uses the quantile of Hotelling's
@@ -29,7 +30,7 @@
 #' ellipse.
 #'
 #' With `hotelling = "all"`, the ellipses of Hotelling's \eqn{T^2} at each
-#' level of `t2_level` (95% and 99% by default) are drawn for all the
+#' level of `conf_level` (97.5% by default) are drawn for all the
 #' samples (contours of \eqn{T^2} on the two components shown, from their
 #' mean and covariance, with [HotellingEllipse::ellipseCoord()]), and the
 #' samples beyond the limit at the highest level of \eqn{T^2} on `k`
@@ -57,7 +58,9 @@
 #' @param size,alpha The size and opacity of the points.
 #' @param ellipse A logical: draw confidence ellipses (`FALSE`, default).
 #'   Needs the ConfidenceEllipse package.
-#' @param conf_level The confidence level of the ellipses. Default is 0.95.
+#' @param conf_level The confidence level(s) of the ellipses, confidence
+#'   and \eqn{T^2}: one or more values between 0 and 1. Default is 0.975.
+#'   The samples beyond a \eqn{T^2} limit are flagged at the highest level.
 #' @param robust A logical: robust ellipses (`FALSE`, default).
 #' @param distribution The quantile of the ellipses: `"normal"` (default,
 #'   chi-square) or `"hotelling"`.
@@ -67,9 +70,6 @@
 #'   later).
 #' @param k The number of components of \eqn{T^2}: the two axes, then the
 #'   next embedding coordinates. Default is 2.
-#' @param t2_level The confidence level(s) of the \eqn{T^2} ellipses: one or
-#'   more values between 0 and 1. Default is `c(0.95, 0.99)`. The samples
-#'   are flagged at the highest level.
 #' @param t2_method The distribution of the \eqn{T^2} limits: `"f"`
 #'   (default) or `"beta"` (see [hotelling_t2()]).
 #' @param label The labels of the outlying samples: a column of `data` or a
@@ -117,9 +117,9 @@
 #'   plot_embedding(umap, colour = texture)
 #' }
 plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, alpha = 0.8,
-                           ellipse = FALSE, conf_level = 0.95, robust = FALSE,
+                           ellipse = FALSE, conf_level = 0.975, robust = FALSE,
                            distribution = "normal", hotelling = "none", k = 2,
-                           t2_level = c(0.95, 0.99), t2_method = "f", label = NULL,
+                           t2_method = "f", label = NULL,
                            title = NULL) {
   df <- embedding_data(data)
   colour_quo <- rlang::enquo(colour)
@@ -137,10 +137,10 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
   check_number(alpha, "alpha", lower = 0, upper = 1, lower_open = TRUE)
   check_flag(ellipse, "ellipse")
   check_flag(robust, "robust")
-  check_number(conf_level, "conf_level", lower = 0, upper = 1, lower_open = TRUE, upper_open = TRUE)
+  ellipse_level <- check_conf_level(conf_level)
+  t2_level <- ellipse_level
   distribution <- match.arg(distribution, c("normal", "hotelling"))
   hotelling <- match.arg(hotelling, c("none", "all", "group"))
-  t2_level <- check_conf_level(t2_level)
   t2_method <- match.arg(t2_method, c("f", "beta"))
 
   colour_info <- embedding_values(colour_quo, df, "colour")
@@ -156,15 +156,19 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
 
   p <- ggplot2::ggplot(plot_df, ggplot2::aes(.data$.x, .data$.y))
   if (ellipse) {
-    ellipses <- embedding_ellipses(plot_df, grouped, conf_level, robust, distribution)
+    ellipses <- embedding_ellipses(plot_df, grouped, ellipse_level, robust, distribution)
     if (!is.null(ellipses)) {
+      fill_alpha <- 0.12 / length(ellipse_level)
       p <- p + if (grouped) {
         ggplot2::geom_polygon(data = ellipses, ggplot2::aes(.data$x, .data$y, colour = .data$.colour,
-                                                            fill = .data$.colour),
-                              alpha = 0.12, linewidth = 0.5, inherit.aes = FALSE, show.legend = FALSE)
+                                                            fill = .data$.colour,
+                                                            group = interaction(.data$.colour, .data$.level)),
+                              alpha = fill_alpha, linewidth = 0.5, inherit.aes = FALSE,
+                              show.legend = FALSE)
       } else {
-        ggplot2::geom_polygon(data = ellipses, ggplot2::aes(.data$x, .data$y), colour = "grey40",
-                              fill = "grey60", alpha = 0.12, linewidth = 0.5, inherit.aes = FALSE)
+        ggplot2::geom_polygon(data = ellipses, ggplot2::aes(.data$x, .data$y, group = .data$.level),
+                              colour = "grey40", fill = "grey60", alpha = fill_alpha, linewidth = 0.5,
+                              inherit.aes = FALSE)
       }
     }
   }
@@ -269,12 +273,17 @@ hotelling_ellipses <- function(plot_df, by_group, levels, method) {
 }
 
 # Coordinates of the confidence ellipses of the groups (or of all samples).
-embedding_ellipses <- function(plot_df, grouped, conf_level, robust, distribution) {
+embedding_ellipses <- function(plot_df, grouped, levels, robust, distribution) {
   rlang::check_installed("ConfidenceEllipse", reason = "to draw confidence ellipses.")
   df <- plot_df[stats::complete.cases(plot_df), , drop = FALSE]
   ellipse_of <- function(d) {
-    ConfidenceEllipse::confidence_ellipse(d, ".x", ".y", conf_level = conf_level, robust = robust,
-                                          distribution = distribution)
+    do.call(rbind, lapply(levels, function(l) {
+      e <- as.data.frame(ConfidenceEllipse::confidence_ellipse(
+        d, ".x", ".y", conf_level = l, robust = robust, distribution = distribution
+      ))
+      e$.level <- l
+      e
+    }))
   }
   if (!grouped) {
     if (nrow(df) < 4) return(NULL)

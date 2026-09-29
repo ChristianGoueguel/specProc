@@ -8,7 +8,7 @@ dmodx(
   model,
   k,
   newdata = NULL,
-  conf_level = c(0.95, 0.99),
+  conf_level = 0.975,
   normalized = TRUE,
   df = "effective",
   t2_method = "f",
@@ -28,7 +28,7 @@ variables of the model), whose distances are computed instead of those
 of the calibration samples.}
 
 \item{conf_level}{The confidence level(s) of the limits: one or more
-values between 0 and 1. Default is \code{c(0.95, 0.99)}.}
+values between 0 and 1. Default is 0.975.}
 
 \item{normalized}{A logical: DModX relative to the residual standard
 deviation of the calibration samples (\code{TRUE}, default), or absolute.}
@@ -45,7 +45,7 @@ Default is \code{TRUE} and \code{FALSE}.}
 \value{
 A tibble of class \code{specproc_influence}, with one row per sample:
 \code{sample}, \code{t2} and its limits (as for \code{\link[=q_residuals]{q_residuals()}}), \code{dmodx}, its
-limits at each confidence level (\code{dmodx_limit_95}, ...), and \code{outlier},
+limits at each confidence level (\code{dmodx_limit_97.5}, ...), and \code{outlier},
 the type of the sample at the highest confidence level. Draw it with
 \code{\link[=plot_influence]{plot_influence()}}.
 }

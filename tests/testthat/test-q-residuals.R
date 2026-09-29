@@ -9,7 +9,7 @@ q_data <- function(n = 60, seed = 1) {
 test_that("q_residuals computes T-squared and Q of the calibration samples", {
   d <- q_data()
   pca <- stats::prcomp(d$x)
-  res <- q_residuals(pca, k = 3)
+  res <- q_residuals(pca, k = 3, conf_level = c(0.95, 0.99))
   expect_s3_class(res, "specproc_influence")
   xs <- scale(d$x, scale = FALSE)
   p <- pca$rotation[, 1:3]
@@ -30,7 +30,7 @@ test_that("q_residuals flags new samples off the model", {
   colnames(new) <- colnames(d$x)
   new[2, ] <- new[2, ] + c(5, -5, 0, 0, 0, 0, 0, 0)          # off the plane
   new[3, ] <- 8 * new[3, ]                                   # far within the plane
-  res <- q_residuals(pca, 3, newdata = new)
+  res <- q_residuals(pca, 3, newdata = new, conf_level = c(0.95, 0.99))
   expect_true(res$q[2] > res$q_limit_99[2])
   expect_equal(as.character(res$outlier[2]), "residual")
   expect_true(res$t2[3] > res$t2_limit_99[3])
@@ -55,7 +55,7 @@ test_that("the limits of Q follow Jackson-Mudholkar or Box", {
   pca <- stats::prcomp(d$x)
   set.seed(5)
   new <- matrix(stats::rnorm(5000 * 3), 5000) %*% d$loadings + matrix(stats::rnorm(5000 * 8, sd = 0.2), 5000)
-  res <- q_residuals(pca, 3, newdata = new)
+  res <- q_residuals(pca, 3, newdata = new, conf_level = 0.95)
   expect_lt(abs(mean(res$t2 > res$t2_limit_95) - 0.05), 0.015)
   expect_lt(mean(res$q > res$q_limit_95), 0.07)
 })
@@ -86,7 +86,7 @@ test_that("q_residuals takes any confidence levels and a single one", {
   both <- q_residuals(pca, 3, conf_level = c(0.9, 0.999))
   expect_equal(as.character(both$outlier) != "regular",
                both$t2 > both$t2_limit_99.9 | both$q > both$q_limit_99.9)
-  beta <- q_residuals(pca, 3, t2_method = "beta")
+  beta <- q_residuals(pca, 3, t2_method = "beta", conf_level = 0.95)
   expect_equal(beta$t2_limit_95[1], 59^2 / 60 * stats::qbeta(0.95, 1.5, 28))
   expect_s3_class(plot_influence(one), "ggplot")
   p <- plot_influence(both)
@@ -105,10 +105,10 @@ test_that("dmodx follows the SIMCA formulas", {
   e <- xs - xs %*% p %*% t(p)
   s0 <- sqrt(sum(e^2) / ((n - a - 1) * (kvar - a)))
   si <- sqrt(rowSums(e^2) / (kvar - a)) * sqrt(n / (n - a - 1))
-  simca <- dmodx(pca, a, df = "simca")
+  simca <- dmodx(pca, a, df = "simca", conf_level = c(0.95, 0.99))
   expect_equal(simca$dmodx, unname(si / s0))
   expect_equal(simca$dmodx_limit_95[1], sqrt(stats::qf(0.95, kvar - a, (n - a - 1) * (kvar - a))))
-  absolute <- dmodx(pca, a, normalized = FALSE, df = "simca")
+  absolute <- dmodx(pca, a, normalized = FALSE, df = "simca", conf_level = c(0.95, 0.99))
   expect_equal(absolute$dmodx, unname(si))
   expect_equal(absolute$dmodx_limit_99[1], s0 * sqrt(stats::qf(0.99, kvar - a, (n - a - 1) * (kvar - a))))
   # normalized DModX is a scaled square root of Q
@@ -117,7 +117,7 @@ test_that("dmodx follows the SIMCA formulas", {
   # effective degrees of freedom from the eigenvalues left out
   rest <- pca$sdev[-(1:a)]^2
   nu <- sum(rest)^2 / sum(rest^2)
-  eff <- dmodx(pca, a)
+  eff <- dmodx(pca, a, conf_level = 0.95)
   expect_equal(eff$dmodx, simca$dmodx)
   expect_equal(eff$dmodx_limit_95[1], sqrt(stats::qf(0.95, nu, (n - a - 1) * nu)))
   expect_equal(eff$t2, q$t2)

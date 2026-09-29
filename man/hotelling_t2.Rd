@@ -9,7 +9,7 @@ hotelling_t2(
   columns = NULL,
   k = 2,
   group = NULL,
-  conf_level = c(0.95, 0.99),
+  conf_level = 0.975,
   method = "f"
 )
 }
@@ -28,7 +28,7 @@ is 2.}
 string), or a vector with one value per sample.}
 
 \item{conf_level}{The confidence level(s) of the limits: one or more
-values between 0 and 1. Default is \code{c(0.95, 0.99)}.}
+values between 0 and 1. Default is 0.975.}
 
 \item{method}{The distribution of the limits: \code{"f"} (default) or
 \code{"beta"}.}
@@ -36,8 +36,8 @@ values between 0 and 1. Default is \code{c(0.95, 0.99)}.}
 \value{
 A tibble with one row per sample: its row number \code{sample}, the
 \code{group} (with \code{group}), \code{t2}, then for each confidence level (in \%, e.g.
-95) its limit \code{limit_95} and whether the sample exceeds it,
-\code{outlier_95}, and the number of samples \code{n} of its group (or of the
+97.5) its limit \code{limit_97.5} and whether the sample exceeds it,
+\code{outlier_97.5}, and the number of samples \code{n} of its group (or of the
 data).
 }
 \description{
@@ -78,9 +78,9 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   spectra <- average(soilLIBS[-(2:8)], Sample)
   pca <- stats::prcomp(spectra[-1], scale. = TRUE)
   t2 <- hotelling_t2(pca, k = 3)
-  t2[t2$outlier_95, ]
-  # a single limit, with the exact distribution of the calibration samples
-  hotelling_t2(pca, k = 3, conf_level = 0.975, method = "beta")
+  t2[t2$outlier_97.5, ]
+  # two limits, with the exact distribution of the calibration samples
+  hotelling_t2(pca, k = 3, conf_level = c(0.95, 0.99), method = "beta")
 }
 }
 \references{

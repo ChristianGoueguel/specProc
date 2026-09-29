@@ -8,7 +8,7 @@ q_residuals(
   model,
   k,
   newdata = NULL,
-  conf_level = c(0.95, 0.99),
+  conf_level = 0.975,
   method = "jackson",
   t2_method = "f",
   center = TRUE,
@@ -27,7 +27,7 @@ variables of the model), whose distances are computed instead of those
 of the calibration samples.}
 
 \item{conf_level}{The confidence level(s) of the limits: one or more
-values between 0 and 1. Default is \code{c(0.95, 0.99)}.}
+values between 0 and 1. Default is 0.975.}
 
 \item{method}{The limit of Q: \code{"jackson"} (default, Jackson-Mudholkar) or
 \code{"box"}.}
@@ -41,7 +41,7 @@ Default is \code{TRUE} and \code{FALSE}.}
 \value{
 A tibble of class \code{specproc_influence}, with one row per sample:
 \code{sample} (row number), \code{t2}, its limits at each confidence level (in \%,
-e.g. \code{t2_limit_95}), \code{q}, its limits (\code{q_limit_95}, ...) and \code{outlier},
+e.g. \code{t2_limit_97.5}), \code{q}, its limits (\code{q_limit_97.5}, ...) and \code{outlier},
 the type of the sample at the highest confidence level: \code{"regular"},
 \code{"extreme"} (high \eqn{T^2} only), \code{"residual"} (high Q only) or
 \code{"both"}. Draw it with \code{\link[=plot_influence]{plot_influence()}}.
@@ -84,8 +84,8 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   influence <- q_residuals(pca, k = 3)
   influence[influence$outlier != "regular", ]
   plot_influence(influence, label = spectra$Sample)
-  # a single limit
-  plot_influence(q_residuals(pca, k = 3, conf_level = 0.99))
+  # several limits
+  plot_influence(q_residuals(pca, k = 3, conf_level = c(0.95, 0.99)))
 }
 }
 \references{
