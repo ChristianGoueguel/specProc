@@ -132,7 +132,7 @@ shot_flags <- function(x, group, method, cutoff) {
       scores[rows, "intensity"] <- robust_z(rowSums(xs))
     }
     if (any(c("correlation", "distance") %in% method)) {
-      ref <- apply(xs, 2, stats::median)
+      ref <- col_medians(xs)
       if ("correlation" %in% method) {
         r <- suppressWarnings(as.vector(stats::cor(t(xs), ref)))
         r[is.na(r)] <- 0   # constant spectra

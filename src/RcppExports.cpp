@@ -26,6 +26,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// col_medians_cpp
+NumericVector col_medians_cpp(NumericMatrix x, bool na_rm);
+RcppExport SEXP _specProc_col_medians_cpp(SEXP xSEXP, SEXP na_rmSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type x(xSEXP);
+    Rcpp::traits::input_parameter< bool >::type na_rm(na_rmSEXP);
+    rcpp_result_gen = Rcpp::wrap(col_medians_cpp(x, na_rm));
+    return rcpp_result_gen;
+END_RCPP
+}
 // computeGroupedMeans
 NumericMatrix computeGroupedMeans(NumericMatrix data, IntegerVector group, int ngroups);
 RcppExport SEXP _specProc_computeGroupedMeans(SEXP dataSEXP, SEXP groupSEXP, SEXP ngroupsSEXP) {
@@ -158,6 +170,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_specProc_whittaker_baseline_cpp", (DL_FUNC) &_specProc_whittaker_baseline_cpp, 5},
+    {"_specProc_col_medians_cpp", (DL_FUNC) &_specProc_col_medians_cpp, 2},
     {"_specProc_computeGroupedMeans", (DL_FUNC) &_specProc_computeGroupedMeans, 3},
     {"_specProc_computeMeans", (DL_FUNC) &_specProc_computeMeans, 1},
     {"_specProc_epo_cpp", (DL_FUNC) &_specProc_epo_cpp, 3},

@@ -83,7 +83,7 @@ q_residuals <- function(model, k, newdata = NULL, conf_level = 0.975, method = "
                         t2_method = "f", center = TRUE, scale = FALSE) {
   method <- match.arg(method, c("jackson", "box"))
   parts <- pca_parts(model, k, newdata, conf_level, t2_method, center, scale)
-  q <- rowSums(parts$residuals^2)
+  q <- parts$sq_residuals
   rest <- parts$lambda[-seq_len(parts$k)]
   q_limits <- stats::setNames(vapply(parts$conf_level, function(l) q_limit(rest, l, method),
                                      numeric(1)), parts$labels)
@@ -169,14 +169,14 @@ dmodx <- function(model, k, newdata = NULL, conf_level = 0.975, normalized = TRU
   parts <- pca_parts(model, k, newdata, conf_level, t2_method, center, scale)
   a <- parts$k
   n <- parts$n
-  n_var <- ncol(parts$calibration_residuals)
+  n_var <- parts$n_var
   a0 <- if (parts$centered) 1 else 0
   if (n - a - a0 < 1 || n_var <= a) {
     stop("Too few samples or variables for DModX with ", a, " components.", call. = FALSE)
   }
-  s0 <- sqrt(sum(parts$calibration_residuals^2) / ((n - a - a0) * (n_var - a)))
+  s0 <- sqrt(parts$calibration_ss / ((n - a - a0) * (n_var - a)))
   correction <- if (parts$new) 1 else sqrt(n / (n - a - a0))
-  s <- sqrt(rowSums(parts$residuals^2) / (n_var - a)) * correction
+  s <- sqrt(parts$sq_residuals / (n_var - a)) * correction
   rest <- parts$lambda[-seq_len(a)]
   rest <- rest[rest > 0]
   nu <- if (df == "simca") n_var - a else sum(rest)^2 / sum(rest^2)
@@ -269,7 +269,10 @@ plot_influence <- function(x, label = NULL, log = FALSE, title = NULL) {
 
 # ---- internals ---------------------------------------------------------------
 
-# Scores, residuals and T-squared of the calibration samples or of new ones.
+# T-squared and squared residuals of the calibration samples or of new ones.
+# The model keeps all its components, so the squared residual of a
+# calibration sample is the sum of its squared scores on the components left
+# out: the data need not be reconstructed.
 pca_parts <- function(model, k, newdata, conf_level, t2_method, center, scale) {
   conf_level <- check_conf_level(conf_level)
   t2_method <- match.arg(t2_method, c("f", "beta"))
@@ -287,11 +290,10 @@ pca_parts <- function(model, k, newdata, conf_level, t2_method, center, scale) {
   n <- nrow(model$x)
   lambda <- model$sdev^2
   p <- model$rotation[, seq_len(k), drop = FALSE]
-  calibration <- model$x %*% t(model$rotation)
-  calibration_residuals <- calibration - calibration %*% p %*% t(p)
+  calibration_sq <- rowSums(model$x[, -seq_len(k), drop = FALSE]^2)
   labels <- conf_label(conf_level)
   if (is.null(newdata)) {
-    x <- calibration
+    sq_residuals <- calibration_sq
     t2 <- hotelling_t2(as.data.frame(model$x[, seq_len(k), drop = FALSE]),
                        columns = colnames(model$x)[seq_len(k)], conf_level = conf_level,
                        method = t2_method)
@@ -312,9 +314,10 @@ pca_parts <- function(model, k, newdata, conf_level, t2_method, center, scale) {
     scores <- x %*% p
     t2_values <- unname(rowSums(sweep(scores^2, 2, lambda[seq_len(k)], "/")))
     t2_limits <- vapply(conf_level, function(l) t2_limit(l, k, n, "new"), numeric(1))
+    sq_residuals <- rowSums((x - scores %*% t(p))^2)
   }
-  list(k = k, n = n, lambda = lambda, residuals = x - (x %*% p) %*% t(p),
-       calibration_residuals = calibration_residuals, t2 = t2_values,
+  list(k = k, n = n, n_var = nrow(model$rotation), lambda = lambda,
+       sq_residuals = unname(sq_residuals), calibration_ss = sum(calibration_sq), t2 = t2_values,
        t2_limits = stats::setNames(unname(t2_limits), labels), conf_level = conf_level,
        labels = labels, new = !is.null(newdata), centered = !isFALSE(model$center))
 }

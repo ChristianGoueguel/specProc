@@ -108,3 +108,11 @@ parse_wavelength <- function(nms) {
   }
   num
 }
+
+# Column medians, in C++ (as apply(x, 2, stats::median, na.rm = na.rm), with
+# the column names).
+col_medians <- function(x, na.rm = FALSE) {
+  if (!is.matrix(x)) x <- as.matrix(x)
+  storage.mode(x) <- "double"
+  stats::setNames(col_medians_cpp(x, na.rm), colnames(x))
+}

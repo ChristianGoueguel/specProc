@@ -80,7 +80,7 @@ msc <- function(
   }
 
   if (is.null(xref)) {
-    xref <- if (robust) apply(x, 2, stats::median) else colMeans(x)
+    xref <- if (robust) col_medians(x) else colMeans(x)
   }
   xref <- as.numeric(xref)
 

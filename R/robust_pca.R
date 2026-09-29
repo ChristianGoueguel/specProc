@@ -242,7 +242,7 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = TRUE,
   check_count(maxiter, "maxiter")
 
   # Step 1: robust standardization and outlier detection
-  med <- apply(x, 2, stats::median)
+  med <- col_medians(x)
   scl <- if (stand) apply(x, 2, robust_scale) else rep(1, p)
   xs <- sweep(sweep(x, 2, med), 2, scl, "/")
   red <- svd_reduce(xs)

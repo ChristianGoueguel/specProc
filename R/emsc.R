@@ -101,7 +101,7 @@ emsc <- function(x, xref = NULL, degree = 2, interferents = NULL, wavelength = N
     stop("'xref' must be a numeric vector with one value per column of 'x'.")
   }
   if (is.null(xref)) {
-    xref <- if (robust) apply(x, 2, stats::median) else colMeans(x)
+    xref <- if (robust) col_medians(x) else colMeans(x)
   }
   xref <- as.numeric(xref)
 

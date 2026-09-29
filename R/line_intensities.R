@@ -236,35 +236,41 @@ spectrum_noise <- function(v) {
   if (!is.finite(s) || s <= 0) NA_real_ else s
 }
 
-# Measures one line in every spectrum (rows of x).
+# Measures one line in every spectrum (rows of x). The spectra are grouped by
+# the channel of their peak, which sets their integration window, and each
+# group is measured with matrix operations.
 measure_line <- function(x, wl, center, half_width, search, method, baseline, fit_width, limit) {
   n <- nrow(x)
-  empty <- data.frame(peak_wavelength = rep(NA_real_, n), shift = NA_real_, height = NA_real_,
-                      intensity = NA_real_, saturated = NA)
-  near <- which(abs(wl - center) <= max(search, min(abs(wl - center))))
+  out <- data.frame(peak_wavelength = rep(NA_real_, n), shift = NA_real_, height = NA_real_,
+                    intensity = NA_real_, saturated = NA)
   if (min(abs(wl - center)) > search + half_width) {
-    return(empty)   # outside the spectral range
+    return(out)   # outside the spectral range
   }
-  out <- empty
-  for (i in seq_len(n)) {
-    seg <- x[i, near]
-    if (all(is.na(seg))) next
-    peak <- wl[near][which.max(seg)]
-    idx <- which(abs(wl - peak) <= half_width)
+  near <- which(abs(wl - center) <= max(search, min(abs(wl - center))))
+  seg <- x[, near, drop = FALSE]
+  seg[is.na(seg)] <- -Inf
+  peak <- near[max.col(seg, ties.method = "first")]
+  peak[rowSums(is.finite(seg)) == 0] <- NA_integer_   # no value in the search window
+  for (pk in unique(stats::na.omit(peak))) {
+    rows <- which(peak == pk)
+    idx <- which(abs(wl - wl[pk]) <= half_width)
     idx <- idx[order(wl[idx])]
     w <- wl[idx]
-    v <- x[i, idx]
-    if (baseline && length(idx) > 1) {
-      v <- v - (v[1] + (v[length(v)] - v[1]) * (w - w[1]) / (w[length(w)] - w[1]))
+    v <- x[rows, idx, drop = FALSE]
+    m <- length(idx)
+    if (baseline && m > 1) {
+      v <- v - (v[, 1] + outer(v[, m] - v[, 1], (w - w[1]) / (w[m] - w[1])))
     }
-    height <- max(v, na.rm = TRUE)
-    out$peak_wavelength[i] <- peak
-    out$height[i] <- height
-    out$saturated[i] <- if (is.null(limit)) NA else any(x[i, idx] >= limit, na.rm = TRUE)
-    out$intensity[i] <- switch(
+    height <- suppressWarnings(apply(v, 1, max, na.rm = TRUE))
+    height[!is.finite(height)] <- NA_real_
+    out$peak_wavelength[rows] <- wl[pk]
+    out$height[rows] <- height
+    out$saturated[rows] <- if (is.null(limit)) NA else
+      rowSums(x[rows, idx, drop = FALSE] >= limit, na.rm = TRUE) > 0
+    out$intensity[rows] <- switch(
       method,
       height = height,
-      area = if (length(idx) > 1) sum(diff(w) * (v[-1] + v[-length(v)]) / 2) else height,
+      area = if (m > 1) as.vector((v[, -1, drop = FALSE] + v[, -m, drop = FALSE]) %*% diff(w)) / 2 else height,
       voigt = NA_real_
     )
   }

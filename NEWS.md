@@ -1,5 +1,16 @@
 # specProc (development version)
 
+## Performance
+
+* Column medians are computed in C++ (`reject_shots()`, `msc()` and
+  `emsc()` with `robust = TRUE`, `center(method = "median")`, `robpca()`):
+  `reject_shots()` is about 20 times faster on 400 spectra of 7152 channels.
+* `q_residuals()` and `dmodx()` compute the residuals of the calibration
+  samples from the scores of the components left out, without
+  reconstructing the data (about 100 times faster), and
+  `line_intensities()` measures all the spectra of a line at once (about 3
+  times faster). The results are unchanged.
+
 ## Breaking changes
 
 * The data sets are renamed: `specLIBS` is now `soilLIBS`, and `fourrage`

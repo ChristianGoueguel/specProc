@@ -41,7 +41,7 @@ center <- function(x, method = "mean", drop.na = FALSE) {
   centers <- switch(
     method,
     mean = colMeans(x, na.rm = drop.na),
-    median = apply(x, 2, stats::median, na.rm = drop.na),
+    median = col_medians(x, na.rm = drop.na),
     stop("Invalid method. Must be either 'mean' or 'median'")
   )
 

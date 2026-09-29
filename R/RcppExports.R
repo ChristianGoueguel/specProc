@@ -5,6 +5,10 @@ whittaker_baseline_cpp <- function(x, lambda, param, max_iter, method) {
     .Call(`_specProc_whittaker_baseline_cpp`, x, lambda, param, max_iter, method)
 }
 
+col_medians_cpp <- function(x, na_rm) {
+    .Call(`_specProc_col_medians_cpp`, x, na_rm)
+}
+
 computeGroupedMeans <- function(data, group, ngroups) {
     .Call(`_specProc_computeGroupedMeans`, data, group, ngroups)
 }
