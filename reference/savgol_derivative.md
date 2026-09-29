@@ -1,0 +1,29 @@
+# Derivative Order of a Savitzky-Golay Filter
+
+A dials parameter for the `derivative` of
+[`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md):
+0 (smoothing), 1 or 2.
+
+## Usage
+
+``` r
+savgol_derivative(range = c(0L, 2L), trans = NULL)
+```
+
+## Arguments
+
+- range:
+
+  The range of derivative orders. Default is 0 to 2.
+
+- trans:
+
+  Not used.
+
+## Value
+
+A dials `quant_param` object.
+
+## See also
+
+[`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md)

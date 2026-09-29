@@ -68,6 +68,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_cell_map.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_embedding.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_fit.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/plot_influence.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_lines.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_outlier_map.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_outliers.html</loc></url>
@@ -80,6 +81,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/projected_osc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/q_residuals.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/quantile_weight.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/read_starkb.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/reject_shots.html</loc></url>
@@ -89,6 +91,8 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/rousseeuw_croux.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/saturation_summary.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/savgol_derivative.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/savitzky_golay.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/self_absorption.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/snv.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/soilLIBS.html</loc></url>
@@ -115,13 +119,17 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/step_robpca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_robust_bcyj.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_rospca.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/step_savgol.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_snv.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/step_wavelet.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_y_gradient_glsw.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/summary_stats.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/tukey_gh.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/umad.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/voigt_fwhm.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/voigt_profile.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/wavelet_features.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/wavelet_level.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/y_gradient_glsw.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/zscore.html</loc></url>
 </urlset>

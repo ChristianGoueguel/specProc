@@ -715,6 +715,10 @@ and can be tuned within a tidymodels workflow.
 
 - [`step_baseline()`](https://christiangoueguel.com/specProc/reference/step_baseline.md)
   : Baseline Correction Recipe Step
+- [`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md)
+  : Savitzky-Golay Recipe Step
+- [`step_wavelet()`](https://christiangoueguel.com/specProc/reference/step_wavelet.md)
+  : Wavelet Features Recipe Step
 - [`step_snv()`](https://christiangoueguel.com/specProc/reference/step_snv.md)
   : Standard Normal Variate Recipe Step
 - [`step_msc()`](https://christiangoueguel.com/specProc/reference/step_msc.md)
@@ -769,6 +773,10 @@ and can be tuned within a tidymodels workflow.
   : Baseline Smoothness Parameter
 - [`glsw_alpha()`](https://christiangoueguel.com/specProc/reference/glsw_alpha.md)
   : Relative GLSW Weighting Parameter
+- [`savgol_derivative()`](https://christiangoueguel.com/specProc/reference/savgol_derivative.md)
+  : Derivative Order of a Savitzky-Golay Filter
+- [`wavelet_level()`](https://christiangoueguel.com/specProc/reference/wavelet_level.md)
+  : Number of Levels of a Wavelet Decomposition
 
 ## Line identification
 
@@ -862,6 +870,10 @@ Functions that help assess data visually.
   : Plot a Two-Dimensional Embedding
 - [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)
   : Hotelling's T-squared Statistic of Samples in an Embedding
+- [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md)
+  : Hotelling's T-squared and Q Residuals of a PCA Model
+- [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
+  : Influence Plot of a PCA Model
 - [`plot_outliers()`](https://christiangoueguel.com/specProc/reference/plot_outliers.md)
   : Univariate Representation of Multivariate Outliers
 - [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md)
@@ -873,6 +885,10 @@ Functions that help assess data visually.
 
 Functions used to increase the signal-to-noise ratio.
 
+- [`savitzky_golay()`](https://christiangoueguel.com/specProc/reference/savitzky_golay.md)
+  : Savitzky-Golay Smoothing and Derivatives
+- [`wavelet_features()`](https://christiangoueguel.com/specProc/reference/wavelet_features.md)
+  : Wavelet Coefficients of Spectra
 - [`average()`](https://christiangoueguel.com/specProc/reference/average.md)
   : Fast Average for Large Spectral Dataset
 - [`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md)

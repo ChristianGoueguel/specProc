@@ -10,6 +10,33 @@
 
 ### New features
 
+- [`savitzky_golay()`](https://christiangoueguel.com/specProc/reference/savitzky_golay.md)
+  and
+  [`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md):
+  Savitzky-Golay smoothing and first or second derivatives, keeping
+  every channel (polynomial fits at the edges) and filtering the
+  segments between detector gaps separately. The window, polynomial
+  order and derivative are tunable (new dials parameter
+  [`savgol_derivative()`](https://christiangoueguel.com/specProc/reference/savgol_derivative.md)).
+
+- [`wavelet_features()`](https://christiangoueguel.com/specProc/reference/wavelet_features.md)
+  and
+  [`step_wavelet()`](https://christiangoueguel.com/specProc/reference/step_wavelet.md):
+  discrete wavelet transform of spectra (Haar, Daubechies d4/d6/d8 and
+  least asymmetric la8 wavelets) as compressed features: the
+  approximation at a level or all coefficients, optionally the
+  coefficients of largest variance in the training data. The level and
+  number of coefficients are tunable (new dials parameter
+  [`wavelet_level()`](https://christiangoueguel.com/specProc/reference/wavelet_level.md)).
+
+- [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md)
+  computes Hotelling’s T-squared and the Q residual (SPE) of each sample
+  for a PCA model, for the calibration samples or new ones, with their
+  95% and 99% limits (Jackson-Mudholkar or Box for Q), and classifies
+  the samples as regular, extreme, residual or both.
+  [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
+  draws Q against T-squared with the limits.
+
 - [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md)
   gains prediction intervals:
   [`plot_calibration()`](https://christiangoueguel.com/specProc/reference/plot_calibration.md)
