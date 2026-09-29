@@ -8,6 +8,22 @@
 
 ## New features
 
+* `savitzky_golay()` and `step_savgol()`: Savitzky-Golay smoothing and first
+  or second derivatives, keeping every channel (polynomial fits at the
+  edges) and filtering the segments between detector gaps separately. The
+  window, polynomial order and derivative are tunable (new dials parameter
+  `savgol_derivative()`).
+* `wavelet_features()` and `step_wavelet()`: discrete wavelet transform of
+  spectra (Haar, Daubechies d4/d6/d8 and least asymmetric la8 wavelets) as
+  compressed features: the approximation at a level or all coefficients,
+  optionally the coefficients of largest variance in the training data. The
+  level and number of coefficients are tunable (new dials parameter
+  `wavelet_level()`).
+* `q_residuals()` computes Hotelling's T-squared and the Q residual (SPE) of
+  each sample for a PCA model, for the calibration samples or new ones,
+  with their 95% and 99% limits (Jackson-Mudholkar or Box for Q), and
+  classifies the samples as regular, extreme, residual or both.
+  `plot_influence()` draws Q against T-squared with the limits.
 * `calibration_curve()` gains prediction intervals: `plot_calibration()`
   draws the confidence band, the prediction band or both (`interval`), and
   shows new samples (`newdata`) at their predicted concentrations with

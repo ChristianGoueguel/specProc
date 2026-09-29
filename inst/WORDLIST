@@ -54,6 +54,8 @@ Cristoforetti
 Croux
 DDC
 DOSC
+DWT
+Daubechies
 De
 Debye
 Dell'Aglio
@@ -87,6 +89,7 @@ Gigosos
 Golay
 González
 HWHM
+Haar
 Harmonisation
 Harynuk
 Hegazy
@@ -139,6 +142,7 @@ MacGregor
 MacroPCA
 MacroPCA's
 Mahadevan
+Mallat
 Mandel
 Mandel's
 Marquardt
@@ -151,9 +155,11 @@ Midcovariance
 Midvariance
 Moreau
 Mosteller
+Mudholkar
 NIR
 NIST
 Nessib
+Nomikos
 Noord
 Numer
 OPLS
@@ -201,6 +207,8 @@ Rtools
 SCP
 SIMPLS
 SNV
+SPC
+SPE
 Saha
 Sahal
 Salvetti
@@ -282,6 +290,7 @@ eV
 embeddings
 equilibration
 et
+extremal
 forcats
 frac
 ggplot
@@ -310,6 +319,7 @@ midvariance
 midvariances
 multiplet
 multiplets
+multiresolution
 na
 nm
 nonlinearly
@@ -337,6 +347,7 @@ semiclassical
 smoothes
 spearman
 subspaces
+symlet
 th
 tibble
 tibbles

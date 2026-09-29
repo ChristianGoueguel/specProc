@@ -66,6 +66,8 @@ reference:
 - subtitle: preprocessing
   contents:
   - step_baseline
+  - step_savgol
+  - step_wavelet
   - step_snv
   - step_msc
   - step_emsc
@@ -99,6 +101,8 @@ reference:
   contents:
   - baseline_lambda
   - glsw_alpha
+  - savgol_derivative
+  - wavelet_level
 
 - title: Line identification
   desc: >
@@ -160,6 +164,8 @@ reference:
   - plot_spectra
   - plot_embedding
   - hotelling_t2
+  - q_residuals
+  - plot_influence
   - plot_outliers
   - adjusted_boxplot
   - generalized_boxplot
@@ -168,6 +174,8 @@ reference:
   desc: >
     Functions used to increase the signal-to-noise ratio.
   contents:
+  - savitzky_golay
+  - wavelet_features
   - average
   - reject_shots
 
