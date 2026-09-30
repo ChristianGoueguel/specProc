@@ -216,7 +216,7 @@ test_that("plot_outlier_map and plot_cell_map return ggplots", {
   expect_false(identical(plot_outlier_map(fit, newdata = d$x[1:20, ])$scales$get_scales("shape")$guide, "none"))
 
   # points colored by their reduced distance from the origin, farthest on top
-  rad <- plot_outlier_map(fit, colour_by = "distance")
+  rad <- plot_outlier_map(fit, colour_by = "distance", relative = TRUE)
   expect_s3_class(rad$scales$get_scales("fill"), "ScaleContinuous")
   radius <- pmax(fit$sd / fit$cutoff_sd, fit$od / fit$cutoff_od)
   expect_equal(rad$data$radius, sort(radius))
@@ -225,6 +225,11 @@ test_that("plot_outlier_map and plot_cell_map return ggplots", {
   expect_equal(toupper(sc$map(1)), toupper(radial_rainbow[5]))
   expect_equal(toupper(sc$map(0)), toupper(radial_rainbow[1]))              # dark red at the origin
   expect_true(1 %in% sc$get_breaks())
+  # on the raw distances, two cut-offs of different scales: no anchor at 1
+  raw <- plot_outlier_map(fit, colour_by = "distance")
+  sr <- ggplot2::ggplot_build(raw)$plot$scales$get_scales("fill")
+  expect_equal(sr$get_limits(), range(radius))
+  expect_false(any(grepl("cut-off", sr$get_labels())))
   expect_error(plot_outlier_map(fit, colour_by = "od"), "arg")
 
   # point styling is passed to geom_point(), over the defaults

@@ -51,8 +51,9 @@
 * `plot_outlier_map()` takes a size per sample (`size`), and
   `colour_by = "distance"` colors its points by their reduced distance from
   the origin (the larger of SD and OD over their cut-offs), on a rainbow
-  from dark red through orange for the regular observations, yellow at the
-  cut-offs, then green and blue for the outlying ones.
+  from dark red to blue; with `relative = TRUE`, where both cut-offs are at
+  1, yellow marks the cut-offs, between the regular observations (dark red
+  to orange) and the outlying ones (green to blue).
 * The legends of `plot_embedding()` and `plot_outlier_map()` are more
   compact: smaller text and keys, three sizes, the T-squared levels written
   on their ellipses instead of in a legend, and no key for the kind of

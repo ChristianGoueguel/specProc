@@ -40,10 +40,11 @@ smallest positive distance. Default is \code{FALSE}.}
 
 \item{colour_by}{The colors of the points: \code{"type"} (default), by
 outlier type, or \code{"distance"}, by their reduced distance from the
-origin, \eqn{\max(SD/c_{SD}, OD/c_{OD})}, on a rainbow scale: from dark
-red (close to the origin) through orange for the regular observations,
-yellow at the cut-offs (a distance of 1), then green and blue for the
-outlying observations, the farthest in blue.}
+origin, \eqn{\max(SD/c_{SD}, OD/c_{OD})}, on a rainbow scale from dark
+red (the closest) to blue (the farthest). With \code{relative = TRUE}, where
+both cut-offs are at 1, yellow marks the cut-offs: dark red through
+orange for the regular observations, then green and blue for the
+outlying ones. Otherwise, the colors spread evenly over the distances.}
 
 \item{title}{The plot title.}
 

@@ -47,10 +47,11 @@
 #'   smallest positive distance. Default is `FALSE`.
 #' @param colour_by The colors of the points: `"type"` (default), by
 #'   outlier type, or `"distance"`, by their reduced distance from the
-#'   origin, \eqn{\max(SD/c_{SD}, OD/c_{OD})}, on a rainbow scale: from dark
-#'   red (close to the origin) through orange for the regular observations,
-#'   yellow at the cut-offs (a distance of 1), then green and blue for the
-#'   outlying observations, the farthest in blue.
+#'   origin, \eqn{\max(SD/c_{SD}, OD/c_{OD})}, on a rainbow scale from dark
+#'   red (the closest) to blue (the farthest). With `relative = TRUE`, where
+#'   both cut-offs are at 1, yellow marks the cut-offs: dark red through
+#'   orange for the regular observations, then green and blue for the
+#'   outlying ones. Otherwise, the colors spread evenly over the distances.
 #' @param title The plot title.
 #' @param ... Further arguments passed to [ggplot2::geom_point()] to style
 #'   the points, such as `alpha` (default 0.85), `size` (2.2), `stroke`
@@ -206,7 +207,7 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
       ggplot2::scale_fill_manual(values = palette, drop = FALSE, name = NULL,
                                  guide = ggplot2::guide_legend(order = 1, override.aes = list(shape = 21, size = 2.5)))
     } else {
-      distance_fill_scale(max(df$radius, na.rm = TRUE))
+      distance_fill_scale(range(df$radius, na.rm = TRUE), anchored = relative)
     }) +
     # the kinds of samples only matter with new samples
     ggplot2::scale_shape_manual(values = c(calibration = 21, new = 24), name = NULL, drop = TRUE,
@@ -444,10 +445,18 @@ flagged_regions <- function(object, threshold = 0.1, rows = NULL, columns = NULL
 radial_rainbow <- c("#67001f", "#b2182b", "#f46d43", "#fdae61", "#fdd835", "#d9ef8b",
                     "#66bd63", "#1a9850", "#4575b4", "#313695")
 
-# The fill scale of the distances: the colors below yellow spread over
-# [0, 1], the others over [1, the largest distance], and 1 is labeled.
-distance_fill_scale <- function(largest) {
-  top <- max(largest, 1.5)
+# The fill scale of the distances. Anchored (relative distances, both
+# cut-offs at 1): the colors below yellow spread over [0, 1], the others over
+# [1, the largest distance], and 1 is labeled. Otherwise, the colors spread
+# evenly over the range of the distances.
+distance_fill_scale <- function(range, anchored) {
+  if (!anchored) {
+    return(ggplot2::scale_fill_gradientn(
+      colours = radial_rainbow, name = "Reduced distance",
+      guide = ggplot2::guide_colourbar(order = 1, barwidth = 12, barheight = 0.5, title.vjust = 0.9)
+    ))
+  }
+  top <- max(range[2], 1.5)
   stops <- c(0, 0.35, 0.65, 0.85, 1, 1 + (top - 1) * c(0.15, 0.35, 0.55, 0.8, 1))
   breaks <- pretty(c(0, top), n = 5)
   breaks <- sort(c(1, breaks[breaks >= 0 & breaks <= top & abs(breaks - 1) > 0.12 * top]))
