@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -355,10 +355,10 @@ filter’s is named <code>filter</code>.</p>
 <span><span class="va">method_recipe</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">method</span>, <span class="va">k</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/tune.html" class="external-link">tune</a></span><span class="op">(</span><span class="st">"filter"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="va">method</span> <span class="op">==</span> <span class="st">"none"</span><span class="op">)</span> <span class="va">base_recipe</span> <span class="kw">else</span> <span class="va">filter_steps</span><span class="op">[[</span><span class="va">method</span><span class="op">]</span><span class="op">]</span><span class="op">(</span><span class="va">base_recipe</span>, <span class="va">k</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><code><a href="../reference/opls.html">opls()</a></code> has no step: it wraps the Bioconductor package
-ropls and returns a fitted model rather than a filter.
-<code><a href="../reference/step_projected_osc.html">step_projected_osc()</a></code> gives the same filtered data, as shown
-below.</p>
+<p><code><a href="../reference/step_opls.html">step_opls()</a></code> removes the orthogonal components of an
+<code><a href="../reference/opls.html">opls()</a></code> model. It gives the same filtered data as
+<code><a href="../reference/step_projected_osc.html">step_projected_osc()</a></code>, as shown below, and is not repeated
+in the comparison.</p>
 </div>
 <div class="section level2">
 <h2 id="what-does-each-method-remove">What does each method remove?<a class="anchor" aria-label="anchor" href="#what-does-each-method-remove"></a>
@@ -583,9 +583,12 @@ variation PLS already learns to ignore from 246 calibration spectra.</p>
 <p>Several functions compute the same filter, or a filter that cannot
 change PLS predictions:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># POSC and O2PLS with a single response: both give OPLS-filtered data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="../reference/projected_osc.html">projected_osc</a></span><span class="op">(</span><span class="va">x_cal</span>, <span class="va">calibration</span><span class="op">$</span><span class="va">K</span>, ncomp <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span>,</span>
-<span>          <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="../reference/o2pls.html">o2pls</a></span><span class="op">(</span><span class="va">x_cal</span>, <span class="va">calibration</span><span class="op">$</span><span class="va">K</span>, ncomp <span class="op">=</span> <span class="fl">1</span>, nx <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span>,</span>
+<code class="sourceCode R"><span><span class="co"># POSC, O2PLS with a single response and OPLS all give OPLS-filtered data</span></span>
+<span><span class="va">posc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="../reference/projected_osc.html">projected_osc</a></span><span class="op">(</span><span class="va">x_cal</span>, <span class="va">calibration</span><span class="op">$</span><span class="va">K</span>, ncomp <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">posc</span>, <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="../reference/o2pls.html">o2pls</a></span><span class="op">(</span><span class="va">x_cal</span>, <span class="va">calibration</span><span class="op">$</span><span class="va">K</span>, ncomp <span class="op">=</span> <span class="fl">1</span>, nx <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span>,</span>
+<span>          check.attributes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">posc</span>, <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="fu"><a href="../reference/opls.html">opls</a></span><span class="op">(</span><span class="va">x_cal</span>, <span class="va">calibration</span><span class="op">$</span><span class="va">K</span>, ncomp.ortho <span class="op">=</span> <span class="fl">2</span>, permutation <span class="op">=</span> <span class="fl">0</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span>,</span>
 <span>          check.attributes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span></span>
@@ -600,12 +603,13 @@ change PLS predictions:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="fu">predict_with</span><span class="op">(</span><span class="fu">method_recipe</span><span class="op">(</span><span class="st">"POSC / OPLS"</span>, <span class="fl">2</span><span class="op">)</span>, <span class="fl">1</span><span class="op">)</span>,</span>
 <span>          <span class="fu">predict_with</span><span class="op">(</span><span class="va">base_recipe</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
-<p>The first result means that <code><a href="../reference/projected_osc.html">projected_osc()</a></code> and
-<code><a href="../reference/o2pls.html">o2pls()</a></code> (with one response) are interchangeable. The second
-explains why OPLS-filtered models can reproduce plain PLS predictions
-exactly. OPLS splits the systematic variation of a PLS model into a
-predictive and an orthogonal part, but the model is the same (Trygg and
-Wold, 2002; Kemsley and Tapp, 2009). These filters are still useful for
+<p>The first two results mean that <code><a href="../reference/projected_osc.html">projected_osc()</a></code>,
+<code><a href="../reference/o2pls.html">o2pls()</a></code> (with one response) and <code><a href="../reference/opls.html">opls()</a></code> are
+interchangeable as filters (and so are their steps). The third explains
+why OPLS-filtered models can reproduce plain PLS predictions exactly.
+OPLS splits the systematic variation of a PLS model into a predictive
+and an orthogonal part, but the model is the same (Trygg and Wold, 2002;
+Kemsley and Tapp, 2009). These filters are still useful for
 interpretation: the orthogonal components show what varies in the
 spectra independently of potassium, as in the figure above.</p>
 </div>

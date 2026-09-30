@@ -45,6 +45,8 @@ sources of variance from the multivariate data.
   Orthogonal Signal Correction
 - [`opls()`](https://christiangoueguel.com/specProc/reference/opls.md) :
   Orthogonal Projections to Latent Structures
+- [`predict(`*`<specproc_opls>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_opls.md)
+  : Predict with an OPLS Model
 - [`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md)
   : Modified Orthogonal Projections to Latent Structures
 - [`direct_osc()`](https://christiangoueguel.com/specProc/reference/direct_osc.md)
@@ -144,6 +146,10 @@ and can be tuned within a tidymodels workflow.
   : Direct Orthogonal Signal Correction Recipe Step
 - [`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md)
   : Projected Orthogonal Signal Correction (OPLS Filter) Recipe Step
+- [`step_opls()`](https://christiangoueguel.com/specProc/reference/step_opls.md)
+  : Orthogonal Projections to Latent Structures (OPLS) Recipe Step
+- [`step_o2pls()`](https://christiangoueguel.com/specProc/reference/step_o2pls.md)
+  : O2PLS Filter Recipe Step for One or Several Outcomes
 - [`step_y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/step_y_gradient_glsw.md)
   : y-Gradient Generalized Least Squares Weighting Recipe Step
 

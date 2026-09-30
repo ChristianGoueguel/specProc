@@ -2,6 +2,8 @@
 
 ## specProc (development version)
 
+## specProc 0.7.0
+
 ### Performance
 
 - Column medians are computed in C++
@@ -24,6 +26,22 @@
 
 ### Breaking changes
 
+- [`opls()`](https://christiangoueguel.com/specProc/reference/opls.md)
+  is implemented natively and no longer needs the Bioconductor package
+  ropls. It reproduces
+  [`ropls::opls()`](https://rdrr.io/pkg/ropls/man/opls.html) (scores,
+  loadings, R2X, R2Y, Q2, RMSEE, VIP and permutation p-values), but
+  returns an object of class `specproc_opls` instead of a list holding
+  the ropls model: the `model` element is removed, and the model has new
+  elements `correction` (the OPLS-filtered data), `fitted`,
+  `coefficients`, `vip`, `ortho_vip`, `components` (R2X, R2Y and Q2 of
+  each component) and `permutation`. `x` and `y` can be matrices or
+  vectors as well as data frames. When `ncomp.ortho = NA` and only the
+  predictive component is significant, the model has no orthogonal
+  component (with a warning) instead of failing.
+  [`predict()`](https://rdrr.io/r/stats/predict.html) filters new data,
+  or predicts the response or the scores (`type`), and `crossval = 0`
+  skips the cross-validation.
 - The data sets are renamed: `specLIBS` is now `soilLIBS`, and
   `fourrage` is now `forageLIBS`. Replace `data(specLIBS)` with
   `data(soilLIBS)` and `data(fourrage)` with `data(forageLIBS)`.
@@ -58,6 +76,43 @@
   and matching emission lines.
 
 ### New features
+
+- [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
+  is drawn like
+  [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md):
+  points outlined in black and filled by type (in the colors of the
+  outlier map), dashed limits at the highest confidence level (dotted, …
+  at the others, with a legend only for several levels), a compact
+  legend at the bottom, and labels on the `labels` (default 3) most
+  outlying samples only, instead of all the flagged ones. It gains the
+  options of
+  [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md):
+  `relative` (distances divided by their limits), `shade` (the outlying
+  regions), `log`, `colour_by = "distance"` and point styles in `...`,
+  including a size per sample. The arguments after `label` changed
+  order: name `log` and `title`. In both plots, labels near the right
+  edge are placed on the left of their point, so that they are not cut
+  off.
+
+- [`step_opls()`](https://christiangoueguel.com/specProc/reference/step_opls.md)
+  removes the orthogonal components of an
+  [`opls()`](https://christiangoueguel.com/specProc/reference/opls.md)
+  model in a recipe, with `num_comp` tunable. It gives the same filtered
+  data as
+  [`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md),
+  and also offers Pareto scaling.
+
+- [`step_o2pls()`](https://christiangoueguel.com/specProc/reference/step_o2pls.md)
+  removes the outcome-orthogonal components of an
+  [`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md)
+  model in a recipe, estimated against one or several outcomes
+  (`recipe(K + Ca ~ ., ...)`), with `num_comp` and `joint_comp` tunable
+  for a single outcome. Only the predictors are filtered. Its help page
+  shows a workflow predicting several outcomes and, since
+  [`tune_grid()`](https://tune.tidymodels.org/reference/tune_grid.html)
+  does not support several outcomes, how to tune one workflow per
+  outcome with a workflow set (`workflow_map("tune_grid", ...)`), each
+  filter still estimated against all the outcomes.
 
 - [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
   is drawn in the style of SIMCA score plots: grey outside the outermost

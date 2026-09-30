@@ -86,6 +86,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_emsc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_filter.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_nas.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_opls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_wavelength_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/projected_osc.html</loc></url>
@@ -121,6 +122,8 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/step_line_ratio.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_macropca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_msc.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/step_o2pls.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/step_opls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_osc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_pareto_scale.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_poisson_scale.html</loc></url>

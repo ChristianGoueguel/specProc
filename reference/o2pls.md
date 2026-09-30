@@ -109,9 +109,8 @@ equivalent to OPLS with `nx` orthogonal components.
 
 [`predict.specproc_filter()`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
 to correct new spectra with the fitted filter, and
-[`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md),
-which gives the same filtered data for a single response, to use it in a
-tidymodels recipe.
+[`step_o2pls()`](https://christiangoueguel.com/specProc/reference/step_o2pls.md)
+to use it in a tidymodels recipe, with one or several outcomes.
 
 ## Author
 

@@ -269,11 +269,12 @@ method_recipe <- function(method, k = tune("filter")) {
 }
 ```
 
-[`opls()`](https://christiangoueguel.com/specProc/reference/opls.md) has
-no step: it wraps the Bioconductor package ropls and returns a fitted
-model rather than a filter.
-[`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md)
-gives the same filtered data, as shown below.
+[`step_opls()`](https://christiangoueguel.com/specProc/reference/step_opls.md)
+removes the orthogonal components of an
+[`opls()`](https://christiangoueguel.com/specProc/reference/opls.md)
+model. It gives the same filtered data as
+[`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md),
+as shown below, and is not repeated in the comparison.
 
 ## What does each method remove?
 
@@ -502,9 +503,12 @@ change PLS predictions:
 
 ``` r
 
-# POSC and O2PLS with a single response: both give OPLS-filtered data
-all.equal(as.matrix(projected_osc(x_cal, calibration$K, ncomp = 3)$correction),
-          as.matrix(o2pls(x_cal, calibration$K, ncomp = 1, nx = 2)$correction),
+# POSC, O2PLS with a single response and OPLS all give OPLS-filtered data
+posc <- as.matrix(projected_osc(x_cal, calibration$K, ncomp = 3)$correction)
+all.equal(posc, as.matrix(o2pls(x_cal, calibration$K, ncomp = 1, nx = 2)$correction),
+          check.attributes = FALSE)
+#> [1] TRUE
+all.equal(posc, as.matrix(opls(x_cal, calibration$K, ncomp.ortho = 2, permutation = 0)$correction),
           check.attributes = FALSE)
 #> [1] TRUE
 
@@ -521,14 +525,15 @@ all.equal(predict_with(method_recipe("POSC / OPLS", 2), 1),
 #> [1] TRUE
 ```
 
-The first result means that
-[`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md)
-and
+The first two results mean that
+[`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md),
 [`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md)
-(with one response) are interchangeable. The second explains why
-OPLS-filtered models can reproduce plain PLS predictions exactly. OPLS
-splits the systematic variation of a PLS model into a predictive and an
-orthogonal part, but the model is the same (Trygg and Wold, 2002;
+(with one response) and
+[`opls()`](https://christiangoueguel.com/specProc/reference/opls.md) are
+interchangeable as filters (and so are their steps). The third explains
+why OPLS-filtered models can reproduce plain PLS predictions exactly.
+OPLS splits the systematic variation of a PLS model into a predictive
+and an orthogonal part, but the model is the same (Trygg and Wold, 2002;
 Kemsley and Tapp, 2009). These filters are still useful for
 interpretation: the orthogonal components show what varies in the
 spectra independently of potassium, as in the figure above.

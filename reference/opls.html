@@ -9,7 +9,7 @@ model to the provided x (predictor) and y (response) data."><meta property="og:i
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,23 +57,23 @@ model to the provided x (predictor) and y (response) data.</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A data.frame or tibble containing the x-data (predictors).</p></dd>
+<dd><p>A numeric matrix or data frame of the predictor variables.</p></dd>
 
 
 <dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
-<dd><p>A data.frame or tibble containing the y-data (responses).</p></dd>
+<dd><p>A numeric vector, or a matrix or data frame with one column, of the response variable.</p></dd>
 
 
 <dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
-<dd><p>A character string indicating the scaling method for the data: "none", "center", "pareto" or "standard".</p></dd>
+<dd><p>A character string indicating the scaling method for x and y: "none", "center" (default), "pareto" (divided by the square root of the standard deviation) or "standard" (divided by the standard deviation).</p></dd>
 
 
 <dt id="arg-crossval">crossval<a class="anchor" aria-label="anchor" href="#arg-crossval"></a></dt>
-<dd><p>An integer representing the number of cross-validation groups.</p></dd>
+<dd><p>An integer giving the number of cross-validation groups (default 7), between 2 and the number of observations. With <code>crossval = 0</code>, the model is not cross-validated (\(Q^2\) is <code>NA</code>), which requires a fixed <code>ncomp.ortho</code> and no permutation.</p></dd>
 
 
 <dt id="arg-permutation">permutation<a class="anchor" aria-label="anchor" href="#arg-permutation"></a></dt>
-<dd><p>An integer representing the number of permutations for the permutation test.</p></dd>
+<dd><p>An integer giving the number of permutations for the permutation test. Default is 20; 0 skips the test.</p></dd>
 
 
 <dt id="arg-ncomp-ortho">ncomp.ortho<a class="anchor" aria-label="anchor" href="#arg-ncomp-ortho"></a></dt>
@@ -82,35 +82,56 @@ model to the provided x (predictor) and y (response) data.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list containing the following components:</p><dl><dt>x_scores</dt>
-<dd><p>A matrix of x-scores (the projections of the x-data onto the predictive components).</p></dd>
+    <p>An object of class <code>specproc_opls</code> (a list), which <a href="predict.specproc_opls.html">predict()</a> applies to new data, with the following components:</p><dl><dt>x_scores</dt>
+<dd><p>The predictive scores \(\textbf{t}\) (one column, <code>p1</code>).</p></dd>
 
 <dt>x_loadings</dt>
-<dd><p>A matrix of x-loadings (the weights of the original x-variables on the predictive components).</p></dd>
+<dd><p>The predictive loadings \(\textbf{p}\).</p></dd>
 
 <dt>x_weights</dt>
-<dd><p>A matrix of x-weights (the weights used to calculate the x-scores).</p></dd>
+<dd><p>The predictive weights \(\textbf{w}\).</p></dd>
 
 <dt>orthoScores</dt>
-<dd><p>A matrix of orthogonal scores (the projections of the x-data onto the orthogonal components).</p></dd>
+<dd><p>The orthogonal scores \(\textbf{T}_o\) (columns <code>o1</code>, <code>o2</code>, ...).</p></dd>
 
 <dt>orthoLoadings</dt>
-<dd><p>A matrix of orthogonal loadings (the weights of the original x-variables on the orthogonal components).</p></dd>
+<dd><p>The orthogonal loadings \(\textbf{P}_o\).</p></dd>
 
 <dt>orthoWeights</dt>
-<dd><p>A matrix of orthogonal weights (the weights used to calculate the orthogonal scores).</p></dd>
+<dd><p>The orthogonal weights \(\textbf{W}_o\).</p></dd>
 
 <dt>y_weights</dt>
-<dd><p>A matrix of y-weights.</p></dd>
+<dd><p>The y-weight \(c\) of the predictive component.</p></dd>
 
 <dt>y_scores</dt>
-<dd><p>A matrix of y-scores (the projections of the y-data onto the predictive components).</p></dd>
+<dd><p>The y-scores \(\textbf{u} = \textbf{y}/c\).</p></dd>
+
+<dt>correction</dt>
+<dd><p>The OPLS-filtered x, \(\textbf{X} - \textbf{T}_o\textbf{P}_o^T\) (preprocessed).</p></dd>
+
+<dt>fitted</dt>
+<dd><p>The fitted response, in the units of y.</p></dd>
+
+<dt>coefficients</dt>
+<dd><p>The regression coefficients of the preprocessed filtered x, \(\textbf{w}c\).</p></dd>
+
+<dt>vip, ortho_vip</dt>
+<dd><p>The predictive and orthogonal variable importance in projection (Galindo-Prieto et al., 2014), one value per variable.</p></dd>
+
+<dt>components</dt>
+<dd><p>A tibble with one row per component: <code>R2X</code>, <code>R2Y</code> and <code>Q2</code> (the increase due to the component), their cumulative values, and <code>significance</code> (<code>"R1"</code> significant, <code>"NS"</code> \(Q^2\) increase below 0.01, <code>"N4"</code> \(R^2Y\) increase below 0.01).</p></dd>
 
 <dt>summary</dt>
-<dd><p>The model summary (R2X, R2Y, Q2, ...).</p></dd>
+<dd><p>A one-row data frame with <code>R2X(cum)</code>, <code>R2Y(cum)</code>, <code>Q2(cum)</code>, <code>RMSEE</code> (root mean squared error of estimation), the numbers of predictive (<code>pre</code>) and orthogonal (<code>ort</code>) components and, with a permutation test, <code>pR2Y</code> and <code>pQ2</code>.</p></dd>
 
-<dt>model</dt>
-<dd><p>The fitted <code>ropls</code> model object.</p></dd>
+<dt>permutation</dt>
+<dd><p>With a permutation test, a tibble of <code>R2Y(cum)</code>, <code>Q2(cum)</code> and <code>sim</code> (the correlation between the permuted and the original response) of the model (first row) and of each permuted model.</p></dd>
+
+<dt>center, scale</dt>
+<dd><p>The column centers and scales applied to x.</p></dd>
+
+<dt>y_center, y_scale</dt>
+<dd><p>The center and scale applied to y.</p></dd>
 
 
 </dl></div>
@@ -122,11 +143,45 @@ multidimensional variance in the y-space. It separates the systematic
 variation in x into two parts: one that is linearly related to y
 (predictive components) and one that is statistically uncorrelated to the
 response variable y (orthogonal components).</p>
-<p>The function is a wrapper around <code><a href="https://rdrr.io/pkg/ropls/man/opls.html" class="external-link">ropls::opls()</a></code> from the Bioconductor
-package <span class="pkg">ropls</span>, which must be installed
-(<code>BiocManager::install("ropls")</code>). The model is fitted silently (no
-printed summary or plots). For a dependency-free alternative that returns
-the OPLS-filtered data, see <code><a href="projected_osc.html">projected_osc()</a></code> or <code><a href="o2pls.html">o2pls()</a></code>.</p>
+<p>The model has one predictive component and <code>ncomp.ortho</code> orthogonal
+components, fitted with the NIPALS algorithm of Trygg and Wold (2002). For
+each orthogonal component:</p><ol><li><p>The weight \(\textbf{w} = \textbf{X}^T\textbf{y}/\|\textbf{X}^T\textbf{y}\|\),
+the score \(\textbf{t} = \textbf{Xw}\) and the loading
+\(\textbf{p} = \textbf{X}^T\textbf{t}/(\textbf{t}^T\textbf{t})\) are computed.</p></li>
+<li><p>The orthogonal weight is the part of \(\textbf{p}\) orthogonal to
+\(\textbf{w}\), \(\textbf{w}_o = \textbf{p} - (\textbf{w}^T\textbf{p})\textbf{w}\),
+normalized, with score \(\textbf{t}_o = \textbf{Xw}_o\) and loading
+\(\textbf{p}_o = \textbf{X}^T\textbf{t}_o/(\textbf{t}_o^T\textbf{t}_o)\).</p></li>
+<li><p>\(\textbf{X}\) is deflated by \(\textbf{t}_o\textbf{p}_o^T\).</p></li>
+</ol><p>The predictive component is then computed from the filtered
+\(\textbf{X}\). The filtered data are the same as those of
+<code><a href="projected_osc.html">projected_osc()</a></code> with <code>ncomp = ncomp.ortho + 1</code>, and of <code><a href="o2pls.html">o2pls()</a></code>.</p>
+<p><strong>Cross-validation.</strong> The observations are split into <code>crossval</code>
+interleaved groups (observation <code>i</code> is in group <code>(i - 1) %% crossval + 1</code>).
+Each group is predicted by a model fitted to the others, with the same
+number of orthogonal components, giving the predictive residual sum of
+squares (PRESS) and \(Q^2 = 1 - \text{PRESS}/\text{SS}_y\), where
+\(\text{SS}_y\) is the total sum of squares of the preprocessed y.
+The data are preprocessed once, with the centers and scales of all the
+observations.</p>
+<p><strong>Number of orthogonal components.</strong> If <code>ncomp.ortho = NA</code>, components
+are added (up to <code>min(10, n, p) - 1</code>) while each is significant: a
+component is significant if it increases \(R^2Y\) by at least 0.01 and
+\(Q^2\) by at least 0.01. If the predictive component alone is not
+significant, no model is built. If the first orthogonal component is not
+significant, the model has no orthogonal component (a one-component PLS
+model), with a warning.</p>
+<p><strong>Permutation test.</strong> The response is permuted <code>permutation</code> times and
+the model refitted with the same number of components. <code>pR2Y</code> and <code>pQ2</code>
+are the proportions of permuted models whose \(R^2Y\) and \(Q^2\)
+are at least those of the model, \((1 + \#\{\text{perm} \geq \text{model}\})/\text{permutation}\).
+Use <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed()</a></code> for reproducible p-values.</p>
+<p>The results reproduce those of <code><a href="https://rdrr.io/pkg/ropls/man/opls.html" class="external-link">ropls::opls()</a></code> with <code>predI = 1</code> and the
+same <code>scaleC</code>, <code>crossvalI</code>, <code>orthoI</code> and <code>permI</code> (apart from rounding):
+specProc no longer depends on ropls. Unlike ropls, variables with zero
+variance are kept (their centered values are zero), and when
+<code>ncomp.ortho = NA</code> a model without orthogonal components is returned
+instead of no model when only the predictive component is significant.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -134,12 +189,51 @@ the OPLS-filtered data, see <code><a href="projected_osc.html">projected_osc()</
 <ul><li><p>Trygg, J., and Wold, S., (2002).
 Orthogonal projections to latent structures (O-PLS).
 Journal of Chemometrics, 16(3):119-128.</p></li>
+<li><p>Galindo-Prieto, B., Eriksson, L., and Trygg, J., (2014).
+Variable influence on projection (VIP) for orthogonal projections to
+latent structures (OPLS). Journal of Chemometrics, 28(8):623-632.</p></li>
+<li><p>Thévenot, E.A., Roux, A., Xu, Y., Ezan, E., and Junot, C., (2015).
+Analysis of the human adult urinary metabolome variations with age, body
+mass index, and gender by implementing a comprehensive workflow for
+univariate and OPLS statistical analyses. Journal of Proteome Research,
+14(8):3322-3335.</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="predict.specproc_opls.html">predict.specproc_opls()</a></code>, and <code><a href="step_opls.html">step_opls()</a></code> to use the OPLS
+filter in a tidymodels recipe.</p></div>
+    </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
     <p>Christian L. Goueguel</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">40</span> <span class="op">*</span> <span class="fl">30</span><span class="op">)</span>, <span class="fl">40</span>, <span class="fl">30</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">40</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">x</span><span class="op">[</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">40</span>, sd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>  <span class="co"># response-orthogonal variation</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">opls</span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">30</span>, <span class="op">]</span>, <span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">30</span><span class="op">]</span>, permutation <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fit</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Orthogonal projections to latent structures (OPLS)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variables:               30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations:            30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Scaling:                 center</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Predictive components:   1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Orthogonal components:   3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       R2X(cum) R2Y(cum) Q2(cum) RMSEE pR2Y pQ2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total    0.677     0.95   0.473 0.224  0.1 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Use predict(&lt;model&gt;, newdata, type = ) to filter new data or predict the response.</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">x</span><span class="op">[</span><span class="fl">31</span><span class="op">:</span><span class="fl">40</span>, <span class="op">]</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.98911093 -0.21520551 -0.82803563  0.08133964 -0.26928032 -1.03304174</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.43825878  0.21948811  0.39230090  0.96764347</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

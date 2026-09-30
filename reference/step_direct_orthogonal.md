@@ -97,10 +97,13 @@ this happens automatically for every resample. The outcome is not needed
 when new data are baked.
 
 The related steps `step_direct_orthogonal()`,
-[`step_direct_osc()`](https://christiangoueguel.com/specProc/reference/step_direct_osc.md)
+[`step_direct_osc()`](https://christiangoueguel.com/specProc/reference/step_direct_osc.md),
+[`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md),
+[`step_opls()`](https://christiangoueguel.com/specProc/reference/step_opls.md)
 and
-[`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md)
-remove response-orthogonal variation with other algorithms.
+[`step_o2pls()`](https://christiangoueguel.com/specProc/reference/step_o2pls.md)
+(which also handles several outcomes) remove response-orthogonal
+variation with other algorithms.
 [`step_epo()`](https://christiangoueguel.com/specProc/reference/step_epo.md)
 and
 [`step_glsw()`](https://christiangoueguel.com/specProc/reference/step_glsw.md)

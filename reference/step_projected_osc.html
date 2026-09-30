@@ -13,7 +13,7 @@ predictors with projected_osc(). The result is the OPLS-filtered data
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -139,8 +139,9 @@ filter uses the outcome, it must be estimated on training data only.
 Within a <code><a href="https://workflows.tidymodels.org/reference/workflow.html" class="external-link">workflows::workflow()</a></code> and <code><a href="https://tune.tidymodels.org/reference/tune_grid.html" class="external-link">tune::tune_grid()</a></code>, this happens
 automatically for every resample. The outcome is not needed when new data
 are baked.</p>
-<p>The related steps <code><a href="step_direct_orthogonal.html">step_direct_orthogonal()</a></code>, <code><a href="step_direct_osc.html">step_direct_osc()</a></code> and
-<code>step_projected_osc()</code> remove response-orthogonal variation with other
+<p>The related steps <code><a href="step_direct_orthogonal.html">step_direct_orthogonal()</a></code>, <code><a href="step_direct_osc.html">step_direct_osc()</a></code>,
+<code>step_projected_osc()</code>, <code><a href="step_opls.html">step_opls()</a></code> and <code><a href="step_o2pls.html">step_o2pls()</a></code> (which also
+handles several outcomes) remove response-orthogonal variation with other
 algorithms. <code><a href="step_epo.html">step_epo()</a></code> and <code><a href="step_glsw.html">step_glsw()</a></code> remove variation described by
 external clutter, and <code><a href="step_y_gradient_glsw.html">step_y_gradient_glsw()</a></code> down-weights variation
 between samples with similar outcomes.</p>
