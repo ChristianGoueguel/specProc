@@ -10,7 +10,7 @@ rospca(
   lambda = 1,
   alpha = 0.75,
   ndir = 250,
-  stand = TRUE,
+  stand = FALSE,
   ngrid = 10,
   maxiter = 10
 )
@@ -31,7 +31,7 @@ Default is 250; use \code{"all"} for all directions through pairs of
 observations.}
 
 \item{stand}{A logical value: standardize the variables robustly (median
-and \eqn{Q_n}) before the analysis (\code{TRUE}, default) or only center them
+and \eqn{Q_n}) before the analysis (\code{FALSE}, default) or only center them
 by their median.}
 
 \item{ngrid}{The number of angles in the grid search. Default is 10.}
@@ -65,7 +65,7 @@ The algorithm follows the published description in three steps:
 and \eqn{Q_n}) if \code{stand = TRUE}. As in \code{\link[=robpca]{robpca()}}, the \code{h} least
 outlying observations form \eqn{H_0}, and those whose orthogonal
 distance to the \eqn{k}-dimensional PCA subspace of \eqn{H_0} is below
-the cut-off form \eqn{H_1}.
+the cut-off form \eqn{H_1}
 \item \strong{Sparsification.} The observations of \eqn{H_1} are standardized and
 the sparse loadings are computed by maximizing, component by component,
 the variance of the scores minus \code{lambda} times the \eqn{L_1} norm of
@@ -93,14 +93,12 @@ a port of the rospca code, so results can differ from those of
 }
 \examples{
 set.seed(1)
-# two latent factors, each loading on 5 of 20 variables
-f <- matrix(rnorm(100 * 2), 100, 2)
-x <- cbind(f[, 1] \%o\% rep(1, 5), f[, 2] \%o\% rep(1, 5)) * 3 +
-  matrix(rnorm(100 * 10), 100, 10)
-x <- cbind(x, matrix(rnorm(100 * 10), 100, 10))
-x[1:5, ] <- x[1:5, ] + 10  # outliers
-fit <- rospca(x, k = 2, lambda = 2)
-round(fit$loadings, 2)
+minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+forageLIBS |>
+  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  center() |>
+  rospca() |>
+  print()
 
 }
 \references{

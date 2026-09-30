@@ -4,11 +4,11 @@
 \name{specProc-package}
 \alias{specProc}
 \alias{specProc-package}
-\title{specProc: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy (LIBS) Spectra}
+\title{specProc: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-A collection of functions for preprocessing spectra in optical emission spectroscopy of laser-induced plasmas, called laser-induced breakdown spectroscopy. It covers baseline correction, normalization and scaling, orthogonal signal correction and calibration transfer, peak fitting, and robust statistics for outlier detection. Computationally intensive steps are implemented in C++ for large spectral datasets.
+Tools for exploring and preprocessing spectroscopic data, developed for laser-induced breakdown spectroscopy (LIBS) and also applicable to other techniques such as Raman, infrared, and inductively coupled plasma optical emission spectroscopy. Covers the entire preprocessing workflow, from raw spectra to a modeling-ready data matrix, including baseline correction, normalization and scaling, orthogonal signal correction, calibration transfer, peak fitting, and robust outlier detection. Computationally intensive steps are implemented in 'C++' via 'Rcpp' for efficient processing of large spectral datasets.
 }
 \seealso{
 Useful links:
@@ -20,11 +20,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Christian L. Goueguel \email{christian.goueguel@gmail.com}
+\strong{Maintainer}: Christian L. Goueguel \email{christian.goueguel@gmail.com} (\href{https://orcid.org/0000-0003-0521-3446}{ORCID})
 
 Authors:
 \itemize{
-  \item Christian L. Goueguel \email{christian.goueguel@gmail.com}
+  \item Christian L. Goueguel \email{christian.goueguel@gmail.com} (\href{https://orcid.org/0000-0003-0521-3446}{ORCID})
 }
 
 }

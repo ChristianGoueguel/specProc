@@ -95,11 +95,12 @@ results.
 }
 \examples{
 set.seed(1)
-x <- matrix(rnorm(100 * 10), 100, 10) \%*\% diag(10:1)
-x[1:5, ] <- x[1:5, ] + 30  # outliers
-fit <- robpca(x, k = 2)
-fit
-table(fit$outlier_type)
+minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+forageLIBS |>
+  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  center() |>
+  robpca() |>
+  print()
 
 }
 \references{
