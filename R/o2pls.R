@@ -56,8 +56,8 @@
 #'  - `center`, `scale`: The column centers and scales applied to `x`.
 #'
 #' @seealso [predict.specproc_filter()] to correct new spectra with the fitted filter, and
-#'   [step_projected_osc()], which gives the same filtered data for a single
-#'   response, to use it in a tidymodels recipe.
+#'   [step_o2pls()] to use it in a tidymodels recipe, with one or several
+#'   outcomes.
 #'
 #' @export o2pls
 #'

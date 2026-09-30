@@ -23,8 +23,9 @@
 #' automatically for every resample. The outcome is not needed when new data
 #' are baked.
 #'
-#' The related steps [step_direct_orthogonal()], [step_direct_osc()] and
-#' [step_projected_osc()] remove response-orthogonal variation with other
+#' The related steps [step_direct_orthogonal()], [step_direct_osc()],
+#' [step_projected_osc()], [step_opls()] and [step_o2pls()] (which also
+#' handles several outcomes) remove response-orthogonal variation with other
 #' algorithms. [step_epo()] and [step_glsw()] remove variation described by
 #' external clutter, and [step_y_gradient_glsw()] down-weights variation
 #' between samples with similar outcomes.
@@ -185,6 +186,205 @@ step_projected_osc <- function(recipe, ..., role = NA, trained = FALSE,
     "projected_osc", terms = rlang::enquos(...), role = role,
     trained = trained, outcome = rlang::enquos(outcome), num_comp = num_comp,
     options = options, res = res, columns = columns, skip = skip, id = id
+  ))
+}
+
+#' @title Orthogonal Projections to Latent Structures (OPLS) Recipe Step
+#'
+#' @description
+#' `step_opls()` creates a *specification* of a recipe step that removes
+#' `num_comp` orthogonal components from the selected predictors with the
+#' OPLS model of [opls()]: the selected columns are replaced by the
+#' OPLS-filtered data.
+#'
+#' @details
+#' The filtered data are the same as those of [step_projected_osc()] with the
+#' same `num_comp`, but [opls()] also offers Pareto scaling
+#' (`options = list(scale = "pareto")`). The model is fitted without
+#' cross-validation or permutation test, which do not change the filter.
+#' The number of orthogonal components is not selected automatically: tune
+#' `num_comp` instead. As for [step_osc()], the filter uses the outcome and
+#' is estimated on the training data only; the outcome is not needed when new
+#' data are baked.
+#'
+#' # Tuning
+#'
+#' `num_comp` can be tuned with [tune::tune()]; its default range is
+#' [dials::num_comp()] with values 1 to 4.
+#'
+#' # Tidying
+#'
+#' [tidy()][recipes::tidy.recipe] returns a tibble with columns `terms` (the
+#' selected predictors), `num_comp` and `id`.
+#'
+#' @inherit step_osc return
+#' @inheritParams step_osc
+#' @param num_comp The number of orthogonal components to remove.
+#' @param options A list of further arguments passed to [opls()]: only
+#'   `scale` (`"center"` by default; `"none"`, `"pareto"` or `"standard"`).
+#'
+#' @seealso [opls()], [predict.specproc_opls()]
+#' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' set.seed(1)
+#' x <- matrix(rnorm(40 * 30), 40, 30, dimnames = list(NULL, paste0("v", 1:30)))
+#' dat <- data.frame(y = x[, 1] + rnorm(40, sd = 0.1), x)
+#' rec <- recipes::recipe(y ~ ., data = dat[1:30, ]) |>
+#'   step_opls(recipes::all_predictors(), num_comp = 2, options = list(scale = "pareto"))
+#' prepped <- recipes::prep(rec)
+#' recipes::bake(prepped, new_data = dat[31:40, ])
+#'
+step_opls <- function(recipe, ..., role = NA, trained = FALSE,
+                      outcome = NULL, num_comp = 2, options = list(),
+                      res = NULL, columns = NULL, skip = FALSE,
+                      id = recipes::rand_id("opls")) {
+  rlang::check_installed("recipes")
+  recipes::add_step(recipe, specproc_step_new(
+    "opls", terms = rlang::enquos(...), role = role,
+    trained = trained, outcome = rlang::enquos(outcome), num_comp = num_comp,
+    options = options, res = res, columns = columns, skip = skip, id = id
+  ))
+}
+
+#' @title O2PLS Filter Recipe Step for One or Several Outcomes
+#'
+#' @description
+#' `step_o2pls()` creates a *specification* of a recipe step that removes
+#' `num_comp` outcome-orthogonal components from the selected predictors
+#' with [o2pls()]. Unlike the other orthogonalization steps, the filter can
+#' be estimated against several outcomes at once.
+#'
+#' @details
+#' The joint (predictive) directions are the `joint_comp` dominant singular
+#' vectors of \eqn{\textbf{Y}^T\textbf{X}}, and the removed components are the
+#' systematic variation of the predictors orthogonal to them (Trygg and Wold,
+#' 2003). Only the predictors are filtered: the outcomes are left unchanged,
+#' so that models are fitted to, and assessed on, the measured values. (The
+#' outcome-side filtering of [o2pls()], its `ny` argument, does not change the
+#' filtered predictors.)
+#'
+#' With a single outcome and `joint_comp = 1`, the filtered data are those of
+#' [step_opls()] and [step_projected_osc()] with the same `num_comp`.
+#'
+#' The selected columns are replaced by the filtered values, which are
+#' centered (and scaled, if `options = list(scale = TRUE)`). The filter uses
+#' the outcomes, so it is estimated on the training data only (on the
+#' analysis set of each resample within [tune::tune_grid()]); the outcomes are
+#' not needed when new data are baked.
+#'
+#' # Several outcomes
+#'
+#' Declare the outcomes in the recipe formula; a model that handles several
+#' outcomes, such as [parsnip::pls()] with the mixOmics engine, then predicts
+#' them all, with one column per outcome (`.pred_K`, `.pred_Ca`, ...):
+#'
+#' ```r
+#' rec <- recipe(K + Ca ~ ., data = spectra) |>
+#'   step_o2pls(all_predictors(), num_comp = 2, joint_comp = 2)
+#' model <- parsnip::pls(num_comp = 2) |>
+#'   set_mode("regression") |>
+#'   set_engine("mixOmics", scale = FALSE)
+#' fitted <- fit(workflow(rec, model), data = spectra)
+#' predict(fitted, new_data = new_spectra)
+#' ```
+#'
+#' Use `outcome` to estimate the filter against some of the outcomes only.
+#'
+#' # Tuning
+#'
+#' `num_comp` and `joint_comp` can be tuned with [tune::tune()] when the
+#' recipe has a single outcome. Their default ranges are [dials::num_comp()]
+#' with values 1 to 4 and 1 to 3; `joint_comp` cannot exceed the number of
+#' outcomes.
+#'
+#' [tune::tune_grid()] does not support several outcomes. Instead, create
+#' one workflow per outcome with the workflowsets package, and tune them all
+#' with `workflowsets::workflow_map("tune_grid", ...)`. Each recipe has a
+#' single outcome, for the model, but the filter can still be estimated
+#' against all the outcomes: give the others a role of their own
+#' (`"reference"` here), not needed to bake new data, and select them with
+#' `outcome`. Each outcome gets its own number of filter and model components:
+#'
+#' ```r
+#' outcomes <- c("K", "Ca", "Mg")
+#' recipes <- purrr::map(outcomes, \(y) {
+#'   recipe(reformulate(".", response = y), data = spectra) |>
+#'     update_role(all_of(setdiff(outcomes, y)), new_role = "reference") |>
+#'     update_role_requirements("reference", bake = FALSE) |>
+#'     step_o2pls(all_predictors(), outcome = c(all_outcomes(), has_role("reference")),
+#'                num_comp = tune("filter"), joint_comp = length(outcomes))
+#' }) |>
+#'   purrr::set_names(outcomes)
+#' model <- parsnip::pls(num_comp = tune()) |>
+#'   set_mode("regression") |>
+#'   set_engine("mixOmics", scale = FALSE)
+#'
+#' wf_set <- workflow_set(preproc = recipes, models = list(pls = model))
+#' res <- workflow_map(wf_set, "tune_grid", resamples = vfold_cv(spectra, v = 5),
+#'                     grid = 10, metrics = metric_set(rmse), seed = 1)
+#'
+#' # best settings and final model of each outcome
+#' fits <- purrr::map(purrr::set_names(res$wflow_id), \(id) {
+#'   best <- select_best(extract_workflow_set_result(res, id), metric = "rmse")
+#'   extract_workflow(res, id) |>
+#'     finalize_workflow(best) |>
+#'     fit(data = spectra)
+#' })
+#' purrr::map(fits, \(f) predict(f, new_data = new_spectra))
+#' ```
+#'
+#' Select the outcomes by role (`all_outcomes()`, `has_role()`) rather than
+#' with `all_of(outcomes)`, which refers to a variable outside the recipe.
+#' To filter each outcome against itself only, drop the other outcomes from
+#' its recipe instead; the step is then equivalent to [step_opls()]. Read
+#' the results outcome by outcome: `workflowsets::rank_results()` would rank
+#' workflows of different outcomes, whose RMSE are in different units.
+#'
+#' # Tidying
+#'
+#' [tidy()][recipes::tidy.recipe] returns a tibble with columns `terms` (the
+#' selected predictors), `num_comp`, `joint_comp` and `id`.
+#'
+#' @inherit step_osc return
+#' @inheritParams step_osc
+#' @param outcome The outcome variables, as bare names or selectors. If
+#'   `NULL` (default), all the outcomes of the recipe are used.
+#' @param num_comp The number of outcome-orthogonal components to remove
+#'   (`nx` in [o2pls()]).
+#' @param joint_comp The number of joint (predictive) components (`ncomp` in
+#'   [o2pls()]), at most the number of outcomes. Default is 1.
+#' @param options A list of further arguments passed to [o2pls()]: `center`
+#'   and `scale`.
+#'
+#' @references
+#'    - Trygg, J., Wold, S., (2003).
+#'      O2-PLS, a two-block (X–Y) latent variable regression (LVR) method with an integral OSC filter.
+#'      J. Chemom. 17(1):53–64.
+#'
+#' @seealso [o2pls()], [predict.o2pls()][predict.specproc_filter]
+#' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' set.seed(1)
+#' x <- matrix(rnorm(40 * 30), 40, 30, dimnames = list(NULL, paste0("v", 1:30)))
+#' dat <- data.frame(y1 = x[, 1] + rnorm(40, sd = 0.1), y2 = x[, 2] - x[, 3], x)
+#' rec <- recipes::recipe(y1 + y2 ~ ., data = dat[1:30, ]) |>
+#'   step_o2pls(recipes::all_predictors(), num_comp = 2, joint_comp = 2)
+#' prepped <- recipes::prep(rec)
+#' recipes::tidy(prepped, number = 1)
+#' recipes::bake(prepped, new_data = dat[31:40, ])
+#'
+step_o2pls <- function(recipe, ..., role = NA, trained = FALSE,
+                       outcome = NULL, num_comp = 2, joint_comp = 1, options = list(),
+                       res = NULL, columns = NULL, skip = FALSE,
+                       id = recipes::rand_id("o2pls")) {
+  rlang::check_installed("recipes")
+  recipes::add_step(recipe, specproc_step_new(
+    "o2pls", terms = rlang::enquos(...), role = role,
+    trained = trained, outcome = rlang::enquos(outcome), num_comp = num_comp,
+    joint_comp = joint_comp, options = options, res = res, columns = columns,
+    skip = skip, id = id
   ))
 }
 
@@ -352,6 +552,8 @@ step_titles <- c(
   direct_orthogonal = "Direct orthogonalization on ",
   direct_osc = "Direct orthogonal signal correction on ",
   projected_osc = "Projected OSC (OPLS filter) on ",
+  opls = "OPLS filter on ",
+  o2pls = "O2PLS filter on ",
   epo = "External parameter orthogonalization on ",
   glsw = "GLSW filter on ",
   y_gradient_glsw = "y-gradient GLSW filter on "
@@ -364,7 +566,8 @@ step_predictors <- function(x, training, info) {
   unname(cols)
 }
 
-# Outcome name: the `outcome` argument, or the recipe's single outcome.
+# Outcome names: the `outcome` argument, or the recipe's outcomes. Steps
+# other than step_o2pls() need a single outcome.
 step_outcome <- function(x, training, info) {
   y_name <- if (is.character(x$outcome)) {
     x$outcome  # already resolved when the step was trained
@@ -373,11 +576,13 @@ step_outcome <- function(x, training, info) {
   } else {
     recipes::recipes_argument_select(x$outcome, training, info, single = FALSE)
   }
-  if (length(y_name) != 1) {
+  if (length(y_name) == 0 || (length(y_name) > 1 && !inherits(x, "step_o2pls"))) {
     stop("`", class(x)[1], "()` needs a single outcome: specify `outcome`.", call. = FALSE)
   }
-  if (!is.numeric(training[[y_name]])) {
-    stop("The outcome `", y_name, "` must be numeric.", call. = FALSE)
+  for (nm in y_name) {
+    if (!is.numeric(training[[nm]])) {
+      stop("The outcome `", nm, "` must be numeric.", call. = FALSE)
+    }
   }
   y_name
 }
@@ -400,7 +605,8 @@ step_clutter <- function(clutter, cols) {
 
 # Keeps only what predict() needs from a fitted filter.
 strip_filter <- function(fit) {
-  fit[c("correction", "clutter", "scores", "score", "angle", "R2", "newdata", "singular_values")] <- NULL
+  fit[c("correction", "clutter", "scores", "score", "angle", "R2", "newdata", "singular_values",
+        "x_scores", "orthoScores", "y_scores", "fitted", "correction_y")] <- NULL
   fit
 }
 
@@ -415,6 +621,11 @@ fit_step_filter <- function(x, xmat, y) {
     step_direct_orthogonal = strip_filter(do.call(direct_orthogonal, c(list(xmat, y, ncomp = k), opts))),
     step_direct_osc = strip_filter(do.call(direct_osc, c(list(xmat, y, ncomp = k), opts))),
     step_projected_osc = strip_filter(do.call(projected_osc, c(list(xmat, y, ncomp = k + 1), opts))),
+    step_o2pls = {
+      check_count(x$joint_comp, "joint_comp")
+      strip_filter(do.call(o2pls, c(list(xmat, y, ncomp = x$joint_comp, nx = k, ny = 0), opts)))
+    },
+    step_opls = strip_filter(do.call(opls, c(list(xmat, y, crossval = 0, permutation = 0, ncomp.ortho = k), opts))),
     step_epo = {
       clutter <- if (is.null(x$clutter)) NULL else step_clutter(x$clutter, colnames(xmat))
       strip_filter(epo(xmat, ncomp = k, clutter = clutter))
@@ -440,7 +651,7 @@ prep_specproc_step <- function(x, training, info = NULL, ...) {
   y_name <- if (supervised) step_outcome(x, training, info) else NULL
   xmat <- as.matrix(training[, cols])
   storage.mode(xmat) <- "double"
-  y <- if (supervised) training[[y_name]] else NULL
+  y <- if (!supervised) NULL else if (length(y_name) > 1) as.matrix(training[y_name]) else training[[y_name]]
   if (anyNA(xmat) || anyNA(y)) {
     stop("`", class(x)[1], "()` does not handle missing values; impute or remove them first.",
          call. = FALSE)
@@ -482,6 +693,10 @@ tidy_specproc_step <- function(x, ...) {
   if (!is.numeric(value)) value <- NA_real_
   res <- tibble::tibble(terms = terms)
   res[[param]] <- rep(value, length(terms))
+  if (inherits(x, "step_o2pls")) {
+    joint <- if (is.numeric(x$joint_comp)) x$joint_comp else NA_real_
+    res$joint_comp <- rep(joint, length(terms))
+  }
   res$id <- x$id
   res
 }
@@ -491,6 +706,15 @@ tunable_specproc_step <- function(x, ...) {
     tibble::tibble(
       name = "alpha",
       call_info = list(list(pkg = "specProc", fun = "glsw_alpha")),
+      source = "recipe", component = class(x)[1], component_id = x$id
+    )
+  } else if (inherits(x, "step_o2pls")) {
+    tibble::tibble(
+      name = c("num_comp", "joint_comp"),
+      call_info = list(
+        list(pkg = "dials", fun = "num_comp", range = c(1L, 4L)),
+        list(pkg = "dials", fun = "num_comp", range = c(1L, 3L))
+      ),
       source = "recipe", component = class(x)[1], component_id = x$id
     )
   } else {
@@ -517,6 +741,10 @@ prep.step_direct_osc <- prep_specproc_step
 #' @exportS3Method recipes::prep
 prep.step_projected_osc <- prep_specproc_step
 #' @exportS3Method recipes::prep
+prep.step_opls <- prep_specproc_step
+#' @exportS3Method recipes::prep
+prep.step_o2pls <- prep_specproc_step
+#' @exportS3Method recipes::prep
 prep.step_epo <- prep_specproc_step
 #' @exportS3Method recipes::prep
 prep.step_glsw <- prep_specproc_step
@@ -531,6 +759,10 @@ bake.step_direct_orthogonal <- bake_specproc_step
 bake.step_direct_osc <- bake_specproc_step
 #' @exportS3Method recipes::bake
 bake.step_projected_osc <- bake_specproc_step
+#' @exportS3Method recipes::bake
+bake.step_opls <- bake_specproc_step
+#' @exportS3Method recipes::bake
+bake.step_o2pls <- bake_specproc_step
 #' @exportS3Method recipes::bake
 bake.step_epo <- bake_specproc_step
 #' @exportS3Method recipes::bake
@@ -547,6 +779,10 @@ print.step_direct_osc <- print_specproc_step
 #' @export
 print.step_projected_osc <- print_specproc_step
 #' @export
+print.step_opls <- print_specproc_step
+#' @export
+print.step_o2pls <- print_specproc_step
+#' @export
 print.step_epo <- print_specproc_step
 #' @export
 print.step_glsw <- print_specproc_step
@@ -561,6 +797,10 @@ tidy.step_direct_orthogonal <- tidy_specproc_step
 tidy.step_direct_osc <- tidy_specproc_step
 #' @exportS3Method generics::tidy
 tidy.step_projected_osc <- tidy_specproc_step
+#' @exportS3Method generics::tidy
+tidy.step_opls <- tidy_specproc_step
+#' @exportS3Method generics::tidy
+tidy.step_o2pls <- tidy_specproc_step
 #' @exportS3Method generics::tidy
 tidy.step_epo <- tidy_specproc_step
 #' @exportS3Method generics::tidy
@@ -577,6 +817,10 @@ tunable.step_direct_osc <- tunable_specproc_step
 #' @exportS3Method generics::tunable
 tunable.step_projected_osc <- tunable_specproc_step
 #' @exportS3Method generics::tunable
+tunable.step_opls <- tunable_specproc_step
+#' @exportS3Method generics::tunable
+tunable.step_o2pls <- tunable_specproc_step
+#' @exportS3Method generics::tunable
 tunable.step_epo <- tunable_specproc_step
 #' @exportS3Method generics::tunable
 tunable.step_glsw <- tunable_specproc_step
@@ -591,6 +835,10 @@ required_pkgs.step_direct_orthogonal <- required_pkgs_specproc_step
 required_pkgs.step_direct_osc <- required_pkgs_specproc_step
 #' @exportS3Method generics::required_pkgs
 required_pkgs.step_projected_osc <- required_pkgs_specproc_step
+#' @exportS3Method generics::required_pkgs
+required_pkgs.step_opls <- required_pkgs_specproc_step
+#' @exportS3Method generics::required_pkgs
+required_pkgs.step_o2pls <- required_pkgs_specproc_step
 #' @exportS3Method generics::required_pkgs
 required_pkgs.step_epo <- required_pkgs_specproc_step
 #' @exportS3Method generics::required_pkgs

@@ -35,6 +35,7 @@ reference:
   - epo
   - osc
   - opls
+  - predict.specproc_opls
   - o2pls
   - direct_osc
   - projected_osc
@@ -97,6 +98,8 @@ reference:
   - step_direct_orthogonal
   - step_direct_osc
   - step_projected_osc
+  - step_opls
+  - step_o2pls
   - step_y_gradient_glsw
 
 - subtitle: tuning parameters

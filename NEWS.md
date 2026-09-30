@@ -13,6 +13,18 @@
 
 ## Breaking changes
 
+* `opls()` is implemented natively and no longer needs the Bioconductor
+  package ropls. It reproduces `ropls::opls()` (scores, loadings, R2X, R2Y,
+  Q2, RMSEE, VIP and permutation p-values), but returns an object of class
+  `specproc_opls` instead of a list holding the ropls model: the `model`
+  element is removed, and the model has new elements `correction` (the
+  OPLS-filtered data), `fitted`, `coefficients`, `vip`, `ortho_vip`,
+  `components` (R2X, R2Y and Q2 of each component) and `permutation`.
+  `x` and `y` can be matrices or vectors as well as data frames. When
+  `ncomp.ortho = NA` and only the predictive component is significant, the
+  model has no orthogonal component (with a warning) instead of failing.
+  `predict()` filters new data, or predicts the response or the scores
+  (`type`), and `crossval = 0` skips the cross-validation.
 * The data sets are renamed: `specLIBS` is now `soilLIBS`, and `fourrage`
   is now `forageLIBS`. Replace `data(specLIBS)` with `data(soilLIBS)` and
   `data(fourrage)` with `data(forageLIBS)`.
@@ -39,6 +51,17 @@
 
 ## New features
 
+* `step_opls()` removes the orthogonal components of an `opls()` model in a
+  recipe, with `num_comp` tunable. It gives the same filtered data as
+  `step_projected_osc()`, and also offers Pareto scaling.
+* `step_o2pls()` removes the outcome-orthogonal components of an `o2pls()`
+  model in a recipe, estimated against one or several outcomes (`recipe(K +
+  Ca ~ ., ...)`), with `num_comp` and `joint_comp` tunable for a single
+  outcome. Only the predictors are filtered. Its help page shows a workflow
+  predicting several outcomes and, since `tune_grid()` does not support
+  several outcomes, how to tune one workflow per outcome with a workflow set
+  (`workflow_map("tune_grid", ...)`), each filter still estimated against
+  all the outcomes.
 * `plot_embedding()` is drawn in the style of SIMCA score plots: grey
   outside the outermost ellipse (of T-squared, or of each group) and white
   inside, with no grid, a fixed `aspect_ratio` (0.7) and lines through the

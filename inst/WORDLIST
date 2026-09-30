@@ -77,6 +77,7 @@ El
 Engelsen
 Eriksson
 Everitt
+Ezan
 FWHM
 Faber
 Faddeeva
@@ -84,6 +85,7 @@ Fearn
 Fearn's
 Ferré
 Filzmoser
+Galindo
 GLSW
 Gaithersburg
 Gaudiuso
@@ -118,6 +120,7 @@ Interscience
 Johansson
 Jong
 Josefson
+Junot
 Kalivas
 Kemsley
 Kettaneh
@@ -145,6 +148,8 @@ Lindgren
 Longbothum
 Lorber
 Lorentzian's
+metabolome
+mixOmics
 MSC
 MacGregor
 MacroPCA
@@ -165,6 +170,8 @@ Midvariance
 Moreau
 Mosteller
 Mudholkar
+natively
+NIPALS
 NIR
 NIST
 Nessib
@@ -191,11 +198,14 @@ Ph
 Physica
 Pierna
 Pre
+Prieto
 Probab
+Proteome
 Qn
 Quant
 README
 RMC
+RMSEE
 RMSEP
 ROBPCA
 ROSPCA
@@ -248,6 +258,7 @@ Talanta
 Tapp
 Technometrics
 Teghil
+Thévenot
 Tognoni
 Toraya
 Trautmann
@@ -271,8 +282,10 @@ Westerhuis
 Whittaker
 Wikström
 Windig
+workflowsets
 XSAMS
 Xcode
+Xu
 YJ
 Yeo
 Yu

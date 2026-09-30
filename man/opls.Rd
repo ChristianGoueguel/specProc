@@ -7,31 +7,38 @@
 opls(x, y, scale = "center", crossval = 7, permutation = 20, ncomp.ortho = NA)
 }
 \arguments{
-\item{x}{A data.frame or tibble containing the x-data (predictors).}
+\item{x}{A numeric matrix or data frame of the predictor variables.}
 
-\item{y}{A data.frame or tibble containing the y-data (responses).}
+\item{y}{A numeric vector, or a matrix or data frame with one column, of the response variable.}
 
-\item{scale}{A character string indicating the scaling method for the data: "none", "center", "pareto" or "standard".}
+\item{scale}{A character string indicating the scaling method for x and y: "none", "center" (default), "pareto" (divided by the square root of the standard deviation) or "standard" (divided by the standard deviation).}
 
-\item{crossval}{An integer representing the number of cross-validation groups.}
+\item{crossval}{An integer giving the number of cross-validation groups (default 7), between 2 and the number of observations. With \code{crossval = 0}, the model is not cross-validated (\eqn{Q^2} is \code{NA}), which requires a fixed \code{ncomp.ortho} and no permutation.}
 
-\item{permutation}{An integer representing the number of permutations for the permutation test.}
+\item{permutation}{An integer giving the number of permutations for the permutation test. Default is 20; 0 skips the test.}
 
 \item{ncomp.ortho}{The number of orthogonal components. If \code{NA} (default), it is determined automatically by cross-validation.}
 }
 \value{
-A list containing the following components:
+An object of class \code{specproc_opls} (a list), which \link[=predict.specproc_opls]{predict()} applies to new data, with the following components:
 \describe{
-\item{x_scores}{A matrix of x-scores (the projections of the x-data onto the predictive components).}
-\item{x_loadings}{A matrix of x-loadings (the weights of the original x-variables on the predictive components).}
-\item{x_weights}{A matrix of x-weights (the weights used to calculate the x-scores).}
-\item{orthoScores}{A matrix of orthogonal scores (the projections of the x-data onto the orthogonal components).}
-\item{orthoLoadings}{A matrix of orthogonal loadings (the weights of the original x-variables on the orthogonal components).}
-\item{orthoWeights}{A matrix of orthogonal weights (the weights used to calculate the orthogonal scores).}
-\item{y_weights}{A matrix of y-weights.}
-\item{y_scores}{A matrix of y-scores (the projections of the y-data onto the predictive components).}
-\item{summary}{The model summary (R2X, R2Y, Q2, ...).}
-\item{model}{The fitted \code{ropls} model object.}
+\item{x_scores}{The predictive scores \eqn{\textbf{t}} (one column, \code{p1}).}
+\item{x_loadings}{The predictive loadings \eqn{\textbf{p}}.}
+\item{x_weights}{The predictive weights \eqn{\textbf{w}}.}
+\item{orthoScores}{The orthogonal scores \eqn{\textbf{T}_o} (columns \code{o1}, \code{o2}, ...).}
+\item{orthoLoadings}{The orthogonal loadings \eqn{\textbf{P}_o}.}
+\item{orthoWeights}{The orthogonal weights \eqn{\textbf{W}_o}.}
+\item{y_weights}{The y-weight \eqn{c} of the predictive component.}
+\item{y_scores}{The y-scores \eqn{\textbf{u} = \textbf{y}/c}.}
+\item{correction}{The OPLS-filtered x, \eqn{\textbf{X} - \textbf{T}_o\textbf{P}_o^T} (preprocessed).}
+\item{fitted}{The fitted response, in the units of y.}
+\item{coefficients}{The regression coefficients of the preprocessed filtered x, \eqn{\textbf{w}c}.}
+\item{vip, ortho_vip}{The predictive and orthogonal variable importance in projection (Galindo-Prieto et al., 2014), one value per variable.}
+\item{components}{A tibble with one row per component: \code{R2X}, \code{R2Y} and \code{Q2} (the increase due to the component), their cumulative values, and \code{significance} (\code{"R1"} significant, \code{"NS"} \eqn{Q^2} increase below 0.01, \code{"N4"} \eqn{R^2Y} increase below 0.01).}
+\item{summary}{A one-row data frame with \code{R2X(cum)}, \code{R2Y(cum)}, \code{Q2(cum)}, \code{RMSEE} (root mean squared error of estimation), the numbers of predictive (\code{pre}) and orthogonal (\code{ort}) components and, with a permutation test, \code{pR2Y} and \code{pQ2}.}
+\item{permutation}{With a permutation test, a tibble of \code{R2Y(cum)}, \code{Q2(cum)} and \code{sim} (the correlation between the permuted and the original response) of the model (first row) and of each permuted model.}
+\item{center, scale}{The column centers and scales applied to x.}
+\item{y_center, y_scale}{The center and scale applied to y.}
 }
 }
 \description{
@@ -46,18 +53,82 @@ variation in x into two parts: one that is linearly related to y
 (predictive components) and one that is statistically uncorrelated to the
 response variable y (orthogonal components).
 
-The function is a wrapper around \code{ropls::opls()} from the Bioconductor
-package \pkg{ropls}, which must be installed
-(\code{BiocManager::install("ropls")}). The model is fitted silently (no
-printed summary or plots). For a dependency-free alternative that returns
-the OPLS-filtered data, see \code{\link[=projected_osc]{projected_osc()}} or \code{\link[=o2pls]{o2pls()}}.
+The model has one predictive component and \code{ncomp.ortho} orthogonal
+components, fitted with the NIPALS algorithm of Trygg and Wold (2002). For
+each orthogonal component:
+\enumerate{
+\item The weight \eqn{\textbf{w} = \textbf{X}^T\textbf{y}/\|\textbf{X}^T\textbf{y}\|},
+the score \eqn{\textbf{t} = \textbf{Xw}} and the loading
+\eqn{\textbf{p} = \textbf{X}^T\textbf{t}/(\textbf{t}^T\textbf{t})} are computed.
+\item The orthogonal weight is the part of \eqn{\textbf{p}} orthogonal to
+\eqn{\textbf{w}}, \eqn{\textbf{w}_o = \textbf{p} - (\textbf{w}^T\textbf{p})\textbf{w}},
+normalized, with score \eqn{\textbf{t}_o = \textbf{Xw}_o} and loading
+\eqn{\textbf{p}_o = \textbf{X}^T\textbf{t}_o/(\textbf{t}_o^T\textbf{t}_o)}.
+\item \eqn{\textbf{X}} is deflated by \eqn{\textbf{t}_o\textbf{p}_o^T}.
+}
+
+The predictive component is then computed from the filtered
+\eqn{\textbf{X}}. The filtered data are the same as those of
+\code{\link[=projected_osc]{projected_osc()}} with \code{ncomp = ncomp.ortho + 1}, and of \code{\link[=o2pls]{o2pls()}}.
+
+\strong{Cross-validation.} The observations are split into \code{crossval}
+interleaved groups (observation \code{i} is in group \code{(i - 1) \%\% crossval + 1}).
+Each group is predicted by a model fitted to the others, with the same
+number of orthogonal components, giving the predictive residual sum of
+squares (PRESS) and \eqn{Q^2 = 1 - \text{PRESS}/\text{SS}_y}, where
+\eqn{\text{SS}_y} is the total sum of squares of the preprocessed y.
+The data are preprocessed once, with the centers and scales of all the
+observations.
+
+\strong{Number of orthogonal components.} If \code{ncomp.ortho = NA}, components
+are added (up to \code{min(10, n, p) - 1}) while each is significant: a
+component is significant if it increases \eqn{R^2Y} by at least 0.01 and
+\eqn{Q^2} by at least 0.01. If the predictive component alone is not
+significant, no model is built. If the first orthogonal component is not
+significant, the model has no orthogonal component (a one-component PLS
+model), with a warning.
+
+\strong{Permutation test.} The response is permuted \code{permutation} times and
+the model refitted with the same number of components. \code{pR2Y} and \code{pQ2}
+are the proportions of permuted models whose \eqn{R^2Y} and \eqn{Q^2}
+are at least those of the model, \eqn{(1 + \#\{\text{perm} \geq \text{model}\})/\text{permutation}}.
+Use \code{\link[=set.seed]{set.seed()}} for reproducible p-values.
+
+The results reproduce those of \code{ropls::opls()} with \code{predI = 1} and the
+same \code{scaleC}, \code{crossvalI}, \code{orthoI} and \code{permI} (apart from rounding):
+specProc no longer depends on ropls. Unlike ropls, variables with zero
+variance are kept (their centered values are zero), and when
+\code{ncomp.ortho = NA} a model without orthogonal components is returned
+instead of no model when only the predictive component is significant.
+}
+\examples{
+set.seed(1)
+x <- matrix(rnorm(40 * 30), 40, 30)
+y <- x[, 1] + rnorm(40, sd = 0.1)
+x[, 2:5] <- x[, 2:5] + rnorm(40, sd = 3)  # response-orthogonal variation
+fit <- opls(x[1:30, ], y[1:30], permutation = 10)
+fit
+predict(fit, x[31:40, ], type = "response")
+
 }
 \references{
 \itemize{
 \item Trygg, J., and Wold, S., (2002).
 Orthogonal projections to latent structures (O-PLS).
 Journal of Chemometrics, 16(3):119-128.
+\item Galindo-Prieto, B., Eriksson, L., and Trygg, J., (2014).
+Variable influence on projection (VIP) for orthogonal projections to
+latent structures (OPLS). Journal of Chemometrics, 28(8):623-632.
+\item Thévenot, E.A., Roux, A., Xu, Y., Ezan, E., and Junot, C., (2015).
+Analysis of the human adult urinary metabolome variations with age, body
+mass index, and gender by implementing a comprehensive workflow for
+univariate and OPLS statistical analyses. Journal of Proteome Research,
+14(8):3322-3335.
 }
+}
+\seealso{
+\code{\link[=predict.specproc_opls]{predict.specproc_opls()}}, and \code{\link[=step_opls]{step_opls()}} to use the OPLS
+filter in a tidymodels recipe.
 }
 \author{
 Christian L. Goueguel

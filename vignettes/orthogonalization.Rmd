@@ -259,9 +259,9 @@ method_recipe <- function(method, k = tune("filter")) {
 }
 ```
 
-`opls()` has no step: it wraps the Bioconductor package ropls and returns
-a fitted model rather than a filter. `step_projected_osc()` gives the same
-filtered data, as shown below.
+`step_opls()` removes the orthogonal components of an `opls()` model. It
+gives the same filtered data as `step_projected_osc()`, as shown below, and
+is not repeated in the comparison.
 
 ## What does each method remove?
 
@@ -472,9 +472,11 @@ Several functions compute the same filter, or a filter that cannot change
 PLS predictions:
 
 ```{r equivalences}
-# POSC and O2PLS with a single response: both give OPLS-filtered data
-all.equal(as.matrix(projected_osc(x_cal, calibration$K, ncomp = 3)$correction),
-          as.matrix(o2pls(x_cal, calibration$K, ncomp = 1, nx = 2)$correction),
+# POSC, O2PLS with a single response and OPLS all give OPLS-filtered data
+posc <- as.matrix(projected_osc(x_cal, calibration$K, ncomp = 3)$correction)
+all.equal(posc, as.matrix(o2pls(x_cal, calibration$K, ncomp = 1, nx = 2)$correction),
+          check.attributes = FALSE)
+all.equal(posc, as.matrix(opls(x_cal, calibration$K, ncomp.ortho = 2, permutation = 0)$correction),
           check.attributes = FALSE)
 
 # OPLS filter with 2 orthogonal components + 1-component PLS
@@ -489,8 +491,9 @@ all.equal(predict_with(method_recipe("POSC / OPLS", 2), 1),
           predict_with(base_recipe, 3))
 ```
 
-The first result means that `projected_osc()` and `o2pls()` (with one
-response) are interchangeable. The second explains why OPLS-filtered
+The first two results mean that `projected_osc()`, `o2pls()` (with one
+response) and `opls()` are interchangeable as filters (and so are their
+steps). The third explains why OPLS-filtered
 models can reproduce plain PLS predictions exactly. OPLS splits the
 systematic variation of a PLS model into a predictive and an orthogonal
 part, but the model is the same (Trygg and Wold, 2002; Kemsley and Tapp,

@@ -65,8 +65,9 @@ Within a \code{\link[workflows:workflow]{workflows::workflow()}} and \code{\link
 automatically for every resample. The outcome is not needed when new data
 are baked.
 
-The related steps \code{\link[=step_direct_orthogonal]{step_direct_orthogonal()}}, \code{\link[=step_direct_osc]{step_direct_osc()}} and
-\code{\link[=step_projected_osc]{step_projected_osc()}} remove response-orthogonal variation with other
+The related steps \code{\link[=step_direct_orthogonal]{step_direct_orthogonal()}}, \code{\link[=step_direct_osc]{step_direct_osc()}},
+\code{\link[=step_projected_osc]{step_projected_osc()}}, \code{\link[=step_opls]{step_opls()}} and \code{\link[=step_o2pls]{step_o2pls()}} (which also
+handles several outcomes) remove response-orthogonal variation with other
 algorithms. \code{\link[=step_epo]{step_epo()}} and \code{\link[=step_glsw]{step_glsw()}} remove variation described by
 external clutter, and \code{\link[=step_y_gradient_glsw]{step_y_gradient_glsw()}} down-weights variation
 between samples with similar outcomes.
