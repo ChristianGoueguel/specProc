@@ -51,6 +51,17 @@
 
 ## New features
 
+* `plot_influence()` is drawn like `plot_outlier_map()`: points outlined in
+  black and filled by type (in the colors of the outlier map), dashed limits
+  at the highest confidence level (dotted, ... at the others, with a legend
+  only for several levels), a compact legend at the bottom, and labels on
+  the `labels` (default 3) most outlying samples only, instead of all the
+  flagged ones. It gains the options of `plot_outlier_map()`: `relative`
+  (distances divided by their limits), `shade` (the outlying regions),
+  `log`, `colour_by = "distance"` and point styles in `...`, including a
+  size per sample. The arguments after `label` changed order: name `log`
+  and `title`. In both plots, labels near the right edge are placed on the
+  left of their point, so that they are not cut off.
 * `step_opls()` removes the orthogonal components of an `opls()` model in a
   recipe, with `num_comp` tunable. It gives the same filtered data as
   `step_projected_osc()`, and also offers Pareto scaling.

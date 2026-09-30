@@ -74,6 +74,43 @@ test_that("q_residuals checks its inputs and plot_influence draws it", {
   expect_error(plot_influence(pca), "q_residuals")
 })
 
+test_that("plot_influence is drawn like plot_outlier_map", {
+  skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
+  d <- q_data()
+  pca <- stats::prcomp(d$x)
+  res <- q_residuals(pca, k = 2, conf_level = c(0.95, 0.99))
+  top <- c(t2 = res$t2_limit_99[1], q = res$q_limit_99[1])
+  built <- ggplot2::ggplot_build(plot_influence(res, labels = 2))
+  # outlined points filled by type, and the limits of each level
+  pts <- built$data[[3]]
+  expect_equal(unique(pts$shape), 21)
+  expect_equal(unique(pts$colour), "black")
+  expect_setequal(built$data[[1]]$xintercept, c(res$t2_limit_95[1], top[["t2"]]))
+  # at most `labels` labels, of samples beyond a limit
+  labelled <- built$data[[4]]$label != ""
+  radius <- pmax(res$t2 / top[["t2"]], res$q / top[["q"]])
+  expect_lte(sum(labelled), 2)
+  expect_true(all(radius[order(radius, decreasing = TRUE)[seq_len(sum(labelled))]] > 1))
+
+  # relative distances put the highest limits at 1
+  rel <- ggplot2::ggplot_build(plot_influence(res, relative = TRUE))
+  expect_equal(max(rel$data[[1]]$xintercept), 1)
+  expect_equal(max(rel$data[[2]]$yintercept), 1)
+  expect_equal(rel$data[[3]]$x, res$t2 / top[["t2"]])
+
+  # shading, log axes, colors by distance and a size per sample
+  sh <- ggplot2::ggplot_build(plot_influence(res, shade = TRUE, log = TRUE))
+  expect_equal(nrow(sh$data[[1]]), 3)
+  expect_equal(sh$data[[1]]$xmax[2], log10(top[["t2"]]))
+  expect_s3_class(plot_influence(res, colour_by = "distance", relative = TRUE), "ggplot")
+  conc <- seq_len(nrow(res))
+  sized <- plot_influence(res, size = conc, alpha = 0.5)
+  expect_equal(sized$scales$get_scales("size")$name, "conc")
+  expect_error(plot_influence(res, size = 1:3), "one value per sample")
+  expect_error(plot_influence(res, shade = NA), "shade")
+  expect_error(plot_influence(res, 0.5), "one value per sample")
+})
+
 test_that("q_residuals takes any confidence levels and a single one", {
   skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
   d <- q_data()

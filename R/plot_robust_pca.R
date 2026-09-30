@@ -86,22 +86,16 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
   }
   check_count(labels, "labels", lower = 0)
   colour_by <- match.arg(colour_by)
-  for (arg in c("relative", "shade", "log")) {
-    value <- get(arg)
-    if (!is.logical(value) || length(value) != 1L || is.na(value)) {
-      stop("'", arg, "' must be TRUE or FALSE.", call. = FALSE)
-    }
-  }
+  check_map_flags(relative, shade, log)
   ids <- rownames(object$scores) %||% as.character(seq_along(object$sd))
-  df <- data.frame(id = ids, sd = object$sd, od = object$od, type = object$outlier_type,
+  df <- data.frame(id = ids, x = object$sd, y = object$od, type = object$outlier_type,
                    set = "calibration", stringsAsFactors = FALSE)
   if (!is.null(newdata)) {
     pred <- stats::predict(object, newdata)
     new_ids <- rownames(newdata) %||% paste0("new", seq_len(nrow(pred)))
-    df <- rbind(df, data.frame(id = new_ids, sd = pred$sd, od = pred$od, type = pred$outlier_type,
+    df <- rbind(df, data.frame(id = new_ids, x = pred$sd, y = pred$od, type = pred$outlier_type,
                                set = "new", stringsAsFactors = FALSE))
   }
-  df$set <- factor(df$set, levels = c("calibration", "new"))
   df$type <- factor(df$type, levels = levels(object$outlier_type))
 
   if (is.null(title)) {
@@ -109,127 +103,20 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
                     specproc_macropca = "MacroPCA")
     title <- paste0(title, " outlier map (", object$k, " components)")
   }
-  # most outlying: largest distance relative to the cut-offs
-  sd_cut <- max(object$cutoff_sd, .Machine$double.eps)
-  od_cut <- max(object$cutoff_od, .Machine$double.eps)
-  severity <- pmax(df$sd / sd_cut, df$od / od_cut)
-  # distance from the origin in reduced distances: 1 on the cut-offs
-  df$radius <- severity
-  df$label <- ""
-  if (labels > 0) {
-    top <- order(severity, decreasing = TRUE)[seq_len(min(labels, nrow(df)))]
-    top <- top[severity[top] > 1]
-    df$label[top] <- df$id[top]
-  }
-
-  cut_x <- object$cutoff_sd
-  cut_y <- object$cutoff_od
-  x_lab <- "Score distance"
-  y_lab <- "Orthogonal distance"
-  if (relative) {
-    df$sd <- df$sd / sd_cut
-    df$od <- df$od / od_cut
-    cut_x <- cut_y <- 1
-    x_lab <- "Reduced score distance"
-    y_lab <- "Reduced orthogonal distance"
-  }
-  if (log) {
-    # plot log10 distances on linear axes labelled in the original units, so
-    # the shaded regions can still reach the panel edges (-Inf); zeros are
-    # drawn at the smallest positive distance
-    for (v in c("sd", "od")) {
-      positive <- df[[v]][df[[v]] > 0]
-      floor_v <- if (length(positive)) min(positive) else 1
-      df[[v]] <- log10(pmax(df[[v]], floor_v))
-    }
-    cut_x <- log10(cut_x)
-    cut_y <- log10(cut_y)
-  }
-
-  dots <- rlang::enquos(...)
-  point_args <- lapply(dots, rlang::eval_tidy)
-  if (length(point_args) && (is.null(names(point_args)) || any(names(point_args) == ""))) {
-    stop("The arguments in '...' must be named, such as 'alpha = 0.5'.", call. = FALSE)
-  }
-  names(point_args)[names(point_args) == "color"] <- "colour"
-  # a size per sample is mapped, with a legend
-  size_name <- NULL
-  if (length(point_args$size) > 1) {
-    if (!is.numeric(point_args$size) || length(point_args$size) != nrow(df)) {
-      stop("`size` must be a number, or a numeric vector with one value per sample (",
-           nrow(df), if (!is.null(newdata)) ", calibration then new samples", ").", call. = FALSE)
-    }
-    df$.size <- point_args$size
-    size_name <- rlang::as_label(dots$size)
-    point_args$size <- NULL
-  }
-  point_args <- utils::modifyList(list(colour = "black", size = 2.2, stroke = 0.4, alpha = 0.85),
-                                  point_args)
-  point_args$mapping <- ggplot2::aes(fill = .data$type, shape = .data$set)
-  if (colour_by == "distance") {
-    point_args$mapping$fill <- quote(.data$radius)
-    # the farthest points on top
-    df <- df[order(df$radius), , drop = FALSE]
-  }
-  if (!is.null(size_name)) {
-    point_args$mapping$size <- quote(.data$.size)
-    point_args$size <- NULL
-  }
-
-  palette <- c(regular = "grey55", `good leverage` = "#1b9e77",
-               `orthogonal outlier` = "#d95f02", `bad leverage` = "#e7298a")
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$sd, y = .data$od))
-  if (shade) {
-    regions <- data.frame(
-      xmin = c(cut_x, -Inf, cut_x), xmax = c(Inf, cut_x, Inf),
-      ymin = c(-Inf, cut_y, cut_y), ymax = c(cut_y, Inf, Inf),
-      alpha = c(0.06, 0.13, 0.22)
-    )
-    # translucent so that the grid shows through
-    p <- p +
-      ggplot2::geom_rect(data = regions, ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax,
-                                                      ymin = .data$ymin, ymax = .data$ymax),
-                         alpha = regions$alpha, fill = "grey20", inherit.aes = FALSE) +
-      # "bad leverage" sits above the OD cut-off rather than in the top
-      # right corner, where the most outlying observations usually are
-      ggplot2::annotate("text", x = c(Inf, -Inf, Inf), y = c(-Inf, Inf, cut_y),
-                        label = c("good leverage", "orthogonal outliers", "bad leverage"),
-                        hjust = c(1.05, -0.05, 1.05), vjust = c(-0.6, 1.6, -0.6),
-                        size = 3, fontface = "italic", colour = "grey35")
-  }
-  p <- p +
-    ggplot2::geom_vline(xintercept = cut_x, linetype = "dashed", colour = "grey30") +
-    ggplot2::geom_hline(yintercept = cut_y, linetype = "dashed", colour = "grey30") +
-    do.call(ggplot2::geom_point, point_args) +
-    ggplot2::geom_text(ggplot2::aes(label = .data$label), size = 3, hjust = -0.2, vjust = -0.4,
-                       colour = "grey20", na.rm = TRUE) +
-    (if (colour_by == "type") {
-      ggplot2::scale_fill_manual(values = palette, drop = FALSE, name = NULL,
-                                 guide = ggplot2::guide_legend(order = 1, override.aes = list(shape = 21, size = 2.5)))
-    } else {
-      distance_fill_scale(range(df$radius, na.rm = TRUE), anchored = relative)
-    }) +
-    # the kinds of samples only matter with new samples
-    ggplot2::scale_shape_manual(values = c(calibration = 21, new = 24), name = NULL, drop = TRUE,
-                                guide = if (is.null(newdata)) "none" else
-                                  ggplot2::guide_legend(order = 2, override.aes = list(size = 2.5))) +
-    ggplot2::labs(x = x_lab, y = y_lab, title = title) +
-    ggplot2::theme_bw() +
-    ggplot2::theme(legend.position = "bottom") +
-    compact_legend()
-  if (!is.null(size_name)) {
-    p <- p + ggplot2::theme(legend.box = "vertical")
-    p <- p + ggplot2::scale_size_continuous(range = c(1.2, 6), name = size_name, breaks = three_breaks,
-                                            guide = ggplot2::guide_legend(order = 3))
-  }
-  if (log) {
-    log_breaks <- function(limits) log10(scales::breaks_log(n = 6)(10^limits))
-    log_labels <- function(breaks) vapply(10^breaks, format, character(1), digits = 3, scientific = FALSE)
-    p <- p +
-      ggplot2::scale_x_continuous(breaks = log_breaks, labels = log_labels, minor_breaks = NULL) +
-      ggplot2::scale_y_continuous(breaks = log_breaks, labels = log_labels, minor_breaks = NULL)
-  }
-  p
+  point <- map_point_args(rlang::enquos(...), nrow(df),
+                          if (!is.null(newdata)) ", calibration then new samples" else "")
+  distance_map(
+    df, cuts = data.frame(level = "cut-off", x = object$cutoff_sd, y = object$cutoff_od),
+    labels = labels, relative = relative, shade = shade, log = log, colour_by = colour_by,
+    palette = c(regular = "grey55", `good leverage` = "#1b9e77",
+                `orthogonal outlier` = "#d95f02", `bad leverage` = "#e7298a"),
+    # "bad leverage" sits above the OD cut-off rather than in the top right
+    # corner, where the most outlying observations usually are
+    regions = c("good leverage", "orthogonal outliers", "bad leverage"),
+    x_lab = c("Score distance", "Reduced score distance"),
+    y_lab = c("Orthogonal distance", "Reduced orthogonal distance"),
+    title = title, point = point, show_set = !is.null(newdata)
+  )
 }
 
 #' @title Cell Map of a MacroPCA Fit
@@ -434,6 +321,176 @@ flagged_regions <- function(object, threshold = 0.1, rows = NULL, columns = NULL
   if (is.null(lines)) out <- out[, setdiff(names(out), c("species", "line_wavelength", "candidates"))]
   rownames(out) <- NULL
   tibble::as_tibble(out)
+}
+
+# ---- distance map internals ---------------------------------------------------
+#
+# plot_outlier_map() and plot_influence() draw the same kind of map: a
+# distance within the model (x) against a distance to the model (y), with
+# their cut-offs dividing the map into four types of observations.
+
+check_map_flags <- function(relative, shade, log) {
+  for (arg in c("relative", "shade", "log")) {
+    value <- get(arg)
+    if (!is.logical(value) || length(value) != 1L || is.na(value)) {
+      stop("'", arg, "' must be TRUE or FALSE.", call. = FALSE)
+    }
+  }
+}
+
+# The arguments of geom_point() given in `...` of a distance map, with their
+# defaults. A `size` with one value per sample is returned apart (`sizes`,
+# with the expression `size_name` as the legend title), to be mapped.
+map_point_args <- function(dots, n, size_hint = "") {
+  args <- lapply(dots, rlang::eval_tidy)
+  if (length(args) && (is.null(names(args)) || any(names(args) == ""))) {
+    stop("The arguments in '...' must be named, such as 'alpha = 0.5'.", call. = FALSE)
+  }
+  names(args)[names(args) == "color"] <- "colour"
+  sizes <- size_name <- NULL
+  if (length(args$size) > 1) {
+    if (!is.numeric(args$size) || length(args$size) != n) {
+      stop("`size` must be a number, or a numeric vector with one value per sample (",
+           n, size_hint, ").", call. = FALSE)
+    }
+    sizes <- args$size
+    size_name <- rlang::as_label(dots$size)
+    args$size <- NULL
+  }
+  args <- utils::modifyList(list(colour = "black", size = 2.2, stroke = 0.4, alpha = 0.85), args)
+  if (!is.null(sizes)) args$size <- NULL
+  list(args = args, sizes = sizes, size_name = size_name)
+}
+
+# Draws a distance map.
+#  - df: columns id, x, y, type (a factor of the four types, regular first)
+#    and set ("calibration" or "new").
+#  - cuts: the cut-offs, columns level, x and y, one row per confidence
+#    level, the highest (which classifies the observations) last.
+#  - regions: the names of the three outlying regions (bottom right, top
+#    left, top right), shown with `shade`.
+#  - x_lab, y_lab: the axis titles of the distances and of the reduced ones.
+distance_map <- function(df, cuts, labels, relative, shade, log, colour_by, palette, regions,
+                         x_lab, y_lab, title, point, show_set) {
+  top <- cuts[nrow(cuts), ]
+  cut_x <- max(top$x, .Machine$double.eps)
+  cut_y <- max(top$y, .Machine$double.eps)
+  df$set <- factor(df$set, levels = c("calibration", "new"))
+  # most outlying: largest distance relative to the cut-offs, which is the
+  # distance from the origin in reduced distances (1 on the cut-offs)
+  df$radius <- pmax(df$x / cut_x, df$y / cut_y)
+  df$label <- ""
+  if (labels > 0) {
+    most <- order(df$radius, decreasing = TRUE)[seq_len(min(labels, nrow(df)))]
+    most <- most[df$radius[most] > 1]
+    df$label[most] <- df$id[most]
+  }
+  if (!is.null(point$sizes)) df$.size <- point$sizes
+
+  x_lab <- x_lab[[1 + relative]]
+  y_lab <- y_lab[[1 + relative]]
+  if (relative) {
+    df$x <- df$x / cut_x
+    df$y <- df$y / cut_y
+    cuts$x <- cuts$x / cut_x
+    cuts$y <- cuts$y / cut_y
+  }
+  if (log) {
+    # plot log10 distances on linear axes labelled in the original units, so
+    # the shaded regions can still reach the panel edges (-Inf); zeros are
+    # drawn at the smallest positive distance
+    for (v in c("x", "y")) {
+      positive <- df[[v]][df[[v]] > 0]
+      floor_v <- if (length(positive)) min(positive) else 1
+      df[[v]] <- log10(pmax(df[[v]], floor_v))
+      cuts[[v]] <- log10(cuts[[v]])
+    }
+  }
+  cuts$level <- factor(cuts$level, levels = rev(cuts$level))
+  # labels on the right of the points, or on their left near the right edge
+  x_range <- range(c(df$x, cuts$x), finite = TRUE)
+  df$.hjust <- ifelse(df$x > x_range[1] + 0.85 * diff(x_range), 1.2, -0.2)
+  shade_x <- cuts$x[nrow(cuts)]
+  shade_y <- cuts$y[nrow(cuts)]
+
+  # keys of the absent types too
+  point_args <- utils::modifyList(list(show.legend = c(fill = TRUE, linetype = FALSE)), point$args)
+  point_args$mapping <- ggplot2::aes(fill = .data$type, shape = .data$set)
+  if (colour_by == "distance") {
+    point_args$mapping$fill <- quote(.data$radius)
+    # the farthest points on top
+    df <- df[order(df$radius), , drop = FALSE]
+  }
+  if (!is.null(point$size_name)) point_args$mapping$size <- quote(.data$.size)
+
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$x, y = .data$y))
+  if (shade) {
+    rects <- data.frame(
+      xmin = c(shade_x, -Inf, shade_x), xmax = c(Inf, shade_x, Inf),
+      ymin = c(-Inf, shade_y, shade_y), ymax = c(shade_y, Inf, Inf),
+      alpha = c(0.06, 0.13, 0.22)
+    )
+    # translucent so that the grid shows through
+    p <- p +
+      ggplot2::geom_rect(data = rects, ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax,
+                                                    ymin = .data$ymin, ymax = .data$ymax),
+                         alpha = rects$alpha, fill = "grey20", inherit.aes = FALSE) +
+      ggplot2::annotate("text", x = c(Inf, -Inf, Inf), y = c(-Inf, Inf, shade_y), label = regions,
+                        hjust = c(1.05, -0.05, 1.05), vjust = c(-0.6, 1.6, -0.6),
+                        size = 3, fontface = "italic", colour = "grey35")
+  }
+  # the highest level dashed, the others dotted, dot-dashed, ...
+  linetypes <- stats::setNames(
+    c("dashed", "dotted", "dotdash", "longdash", "twodash", "solid")[seq_len(nrow(cuts))],
+    levels(cuts$level)
+  )
+  p <- p +
+    ggplot2::geom_vline(data = cuts, ggplot2::aes(xintercept = .data$x, linetype = .data$level),
+                        colour = "grey30", key_glyph = "path") +
+    ggplot2::geom_hline(data = cuts, ggplot2::aes(yintercept = .data$y, linetype = .data$level),
+                        colour = "grey30", key_glyph = "path") +
+    do.call(ggplot2::geom_point, point_args) +
+    ggplot2::geom_text(ggplot2::aes(label = .data$label, hjust = .data$.hjust), size = 3, vjust = -0.4,
+                       colour = "grey20", na.rm = TRUE) +
+    (if (colour_by == "type") {
+      ggplot2::scale_fill_manual(values = palette, drop = FALSE, name = NULL,
+                                 guide = ggplot2::guide_legend(order = 1, override.aes = list(shape = 21, size = 2.5)))
+    } else {
+      distance_fill_scale(range(df$radius, na.rm = TRUE), anchored = relative)
+    }) +
+    # the kinds of samples only matter with new samples
+    ggplot2::scale_shape_manual(values = c(calibration = 21, new = 24), name = NULL, drop = TRUE,
+                                guide = if (show_set) {
+                                  ggplot2::guide_legend(order = 2, override.aes = list(size = 2.5))
+                                } else "none") +
+    # the levels only matter with several of them
+    ggplot2::scale_linetype_manual(values = linetypes, name = "Limits",
+                                   guide = if (nrow(cuts) > 1) {
+                                     ggplot2::guide_legend(order = 4, override.aes = list(colour = "grey30"),
+                                                         keywidth = ggplot2::unit(0.9, "cm"))
+                                   } else "none") +
+    ggplot2::labs(x = x_lab, y = y_lab, title = title) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(legend.position = "bottom") +
+    compact_legend()
+  if (!is.null(point$size_name)) {
+    p <- p + ggplot2::theme(legend.box = "vertical")
+    p <- p + ggplot2::scale_size_continuous(range = c(1.2, 6), name = point$size_name, breaks = three_breaks,
+                                            guide = ggplot2::guide_legend(order = 3))
+  }
+  # room for the labels above the highest points
+  x_args <- list(expand = ggplot2::expansion(mult = 0.05))
+  y_args <- list(expand = ggplot2::expansion(mult = c(0.05, if (any(df$label != "")) 0.08 else 0.05)))
+  if (log) {
+    log_breaks <- function(limits) log10(scales::breaks_log(n = 6)(10^limits))
+    log_labels <- function(breaks) vapply(10^breaks, format, character(1), digits = 3, scientific = FALSE)
+    log_args <- list(breaks = log_breaks, labels = log_labels, minor_breaks = NULL)
+    x_args <- c(x_args, log_args)
+    y_args <- c(y_args, log_args)
+  }
+  p +
+    do.call(ggplot2::scale_x_continuous, x_args) +
+    do.call(ggplot2::scale_y_continuous, y_args)
 }
 
 # Rainbow of the distances of plot_outlier_map(): dark red at the origin,

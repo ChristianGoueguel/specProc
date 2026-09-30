@@ -191,80 +191,98 @@ dmodx <- function(model, k, newdata = NULL, conf_level = 0.975, normalized = TRU
 
 #' @title Influence Plot of a PCA Model
 #'
+#' @author Christian L. Goueguel
+#'
 #' @description
 #' Plots the residual distance of each sample to a PCA model (Q residual or
 #' DModX) against its Hotelling's \eqn{T^2}, with their limits at each
-#' confidence level, from [q_residuals()] or [dmodx()]. The samples beyond a
-#' limit at the highest confidence level are colored by type and labeled.
+#' confidence level, from [q_residuals()] or [dmodx()]. It is drawn like the
+#' outlier map of a robust PCA, [plot_outlier_map()].
 #'
 #' @details
-#' The limit at the highest confidence level is drawn as a solid line, the
-#' others as dashed, dotted, ... lines.
+#' The limits at the highest confidence level (dashed lines) divide the plot
+#' into four types of samples:
+#'  - **regular** samples (bottom left);
+#'  - **extreme** samples (bottom right): a high \eqn{T^2} but well
+#'    described by the model, for example a high concentration;
+#'  - **residual** samples (top left): not described by the model (another
+#'    matrix, a contamination, an instrumental problem);
+#'  - samples beyond **both** limits, the most harmful.
+#'
+#' The limits at lower confidence levels are dotted, dot-dashed, ... lines.
+#'
+#' With `relative = TRUE`, each distance is divided by its limit at the
+#' highest confidence level, so both limits are at 1 whatever the model,
+#' which puts plots of different models on the same scale.
 #'
 #' @param x The result of [q_residuals()] or [dmodx()].
-#' @param label The labels of the samples: a vector with one value per
+#' @param label The names of the samples: a vector with one value per
 #'   sample. By default, their row numbers.
-#' @param log A logical: logarithmic axes (`FALSE`, default), useful when a
-#'   few samples are far beyond the limits.
+#' @param labels The number of most outlying samples to label (beyond a
+#'   limit at the highest confidence level). Default is 3; use 0 for no
+#'   labels.
+#' @param relative If `TRUE`, plot the distances divided by their limits at
+#'   the highest confidence level. Default is `FALSE`.
+#' @param shade If `TRUE`, shade the three outlying regions in grey, darker
+#'   for more harmful samples (extreme, residual, both), and name them in
+#'   their corners. Default is `FALSE`.
+#' @param log If `TRUE`, use logarithmic axes, which spread out the regular
+#'   samples when a few are far away. Zero distances are drawn at the
+#'   smallest positive distance. Default is `FALSE`.
+#' @param colour_by The colors of the points: `"type"` (default), by type,
+#'   or `"distance"`, by their distance relative to the limits,
+#'   \eqn{\max(T^2/T^2_{lim}, Q/Q_{lim})}, on a rainbow scale from dark red to
+#'   blue, as in [plot_outlier_map()].
 #' @param title The plot title.
+#' @param ... Further arguments passed to [ggplot2::geom_point()] to style
+#'   the points, such as `alpha` (default 0.85), `size` (2.2), `stroke`
+#'   (0.4) or `colour` (the outline, `"black"`). `size` can also be a numeric
+#'   vector with one value per sample, such as the concentration of an
+#'   element, to vary the size of the points, with a legend.
 #'
 #' @return A ggplot object.
 #' @seealso [q_residuals()], [dmodx()], [plot_outlier_map()]
 #' @export plot_influence
-plot_influence <- function(x, label = NULL, log = FALSE, title = NULL) {
+plot_influence <- function(x, label = NULL, labels = 3, relative = FALSE, shade = FALSE,
+                           log = FALSE, colour_by = c("type", "distance"), title = NULL, ...) {
   if (!inherits(x, "specproc_influence")) {
     stop("'x' must be returned by q_residuals() or dmodx().", call. = FALSE)
   }
-  check_flag(log, "log")
   if (!is.null(label) && length(label) != nrow(x)) {
     stop("'label' must have one value per sample (", nrow(x), ").", call. = FALSE)
   }
+  check_count(labels, "labels", lower = 0)
+  colour_by <- match.arg(colour_by)
+  check_map_flags(relative, shade, log)
   distance <- attr(x, "distance") %||% "q"
-  labels <- attr(x, "conf_labels")
-  df <- as.data.frame(x)
-  df$.y <- df[[distance]]
-  df$label <- if (is.null(label)) df$sample else label
-  flagged <- df[df$outlier != "regular", , drop = FALSE]
-  level_names <- paste0(labels, "%")
-  lines <- data.frame(
-    level = factor(level_names, levels = rev(level_names)),
-    t2 = vapply(labels, function(l) x[[paste0("t2_limit_", l)]][1], numeric(1)),
-    y = vapply(labels, function(l) x[[paste0(distance, "_limit_", l)]][1], numeric(1))
+  levels <- attr(x, "conf_labels")
+  new <- isTRUE(attr(x, "new"))
+  df <- data.frame(
+    id = as.character(if (is.null(label)) x$sample else label), x = x$t2, y = x[[distance]],
+    type = x$outlier, set = if (new) "new" else "calibration", stringsAsFactors = FALSE
   )
-  linetypes <- stats::setNames(c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash")[
-    seq_along(level_names)], rev(level_names))
+  cuts <- data.frame(
+    level = paste0(levels, "%"),
+    x = vapply(levels, function(l) x[[paste0("t2_limit_", l)]][1], numeric(1)),
+    y = vapply(levels, function(l) x[[paste0(distance, "_limit_", l)]][1], numeric(1))
+  )
   if (is.null(title)) {
-    title <- sprintf("Influence plot (%d components)%s", attr(x, "k"),
-                     if (isTRUE(attr(x, "new"))) ", new samples" else "")
+    title <- sprintf("Influence plot (%d components)%s", attr(x, "k"), if (new) ", new samples" else "")
   }
-  ylab <- if (distance == "q") "Q residual (SPE)" else if (isTRUE(attr(x, "normalized"))) {
+  y_lab <- if (distance == "q") "Q residual (SPE)" else if (isTRUE(attr(x, "normalized"))) {
     "DModX (normalized)"
   } else {
     "DModX"
   }
-  colours <- c(regular = "grey45", extreme = "#1f4e79", residual = "#c0392b", both = "#7b3294")
-  p <- ggplot2::ggplot(df, ggplot2::aes(.data$t2, .data$.y)) +
-    ggplot2::geom_vline(data = lines, ggplot2::aes(xintercept = .data$t2, linetype = .data$level),
-                        colour = "grey40") +
-    ggplot2::geom_hline(data = lines, ggplot2::aes(yintercept = .data$y, linetype = .data$level),
-                        colour = "grey40") +
-    ggplot2::geom_point(ggplot2::aes(colour = .data$outlier), size = 2, alpha = 0.85) +
-    ggplot2::scale_colour_manual(values = colours, drop = TRUE, name = NULL) +
-    ggplot2::scale_linetype_manual(values = linetypes, name = "Limits")
-  if (nrow(flagged) > 0) {
-    p <- p + ggplot2::geom_text(data = flagged, ggplot2::aes(label = .data$label, colour = .data$outlier),
-                                vjust = -0.9, size = 3, show.legend = FALSE)
-  }
-  # room for the labels of the samples at the edges
-  room <- ggplot2::expansion(mult = c(0.05, 0.12))
-  p <- p + if (log) {
-    list(ggplot2::scale_x_log10(expand = room), ggplot2::scale_y_log10(expand = room))
-  } else {
-    list(ggplot2::scale_x_continuous(expand = room), ggplot2::scale_y_continuous(expand = room))
-  }
-  p +
-    ggplot2::labs(x = expression("Hotelling's" ~ T^2), y = ylab, title = title) +
-    ggplot2::theme_bw()
+  distance_map(
+    df, cuts = cuts, labels = labels, relative = relative, shade = shade, log = log,
+    colour_by = colour_by,
+    palette = c(regular = "grey55", extreme = "#1b9e77", residual = "#d95f02", both = "#e7298a"),
+    regions = c("extreme", "residual", "both"),
+    x_lab = list(expression("Hotelling's" ~ T^2), expression("Reduced Hotelling's" ~ T^2)),
+    y_lab = c(y_lab, paste("Reduced", y_lab)),
+    title = title, point = map_point_args(rlang::enquos(...), nrow(df)), show_set = FALSE
+  )
 }
 
 # ---- internals ---------------------------------------------------------------

@@ -4,18 +4,51 @@
 \alias{plot_influence}
 \title{Influence Plot of a PCA Model}
 \usage{
-plot_influence(x, label = NULL, log = FALSE, title = NULL)
+plot_influence(
+  x,
+  label = NULL,
+  labels = 3,
+  relative = FALSE,
+  shade = FALSE,
+  log = FALSE,
+  colour_by = c("type", "distance"),
+  title = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{The result of \code{\link[=q_residuals]{q_residuals()}} or \code{\link[=dmodx]{dmodx()}}.}
 
-\item{label}{The labels of the samples: a vector with one value per
+\item{label}{The names of the samples: a vector with one value per
 sample. By default, their row numbers.}
 
-\item{log}{A logical: logarithmic axes (\code{FALSE}, default), useful when a
-few samples are far beyond the limits.}
+\item{labels}{The number of most outlying samples to label (beyond a
+limit at the highest confidence level). Default is 3; use 0 for no
+labels.}
+
+\item{relative}{If \code{TRUE}, plot the distances divided by their limits at
+the highest confidence level. Default is \code{FALSE}.}
+
+\item{shade}{If \code{TRUE}, shade the three outlying regions in grey, darker
+for more harmful samples (extreme, residual, both), and name them in
+their corners. Default is \code{FALSE}.}
+
+\item{log}{If \code{TRUE}, use logarithmic axes, which spread out the regular
+samples when a few are far away. Zero distances are drawn at the
+smallest positive distance. Default is \code{FALSE}.}
+
+\item{colour_by}{The colors of the points: \code{"type"} (default), by type,
+or \code{"distance"}, by their distance relative to the limits,
+\eqn{\max(T^2/T^2_{lim}, Q/Q_{lim})}, on a rainbow scale from dark red to
+blue, as in \code{\link[=plot_outlier_map]{plot_outlier_map()}}.}
 
 \item{title}{The plot title.}
+
+\item{...}{Further arguments passed to \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} to style
+the points, such as \code{alpha} (default 0.85), \code{size} (2.2), \code{stroke}
+(0.4) or \code{colour} (the outline, \code{"black"}). \code{size} can also be a numeric
+vector with one value per sample, such as the concentration of an
+element, to vary the size of the points, with a legend.}
 }
 \value{
 A ggplot object.
@@ -23,13 +56,30 @@ A ggplot object.
 \description{
 Plots the residual distance of each sample to a PCA model (Q residual or
 DModX) against its Hotelling's \eqn{T^2}, with their limits at each
-confidence level, from \code{\link[=q_residuals]{q_residuals()}} or \code{\link[=dmodx]{dmodx()}}. The samples beyond a
-limit at the highest confidence level are colored by type and labeled.
+confidence level, from \code{\link[=q_residuals]{q_residuals()}} or \code{\link[=dmodx]{dmodx()}}. It is drawn like the
+outlier map of a robust PCA, \code{\link[=plot_outlier_map]{plot_outlier_map()}}.
 }
 \details{
-The limit at the highest confidence level is drawn as a solid line, the
-others as dashed, dotted, ... lines.
+The limits at the highest confidence level (dashed lines) divide the plot
+into four types of samples:
+\itemize{
+\item \strong{regular} samples (bottom left);
+\item \strong{extreme} samples (bottom right): a high \eqn{T^2} but well
+described by the model, for example a high concentration;
+\item \strong{residual} samples (top left): not described by the model (another
+matrix, a contamination, an instrumental problem);
+\item samples beyond \strong{both} limits, the most harmful.
+}
+
+The limits at lower confidence levels are dotted, dot-dashed, ... lines.
+
+With \code{relative = TRUE}, each distance is divided by its limit at the
+highest confidence level, so both limits are at 1 whatever the model,
+which puts plots of different models on the same scale.
 }
 \seealso{
 \code{\link[=q_residuals]{q_residuals()}}, \code{\link[=dmodx]{dmodx()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}
+}
+\author{
+Christian L. Goueguel
 }
