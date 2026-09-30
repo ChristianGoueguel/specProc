@@ -43,6 +43,9 @@ soilLIBS |> count(Sample, name = "locations") |> count(locations, name = "sample
 #>   locations samples
 #>       <int>   <int>
 #> 1         8      50
+```
+
+``` r
 
 soilLIBS |>
   select(all_of(channels)) |>
@@ -73,6 +76,9 @@ spectrum):
 
 lines <- c(`Mg II 279.55` = 279.55, `Si I 288.16` = 288.16, `Ca II 393.37` = 393.37,
            `Al I 396.15` = 396.15, `K I 766.49` = 766.49)
+```
+
+``` r
 
 # Line areas of a table of spectra that has a Sample column, one column per line
 line_areas <- function(spectra) {

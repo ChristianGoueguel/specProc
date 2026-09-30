@@ -108,9 +108,9 @@ between 199 and 822 nm, stored as raw detector counts.</p>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 2</span></span></span>
 <span><span class="co">#&gt;   locations samples</span></span>
 <span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>         8      50</span></span>
-<span></span>
-<span><span class="va">soilLIBS</span> <span class="op">|&gt;</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>         8      50</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">soilLIBS</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">channels</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span>use.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -133,11 +133,11 @@ this offset.</li>
 <code><a href="../reference/line_intensities.html">line_intensities()</a></code> as the area within ±0.15 nm of the line
 center (<code>search = 0</code> keeps the window at the tabulated
 wavelength rather than at the peak of each spectrum):</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>`Mg II 279.55` <span class="op">=</span> <span class="fl">279.55</span>, `Si I 288.16` <span class="op">=</span> <span class="fl">288.16</span>, `Ca II 393.37` <span class="op">=</span> <span class="fl">393.37</span>,</span>
-<span>           `Al I 396.15` <span class="op">=</span> <span class="fl">396.15</span>, `K I 766.49` <span class="op">=</span> <span class="fl">766.49</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Line areas of a table of spectra that has a Sample column, one column per line</span></span>
+<span>           `Al I 396.15` <span class="op">=</span> <span class="fl">396.15</span>, `K I 766.49` <span class="op">=</span> <span class="fl">766.49</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Line areas of a table of spectra that has a Sample column, one column per line</span></span>
 <span><span class="va">line_areas</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">spectra</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">areas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sample"</span>, <span class="va">channels</span><span class="op">)</span><span class="op">]</span>, <span class="va">lines</span>, search <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span>  <span class="va">areas</span> <span class="op">|&gt;</span></span>
@@ -157,7 +157,7 @@ squares (<code><a href="../reference/baseline_arpls.html">baseline_arpls()</a></
 narrow features and can eat into emission lines, while large values miss
 curvature of the continuum. To look at the estimated baseline itself, we
 call <code><a href="../reference/baseline_arpls.html">baseline_arpls()</a></code> on the first spectrum:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">spectrum1</span> <span class="op">&lt;-</span> <span class="va">soilLIBS</span><span class="op">[</span><span class="fl">1</span>, <span class="va">channels</span><span class="op">]</span></span>
 <span><span class="va">fitted_baselines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>`1e2` <span class="op">=</span> <span class="fl">1e2</span>, `1e4` <span class="op">=</span> <span class="fl">1e4</span>, `1e6` <span class="op">=</span> <span class="fl">1e6</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">l</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="fu"><a href="../reference/baseline_arpls.html">baseline_arpls</a></span><span class="op">(</span><span class="va">spectrum1</span>, lambda <span class="op">=</span> <span class="va">l</span>, max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">$</span><span class="va">background</span><span class="op">)</span></span>
@@ -182,7 +182,7 @@ the Ca and Al lines and removes part of their area. Since the baseline
 is an estimate, check how sensitive the quantity you care about is to
 <code>lambda</code>. We bake the first sample’s 8 spectra through a
 one-step recipe for each value:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">first_sample</span> <span class="op">&lt;-</span> <span class="va">soilLIBS</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Sample</span> <span class="op">==</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">Sample</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">baseline_recipe</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">lambda</span><span class="op">)</span> <span class="op">{</span></span>
@@ -218,7 +218,7 @@ therefore robust to this choice for strong lines, but not entirely for
 weak ones. We use <code>lambda = 1e5</code>, the smallest value at which
 the baseline stays clear of the line wings in the plot above. For your
 own data, run the same check on a few representative spectra.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">baselined</span> <span class="op">&lt;-</span> <span class="fu">baseline_recipe</span><span class="op">(</span><span class="va">soilLIBS</span>, <span class="fl">1e5</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://recipes.tidymodels.org/reference/prep.html" class="external-link">prep</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://recipes.tidymodels.org/reference/bake.html" class="external-link">bake</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
@@ -247,7 +247,7 @@ variance that lies between samples rather than between replicates of a
 sample. The higher it is, the better a line discriminates between
 samples relative to its measurement noise. We estimate it from a one-way
 random-effects ANOVA:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">icc</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">v</span>, <span class="va">group</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="co"># constant (up to rounding) within the data: no variance to decompose</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">1e-8</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">v</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="cn">NA_real_</span><span class="op">)</span></span>
@@ -265,7 +265,7 @@ internal standardization to the Si I 288.16 nm line. All are recipe
 steps added after the baseline: <code><a href="../reference/step_spectral_norm.html">step_spectral_norm()</a></code>
 divides each spectrum by its total area (or its L1, L2 or maximum norm),
 and <code><a href="../reference/step_line_ratio.html">step_line_ratio()</a></code> by the area of a reference line:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">normalized</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">step</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">baseline_recipe</span><span class="op">(</span><span class="va">soilLIBS</span>, <span class="fl">1e5</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://recipes.tidymodels.org/reference/step.html" class="external-link">step</a></span><span class="op">(</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -288,7 +288,7 @@ and <code><a href="../reference/step_line_ratio.html">step_line_ratio()</a></cod
 <span>         line <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">line</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">lines</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">normalization</span>, <span class="va">line</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>RSD <span class="op">=</span> <span class="fu">rsd</span><span class="op">(</span><span class="va">value</span>, <span class="va">Sample</span><span class="op">)</span>, ICC <span class="op">=</span> <span class="fu">icc</span><span class="op">(</span><span class="va">value</span>, <span class="va">Sample</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">wide</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">stat</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">scores</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">normalization</span>, <span class="va">line</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">stat</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -359,7 +359,7 @@ calibration vignette. Note that <code><a href="../reference/step_msc.html">step_
 reference spectrum from the data it is prepped on, so in a model it must
 be prepped on calibration data only; within a workflow, this happens
 automatically.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">normalized_snv</span> <span class="op">&lt;-</span> <span class="va">candidates</span><span class="op">$</span><span class="va">SNV</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -371,7 +371,7 @@ sample</em>, because the differences between samples are real signal. We
 therefore remove each sample’s median from its line intensities, and
 look for shots that are outlying in this within-sample deviation
 space.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">deviation</span> <span class="op">&lt;-</span> <span class="va">normalized_snv</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">line_areas</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Sample</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -382,12 +382,12 @@ space.</p>
 <p><code><a href="../reference/plot_outliers.html">plot_outliers()</a></code> computes robust (MCD) Mahalanobis
 distances, which account for the correlation between lines. It then
 displays the standardized deviation of every shot for each variable:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_outliers.html">plot_outliers</a></span><span class="op">(</span><span class="va">deviation</span>, quan <span class="op">=</span> <span class="fl">0.75</span>, show.mahal <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="preprocessing_files/figure-html/outlier-plot-1.png" class="r-plt" alt="" width="100%"></p>
 <p>The default cutoff of <code><a href="../reference/plot_outliers.html">plot_outliers()</a></code> flags a large
 share of the shots:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">screen</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_outliers.html">plot_outliers</a></span><span class="op">(</span><span class="va">deviation</span>, quan <span class="op">=</span> <span class="fl">0.75</span>, show.outlier <span class="op">=</span> <span class="cn">FALSE</span>, show.mahal <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">screen</span>, flagged <span class="op">=</span> <span class="va">outlier</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 2</span></span></span>
@@ -400,7 +400,7 @@ one would expect from misfires. Before discarding anything, compare the
 distribution of the squared robust distances with the χ² distribution
 they would follow if the within-sample deviations were multivariate
 normal:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">deviation</span><span class="op">)</span></span>
 <span><span class="va">qq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>  observed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">screen</span><span class="op">$</span><span class="va">mahalanobis</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,</span>
@@ -426,7 +426,7 @@ homogeneous spots.</p>
 <p>A defensible rule is to remove only the gross outliers, beyond the
 99.9% quantile of the χ² distribution, and to report how many shots were
 removed:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">shots</span> <span class="op">&lt;-</span> <span class="va">normalized_snv</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>flagged <span class="op">=</span> <span class="va">screen</span><span class="op">$</span><span class="va">mahalanobis</span><span class="op">^</span><span class="fl">2</span> <span class="op">&gt;</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Chisquare.html" class="external-link">qchisq</a></span><span class="op">(</span><span class="fl">0.999</span>, <span class="va">p</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -465,7 +465,7 @@ sample, which flags shots of a different shape (another mineral grain, a
 contaminated spot). The total intensity is meaningful only before
 normalization, since SNV gives every spectrum a mean of zero, so we
 screen the baseline-corrected spectra:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">whole</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/reject_shots.html">reject_shots</a></span><span class="op">(</span><span class="va">baselined</span>, <span class="va">Sample</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">whole</span>, <span class="va">.reason</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 2</span></span></span>
@@ -498,7 +498,7 @@ screen, report how many shots it removed.</p>
 <p>With the screened shots, <code><a href="../reference/average.html">average()</a></code> reduces each sample
 to one mean spectrum. It is implemented in C++ and handles the full
 matrix in a fraction of a second:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sample_spectra</span> <span class="op">&lt;-</span> <span class="va">shots</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="va">flagged</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">channels</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -516,7 +516,7 @@ normal.</p>
 </h2>
 <p>The preprocessed, sample-level data set is ready for exploratory
 analysis or calibration:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">zoom</span> <span class="op">&lt;-</span> <span class="va">channels</span><span class="op">[</span><span class="va">wl</span> <span class="op">&gt;</span> <span class="fl">380</span> <span class="op">&amp;</span> <span class="va">wl</span> <span class="op">&lt;</span> <span class="fl">400</span><span class="op">]</span></span>
 <span><span class="va">sample_spectra</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">soilLIBS</span>, <span class="va">Sample</span>, <span class="va">Type</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"Sample"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -539,7 +539,7 @@ map that keeps the neighbors of each sample together. With 7152 channels
 and 50 samples, UMAP is run on the first 10 principal components, which
 hold the structure of the data and drop most of the noise.
 <code><a href="../reference/plot_embedding.html">plot_embedding()</a></code> draws either map:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sample_info</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">soilLIBS</span>, <span class="va">Sample</span>, <span class="va">Texture</span>, <span class="va">Clay</span><span class="op">)</span></span>
 <span><span class="va">map_data</span> <span class="op">&lt;-</span> <span class="va">sample_spectra</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">sample_info</span>, by <span class="op">=</span> <span class="st">"Sample"</span><span class="op">)</span></span>
 <span></span>
@@ -576,7 +576,7 @@ and a sample far from the others on it really has an unusual
 spectrum.</p>
 <p>Coloring the PCA map by a continuous property shows whether it varies
 smoothly with the main directions of the spectra:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_embedding.html">plot_embedding</a></span><span class="op">(</span><span class="va">pca_map</span>, colour <span class="op">=</span> <span class="va">Clay</span>, title <span class="op">=</span> <span class="st">"PCA, colored by clay content (%)"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="preprocessing_files/figure-html/embedding-clay-1.png" class="r-plt" alt="" width="60%"></p>
 <p>The clay content increases from the sands to the clays across the
@@ -587,7 +587,7 @@ step, it must then be estimated within resampling, never on all the data
 before cross-validation.</p>
 <p>The same pipeline, written as one recipe, can be estimated on
 calibration spectra and applied to new ones:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pipeline</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">soilLIBS</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://recipes.tidymodels.org/reference/roles.html" class="external-link">update_role</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">meta_cols</span><span class="op">)</span>, new_role <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/step_baseline.html">step_baseline</a></span><span class="op">(</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
