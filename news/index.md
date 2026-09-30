@@ -27,8 +27,65 @@
 - The data sets are renamed: `specLIBS` is now `soilLIBS`, and
   `fourrage` is now `forageLIBS`. Replace `data(specLIBS)` with
   `data(soilLIBS)` and `data(fourrage)` with `data(forageLIBS)`.
+- [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  (and
+  [`step_macropca()`](https://christiangoueguel.com/specProc/reference/step_macropca.md))
+  now only centers the variables by default, instead of also scaling
+  them as
+  [`cellWise::MacroPCA()`](https://rdrr.io/pkg/cellWise/man/MacroPCA.html)
+  does: scaling spectra gives noise and continuum channels as much
+  weight as emission lines. Use `macropca(x, scale = TRUE)` for the
+  previous behavior.
+- [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
+  is redrawn with ggplot2 and patchwork instead of
+  [`cellWise::cellMap()`](https://rdrr.io/pkg/cellWise/man/cellMap.html),
+  for spectra: the map fills the plot, with a wavelength axis, cells
+  combined into at most `resolution` blocks (within detector segments),
+  flagged cells colored by the sign and size of their residual, a strip
+  of the outlier type of each observation, rows optionally sorted by
+  orthogonal distance (`order = "od"`), and a top panel of the share of
+  flagged cells at each wavelength (`profile`). The arguments
+  `nrowsinblock`, `ncolumnsinblock` and `...` are replaced by
+  `resolution`. The profile shows the mean spectrum in grey (of the
+  imputed data, or of `spectra`) and labels the most flagged regions,
+  with the emission lines they match (`lines`), and `order = "cluster"`
+  groups the observations with similar flagged cells.
+- [`flagged_regions()`](https://christiangoueguel.com/specProc/reference/flagged_regions.md)
+  lists the wavelength regions where many observations have cells
+  flagged by
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  (at least `threshold` of them), with their extent, share, direction
+  and matching emission lines.
 
 ### New features
+
+- [`plot_loadings()`](https://christiangoueguel.com/specProc/reference/plot_loadings.md)
+  plots the loadings of a PCA
+  ([`prcomp()`](https://rdrr.io/r/stats/prcomp.html),
+  [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
+  [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
+  or
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md))
+  against wavelength, one panel per component, and labels the
+  wavelengths that contribute most to each component, with the emission
+  lines they match in a line list from
+  [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md).
+  The mean spectrum can be drawn behind the loadings,
+  `type = "contribution"` plots the variance of each wavelength
+  explained by the components, and `interactive = TRUE` makes a plotly
+  figure.
+  [`loading_peaks()`](https://christiangoueguel.com/specProc/reference/loading_peaks.md)
+  returns the labeled peaks as a table, with their candidate lines and a
+  flag for derivative shapes (line shifts).
+
+- [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
+  gains `relative`, to plot the reduced distances (divided by their
+  cut-offs) so that maps of different models share one scale, `shade`,
+  to shade the good leverage, orthogonal outlier and bad leverage
+  regions in greys of increasing darkness and name them, and `log`, for
+  logarithmic axes. The points are outlined in black, and `...` passes
+  styling such as `alpha` or `size` to
+  [`geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html).
 
 - [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md)
   computes the distance to the model in the space of the variables
@@ -151,6 +208,16 @@
   computes Hotelling’s T-squared of each sample on `k` components of an
   embedding, with its 95% and 99% limits, for all samples or within
   groups.
+
+### Bug fixes
+
+- [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  failed when `k` was not given:
+  [`cellWise::MacroPCA()`](https://rdrr.io/pkg/cellWise/man/MacroPCA.html)
+  with `k = 0` only reports the explained variance. `k` is now chosen
+  from the new arguments `var_explained` (0.8) and `kmax` (10), as in
+  [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
+  and MacroPCA’s message and scree plot are no longer shown.
 
 ## specProc 0.6.0
 

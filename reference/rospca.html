@@ -67,7 +67,7 @@ a few emission lines. The computational kernels are written in C++.</p>
 <span>  lambda <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.75</span>,</span>
 <span>  ndir <span class="op">=</span> <span class="fl">250</span>,</span>
-<span>  stand <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  stand <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ngrid <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  maxiter <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -103,7 +103,7 @@ observations.</p></dd>
 
 <dt id="arg-stand">stand<a class="anchor" aria-label="anchor" href="#arg-stand"></a></dt>
 <dd><p>A logical value: standardize the variables robustly (median
-and \(Q_n\)) before the analysis (<code>TRUE</code>, default) or only center them
+and \(Q_n\)) before the analysis (<code>FALSE</code>, default) or only center them
 by their median.</p></dd>
 
 
@@ -131,7 +131,7 @@ deviation in \(H_2\).</p></li>
 and \(Q_n\)) if <code>stand = TRUE</code>. As in <code><a href="robpca.html">robpca()</a></code>, the <code>h</code> least
 outlying observations form \(H_0\), and those whose orthogonal
 distance to the \(k\)-dimensional PCA subspace of \(H_0\) is below
-the cut-off form \(H_1\).</p></li>
+the cut-off form \(H_1\)</p></li>
 <li><p><strong>Sparsification.</strong> The observations of \(H_1\) are standardized and
 the sparse loadings are computed by maximizing, component by component,
 the variance of the scores minus <code>lambda</code> times the \(L_1\) norm of
@@ -174,35 +174,24 @@ component analysis. Technometrics, 55(2):202-214.</p></li>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># two latent factors, each loading on 5 of 20 variables</span></span></span>
-<span class="r-in"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span>, <span class="fl">100</span>, <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">f</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/outer.html" class="external-link">%o%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span>, <span class="va">f</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/outer.html" class="external-link">%o%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fl">3</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span> <span class="op">*</span> <span class="fl">10</span><span class="op">)</span>, <span class="fl">100</span>, <span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span> <span class="op">*</span> <span class="fl">10</span><span class="op">)</span>, <span class="fl">100</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="op">]</span> <span class="op">+</span> <span class="fl">10</span>  <span class="co"># outliers</span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">rospca</span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">2</span>, lambda <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">fit</span><span class="op">$</span><span class="va">loadings</span>, <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        PC1  PC2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.00 0.45</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 0.00 0.45</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 0.00 0.45</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 0.00 0.44</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.00 0.44</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 0.45 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 0.44 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 0.45 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 0.45 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 0.45 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11,] 0.00 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [12,] 0.00 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [13,] 0.00 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [14,] 0.00 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [15,] 0.00 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [16,] 0.00 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [17,] 0.00 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [18,] 0.00 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [19,] 0.00 0.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20,] 0.00 0.00</span>
+<span class="r-in"><span><span class="va">minerals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ca"</span>, <span class="st">"Cl"</span>, <span class="st">"Cu"</span>, <span class="st">"Fe"</span>, <span class="st">"Mg"</span>, <span class="st">"Mn"</span>, <span class="st">"Mo"</span>, <span class="st">"P"</span>, <span class="st">"K"</span>, <span class="st">"Na"</span>, <span class="st">"S"</span>, <span class="st">"Zn"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">forageLIBS</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">Measurement</span>, <span class="op">-</span><span class="va">Sample</span>, <span class="op">-</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">minerals</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="center.html">center</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">rospca</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Robust sparse PCA (ROSPCA, lambda = 1)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations:   368 (h = 276)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variables:      7152</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Components:     2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Eigenvalues:    3561.6  166.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Non-zero loadings per component: 7148 6469</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Outlier types:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            regular      good leverage orthogonal outlier       bad leverage </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                291                 29                 25                 23 </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

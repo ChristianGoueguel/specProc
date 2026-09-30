@@ -2,11 +2,13 @@
 
 Shows which cells of the data deviate from a
 [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
-fit, with
-[`cellWise::cellMap()`](https://rdrr.io/pkg/cellWise/man/cellMap.html).
-Each cell is colored by its standardized residual: red when the observed
-value is much higher than the fit, blue when it is much lower. Rows of
-outlying observations are marked.
+fit: one row per observation, the variables (wavelengths) along the
+horizontal axis, and the flagged cells colored red when the observed
+value is higher than the fit and blue when it is lower. A strip on the
+right shows the outlier type of each observation, and a panel on top the
+share of flagged cells at each wavelength over the mean spectrum, with
+the most flagged regions labeled, which shows which emission lines hold
+the cellwise outliers.
 
 ## Usage
 
@@ -15,10 +17,15 @@ plot_cell_map(
   object,
   rows = NULL,
   columns = NULL,
-  nrowsinblock = NULL,
-  ncolumnsinblock = NULL,
-  title = "MacroPCA cell map",
-  ...
+  resolution = c(200, 400),
+  order = c("data", "od", "cluster"),
+  profile = TRUE,
+  spectra = NULL,
+  threshold = 0.1,
+  labels = 5,
+  lines = NULL,
+  tol = 0.1,
+  title = "MacroPCA cell map"
 )
 ```
 
@@ -34,36 +41,103 @@ plot_cell_map(
   Optional indices or names of the rows and columns to show. Default is
   all.
 
-- nrowsinblock, ncolumnsinblock:
+- resolution:
 
-  Optional numbers of rows and columns combined into one block.
+  The maximum numbers of rows and columns of blocks. Default is
+  `c(200, 400)`.
+
+- order:
+
+  The order of the rows: `"data"` (default), `"od"` for decreasing
+  orthogonal distance, which puts the most outlying observations at the
+  top, or `"cluster"` to group the observations with similar flagged
+  cells.
+
+- profile:
+
+  If `TRUE` (default), add the panel of the share of flagged cells by
+  variable.
+
+- spectra:
+
+  Optional spectra whose mean is drawn behind the profile (a data frame
+  or matrix with the variables of the model, other columns being
+  ignored, or a single named spectrum). Default is the data imputed by
+  MacroPCA.
+
+- threshold:
+
+  The share of flagged observations above which channels form a flagged
+  region. Default is 0.1.
+
+- labels:
+
+  The number of flagged regions labeled in the profile. Default is 5;
+  use 0 for none.
+
+- lines:
+
+  Optional line list returned by
+  [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md),
+  to label the regions with the emission lines they match.
+
+- tol:
+
+  The largest distance, in nm, between a region and a line it matches.
+  Default is 0.1.
 
 - title:
 
   The plot title.
 
-- ...:
-
-  Further arguments passed to
-  [`cellWise::cellMap()`](https://rdrr.io/pkg/cellWise/man/cellMap.html),
-  such as `rowlabels`, `columnlabels` or `columnangle`.
-
 ## Value
 
-A ggplot object.
+A patchwork (ggplot2) object.
 
 ## Details
 
-Spectra have many more variables than can be shown one by one. Use
-`columns` to select a spectral region, and `ncolumnsinblock` (and
-`nrowsinblock`) to combine adjacent cells into blocks; the color of a
-block then summarizes its cells. By default, the columns are grouped
-into blocks when there are more than 60 of them.
+**Resolution.** Spectra have many more cells than a plot has pixels, so
+adjacent cells are combined into blocks: the numbers of rows and columns
+of blocks are at most `resolution`, and a map smaller than that shows
+every cell. Channels are combined only within a detector segment, and
+the gaps between segments stay empty. The map fills the plot area,
+whatever the numbers of observations and variables.
+
+**Colors.** A flagged cell with standardized residual \\r\\ has an
+intensity that grows with \\\log(\|r\|/c)\\, from 0.25 at the flagging
+cut-off \\c\\ to 1 at \\10c\\ and beyond. The color of a block is the
+mean of these signed intensities over its cells (0 for cells that are
+not flagged), on a square-root scale so that blocks with a few flagged
+cells remain visible: pale blocks have few or mixed flagged cells,
+saturated blocks many cells that deviate strongly in the same direction.
+
+**Order.** With `order = "cluster"`, the observations are sorted by a
+hierarchical clustering (Ward's method) of their flagged cells, at the
+column resolution of the map, so that observations that deviate in the
+same regions form bands (for example, a batch or a type of matrix).
+
+**Profile.** The top panel shows, for each variable, the share of the
+(shown) observations whose cell is flagged: above zero when higher than
+the fit, below zero when lower. The mean spectrum is drawn in grey
+behind it, rescaled, to show whether the flagged channels are on
+emission lines, on the continuum or in noise. It is the mean of
+`spectra` or, by default, of the data imputed by MacroPCA; it is left
+out when this mean is close to zero, as for centered data (then give the
+raw spectra in `spectra`). The dashed lines are at `threshold`, and the
+`labels` flagged regions with the largest share (see
+[`flagged_regions()`](https://christiangoueguel.com/specProc/reference/flagged_regions.md))
+are labeled with their peak wavelength, or with the emission line they
+match.
 
 ## See also
 
+[`flagged_regions()`](https://christiangoueguel.com/specProc/reference/flagged_regions.md),
 [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
+
+## Author
+
+Christian L. Goueguel
 
 ## Examples
 
@@ -73,6 +147,35 @@ x <- matrix(rnorm(40 * 8), 40, 8) %*% diag(8:1)
 x[1:2, ] <- x[1:2, ] + 20
 x[10, 2] <- 40
 fit <- macropca(x, k = 2)
-plot_cell_map(fit)
+if (requireNamespace("patchwork", quietly = TRUE)) {
+  plot_cell_map(fit)
+}
 
+# \donttest{
+# LIBS spectra of forage samples
+minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+set.seed(1)
+fit <- forageLIBS |>
+  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  macropca(k = 3)
+if (requireNamespace("patchwork", quietly = TRUE)) {
+  plot_cell_map(fit, order = "cluster")
+}
+
+flagged_regions(fit)
+#> # A tibble: 61 × 7
+#>    start   end  peak channels share mean_share direction
+#>    <dbl> <dbl> <dbl>    <int> <dbl>      <dbl> <chr>    
+#>  1  399.  399.  399.        1 0.391     0.391  lower    
+#>  2  219.  219.  219.        1 0.383     0.383  higher   
+#>  3  393.  393.  393.        2 0.318     0.281  lower    
+#>  4  397.  397.  397.        1 0.207     0.207  lower    
+#>  5  280.  280.  280.        1 0.177     0.177  lower    
+#>  6  793.  793.  793.        2 0.171     0.148  higher   
+#>  7  323.  324.  323.        7 0.149     0.0990 higher   
+#>  8  335.  335.  335.        2 0.130     0.126  higher   
+#>  9  387.  387.  387.        1 0.130     0.130  higher   
+#> 10  338.  338.  338.        1 0.128     0.128  higher   
+#> # ℹ 51 more rows
+# }
 ```

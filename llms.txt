@@ -76,7 +76,7 @@ website](https://christiangoueguel.com/specProc/articles/).
 | Orthogonal filtering | [`osc()`](https://christiangoueguel.com/specProc/reference/osc.md), [`direct_osc()`](https://christiangoueguel.com/specProc/reference/direct_osc.md), [`direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/direct_orthogonal.md), [`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md), [`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md), [`opls()`](https://christiangoueguel.com/specProc/reference/opls.md), [`predict()`](https://rdrr.io/r/stats/predict.html) |
 | Interference removal | [`epo()`](https://christiangoueguel.com/specProc/reference/epo.md), [`glsw()`](https://christiangoueguel.com/specProc/reference/glsw.md), [`y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/y_gradient_glsw.md) |
 | Calibration transfer | [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md) |
-| Robust PCA | [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md), [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md), [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md), [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md), [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md) |
+| Robust PCA | [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md), [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md), [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md), [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md), [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md), [`flagged_regions()`](https://christiangoueguel.com/specProc/reference/flagged_regions.md), [`plot_loadings()`](https://christiangoueguel.com/specProc/reference/plot_loadings.md), [`loading_peaks()`](https://christiangoueguel.com/specProc/reference/loading_peaks.md) |
 | Figures of merit | [`nas()`](https://christiangoueguel.com/specProc/reference/nas.md) |
 | Recipe steps (tidymodels) | [`step_baseline()`](https://christiangoueguel.com/specProc/reference/step_baseline.md), [`step_snv()`](https://christiangoueguel.com/specProc/reference/step_snv.md), [`step_msc()`](https://christiangoueguel.com/specProc/reference/step_msc.md), [`step_emsc()`](https://christiangoueguel.com/specProc/reference/step_emsc.md), [`step_pareto_scale()`](https://christiangoueguel.com/specProc/reference/step_pareto_scale.md), [`step_poisson_scale()`](https://christiangoueguel.com/specProc/reference/step_poisson_scale.md), [`step_epo()`](https://christiangoueguel.com/specProc/reference/step_epo.md), [`step_glsw()`](https://christiangoueguel.com/specProc/reference/step_glsw.md), [`step_osc()`](https://christiangoueguel.com/specProc/reference/step_osc.md), [`step_direct_orthogonal()`](https://christiangoueguel.com/specProc/reference/step_direct_orthogonal.md), [`step_direct_osc()`](https://christiangoueguel.com/specProc/reference/step_direct_osc.md), [`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md), [`step_y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/step_y_gradient_glsw.md), [`step_robust_bcyj()`](https://christiangoueguel.com/specProc/reference/step_robust_bcyj.md), [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md), [`step_rospca()`](https://christiangoueguel.com/specProc/reference/step_rospca.md), [`step_macropca()`](https://christiangoueguel.com/specProc/reference/step_macropca.md) |
 | Line profiles | [`voigt_profile()`](https://christiangoueguel.com/specProc/reference/voigt_profile.md), [`pseudo_voigt_profile()`](https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.md), [`gaussian_profile()`](https://christiangoueguel.com/specProc/reference/gaussian_profile.md), [`lorentzian_profile()`](https://christiangoueguel.com/specProc/reference/lorentzian_profile.md) |
@@ -181,6 +181,8 @@ for MacroPCA, outlying cells and missing values).
   : Outlier Map of a Robust PCA
 - [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
   : Cell Map of a MacroPCA Fit
+- [`flagged_regions()`](https://christiangoueguel.com/specProc/reference/flagged_regions.md)
+  : Flagged Regions of a MacroPCA Fit
 
 ### orthogonalization methods
 
@@ -407,6 +409,10 @@ Functions that help assess data visually.
   : Plotting of Spectra
 - [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
   : Plot a Two-Dimensional Embedding
+- [`plot_loadings()`](https://christiangoueguel.com/specProc/reference/plot_loadings.md)
+  : Loadings of a PCA as Spectra
+- [`loading_peaks()`](https://christiangoueguel.com/specProc/reference/loading_peaks.md)
+  : Peaks of the Loadings of a PCA
 - [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)
   : Hotelling's T-squared Statistic of Samples in an Embedding
 - [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md)

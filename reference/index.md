@@ -31,6 +31,8 @@ for MacroPCA, outlying cells and missing values).
   : Outlier Map of a Robust PCA
 - [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
   : Cell Map of a MacroPCA Fit
+- [`flagged_regions()`](https://christiangoueguel.com/specProc/reference/flagged_regions.md)
+  : Flagged Regions of a MacroPCA Fit
 
 ### orthogonalization methods
 
@@ -257,6 +259,10 @@ Functions that help assess data visually.
   : Plotting of Spectra
 - [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
   : Plot a Two-Dimensional Embedding
+- [`plot_loadings()`](https://christiangoueguel.com/specProc/reference/plot_loadings.md)
+  : Loadings of a PCA as Spectra
+- [`loading_peaks()`](https://christiangoueguel.com/specProc/reference/loading_peaks.md)
+  : Peaks of the Loadings of a PCA
 - [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)
   : Hotelling's T-squared Statistic of Samples in an Embedding
 - [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md)

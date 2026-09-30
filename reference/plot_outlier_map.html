@@ -52,7 +52,16 @@ distance, for a robust PCA fitted by <code><a href="robpca.html">robpca()</a></c
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_outlier_map</span><span class="op">(</span><span class="va">object</span>, newdata <span class="op">=</span> <span class="cn">NULL</span>, labels <span class="op">=</span> <span class="fl">3</span>, title <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_outlier_map</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  labels <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  relative <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  shade <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  log <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -74,8 +83,32 @@ matrix or data frame with the calibration variables).</p></dd>
 their row names, or row numbers). Default is 3; use 0 for no labels.</p></dd>
 
 
+<dt id="arg-relative">relative<a class="anchor" aria-label="anchor" href="#arg-relative"></a></dt>
+<dd><p>If <code>TRUE</code>, plot the reduced distances (divided by their
+cut-offs). Default is <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-shade">shade<a class="anchor" aria-label="anchor" href="#arg-shade"></a></dt>
+<dd><p>If <code>TRUE</code>, shade the three outlying regions in grey, darker
+for more harmful observations (good leverage, orthogonal outliers, bad
+leverage), and name them in their corners. The region of regular
+observations stays white. Default is <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-log">log<a class="anchor" aria-label="anchor" href="#arg-log"></a></dt>
+<dd><p>If <code>TRUE</code>, use logarithmic axes, which spread out the regular
+observations when a few are far away. Zero distances are drawn at the
+smallest positive distance. Default is <code>FALSE</code>.</p></dd>
+
+
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>The plot title.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Further arguments passed to <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">ggplot2::geom_point()</a></code> to style
+the points, such as <code>alpha</code> (default 0.85), <code>size</code> (2.2), <code>stroke</code>
+(0.4) or <code>colour</code> (the outline, <code>"black"</code>).</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -95,6 +128,13 @@ harmful outliers.</p></li>
 </ul><p>New observations (<code>newdata</code>) are projected onto the model with
 <a href="predict.specproc_robpca.html">predict()</a> and shown with the calibration
 cut-offs, which is how new spectra are screened before prediction.</p>
+<p>With <code>relative = TRUE</code>, each distance is divided by its cut-off (the
+reduced score and orthogonal distances), so both cut-offs are at 1
+whatever the model. This puts maps of different models
+(for example, with different numbers of components) on the same scale.
+A relative distance tells where an observation falls with respect to the
+cut-off, not how unlikely it is: twice the cut-off is not equally rare
+in every model.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -107,14 +147,18 @@ cut-offs, which is how new spectra are screened before prediction.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span> <span class="op">*</span> <span class="fl">10</span><span class="op">)</span>, <span class="fl">100</span>, <span class="fl">10</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="fl">10</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="op">]</span> <span class="op">+</span> <span class="fl">25</span>                          <span class="co"># bad leverage</span></span></span>
-<span class="r-in"><span><span class="va">x</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">8</span>, <span class="fl">9</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span><span class="fl">5</span><span class="op">:</span><span class="fl">8</span>, <span class="fl">9</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span> <span class="op">+</span> <span class="fl">15</span>                  <span class="co"># orthogonal outliers</span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="robpca.html">robpca</a></span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">90</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span>, <span class="op">]</span>, k <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">plot_outlier_map</span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># LIBS spectra of forage samples</span></span></span>
+<span class="r-in"><span><span class="va">minerals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ca"</span>, <span class="st">"Cl"</span>, <span class="st">"Cu"</span>, <span class="st">"Fe"</span>, <span class="st">"Mg"</span>, <span class="st">"Mn"</span>, <span class="st">"Mo"</span>, <span class="st">"P"</span>, <span class="st">"K"</span>, <span class="st">"Na"</span>, <span class="st">"S"</span>, <span class="st">"Zn"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">Measurement</span>, <span class="op">-</span><span class="va">Sample</span>, <span class="op">-</span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">minerals</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="center.html">center</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="robpca.html">robpca</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">plot_outlier_map</span><span class="op">(</span><span class="va">fit</span>, relative <span class="op">=</span> <span class="cn">TRUE</span>, shade <span class="op">=</span> <span class="cn">TRUE</span>, log <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_outlier_map-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu">plot_outlier_map</span><span class="op">(</span><span class="va">fit</span>, newdata <span class="op">=</span> <span class="va">x</span><span class="op">[</span><span class="fl">90</span><span class="op">:</span><span class="fl">100</span>, <span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_outlier_map</span><span class="op">(</span><span class="va">fit</span>, relative <span class="op">=</span> <span class="cn">TRUE</span>, shade <span class="op">=</span> <span class="cn">TRUE</span>, log <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                 alpha <span class="op">=</span> <span class="fl">0.5</span>, size <span class="op">=</span> <span class="fl">3</span>, stroke <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_outlier_map-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

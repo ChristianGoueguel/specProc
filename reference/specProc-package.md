@@ -1,11 +1,14 @@
-# specProc: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy (LIBS) Spectra
+# specProc: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy
 
-A collection of functions for preprocessing spectra in optical emission
-spectroscopy of laser-induced plasmas, called laser-induced breakdown
-spectroscopy. It covers baseline correction, normalization and scaling,
-orthogonal signal correction and calibration transfer, peak fitting, and
-robust statistics for outlier detection. Computationally intensive steps
-are implemented in C++ for large spectral datasets.
+Tools for exploring and preprocessing spectroscopic data, developed for
+laser-induced breakdown spectroscopy (LIBS) and also applicable to other
+techniques such as Raman, infrared, and inductively coupled plasma
+optical emission spectroscopy. Covers the entire preprocessing workflow,
+from raw spectra to a modeling-ready data matrix, including baseline
+correction, normalization and scaling, orthogonal signal correction,
+calibration transfer, peak fitting, and robust outlier detection.
+Computationally intensive steps are implemented in 'C++' via 'Rcpp' for
+efficient processing of large spectral datasets.
 
 ## See also
 
@@ -20,7 +23,9 @@ Useful links:
 ## Author
 
 **Maintainer**: Christian L. Goueguel <christian.goueguel@gmail.com>
+([ORCID](https://orcid.org/0000-0003-0521-3446))
 
 Authors:
 
 - Christian L. Goueguel <christian.goueguel@gmail.com>
+  ([ORCID](https://orcid.org/0000-0003-0521-3446))

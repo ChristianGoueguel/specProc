@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Preprocessing Tools for Laser-Induced Breakdown Spectroscopy (LIBS) Spectra • specProc</title>
+<title>Preprocessing Tools for Laser-Induced Breakdown Spectroscopy • specProc</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -16,9 +16,9 @@
 <link href="deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Preprocessing Tools for Laser-Induced Breakdown Spectroscopy (LIBS) Spectra">
-<meta name="description" content="A collection of functions for preprocessing spectra in optical emission spectroscopy of laser-induced plasmas, called laser-induced breakdown spectroscopy. It covers baseline correction, normalization and scaling, orthogonal signal correction and calibration transfer, peak fitting, and robust statistics for outlier detection. Computationally intensive steps are implemented in C++ for large spectral datasets.">
-<meta property="og:description" content="A collection of functions for preprocessing spectra in optical emission spectroscopy of laser-induced plasmas, called laser-induced breakdown spectroscopy. It covers baseline correction, normalization and scaling, orthogonal signal correction and calibration transfer, peak fitting, and robust statistics for outlier detection. Computationally intensive steps are implemented in C++ for large spectral datasets.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Preprocessing Tools for Laser-Induced Breakdown Spectroscopy">
+<meta name="description" content="Tools for exploring and preprocessing spectroscopic data, developed for laser-induced breakdown spectroscopy (LIBS) and also applicable to other techniques such as Raman, infrared, and inductively coupled plasma optical emission spectroscopy. Covers the entire preprocessing workflow, from raw spectra to a modeling-ready data matrix, including baseline correction, normalization and scaling, orthogonal signal correction, calibration transfer, peak fitting, and robust outlier detection. Computationally intensive steps are implemented in C++ via Rcpp for efficient processing of large spectral datasets.">
+<meta property="og:description" content="Tools for exploring and preprocessing spectroscopic data, developed for laser-induced breakdown spectroscopy (LIBS) and also applicable to other techniques such as Raman, infrared, and inductively coupled plasma optical emission spectroscopy. Covers the entire preprocessing workflow, from raw spectra to a modeling-ready data matrix, including baseline correction, normalization and scaling, orthogonal signal correction, calibration transfer, peak fitting, and robust outlier detection. Computationally intensive steps are implemented in C++ via Rcpp for efficient processing of large spectral datasets.">
 <meta property="og:image" content="https://christiangoueguel.com/specProc/logo.png">
 </head>
 <body>
@@ -163,7 +163,7 @@
 <tr>
 <td>Robust PCA</td>
 <td>
-<code><a href="reference/robpca.html">robpca()</a></code>, <code><a href="reference/rospca.html">rospca()</a></code>, <code><a href="reference/macropca.html">macropca()</a></code>, <code><a href="reference/plot_outlier_map.html">plot_outlier_map()</a></code>, <code><a href="reference/plot_cell_map.html">plot_cell_map()</a></code>
+<code><a href="reference/robpca.html">robpca()</a></code>, <code><a href="reference/rospca.html">rospca()</a></code>, <code><a href="reference/macropca.html">macropca()</a></code>, <code><a href="reference/plot_outlier_map.html">plot_outlier_map()</a></code>, <code><a href="reference/plot_cell_map.html">plot_cell_map()</a></code>, <code><a href="reference/flagged_regions.html">flagged_regions()</a></code>, <code><a href="reference/plot_loadings.html">plot_loadings()</a></code>, <code><a href="reference/loading_peaks.html">loading_peaks()</a></code>
 </td>
 </tr>
 <tr>
@@ -347,7 +347,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Christian L. Goueguel <br><small class="roles"> Author, maintainer </small>   </li>
+<li>Christian L. Goueguel <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/https://orcid.org/0000-0003-0521-3446" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 

@@ -17,7 +17,7 @@ work the same way, and adds
 ## Usage
 
 ``` r
-macropca(x, k = NULL, alpha = 0.5, ...)
+macropca(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, ...)
 ```
 
 ## Arguments
@@ -30,17 +30,30 @@ macropca(x, k = NULL, alpha = 0.5, ...)
 - k:
 
   The number of principal components. If `NULL` (default), it is chosen
-  by MacroPCA.
+  from `var_explained` and `kmax`.
 
 - alpha:
 
   The robustness parameter, between 0.5 and 1. Default is 0.5.
 
+- kmax:
+
+  The maximum number of components. Default is 10.
+
+- var_explained:
+
+  The fraction of variance used to choose `k` when it is not given.
+  Default is 0.8.
+
 - ...:
 
   Further parameters of MacroPCA, passed in `MacroPCApars` (see
   [`cellWise::MacroPCA()`](https://rdrr.io/pkg/cellWise/man/MacroPCA.html)),
-  for example `scale` or `maxdir`.
+  for example `maxdir`, or `scale = TRUE` to scale the variables (by
+  default, they are only centered, unlike in
+  [`cellWise::MacroPCA()`](https://rdrr.io/pkg/cellWise/man/MacroPCA.html),
+  so that intense emission lines are not outweighed by noise and
+  continuum channels).
 
 ## Value
 
@@ -70,6 +83,14 @@ are displayed by
 Spectra often have many more channels than observations; MacroPCA's DDC
 step can then be slow, and averaging adjacent channels first helps.
 
+When `k` is `NULL`, MacroPCA is run a first time to estimate the
+variance explained by up to `kmax` components, and `k` is the smallest
+number of components that explain `var_explained` of it (or `kmax`, if
+none does), as in
+[`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md).
+MacroPCA is then run again with this `k`, so giving `k` halves the
+computing time.
+
 ## References
 
 - Hubert, M., Rousseeuw, P.J., Van den Bossche, W. (2019). MacroPCA: an
@@ -91,22 +112,24 @@ Christian L. Goueguel
 
 ``` r
 set.seed(1)
-x <- matrix(rnorm(60 * 8), 60, 8) %*% diag(8:1)
-x[1:3, ] <- x[1:3, ] + 20   # outlying observations
-x[10, 2] <- 40              # an outlying cell
-x[12, 5] <- NA              # a missing value
-fit <- macropca(x, k = 2)
-fit
+# LIBS spectra of forage samples (MacroPCA is run twice to choose k)
+minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+set.seed(1)
+forageLIBS |>
+  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  center() |>
+  macropca() |>
+  print()
 #> Robust PCA for cellwise and casewise outliers (MacroPCA)
 #> 
-#> Observations:   60 (h = 31)
-#> Variables:      8
-#> Components:     2
-#> Eigenvalues:    1.521 1.421
-#> Flagged cells:  22
+#> Observations:   368 (h = 186)
+#> Variables:      7152
+#> Components:     3
+#> Eigenvalues:    1.951e+09 5.207e+08 1.389e+08
+#> Flagged cells:  59386
 #> 
 #> Outlier types:
 #> 
 #>            regular      good leverage orthogonal outlier       bad leverage 
-#>                 55                  0                  2                  3 
+#>                266                 10                 78                 14 
 ```

@@ -151,23 +151,21 @@ Christian L. Goueguel
 
 ``` r
 set.seed(1)
-x <- matrix(rnorm(100 * 10), 100, 10) %*% diag(10:1)
-x[1:5, ] <- x[1:5, ] + 30  # outliers
-fit <- robpca(x, k = 2)
-fit
+minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+forageLIBS |>
+  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  center() |>
+  robpca() |>
+  print()
 #> Robust PCA (ROBPCA)
 #> 
-#> Observations:   100 (h = 75)
-#> Variables:      10
-#> Components:     2
-#> Eigenvalues:    91.74 75.98
+#> Observations:   368 (h = 276)
+#> Variables:      7152
+#> Components:     3
+#> Eigenvalues:    2.645e+09 5.893e+08 1.863e+08
 #> 
 #> Outlier types:
 #> 
 #>            regular      good leverage orthogonal outlier       bad leverage 
-#>                 90                  1                  4                  5 
-table(fit$outlier_type)
-#> 
-#>            regular      good leverage orthogonal outlier       bad leverage 
-#>                 90                  1                  4                  5 
+#>                314                  6                 34                 14 
 ```

@@ -11,7 +11,16 @@ or
 ## Usage
 
 ``` r
-plot_outlier_map(object, newdata = NULL, labels = 3, title = NULL)
+plot_outlier_map(
+  object,
+  newdata = NULL,
+  labels = 3,
+  relative = FALSE,
+  shade = FALSE,
+  log = FALSE,
+  title = NULL,
+  ...
+)
 ```
 
 ## Arguments
@@ -34,9 +43,34 @@ plot_outlier_map(object, newdata = NULL, labels = 3, title = NULL)
   The number of most outlying observations to label (by their row names,
   or row numbers). Default is 3; use 0 for no labels.
 
+- relative:
+
+  If `TRUE`, plot the reduced distances (divided by their cut-offs).
+  Default is `FALSE`.
+
+- shade:
+
+  If `TRUE`, shade the three outlying regions in grey, darker for more
+  harmful observations (good leverage, orthogonal outliers, bad
+  leverage), and name them in their corners. The region of regular
+  observations stays white. Default is `FALSE`.
+
+- log:
+
+  If `TRUE`, use logarithmic axes, which spread out the regular
+  observations when a few are far away. Zero distances are drawn at the
+  smallest positive distance. Default is `FALSE`.
+
 - title:
 
   The plot title.
+
+- ...:
+
+  Further arguments passed to
+  [`ggplot2::geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html)
+  to style the points, such as `alpha` (default 0.85), `size` (2.2),
+  `stroke` (0.4) or `colour` (the outline, `"black"`).
 
 ## Value
 
@@ -63,6 +97,14 @@ New observations (`newdata`) are projected onto the model with
 and shown with the calibration cut-offs, which is how new spectra are
 screened before prediction.
 
+With `relative = TRUE`, each distance is divided by its cut-off (the
+reduced score and orthogonal distances), so both cut-offs are at 1
+whatever the model. This puts maps of different models (for example,
+with different numbers of components) on the same scale. A relative
+distance tells where an observation falls with respect to the cut-off,
+not how unlikely it is: twice the cut-off is not equally rare in every
+model.
+
 ## See also
 
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
@@ -77,13 +119,17 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
+# LIBS spectra of forage samples
+minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
 set.seed(1)
-x <- matrix(rnorm(100 * 10), 100, 10) %*% diag(10:1)
-x[1:4, ] <- x[1:4, ] + 25                          # bad leverage
-x[5:8, 9:10] <- x[5:8, 9:10] + 15                  # orthogonal outliers
-fit <- robpca(x[-(90:100), ], k = 3)
-plot_outlier_map(fit)
+fit <- forageLIBS |>
+  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  center() |>
+  robpca()
 
-plot_outlier_map(fit, newdata = x[90:100, ])
+plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE)
+
+plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE,
+                 alpha = 0.5, size = 3, stroke = 0.2)
 
 ```

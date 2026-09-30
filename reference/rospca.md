@@ -18,7 +18,7 @@ rospca(
   lambda = 1,
   alpha = 0.75,
   ndir = 250,
-  stand = TRUE,
+  stand = FALSE,
   ngrid = 10,
   maxiter = 10
 )
@@ -53,7 +53,7 @@ rospca(
 - stand:
 
   A logical value: standardize the variables robustly (median and
-  \\Q_n\\) before the analysis (`TRUE`, default) or only center them by
+  \\Q_n\\) before the analysis (`FALSE`, default) or only center them by
   their median.
 
 - ngrid:
@@ -88,7 +88,7 @@ The algorithm follows the published description in three steps:
     [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
     the `h` least outlying observations form \\H_0\\, and those whose
     orthogonal distance to the \\k\\-dimensional PCA subspace of \\H_0\\
-    is below the cut-off form \\H_1\\.
+    is below the cut-off form \\H_1\\
 
 2.  **Sparsification.** The observations of \\H_1\\ are standardized and
     the sparse loadings are computed by maximizing, component by
@@ -138,33 +138,22 @@ Christian L. Goueguel
 
 ``` r
 set.seed(1)
-# two latent factors, each loading on 5 of 20 variables
-f <- matrix(rnorm(100 * 2), 100, 2)
-x <- cbind(f[, 1] %o% rep(1, 5), f[, 2] %o% rep(1, 5)) * 3 +
-  matrix(rnorm(100 * 10), 100, 10)
-x <- cbind(x, matrix(rnorm(100 * 10), 100, 10))
-x[1:5, ] <- x[1:5, ] + 10  # outliers
-fit <- rospca(x, k = 2, lambda = 2)
-round(fit$loadings, 2)
-#>        PC1  PC2
-#>  [1,] 0.00 0.45
-#>  [2,] 0.00 0.45
-#>  [3,] 0.00 0.45
-#>  [4,] 0.00 0.44
-#>  [5,] 0.00 0.44
-#>  [6,] 0.45 0.00
-#>  [7,] 0.44 0.00
-#>  [8,] 0.45 0.00
-#>  [9,] 0.45 0.00
-#> [10,] 0.45 0.00
-#> [11,] 0.00 0.00
-#> [12,] 0.00 0.00
-#> [13,] 0.00 0.00
-#> [14,] 0.00 0.00
-#> [15,] 0.00 0.00
-#> [16,] 0.00 0.00
-#> [17,] 0.00 0.00
-#> [18,] 0.00 0.00
-#> [19,] 0.00 0.00
-#> [20,] 0.00 0.00
+minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+forageLIBS |>
+  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  center() |>
+  rospca() |>
+  print()
+#> Robust sparse PCA (ROSPCA, lambda = 1)
+#> 
+#> Observations:   368 (h = 276)
+#> Variables:      7152
+#> Components:     2
+#> Eigenvalues:    3561.6  166.3
+#> Non-zero loadings per component: 7148 6469
+#> 
+#> Outlier types:
+#> 
+#>            regular      good leverage orthogonal outlier       bad leverage 
+#>                291                 29                 25                 23 
 ```

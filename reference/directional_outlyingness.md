@@ -57,9 +57,9 @@ A tibble with columns:
 ## Details
 
 Directional outlyingness takes the potential skewness of the underlying
-distribution into account, by the splitting the univariate dataset in
-two half samples around the median. And then apply one-step M-estimator
-with Huber \\\rho\\-function for scaling each part.
+distribution into account, by splitting the univariate dataset in two
+half samples around the median. And then apply one-step M-estimator with
+Huber \\\rho\\-function for scaling each part.
 
 ## References
 

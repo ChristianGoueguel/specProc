@@ -35,6 +35,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/electron_density.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/emsc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/epo.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/flagged_regions.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/forageLIBS.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/gaussian_profile.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/generalized_boxplot.html</loc></url>
@@ -46,6 +47,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/libs_lines.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/line_finder.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/line_intensities.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/loading_peaks.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/lorentzian_profile.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/macropca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/mcwhirter_criterion.html</loc></url>
@@ -72,6 +74,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_fit.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_influence.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_lines.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/plot_loadings.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_outlier_map.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_outliers.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_spectra.html</loc></url>
