@@ -46,10 +46,11 @@
 #'   observations when a few are far away. Zero distances are drawn at the
 #'   smallest positive distance. Default is `FALSE`.
 #' @param colour_by The colors of the points: `"type"` (default), by
-#'   outlier type, or `"distance"`, by their distance from the origin in
-#'   reduced distances, \eqn{\sqrt{(SD/c_{SD})^2 + (OD/c_{OD})^2}}, on a
-#'   rainbow scale from dark red (close to the origin, in the regular
-#'   region) to blue (the farthest observations).
+#'   outlier type, or `"distance"`, by their reduced distance from the
+#'   origin, \eqn{\max(SD/c_{SD}, OD/c_{OD})}, on a rainbow scale: from dark
+#'   red (close to the origin) through orange for the regular observations,
+#'   yellow at the cut-offs (a distance of 1), then green and blue for the
+#'   outlying observations, the farthest in blue.
 #' @param title The plot title.
 #' @param ... Further arguments passed to [ggplot2::geom_point()] to style
 #'   the points, such as `alpha` (default 0.85), `size` (2.2), `stroke`
@@ -111,8 +112,8 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
   sd_cut <- max(object$cutoff_sd, .Machine$double.eps)
   od_cut <- max(object$cutoff_od, .Machine$double.eps)
   severity <- pmax(df$sd / sd_cut, df$od / od_cut)
-  # radial distance from the origin, in reduced distances
-  df$radius <- sqrt((df$sd / sd_cut)^2 + (df$od / od_cut)^2)
+  # distance from the origin in reduced distances: 1 on the cut-offs
+  df$radius <- severity
   df$label <- ""
   if (labels > 0) {
     top <- order(severity, decreasing = TRUE)[seq_len(min(labels, nrow(df)))]
@@ -205,10 +206,7 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
       ggplot2::scale_fill_manual(values = palette, drop = FALSE, name = NULL,
                                  guide = ggplot2::guide_legend(order = 1, override.aes = list(shape = 21, size = 2.5)))
     } else {
-      ggplot2::scale_fill_gradientn(colours = radial_rainbow, name = "Reduced distance from the origin",
-                                    guide = ggplot2::guide_colourbar(order = 1, barwidth = 10,
-                                                                     barheight = 0.5,
-                                                                     title.vjust = 0.9))
+      distance_fill_scale(max(df$radius, na.rm = TRUE))
     }) +
     # the kinds of samples only matter with new samples
     ggplot2::scale_shape_manual(values = c(calibration = 21, new = 24), name = NULL, drop = TRUE,
@@ -442,9 +440,24 @@ flagged_regions <- function(object, threshold = 0.1, rows = NULL, columns = NULL
 }
 
 # Rainbow of the distances of plot_outlier_map(): dark red at the origin,
-# through orange, yellow and green, to blue.
-radial_rainbow <- c("#67001f", "#b2182b", "#f46d43", "#fdae61", "#fee08b", "#d9ef8b",
+# through orange, yellow at the cut-offs (distance 1), then green and blue.
+radial_rainbow <- c("#67001f", "#b2182b", "#f46d43", "#fdae61", "#fdd835", "#d9ef8b",
                     "#66bd63", "#1a9850", "#4575b4", "#313695")
+
+# The fill scale of the distances: the colors below yellow spread over
+# [0, 1], the others over [1, the largest distance], and 1 is labeled.
+distance_fill_scale <- function(largest) {
+  top <- max(largest, 1.5)
+  stops <- c(0, 0.35, 0.65, 0.85, 1, 1 + (top - 1) * c(0.15, 0.35, 0.55, 0.8, 1))
+  breaks <- pretty(c(0, top), n = 5)
+  breaks <- sort(c(1, breaks[breaks >= 0 & breaks <= top & abs(breaks - 1) > 0.12 * top]))
+  ggplot2::scale_fill_gradientn(
+    colours = radial_rainbow, values = stops / top, limits = c(0, top),
+    breaks = breaks, labels = ifelse(breaks == 1, "1 (cut-off)", format(breaks, trim = TRUE)),
+    name = "Reduced distance",
+    guide = ggplot2::guide_colourbar(order = 1, barwidth = 12, barheight = 0.5, title.vjust = 0.9)
+  )
+}
 
 # ---- cell map internals ------------------------------------------------------
 

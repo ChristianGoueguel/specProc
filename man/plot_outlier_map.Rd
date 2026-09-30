@@ -39,10 +39,11 @@ observations when a few are far away. Zero distances are drawn at the
 smallest positive distance. Default is \code{FALSE}.}
 
 \item{colour_by}{The colors of the points: \code{"type"} (default), by
-outlier type, or \code{"distance"}, by their distance from the origin in
-reduced distances, \eqn{\sqrt{(SD/c_{SD})^2 + (OD/c_{OD})^2}}, on a
-rainbow scale from dark red (close to the origin, in the regular
-region) to blue (the farthest observations).}
+outlier type, or \code{"distance"}, by their reduced distance from the
+origin, \eqn{\max(SD/c_{SD}, OD/c_{OD})}, on a rainbow scale: from dark
+red (close to the origin) through orange for the regular observations,
+yellow at the cut-offs (a distance of 1), then green and blue for the
+outlying observations, the farthest in blue.}
 
 \item{title}{The plot title.}
 

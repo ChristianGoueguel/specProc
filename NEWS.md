@@ -50,7 +50,9 @@
   important variables (emission lines, for spectra) as labeled arrows.
 * `plot_outlier_map()` takes a size per sample (`size`), and
   `colour_by = "distance"` colors its points by their reduced distance from
-  the origin, on a rainbow from dark red (regular) to blue.
+  the origin (the larger of SD and OD over their cut-offs), on a rainbow
+  from dark red through orange for the regular observations, yellow at the
+  cut-offs, then green and blue for the outlying ones.
 * The legends of `plot_embedding()` and `plot_outlier_map()` are more
   compact: smaller text and keys, three sizes, the T-squared levels written
   on their ellipses instead of in a legend, and no key for the kind of
