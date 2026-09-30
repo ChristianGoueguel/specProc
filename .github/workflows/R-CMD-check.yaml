@@ -43,6 +43,11 @@ jobs:
           # do not link libomp and fail to load; use CRAN binaries on macOS
           use-public-rspm: ${{ matrix.config.os != 'macos-latest' }}
 
+      # rgl (imported by ConfidenceEllipse) links /opt/X11/lib/libGLU on macOS
+      - name: Install XQuartz
+        if: runner.os == 'macOS'
+        run: brew install --cask xquartz
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck

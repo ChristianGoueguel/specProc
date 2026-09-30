@@ -395,7 +395,7 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
     }
   }
   subtitle <- if (!is.null(t2)) {
-    sprintf("Hotelling T² (%d components%s): %d sample(s) beyond the %s%% limit",
+    sprintf("Hotelling T\u00b2 (%d components%s): %d sample(s) beyond the %s%% limit",
             k, if (hotelling == "group") ", within groups" else "", sum(t2$.flag),
             conf_label(max(t2_level)))
   }

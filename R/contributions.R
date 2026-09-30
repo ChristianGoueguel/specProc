@@ -180,7 +180,7 @@ plot_contributions <- function(x, samples = NULL, top = 10, lines = NULL, tol = 
   check_peak_args(top, span, lines, tol, parts)
 
   statistic <- attr(x, "statistic")
-  stat_label <- if (statistic == "q") "Q" else "T²"
+  stat_label <- if (statistic == "q") "Q" else "T\u00b2"
   labels <- sprintf("Sample %s (%s = %s)", x$sample[rows], stat_label, signif(total[rows], 3))
   n <- ncol(values)
   curves <- data.frame(
