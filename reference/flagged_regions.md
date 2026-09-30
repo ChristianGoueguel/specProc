@@ -82,20 +82,30 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-# spectra of two emitters, 0.1 nm apart, with a region (400.7-400.8 nm)
-# that deviates in 15 of the 60 spectra
-set.seed(21)
-wl <- seq(400, by = 0.1, length.out = 20)
-line <- function(center) exp(-(wl - center)^2 / 0.02)
-x <- outer(rnorm(60, 10, 2), 50 * line(400.3) + 5) +
-  outer(rnorm(60, 5, 1), 30 * line(401.5) + 3) +
-  matrix(rnorm(60 * 20, sd = 0.5), 60)
-colnames(x) <- wl
-x[1:15, 8:9] <- x[1:15, 8:9] + 20
-fit <- macropca(x, k = 2)
-flagged_regions(fit, threshold = 0.2)
-#> # A tibble: 1 × 7
-#>   start   end  peak channels share mean_share direction
-#>   <dbl> <dbl> <dbl>    <int> <dbl>      <dbl> <chr>    
-#> 1  401.  401.  401.        2  0.25       0.25 higher   
+minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+set.seed(1)
+fit <- forageLIBS |>
+  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  macropca(k = 3)
+
+if (requireNamespace("patchwork", quietly = TRUE)) {
+  plot_cell_map(fit, order = "cluster")
+}
+
+
+flagged_regions(fit)
+#> # A tibble: 61 × 7
+#>    start   end  peak channels share mean_share direction
+#>    <dbl> <dbl> <dbl>    <int> <dbl>      <dbl> <chr>    
+#>  1  399.  399.  399.        1 0.391     0.391  lower    
+#>  2  219.  219.  219.        1 0.383     0.383  higher   
+#>  3  393.  393.  393.        2 0.318     0.281  lower    
+#>  4  397.  397.  397.        1 0.207     0.207  lower    
+#>  5  280.  280.  280.        1 0.177     0.177  lower    
+#>  6  793.  793.  793.        2 0.171     0.148  higher   
+#>  7  323.  324.  323.        7 0.149     0.0990 higher   
+#>  8  335.  335.  335.        2 0.130     0.126  higher   
+#>  9  387.  387.  387.        1 0.130     0.130  higher   
+#> 10  338.  338.  338.        1 0.128     0.128  higher   
+#> # ℹ 51 more rows
 ```

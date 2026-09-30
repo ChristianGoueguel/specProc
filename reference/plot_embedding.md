@@ -27,6 +27,9 @@ plot_embedding(
   k = 2,
   t2_method = "f",
   label = NULL,
+  biplot = FALSE,
+  biplot_top = 10,
+  aspect_ratio = 0.7,
   title = NULL
 )
 ```
@@ -53,9 +56,14 @@ plot_embedding(
   The variable coloring the points: a column of `data` (unquoted or as a
   string), or a vector with one value per sample.
 
-- size, alpha:
+- size:
 
-  The size and opacity of the points.
+  The size of the points: a number (default 2), or a numeric column of
+  `data` or vector with one value per sample to vary it.
+
+- alpha:
+
+  The opacity of the points.
 
 - ellipse:
 
@@ -99,6 +107,19 @@ plot_embedding(
   The labels of the outlying samples: a column of `data` or a vector
   with one value per sample. By default, their row numbers.
 
+- biplot:
+
+  A logical: draw the loadings over the scores (`FALSE`, default).
+
+- biplot_top:
+
+  The number of loadings drawn as labeled arrows. Default is 10.
+
+- aspect_ratio:
+
+  The ratio of the height to the width of the panel. Default is 0.7;
+  `NULL` lets the panel fill the plot.
+
 - title:
 
   The plot title.
@@ -140,10 +161,46 @@ components (see
 are circled and labeled: the classical outlier limits of a score plot.
 With `hotelling = "group"`, each group of a discrete `colour` gets its
 own ellipses and limits, which flags the samples atypical of their own
-group. The ellipses are drawn for the two components shown, while the
-limits use `k` components, so with `k > 2` a flagged sample can lie
-inside the ellipses. \\T^2\\ suits linear scores such as PCA or PLS; on
-a UMAP map, whose distances are not meaningful, prefer `ellipse`.
+group. The ellipses are labeled with their level (instead of a legend),
+and drawn for the two components shown, while the limits use `k`
+components, so with `k > 2` a flagged sample can lie inside the
+ellipses. \\T^2\\ suits linear scores such as PCA or PLS; on a UMAP map,
+whose distances are not meaningful, prefer `ellipse`.
+
+**Style.** The panel is drawn in the style of SIMCA score plots: grey
+outside the outermost ellipse (of \\T^2\\, or of each group) and white
+inside, so that the samples beyond the limits stand out, with no grid
+and a fixed `aspect_ratio` (0.7 by default; `NULL` lets the plot fill
+the space), and thin black lines through the origin (when it lies in the
+range of the samples, as for centered scores). Without ellipses, the
+panel is white.
+
+**Axes.** For a [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html)
+fit or a robust PCA, the axis titles give the share of the variance of
+each component: of the total variance for
+[`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html), and of the
+variance of the `k` components of the model for
+[`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
+[`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
+and
+[`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
+which estimate only these. With groups, the ellipses (confidence, or
+\\T^2\\ with `hotelling = "group"`) are filled with the color of their
+group.
+
+**Point size.** `size` is a number, or a numeric variable (a column of
+`data` or a vector with one value per sample), such as the concentration
+of an element, which sets the size of each point, with a legend.
+
+**Biplot.** With `biplot = TRUE` (for a
+[`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html) fit or a robust
+PCA), the loadings of the two components are drawn over the scores: all
+the variables as faint points, and the `biplot_top` longest as labeled
+arrows. For spectra, the arrows are the local peaks of the loading
+length along the wavelength, one per emission line, labeled with their
+wavelength. Each axis of loadings is scaled to the range of its scores,
+and read on the top and right axes. A sample lies toward the arrows of
+the variables in which it is high.
 
 In a UMAP embedding, only the neighborhoods are meaningful: the sizes of
 the clusters and the distances between them are not, and they change
@@ -154,6 +211,7 @@ are similar, not as a quantitative projection.
 
 [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md),
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md),
+[`plot_loadings()`](https://christiangoueguel.com/specProc/reference/plot_loadings.md),
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
 
 ## Author
@@ -191,6 +249,13 @@ if (rlang::is_installed("ConfidenceEllipse")) {
 if (rlang::is_installed("ConfidenceEllipse")) {
   plot_embedding(pca, colour = texture, hotelling = "all", k = 3, label = spectra$Sample)
 }
+
+
+# point size by clay content, and a biplot of the emission lines
+clay <- soilLIBS$Clay[match(spectra$Sample, soilLIBS$Sample)]
+plot_embedding(pca, colour = texture, size = clay)
+
+plot_embedding(pca, colour = texture, biplot = TRUE)
 
 
 if (rlang::is_installed(c("recipes", "embed"))) {

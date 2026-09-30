@@ -59,6 +59,43 @@
 
 ### New features
 
+- [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
+  is drawn in the style of SIMCA score plots: grey outside the outermost
+  ellipse (of T-squared, or of each group) and white inside, with no
+  grid, a fixed `aspect_ratio` (0.7) and lines through the origin. The
+  axis titles give the explained variance of the components of PCA fits,
+  and the T-squared ellipses of the groups (`hotelling = "group"`) are
+  filled with their color. `size` can be a variable (such as a
+  concentration) that sets the size of the points, and `biplot = TRUE`
+  draws the loadings of a PCA over the scores, with the `biplot_top`
+  most important variables (emission lines, for spectra) as labeled
+  arrows.
+
+- [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
+  takes a size per sample (`size`), and `colour_by = "distance"` colors
+  its points by their reduced distance from the origin, on a rainbow
+  from dark red (regular) to blue.
+
+- The legends of
+  [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
+  and
+  [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
+  are more compact: smaller text and keys, three sizes, the T-squared
+  levels written on their ellipses instead of in a legend, and no key
+  for the kind of samples without new samples.
+
+- [`contributions()`](https://christiangoueguel.com/specProc/reference/contributions.md)
+  computes the contributions of each variable to the Q residual or to
+  Hotelling’s T-squared of samples (the definitions of the PLS_Toolbox,
+  whose squares add up to Q and T-squared), for a
+  [`prcomp()`](https://rdrr.io/r/stats/prcomp.html) fit or a robust fit
+  (where they decompose the orthogonal and score distances), and
+  relative contributions against reference samples (`reference`, or
+  `"regular"` for all regular samples).
+  [`plot_contributions()`](https://christiangoueguel.com/specProc/reference/plot_contributions.md)
+  draws them against wavelength with the largest labeled and matched to
+  emission lines.
+
 - [`plot_loadings()`](https://christiangoueguel.com/specProc/reference/plot_loadings.md)
   plots the loadings of a PCA
   ([`prcomp()`](https://rdrr.io/r/stats/prcomp.html),

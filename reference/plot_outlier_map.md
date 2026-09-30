@@ -18,6 +18,7 @@ plot_outlier_map(
   relative = FALSE,
   shade = FALSE,
   log = FALSE,
+  colour_by = c("type", "distance"),
   title = NULL,
   ...
 )
@@ -61,6 +62,14 @@ plot_outlier_map(
   observations when a few are far away. Zero distances are drawn at the
   smallest positive distance. Default is `FALSE`.
 
+- colour_by:
+
+  The colors of the points: `"type"` (default), by outlier type, or
+  `"distance"`, by their distance from the origin in reduced distances,
+  \\\sqrt{(SD/c\_{SD})^2 + (OD/c\_{OD})^2}\\, on a rainbow scale from
+  dark red (close to the origin, in the regular region) to blue (the
+  farthest observations).
+
 - title:
 
   The plot title.
@@ -70,7 +79,10 @@ plot_outlier_map(
   Further arguments passed to
   [`ggplot2::geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html)
   to style the points, such as `alpha` (default 0.85), `size` (2.2),
-  `stroke` (0.4) or `colour` (the outline, `"black"`).
+  `stroke` (0.4) or `colour` (the outline, `"black"`). `size` can also
+  be a numeric vector with one value per sample (the calibration
+  samples, then those of `newdata`), such as the concentration of an
+  element, to vary the size of the points, with a legend.
 
 ## Value
 

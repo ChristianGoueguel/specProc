@@ -140,7 +140,7 @@ head(fit$coefficients)
 #> 6 0.859  0.310  -0.000292  0.744 
 # the corrected spectra are nearly identical
 range(apply(as.matrix(fit$correction), 2, sd))
-#> [1] 2.977891e-16 1.769390e-13
+#> [1] 4.251830e-16 1.768865e-13
 
 # new spectra are corrected with the calibration reference
 corrected <- predict(fit, x[1:2, ])

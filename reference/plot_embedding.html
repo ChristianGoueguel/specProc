@@ -70,6 +70,9 @@ variable.</p>
 <span>  k <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  t2_method <span class="op">=</span> <span class="st">"f"</span>,</span>
 <span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  biplot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  biplot_top <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  aspect_ratio <span class="op">=</span> <span class="fl">0.7</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -94,8 +97,13 @@ the first two embedding coordinates (see details).</p></dd>
 (unquoted or as a string), or a vector with one value per sample.</p></dd>
 
 
-<dt id="arg-size-alpha">size, alpha<a class="anchor" aria-label="anchor" href="#arg-size-alpha"></a></dt>
-<dd><p>The size and opacity of the points.</p></dd>
+<dt id="arg-size">size<a class="anchor" aria-label="anchor" href="#arg-size"></a></dt>
+<dd><p>The size of the points: a number (default 2), or a numeric
+column of <code>data</code> or vector with one value per sample to vary it.</p></dd>
+
+
+<dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
+<dd><p>The opacity of the points.</p></dd>
 
 
 <dt id="arg-ellipse">ellipse<a class="anchor" aria-label="anchor" href="#arg-ellipse"></a></dt>
@@ -140,6 +148,21 @@ next embedding coordinates. Default is 2.</p></dd>
 vector with one value per sample. By default, their row numbers.</p></dd>
 
 
+<dt id="arg-biplot">biplot<a class="anchor" aria-label="anchor" href="#arg-biplot"></a></dt>
+<dd><p>A logical: draw the loadings over the scores (<code>FALSE</code>,
+default).</p></dd>
+
+
+<dt id="arg-biplot-top">biplot_top<a class="anchor" aria-label="anchor" href="#arg-biplot-top"></a></dt>
+<dd><p>The number of loadings drawn as labeled arrows.
+Default is 10.</p></dd>
+
+
+<dt id="arg-aspect-ratio">aspect_ratio<a class="anchor" aria-label="anchor" href="#arg-aspect-ratio"></a></dt>
+<dd><p>The ratio of the height to the width of the panel.
+Default is 0.7; <code>NULL</code> lets the panel fill the plot.</p></dd>
+
+
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>The plot title.</p></dd>
 
@@ -176,10 +199,35 @@ samples beyond the limit at the highest level of \(T^2\) on <code>k</code>
 components (see <code><a href="hotelling_t2.html">hotelling_t2()</a></code>) are circled and labeled: the classical
 outlier limits of a score plot. With <code>hotelling = "group"</code>, each group of a discrete <code>colour</code> gets its own ellipses and
 limits, which flags the samples atypical of their own group. The
-ellipses are drawn for the two components shown, while the limits use
+ellipses are labeled with their level (instead of a legend), and drawn
+for the two components shown, while the limits use
 <code>k</code> components, so with <code>k &gt; 2</code> a flagged sample can lie inside the
 ellipses. \(T^2\) suits linear scores such as PCA or PLS; on a UMAP
 map, whose distances are not meaningful, prefer <code>ellipse</code>.</p>
+<p><strong>Style.</strong> The panel is drawn in the style of SIMCA score plots: grey
+outside the outermost ellipse (of \(T^2\), or of each group) and white
+inside, so that the samples beyond the limits stand out, with no grid and
+a fixed <code>aspect_ratio</code> (0.7 by default; <code>NULL</code> lets the plot fill the
+space), and thin black lines through the origin (when it lies in the
+range of the samples, as for centered scores). Without ellipses, the
+panel is white.</p>
+<p><strong>Axes.</strong> For a <code><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">stats::prcomp()</a></code> fit or a robust PCA, the axis titles
+give the share of the variance of each component: of the total variance
+for <code><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">stats::prcomp()</a></code>, and of the variance of the <code>k</code> components of the
+model for <code><a href="robpca.html">robpca()</a></code>, <code><a href="rospca.html">rospca()</a></code> and <code><a href="macropca.html">macropca()</a></code>, which estimate only
+these. With groups, the ellipses (confidence, or \(T^2\) with
+<code>hotelling = "group"</code>) are filled with the color of their group.</p>
+<p><strong>Point size.</strong> <code>size</code> is a number, or a numeric variable (a column of
+<code>data</code> or a vector with one value per sample), such as the concentration
+of an element, which sets the size of each point, with a legend.</p>
+<p><strong>Biplot.</strong> With <code>biplot = TRUE</code> (for a <code><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">stats::prcomp()</a></code> fit or a robust
+PCA), the loadings of the two components are drawn over the scores: all
+the variables as faint points, and the <code>biplot_top</code> longest as labeled
+arrows. For spectra, the arrows are the local peaks of the loading
+length along the wavelength, one per emission line, labeled with their
+wavelength. Each axis of loadings is scaled to the range of its scores,
+and read on the top and right axes. A sample lies toward the arrows of
+the variables in which it is high.</p>
 <p>In a UMAP embedding, only the neighborhoods are meaningful: the sizes of
 the clusters and the distances between them are not, and they change
 with <code>neighbors</code> and <code>min_dist</code>. Read the plot as a map of which samples
@@ -187,7 +235,7 @@ are similar, not as a quantitative projection.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="hotelling_t2.html">hotelling_t2()</a></code>, <code><a href="plot_outlier_map.html">plot_outlier_map()</a></code>, <code><a href="robpca.html">robpca()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="hotelling_t2.html">hotelling_t2()</a></code>, <code><a href="plot_outlier_map.html">plot_outlier_map()</a></code>, <code><a href="plot_loadings.html">plot_loadings()</a></code>, <code><a href="robpca.html">robpca()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -226,6 +274,13 @@ are similar, not as a quantitative projection.</p>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-plt img"><img src="plot_embedding-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># point size by clay content, and a biplot of the emission lines</span></span></span>
+<span class="r-in"><span><span class="va">clay</span> <span class="op">&lt;-</span> <span class="va">soilLIBS</span><span class="op">$</span><span class="va">Clay</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/match.html" class="external-link">match</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">$</span><span class="va">Sample</span>, <span class="va">soilLIBS</span><span class="op">$</span><span class="va">Sample</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="fu">plot_embedding</span><span class="op">(</span><span class="va">pca</span>, colour <span class="op">=</span> <span class="va">texture</span>, size <span class="op">=</span> <span class="va">clay</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_embedding-4.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu">plot_embedding</span><span class="op">(</span><span class="va">pca</span>, colour <span class="op">=</span> <span class="va">texture</span>, biplot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_embedding-5.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/is_installed.html" class="external-link">is_installed</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"recipes"</span>, <span class="st">"embed"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">umap</span> <span class="op">&lt;-</span> <span class="fu">recipes</span><span class="fu">::</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">spectra</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
@@ -237,7 +292,7 @@ are similar, not as a quantitative projection.</p>
 <span class="r-in"><span>    <span class="fu">recipes</span><span class="fu">::</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/bake.html" class="external-link">bake</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">plot_embedding</span><span class="op">(</span><span class="va">umap</span>, colour <span class="op">=</span> <span class="va">texture</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-plt img"><img src="plot_embedding-4.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="plot_embedding-6.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

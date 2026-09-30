@@ -332,7 +332,15 @@ if (is.null(stark)) {
 } else {
   stark |> filter(density == 1e17) |> select(wavelength, upper, lower, temperature, width, shift)
 }
-#> STARK-B could not be reached; the sections that need it are skipped.
+#> # A tibble: 6 × 6
+#>   wavelength upper      lower     temperature  width    shift
+#>        <dbl> <chr>      <chr>           <dbl>  <dbl>    <dbl>
+#> 1       395. 3p6.4p 2Po 3p6.4s 2S        5000 0.0296 -0.00507
+#> 2       395. 3p6.4p 2Po 3p6.4s 2S       10000 0.0228 -0.00418
+#> 3       395. 3p6.4p 2Po 3p6.4s 2S       20000 0.0188 -0.00324
+#> 4       395. 3p6.4p 2Po 3p6.4s 2S       30000 0.0177 -0.00275
+#> 5       395. 3p6.4p 2Po 3p6.4s 2S       50000 0.0171 -0.00257
+#> 6       395. 3p6.4p 2Po 3p6.4s 2S      100000 0.0166 -0.00214
 ```
 
 STARK-B tabulates the Ca II 4s–4p multiplet at its mean wavelength.
@@ -346,6 +354,11 @@ line with the \lambda^2 rule:
 thin <- stark_width(stark, wavelength = 393.366, temperature = saha$temperature,
                     density = ne, tolerance = 2)
 thin
+#> # A tibble: 1 × 9
+#>   wavelength tabulated_wavelength upper      lower perturber temperature density
+#>        <dbl>                <dbl> <chr>      <chr> <chr>           <dbl>   <dbl>
+#> 1       393.                 395. 3p6.4p 2Po 3p6.… electron        8747. 1.80e17
+#> # ℹ 2 more variables: width <dbl>, shift <dbl>
 ```
 
 If the service is not available, a table saved earlier can be read with
@@ -389,11 +402,21 @@ ca_fit <- as_tibble(as.list(spectrum[ca_window])) |>
   multipeak_fit(peaks = c(393.37, 394.40, 396.15, 396.85), profiles = "voigt")
 measured <- ca_fit$tidied[[1]] |> filter(term == "wL_1")
 measured
+#> # A tibble: 1 × 5
+#>   term  estimate std.error statistic  p.value
+#>   <chr>    <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 wL_1     0.102    0.0260      3.90 0.000399
 self_absorption(width = measured$estimate, thin_width = thin$width)
+#> # A tibble: 1 × 4
+#>   width thin_width    SA intensity_correction
+#>   <dbl>      <dbl> <dbl>                <dbl>
+#> 1 0.102     0.0429 0.203                 4.94
 ```
 
-(This section needs the STARK-B service.) The Lorentzian width of a line
-only a few channels wide is uncertain (see its standard error), so this
+The measured Lorentzian width, 0.102 nm, is 2.4 times the optically thin
+width of 0.043 nm, which gives SA of about 0.2: only a fraction of the
+peak intensity escapes the plasma. The Lorentzian width of a line only a
+few channels wide is uncertain (see its standard error), so this
 coefficient is an order of magnitude rather than a correction factor. It
 confirms what the saturation of the same line in the forage spectra
 already suggested: the Ca II resonance lines are unsuitable for

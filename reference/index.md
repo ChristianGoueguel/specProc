@@ -271,6 +271,10 @@ Functions that help assess data visually.
   : Distance to the Model (DModX) of a PCA Model
 - [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
   : Influence Plot of a PCA Model
+- [`contributions()`](https://christiangoueguel.com/specProc/reference/contributions.md)
+  : Q and T-squared Contributions of a PCA Model
+- [`plot_contributions()`](https://christiangoueguel.com/specProc/reference/plot_contributions.md)
+  : Plot Q and T-squared Contributions
 - [`plot_outliers()`](https://christiangoueguel.com/specProc/reference/plot_outliers.md)
   : Univariate Representation of Multivariate Outliers
 - [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md)

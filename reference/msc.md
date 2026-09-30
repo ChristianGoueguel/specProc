@@ -97,5 +97,5 @@ base <- sin(seq(0, pi, length.out = 50))
 x <- t(sapply(1:10, function(i) runif(1, 0, 1) + runif(1, 0.5, 2) * base))
 res <- msc(x)
 range(apply(as.matrix(res$correction), 2, sd))
-#> [1] 1.110223e-16 2.960595e-16
+#> [1] 1.046728e-16 3.051711e-16
 ```
