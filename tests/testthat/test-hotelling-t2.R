@@ -38,7 +38,7 @@ test_that("plot_embedding draws T-squared ellipses and labels outliers", {
   x <- data.frame(PC1 = rnorm(40), PC2 = rnorm(40), group = rep(c("a", "b"), 20),
                   id = paste0("s", 1:40))
   x[3, 1:2] <- c(8, -8)
-  p <- plot_embedding(x, hotelling = "all", conf_level = c(0.95, 0.99), label = id)
+  p <- plot_embedding(x, hotelling = "all", conf_level = c(0.95, 0.99), flag = TRUE, label = id)
   paths <- p$layers[vapply(p$layers, function(l) inherits(l$geom, "GeomPath"), logical(1))][[1]]$data
   # the 95% contour lies at the T-squared limit
   s <- as.matrix(x[1:2])

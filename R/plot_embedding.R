@@ -30,18 +30,34 @@
 #' ellipse.
 #'
 #' With `hotelling = "all"`, the ellipses of Hotelling's \eqn{T^2} at each
-#' level of `conf_level` (97.5% by default) are drawn for all the
-#' samples (contours of \eqn{T^2} on the two components shown, from their
-#' mean and covariance, with [HotellingEllipse::ellipseCoord()]), and the
-#' samples beyond the limit at the highest level of \eqn{T^2} on `k`
-#' components (see [hotelling_t2()]) are circled and labeled: the classical
-#' outlier limits of a score plot. With `hotelling
-#' = "group"`, each group of a discrete `colour` gets its own ellipses and
-#' limits, which flags the samples atypical of their own group. The
-#' ellipses are labeled with their level (instead of a legend), and drawn
-#' for the two components shown, while the limits use
-#' `k` components, so with `k > 2` a flagged sample can lie inside the
-#' ellipses. \eqn{T^2} suits linear scores such as PCA or PLS; on a UMAP
+#' level of `conf_level` (97.5% by default) are drawn for all the samples,
+#' and the samples beyond the limit at the highest level of \eqn{T^2} on `k`
+#' components are counted in the subtitle, circled in red with
+#' `flag = TRUE` and labeled with `label` (each independently of the other):
+#' the classical outlier limits of a score plot. For a PCA model ([stats::prcomp()], [robpca()], [rospca()] or
+#' [macropca()]), \eqn{T^2} is that of the model: the scores divided by the
+#' variances of the components (the robust eigenvalues of a robust fit), so
+#' the ellipses are centered at 0 with the axes of the components, and
+#' semi-axes \eqn{\sqrt{\lambda_a L}} for the limit \eqn{L}. The limit is
+#' the F (or Beta) limit of [hotelling_t2()] for a [stats::prcomp()] fit, and
+#' the chi-square quantile of ROBPCA for a robust fit, whose flagged samples
+#' are then the leverage points of [plot_outlier_map()] (with `k` its
+#' number of components and `conf_level = 0.975`). The scores of the
+#' outlying samples then do not inflate or tilt the ellipses. For other
+#' embeddings, \eqn{T^2} is computed from the mean and covariance of the
+#' samples (with [hotelling_t2()] and [HotellingEllipse::ellipseCoord()]).
+#' With `hotelling = "group"`, each group of a discrete `colour` gets its own
+#' ellipses and limits, from its mean and covariance, which flags the samples
+#' atypical of their own group. The ellipses are labeled with their level
+#' (instead of a legend), and drawn for the two components shown, while the
+#' limits use `k` components, so with `k > 2` a flagged sample can lie inside
+#' the ellipses. With `ellipse = TRUE`, the confidence ellipses are always
+#' computed from the samples shown. Without groups, `ellipse = TRUE` and
+#' `hotelling = "all"` would draw two ellipses of all the samples: only the
+#' \eqn{T^2} ellipse is drawn, with a warning. With groups, both are drawn:
+#' the confidence ellipses of the groups and the \eqn{T^2} limits of all
+#' the samples. \eqn{T^2} suits linear scores such as
+#' PCA or PLS; on a UMAP
 #' map, whose distances are not meaningful, prefer `ellipse`.
 #'
 #' **Style.** The panel is drawn in the style of SIMCA score plots: grey
@@ -103,8 +119,12 @@
 #'   next embedding coordinates. Default is 2.
 #' @param t2_method The distribution of the \eqn{T^2} limits: `"f"`
 #'   (default) or `"beta"` (see [hotelling_t2()]).
-#' @param label The labels of the outlying samples: a column of `data` or a
-#'   vector with one value per sample. By default, their row numbers.
+#' @param flag A logical: circle in red the samples beyond the \eqn{T^2}
+#'   limit (`FALSE`, default).
+#' @param label The labels of the samples beyond the \eqn{T^2} limit,
+#'   whether or not they are circled: `NULL` or `FALSE` (default) for none,
+#'   `TRUE` for their row numbers, or a column of `data` or a vector with
+#'   one value per sample.
 #' @param biplot A logical: draw the loadings over the scores (`FALSE`,
 #'   default).
 #' @param biplot_top The number of loadings drawn as labeled arrows.
@@ -139,7 +159,8 @@
 #'
 #' # Hotelling's T-squared limits of the score plot, on 3 components
 #' if (rlang::is_installed("ConfidenceEllipse")) {
-#'   plot_embedding(pca, colour = texture, hotelling = "all", k = 3, label = spectra$Sample)
+#'   plot_embedding(pca, colour = texture, hotelling = "all", k = 3, flag = TRUE,
+#'                  label = spectra$Sample)
 #' }
 #'
 #' # point size by clay content, and a biplot of the emission lines
@@ -161,7 +182,8 @@
 plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, alpha = 0.8,
                            ellipse = FALSE, conf_level = 0.975, robust = FALSE,
                            distribution = "normal", hotelling = "none", k = 2,
-                           t2_method = "f", label = NULL, biplot = FALSE, biplot_top = 10,
+                           t2_method = "f", flag = FALSE, label = NULL, biplot = FALSE,
+                           biplot_top = 10,
                            aspect_ratio = 0.7, title = NULL) {
   df <- embedding_data(data)
   variance <- embedding_variance(data)
@@ -181,6 +203,7 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
   check_flag(ellipse, "ellipse")
   check_flag(robust, "robust")
   check_flag(biplot, "biplot")
+  check_flag(flag, "flag")
   check_count(biplot_top, "biplot_top", lower = 0)
   if (!is.null(aspect_ratio)) check_number(aspect_ratio, "aspect_ratio", lower = 0, lower_open = TRUE)
   ellipse_level <- check_conf_level(conf_level)
@@ -193,7 +216,16 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
   colour_values <- colour_info$values
   colour_name <- colour_info$name
   size_info <- embedding_size(size_quo, df)
-  label_values <- embedding_values(rlang::enquo(label), df, "label")$values
+  label_quo <- rlang::enquo(label)
+  label_expr <- rlang::quo_get_expr(label_quo)
+  show_labels <- !(is.null(label_expr) || isFALSE(label_expr))
+  label_values <- if (show_labels && !isTRUE(label_expr)) {
+    embedding_values(label_quo, df, "label")$values
+  }
+  if (show_labels && !isTRUE(label_expr) && is.logical(label_values) && length(label_values) == 1) {
+    show_labels <- isTRUE(label_values)
+    label_values <- NULL
+  }
   plot_df <- data.frame(.x = df[[x]], .y = df[[y]])
   if (!is.null(colour_values)) plot_df$.colour <- colour_values
   if (!is.null(size_info$values)) plot_df$.size <- size_info$values
@@ -205,6 +237,11 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
   # ellipses first: their insides are white, the rest of the panel grey
   layers <- list()
   inside <- list()
+  if (ellipse && hotelling == "all" && !grouped) {
+    warning("Without groups, the confidence ellipse is left out: the T-squared ellipse of ",
+            "`hotelling = \"all\"` already covers all the samples.", call. = FALSE)
+    ellipse <- FALSE
+  }
   if (ellipse) {
     ellipses <- embedding_ellipses(plot_df, grouped, ellipse_level, robust, distribution)
     if (!is.null(ellipses)) {
@@ -232,11 +269,18 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
       stop("'data' has fewer than ", k, " numeric columns for the T-squared.", call. = FALSE)
     }
     by_group <- hotelling == "group"
-    t2 <- hotelling_t2(df, columns = t2_cols[seq_len(k)],
-                       group = if (by_group) colour_values else NULL, conf_level = t2_level,
-                       method = t2_method)
-    t2$.flag <- t2[[paste0("outlier_", conf_label(max(t2_level)))]]
-    limits <- hotelling_ellipses(plot_df, by_group, t2_level, t2_method)
+    model <- if (by_group) NULL else model_t2_parts(data, t2_cols[seq_len(k)], x, y)
+    if (!is.null(model)) {
+      # the T-squared of the PCA model: its eigenvalues, centered at 0
+      t2 <- model_t2_flags(model, t2_level, t2_method)
+      limits <- model_t2_ellipses(model, x, y, t2_level, t2_method)
+    } else {
+      t2 <- hotelling_t2(df, columns = t2_cols[seq_len(k)],
+                         group = if (by_group) colour_values else NULL, conf_level = t2_level,
+                         method = t2_method)
+      t2$.flag <- t2[[paste0("outlier_", conf_label(max(t2_level)))]]
+      limits <- hotelling_ellipses(plot_df, by_group, t2_level, t2_method)
+    }
     if (!is.null(limits)) {
       outer <- limits[limits$limit == t2_names(max(t2_level)), , drop = FALSE]
       inside <- c(inside, list(outer_shapes(outer, if (by_group) ".colour" else NULL)))
@@ -334,16 +378,21 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
                            colour = "#7f0000", size = 2.6, inherit.aes = FALSE)
     }
   }
-  if (!is.null(t2) && any(t2$.flag)) {
+  # the samples beyond the limit: circled (flag) and labeled (label), independently
+  if ((flag || show_labels) && !is.null(t2) && any(t2$.flag)) {
     out <- plot_df[t2$sample[t2$.flag], , drop = FALSE]
     out$.label <- if (is.null(label_values)) t2$sample[t2$.flag] else
       label_values[t2$sample[t2$.flag]]
-    circle <- if (is.null(size_info$values)) size_info$constant + 2.5 else 7
-    p <- p +
-      ggplot2::geom_point(data = out, ggplot2::aes(.data$.x, .data$.y), shape = 21, size = circle,
-                          colour = "#c0392b", stroke = 0.8, inherit.aes = FALSE) +
-      ggplot2::geom_text(data = out, ggplot2::aes(.data$.x, .data$.y, label = .data$.label),
-                         vjust = -1.1, size = 3, colour = "#c0392b", inherit.aes = FALSE)
+    if (flag) {
+      circle <- if (is.null(size_info$values)) size_info$constant + 2.5 else 7
+      p <- p +
+        ggplot2::geom_point(data = out, ggplot2::aes(.data$.x, .data$.y), shape = 21, size = circle,
+                            colour = "#c0392b", stroke = 0.8, inherit.aes = FALSE)
+    }
+    if (show_labels) {
+      p <- p + ggplot2::geom_text(data = out, ggplot2::aes(.data$.x, .data$.y, label = .data$.label),
+                                  vjust = -1.1, size = 3, colour = "#c0392b", inherit.aes = FALSE)
+    }
   }
   subtitle <- if (!is.null(t2)) {
     sprintf("Hotelling T² (%d components%s): %d sample(s) beyond the %s%% limit",
@@ -411,6 +460,52 @@ hotelling_ellipses <- function(plot_df, by_group, levels, method) {
   }))
   if (is.factor(df$.colour)) out$.colour <- factor(out$.colour, levels = levels(df$.colour))
   out
+}
+
+# Scores and variances of the components of a PCA model, for its T-squared,
+# or NULL when `data` is not a PCA model or the components are not its own.
+model_t2_parts <- function(data, components, x, y) {
+  if (inherits(data, "prcomp")) {
+    scores <- data$x
+    lambda <- data$sdev[seq_len(ncol(scores))]^2
+    robust <- FALSE
+  } else if (inherits(data, "specproc_robpca") && length(data$eigenvalues) == ncol(data$scores)) {
+    scores <- data$scores
+    lambda <- data$eigenvalues
+    robust <- TRUE
+  } else {
+    return(NULL)
+  }
+  names(lambda) <- colnames(scores)
+  if (!all(c(components, x, y) %in% colnames(scores))) return(NULL)
+  list(scores = scores[, components, drop = FALSE], lambda = lambda, n = nrow(scores),
+       robust = robust)
+}
+
+# T-squared limit on `a` components: the chi-square quantile of ROBPCA for
+# robust fits (the score distance cut-off), the F or Beta limit otherwise.
+model_t2_limit <- function(model, level, a, method) {
+  if (model$robust) stats::qchisq(level, a) else t2_limit(level, a, model$n, method)
+}
+
+model_t2_flags <- function(model, levels, method) {
+  a <- ncol(model$scores)
+  t2 <- rowSums(sweep(model$scores^2, 2, model$lambda[colnames(model$scores)], "/"))
+  data.frame(sample = seq_len(model$n), t2 = unname(t2),
+             .flag = unname(t2 > model_t2_limit(model, max(levels), a, method)))
+}
+
+# The T-squared ellipses of the two components shown: centered at 0, with the
+# axes of the components, and semi-axes sqrt(lambda * limit).
+model_t2_ellipses <- function(model, x, y, levels, method) {
+  angle <- seq(0, 2 * pi, length.out = 361)
+  labels <- t2_names(levels)
+  do.call(rbind, lapply(seq_along(levels), function(i) {
+    limit <- model_t2_limit(model, levels[i], 2, method)
+    data.frame(x = sqrt(model$lambda[[x]] * limit) * cos(angle),
+               y = sqrt(model$lambda[[y]] * limit) * sin(angle),
+               limit = factor(labels[i], levels = labels))
+  }))
 }
 
 # Share of the variance of each component of a PCA fit (named like the

@@ -48,6 +48,15 @@
   a concentration) that sets the size of the points, and `biplot = TRUE`
   draws the loadings of a PCA over the scores, with the `biplot_top` most
   important variables (emission lines, for spectra) as labeled arrows.
+  With `hotelling = "all"`, the T-squared of a PCA model is that of the
+  model (its eigenvalues, centered at 0): for a robust fit, the ellipses are
+  no longer inflated or tilted by the outlying samples, and the flagged
+  samples are the leverage points of `plot_outlier_map()`. Without groups,
+  `ellipse = TRUE` with `hotelling = "all"` draws only the T-squared
+  ellipse, with a warning, instead of two ellipses of all the samples. The
+  samples beyond the T-squared limit are counted in the subtitle, circled
+  in red only with `flag = TRUE`, and labeled only with `label` (`TRUE`, or
+  a column or vector of labels), independently of each other.
 * `plot_outlier_map()` takes a size per sample (`size`), and
   `colour_by = "distance"` colors its points by their reduced distance from
   the origin (the larger of SD and OD over their cut-offs), on a rainbow

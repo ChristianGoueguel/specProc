@@ -18,6 +18,7 @@ plot_embedding(
   hotelling = "none",
   k = 2,
   t2_method = "f",
+  flag = FALSE,
   label = NULL,
   biplot = FALSE,
   biplot_top = 10,
@@ -64,8 +65,13 @@ next embedding coordinates. Default is 2.}
 \item{t2_method}{The distribution of the \eqn{T^2} limits: \code{"f"}
 (default) or \code{"beta"} (see \code{\link[=hotelling_t2]{hotelling_t2()}}).}
 
-\item{label}{The labels of the outlying samples: a column of \code{data} or a
-vector with one value per sample. By default, their row numbers.}
+\item{flag}{A logical: circle in red the samples beyond the \eqn{T^2}
+limit (\code{FALSE}, default).}
+
+\item{label}{The labels of the samples beyond the \eqn{T^2} limit,
+whether or not they are circled: \code{NULL} or \code{FALSE} (default) for none,
+\code{TRUE} for their row numbers, or a column of \code{data} or a vector with
+one value per sample.}
 
 \item{biplot}{A logical: draw the loadings over the scores (\code{FALSE},
 default).}
@@ -109,17 +115,34 @@ leave out several samples. Groups with fewer than 4 samples get no
 ellipse.
 
 With \code{hotelling = "all"}, the ellipses of Hotelling's \eqn{T^2} at each
-level of \code{conf_level} (97.5\% by default) are drawn for all the
-samples (contours of \eqn{T^2} on the two components shown, from their
-mean and covariance, with \code{\link[HotellingEllipse:ellipseCoord]{HotellingEllipse::ellipseCoord()}}), and the
-samples beyond the limit at the highest level of \eqn{T^2} on \code{k}
-components (see \code{\link[=hotelling_t2]{hotelling_t2()}}) are circled and labeled: the classical
-outlier limits of a score plot. With \code{hotelling = "group"}, each group of a discrete \code{colour} gets its own ellipses and
-limits, which flags the samples atypical of their own group. The
-ellipses are labeled with their level (instead of a legend), and drawn
-for the two components shown, while the limits use
-\code{k} components, so with \code{k > 2} a flagged sample can lie inside the
-ellipses. \eqn{T^2} suits linear scores such as PCA or PLS; on a UMAP
+level of \code{conf_level} (97.5\% by default) are drawn for all the samples,
+and the samples beyond the limit at the highest level of \eqn{T^2} on \code{k}
+components are counted in the subtitle, circled in red with
+\code{flag = TRUE} and labeled with \code{label} (each independently of the other):
+the classical outlier limits of a score plot. For a PCA model (\code{\link[stats:prcomp]{stats::prcomp()}}, \code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}} or
+\code{\link[=macropca]{macropca()}}), \eqn{T^2} is that of the model: the scores divided by the
+variances of the components (the robust eigenvalues of a robust fit), so
+the ellipses are centered at 0 with the axes of the components, and
+semi-axes \eqn{\sqrt{\lambda_a L}} for the limit \eqn{L}. The limit is
+the F (or Beta) limit of \code{\link[=hotelling_t2]{hotelling_t2()}} for a \code{\link[stats:prcomp]{stats::prcomp()}} fit, and
+the chi-square quantile of ROBPCA for a robust fit, whose flagged samples
+are then the leverage points of \code{\link[=plot_outlier_map]{plot_outlier_map()}} (with \code{k} its
+number of components and \code{conf_level = 0.975}). The scores of the
+outlying samples then do not inflate or tilt the ellipses. For other
+embeddings, \eqn{T^2} is computed from the mean and covariance of the
+samples (with \code{\link[=hotelling_t2]{hotelling_t2()}} and \code{\link[HotellingEllipse:ellipseCoord]{HotellingEllipse::ellipseCoord()}}).
+With \code{hotelling = "group"}, each group of a discrete \code{colour} gets its own
+ellipses and limits, from its mean and covariance, which flags the samples
+atypical of their own group. The ellipses are labeled with their level
+(instead of a legend), and drawn for the two components shown, while the
+limits use \code{k} components, so with \code{k > 2} a flagged sample can lie inside
+the ellipses. With \code{ellipse = TRUE}, the confidence ellipses are always
+computed from the samples shown. Without groups, \code{ellipse = TRUE} and
+\code{hotelling = "all"} would draw two ellipses of all the samples: only the
+\eqn{T^2} ellipse is drawn, with a warning. With groups, both are drawn:
+the confidence ellipses of the groups and the \eqn{T^2} limits of all
+the samples. \eqn{T^2} suits linear scores such as
+PCA or PLS; on a UMAP
 map, whose distances are not meaningful, prefer \code{ellipse}.
 
 \strong{Style.} The panel is drawn in the style of SIMCA score plots: grey
@@ -177,7 +200,8 @@ if (rlang::is_installed("ConfidenceEllipse")) {
 
 # Hotelling's T-squared limits of the score plot, on 3 components
 if (rlang::is_installed("ConfidenceEllipse")) {
-  plot_embedding(pca, colour = texture, hotelling = "all", k = 3, label = spectra$Sample)
+  plot_embedding(pca, colour = texture, hotelling = "all", k = 3, flag = TRUE,
+                 label = spectra$Sample)
 }
 
 # point size by clay content, and a biplot of the emission lines

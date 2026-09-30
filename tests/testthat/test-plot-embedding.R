@@ -76,7 +76,7 @@ test_that("plot_embedding draws T-squared ellipses at the chosen levels", {
   x <- data.frame(PC1 = rnorm(40), PC2 = 0.7 * rnorm(40), id = paste0("s", 1:40))
   x$PC2 <- x$PC2 + 0.8 * x$PC1                                # correlated components
   x[5, 1:2] <- c(4, -4)
-  p <- plot_embedding(x, hotelling = "all", conf_level = 0.9, label = id)
+  p <- plot_embedding(x, hotelling = "all", conf_level = 0.9, flag = TRUE, label = id)
   path <- p$layers[vapply(p$layers, function(l) inherits(l$geom, "GeomPath"), logical(1))][[1]]$data
   expect_equal(levels(path$limit), "T² 90%")
   s <- as.matrix(x[1:2])
@@ -95,18 +95,24 @@ test_that("plot_embedding uses one conf_level for both kinds of ellipses", {
   skip_if_not_installed("ConfidenceEllipse")
   skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
   set.seed(10)
-  x <- data.frame(PC1 = rnorm(30), PC2 = rnorm(30))
-  both <- plot_embedding(x, ellipse = TRUE, hotelling = "all")
+  x <- data.frame(PC1 = rnorm(30), PC2 = rnorm(30), g = rep(c("a", "b"), 15))
+  both <- plot_embedding(x, colour = g, ellipse = TRUE, hotelling = "all")
   poly <- ellipse_data(both)
   path <- both$layers[vapply(both$layers, function(l) inherits(l$geom, "GeomPath"), logical(1))][[1]]$data
   expect_equal(unique(poly$.level), 0.975)                           # the default of both kinds
   expect_equal(as.character(unique(path$limit)), "T\u00b2 97.5%")
-  same <- plot_embedding(x, ellipse = TRUE, hotelling = "all", conf_level = 0.9)
+  same <- plot_embedding(x, colour = g, ellipse = TRUE, hotelling = "all", conf_level = 0.9)
   poly9 <- ellipse_data(same)
   path9 <- same$layers[vapply(same$layers, function(l) inherits(l$geom, "GeomPath"), logical(1))][[1]]$data
   expect_equal(unique(poly9$.level), 0.9)
   expect_equal(as.character(unique(path9$limit)), "T\u00b2 90%")
   expect_false("t2_level" %in% names(formals(plot_embedding)))
+  # without groups, only the T-squared ellipse, with a warning
+  expect_warning(alone <- plot_embedding(x, ellipse = TRUE, hotelling = "all"), "left out")
+  expect_length(Filter(function(l) inherits(l$geom, "GeomPolygon") && ".level" %in% names(l$data),
+                       alone$layers), 0)
+  expect_length(Filter(function(l) inherits(l$geom, "GeomPath"), alone$layers), 1)
+  expect_silent(plot_embedding(x, ellipse = TRUE))
 })
 
 test_that("plot_embedding fills the insides of the ellipses in white on a grey panel", {
@@ -205,4 +211,68 @@ test_that("plot_embedding fills the T-squared ellipses of the groups", {
   # one group-free T-squared ellipse is not filled
   expect_length(Filter(function(l) inherits(l$geom, "GeomPolygon") && "limit" %in% names(l$data),
                        plot_embedding(x, hotelling = "all")$layers), 0)
+})
+
+test_that("plot_embedding draws the T-squared ellipses of a PCA model", {
+  set.seed(16)
+  x <- matrix(rnorm(60 * 6), 60, 6) %*% diag(6:1)
+  x[1:4, ] <- x[1:4, ] + 12
+  # prcomp: the model ellipse, centered at 0 with the axes of the components
+  pca <- stats::prcomp(x)
+  p <- plot_embedding(pca, hotelling = "all", conf_level = 0.95)
+  path <- Filter(function(l) inherits(l$geom, "GeomPath"), p$layers)[[1]]$data
+  lambda <- pca$sdev[1:2]^2
+  limit <- t2_limit(0.95, 2, 60, "f")
+  expect_equal(path$x^2 / lambda[1] + path$y^2 / lambda[2], rep(limit, nrow(path)))
+  expect_equal(range(path$x), c(-1, 1) * sqrt(lambda[1] * limit))
+  # the flags: T-squared of the model on k components
+  t2 <- rowSums(sweep(pca$x[, 1:3]^2, 2, pca$sdev[1:3]^2, "/"))
+  p3 <- plot_embedding(pca, hotelling = "all", k = 3)
+  expect_match(p3$labels$subtitle, paste0(sum(t2 > t2_limit(0.975, 3, 60, "f")), " sample"))
+
+  # robust fit: its eigenvalues and chi-square limit, the leverage points of the outlier map
+  set.seed(17)
+  fit <- robpca(x, k = 3)
+  r <- plot_embedding(fit, hotelling = "all", k = 3, flag = TRUE, label = TRUE)
+  rp <- Filter(function(l) inherits(l$geom, "GeomPath"), r$layers)[[1]]$data
+  expect_equal(rp$x^2 / fit$eigenvalues[1] + rp$y^2 / fit$eigenvalues[2],
+               rep(stats::qchisq(0.975, 2), nrow(rp)))
+  flagged <- Filter(function(l) inherits(l$geom, "GeomText") && ".label" %in% names(l$data),
+                    r$layers)[[1]]$data$.label
+  leverage <- which(fit$outlier_type %in% c("good leverage", "bad leverage"))
+  expect_setequal(as.integer(flagged), leverage)
+  # other embeddings: from the mean and covariance of the samples
+  skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
+  shifted <- as.data.frame(pca$x[, 1:3] + 100)
+  sp <- plot_embedding(shifted, hotelling = "all")
+  spath <- Filter(function(l) inherits(l$geom, "GeomPath"), sp$layers)[[1]]$data
+  expect_equal(mean(range(spath$x)), 100, tolerance = 1e-3)
+})
+
+test_that("the circles and labels of the flagged samples are optional", {
+  set.seed(18)
+  x <- data.frame(PC1 = rnorm(30), PC2 = rnorm(30), id = paste0("s", 1:30))
+  x[1, 1:2] <- c(8, 8)
+  pca <- stats::prcomp(x[1:2])
+  texts <- function(p) Filter(function(l) inherits(l$geom, "GeomText") && ".label" %in% names(l$data),
+                              p$layers)
+  circles <- function(p) Filter(function(l) inherits(l$geom, "GeomPoint") && identical(l$aes_params$shape, 21),
+                                p$layers)
+  # by default, neither circles nor labels, but the count in the subtitle
+  p <- plot_embedding(pca, hotelling = "all")
+  expect_length(texts(p), 0)
+  expect_length(circles(p), 0)
+  expect_match(p$labels$subtitle, "1 sample")
+  # labels without circles, circles without labels, or both
+  lab <- plot_embedding(pca, hotelling = "all", label = TRUE)
+  expect_equal(texts(lab)[[1]]$data$.label, 1)
+  expect_length(circles(lab), 0)
+  expect_equal(texts(plot_embedding(pca, hotelling = "all", label = x$id))[[1]]$data$.label, "s1")
+  f <- plot_embedding(pca, hotelling = "all", flag = TRUE)
+  expect_length(circles(f), 1)
+  expect_length(texts(f), 0)
+  expect_length(texts(plot_embedding(pca, hotelling = "all", flag = TRUE, label = FALSE)), 0)
+  expect_equal(texts(plot_embedding(pca, hotelling = "all", flag = TRUE, label = TRUE))[[1]]$data$.label, 1)
+  expect_equal(texts(plot_embedding(pca, hotelling = "all", flag = TRUE, label = x$id))[[1]]$data$.label, "s1")
+  expect_error(plot_embedding(pca, hotelling = "all", flag = NA), "flag")
 })
