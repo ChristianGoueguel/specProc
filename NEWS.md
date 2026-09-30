@@ -1,5 +1,7 @@
 # specProc (development version)
 
+# specProc 0.7.0
+
 ## Performance
 
 * Column medians are computed in C++ (`reject_shots()`, `msc()` and
