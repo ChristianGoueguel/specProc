@@ -11,6 +11,7 @@ plot_outlier_map(
   relative = FALSE,
   shade = FALSE,
   log = FALSE,
+  colour_by = c("type", "distance"),
   title = NULL,
   ...
 )
@@ -37,11 +38,20 @@ observations stays white. Default is \code{FALSE}.}
 observations when a few are far away. Zero distances are drawn at the
 smallest positive distance. Default is \code{FALSE}.}
 
+\item{colour_by}{The colors of the points: \code{"type"} (default), by
+outlier type, or \code{"distance"}, by their distance from the origin in
+reduced distances, \eqn{\sqrt{(SD/c_{SD})^2 + (OD/c_{OD})^2}}, on a
+rainbow scale from dark red (close to the origin, in the regular
+region) to blue (the farthest observations).}
+
 \item{title}{The plot title.}
 
 \item{...}{Further arguments passed to \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} to style
 the points, such as \code{alpha} (default 0.85), \code{size} (2.2), \code{stroke}
-(0.4) or \code{colour} (the outline, \code{"black"}).}
+(0.4) or \code{colour} (the outline, \code{"black"}). \code{size} can also be a numeric
+vector with one value per sample (the calibration samples, then those
+of \code{newdata}), such as the concentration of an element, to vary the
+size of the points, with a legend.}
 }
 \value{
 A ggplot object.

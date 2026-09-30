@@ -177,6 +177,8 @@ reference:
   - q_residuals
   - dmodx
   - plot_influence
+  - contributions
+  - plot_contributions
   - plot_outliers
   - adjusted_boxplot
   - generalized_boxplot

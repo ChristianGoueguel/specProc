@@ -204,13 +204,33 @@ test_that("plot_outlier_map and plot_cell_map return ggplots", {
   expect_no_warning(ggplot2::ggplot_build(plot_outlier_map(fit, shade = TRUE, log = TRUE)))
   expect_error(plot_outlier_map(fit, shade = NA), "shade")
 
+  # a size per sample is mapped, with the expression as the legend title
+  conc <- seq_along(fit$od)
+  sized <- plot_outlier_map(fit, size = conc)
+  expect_equal(sized$scales$get_scales("size")$name, "conc")
+  expect_equal(ggplot2::ggplot_build(sized)$data[[3]]$size[which.max(conc)], 6)
+  expect_error(plot_outlier_map(fit, size = 1:3), "one value per sample")
+  # compact legends: three sizes, and no key for the kind of samples without new ones
+  expect_equal(length(ggplot2::ggplot_build(sized)$plot$scales$get_scales("size")$get_breaks()), 3)
+  expect_equal(sized$scales$get_scales("shape")$guide, "none")
+  expect_false(identical(plot_outlier_map(fit, newdata = d$x[1:20, ])$scales$get_scales("shape")$guide, "none"))
+
+  # points colored by their reduced distance from the origin, farthest on top
+  rad <- plot_outlier_map(fit, colour_by = "distance")
+  expect_s3_class(rad$scales$get_scales("fill"), "ScaleContinuous")
+  radius <- sqrt((fit$sd / fit$cutoff_sd)^2 + (fit$od / fit$cutoff_od)^2)
+  expect_equal(rad$data$radius, sort(radius))
+  built <- ggplot2::ggplot_build(rad)$data[[3]]
+  expect_equal(toupper(built$fill[1]), toupper(radial_rainbow[1]))           # the closest
+  expect_error(plot_outlier_map(fit, colour_by = "od"), "arg")
+
   # point styling is passed to geom_point(), over the defaults
   styled <- ggplot2::ggplot_build(plot_outlier_map(fit, alpha = 0.4, size = 3, color = "red"))
   expect_equal(unique(styled$data[[3]]$alpha), 0.4)
   expect_equal(unique(styled$data[[3]]$size), 3)
   expect_equal(unique(styled$data[[3]]$colour), "red")
   expect_equal(unique(styled$data[[3]]$stroke), 0.4)
-  expect_error(plot_outlier_map(fit, NULL, 3, FALSE, FALSE, FALSE, NULL, 0.5), "named")
+  expect_error(plot_outlier_map(fit, NULL, 3, FALSE, FALSE, FALSE, "type", NULL, 0.5), "named")
 
   set.seed(17)
   x <- matrix(rnorm(40 * 8), 40, 8) %*% diag(8:1)

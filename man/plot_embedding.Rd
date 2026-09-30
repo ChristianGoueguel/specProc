@@ -19,6 +19,9 @@ plot_embedding(
   k = 2,
   t2_method = "f",
   label = NULL,
+  biplot = FALSE,
+  biplot_top = 10,
+  aspect_ratio = 0.7,
   title = NULL
 )
 }
@@ -33,7 +36,10 @@ the first two embedding coordinates (see details).}
 \item{colour}{The variable coloring the points: a column of \code{data}
 (unquoted or as a string), or a vector with one value per sample.}
 
-\item{size, alpha}{The size and opacity of the points.}
+\item{size}{The size of the points: a number (default 2), or a numeric
+column of \code{data} or vector with one value per sample to vary it.}
+
+\item{alpha}{The opacity of the points.}
 
 \item{ellipse}{A logical: draw confidence ellipses (\code{FALSE}, default).
 Needs the ConfidenceEllipse package.}
@@ -60,6 +66,15 @@ next embedding coordinates. Default is 2.}
 
 \item{label}{The labels of the outlying samples: a column of \code{data} or a
 vector with one value per sample. By default, their row numbers.}
+
+\item{biplot}{A logical: draw the loadings over the scores (\code{FALSE},
+default).}
+
+\item{biplot_top}{The number of loadings drawn as labeled arrows.
+Default is 10.}
+
+\item{aspect_ratio}{The ratio of the height to the width of the panel.
+Default is 0.7; \code{NULL} lets the panel fill the plot.}
 
 \item{title}{The plot title.}
 }
@@ -101,10 +116,39 @@ samples beyond the limit at the highest level of \eqn{T^2} on \code{k}
 components (see \code{\link[=hotelling_t2]{hotelling_t2()}}) are circled and labeled: the classical
 outlier limits of a score plot. With \code{hotelling = "group"}, each group of a discrete \code{colour} gets its own ellipses and
 limits, which flags the samples atypical of their own group. The
-ellipses are drawn for the two components shown, while the limits use
+ellipses are labeled with their level (instead of a legend), and drawn
+for the two components shown, while the limits use
 \code{k} components, so with \code{k > 2} a flagged sample can lie inside the
 ellipses. \eqn{T^2} suits linear scores such as PCA or PLS; on a UMAP
 map, whose distances are not meaningful, prefer \code{ellipse}.
+
+\strong{Style.} The panel is drawn in the style of SIMCA score plots: grey
+outside the outermost ellipse (of \eqn{T^2}, or of each group) and white
+inside, so that the samples beyond the limits stand out, with no grid and
+a fixed \code{aspect_ratio} (0.7 by default; \code{NULL} lets the plot fill the
+space), and thin black lines through the origin (when it lies in the
+range of the samples, as for centered scores). Without ellipses, the
+panel is white.
+
+\strong{Axes.} For a \code{\link[stats:prcomp]{stats::prcomp()}} fit or a robust PCA, the axis titles
+give the share of the variance of each component: of the total variance
+for \code{\link[stats:prcomp]{stats::prcomp()}}, and of the variance of the \code{k} components of the
+model for \code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}} and \code{\link[=macropca]{macropca()}}, which estimate only
+these. With groups, the ellipses (confidence, or \eqn{T^2} with
+\code{hotelling = "group"}) are filled with the color of their group.
+
+\strong{Point size.} \code{size} is a number, or a numeric variable (a column of
+\code{data} or a vector with one value per sample), such as the concentration
+of an element, which sets the size of each point, with a legend.
+
+\strong{Biplot.} With \code{biplot = TRUE} (for a \code{\link[stats:prcomp]{stats::prcomp()}} fit or a robust
+PCA), the loadings of the two components are drawn over the scores: all
+the variables as faint points, and the \code{biplot_top} longest as labeled
+arrows. For spectra, the arrows are the local peaks of the loading
+length along the wavelength, one per emission line, labeled with their
+wavelength. Each axis of loadings is scaled to the range of its scores,
+and read on the top and right axes. A sample lies toward the arrows of
+the variables in which it is high.
 
 In a UMAP embedding, only the neighborhoods are meaningful: the sizes of
 the clusters and the distances between them are not, and they change
@@ -136,6 +180,11 @@ if (rlang::is_installed("ConfidenceEllipse")) {
   plot_embedding(pca, colour = texture, hotelling = "all", k = 3, label = spectra$Sample)
 }
 
+# point size by clay content, and a biplot of the emission lines
+clay <- soilLIBS$Clay[match(spectra$Sample, soilLIBS$Sample)]
+plot_embedding(pca, colour = texture, size = clay)
+plot_embedding(pca, colour = texture, biplot = TRUE)
+
 if (rlang::is_installed(c("recipes", "embed"))) {
   set.seed(1)
   umap <- recipes::recipe(~ ., data = spectra) |>
@@ -149,7 +198,7 @@ if (rlang::is_installed(c("recipes", "embed"))) {
 }
 }
 \seealso{
-\code{\link[=hotelling_t2]{hotelling_t2()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}, \code{\link[=robpca]{robpca()}}
+\code{\link[=hotelling_t2]{hotelling_t2()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}, \code{\link[=plot_loadings]{plot_loadings()}}, \code{\link[=robpca]{robpca()}}
 }
 \author{
 Christian L. Goueguel

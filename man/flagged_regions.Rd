@@ -54,18 +54,17 @@ otherwise. With \code{lines}, the lines between \code{start - tol} and \code{end
 are the candidates, from the nearest to the peak.
 }
 \examples{
-# spectra of two emitters, 0.1 nm apart, with a region (400.7-400.8 nm)
-# that deviates in 15 of the 60 spectra
-set.seed(21)
-wl <- seq(400, by = 0.1, length.out = 20)
-line <- function(center) exp(-(wl - center)^2 / 0.02)
-x <- outer(rnorm(60, 10, 2), 50 * line(400.3) + 5) +
-  outer(rnorm(60, 5, 1), 30 * line(401.5) + 3) +
-  matrix(rnorm(60 * 20, sd = 0.5), 60)
-colnames(x) <- wl
-x[1:15, 8:9] <- x[1:15, 8:9] + 20
-fit <- macropca(x, k = 2)
-flagged_regions(fit, threshold = 0.2)
+minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+set.seed(1)
+fit <- forageLIBS |>
+  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  macropca(k = 3)
+
+if (requireNamespace("patchwork", quietly = TRUE)) {
+  plot_cell_map(fit, order = "cluster")
+}
+
+flagged_regions(fit)
 
 }
 \seealso{

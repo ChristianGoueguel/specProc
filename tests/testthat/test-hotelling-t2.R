@@ -45,8 +45,14 @@ test_that("plot_embedding draws T-squared ellipses and labels outliers", {
   on95 <- as.matrix(paths[paths$limit == "T² 95%", c("x", "y")])
   expect_equal(range(stats::mahalanobis(on95, colMeans(s), stats::cov(s))),
                rep(2 * 39 / 38 * stats::qf(0.95, 2, 38), 2))
-  labels <- p$layers[vapply(p$layers, function(l) inherits(l$geom, "GeomText"), logical(1))][[1]]$data
+  labels <- Filter(function(l) inherits(l$geom, "GeomText") && ".label" %in% names(l$data),
+                   p$layers)[[1]]$data
   expect_equal(labels$.label, "s3")
+  # the T-squared levels are labeled on the ellipses, not in a legend
+  levels_text <- Filter(function(l) inherits(l$geom, "GeomText") && "limit" %in% names(l$data),
+                        p$layers)[[1]]$data
+  expect_setequal(as.character(levels_text$limit), c("T\u00b2 95%", "T\u00b2 99%"))
+  expect_equal(p$scales$get_scales("linetype")$guide, "none")
   expect_match(p$labels$subtitle, "1 sample")
   g <- plot_embedding(x, colour = group, hotelling = "group")
   gp <- g$layers[vapply(g$layers, function(l) inherits(l$geom, "GeomPath"), logical(1))][[1]]$data

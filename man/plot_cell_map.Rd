@@ -100,26 +100,17 @@ regions with the largest share (see \code{\link[=flagged_regions]{flagged_region
 their peak wavelength, or with the emission line they match.
 }
 \examples{
-set.seed(1)
-x <- matrix(rnorm(40 * 8), 40, 8) \%*\% diag(8:1)
-x[1:2, ] <- x[1:2, ] + 20
-x[10, 2] <- 40
-fit <- macropca(x, k = 2)
-if (requireNamespace("patchwork", quietly = TRUE)) {
-  plot_cell_map(fit)
-}
-\donttest{
-# LIBS spectra of forage samples
 minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
 set.seed(1)
 fit <- forageLIBS |>
   dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
   macropca(k = 3)
+
 if (requireNamespace("patchwork", quietly = TRUE)) {
   plot_cell_map(fit, order = "cluster")
 }
-flagged_regions(fit)
-}
+
+plot_cell_map(fit, order = "od")
 
 }
 \seealso{

@@ -45,10 +45,18 @@
 #' @param log If `TRUE`, use logarithmic axes, which spread out the regular
 #'   observations when a few are far away. Zero distances are drawn at the
 #'   smallest positive distance. Default is `FALSE`.
+#' @param colour_by The colors of the points: `"type"` (default), by
+#'   outlier type, or `"distance"`, by their distance from the origin in
+#'   reduced distances, \eqn{\sqrt{(SD/c_{SD})^2 + (OD/c_{OD})^2}}, on a
+#'   rainbow scale from dark red (close to the origin, in the regular
+#'   region) to blue (the farthest observations).
 #' @param title The plot title.
 #' @param ... Further arguments passed to [ggplot2::geom_point()] to style
 #'   the points, such as `alpha` (default 0.85), `size` (2.2), `stroke`
-#'   (0.4) or `colour` (the outline, `"black"`).
+#'   (0.4) or `colour` (the outline, `"black"`). `size` can also be a numeric
+#'   vector with one value per sample (the calibration samples, then those
+#'   of `newdata`), such as the concentration of an element, to vary the
+#'   size of the points, with a legend.
 #'
 #' @return A ggplot object.
 #'
@@ -69,11 +77,13 @@
 #'                  alpha = 0.5, size = 3, stroke = 0.2)
 #'
 plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALSE,
-                             shade = FALSE, log = FALSE, title = NULL, ...) {
+                             shade = FALSE, log = FALSE, colour_by = c("type", "distance"),
+                             title = NULL, ...) {
   if (!inherits(object, "specproc_robpca")) {
     stop("'object' must be returned by robpca(), rospca() or macropca().", call. = FALSE)
   }
   check_count(labels, "labels", lower = 0)
+  colour_by <- match.arg(colour_by)
   for (arg in c("relative", "shade", "log")) {
     value <- get(arg)
     if (!is.logical(value) || length(value) != 1L || is.na(value)) {
@@ -101,6 +111,8 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
   sd_cut <- max(object$cutoff_sd, .Machine$double.eps)
   od_cut <- max(object$cutoff_od, .Machine$double.eps)
   severity <- pmax(df$sd / sd_cut, df$od / od_cut)
+  # radial distance from the origin, in reduced distances
+  df$radius <- sqrt((df$sd / sd_cut)^2 + (df$od / od_cut)^2)
   df$label <- ""
   if (labels > 0) {
     top <- order(severity, decreasing = TRUE)[seq_len(min(labels, nrow(df)))]
@@ -132,14 +144,35 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
     cut_y <- log10(cut_y)
   }
 
-  point_args <- list(...)
+  dots <- rlang::enquos(...)
+  point_args <- lapply(dots, rlang::eval_tidy)
   if (length(point_args) && (is.null(names(point_args)) || any(names(point_args) == ""))) {
     stop("The arguments in '...' must be named, such as 'alpha = 0.5'.", call. = FALSE)
   }
   names(point_args)[names(point_args) == "color"] <- "colour"
+  # a size per sample is mapped, with a legend
+  size_name <- NULL
+  if (length(point_args$size) > 1) {
+    if (!is.numeric(point_args$size) || length(point_args$size) != nrow(df)) {
+      stop("`size` must be a number, or a numeric vector with one value per sample (",
+           nrow(df), if (!is.null(newdata)) ", calibration then new samples", ").", call. = FALSE)
+    }
+    df$.size <- point_args$size
+    size_name <- rlang::as_label(dots$size)
+    point_args$size <- NULL
+  }
   point_args <- utils::modifyList(list(colour = "black", size = 2.2, stroke = 0.4, alpha = 0.85),
                                   point_args)
   point_args$mapping <- ggplot2::aes(fill = .data$type, shape = .data$set)
+  if (colour_by == "distance") {
+    point_args$mapping$fill <- quote(.data$radius)
+    # the farthest points on top
+    df <- df[order(df$radius), , drop = FALSE]
+  }
+  if (!is.null(size_name)) {
+    point_args$mapping$size <- quote(.data$.size)
+    point_args$size <- NULL
+  }
 
   palette <- c(regular = "grey55", `good leverage` = "#1b9e77",
                `orthogonal outlier` = "#d95f02", `bad leverage` = "#e7298a")
@@ -168,13 +201,28 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
     do.call(ggplot2::geom_point, point_args) +
     ggplot2::geom_text(ggplot2::aes(label = .data$label), size = 3, hjust = -0.2, vjust = -0.4,
                        colour = "grey20", na.rm = TRUE) +
-    ggplot2::scale_fill_manual(values = palette, drop = FALSE, name = NULL,
-                               guide = ggplot2::guide_legend(order = 1, override.aes = list(shape = 21))) +
+    (if (colour_by == "type") {
+      ggplot2::scale_fill_manual(values = palette, drop = FALSE, name = NULL,
+                                 guide = ggplot2::guide_legend(order = 1, override.aes = list(shape = 21, size = 2.5)))
+    } else {
+      ggplot2::scale_fill_gradientn(colours = radial_rainbow, name = "Reduced distance from the origin",
+                                    guide = ggplot2::guide_colourbar(order = 1, barwidth = 10,
+                                                                     barheight = 0.5,
+                                                                     title.vjust = 0.9))
+    }) +
+    # the kinds of samples only matter with new samples
     ggplot2::scale_shape_manual(values = c(calibration = 21, new = 24), name = NULL, drop = TRUE,
-                                guide = ggplot2::guide_legend(order = 2)) +
+                                guide = if (is.null(newdata)) "none" else
+                                  ggplot2::guide_legend(order = 2, override.aes = list(size = 2.5))) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
     ggplot2::theme_bw() +
-    ggplot2::theme(legend.position = "bottom")
+    ggplot2::theme(legend.position = "bottom") +
+    compact_legend()
+  if (!is.null(size_name)) {
+    p <- p + ggplot2::theme(legend.box = "vertical")
+    p <- p + ggplot2::scale_size_continuous(range = c(1.2, 6), name = size_name, breaks = three_breaks,
+                                            guide = ggplot2::guide_legend(order = 3))
+  }
   if (log) {
     log_breaks <- function(limits) log10(scales::breaks_log(n = 6)(10^limits))
     log_labels <- function(breaks) vapply(10^breaks, format, character(1), digits = 3, scientific = FALSE)
@@ -389,6 +437,11 @@ flagged_regions <- function(object, threshold = 0.1, rows = NULL, columns = NULL
   rownames(out) <- NULL
   tibble::as_tibble(out)
 }
+
+# Rainbow of the distances of plot_outlier_map(): dark red at the origin,
+# through orange, yellow and green, to blue.
+radial_rainbow <- c("#67001f", "#b2182b", "#f46d43", "#fdae61", "#fee08b", "#d9ef8b",
+                    "#66bd63", "#1a9850", "#4575b4", "#313695")
 
 # ---- cell map internals ------------------------------------------------------
 
