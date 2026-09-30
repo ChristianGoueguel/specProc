@@ -54,6 +54,7 @@ otherwise. With \code{lines}, the lines between \code{start - tol} and \code{end
 are the candidates, from the nearest to the peak.
 }
 \examples{
+\donttest{
 minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
 set.seed(1)
 fit <- forageLIBS |>
@@ -65,6 +66,7 @@ if (requireNamespace("patchwork", quietly = TRUE)) {
 }
 
 flagged_regions(fit)
+}
 
 }
 \seealso{

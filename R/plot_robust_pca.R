@@ -309,6 +309,7 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
 #' set.seed(1)
 #' fit <- forageLIBS |>
@@ -317,9 +318,9 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
 #'
 #' if (requireNamespace("patchwork", quietly = TRUE)) {
 #'   plot_cell_map(fit, order = "cluster")
+#'   plot_cell_map(fit, order = "od")
 #' }
-#'
-#' plot_cell_map(fit, order = "od")
+#' }
 #'
 plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(200, 400),
                           order = c("data", "od", "cluster"), profile = TRUE, spectra = NULL,
@@ -415,6 +416,7 @@ plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(20
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
 #' set.seed(1)
 #' fit <- forageLIBS |>
@@ -426,6 +428,7 @@ plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(20
 #' }
 #'
 #' flagged_regions(fit)
+#' }
 #'
 flagged_regions <- function(object, threshold = 0.1, rows = NULL, columns = NULL, lines = NULL,
                             tol = 0.1) {
