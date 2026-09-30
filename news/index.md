@@ -73,8 +73,11 @@
 
 - [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
   takes a size per sample (`size`), and `colour_by = "distance"` colors
-  its points by their reduced distance from the origin, on a rainbow
-  from dark red (regular) to blue.
+  its points by their reduced distance from the origin (the larger of SD
+  and OD over their cut-offs), on a rainbow from dark red to blue; with
+  `relative = TRUE`, where both cut-offs are at 1, yellow marks the
+  cut-offs, between the regular observations (dark red to orange) and
+  the outlying ones (green to blue).
 
 - The legends of
   [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)

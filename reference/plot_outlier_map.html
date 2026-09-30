@@ -104,10 +104,12 @@ smallest positive distance. Default is <code>FALSE</code>.</p></dd>
 
 <dt id="arg-colour-by">colour_by<a class="anchor" aria-label="anchor" href="#arg-colour-by"></a></dt>
 <dd><p>The colors of the points: <code>"type"</code> (default), by
-outlier type, or <code>"distance"</code>, by their distance from the origin in
-reduced distances, \(\sqrt{(SD/c_{SD})^2 + (OD/c_{OD})^2}\), on a
-rainbow scale from dark red (close to the origin, in the regular
-region) to blue (the farthest observations).</p></dd>
+outlier type, or <code>"distance"</code>, by their reduced distance from the
+origin, \(\max(SD/c_{SD}, OD/c_{OD})\), on a rainbow scale from dark
+red (the closest) to blue (the farthest). With <code>relative = TRUE</code>, where
+both cut-offs are at 1, yellow marks the cut-offs: dark red through
+orange for the regular observations, then green and blue for the
+outlying ones. Otherwise, the colors spread evenly over the distances.</p></dd>
 
 
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>

@@ -82,6 +82,7 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
+# \donttest{
 minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
 set.seed(1)
 fit <- forageLIBS |>
@@ -108,4 +109,5 @@ flagged_regions(fit)
 #>  9  387.  387.  387.        1 0.130     0.130  higher   
 #> 10  338.  338.  338.        1 0.128     0.128  higher   
 #> # ℹ 51 more rows
+# }
 ```

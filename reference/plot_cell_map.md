@@ -142,6 +142,7 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
+# \donttest{
 minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
 set.seed(1)
 fit <- forageLIBS |>
@@ -150,9 +151,8 @@ fit <- forageLIBS |>
 
 if (requireNamespace("patchwork", quietly = TRUE)) {
   plot_cell_map(fit, order = "cluster")
+  plot_cell_map(fit, order = "od")
 }
 
-
-plot_cell_map(fit, order = "od")
-
+# }
 ```

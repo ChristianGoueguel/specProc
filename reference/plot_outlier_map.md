@@ -65,10 +65,12 @@ plot_outlier_map(
 - colour_by:
 
   The colors of the points: `"type"` (default), by outlier type, or
-  `"distance"`, by their distance from the origin in reduced distances,
-  \\\sqrt{(SD/c\_{SD})^2 + (OD/c\_{OD})^2}\\, on a rainbow scale from
-  dark red (close to the origin, in the regular region) to blue (the
-  farthest observations).
+  `"distance"`, by their reduced distance from the origin,
+  \\\max(SD/c\_{SD}, OD/c\_{OD})\\, on a rainbow scale from dark red
+  (the closest) to blue (the farthest). With `relative = TRUE`, where
+  both cut-offs are at 1, yellow marks the cut-offs: dark red through
+  orange for the regular observations, then green and blue for the
+  outlying ones. Otherwise, the colors spread evenly over the distances.
 
 - title:
 
