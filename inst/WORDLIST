@@ -282,6 +282,7 @@ analyte
 arPLS
 arxiv
 autoionizing
+autoscaled
 autoscaling
 bestObj
 bicor
@@ -306,10 +307,14 @@ eV
 embeddings
 equilibration
 et
+extrema
 extremal
+extremum
 forcats
 frac
 ggplot
+grey
+greys
 hayes
 https
 hydrogenic
@@ -371,6 +376,7 @@ tibbles
 tidymodels
 tidyverse
 tunable
+uncalibrated
 und
 underpredicted
 vibrational

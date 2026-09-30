@@ -86,7 +86,7 @@ website](https://christiangoueguel.com/specProc/articles/).
 | Orthogonal filtering | `osc()`, `direct_osc()`, `direct_orthogonal()`, `projected_osc()`, `o2pls()`, `opls()`, `predict()` |
 | Interference removal | `epo()`, `glsw()`, `y_gradient_glsw()` |
 | Calibration transfer | `pds()` |
-| Robust PCA | `robpca()`, `rospca()`, `macropca()`, `plot_outlier_map()`, `plot_cell_map()` |
+| Robust PCA | `robpca()`, `rospca()`, `macropca()`, `plot_outlier_map()`, `plot_cell_map()`, `flagged_regions()`, `plot_loadings()`, `loading_peaks()` |
 | Figures of merit | `nas()` |
 | Recipe steps (tidymodels) | `step_baseline()`, `step_snv()`, `step_msc()`, `step_emsc()`, `step_pareto_scale()`, `step_poisson_scale()`, `step_epo()`, `step_glsw()`, `step_osc()`, `step_direct_orthogonal()`, `step_direct_osc()`, `step_projected_osc()`, `step_y_gradient_glsw()`, `step_robust_bcyj()`, `step_robpca()`, `step_rospca()`, `step_macropca()` |
 | Line profiles | `voigt_profile()`, `pseudo_voigt_profile()`, `gaussian_profile()`, `lorentzian_profile()` |

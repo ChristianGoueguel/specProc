@@ -36,10 +36,11 @@ MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/
 **specProc** preprocesses and explores spectroscopic data. It was
 developed for laser-induced breakdown spectroscopy (LIBS) but works with
 other techniques such as Raman, infrared, and inductively coupled plasma
-optical emission spectroscopy. It takes raw detector counts through to a
-data matrix ready for modeling. Its computationally heavy steps run in
-C++ (via Rcpp), so it stays fast on data sets with thousands of spectra
-and high-resolution wavelength channels.
+optical emission spectroscopy. It handles the entire preprocessing
+workflow, from raw spectra to a data matrix ready for modeling. Its
+computationally heavy steps run in C++ (via Rcpp), so it stays fast on
+data sets with thousands of spectra and high-resolution wavelength
+channels.
 
 ## Installation
 
@@ -97,14 +98,14 @@ website](https://christiangoueguel.com/specProc/articles/).
 ## Function overview
 
 | Task | Functions |
-|------------------------------------|------------------------------------|
+|----|----|
 | Baseline correction | `baseline_arpls()`, `baseline_als()`, `baseline_lsp()` |
 | Normalization | `snv()`, `msc()`, `emsc()`, `normalize()` |
 | Scaling and centering | `center()`, `pareto_scale()`, `poisson_scale()`, `minmax()` |
 | Orthogonal filtering | `osc()`, `direct_osc()`, `direct_orthogonal()`, `projected_osc()`, `o2pls()`, `opls()`, `predict()` |
 | Interference removal | `epo()`, `glsw()`, `y_gradient_glsw()` |
 | Calibration transfer | `pds()` |
-| Robust PCA | `robpca()`, `rospca()`, `macropca()`, `plot_outlier_map()`, `plot_cell_map()` |
+| Robust PCA | `robpca()`, `rospca()`, `macropca()`, `plot_outlier_map()`, `plot_cell_map()`, `flagged_regions()`, `plot_loadings()`, `loading_peaks()` |
 | Figures of merit | `nas()` |
 | Recipe steps (tidymodels) | `step_baseline()`, `step_snv()`, `step_msc()`, `step_emsc()`, `step_pareto_scale()`, `step_poisson_scale()`, `step_epo()`, `step_glsw()`, `step_osc()`, `step_direct_orthogonal()`, `step_direct_osc()`, `step_projected_osc()`, `step_y_gradient_glsw()`, `step_robust_bcyj()`, `step_robpca()`, `step_rospca()`, `step_macropca()` |
 | Line profiles | `voigt_profile()`, `pseudo_voigt_profile()`, `gaussian_profile()`, `lorentzian_profile()` |
@@ -126,7 +127,7 @@ its asymptotic efficiency relative to the standard deviation for normal
 data.
 
 | Estimator | Function | Breakdown point | Efficiency |
-|------------------|------------------|------------------|------------------|
+|----|----|----|----|
 | Standard deviation | `stats::sd()` | 0% | 100% |
 | MAD (bias-corrected) | `umad()` | 50% | 37% |
 | Rousseeuw–Croux Sn | `rousseeuw_croux(estimator = "Sn")` | 50% | 58% |

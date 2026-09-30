@@ -84,11 +84,12 @@
 #'
 #' @examples
 #' set.seed(1)
-#' x <- matrix(rnorm(100 * 10), 100, 10) %*% diag(10:1)
-#' x[1:5, ] <- x[1:5, ] + 30  # outliers
-#' fit <- robpca(x, k = 2)
-#' fit
-#' table(fit$outlier_type)
+#' minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+#' forageLIBS |>
+#'   dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+#'   center() |>
+#'   robpca() |>
+#'   print()
 #'
 robpca <- function(x, k = NULL, kmax = 10, alpha = 0.75, ndir = 250, var_explained = 0.8, nsamp = 500) {
   x <- robust_pca_input(x)
@@ -165,7 +166,7 @@ robpca <- function(x, k = NULL, kmax = 10, alpha = 0.75, ndir = 250, var_explain
 #'    and \eqn{Q_n}) if `stand = TRUE`. As in [robpca()], the `h` least
 #'    outlying observations form \eqn{H_0}, and those whose orthogonal
 #'    distance to the \eqn{k}-dimensional PCA subspace of \eqn{H_0} is below
-#'    the cut-off form \eqn{H_1}.
+#'    the cut-off form \eqn{H_1}
 #' 2. **Sparsification.** The observations of \eqn{H_1} are standardized and
 #'    the sparse loadings are computed by maximizing, component by component,
 #'    the variance of the scores minus `lambda` times the \eqn{L_1} norm of
@@ -194,7 +195,7 @@ robpca <- function(x, k = NULL, kmax = 10, alpha = 0.75, ndir = 250, var_explain
 #' @param k The number of principal components. Default is 2.
 #' @param lambda A non-negative number: the sparsity parameter. Default is 1.
 #' @param stand A logical value: standardize the variables robustly (median
-#'   and \eqn{Q_n}) before the analysis (`TRUE`, default) or only center them
+#'   and \eqn{Q_n}) before the analysis (`FALSE`, default) or only center them
 #'   by their median.
 #' @param ngrid The number of angles in the grid search. Default is 10.
 #' @param maxiter The maximum number of grid refinements per component.
@@ -220,16 +221,14 @@ robpca <- function(x, k = NULL, kmax = 10, alpha = 0.75, ndir = 250, var_explain
 #'
 #' @examples
 #' set.seed(1)
-#' # two latent factors, each loading on 5 of 20 variables
-#' f <- matrix(rnorm(100 * 2), 100, 2)
-#' x <- cbind(f[, 1] %o% rep(1, 5), f[, 2] %o% rep(1, 5)) * 3 +
-#'   matrix(rnorm(100 * 10), 100, 10)
-#' x <- cbind(x, matrix(rnorm(100 * 10), 100, 10))
-#' x[1:5, ] <- x[1:5, ] + 10  # outliers
-#' fit <- rospca(x, k = 2, lambda = 2)
-#' round(fit$loadings, 2)
+#' minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+#' forageLIBS |>
+#'   dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+#'   center() |>
+#'   rospca() |>
+#'   print()
 #'
-rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = TRUE,
+rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE,
                    ngrid = 10, maxiter = 10) {
   x <- robust_pca_input(x)
   n <- nrow(x)
@@ -336,13 +335,25 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = TRUE,
 #' Spectra often have many more channels than observations; MacroPCA's DDC
 #' step can then be slow, and averaging adjacent channels first helps.
 #'
+#' When `k` is `NULL`, MacroPCA is run a first time to estimate the variance
+#' explained by up to `kmax` components, and `k` is the smallest number of
+#' components that explain `var_explained` of it (or `kmax`, if none does),
+#' as in [robpca()]. MacroPCA is then run again with this `k`, so giving `k`
+#' halves the computing time.
+#'
 #' @param x A numeric matrix or data frame, with one observation per row.
 #'   Missing values are allowed.
 #' @param k The number of principal components. If `NULL` (default), it is
-#'   chosen by MacroPCA.
+#'   chosen from `var_explained` and `kmax`.
 #' @param alpha The robustness parameter, between 0.5 and 1. Default is 0.5.
+#' @param kmax The maximum number of components. Default is 10.
+#' @param var_explained The fraction of variance used to choose `k` when it
+#'   is not given. Default is 0.8.
 #' @param ... Further parameters of MacroPCA, passed in `MacroPCApars` (see
-#'   [cellWise::MacroPCA()]), for example `scale` or `maxdir`.
+#'   [cellWise::MacroPCA()]), for example `maxdir`, or `scale = TRUE` to
+#'   scale the variables (by default, they are only centered, unlike in
+#'   `cellWise::MacroPCA()`, so that intense emission lines are not
+#'   outweighed by noise and continuum channels).
 #'
 #' @return An object of class `specproc_macropca` (inheriting from
 #'   `specproc_robpca`), with the components described in [robpca()], and:
@@ -363,14 +374,16 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = TRUE,
 #'
 #' @examples
 #' set.seed(1)
-#' x <- matrix(rnorm(60 * 8), 60, 8) %*% diag(8:1)
-#' x[1:3, ] <- x[1:3, ] + 20   # outlying observations
-#' x[10, 2] <- 40              # an outlying cell
-#' x[12, 5] <- NA              # a missing value
-#' fit <- macropca(x, k = 2)
-#' fit
+#' # LIBS spectra of forage samples (MacroPCA is run twice to choose k)
+#' minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+#' set.seed(1)
+#' forageLIBS |>
+#'   dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+#'   center() |>
+#'   macropca() |>
+#'   print()
 #'
-macropca <- function(x, k = NULL, alpha = 0.5, ...) {
+macropca <- function(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, ...) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -378,8 +391,25 @@ macropca <- function(x, k = NULL, alpha = 0.5, ...) {
   if (is.null(colnames(x))) colnames(x) <- paste0("V", seq_len(ncol(x)))
   if (!is.null(k)) check_count(k, "k")
   check_number(alpha, "alpha", lower = 0.5, upper = 1)
-  pars <- utils::modifyList(list(alpha = alpha, silent = TRUE), list(...))
-  fit <- cellWise::MacroPCA(x, k = if (is.null(k)) 0 else k, MacroPCApars = pars)
+  check_count(kmax, "kmax")
+  check_number(var_explained, "var_explained", lower = 0, upper = 1, lower_open = TRUE)
+  pars <- utils::modifyList(list(alpha = alpha, silent = TRUE, kmax = kmax, scale = FALSE),
+                            list(...))
+  if (is.null(k)) {
+    # with k = 0, MacroPCA only reports the explained variance (with a scree
+    # plot and a message) and does not fit the model
+    device <- grDevices::dev.cur()
+    grDevices::pdf(NULL)
+    on.exit({
+      grDevices::dev.off()
+      if (device > 1) grDevices::dev.set(device)
+    }, add = TRUE)
+    utils::capture.output(explained <- cellWise::MacroPCA(x, k = 0, MacroPCApars = pars))
+    cumulative <- explained$cumulativeVar
+    k <- which(cumulative >= var_explained - 1e-12)[1]
+    if (is.na(k)) k <- length(cumulative)
+  }
+  fit <- cellWise::MacroPCA(x, k = k, MacroPCApars = pars)
 
   k <- as.integer(fit$k)
   loadings <- matrix(fit$loadings, ncol = k)

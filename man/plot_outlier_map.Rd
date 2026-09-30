@@ -4,7 +4,16 @@
 \alias{plot_outlier_map}
 \title{Outlier Map of a Robust PCA}
 \usage{
-plot_outlier_map(object, newdata = NULL, labels = 3, title = NULL)
+plot_outlier_map(
+  object,
+  newdata = NULL,
+  labels = 3,
+  relative = FALSE,
+  shade = FALSE,
+  log = FALSE,
+  title = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{An object returned by \code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}} or
@@ -16,7 +25,23 @@ matrix or data frame with the calibration variables).}
 \item{labels}{The number of most outlying observations to label (by
 their row names, or row numbers). Default is 3; use 0 for no labels.}
 
+\item{relative}{If \code{TRUE}, plot the reduced distances (divided by their
+cut-offs). Default is \code{FALSE}.}
+
+\item{shade}{If \code{TRUE}, shade the three outlying regions in grey, darker
+for more harmful observations (good leverage, orthogonal outliers, bad
+leverage), and name them in their corners. The region of regular
+observations stays white. Default is \code{FALSE}.}
+
+\item{log}{If \code{TRUE}, use logarithmic axes, which spread out the regular
+observations when a few are far away. Zero distances are drawn at the
+smallest positive distance. Default is \code{FALSE}.}
+
 \item{title}{The plot title.}
+
+\item{...}{Further arguments passed to \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} to style
+the points, such as \code{alpha} (default 0.85), \code{size} (2.2), \code{stroke}
+(0.4) or \code{colour} (the outline, \code{"black"}).}
 }
 \value{
 A ggplot object.
@@ -42,15 +67,27 @@ harmful outliers.
 New observations (\code{newdata}) are projected onto the model with
 \link[=predict.specproc_robpca]{predict()} and shown with the calibration
 cut-offs, which is how new spectra are screened before prediction.
+
+With \code{relative = TRUE}, each distance is divided by its cut-off (the
+reduced score and orthogonal distances), so both cut-offs are at 1
+whatever the model. This puts maps of different models
+(for example, with different numbers of components) on the same scale.
+A relative distance tells where an observation falls with respect to the
+cut-off, not how unlikely it is: twice the cut-off is not equally rare
+in every model.
 }
 \examples{
+# LIBS spectra of forage samples
+minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
 set.seed(1)
-x <- matrix(rnorm(100 * 10), 100, 10) \%*\% diag(10:1)
-x[1:4, ] <- x[1:4, ] + 25                          # bad leverage
-x[5:8, 9:10] <- x[5:8, 9:10] + 15                  # orthogonal outliers
-fit <- robpca(x[-(90:100), ], k = 3)
-plot_outlier_map(fit)
-plot_outlier_map(fit, newdata = x[90:100, ])
+fit <- forageLIBS |>
+  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  center() |>
+  robpca()
+
+plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE)
+plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE,
+                 alpha = 0.5, size = 3, stroke = 0.2)
 
 }
 \seealso{

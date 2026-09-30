@@ -4,19 +4,27 @@
 \alias{macropca}
 \title{Robust PCA for Cellwise and Casewise Outliers (MacroPCA)}
 \usage{
-macropca(x, k = NULL, alpha = 0.5, ...)
+macropca(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, ...)
 }
 \arguments{
 \item{x}{A numeric matrix or data frame, with one observation per row.
 Missing values are allowed.}
 
 \item{k}{The number of principal components. If \code{NULL} (default), it is
-chosen by MacroPCA.}
+chosen from \code{var_explained} and \code{kmax}.}
 
 \item{alpha}{The robustness parameter, between 0.5 and 1. Default is 0.5.}
 
+\item{kmax}{The maximum number of components. Default is 10.}
+
+\item{var_explained}{The fraction of variance used to choose \code{k} when it
+is not given. Default is 0.8.}
+
 \item{...}{Further parameters of MacroPCA, passed in \code{MacroPCApars} (see
-\code{\link[cellWise:MacroPCA]{cellWise::MacroPCA()}}), for example \code{scale} or \code{maxdir}.}
+\code{\link[cellWise:MacroPCA]{cellWise::MacroPCA()}}), for example \code{maxdir}, or \code{scale = TRUE} to
+scale the variables (by default, they are only centered, unlike in
+\code{cellWise::MacroPCA()}, so that intense emission lines are not
+outweighed by noise and continuum channels).}
 }
 \value{
 An object of class \code{specproc_macropca} (inheriting from
@@ -45,15 +53,23 @@ are displayed by \code{\link[=plot_cell_map]{plot_cell_map()}}.
 
 Spectra often have many more channels than observations; MacroPCA's DDC
 step can then be slow, and averaging adjacent channels first helps.
+
+When \code{k} is \code{NULL}, MacroPCA is run a first time to estimate the variance
+explained by up to \code{kmax} components, and \code{k} is the smallest number of
+components that explain \code{var_explained} of it (or \code{kmax}, if none does),
+as in \code{\link[=robpca]{robpca()}}. MacroPCA is then run again with this \code{k}, so giving \code{k}
+halves the computing time.
 }
 \examples{
 set.seed(1)
-x <- matrix(rnorm(60 * 8), 60, 8) \%*\% diag(8:1)
-x[1:3, ] <- x[1:3, ] + 20   # outlying observations
-x[10, 2] <- 40              # an outlying cell
-x[12, 5] <- NA              # a missing value
-fit <- macropca(x, k = 2)
-fit
+# LIBS spectra of forage samples (MacroPCA is run twice to choose k)
+minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+set.seed(1)
+forageLIBS |>
+  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  center() |>
+  macropca() |>
+  print()
 
 }
 \references{

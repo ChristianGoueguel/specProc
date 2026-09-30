@@ -127,7 +127,7 @@ test_that("macropca wraps cellWise::MacroPCA and predicts with missing values", 
   x[10, 2] <- 40
   x[12, 5] <- NA
   fit <- macropca(x, k = 2)
-  ref <- cellWise::MacroPCA(x, k = 2, MacroPCApars = list(alpha = 0.5, silent = TRUE))
+  ref <- cellWise::MacroPCA(x, k = 2, MacroPCApars = list(alpha = 0.5, silent = TRUE, scale = FALSE))
   expect_equal(fit$sd, unname(ref$SD))
   expect_equal(fit$od, unname(ref$OD))
   expect_true(fit$flagged_cells[10, 2])
@@ -137,6 +137,32 @@ test_that("macropca wraps cellWise::MacroPCA and predicts with missing values", 
   pred <- predict(fit, new)
   expect_equal(nrow(pred), 5L)
   expect_false(anyNA(pred$PC1))
+})
+
+test_that("macropca chooses k from the explained variance", {
+  set.seed(13)
+  x <- matrix(rnorm(60 * 8), 60, 8) %*% diag(8:1)
+  x[1:3, ] <- x[1:3, ] + 20
+  devices <- grDevices::dev.list()
+  # MacroPCA with k = 0 prints a message and draws a scree plot: both hidden
+  expect_silent(fit <- macropca(x))
+  expect_identical(grDevices::dev.list(), devices)
+  explained <- utils::capture.output(ref <- {
+    grDevices::pdf(NULL)
+    on.exit(grDevices::dev.off())
+    cellWise::MacroPCA(x, k = 0, MacroPCApars = list(alpha = 0.5, silent = TRUE, scale = FALSE))
+  })
+  expect_equal(fit$k, which(ref$cumulativeVar >= 0.8)[1])
+  direct <- cellWise::MacroPCA(x, k = fit$k, MacroPCApars = list(alpha = 0.5, silent = TRUE, scale = FALSE))
+  expect_equal(fit$od, unname(direct$OD))
+  # kmax components when they explain less than var_explained
+  expect_equal(macropca(x, kmax = 2, var_explained = 0.99)$k, 2L)
+  expect_error(macropca(x, var_explained = 0), "var_explained")
+  # scale = TRUE is passed to MacroPCA
+  scaled <- macropca(x, k = 2, scale = TRUE)
+  ref <- cellWise::MacroPCA(x, k = 2, MacroPCApars = list(alpha = 0.5, silent = TRUE))
+  expect_equal(scaled$od, unname(ref$OD))
+  expect_false(isTRUE(all.equal(scaled$od, macropca(x, k = 2)$od)))
 })
 
 test_that("robust PCA functions validate their inputs", {
@@ -159,12 +185,141 @@ test_that("plot_outlier_map and plot_cell_map return ggplots", {
   expect_equal(nrow(built$data[[3]]), nrow(d$x))
   expect_error(plot_outlier_map(list()), "robpca")
 
+  # relative distances put both cut-offs at 1
+  rel <- ggplot2::ggplot_build(plot_outlier_map(fit, relative = TRUE))
+  expect_equal(rel$data[[1]]$xintercept, 1)
+  expect_equal(rel$data[[2]]$yintercept, 1)
+  expect_equal(rel$data[[3]]$x, fit$sd / fit$cutoff_sd)
+  expect_equal(rel$data[[3]]$y, fit$od / fit$cutoff_od)
+
+  # shading adds the three outlying regions and their names before the points
+  sh <- ggplot2::ggplot_build(plot_outlier_map(fit, shade = TRUE))
+  expect_equal(nrow(sh$data[[1]]), 3)
+  # the orthogonal outlier region stops at the score distance cut-off
+  expect_equal(sh$data[[1]]$xmax[2], fit$cutoff_sd)
+  expect_equal(nrow(sh$data[[2]]), 3)
+  expect_equal(nrow(sh$data[[5]]), nrow(fit$scores))
+  expect_s3_class(plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE,
+                                   newdata = d$x[1:20, ]), "ggplot")
+  expect_no_warning(ggplot2::ggplot_build(plot_outlier_map(fit, shade = TRUE, log = TRUE)))
+  expect_error(plot_outlier_map(fit, shade = NA), "shade")
+
+  # point styling is passed to geom_point(), over the defaults
+  styled <- ggplot2::ggplot_build(plot_outlier_map(fit, alpha = 0.4, size = 3, color = "red"))
+  expect_equal(unique(styled$data[[3]]$alpha), 0.4)
+  expect_equal(unique(styled$data[[3]]$size), 3)
+  expect_equal(unique(styled$data[[3]]$colour), "red")
+  expect_equal(unique(styled$data[[3]]$stroke), 0.4)
+  expect_error(plot_outlier_map(fit, NULL, 3, FALSE, FALSE, FALSE, NULL, 0.5), "named")
+
   set.seed(17)
   x <- matrix(rnorm(40 * 8), 40, 8) %*% diag(8:1)
   x[10, 2] <- 40
   mfit <- macropca(x, k = 2)
   expect_s3_class(plot_outlier_map(mfit), "ggplot")
+  skip_if_not_installed("patchwork")
   expect_s3_class(plot_cell_map(mfit), "ggplot")
-  expect_s3_class(plot_cell_map(mfit, columns = 1:6, ncolumnsinblock = 2), "ggplot")
+  expect_s3_class(plot_cell_map(mfit, columns = 1:6, order = "od", profile = FALSE), "ggplot")
+  # rows without flagged cells keep the extent of the map
+  expect_s3_class(plot_cell_map(mfit, rows = c("1", "10")), "ggplot")
+  grDevices::pdf(NULL)
+  expect_no_warning(print(plot_cell_map(mfit, rows = 1:2)))
+  grDevices::dev.off()
   expect_error(plot_cell_map(fit), "macropca")
+  expect_error(plot_cell_map(mfit, resolution = 10), "resolution")
+  expect_error(plot_cell_map(mfit, rows = 0), "rows")
+  expect_error(plot_cell_map(mfit, columns = "nope"), "columns")
+  expect_error(plot_cell_map(mfit, threshold = 0), "threshold")
+  expect_error(plot_cell_map(mfit, labels = -1), "labels")
+  expect_error(plot_cell_map(mfit, order = "name"), "arg")
+})
+
+# Spectra with a region (channels 8-9) flagged in the first 15 observations
+make_flagged_spectra <- function() {
+  set.seed(21)
+  wl <- seq(400, by = 0.1, length.out = 20)
+  line <- function(center) exp(-(wl - center)^2 / 0.02)
+  x <- outer(stats::rnorm(60, 10, 2), 50 * line(400.3) + 5) +
+    outer(stats::rnorm(60, 5, 1), 30 * line(401.5) + 3) +
+    matrix(stats::rnorm(60 * 20, sd = 0.5), 60)
+  colnames(x) <- wl
+  x[1:15, 8:9] <- x[1:15, 8:9] + 20
+  x
+}
+
+test_that("flagged_regions finds the channels flagged in many observations", {
+  x <- make_flagged_spectra()
+  fit <- macropca(x, k = 2)
+  regions <- flagged_regions(fit, threshold = 0.2)
+  expect_s3_class(regions, "tbl_df")
+  expect_named(regions, c("start", "end", "peak", "channels", "share", "mean_share", "direction"))
+  expect_equal(nrow(regions), 1)
+  expect_equal(c(regions$start, regions$end), c(400.7, 400.8))
+  expect_equal(regions$share, 15 / 60)
+  expect_equal(regions$channels, 2L)
+  expect_equal(regions$direction, "higher")
+  # the share is over the selected rows
+  expect_equal(flagged_regions(fit, threshold = 0.2, rows = 1:30)$share[1], 15 / 30)
+  expect_equal(nrow(flagged_regions(fit, threshold = 0.9)), 0)
+
+  lines <- tibble::tibble(species = c("Ca II", "K I"), stage = c(2L, 1L),
+                          wavelength = c(400.75, 405), relative_intensity = 1)
+  matched <- flagged_regions(fit, threshold = 0.2, lines = lines)
+  expect_equal(matched$species, "Ca II")
+  expect_equal(matched$candidates, "Ca II 400.75")
+  expect_error(flagged_regions(fit, threshold = 2), "threshold")
+  expect_error(flagged_regions(list()), "macropca")
+})
+
+test_that("runs of flagged channels are merged across short gaps and split at segments", {
+  cells <- list(flagged = matrix(FALSE, 10, 12), resid = matrix(3, 10, 12),
+                wavelength = c(seq(400, by = 0.1, length.out = 6), seq(500, by = 0.1, length.out = 6)),
+                segment = rep(1:2, each = 6))
+  cells$flagged[1:5, c(1, 3, 6, 7)] <- TRUE        # gap of 1, then of 2, then a new segment
+  regions <- find_flagged_regions(cells, 0.5, NULL, 0.1)
+  expect_equal(nrow(regions), 2)
+  expect_equal(sort(regions$start), c(400, 500))
+  expect_equal(regions$channels[regions$start == 400], 6)
+})
+
+test_that("plot_cell_map clusters the rows and draws the mean spectrum", {
+  skip_if_not_installed("patchwork")
+  x <- make_flagged_spectra()
+  fit <- macropca(x, k = 2)
+  # the rows flagged in the same region are grouped
+  cell <- ifelse(fit$flagged_cells, sign(fit$std_resid), 0)
+  o <- cell_map_cluster(cell, cell_map_columns(rep(1L, 20), 20, 400))
+  expect_setequal(o, 1:60)
+  flagged_rows <- which(rowSums(fit$flagged_cells[, 8:9]) > 0)
+  expect_lte(diff(range(match(flagged_rows, o))), length(flagged_rows) + 5)
+  p <- plot_cell_map(fit, order = "cluster", threshold = 0.2)
+  expect_s3_class(p, "ggplot")
+  # the profile has the mean spectrum (raw data), not with centered data
+  has_line <- function(p) any(vapply(p[[1]]$layers, function(l) inherits(l$geom, "GeomLine"), logical(1)))
+  expect_true(has_line(p))
+  centered <- macropca(sweep(x, 2, colMeans(x)), k = 2)
+  expect_false(has_line(plot_cell_map(centered)))
+  expect_true(has_line(plot_cell_map(centered, spectra = x)))
+  expect_error(plot_cell_map(centered, spectra = x[, 1:3]), "variables")
+})
+
+test_that("cell map blocks average the cells within detector segments", {
+  cell <- matrix(0, 4, 6)
+  cell[1, 1] <- 1
+  cell[4, 6] <- -0.5
+  wl <- c(400, 400.1, 400.2, 500, 500.1, 500.2)          # two segments
+  col_id <- cell_map_columns(wavelength_segments(wl), 6, max_blocks = 2)
+  expect_equal(col_id, c(1, 1, 1, 2, 2, 2))
+  blocks <- cell_map_blocks(cell, wl, col_id, max_rows = 2)
+  # 2 rows and 3 channels per block, but blocks do not cross the gap
+  expect_equal(nrow(blocks), 2)
+  expect_equal(blocks$value, c(1 / 6, -0.5 / 6))
+  expect_equal(blocks$xmin, c(399.95, 499.95))
+  expect_equal(blocks$xmax, c(400.25, 500.25))
+  expect_equal(blocks$ymin, c(0.5, 2.5))
+  expect_equal(blocks$fill, sign(blocks$value) * sqrt(abs(blocks$value)))
+  # small maps show every cell
+  single <- cell_map_blocks(cell, wl, cell_map_columns(wavelength_segments(wl), 6, 400),
+                            max_rows = 200)
+  expect_equal(sort(single$value), c(-0.5, 1))
 })

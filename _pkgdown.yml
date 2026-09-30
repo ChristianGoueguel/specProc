@@ -25,6 +25,7 @@ reference:
   - predict.specproc_robpca
   - plot_outlier_map
   - plot_cell_map
+  - flagged_regions
 
 - subtitle: orthogonalization methods
   desc: >
@@ -170,6 +171,8 @@ reference:
   - plot_fit
   - plot_spectra
   - plot_embedding
+  - plot_loadings
+  - loading_peaks
   - hotelling_t2
   - q_residuals
   - dmodx

@@ -109,6 +109,14 @@ parse_wavelength <- function(nms) {
   num
 }
 
+# Wavelengths from variable names, or NULL when the names are not all
+# wavelengths or are default names (V1, V2, ...).
+names_to_wavelength <- function(nms) {
+  if (length(nms) == 0 || identical(nms, paste0("V", seq_along(nms)))) return(NULL)
+  wl <- parse_wavelength(nms)
+  if (anyNA(wl)) NULL else wl
+}
+
 # Column medians, in C++ (as apply(x, 2, stats::median, na.rm = na.rm), with
 # the column names).
 col_medians <- function(x, na.rm = FALSE) {

@@ -8,10 +8,15 @@ plot_cell_map(
   object,
   rows = NULL,
   columns = NULL,
-  nrowsinblock = NULL,
-  ncolumnsinblock = NULL,
-  title = "MacroPCA cell map",
-  ...
+  resolution = c(200, 400),
+  order = c("data", "od", "cluster"),
+  profile = TRUE,
+  spectra = NULL,
+  threshold = 0.1,
+  labels = 5,
+  lines = NULL,
+  tol = 0.1,
+  title = "MacroPCA cell map"
 )
 }
 \arguments{
@@ -20,29 +25,79 @@ plot_cell_map(
 \item{rows, columns}{Optional indices or names of the rows and columns to
 show. Default is all.}
 
-\item{nrowsinblock, ncolumnsinblock}{Optional numbers of rows and columns
-combined into one block.}
+\item{resolution}{The maximum numbers of rows and columns of blocks.
+Default is \code{c(200, 400)}.}
+
+\item{order}{The order of the rows: \code{"data"} (default), \code{"od"} for
+decreasing orthogonal distance, which puts the most outlying
+observations at the top, or \code{"cluster"} to group the observations with
+similar flagged cells.}
+
+\item{profile}{If \code{TRUE} (default), add the panel of the share of flagged
+cells by variable.}
+
+\item{spectra}{Optional spectra whose mean is drawn behind the profile (a
+data frame or matrix with the variables of the model, other columns
+being ignored, or a single named spectrum). Default is the data imputed
+by MacroPCA.}
+
+\item{threshold}{The share of flagged observations above which channels
+form a flagged region. Default is 0.1.}
+
+\item{labels}{The number of flagged regions labeled in the profile.
+Default is 5; use 0 for none.}
+
+\item{lines}{Optional line list returned by \code{\link[=libs_lines]{libs_lines()}}, to label the
+regions with the emission lines they match.}
+
+\item{tol}{The largest distance, in nm, between a region and a line it
+matches. Default is 0.1.}
 
 \item{title}{The plot title.}
-
-\item{...}{Further arguments passed to \code{\link[cellWise:cellMap]{cellWise::cellMap()}}, such as
-\code{rowlabels}, \code{columnlabels} or \code{columnangle}.}
 }
 \value{
-A ggplot object.
+A patchwork (ggplot2) object.
 }
 \description{
-Shows which cells of the data deviate from a \code{\link[=macropca]{macropca()}} fit, with
-\code{\link[cellWise:cellMap]{cellWise::cellMap()}}. Each cell is colored by its standardized residual:
-red when the observed value is much higher than the fit, blue when it is
-much lower. Rows of outlying observations are marked.
+Shows which cells of the data deviate from a \code{\link[=macropca]{macropca()}} fit: one row
+per observation, the variables (wavelengths) along the horizontal axis,
+and the flagged cells colored red when the observed value is higher than
+the fit and blue when it is lower. A strip on the right shows the outlier
+type of each observation, and a panel on top the share of flagged cells
+at each wavelength over the mean spectrum, with the most flagged regions
+labeled, which shows which emission lines hold the cellwise outliers.
 }
 \details{
-Spectra have many more variables than can be shown one by one. Use
-\code{columns} to select a spectral region, and \code{ncolumnsinblock} (and
-\code{nrowsinblock}) to combine adjacent cells into blocks; the color of a
-block then summarizes its cells. By default, the columns are grouped
-into blocks when there are more than 60 of them.
+\strong{Resolution.} Spectra have many more cells than a plot has pixels, so
+adjacent cells are combined into blocks: the numbers of rows and columns
+of blocks are at most \code{resolution}, and a map smaller than that shows
+every cell. Channels are combined only within a detector segment, and the
+gaps between segments stay empty. The map fills the plot area, whatever
+the numbers of observations and variables.
+
+\strong{Colors.} A flagged cell with standardized residual \eqn{r} has an
+intensity that grows with \eqn{\log(|r|/c)}, from 0.25 at the flagging
+cut-off \eqn{c} to 1 at \eqn{10c} and beyond. The color of a block is the
+mean of these signed intensities over its cells (0 for cells that are not
+flagged), on a square-root scale so that blocks with a few flagged cells
+remain visible: pale blocks have few or mixed flagged cells, saturated
+blocks many cells that deviate strongly in the same direction.
+
+\strong{Order.} With \code{order = "cluster"}, the observations are sorted by a
+hierarchical clustering (Ward's method) of their flagged cells, at the
+column resolution of the map, so that observations that deviate in the
+same regions form bands (for example, a batch or a type of matrix).
+
+\strong{Profile.} The top panel shows, for each variable, the share of the
+(shown) observations whose cell is flagged: above zero when higher than
+the fit, below zero when lower. The mean spectrum is drawn in grey
+behind it, rescaled, to show whether the flagged channels are on emission
+lines, on the continuum or in noise. It is the mean of \code{spectra} or, by
+default, of the data imputed by MacroPCA; it is left out when this mean
+is close to zero, as for centered data (then give the raw spectra in
+\code{spectra}). The dashed lines are at \code{threshold}, and the \code{labels} flagged
+regions with the largest share (see \code{\link[=flagged_regions]{flagged_regions()}}) are labeled with
+their peak wavelength, or with the emission line they match.
 }
 \examples{
 set.seed(1)
@@ -50,9 +105,26 @@ x <- matrix(rnorm(40 * 8), 40, 8) \%*\% diag(8:1)
 x[1:2, ] <- x[1:2, ] + 20
 x[10, 2] <- 40
 fit <- macropca(x, k = 2)
-plot_cell_map(fit)
+if (requireNamespace("patchwork", quietly = TRUE)) {
+  plot_cell_map(fit)
+}
+\donttest{
+# LIBS spectra of forage samples
+minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+set.seed(1)
+fit <- forageLIBS |>
+  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  macropca(k = 3)
+if (requireNamespace("patchwork", quietly = TRUE)) {
+  plot_cell_map(fit, order = "cluster")
+}
+flagged_regions(fit)
+}
 
 }
 \seealso{
-\code{\link[=macropca]{macropca()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}
+\code{\link[=flagged_regions]{flagged_regions()}}, \code{\link[=macropca]{macropca()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}
+}
+\author{
+Christian L. Goueguel
 }
