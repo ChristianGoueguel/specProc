@@ -422,10 +422,6 @@ plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(20
 #'   dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
 #'   macropca(k = 3)
 #'
-#' if (requireNamespace("patchwork", quietly = TRUE)) {
-#'   plot_cell_map(fit, order = "cluster")
-#' }
-#'
 #' flagged_regions(fit)
 #' }
 #'
