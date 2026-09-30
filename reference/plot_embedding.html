@@ -69,6 +69,7 @@ variable.</p>
 <span>  hotelling <span class="op">=</span> <span class="st">"none"</span>,</span>
 <span>  k <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  t2_method <span class="op">=</span> <span class="st">"f"</span>,</span>
+<span>  flag <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  label <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  biplot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  biplot_top <span class="op">=</span> <span class="fl">10</span>,</span>
@@ -143,9 +144,16 @@ next embedding coordinates. Default is 2.</p></dd>
 (default) or <code>"beta"</code> (see <code><a href="hotelling_t2.html">hotelling_t2()</a></code>).</p></dd>
 
 
+<dt id="arg-flag">flag<a class="anchor" aria-label="anchor" href="#arg-flag"></a></dt>
+<dd><p>A logical: circle in red the samples beyond the \(T^2\)
+limit (<code>FALSE</code>, default).</p></dd>
+
+
 <dt id="arg-label">label<a class="anchor" aria-label="anchor" href="#arg-label"></a></dt>
-<dd><p>The labels of the outlying samples: a column of <code>data</code> or a
-vector with one value per sample. By default, their row numbers.</p></dd>
+<dd><p>The labels of the samples beyond the \(T^2\) limit,
+whether or not they are circled: <code>NULL</code> or <code>FALSE</code> (default) for none,
+<code>TRUE</code> for their row numbers, or a column of <code>data</code> or a vector with
+one value per sample.</p></dd>
 
 
 <dt id="arg-biplot">biplot<a class="anchor" aria-label="anchor" href="#arg-biplot"></a></dt>
@@ -192,17 +200,34 @@ fewer than about 10 samples per group, their ellipses can be flat or
 leave out several samples. Groups with fewer than 4 samples get no
 ellipse.</p>
 <p>With <code>hotelling = "all"</code>, the ellipses of Hotelling's \(T^2\) at each
-level of <code>conf_level</code> (97.5% by default) are drawn for all the
-samples (contours of \(T^2\) on the two components shown, from their
-mean and covariance, with <code><a href="https://pkgdown.r-lib.org,%20https://github.com/ChristianGoueguel/HotellingEllipse/reference/ellipseCoord.html" class="external-link">HotellingEllipse::ellipseCoord()</a></code>), and the
-samples beyond the limit at the highest level of \(T^2\) on <code>k</code>
-components (see <code><a href="hotelling_t2.html">hotelling_t2()</a></code>) are circled and labeled: the classical
-outlier limits of a score plot. With <code>hotelling = "group"</code>, each group of a discrete <code>colour</code> gets its own ellipses and
-limits, which flags the samples atypical of their own group. The
-ellipses are labeled with their level (instead of a legend), and drawn
-for the two components shown, while the limits use
-<code>k</code> components, so with <code>k &gt; 2</code> a flagged sample can lie inside the
-ellipses. \(T^2\) suits linear scores such as PCA or PLS; on a UMAP
+level of <code>conf_level</code> (97.5% by default) are drawn for all the samples,
+and the samples beyond the limit at the highest level of \(T^2\) on <code>k</code>
+components are counted in the subtitle, circled in red with
+<code>flag = TRUE</code> and labeled with <code>label</code> (each independently of the other):
+the classical outlier limits of a score plot. For a PCA model (<code><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">stats::prcomp()</a></code>, <code><a href="robpca.html">robpca()</a></code>, <code><a href="rospca.html">rospca()</a></code> or
+<code><a href="macropca.html">macropca()</a></code>), \(T^2\) is that of the model: the scores divided by the
+variances of the components (the robust eigenvalues of a robust fit), so
+the ellipses are centered at 0 with the axes of the components, and
+semi-axes \(\sqrt{\lambda_a L}\) for the limit \(L\). The limit is
+the F (or Beta) limit of <code><a href="hotelling_t2.html">hotelling_t2()</a></code> for a <code><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">stats::prcomp()</a></code> fit, and
+the chi-square quantile of ROBPCA for a robust fit, whose flagged samples
+are then the leverage points of <code><a href="plot_outlier_map.html">plot_outlier_map()</a></code> (with <code>k</code> its
+number of components and <code>conf_level = 0.975</code>). The scores of the
+outlying samples then do not inflate or tilt the ellipses. For other
+embeddings, \(T^2\) is computed from the mean and covariance of the
+samples (with <code><a href="hotelling_t2.html">hotelling_t2()</a></code> and <code><a href="https://pkgdown.r-lib.org,%20https://github.com/ChristianGoueguel/HotellingEllipse/reference/ellipseCoord.html" class="external-link">HotellingEllipse::ellipseCoord()</a></code>).
+With <code>hotelling = "group"</code>, each group of a discrete <code>colour</code> gets its own
+ellipses and limits, from its mean and covariance, which flags the samples
+atypical of their own group. The ellipses are labeled with their level
+(instead of a legend), and drawn for the two components shown, while the
+limits use <code>k</code> components, so with <code>k &gt; 2</code> a flagged sample can lie inside
+the ellipses. With <code>ellipse = TRUE</code>, the confidence ellipses are always
+computed from the samples shown. Without groups, <code>ellipse = TRUE</code> and
+<code>hotelling = "all"</code> would draw two ellipses of all the samples: only the
+\(T^2\) ellipse is drawn, with a warning. With groups, both are drawn:
+the confidence ellipses of the groups and the \(T^2\) limits of all
+the samples. \(T^2\) suits linear scores such as
+PCA or PLS; on a UMAP
 map, whose distances are not meaningful, prefer <code>ellipse</code>.</p>
 <p><strong>Style.</strong> The panel is drawn in the style of SIMCA score plots: grey
 outside the outermost ellipse (of \(T^2\), or of each group) and white
@@ -270,7 +295,8 @@ are similar, not as a quantitative projection.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Hotelling's T-squared limits of the score plot, on 3 components</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/is_installed.html" class="external-link">is_installed</a></span><span class="op">(</span><span class="st">"ConfidenceEllipse"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="fu">plot_embedding</span><span class="op">(</span><span class="va">pca</span>, colour <span class="op">=</span> <span class="va">texture</span>, hotelling <span class="op">=</span> <span class="st">"all"</span>, k <span class="op">=</span> <span class="fl">3</span>, label <span class="op">=</span> <span class="va">spectra</span><span class="op">$</span><span class="va">Sample</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">plot_embedding</span><span class="op">(</span><span class="va">pca</span>, colour <span class="op">=</span> <span class="va">texture</span>, hotelling <span class="op">=</span> <span class="st">"all"</span>, k <span class="op">=</span> <span class="fl">3</span>, flag <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                 label <span class="op">=</span> <span class="va">spectra</span><span class="op">$</span><span class="va">Sample</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-plt img"><img src="plot_embedding-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>

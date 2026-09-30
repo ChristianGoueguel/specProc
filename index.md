@@ -3,10 +3,11 @@
 **specProc** preprocesses and explores spectroscopic data. It was
 developed for laser-induced breakdown spectroscopy (LIBS) but works with
 other techniques such as Raman, infrared, and inductively coupled plasma
-optical emission spectroscopy. It takes raw detector counts through to a
-data matrix ready for modeling. Its computationally heavy steps run in
-C++ (via Rcpp), so it stays fast on data sets with thousands of spectra
-and high-resolution wavelength channels.
+optical emission spectroscopy. It handles the entire preprocessing
+workflow, from raw spectra to a data matrix ready for modeling. Its
+computationally heavy steps run in C++ (via Rcpp), so it stays fast on
+data sets with thousands of spectra and high-resolution wavelength
+channels.
 
 ## Installation
 
