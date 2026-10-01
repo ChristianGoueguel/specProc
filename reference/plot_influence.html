@@ -13,7 +13,7 @@ outlier map of a robust PCA, plot_outlier_map()."><meta property="og:image" cont
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -160,6 +160,11 @@ which puts plots of different models on the same scale.</p>
 <span class="r-in"><span><span class="co"># shaded outlying regions, logarithmic axes and colors by distance</span></span></span>
 <span class="r-in"><span><span class="fu">plot_influence</span><span class="op">(</span><span class="va">influence</span>, relative <span class="op">=</span> <span class="cn">TRUE</span>, shade <span class="op">=</span> <span class="cn">TRUE</span>, log <span class="op">=</span> <span class="cn">TRUE</span>, colour_by <span class="op">=</span> <span class="st">"distance"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_influence-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># a single limit at 97.5%, with the outlying regions shaded</span></span></span>
+<span class="r-in"><span><span class="va">influence_975</span> <span class="op">&lt;-</span> <span class="fu"><a href="q_residuals.html">q_residuals</a></span><span class="op">(</span><span class="va">pca</span>, k <span class="op">=</span> <span class="fl">3</span>, conf_level <span class="op">=</span> <span class="fl">0.975</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_influence</span><span class="op">(</span><span class="va">influence_975</span>, label <span class="op">=</span> <span class="va">forageLIBS</span><span class="op">$</span><span class="va">Measurement</span>, shade <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_influence-3.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

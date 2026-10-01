@@ -15,7 +15,7 @@ their limits at one or more confidence levels."><meta property="og:image" conten
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -134,8 +134,12 @@ the limit is that of a new observation,
 \(k(n+1)(n-1)/(n(n-k))\,F(k, n-k)\). The limit of Q is that of Jackson
 and Mudholkar (1979), from the eigenvalues of the components left out, or
 Box's (1954) scaled chi-square approximation (<code>method = "box"</code>); both
-tend to be slightly conservative. Samples are classified at the highest
-confidence level.</p>
+tend to be slightly conservative. The Jackson-Mudholkar limit depends on
+a power \(h_0\) of Q computed from these eigenvalues; when \(h_0\) is
+close to zero (a few large eigenvalues followed by a long tail of small
+ones, common for spectra), its limit as \(h_0 \to 0\), a lognormal
+approximation, is used. Samples are classified at the highest confidence
+level.</p>
 <p>These are classical estimates, themselves affected by outliers: see
 <code><a href="robpca.html">robpca()</a></code> and <code><a href="plot_outlier_map.html">plot_outlier_map()</a></code> for robust score and orthogonal
 distances. <code><a href="dmodx.html">dmodx()</a></code> gives the residual distance as a standard deviation,

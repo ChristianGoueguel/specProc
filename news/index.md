@@ -1,5 +1,22 @@
 # Changelog
 
+## specProc 0.8.1
+
+### Bug fixes
+
+- The Jackson-Mudholkar limit of the Q residuals
+  ([`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md),
+  and the Q limits of
+  [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md))
+  was wrong when its exponent h0 is close to zero or negative, which
+  happens for spectra (a few large eigenvalues of the components left
+  out, then a long tail of small ones): it fell below the mean of Q, so
+  that nearly every sample was flagged. For example, with 3 components
+  on the `forageLIBS` spectra, the 99% limit was 1.8e8 instead of 2.0e9,
+  and 355 of the 368 spectra were flagged. The sign of h0 is now kept,
+  as its derivation requires, and the limit as h0 tends to zero is used
+  near zero.
+
 ## specProc 0.8.0
 
 ### Breaking changes

@@ -129,4 +129,9 @@ plot_influence(influence, label = forageLIBS$Measurement)
 # the same options as plot_outlier_map(): distances relative to the limits,
 # shaded outlying regions, logarithmic axes and colors by distance
 plot_influence(influence, relative = TRUE, shade = TRUE, log = TRUE, colour_by = "distance")
+
+
+# a single limit at 97.5%, with the outlying regions shaded
+influence_975 <- q_residuals(pca, k = 3, conf_level = 0.975)
+plot_influence(influence_975, label = forageLIBS$Measurement, shade = TRUE)
 ```

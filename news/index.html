@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,13 @@
       <small>Source: <a href="https://github.com/ChristianGoueguel/specProc/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.8.1" id="specproc-081">specProc 0.8.1<a class="anchor" aria-label="anchor" href="#specproc-081"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-8-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-1"></a></h3>
+<ul><li>The Jackson-Mudholkar limit of the Q residuals (<code><a href="../reference/q_residuals.html">q_residuals()</a></code>, and the Q limits of <code><a href="../reference/plot_influence.html">plot_influence()</a></code>) was wrong when its exponent h0 is close to zero or negative, which happens for spectra (a few large eigenvalues of the components left out, then a long tail of small ones): it fell below the mean of Q, so that nearly every sample was flagged. For example, with 3 components on the <code>forageLIBS</code> spectra, the 99% limit was 1.8e8 instead of 2.0e9, and 355 of the 368 spectra were flagged. The sign of h0 is now kept, as its derivation requires, and the limit as h0 tends to zero is used near zero.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.8.0" id="specproc-080">specProc 0.8.0<a class="anchor" aria-label="anchor" href="#specproc-080"></a></h2>
 <div class="section level3">
