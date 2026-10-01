@@ -83,18 +83,16 @@
 #'
 #' @examplesIf rlang::is_installed("recipes")
 #' library(recipes)
-#' set.seed(1)
-#' x <- matrix(rnorm(60 * 20), 60, 20, dimnames = list(NULL, paste0("wl", 1:20)))
-#' dat <- data.frame(y = x[, 1] + rnorm(60, sd = 0.1), x)
-#'
-#' rec <- recipe(y ~ ., data = dat[1:40, ]) |>
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' rec <- recipe(K ~ ., data = dat[1:300, ]) |>
 #'   step_osc(all_predictors(), method = "fearn", num_comp = 2)
 #' prepped <- prep(rec)
 #' tidy(prepped, number = 1)
-#'
 #' # new spectra are corrected with the filter estimated on the training data
-#' bake(prepped, new_data = dat[41:60, -1])
-#'
+#' bake(prepped, new_data = dat[301:368, -1])
 step_osc <- function(recipe, ..., role = NA, trained = FALSE, outcome = NULL,
                      method = "sjoblom", num_comp = 2, options = list(),
                      res = NULL, columns = NULL, skip = FALSE,
@@ -227,14 +225,14 @@ step_projected_osc <- function(recipe, ..., role = NA, trained = FALSE,
 #' @export
 #'
 #' @examplesIf rlang::is_installed("recipes")
-#' set.seed(1)
-#' x <- matrix(rnorm(40 * 30), 40, 30, dimnames = list(NULL, paste0("v", 1:30)))
-#' dat <- data.frame(y = x[, 1] + rnorm(40, sd = 0.1), x)
-#' rec <- recipes::recipe(y ~ ., data = dat[1:30, ]) |>
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
 #'   step_opls(recipes::all_predictors(), num_comp = 2, options = list(scale = "pareto"))
 #' prepped <- recipes::prep(rec)
-#' recipes::bake(prepped, new_data = dat[31:40, ])
-#'
+#' recipes::bake(prepped, new_data = dat[301:368, ])
 step_opls <- function(recipe, ..., role = NA, trained = FALSE,
                       outcome = NULL, num_comp = 2, options = list(),
                       res = NULL, columns = NULL, skip = FALSE,
@@ -366,15 +364,14 @@ step_opls <- function(recipe, ..., role = NA, trained = FALSE,
 #' @export
 #'
 #' @examplesIf rlang::is_installed("recipes")
-#' set.seed(1)
-#' x <- matrix(rnorm(40 * 30), 40, 30, dimnames = list(NULL, paste0("v", 1:30)))
-#' dat <- data.frame(y1 = x[, 1] + rnorm(40, sd = 0.1), y2 = x[, 2] - x[, 3], x)
-#' rec <- recipes::recipe(y1 + y2 ~ ., data = dat[1:30, ]) |>
+#' data(forageLIBS)
+#' # potassium, calcium and the spectral channels
+#' dat <- forageLIBS[-c(1:2, 4:10, 12:14)]
+#' rec <- recipes::recipe(K + Ca ~ ., data = dat[1:300, ]) |>
 #'   step_o2pls(recipes::all_predictors(), num_comp = 2, joint_comp = 2)
 #' prepped <- recipes::prep(rec)
 #' recipes::tidy(prepped, number = 1)
-#' recipes::bake(prepped, new_data = dat[31:40, ])
-#'
+#' dim(recipes::bake(prepped, new_data = dat[301:368, ]))
 step_o2pls <- function(recipe, ..., role = NA, trained = FALSE,
                        outcome = NULL, num_comp = 2, joint_comp = 1, options = list(),
                        res = NULL, columns = NULL, skip = FALSE,

@@ -27,15 +27,10 @@
 #' @export average
 #'
 #' @examples
-#' spectra <- data.frame(
-#'   sample = rep(c("a", "b"), each = 3),
-#'   `200.1` = c(1, 2, 3, 10, 11, 12),
-#'   `200.2` = c(2, 3, 4, 20, 21, 22),
-#'   check.names = FALSE
-#' )
-#' average(spectra[, -1])
-#' average(spectra, sample)
-#'
+#' data(forageLIBS)
+#' # one mean spectrum per sample: three samples were measured twice
+#' means <- average(forageLIBS[-c(1, 3:14)], Sample)
+#' dim(means)
 average <- function(x, .group_by = NULL) {
   if (missing(x)) {
     stop("Missing 'x' argument.")

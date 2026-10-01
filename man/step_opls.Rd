@@ -80,13 +80,14 @@ selected predictors), \code{num_comp} and \code{id}.
 
 \examples{
 \dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
-set.seed(1)
-x <- matrix(rnorm(40 * 30), 40, 30, dimnames = list(NULL, paste0("v", 1:30)))
-dat <- data.frame(y = x[, 1] + rnorm(40, sd = 0.1), x)
-rec <- recipes::recipe(y ~ ., data = dat[1:30, ]) |>
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
   step_opls(recipes::all_predictors(), num_comp = 2, options = list(scale = "pareto"))
 prepped <- recipes::prep(rec)
-recipes::bake(prepped, new_data = dat[31:40, ])
+recipes::bake(prepped, new_data = dat[301:368, ])
 \dontshow{\}) # examplesIf}
 }
 \seealso{

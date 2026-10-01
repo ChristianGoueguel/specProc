@@ -79,12 +79,12 @@ and then, for each component \eqn{i}, computing
 \eqn{\textbf{X}_{new} \leftarrow \textbf{X}_{new} - \textbf{t}_i\textbf{p}_i^T}.
 }
 \examples{
-set.seed(1)
-x <- matrix(rnorm(20 * 50), 20, 50)
-y <- x[, 1] + rnorm(20, sd = 0.1)
-res <- osc(x, y, method = "fearn", ncomp = 2)
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]
+wl <- as.numeric(names(spectra))
+x <- spectra[wl > 760 & wl < 780]  # the K I resonance lines
+res <- osc(x, forageLIBS$K, method = "fearn", ncomp = 2)
 res$angle
-
 }
 \references{
 \itemize{

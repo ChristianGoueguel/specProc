@@ -36,12 +36,11 @@ z-score greater than 3 (|z| > 3) can be considered potential outliers (default),
 that covers 99.7\% of the data points in a normal distribution. (Note that a cutoff of |z| > 2.5 is also often used).
 }
 \examples{
-x <- c(1:5, 100)
-# Non-robust approach
-zscore(x)
-
-# Robust approach
-zscore(x, robust = TRUE)
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+head(zscore(fe))
+head(zscore(fe, robust = TRUE))
 
 }
 \references{

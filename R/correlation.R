@@ -88,19 +88,16 @@
 #' @export correlation
 #'
 #' @examples
-#' set.seed(1)
-#' df <- data.frame(y = rnorm(50))
-#' df$a <- 2 * df$y + rnorm(50, sd = 0.5)
-#' df$b <- -df$y + rnorm(50)
-#' df$c <- rnorm(50)
-#' correlation(df, y)
-#' correlation(df, "y", method = "bicor")
-#' correlation(df, y, plot = TRUE)$plot
-#'
 #' # LIBS spectra of forage samples and their mineral contents
 #' data(forageLIBS)
 #' spectra_id <- names(forageLIBS)[1:2]
 #' minerals <- names(forageLIBS)[3:14]
+#'
+#' # potassium against the other mineral contents
+#' correlation(forageLIBS[minerals], K)
+#' correlation(forageLIBS[minerals], "K", method = "bicor")
+#' correlation(forageLIBS[minerals], K, plot = TRUE)$plot
+#'
 #' spectra <- forageLIBS[setdiff(names(forageLIBS), spectra_id)]
 #'
 #' # a correlation spectrum: potassium against every channel

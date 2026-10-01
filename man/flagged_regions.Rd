@@ -54,15 +54,17 @@ otherwise. With \code{lines}, the lines between \code{start - tol} and \code{end
 are the candidates, from the nearest to the peak.
 }
 \examples{
-spectra_id <- forageLIBS |> select(1:2) |> names()
-minerals <- forageLIBS |> select(3:14) |> names()
+\donttest{
+spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()
+minerals <- forageLIBS |> dplyr::select(3:14) |> names()
 set.seed(1)
 fit <- forageLIBS |>
-  select(-all_of(c(spectra_id, minerals))) |>
+  dplyr::select(-dplyr::all_of(c(spectra_id, minerals))) |>
   center() |>
   macropca(k = 3)
 
 flagged_regions(fit)
+}
 
 }
 \seealso{

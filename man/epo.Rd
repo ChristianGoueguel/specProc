@@ -53,13 +53,16 @@ The singular value decomposition is computed in C++ (Eigen), and the
 \eqn{p \times p} projection matrix is never formed explicitly.
 }
 \examples{
-set.seed(1)
-x <- matrix(rnorm(20 * 50), 20, 50)
-# spectra of the same samples measured at a second temperature
-x_temp <- x + outer(rnorm(20), sin(seq(0, pi, length.out = 50)))
-res <- epo(x, ncomp = 1, clutter = x_temp - x)
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+# the three samples measured twice
+twice <- forageLIBS$Sample[duplicated(forageLIBS$Sample)]
+first <- match(twice, forageLIBS$Sample)
+second <- vapply(twice, function(s) max(which(forageLIBS$Sample == s)), integer(1))
+# their differences describe the variation between repeated measurements
+clutter <- as.matrix(spectra[second, ]) - as.matrix(spectra[first, ])
+res <- epo(spectra, ncomp = 1, clutter = clutter)
 dim(res$correction)
-
 }
 \references{
 \itemize{

@@ -43,9 +43,10 @@ samples around the median. And then apply one-step M-estimator with Huber
 \eqn{\rho}-function for scaling each part.
 }
 \examples{
-x <- c(1, 5, 3, 9, 2, 6, 4, 8, 7, 1e3)
-directional_outlyingness(x)
-
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+head(directional_outlyingness(fe))
 }
 \references{
 \itemize{

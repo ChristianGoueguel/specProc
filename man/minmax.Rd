@@ -27,9 +27,9 @@ which linearly transforms the values to a new range specified by the \code{a} an
 the maximum value is mapped to \code{b}.
 }
 \examples{
-minmax(c(2, 4, 6, 10))
-minmax(c(2, 4, NA, 10), a = -1, b = 1, drop.na = FALSE)
-
+data(forageLIBS)
+head(minmax(forageLIBS$K))
+head(minmax(forageLIBS$S, a = -1, b = 1, drop.na = FALSE))
 }
 \author{
 Christian L. Goueguel

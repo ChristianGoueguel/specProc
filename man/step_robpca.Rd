@@ -87,11 +87,10 @@ columns \code{terms}, \code{value}, \code{component} and \code{id}.
 \examples{
 \dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
 library(recipes)
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]
 set.seed(1)
-x <- matrix(rnorm(80 * 10), 80, 10) \%*\% diag(10:1)
-x[1:4, ] <- x[1:4, ] + 25
-dat <- as.data.frame(x)
-rec <- recipe(~ ., data = dat) |>
+rec <- recipe(~ ., data = spectra) |>
   step_robpca(all_predictors(), num_comp = 3, distances = TRUE)
 bake(prep(rec), new_data = NULL)
 \dontshow{\}) # examplesIf}

@@ -38,12 +38,11 @@ The predicted response is \eqn{\textbf{X}\textbf{w}c}, of the filtered
 data, back in the units of y.
 }
 \examples{
-set.seed(1)
-x <- matrix(rnorm(40 * 30), 40, 30)
-y <- x[, 1] + rnorm(40, sd = 0.1)
-fit <- opls(x[1:30, ], y[1:30], ncomp.ortho = 2, permutation = 0)
-predict(fit, x[31:40, ], type = "response")
-
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+cal <- 1:300
+fit <- opls(spectra[cal, ], forageLIBS$K[cal], ncomp.ortho = 2, permutation = 0)
+head(predict(fit, spectra[-cal, ], type = "response"))
 }
 \seealso{
 \code{\link[=opls]{opls()}}, \code{\link[=step_opls]{step_opls()}}

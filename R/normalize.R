@@ -56,11 +56,13 @@
 #' @export normalize
 #'
 #' @examples
-#' x <- data.frame(`400` = c(1, 2), `401` = c(3, 6), `402` = c(1, 2), check.names = FALSE)
-#' normalize(x, method = "area")
-#' normalize(x, method = "l2")
-#' normalize(x, method = "internal", wlength = "401")
-#'
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]  # the spectral channels
+#' normalize(spectra[1:3, ], method = "area")[, 1:4]
+#' normalize(spectra[1:3, ], method = "l2")[, 1:4]
+#' # internal standard: the C I 247.86 nm line of the organic matrix
+#' carbon <- names(spectra)[which.min(abs(as.numeric(names(spectra)) - 247.856))]
+#' normalize(spectra[1:3, ], method = "internal", wlength = carbon)[, 1:4]
 normalize <- function(x, method = "area", bkg = NULL, wlength = NULL, drop.na = TRUE) {
 
   if (missing(x)) {

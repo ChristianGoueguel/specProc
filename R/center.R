@@ -26,10 +26,10 @@
 #' @export center
 #'
 #' @examples
-#' m <- matrix(c(1, 2, 3, 10, 20, 30), ncol = 2)
-#' center(m)
-#' center(m, method = "median")
-#'
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]  # the spectral channels
+#' center(spectra)[1:3, 1:4]
+#' center(spectra, method = "median")[1:3, 1:4]
 center <- function(x, method = "mean", drop.na = FALSE) {
 
   if (!is.numeric(x) && !is.data.frame(x)) {

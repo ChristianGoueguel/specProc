@@ -35,7 +35,7 @@ are taken from the NIST database (see \code{\link[=nist_ionization_energy]{nist_
 species, or \code{NULL} (default) to choose them by optical depth.}
 
 \item{units}{The units of \code{intensity}: \code{"energy"} (default) or
-\code{"photons"}, as in \code{\link[=boltzmann_plot]{boltzmann_plot()}}.}
+\code{"photons"}, as in \code{\link[=boltzmann]{boltzmann()}}.}
 
 \item{tol}{The relative tolerance on the estimated temperature.
 Default is 1e-8.}
@@ -45,7 +45,7 @@ Default is 1e-8.}
 \value{
 \code{lines}, as a tibble, with the corrected \code{intensity}, the
 \code{measured_intensity}, the self-absorption coefficient \code{SA} and a
-logical \code{reference}, ready for \code{\link[=boltzmann_plot]{boltzmann_plot()}} or \code{\link[=cf_libs]{cf_libs()}}. The
+logical \code{reference}, ready for \code{\link[=boltzmann]{boltzmann()}} or \code{\link[=cf_libs]{cf_libs()}}. The
 temperature used is in the attribute \code{temperature}.
 }
 \description{
@@ -78,7 +78,7 @@ must be well measured: its noise propagates to every coefficient.
 The corrected lines of a species lie, by construction, on the Boltzmann
 plot of its reference line at the temperature used, so they cannot give
 the temperature by themselves. Give \code{temperature}, measured on optically
-thin lines (for example with \code{\link[=saha_boltzmann_plot]{saha_boltzmann_plot()}} or \code{\link[=cf_libs]{cf_libs()}}), or
+thin lines (for example with \code{\link[=saha_boltzmann]{saha_boltzmann()}} or \code{\link[=cf_libs]{cf_libs()}}), or
 give \code{electron_density}: the temperature is then the one at which the
 corrected lines of the neutral atom and of the ion of each element lie on
 a common Saha-Boltzmann plot (as in \code{\link[=cf_libs]{cf_libs()}}), which needs lines of
@@ -90,18 +90,20 @@ the reference, because of noise, errors of the atomic data, or a
 self-absorbed reference; they are kept, with a warning.
 }
 \examples{
-# Lines of one species at 9000 K; the resonance line at 400 nm keeps only
-# 40\% of its intensity
-kB <- 8.617333262e-5
-lines <- data.frame(
-  species = "X I", wavelength = c(400, 420, 450, 480, 500),
-  Aki = c(2e8, 5e7, 2e7, 8e7, 3e7), gk = c(3, 5, 7, 5, 9),
-  Ek = c(3.1, 3.9, 4.6, 5.3, 6.0), Ei = c(0, 1.0, 1.9, 2.7, 3.5)
+data(forageLIBS)
+mean_spectrum <- colMeans(forageLIBS[-(1:14)])
+# potassium lines: the resonance doublet at 766.49 and 769.90 nm ends on
+# the ground state (Ei = 0) and is strongly reabsorbed
+k_lines <- data.frame(
+  species = "K I", wavelength = c(404.414, 404.721, 691.108, 693.877, 766.490, 769.896),
+  Aki = c(1.150e6, 1.070e6, 2.500e6, 4.956e6, 3.779e7, 3.734e7),
+  gk = c(4, 2, 2, 2, 4, 2),
+  Ek = c(3.065, 3.063, 3.403, 3.403, 1.617, 1.610),
+  Ei = c(0, 0, 1.610, 1.617, 0, 0)
 )
-lines$intensity <- with(lines, gk * Aki / wavelength * exp(-Ek / (kB * 9000)))
-lines$intensity[1] <- 0.4 * lines$intensity[1]
-corrected <- correct_self_absorption(lines, temperature = 9000)
+corrected <- correct_self_absorption(line_intensities(mean_spectrum, k_lines), temperature = 8000)
 corrected[c("wavelength", "measured_intensity", "SA", "reference")]
+
 }
 \references{
 \itemize{

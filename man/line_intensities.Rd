@@ -59,7 +59,7 @@ spectrum, it has one row per line, like \code{lines}, with the measured
 \description{
 Measures the intensity of emission lines in spectra: for each line, the
 peak is searched near its tabulated wavelength, and its area or height is
-measured. The result feeds \code{\link[=boltzmann_plot]{boltzmann_plot()}}, \code{\link[=saha_boltzmann_plot]{saha_boltzmann_plot()}},
+measured. The result feeds \code{\link[=boltzmann]{boltzmann()}}, \code{\link[=saha_boltzmann]{saha_boltzmann()}},
 \code{\link[=cf_libs]{cf_libs()}} and \code{\link[=calibration_curve]{calibration_curve()}}.
 }
 \details{

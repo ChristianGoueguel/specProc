@@ -62,12 +62,11 @@
 #' @export o2pls
 #'
 #' @examples
-#' set.seed(1)
-#' x <- matrix(rnorm(30 * 40), 30, 40)
-#' y <- x[, 1:2] %*% c(1, -1) + rnorm(30, sd = 0.1)
-#' fit <- o2pls(x, y, ncomp = 1, nx = 2)
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]  # the spectral channels
+#' # potassium and calcium at once
+#' fit <- o2pls(spectra, forageLIBS[c("K", "Ca")], ncomp = 2, nx = 2)
 #' fit
-#'
 o2pls <- function(x, y, ncomp = 1, nx = 1, ny = 0, center = TRUE, scale = FALSE) {
 
   if (missing(x) || missing(y)) {

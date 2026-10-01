@@ -1,8 +1,8 @@
 #' Deprecated functions in specProc
 #'
-#' These functions were renamed in specProc 0.2.0 to follow a consistent
-#' snake_case naming scheme. The old names still work but issue a deprecation
-#' warning and will be removed in a future release.
+#' These functions were renamed, most of them in specProc 0.2.0 to follow a
+#' consistent snake_case naming scheme. The old names still work but issue a
+#' deprecation warning and will be removed in a future release.
 #'
 #' `gaussian()` was renamed to [gaussian_profile()] without an alias, because
 #' an exported `gaussian()` masks `stats::gaussian()`, the family used by
@@ -26,6 +26,12 @@
 #' | `tukeyGH()` | [tukey_gh()] |
 #' | `yGradientglsw()` | [y_gradient_glsw()] |
 #' | `pareto()` | [pareto_scale()] |
+#' | `boltzmann_plot()` | [boltzmann()] |
+#' | `saha_boltzmann_plot()` | [saha_boltzmann()] |
+#'
+#' `boltzmann_plot()` and `saha_boltzmann_plot()` were renamed in specProc
+#' 0.7.0.9003, so that they are not confused with [plot_boltzmann()], which
+#' draws their result.
 #'
 #' @param ... Arguments passed to the new function.
 #' @return The result of the new function.
@@ -105,3 +111,11 @@ yGradientglsw <- deprecate("yGradientglsw", "y_gradient_glsw")
 #' @rdname specProc-deprecated
 #' @export
 pareto <- deprecate("pareto", "pareto_scale")
+
+#' @rdname specProc-deprecated
+#' @export
+boltzmann_plot <- deprecate("boltzmann_plot", "boltzmann")
+
+#' @rdname specProc-deprecated
+#' @export
+saha_boltzmann_plot <- deprecate("saha_boltzmann_plot", "saha_boltzmann")

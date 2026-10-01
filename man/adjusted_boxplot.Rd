@@ -56,19 +56,10 @@ whereas a positive (resp. negative) value of MC corresponds to a right
 that are not excessively skewed i.e., for \eqn{|\text{MC}| \leq 0.6}.
 }
 \examples{
-set.seed(123)
-data <- data.frame(
-  normal = rnorm(100),
-  skewed = rexp(100, rate = 0.5),
-  heavy_tailed = rt(100, df = 3)
-)
-
-# Plot the adjusted boxplot
-adjusted_boxplot(data)
-
-# Retrieve the adjusted boxplot statistics
-adjusted_boxplot(data, plot = FALSE)
-
+data(forageLIBS)
+# mineral contents (\%) of the forage samples
+adjusted_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")])
+adjusted_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")], plot = FALSE)
 }
 \references{
 The adjusted boxplot is based on the methodology described in:

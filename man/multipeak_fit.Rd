@@ -63,15 +63,13 @@ estimated from the data around each peak center. Each peak center is
 constrained to lie within the fitted wavelength range.
 }
 \examples{
-wl <- seq(395, 397, by = 0.02)
-set.seed(1)
-spec <- 5 + gaussian_profile(wl, 0, 395.8, 0.15, 20) + lorentzian_profile(wl, 0, 396.3, 0.2, 30) +
-  rnorm(length(wl), sd = 0.5)
-df <- as.data.frame(t(spec))
-names(df) <- wl
-res <- multipeak_fit(df, peaks = c(395.8, 396.3), profiles = c("gaussian", "lorentzian"))
+data(forageLIBS)
+mean_spectrum <- colMeans(forageLIBS[-(1:14)])
+wl <- as.numeric(names(mean_spectrum))
+# the overlapping lines of the K I doublet
+doublet <- tibble::as_tibble(as.list(mean_spectrum[wl > 404.1 & wl < 405.0]))
+res <- multipeak_fit(doublet, peaks = c(404.414, 404.721), profiles = "gaussian")
 res$tidied[[1]]
-
 }
 \author{
 Christian L. Goueguel

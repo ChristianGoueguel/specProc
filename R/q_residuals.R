@@ -30,7 +30,8 @@
 #'
 #' These are classical estimates, themselves affected by outliers: see
 #' [robpca()] and [plot_outlier_map()] for robust score and orthogonal
-#' distances. [dmodx()] gives the residual distance in SIMCA's form.
+#' distances. [dmodx()] gives the residual distance as a standard deviation,
+#' relative to that of the calibration samples.
 #'
 #' @param model A [stats::prcomp()] fit that kept all its components (the
 #'   default of `prcomp()`), or a numeric matrix or data frame, on which a
@@ -96,7 +97,7 @@ q_residuals <- function(model, k, newdata = NULL, conf_level = 0.975, method = "
 #'
 #' @description
 #' Computes the distance of each sample to a principal component analysis
-#' (PCA) model in the space of the variables (DModX, as in SIMCA): the
+#' (PCA) model in the space of the variables (DModX): the
 #' residual standard deviation of the sample, normalized by that of the
 #' calibration samples, with its limits at one or more confidence levels,
 #' and Hotelling's \eqn{T^2} for the influence plot.
@@ -115,8 +116,8 @@ q_residuals <- function(model, k, newdata = NULL, conf_level = 0.975, method = "
 #' the normalized DModX is \eqn{\sqrt{F_{1-\alpha}}} (times \eqn{s_0} for the
 #' absolute DModX).
 #'
-#' SIMCA takes \eqn{\nu = K - k} (`df = "simca"`), as if the residuals of the
-#' variables were independent. For spectra, with far more (correlated)
+#' The nominal degrees of freedom are \eqn{\nu = K - k} (`df = "nominal"`), as
+#' if the residuals of the variables were independent. For spectra, with far more (correlated)
 #' channels than samples, this gives a limit close to 1 that flags a large
 #' share of ordinary samples. With `df = "effective"` (default), \eqn{\nu} is
 #' the effective number of residual dimensions,
@@ -130,7 +131,7 @@ q_residuals <- function(model, k, newdata = NULL, conf_level = 0.975, method = "
 #' @param normalized A logical: DModX relative to the residual standard
 #'   deviation of the calibration samples (`TRUE`, default), or absolute.
 #' @param df The degrees of freedom of the limit: `"effective"` (default) or
-#'   `"simca"` (see details).
+#'   `"nominal"` (see details).
 #'
 #' @return A tibble of class `specproc_influence`, with one row per sample:
 #'   `sample`, `t2` and its limits (as for [q_residuals()]), `dmodx`, its
@@ -139,10 +140,6 @@ q_residuals <- function(model, k, newdata = NULL, conf_level = 0.975, method = "
 #'   [plot_influence()].
 #'
 #' @references
-#'  - Wold, S., Sjöström, M. (1977). SIMCA: a method for analyzing chemical
-#'    data in terms of similarity and analogy. In Kowalski, B.R. (ed.),
-#'    Chemometrics: Theory and Application, ACS Symposium Series 52,
-#'    American Chemical Society, Washington, pp. 243-282.
 #'  - Eriksson, L., Johansson, E., Kettaneh-Wold, N., Trygg, J., Wikström,
 #'    C., Wold, S. (2006). Multi- and Megavariate Data Analysis, Part I, 2nd
 #'    ed. Umetrics Academy, Umeå.
@@ -165,7 +162,7 @@ q_residuals <- function(model, k, newdata = NULL, conf_level = 0.975, method = "
 dmodx <- function(model, k, newdata = NULL, conf_level = 0.975, normalized = TRUE,
                   df = "effective", t2_method = "f", center = TRUE, scale = FALSE) {
   check_flag(normalized, "normalized")
-  df <- match.arg(df, c("effective", "simca"))
+  df <- match.arg(df, c("effective", "nominal"))
   parts <- pca_parts(model, k, newdata, conf_level, t2_method, center, scale)
   a <- parts$k
   n <- parts$n
@@ -179,7 +176,7 @@ dmodx <- function(model, k, newdata = NULL, conf_level = 0.975, normalized = TRU
   s <- sqrt(parts$sq_residuals / (n_var - a)) * correction
   rest <- parts$lambda[-seq_len(a)]
   rest <- rest[rest > 0]
-  nu <- if (df == "simca") n_var - a else sum(rest)^2 / sum(rest^2)
+  nu <- if (df == "nominal") n_var - a else sum(rest)^2 / sum(rest^2)
   crit <- sqrt(stats::qf(parts$conf_level, nu, (n - a - a0) * nu))
   value <- if (normalized) s / s0 else s
   limits <- stats::setNames(if (normalized) crit else crit * s0, parts$labels)
@@ -243,6 +240,16 @@ dmodx <- function(model, k, newdata = NULL, conf_level = 0.975, normalized = TRU
 #' @return A ggplot object.
 #' @seealso [q_residuals()], [dmodx()], [plot_outlier_map()]
 #' @export plot_influence
+#'
+#' @examplesIf rlang::is_installed("HotellingEllipse", version = "1.3.0")
+#' data(forageLIBS)
+#' pca <- stats::prcomp(forageLIBS[-(1:14)])
+#' influence <- q_residuals(pca, k = 3, conf_level = c(0.95, 0.99))
+#' plot_influence(influence, label = forageLIBS$Measurement)
+#' # the same options as plot_outlier_map(): distances relative to the limits,
+#' # shaded outlying regions, logarithmic axes and colors by distance
+#' plot_influence(influence, relative = TRUE, shade = TRUE, log = TRUE, colour_by = "distance")
+#'
 plot_influence <- function(x, label = NULL, labels = 3, relative = FALSE, shade = FALSE,
                            log = FALSE, colour_by = c("type", "distance"), title = NULL, ...) {
   if (!inherits(x, "specproc_influence")) {

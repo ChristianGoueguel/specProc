@@ -63,19 +63,10 @@ and informative summary of the data's central tendency, spread, and potential
 outliers.
 }
 \examples{
-set.seed(123)
-data <- data.frame(
-  normal = rnorm(100),
-  skewed = rexp(100, rate = 0.5),
-  heavy_tailed = rt(100, df = 3)
-)
-
-# Plot the generalized boxplot
-generalized_boxplot(data)
-
-# Retrieve the generalized boxplot statistics
-generalized_boxplot(data, plot = FALSE)
-
+data(forageLIBS)
+# mineral contents (\%) of the forage samples
+generalized_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")])
+generalized_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")], plot = FALSE)
 }
 \references{
 \itemize{

@@ -23,18 +23,10 @@
 #' @export summary_stats
 #'
 #' @examples
-#' # Load the iris dataset
-#' data(iris)
-#'
-#' # Example1:
-#' iris |> summary_stats()
-#'
-#' # Example2:
-#' iris |> summary_stats(
-#'   var = c("Sepal.Length", "Petal.Length"),
-#'   robust = TRUE
-#'   )
-#'
+#' data(forageLIBS)
+#' # mineral contents (%) of the forage samples
+#' summary_stats(forageLIBS[c("Ca", "Mg", "P", "K", "S")])
+#' summary_stats(forageLIBS, var = c("Ca", "K"), robust = TRUE)
 summary_stats <- function(x, var = NULL, digits = 2, robust = FALSE, drop.na = TRUE) {
 
   if (is.null(x) == TRUE) {

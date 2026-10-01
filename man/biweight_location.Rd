@@ -44,21 +44,10 @@ iterated, replacing \eqn{M} by \eqn{\zeta}, until the change is smaller
 than \code{tol} or \code{max_iter} iterations are reached.
 }
 \examples{
-# Example 1: Compute biweight location for a vector
-x <- c(seq(1,100))
-tibble::tibble(
-mean = mean(x),
-med = stats::median(x),
-biloc = biweight_location(x)
-)
-
-# Example 2: Biweight location is robust to outliers
-x <- c(seq(1,99), 1e3)  # An outlier at 1000
-tibble::tibble(
-mean = mean(x),
-med = stats::median(x),
-biloc = biweight_location(x)
-)
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+c(mean = mean(fe), median = stats::median(fe), biweight = biweight_location(fe))
 
 }
 \references{

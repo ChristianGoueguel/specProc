@@ -59,17 +59,13 @@ individual peak contributions are drawn as dashed lines. When several
 spectra were fitted, one panel is drawn per spectrum.
 }
 \examples{
-\donttest{
-if (requireNamespace("patchwork", quietly = TRUE)) {
-  wl <- seq(395, 397, by = 0.02)
-  set.seed(1)
-  spec <- 10 + gaussian_profile(wl, y0 = 0, xc = 396.15, wG = 0.2, A = 50) + rnorm(length(wl))
-  df <- as.data.frame(t(spec))
-  names(df) <- wl
-  plot_fit(peak_fit(df, profile = "gaussian"))
-}
-}
-
+\dontshow{if (rlang::is_installed("patchwork")) withAutoprint(\{ # examplesIf}
+data(forageLIBS)
+mean_spectrum <- colMeans(forageLIBS[-(1:14)])
+wl <- as.numeric(names(mean_spectrum))
+halpha <- tibble::as_tibble(as.list(mean_spectrum[wl > 653.5 & wl < 659.5]))
+plot_fit(peak_fit(halpha, profile = "lorentzian"), title = "H-alpha 656.28 nm")
+\dontshow{\}) # examplesIf}
 }
 \author{
 Christian L. Goueguel

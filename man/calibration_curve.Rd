@@ -102,16 +102,18 @@ delta method, combines the uncertainty of the curve with that of the new
 signal, the mean of \code{replicates} measurements.
 }
 \examples{
-# standards with a slightly curved response
-set.seed(1)
-standards <- data.frame(concentration = rep(c(0, 0.5, 1, 2, 4, 8), each = 3))
-standards$intensity <- with(standards, 50 + 1000 * concentration - 15 * concentration^2 +
-                              rnorm(18, sd = 20))
-cal <- calibration_curve(standards, intensity, concentration)
+data(forageLIBS)
+# the K I 769.90 nm line, normalized to the C I 247.86 nm line of the matrix
+lines <- line_intensities(forageLIBS[-(1:14)], c(C = 247.856, K = 769.896), baseline = TRUE)
+standards <- data.frame(
+  K = forageLIBS$K,
+  signal = lines$intensity[lines$line == "K"] / lines$intensity[lines$line == "C"]
+)
+cal <- calibration_curve(standards[1:300, ], signal, K)
 cal
-cal2 <- calibration_curve(standards, intensity, concentration, model = "quadratic")
-predict(cal2, c(1500, 5000))
-plot_calibration(cal2)
+# the concentrations of new samples, from their signals
+head(predict(cal, standards$signal[301:368]))
+
 }
 \references{
 \itemize{

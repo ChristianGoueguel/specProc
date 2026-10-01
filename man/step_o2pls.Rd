@@ -154,14 +154,14 @@ selected predictors), \code{num_comp}, \code{joint_comp} and \code{id}.
 
 \examples{
 \dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
-set.seed(1)
-x <- matrix(rnorm(40 * 30), 40, 30, dimnames = list(NULL, paste0("v", 1:30)))
-dat <- data.frame(y1 = x[, 1] + rnorm(40, sd = 0.1), y2 = x[, 2] - x[, 3], x)
-rec <- recipes::recipe(y1 + y2 ~ ., data = dat[1:30, ]) |>
+data(forageLIBS)
+# potassium, calcium and the spectral channels
+dat <- forageLIBS[-c(1:2, 4:10, 12:14)]
+rec <- recipes::recipe(K + Ca ~ ., data = dat[1:300, ]) |>
   step_o2pls(recipes::all_predictors(), num_comp = 2, joint_comp = 2)
 prepped <- recipes::prep(rec)
 recipes::tidy(prepped, number = 1)
-recipes::bake(prepped, new_data = dat[31:40, ])
+dim(recipes::bake(prepped, new_data = dat[301:368, ]))
 \dontshow{\}) # examplesIf}
 }
 \references{

@@ -145,8 +145,7 @@ the samples. \eqn{T^2} suits linear scores such as
 PCA or PLS; on a UMAP
 map, whose distances are not meaningful, prefer \code{ellipse}.
 
-\strong{Style.} The panel is drawn in the style of SIMCA score plots: grey
-outside the outermost ellipse (of \eqn{T^2}, or of each group) and white
+\strong{Style.} The panel is grey outside the outermost ellipse (of \eqn{T^2}, or of each group) and white
 inside, so that the samples beyond the limits stand out, with no grid and
 a fixed \code{aspect_ratio} (0.7 by default; \code{NULL} lets the plot fill the
 space), and thin black lines through the origin (when it lies in the

@@ -62,8 +62,9 @@ within \code{2 * span} channels on the same detector segment: this usually
 means a shift or a broadening of the line between spectra.
 }
 \examples{
-minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
-spectra <- dplyr::select(forageLIBS, -Measurement, -Sample, -dplyr::all_of(minerals))
+spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()
+minerals <- forageLIBS |> dplyr::select(3:14) |> names()
+spectra <- forageLIBS |> dplyr::select(-dplyr::all_of(c(spectra_id, minerals)))
 set.seed(1)
 fit <- robpca(center(spectra))
 loading_peaks(fit, top = 5)

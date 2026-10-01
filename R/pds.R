@@ -45,16 +45,6 @@
 #'
 #' @export pds
 #'
-#' @examples
-#' set.seed(1)
-#' wl <- seq(0, 1, length.out = 40)
-#' x1 <- t(replicate(15, runif(1) * dnorm(wl, 0.5, 0.1) + runif(1)))
-#' x2 <- 1.1 * x1 + 0.05                 # slave instrument: gain and offset
-#' model <- pds(x1, x2, win = 3, ncomp = 2)
-#' x2_std <- x2 %*% model$transfer_matrix +
-#'   matrix(model$intercept, nrow(x2), ncol(x2), byrow = TRUE)
-#' max(abs(x2_std - x1))
-#'
 pds <- function(x1, x2, win = 5, ncomp = 2, alpha = 0) {
   x1 <- as_numeric_matrix(x1, "x1")
   x2 <- as_numeric_matrix(x2, "x2")

@@ -89,11 +89,11 @@ cut-off, not how unlikely it is: twice the cut-off is not equally rare
 in every model.
 }
 \examples{
-spectra_id <- forageLIBS |> select(1:2) |> names()
-minerals <- forageLIBS |> select(3:14) |> names()
+spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()
+minerals <- forageLIBS |> dplyr::select(3:14) |> names()
 set.seed(1)
 fit <- forageLIBS |>
-  select(-all_of(c(spectra_id, minerals))) |>
+  dplyr::select(-dplyr::all_of(c(spectra_id, minerals))) |>
   center() |>
   robpca()
 

@@ -56,12 +56,10 @@ New data are corrected with \eqn{\textbf{X}_{new} - \textbf{X}_{new}\textbf{WP}^
 after applying the returned \code{center} and \code{scale}.
 }
 \examples{
-set.seed(1)
-x <- matrix(rnorm(20 * 50), 20, 50)
-y <- x[, 1] + rnorm(20, sd = 0.1)
-res <- direct_osc(x, y, ncomp = 2)
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+res <- direct_osc(spectra, forageLIBS$K, ncomp = 2)
 dim(res$correction)
-
 }
 \references{
 \itemize{

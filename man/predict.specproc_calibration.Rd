@@ -60,13 +60,19 @@ weighted curve, the noise of a new signal follows the weights at its
 concentration (numeric weights give new samples a weight of 1).
 }
 \examples{
-set.seed(1)
-standards <- data.frame(concentration = rep(c(0, 0.5, 1, 2, 4, 8), each = 3))
-standards$intensity <- 50 + 1000 * standards$concentration + rnorm(18, sd = 30)
-cal <- calibration_curve(standards, intensity, concentration)
-predict(cal, c(800, 3000), replicates = 3)
-predict(cal, c(1, 5), type = "signal")
-predict(cal, c(1, 5), type = "signal", interval = "confidence")
+data(forageLIBS)
+# the K I 769.90 nm line, normalized to the C I 247.86 nm line of the matrix
+lines <- line_intensities(forageLIBS[-(1:14)], c(C = 247.856, K = 769.896), baseline = TRUE)
+standards <- data.frame(
+  K = forageLIBS$K,
+  signal = lines$intensity[lines$line == "K"] / lines$intensity[lines$line == "C"]
+)
+cal <- calibration_curve(standards[1:300, ], signal, K)
+predict(cal, standards$signal[301:305])
+# the signal expected at given contents (\% K)
+predict(cal, c(1, 2, 3), type = "signal")
+predict(cal, c(1, 2, 3), type = "signal", interval = "confidence")
+
 }
 \seealso{
 \code{\link[=calibration_curve]{calibration_curve()}}, \code{\link[=plot_calibration]{plot_calibration()}}

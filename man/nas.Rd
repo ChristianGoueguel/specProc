@@ -114,24 +114,21 @@ orthogonalization; that correction is available from
 \code{\link[=direct_orthogonal]{direct_orthogonal()}}.
 }
 \examples{
-# Three constituents with overlapping lines; the analyte is the first one
-set.seed(1)
-wl <- seq(390, 400, length.out = 200)
-line <- function(center) exp(-(wl - center)^2 / 0.1)
-pure <- rbind(line(393.4) + 0.3 * line(396.8), line(393.8), line(396.5))
-conc <- matrix(runif(30 * 3, 0, 1), 30, 3)
-x <- conc \%*\% pure + matrix(rnorm(30 * 200, sd = 0.002), 30)
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+# the three samples measured twice
+twice <- forageLIBS$Sample[duplicated(forageLIBS$Sample)]
+first <- match(twice, forageLIBS$Sample)
+second <- vapply(twice, function(s) max(which(forageLIBS$Sample == s)), integer(1))
+# the noise of the spectra, from the differences between repeated measurements
+noise <- stats::sd(as.matrix(spectra[second, ]) - as.matrix(spectra[first, ])) / sqrt(2)
 
-fit <- nas(x, conc[, 1], ncomp = 3, noise = 0.002)
+cal <- 1:300
+fit <- nas(spectra[cal, ], forageLIBS$K[cal], ncomp = 7, noise = noise)
 fit
 head(fit$nas)
-
-# the sensitivity equals the length of the analyte spectrum orthogonal
-# to the interferent spectra
-interf <- t(pure[2:3, ])
-net <- pure[1, ] - interf \%*\% qr.solve(interf, pure[1, ])
-c(model = fit$figures_of_merit[["sensitivity"]], theory = sqrt(sum(net^2)))
-
+# the net analyte signal and selectivity of new spectra
+head(predict(fit, spectra[-cal, ]))
 }
 \references{
 \itemize{

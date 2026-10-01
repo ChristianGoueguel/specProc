@@ -71,14 +71,13 @@ area to positive values. If the fit of a spectrum fails, a warning is issued
 and the corresponding \code{fit}, \code{tidied} and \code{augmented} entries are \code{NULL}.
 }
 \examples{
-wl <- seq(395, 397, by = 0.02)
-set.seed(1)
-spec <- 10 + gaussian_profile(wl, y0 = 0, xc = 396.15, wG = 0.2, A = 50) + rnorm(length(wl))
-df <- as.data.frame(t(spec))
-names(df) <- wl
-res <- peak_fit(df, profile = "gaussian")
+data(forageLIBS)
+mean_spectrum <- colMeans(forageLIBS[-(1:14)])
+wl <- as.numeric(names(mean_spectrum))
+# the H-alpha line of the hydrogen of the samples, Stark-broadened
+halpha <- tibble::as_tibble(as.list(mean_spectrum[wl > 653.5 & wl < 659.5]))
+res <- peak_fit(halpha, profile = "lorentzian")
 res$tidied[[1]]
-
 }
 \author{
 Christian L. Goueguel

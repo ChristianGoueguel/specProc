@@ -20,17 +20,11 @@ covariance between two numerical vectors. The biweight midcovariance is
 less sensitive to outliers than the traditional covariance.
 }
 \examples{
-# Example 1: Compute biweight midcovariance for two vectors
-x <- c(1, 2, 3, 4, 5)
-y <- c(2, 3, 4, 5, 6)
-stats::cov(x, y)
-biweight_midcovariance(x, y)
-
-# Example 2: Biweight midcovariance is robust to outliers
-x <- c(1, 2, 3, 4, 100)  # An outlier at 100
-y <- c(2, 3, 4, 5, 6)
-stats::cov(x, y)
-biweight_midcovariance(x, y)
+data(forageLIBS)
+# iron and manganese contents (mg/kg), with a few iron-rich samples
+ok <- !is.na(forageLIBS$Fe)
+c(covariance = stats::cov(forageLIBS$Fe[ok], forageLIBS$Mn[ok]),
+  biweight = biweight_midcovariance(forageLIBS$Fe[ok], forageLIBS$Mn[ok]))
 
 }
 \references{

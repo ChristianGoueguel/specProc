@@ -48,12 +48,10 @@ To correct new data, preprocess it with the returned \code{center} and \code{sca
 vectors and apply \eqn{\textbf{X}_{new} - \textbf{X}_{new}\textbf{PP}^T}.
 }
 \examples{
-set.seed(1)
-x <- matrix(rnorm(20 * 50), 20, 50)
-y <- x[, 1] + rnorm(20, sd = 0.1)
-res <- direct_orthogonal(x, y, ncomp = 2)
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+res <- direct_orthogonal(spectra, forageLIBS$K, ncomp = 2)
 dim(res$correction)
-
 }
 \references{
 \itemize{

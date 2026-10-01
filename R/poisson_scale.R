@@ -32,13 +32,12 @@
 #' @export poisson_scale
 #'
 #' @examples
-#' set.seed(1)
-#' x <- matrix(rpois(40, lambda = rep(c(5, 50, 500, 5000), each = 10)), ncol = 4)
-#' res <- poisson_scale(x)
-#' res$sc
-#' # apply the same scales to new data
-#' poisson_scale(x[1:2, ], sc = res$sc)
-#'
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]  # the spectral channels
+#' res <- poisson_scale(spectra[1:300, ])
+#' head(res$sc)
+#' # the same scales for new spectra
+#' poisson_scale(spectra[301:368, ], sc = res$sc)[1:3, 1:4]
 poisson_scale <- function(x, sc = NULL, drop.na = TRUE, options = list()) {
 
   if (missing(x)) {

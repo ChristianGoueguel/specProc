@@ -55,12 +55,11 @@ smaller values lighter tails.
 }
 }
 \examples{
-vec <- c(-100, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100)
-# non-robust approach
-moments::kurtosis(vec)
-
-# robust approach
-quantile_weight(vec)
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+moments::kurtosis(fe)   # classical
+quantile_weight(fe)     # robust, left and right tails
 
 }
 \references{

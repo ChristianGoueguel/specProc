@@ -32,10 +32,10 @@ mean-centering except that the reference point is the median of each column
 rather than the mean.
 }
 \examples{
-m <- matrix(c(1, 2, 3, 10, 20, 30), ncol = 2)
-center(m)
-center(m, method = "median")
-
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+center(spectra)[1:3, 1:4]
+center(spectra, method = "median")[1:3, 1:4]
 }
 \author{
 Christian L. Goueguel

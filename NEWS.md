@@ -2,6 +2,26 @@
 
 ## Breaking changes
 
+* `boltzmann_plot()` and `saha_boltzmann_plot()` are renamed `boltzmann()`
+  and `saha_boltzmann()`, so that they are not confused with
+  `plot_boltzmann()`, which draws their result. The old names still work,
+  with a deprecation warning.
+* In `dmodx()`, the nominal degrees of freedom (\eqn{K - k}) are now
+  selected with `df = "nominal"`.
+
+## Documentation
+
+* The examples use the `forageLIBS` spectra and mineral contents instead
+  of simulated data, wherever the function applies to them (some taken
+  from the vignettes). Examples of pure helper functions (line profiles,
+  plasma criteria, tuning parameters) keep simple inputs, and the examples
+  of `pds()` and `step_reject_shots()`, for which `forageLIBS` has no
+  suitable data, are removed. `plot_influence()` gains an example.
+* Every example calls dplyr functions with `dplyr::`, so that it runs
+  without dplyr attached.
+
+## Breaking changes
+
 * The `soilLIBS` data set is removed, to keep the package data under the
   5 MB CRAN guideline: `data(soilLIBS)` no longer works. The examples use
   `forageLIBS` instead; the example of `reject_shots()`, which relied on
@@ -115,8 +135,8 @@
   several outcomes, how to tune one workflow per outcome with a workflow set
   (`workflow_map("tune_grid", ...)`), each filter still estimated against
   all the outcomes.
-* `plot_embedding()` is drawn in the style of SIMCA score plots: grey
-  outside the outermost ellipse (of T-squared, or of each group) and white
+* `plot_embedding()` is drawn with a grey panel outside the outermost
+  ellipse (of T-squared, or of each group) and white
   inside, with no grid, a fixed `aspect_ratio` (0.7) and lines through the
   origin. The axis titles give the explained variance of the components of
   PCA fits, and the T-squared ellipses of the groups (`hotelling =
@@ -144,8 +164,8 @@
   on their ellipses instead of in a legend, and no key for the kind of
   samples without new samples.
 * `contributions()` computes the contributions of each variable to the Q
-  residual or to Hotelling's T-squared of samples (the definitions of the
-  PLS_Toolbox, whose squares add up to Q and T-squared), for a `prcomp()`
+  residual or to Hotelling's T-squared of samples (whose squares add up to
+  Q and T-squared), for a `prcomp()`
   fit or a robust fit (where they decompose the orthogonal and score
   distances), and relative contributions against reference samples
   (`reference`, or `"regular"` for all regular samples).
@@ -167,10 +187,10 @@
   `log`, for logarithmic axes. The points are outlined in black, and
   `...` passes styling such as `alpha` or `size` to `geom_point()`.
 * `dmodx()` computes the distance to the model in the space of the
-  variables (DModX, as in SIMCA) of a PCA model, normalized or absolute,
+  variables (DModX) of a PCA model, normalized or absolute,
   for the calibration samples or new ones. Its limits use the effective
   number of residual dimensions by default (`df = "effective"`), because
-  SIMCA's degrees of freedom (`df = "simca"`) flag a large share of
+  the nominal degrees of freedom (`df = "nominal"`) flag a large share of
   ordinary samples when spectra have far more channels than samples.
   `plot_influence()` draws DModX or Q against T-squared.
 * `hotelling_t2()`, `q_residuals()`, `dmodx()`, `plot_influence()` and the

@@ -43,14 +43,13 @@
 #'
 #' @examplesIf rlang::is_installed("recipes")
 #' library(recipes)
-#' set.seed(1)
-#' dat <- data.frame(a = rlnorm(100), b = rexp(100), c = rnorm(100))
-#' rec <- recipe(~ ., data = dat[1:80, ]) |>
+#' data(forageLIBS)
+#' contents <- forageLIBS[c("Ca", "Mg", "P", "K", "Mn")]
+#' rec <- recipe(~ ., data = contents[1:300, ]) |>
 #'   step_robust_bcyj(all_numeric_predictors())
 #' prepped <- prep(rec)
 #' tidy(prepped, number = 1)
-#' bake(prepped, new_data = dat[81:100, ])
-#'
+#' bake(prepped, new_data = contents[301:368, ])
 step_robust_bcyj <- function(recipe, ..., role = NA, trained = FALSE, type = "bestObj",
                              quantile = 0.99, nbsteps = 2, standardize = TRUE,
                              res = NULL, columns = NULL, skip = FALSE,
@@ -109,14 +108,12 @@ step_robust_bcyj <- function(recipe, ..., role = NA, trained = FALSE, type = "be
 #'
 #' @examplesIf rlang::is_installed("recipes")
 #' library(recipes)
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]
 #' set.seed(1)
-#' x <- matrix(rnorm(80 * 10), 80, 10) %*% diag(10:1)
-#' x[1:4, ] <- x[1:4, ] + 25
-#' dat <- as.data.frame(x)
-#' rec <- recipe(~ ., data = dat) |>
+#' rec <- recipe(~ ., data = spectra) |>
 #'   step_robpca(all_predictors(), num_comp = 3, distances = TRUE)
 #' bake(prep(rec), new_data = NULL)
-#'
 step_robpca <- function(recipe, ..., role = "predictor", trained = FALSE, num_comp = 2,
                         options = list(), prefix = "RPC", distances = FALSE,
                         keep_original_cols = FALSE, res = NULL, columns = NULL,

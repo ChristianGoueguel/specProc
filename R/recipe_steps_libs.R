@@ -123,21 +123,6 @@ step_line_ratio <- function(recipe, ..., reference, window = 0.1, method = "area
 #' @seealso [reject_shots()], [average()], [step_line_ratio()]
 #' @export
 #'
-#' @examples
-#' if (rlang::is_installed("recipes")) {
-#'   set.seed(1)
-#'   wl <- seq(390, 400, by = 0.1)
-#'   line <- exp(-(wl - 393.4)^2 / 0.02)
-#'   shots <- t(sapply(rep(c(1, 2), each = 6), function(s) 1000 * s * line + rnorm(length(wl), 50, 5)))
-#'   shots[3, ] <- shots[3, ] / 10     # a weak shot
-#'   colnames(shots) <- wl
-#'   df <- data.frame(Sample = rep(c("a", "b"), each = 6), shots, check.names = FALSE)
-#'   rec <- recipes::recipe(~ ., data = df) |>
-#'     recipes::update_role(Sample, new_role = "id") |>
-#'     step_reject_shots(recipes::all_numeric(), sample = Sample) |>
-#'     recipes::prep()
-#'   nrow(recipes::bake(rec, new_data = NULL))   # 11 shots kept for training
-#' }
 step_reject_shots <- function(recipe, ..., sample, method = c("intensity", "correlation"),
                               cutoff = 3.5, role = NA, trained = FALSE, columns = NULL,
                               skip = TRUE, id = recipes::rand_id("reject_shots")) {

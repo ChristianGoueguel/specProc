@@ -31,11 +31,11 @@ test_that("parse_nist_ie reads ionization energies", {
   expect_equal(ie$energy, c(6, 12.5))
 })
 
-test_that("nist_lines output feeds boltzmann_plot", {
+test_that("nist_lines output feeds boltzmann", {
   lines <- parse_nist_lines(nist_csv, "X II")[1:2, ]
   lines <- rbind(lines, transform(lines[1, ], wavelength = 430, Ek = 5))
   lines$intensity <- with(lines, gk * Aki / wavelength * exp(-Ek / (8.617333262e-5 * 9000)))
-  expect_equal(boltzmann_plot(lines)$temperature, 9000)
+  expect_equal(boltzmann(lines)$temperature, 9000)
 })
 
 test_that("nist functions validate their inputs", {

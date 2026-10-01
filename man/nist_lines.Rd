@@ -29,8 +29,8 @@ listed by the ASD, as text).
 \description{
 Retrieves the lines of an atom or ion in a wavelength range from the NIST
 Atomic Spectra Database (ASD): wavelengths, transition probabilities,
-level energies and statistical weights, as needed by \code{\link[=boltzmann_plot]{boltzmann_plot()}}
-and \code{\link[=saha_boltzmann_plot]{saha_boltzmann_plot()}}. The data are downloaded on demand; they are
+level energies and statistical weights, as needed by \code{\link[=boltzmann]{boltzmann()}}
+and \code{\link[=saha_boltzmann]{saha_boltzmann()}}. The data are downloaded on demand; they are
 not distributed with specProc.
 }
 \details{
@@ -58,8 +58,8 @@ if (!inherits(ca, "try-error")) ca
 }
 }
 \seealso{
-\code{\link[=nist_ionization_energy]{nist_ionization_energy()}}, \code{\link[=boltzmann_plot]{boltzmann_plot()}},
-\code{\link[=saha_boltzmann_plot]{saha_boltzmann_plot()}}, \code{\link[=starkb_lines]{starkb_lines()}}
+\code{\link[=nist_ionization_energy]{nist_ionization_energy()}}, \code{\link[=boltzmann]{boltzmann()}},
+\code{\link[=saha_boltzmann]{saha_boltzmann()}}, \code{\link[=starkb_lines]{starkb_lines()}}
 }
 \author{
 Christian L. Goueguel

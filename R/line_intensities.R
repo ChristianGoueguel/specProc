@@ -5,7 +5,7 @@
 #' @description
 #' Measures the intensity of emission lines in spectra: for each line, the
 #' peak is searched near its tabulated wavelength, and its area or height is
-#' measured. The result feeds [boltzmann_plot()], [saha_boltzmann_plot()],
+#' measured. The result feeds [boltzmann()], [saha_boltzmann()],
 #' [cf_libs()] and [calibration_curve()].
 #'
 #' @details

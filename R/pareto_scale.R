@@ -18,8 +18,9 @@
 #' @export pareto_scale
 #'
 #' @examples
-#' pareto_scale(matrix(c(1, 2, 3, 10, 20, 30), ncol = 2))
-#'
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]  # the spectral channels
+#' pareto_scale(spectra)[1:3, 1:4]
 pareto_scale <- function(x, drop.na = FALSE) {
 
   if (missing(x)) {

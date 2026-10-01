@@ -47,26 +47,13 @@ the outlier detection. The results are visualized using \code{ggplot2}, with opt
 outliers and/or color-code points based on their Mahalanobis distances.
 }
 \examples{
-set.seed(1)
-x <- matrix(rnorm(100 * 4), ncol = 4, dimnames = list(NULL, paste0("V", 1:4)))
-x[1:5, ] <- x[1:5, ] + 4 # five multivariate outliers
-
-# Basic usage with default parameters
-plot_outliers(x)
-
-# Adjust the proportion of observations used for MCD estimation
-plot_outliers(x, quan = 0.75)
-
-# Show Mahalanobis distances instead of outlier highlighting
-plot_outliers(x, show.outlier = FALSE, show.mahal = TRUE)
-
-# Combine outlier highlighting and Mahalanobis distance color-coding
-plot_outliers(x, show.outlier = TRUE, show.mahal = TRUE)
-
-# Return data frame instead of plot
-result_df <- plot_outliers(x, show.outlier = FALSE, show.mahal = FALSE)
-head(result_df)
-
+data(forageLIBS)
+# mineral contents (\%) of the forage samples
+contents <- forageLIBS[c("Ca", "Mg", "P", "K")]
+plot_outliers(contents)
+plot_outliers(contents, show.outlier = FALSE, show.mahal = TRUE)
+# a data frame instead of a plot
+head(plot_outliers(contents, show.outlier = FALSE, show.mahal = FALSE))
 }
 \author{
 Christian L. Goueguel

@@ -26,18 +26,12 @@
 #' @return A `patchwork` (ggplot2) object.
 #' @export plot_fit
 #'
-#' @examples
-#' \donttest{
-#' if (requireNamespace("patchwork", quietly = TRUE)) {
-#'   wl <- seq(395, 397, by = 0.02)
-#'   set.seed(1)
-#'   spec <- 10 + gaussian_profile(wl, y0 = 0, xc = 396.15, wG = 0.2, A = 50) + rnorm(length(wl))
-#'   df <- as.data.frame(t(spec))
-#'   names(df) <- wl
-#'   plot_fit(peak_fit(df, profile = "gaussian"))
-#' }
-#' }
-#'
+#' @examplesIf rlang::is_installed("patchwork")
+#' data(forageLIBS)
+#' mean_spectrum <- colMeans(forageLIBS[-(1:14)])
+#' wl <- as.numeric(names(mean_spectrum))
+#' halpha <- tibble::as_tibble(as.list(mean_spectrum[wl > 653.5 & wl < 659.5]))
+#' plot_fit(peak_fit(halpha, profile = "lorentzian"), title = "H-alpha 656.28 nm")
 plot_fit <- function(data, title = NULL, pt.size = 3, pt.colour = "black", pt.shape = 21, pt.fill = "black", line.size = 1, line.colour = "red", linetype = "solid", resid.shape = 21, resid.size = 2, resid.fill = "blue", resid.colour = "black") {
   if (missing(data) || is.null(data) || length(data) == 0) {
     stop("Seems you forgot to provide spectra data.")

@@ -48,11 +48,11 @@ may still struggle to accurately identify potential outliers in distributions wi
 kurtosis or long-tailed behavior.
 }
 \examples{
-set.seed(3317)
-x <- stats::rexp(7, rate = 0.5)
-iqr_outliers(x)
-
-iqr_outliers(x, skew = TRUE)
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+iqr_outliers(fe)
+iqr_outliers(fe, skew = TRUE)   # adjusted for the skewness of the contents
 
 }
 \references{

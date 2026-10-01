@@ -61,6 +61,7 @@ as in \code{\link[=robpca]{robpca()}}. MacroPCA is then run again with this \cod
 halves the computing time.
 }
 \examples{
+\donttest{
 set.seed(1)
 # LIBS spectra of forage samples (MacroPCA is run twice to choose k)
 minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
@@ -70,6 +71,7 @@ forageLIBS |>
   center() |>
   macropca() |>
   print()
+}
 
 }
 \references{

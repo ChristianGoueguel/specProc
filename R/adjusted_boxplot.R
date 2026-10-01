@@ -40,19 +40,10 @@
 #' @export adjusted_boxplot
 #'
 #' @examples
-#' set.seed(123)
-#' data <- data.frame(
-#'   normal = rnorm(100),
-#'   skewed = rexp(100, rate = 0.5),
-#'   heavy_tailed = rt(100, df = 3)
-#' )
-#'
-#' # Plot the adjusted boxplot
-#' adjusted_boxplot(data)
-#'
-#' # Retrieve the adjusted boxplot statistics
-#' adjusted_boxplot(data, plot = FALSE)
-#'
+#' data(forageLIBS)
+#' # mineral contents (%) of the forage samples
+#' adjusted_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")])
+#' adjusted_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")], plot = FALSE)
 adjusted_boxplot <- function(x, plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, xlabels.hjust = 1, box.width = .5, notch = FALSE, notchwidth = 0.5, staplewidth = 0.5) {
   if (missing(x)) {
     stop("Missing 'x' argument.")

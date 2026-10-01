@@ -74,7 +74,8 @@ confidence level.
 
 These are classical estimates, themselves affected by outliers: see
 \code{\link[=robpca]{robpca()}} and \code{\link[=plot_outlier_map]{plot_outlier_map()}} for robust score and orthogonal
-distances. \code{\link[=dmodx]{dmodx()}} gives the residual distance in SIMCA's form.
+distances. \code{\link[=dmodx]{dmodx()}} gives the residual distance as a standard deviation,
+relative to that of the calibration samples.
 }
 \examples{
 if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {

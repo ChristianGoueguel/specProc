@@ -17,16 +17,16 @@ simulate_lines <- function(temperature, ne = NULL, ionization_energy = 6.11, pho
   lines
 }
 
-test_that("boltzmann_plot recovers the temperature", {
+test_that("boltzmann recovers the temperature", {
   lines <- simulate_lines(9000)[1:4, ]
-  fit <- boltzmann_plot(lines)
+  fit <- boltzmann(lines)
   expect_s3_class(fit, "specproc_boltzmann")
   expect_equal(fit$temperature, 9000)
   expect_equal(fit$r_squared, 1)
   expect_lt(fit$temperature_se, 1e-6)
 
   photons <- simulate_lines(9000, photons = TRUE)[1:4, ]
-  expect_equal(boltzmann_plot(photons, units = "photons")$temperature, 9000)
+  expect_equal(boltzmann(photons, units = "photons")$temperature, 9000)
 
   expect_output(print(fit), "Temperature:  9000")
   p <- plot_boltzmann(fit)
@@ -41,18 +41,18 @@ test_that("boltzmann_plot recovers the temperature", {
   grDevices::dev.off()
 })
 
-test_that("boltzmann_plot gives a standard error with noisy intensities", {
+test_that("boltzmann gives a standard error with noisy intensities", {
   set.seed(1)
   lines <- simulate_lines(9000)[1:4, ]
   lines$intensity <- lines$intensity * exp(rnorm(4, sd = 0.05))
-  fit <- boltzmann_plot(lines)
+  fit <- boltzmann(lines)
   expect_gt(fit$temperature_se, 0)
   expect_equal(fit$temperature, 9000, tolerance = 0.1)
 })
 
-test_that("saha_boltzmann_plot recovers the temperature with ionic lines", {
+test_that("saha_boltzmann recovers the temperature with ionic lines", {
   lines <- simulate_lines(12000, ne = 1e17)
-  fit <- saha_boltzmann_plot(lines, ionization_energy = 6.11, electron_density = 1e17)
+  fit <- saha_boltzmann(lines, ionization_energy = 6.11, electron_density = 1e17)
   expect_equal(fit$temperature, 12000, tolerance = 1e-6)
   expect_equal(fit$method, "Saha-Boltzmann")
   expect_lt(fit$iterations, 100)
@@ -60,22 +60,22 @@ test_that("saha_boltzmann_plot recovers the temperature with ionic lines", {
   expect_equal(fit$r_squared, 1)
   expect_s3_class(plot_boltzmann(fit), "ggplot")
   # a wrong electron density biases the temperature
-  wrong <- saha_boltzmann_plot(lines, ionization_energy = 6.11, electron_density = 1e18)
+  wrong <- saha_boltzmann(lines, ionization_energy = 6.11, electron_density = 1e18)
   expect_false(isTRUE(all.equal(wrong$temperature, 12000, tolerance = 0.01)))
 })
 
 test_that("plasma functions validate their inputs", {
   lines <- simulate_lines(9000)
-  expect_error(boltzmann_plot(lines[1:2, ]), "at least 3")
-  expect_error(boltzmann_plot(lines[c("wavelength", "Aki")]), "needs the column")
+  expect_error(boltzmann(lines[1:2, ]), "at least 3")
+  expect_error(boltzmann(lines[c("wavelength", "Aki")]), "needs the column")
   bad <- lines
   bad$Aki[1] <- -1
-  expect_error(boltzmann_plot(bad), "positive")
-  expect_error(saha_boltzmann_plot(lines[lines$stage == 1, ], 6.11, 1e17), "both stages")
+  expect_error(boltzmann(bad), "positive")
+  expect_error(saha_boltzmann(lines[lines$stage == 1, ], 6.11, 1e17), "both stages")
   # intensities increasing with energy give a non-negative slope
   inverted <- lines[1:4, ]
   inverted$intensity <- rev(inverted$intensity)
-  expect_error(boltzmann_plot(inverted), "slope")
+  expect_error(boltzmann(inverted), "slope")
 })
 
 test_that("mcwhirter_criterion computes the minimum density", {

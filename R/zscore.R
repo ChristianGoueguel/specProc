@@ -39,12 +39,11 @@
 #'   - `flag`: `TRUE` if the corresponding data point is flagged as a potential outlier, and `FALSE` otherwise.
 #'
 #' @examples
-#' x <- c(1:5, 100)
-#' # Non-robust approach
-#' zscore(x)
-#'
-#' # Robust approach
-#' zscore(x, robust = TRUE)
+#' data(forageLIBS)
+#' # iron contents (mg/kg): a few samples are far above the others
+#' fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+#' head(zscore(fe))
+#' head(zscore(fe, robust = TRUE))
 #'
 #' @export zscore
 #'

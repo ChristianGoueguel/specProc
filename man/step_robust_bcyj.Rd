@@ -80,13 +80,13 @@ constant ones) are left unchanged.
 \examples{
 \dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
 library(recipes)
-set.seed(1)
-dat <- data.frame(a = rlnorm(100), b = rexp(100), c = rnorm(100))
-rec <- recipe(~ ., data = dat[1:80, ]) |>
+data(forageLIBS)
+contents <- forageLIBS[c("Ca", "Mg", "P", "K", "Mn")]
+rec <- recipe(~ ., data = contents[1:300, ]) |>
   step_robust_bcyj(all_numeric_predictors())
 prepped <- prep(rec)
 tidy(prepped, number = 1)
-bake(prepped, new_data = dat[81:100, ])
+bake(prepped, new_data = contents[301:368, ])
 \dontshow{\}) # examplesIf}
 }
 \seealso{

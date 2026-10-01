@@ -77,6 +77,17 @@ With \code{relative = TRUE}, each distance is divided by its limit at the
 highest confidence level, so both limits are at 1 whatever the model,
 which puts plots of different models on the same scale.
 }
+\examples{
+\dontshow{if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) withAutoprint(\{ # examplesIf}
+data(forageLIBS)
+pca <- stats::prcomp(forageLIBS[-(1:14)])
+influence <- q_residuals(pca, k = 3, conf_level = c(0.95, 0.99))
+plot_influence(influence, label = forageLIBS$Measurement)
+# the same options as plot_outlier_map(): distances relative to the limits,
+# shaded outlying regions, logarithmic axes and colors by distance
+plot_influence(influence, relative = TRUE, shade = TRUE, log = TRUE, colour_by = "distance")
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link[=q_residuals]{q_residuals()}}, \code{\link[=dmodx]{dmodx()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}
 }

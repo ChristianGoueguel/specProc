@@ -31,23 +31,12 @@ Qn, the bias-correction factors used in the calculations have been, however, ref
 according to Akinshin, A., (2022).
 }
 \examples{
-# Example 1:
-x <- c(seq(1,100))
-tibble::tibble(
-sd = stats::sd(x),
-mad = stats::mad(x),
-Sn = rousseeuw_croux(x, estimator = "Sn"),
-Qn = rousseeuw_croux(x, estimator = "Qn")
-)
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+c(sd = stats::sd(fe), mad = stats::mad(fe),
+  Sn = rousseeuw_croux(fe, estimator = "Sn"), Qn = rousseeuw_croux(fe, estimator = "Qn"))
 
-# Example 2:
-x <- c(seq(1,99), 1e3) # An outlier at 1000
-tibble::tibble(
-sd = stats::sd(x),
-mad = stats::mad(x),
-Sn = rousseeuw_croux(x, estimator = "Sn"),
-Qn = rousseeuw_croux(x, estimator = "Qn")
-)
 }
 \references{
 \itemize{

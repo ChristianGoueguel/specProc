@@ -96,15 +96,17 @@ libs_lines <- function(species, wavelength = c(200, 900), temperature = 10000, t
 #' @export plot_lines
 #'
 #' @examples
-#' # a synthetic spectrum and two made-up lines
-#' wl <- seq(390, 400, by = 0.02)
-#' spectrum <- setNames(1000 * exp(-(wl - 393.4)^2 / 0.01) + 600 * exp(-(wl - 396.8)^2 / 0.01), wl)
+#' data(forageLIBS)
+#' spectrum <- colMeans(forageLIBS[-(1:14)])
+#' spectrum <- spectrum[as.numeric(names(spectrum)) > 403 & as.numeric(names(spectrum)) < 406]
+#' # the K I doublet, with the atomic data of the NIST database
 #' lines <- tibble::tibble(
-#'   species = "Ca II", element = "Ca", stage = 2L, wavelength = c(393.37, 396.85),
-#'   relative_intensity = c(1, 0.55), Aki = c(1.47e8, 1.4e8), Ek = c(3.15, 3.12),
-#'   gk = c(4, 2), accuracy = "C", lower = "4s 2S", upper = c("4p 2P* 3/2", "4p 2P* 1/2")
+#'   species = "K I", element = "K", stage = 1L, wavelength = c(404.414, 404.721),
+#'   relative_intensity = c(1, 0.5), Aki = c(1.15e6, 1.07e6), Ek = c(3.065, 3.063),
+#'   gk = c(4, 2), accuracy = "A", lower = "4s 2S", upper = c("5p 2P* 3/2", "5p 2P* 1/2")
 #' )
 #' plot_lines(spectrum, lines, interactive = FALSE)
+#'
 plot_lines <- function(spectrum, lines, shift = 0, scale_markers = TRUE, interactive = TRUE,
                        title = NULL) {
   spec <- as_spectrum(spectrum)

@@ -31,18 +31,10 @@ This function calculates various descriptive statistics (robust and non-robust)
 for a specified variable or all variables in a given data frame or tibble.
 }
 \examples{
-# Load the iris dataset
-data(iris)
-
-# Example1:
-iris |> summary_stats()
-
-# Example2:
-iris |> summary_stats(
-  var = c("Sepal.Length", "Petal.Length"),
-  robust = TRUE
-  )
-
+data(forageLIBS)
+# mineral contents (\%) of the forage samples
+summary_stats(forageLIBS[c("Ca", "Mg", "P", "K", "S")])
+summary_stats(forageLIBS, var = c("Ca", "K"), robust = TRUE)
 }
 \author{
 Christian L. Goueguel

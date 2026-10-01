@@ -28,13 +28,10 @@ of efficiency, while the biweight midvariance estimator is both resistant
 and robust of efficiency.
 }
 \examples{
-vec <- c(1, 2, 3, 4, 4, 2)
-stats::var(vec)
-biweight_midvariance(vec)
-
-vec <- c(1, 2, 3, 4, 4, 100)
-stats::var(vec)
-biweight_midvariance(vec)
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+c(variance = stats::var(fe), biweight = biweight_midvariance(fe))
 
 }
 \references{

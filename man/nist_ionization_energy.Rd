@@ -19,7 +19,7 @@ A named numeric vector of ionization energies, in eV.
 \description{
 Retrieves ionization energies from the NIST Atomic Spectra Database, for
 example the ionization energy of the neutral atom needed by
-\code{\link[=saha_boltzmann_plot]{saha_boltzmann_plot()}}.
+\code{\link[=saha_boltzmann]{saha_boltzmann()}}.
 }
 \examples{
 \donttest{
@@ -28,5 +28,5 @@ try(nist_ionization_energy(c("Ca I", "Mg I")))
 }
 }
 \seealso{
-\code{\link[=nist_lines]{nist_lines()}}, \code{\link[=saha_boltzmann_plot]{saha_boltzmann_plot()}}
+\code{\link[=nist_lines]{nist_lines()}}, \code{\link[=saha_boltzmann]{saha_boltzmann()}}
 }

@@ -130,7 +130,7 @@ test_that("q_residuals takes any confidence levels and a single one", {
   expect_setequal(levels(p$layers[[1]]$data$level), c("90%", "99.9%"))
 })
 
-test_that("dmodx follows the SIMCA formulas", {
+test_that("dmodx follows its formulas", {
   skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
   d <- q_data()
   pca <- stats::prcomp(d$x)
@@ -142,20 +142,20 @@ test_that("dmodx follows the SIMCA formulas", {
   e <- xs - xs %*% p %*% t(p)
   s0 <- sqrt(sum(e^2) / ((n - a - 1) * (kvar - a)))
   si <- sqrt(rowSums(e^2) / (kvar - a)) * sqrt(n / (n - a - 1))
-  simca <- dmodx(pca, a, df = "simca", conf_level = c(0.95, 0.99))
-  expect_equal(simca$dmodx, unname(si / s0))
-  expect_equal(simca$dmodx_limit_95[1], sqrt(stats::qf(0.95, kvar - a, (n - a - 1) * (kvar - a))))
-  absolute <- dmodx(pca, a, normalized = FALSE, df = "simca", conf_level = c(0.95, 0.99))
+  nominal <- dmodx(pca, a, df = "nominal", conf_level = c(0.95, 0.99))
+  expect_equal(nominal$dmodx, unname(si / s0))
+  expect_equal(nominal$dmodx_limit_95[1], sqrt(stats::qf(0.95, kvar - a, (n - a - 1) * (kvar - a))))
+  absolute <- dmodx(pca, a, normalized = FALSE, df = "nominal", conf_level = c(0.95, 0.99))
   expect_equal(absolute$dmodx, unname(si))
   expect_equal(absolute$dmodx_limit_99[1], s0 * sqrt(stats::qf(0.99, kvar - a, (n - a - 1) * (kvar - a))))
   # normalized DModX is a scaled square root of Q
   q <- q_residuals(pca, a)
-  expect_equal(simca$dmodx^2, n * q$q / sum(q$q))
+  expect_equal(nominal$dmodx^2, n * q$q / sum(q$q))
   # effective degrees of freedom from the eigenvalues left out
   rest <- pca$sdev[-(1:a)]^2
   nu <- sum(rest)^2 / sum(rest^2)
   eff <- dmodx(pca, a, conf_level = 0.95)
-  expect_equal(eff$dmodx, simca$dmodx)
+  expect_equal(eff$dmodx, nominal$dmodx)
   expect_equal(eff$dmodx_limit_95[1], sqrt(stats::qf(0.95, nu, (n - a - 1) * nu)))
   expect_equal(eff$t2, q$t2)
   expect_equal(attr(eff, "distance"), "dmodx")

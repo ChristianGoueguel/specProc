@@ -17,8 +17,7 @@
 #'    sum of squares is Q (the squared orthogonal distance of robust fits);
 #'  - the **\eqn{T^2} contributions** are \eqn{t \Lambda^{-1/2} P^T}, the
 #'    scaled scores projected back onto the variables, whose sum of squares
-#'    is \eqn{T^2} (the squared score distance of robust fits). This is the
-#'    definition of the PLS_Toolbox (Eigenvector Research). For [rospca()]
+#'    is \eqn{T^2} (the squared score distance of robust fits). For [rospca()]
 #'    fits, whose loadings are not exactly orthogonal, the sum of squares is
 #'    close to, but not exactly, \eqn{T^2}.
 #'
@@ -69,9 +68,6 @@
 #'   [plot_contributions()].
 #'
 #' @references
-#'  - Wise, B.M., Gallagher, N.B., Bro, R., Shaver, J.M., Windig, W.,
-#'    Koch, R.S. (2006). PLS_Toolbox 4.0 for use with MATLAB. Eigenvector
-#'    Research, Wenatchee, WA.
 #'  - Westerhuis, J.A., Gurden, S.P., Smilde, A.K. (2000). Generalized
 #'    contribution plots in multivariate statistical process monitoring.
 #'    Chemometrics and Intelligent Laboratory Systems, 51(1):95-114.
@@ -80,9 +76,9 @@
 #' @export
 #'
 #' @examples
-#' spectra_id <- forageLIBS |> select(1:2) |> names()
-#' minerals <- forageLIBS |> select(3:14) |> names()
-#' spectra <- forageLIBS |> select(-all_of(c(spectra_id, minerals)))
+#' spectra_id <- names(forageLIBS)[1:2]
+#' minerals <- names(forageLIBS)[3:14]
+#' spectra <- forageLIBS |> dplyr::select(-dplyr::all_of(c(spectra_id, minerals)))
 #' set.seed(1)
 #' fit <- robpca(spectra, k = 3)
 #'

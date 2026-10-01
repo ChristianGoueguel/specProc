@@ -138,8 +138,8 @@ reference:
   - stark_table
   - stark_width
   - electron_density
-  - boltzmann_plot
-  - saha_boltzmann_plot
+  - boltzmann
+  - saha_boltzmann
   - plot_boltzmann
   - mcwhirter_criterion
   - self_absorption

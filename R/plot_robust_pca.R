@@ -195,6 +195,7 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()
 #' minerals <- forageLIBS |> dplyr::select(3:14) |> names()
 #' set.seed(1)
@@ -205,6 +206,7 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
 #'
 #' if (requireNamespace("patchwork", quietly = TRUE)) {
 #'   plot_cell_map(fit, order = "od")
+#' }
 #' }
 #'
 plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(200, 400),
@@ -302,6 +304,7 @@ plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(20
 #' @export
 #'
 #' @examples
+#' \donttest{
 #' spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()
 #' minerals <- forageLIBS |> dplyr::select(3:14) |> names()
 #' set.seed(1)
@@ -311,6 +314,7 @@ plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(20
 #'   macropca(k = 3)
 #'
 #' flagged_regions(fit)
+#' }
 #'
 flagged_regions <- function(object, threshold = 0.1, rows = NULL, columns = NULL, lines = NULL,
                             tol = 0.1) {

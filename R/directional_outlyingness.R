@@ -32,9 +32,10 @@
 #' @export directional_outlyingness
 #'
 #' @examples
-#' x <- c(1, 5, 3, 9, 2, 6, 4, 8, 7, 1e3)
-#' directional_outlyingness(x)
-#'
+#' data(forageLIBS)
+#' # iron contents (mg/kg): a few samples are far above the others
+#' fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+#' head(directional_outlyingness(fe))
 directional_outlyingness <- function(x, cutoff.quantile = 0.995, rmZeroes = FALSE, maxRatio = NULL, precScale = 1e-10) {
   if (missing(x)) {
     stop("Missing 'x' argument.")

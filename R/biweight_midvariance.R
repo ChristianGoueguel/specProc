@@ -26,13 +26,10 @@
 #' @return The biweight midvariance of the input vector.
 #'
 #' @examples
-#' vec <- c(1, 2, 3, 4, 4, 2)
-#' stats::var(vec)
-#' biweight_midvariance(vec)
-#'
-#' vec <- c(1, 2, 3, 4, 4, 100)
-#' stats::var(vec)
-#' biweight_midvariance(vec)
+#' data(forageLIBS)
+#' # iron contents (mg/kg): a few samples are far above the others
+#' fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+#' c(variance = stats::var(fe), biweight = biweight_midvariance(fe))
 #'
 #' @export biweight_midvariance
 #'

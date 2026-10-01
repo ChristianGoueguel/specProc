@@ -34,7 +34,7 @@ values between 0 and 1. Default is 0.975.}
 deviation of the calibration samples (\code{TRUE}, default), or absolute.}
 
 \item{df}{The degrees of freedom of the limit: \code{"effective"} (default) or
-\code{"simca"} (see details).}
+\code{"nominal"} (see details).}
 
 \item{t2_method}{The distribution of the \eqn{T^2} limit of the samples
 of the model: \code{"f"} (default) or \code{"beta"} (see \code{\link[=hotelling_t2]{hotelling_t2()}}).}
@@ -51,7 +51,7 @@ the type of the sample at the highest confidence level. Draw it with
 }
 \description{
 Computes the distance of each sample to a principal component analysis
-(PCA) model in the space of the variables (DModX, as in SIMCA): the
+(PCA) model in the space of the variables (DModX): the
 residual standard deviation of the sample, normalized by that of the
 calibration samples, with its limits at one or more confidence levels,
 and Hotelling's \eqn{T^2} for the influence plot.
@@ -70,8 +70,8 @@ or \eqn{s_i}. Its squared ratio follows an F distribution with
 the normalized DModX is \eqn{\sqrt{F_{1-\alpha}}} (times \eqn{s_0} for the
 absolute DModX).
 
-SIMCA takes \eqn{\nu = K - k} (\code{df = "simca"}), as if the residuals of the
-variables were independent. For spectra, with far more (correlated)
+The nominal degrees of freedom are \eqn{\nu = K - k} (\code{df = "nominal"}), as
+if the residuals of the variables were independent. For spectra, with far more (correlated)
 channels than samples, this gives a limit close to 1 that flags a large
 share of ordinary samples. With \code{df = "effective"} (default), \eqn{\nu} is
 the effective number of residual dimensions,
@@ -93,10 +93,6 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
 }
 \references{
 \itemize{
-\item Wold, S., Sjöström, M. (1977). SIMCA: a method for analyzing chemical
-data in terms of similarity and analogy. In Kowalski, B.R. (ed.),
-Chemometrics: Theory and Application, ACS Symposium Series 52,
-American Chemical Society, Washington, pp. 243-282.
 \item Eriksson, L., Johansson, E., Kettaneh-Wold, N., Trygg, J., Wikström,
 C., Wold, S. (2006). Multi- and Megavariate Data Analysis, Part I, 2nd
 ed. Umetrics Academy, Umeå.

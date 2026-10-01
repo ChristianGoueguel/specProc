@@ -62,8 +62,7 @@ variances of the scores \eqn{\lambda}):
 sum of squares is Q (the squared orthogonal distance of robust fits);
 \item the \strong{\eqn{T^2} contributions} are \eqn{t \Lambda^{-1/2} P^T}, the
 scaled scores projected back onto the variables, whose sum of squares
-is \eqn{T^2} (the squared score distance of robust fits). This is the
-definition of the PLS_Toolbox (Eigenvector Research). For \code{\link[=rospca]{rospca()}}
+is \eqn{T^2} (the squared score distance of robust fits). For \code{\link[=rospca]{rospca()}}
 fits, whose loadings are not exactly orthogonal, the sum of squares is
 close to, but not exactly, \eqn{T^2}.
 }
@@ -89,10 +88,12 @@ The contributions are in the units of the preprocessed data of the
 model: centered (and scaled, if the model scaled the variables).
 }
 \examples{
-minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
-spectra <- dplyr::select(forageLIBS, -Measurement, -Sample, -dplyr::all_of(minerals))
+spectra_id <- names(forageLIBS)[1:2]
+minerals <- names(forageLIBS)[3:14]
+spectra <- forageLIBS |> dplyr::select(-dplyr::all_of(c(spectra_id, minerals)))
 set.seed(1)
 fit <- robpca(spectra, k = 3)
+
 # Q contributions of two outlying samples, relative to the regular ones
 q <- contributions(fit, data = spectra, samples = c(49, 127), reference = "regular")
 q[, 1:5]
@@ -100,9 +101,6 @@ q[, 1:5]
 }
 \references{
 \itemize{
-\item Wise, B.M., Gallagher, N.B., Bro, R., Shaver, J.M., Windig, W.,
-Koch, R.S. (2006). PLS_Toolbox 4.0 for use with MATLAB. Eigenvector
-Research, Wenatchee, WA.
 \item Westerhuis, J.A., Gurden, S.P., Smilde, A.K. (2000). Generalized
 contribution plots in multivariate statistical process monitoring.
 Chemometrics and Intelligent Laboratory Systems, 51(1):95-114.

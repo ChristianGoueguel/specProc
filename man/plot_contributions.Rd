@@ -62,8 +62,9 @@ in bold with the nearest line of \code{lines} within \code{tol} nm. The mean
 spectrum can be drawn in grey behind each panel, rescaled to it.
 }
 \examples{
-minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
-spectra <- dplyr::select(forageLIBS, -Measurement, -Sample, -dplyr::all_of(minerals))
+spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()
+minerals <- forageLIBS |> dplyr::select(3:14) |> names()
+spectra <- forageLIBS |> dplyr::select(-dplyr::all_of(c(spectra_id, minerals)))
 set.seed(1)
 fit <- robpca(spectra, k = 3)
 q <- contributions(fit, data = spectra, samples = c(49, 127), reference = "regular")

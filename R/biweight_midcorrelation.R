@@ -22,10 +22,10 @@
 #' @return The biweight midcorrelation between `x` and `y`.
 #'
 #' @examples
-#' set.seed(11230)
-#' x <- rnorm(100)
-#' y <- 2 * x + rnorm(100)
-#' biweight_midcorrelation(x, y)
+#' data(forageLIBS)
+#' ok <- !is.na(forageLIBS$Fe)
+#' c(pearson = stats::cor(forageLIBS$Fe[ok], forageLIBS$Mn[ok]),
+#'   biweight = biweight_midcorrelation(forageLIBS$Fe[ok], forageLIBS$Mn[ok]))
 #'
 #' @export biweight_midcorrelation
 #'

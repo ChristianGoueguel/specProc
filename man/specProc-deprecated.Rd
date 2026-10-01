@@ -18,6 +18,8 @@
 \alias{tukeyGH}
 \alias{yGradientglsw}
 \alias{pareto}
+\alias{boltzmann_plot}
+\alias{saha_boltzmann_plot}
 \title{Deprecated functions in specProc}
 \usage{
 whittaker(...)
@@ -51,6 +53,10 @@ tukeyGH(...)
 yGradientglsw(...)
 
 pareto(...)
+
+boltzmann_plot(...)
+
+saha_boltzmann_plot(...)
 }
 \arguments{
 \item{...}{Arguments passed to the new function.}
@@ -59,9 +65,9 @@ pareto(...)
 The result of the new function.
 }
 \description{
-These functions were renamed in specProc 0.2.0 to follow a consistent
-snake_case naming scheme. The old names still work but issue a deprecation
-warning and will be removed in a future release.
+These functions were renamed, most of them in specProc 0.2.0 to follow a
+consistent snake_case naming scheme. The old names still work but issue a
+deprecation warning and will be removed in a future release.
 }
 \details{
 \code{gaussian()} was renamed to \code{\link[=gaussian_profile]{gaussian_profile()}} without an alias, because
@@ -84,6 +90,13 @@ an exported \code{gaussian()} masks \code{stats::gaussian()}, the family used by
    \code{tukeyGH()} \tab \code{\link[=tukey_gh]{tukey_gh()}} \cr
    \code{yGradientglsw()} \tab \code{\link[=y_gradient_glsw]{y_gradient_glsw()}} \cr
    \code{pareto()} \tab \code{\link[=pareto_scale]{pareto_scale()}} \cr
+   \code{boltzmann_plot()} \tab \code{\link[=boltzmann]{boltzmann()}} \cr
+   \code{saha_boltzmann_plot()} \tab \code{\link[=saha_boltzmann]{saha_boltzmann()}} \cr
 }
+
+
+\code{boltzmann_plot()} and \code{saha_boltzmann_plot()} were renamed in specProc
+0.7.0.9003, so that they are not confused with \code{\link[=plot_boltzmann]{plot_boltzmann()}}, which
+draws their result.
 }
 \keyword{internal}

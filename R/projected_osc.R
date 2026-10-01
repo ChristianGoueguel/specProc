@@ -52,12 +52,11 @@
 #' @export projected_osc
 #'
 #' @examples
-#' set.seed(1)
-#' x <- matrix(rnorm(30 * 40), 30, 40)
-#' y <- x[, 1] + rnorm(30, sd = 0.1)
-#' res <- projected_osc(x[1:20, ], y[1:20], ncomp = 3, newdata = x[21:30, ])
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]  # the spectral channels
+#' cal <- 1:300
+#' res <- projected_osc(spectra[cal, ], forageLIBS$K[cal], ncomp = 3, newdata = spectra[-cal, ])
 #' dim(res$newdata$correction)
-#'
 projected_osc <- function(x, y, ncomp = 5, center = TRUE, scale = FALSE, tol = 1e-10, newdata = NULL) {
 
   if (missing(x) || missing(y)) {

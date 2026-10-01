@@ -373,6 +373,7 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE
 #' @export macropca
 #'
 #' @examples
+#' \donttest{
 #' set.seed(1)
 #' # LIBS spectra of forage samples (MacroPCA is run twice to choose k)
 #' minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
@@ -382,6 +383,7 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE
 #'   center() |>
 #'   macropca() |>
 #'   print()
+#' }
 #'
 macropca <- function(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, ...) {
   if (missing(x)) {

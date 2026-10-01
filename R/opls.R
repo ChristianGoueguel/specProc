@@ -107,14 +107,12 @@
 #' @export opls
 #'
 #' @examples
-#' set.seed(1)
-#' x <- matrix(rnorm(40 * 30), 40, 30)
-#' y <- x[, 1] + rnorm(40, sd = 0.1)
-#' x[, 2:5] <- x[, 2:5] + rnorm(40, sd = 3)  # response-orthogonal variation
-#' fit <- opls(x[1:30, ], y[1:30], permutation = 10)
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]  # the spectral channels
+#' cal <- 1:300
+#' fit <- opls(spectra[cal, ], forageLIBS$K[cal], permutation = 5)
 #' fit
-#' predict(fit, x[31:40, ], type = "response")
-#'
+#' head(predict(fit, spectra[-cal, ], type = "response"))
 opls <- function(x, y, scale = "center", crossval = 7, permutation = 20, ncomp.ortho = NA) {
   if (missing(x) || missing(y) || is.null(x) || is.null(y)) {
     stop("Both 'x' and 'y' must be provided.", call. = FALSE)
@@ -409,12 +407,11 @@ opls_vip <- function(fit, ys) {
 #' @export
 #'
 #' @examples
-#' set.seed(1)
-#' x <- matrix(rnorm(40 * 30), 40, 30)
-#' y <- x[, 1] + rnorm(40, sd = 0.1)
-#' fit <- opls(x[1:30, ], y[1:30], ncomp.ortho = 2, permutation = 0)
-#' predict(fit, x[31:40, ], type = "response")
-#'
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]  # the spectral channels
+#' cal <- 1:300
+#' fit <- opls(spectra[cal, ], forageLIBS$K[cal], ncomp.ortho = 2, permutation = 0)
+#' head(predict(fit, spectra[-cal, ], type = "response"))
 predict.specproc_opls <- function(object, newdata, type = c("correction", "response", "scores"), ...) {
   type <- match.arg(type)
   z <- filter_preprocess(object, filter_newdata(object, newdata))

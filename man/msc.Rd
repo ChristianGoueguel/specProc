@@ -55,12 +55,10 @@ variables outside all windows are left unchanged.
 To correct new spectra consistently, pass the returned \code{reference} as \code{xref}.
 }
 \examples{
-set.seed(1)
-base <- sin(seq(0, pi, length.out = 50))
-x <- t(sapply(1:10, function(i) runif(1, 0, 1) + runif(1, 0.5, 2) * base))
-res <- msc(x)
-range(apply(as.matrix(res$correction), 2, sd))
-
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+res <- msc(spectra)
+res$correction[1:3, 1:4]
 }
 \author{
 Christian L. Goueguel

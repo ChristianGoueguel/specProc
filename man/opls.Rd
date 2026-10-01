@@ -102,14 +102,12 @@ variance are kept (their centered values are zero), and when
 instead of no model when only the predictive component is significant.
 }
 \examples{
-set.seed(1)
-x <- matrix(rnorm(40 * 30), 40, 30)
-y <- x[, 1] + rnorm(40, sd = 0.1)
-x[, 2:5] <- x[, 2:5] + rnorm(40, sd = 3)  # response-orthogonal variation
-fit <- opls(x[1:30, ], y[1:30], permutation = 10)
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+cal <- 1:300
+fit <- opls(spectra[cal, ], forageLIBS$K[cal], permutation = 5)
 fit
-predict(fit, x[31:40, ], type = "response")
-
+head(predict(fit, spectra[-cal, ], type = "response"))
 }
 \references{
 \itemize{

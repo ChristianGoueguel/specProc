@@ -40,19 +40,10 @@
 #' @export generalized_boxplot
 #'
 #' @examples
-#' set.seed(123)
-#' data <- data.frame(
-#'   normal = rnorm(100),
-#'   skewed = rexp(100, rate = 0.5),
-#'   heavy_tailed = rt(100, df = 3)
-#' )
-#'
-#' # Plot the generalized boxplot
-#' generalized_boxplot(data)
-#'
-#' # Retrieve the generalized boxplot statistics
-#' generalized_boxplot(data, plot = FALSE)
-#'
+#' data(forageLIBS)
+#' # mineral contents (%) of the forage samples
+#' generalized_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")])
+#' generalized_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")], plot = FALSE)
 generalized_boxplot <- function(x, alpha = 0.05, p = 0.9, plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, xlabels.hjust = 1, box.width = .5, notch = FALSE, notchwidth = 0.5, staplewidth = 0.5) {
   if (missing(x)) {
     stop("Missing 'x' argument.")

@@ -72,22 +72,6 @@ the recipe, with \code{\link[=reject_shots]{reject_shots()}} and \code{\link[=av
 \link[recipes:tidy.recipe]{tidy()} returns the spectral \code{terms}, the \code{sample}
 column, the criteria (\code{method}), the \code{cutoff} and \code{id}.
 }
-\examples{
-if (rlang::is_installed("recipes")) {
-  set.seed(1)
-  wl <- seq(390, 400, by = 0.1)
-  line <- exp(-(wl - 393.4)^2 / 0.02)
-  shots <- t(sapply(rep(c(1, 2), each = 6), function(s) 1000 * s * line + rnorm(length(wl), 50, 5)))
-  shots[3, ] <- shots[3, ] / 10     # a weak shot
-  colnames(shots) <- wl
-  df <- data.frame(Sample = rep(c("a", "b"), each = 6), shots, check.names = FALSE)
-  rec <- recipes::recipe(~ ., data = df) |>
-    recipes::update_role(Sample, new_role = "id") |>
-    step_reject_shots(recipes::all_numeric(), sample = Sample) |>
-    recipes::prep()
-  nrow(recipes::bake(rec, new_data = NULL))   # 11 shots kept for training
-}
-}
 \seealso{
 \code{\link[=reject_shots]{reject_shots()}}, \code{\link[=average]{average()}}, \code{\link[=step_line_ratio]{step_line_ratio()}}
 }

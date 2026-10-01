@@ -20,9 +20,9 @@
 #' @export minmax
 #'
 #' @examples
-#' minmax(c(2, 4, 6, 10))
-#' minmax(c(2, 4, NA, 10), a = -1, b = 1, drop.na = FALSE)
-#'
+#' data(forageLIBS)
+#' head(minmax(forageLIBS$K))
+#' head(minmax(forageLIBS$S, a = -1, b = 1, drop.na = FALSE))
 minmax <- function(x, a = 0, b = 1, drop.na = TRUE) {
   if (missing(x)) {
     stop("Missing 'x' argument.")

@@ -23,8 +23,9 @@ Pareto scaling scales each variable (column) by dividing it by the square
 root of its standard deviation.
 }
 \examples{
-pareto_scale(matrix(c(1, 2, 3, 10, 20, 30), ncol = 2))
-
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+pareto_scale(spectra)[1:3, 1:4]
 }
 \author{
 Christian L. Goueguel

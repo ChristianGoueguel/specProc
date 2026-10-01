@@ -30,12 +30,11 @@
 #' @export plot_spectra
 #'
 #' @examples
-#' wl <- seq(390, 400, length.out = 200)
-#' spectra <- as.data.frame(t(sapply(1:3, function(i) i * exp(-(wl - 395)^2 / 0.1) + 0.1 * i)))
-#' names(spectra) <- wl
-#' spectra$conc <- 1:3
-#' plot_spectra(spectra, colvar = conc)
-#'
+#' data(forageLIBS)
+#' wl <- as.numeric(names(forageLIBS)[-(1:14)])
+#' k_lines <- names(forageLIBS)[-(1:14)][wl > 764 & wl < 772]
+#' # the K I resonance lines, colored by potassium content
+#' plot_spectra(forageLIBS[1:20, c("K", k_lines)], colvar = K)
 plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop_na = FALSE) {
   if (missing(x)) {
     stop("Missing 'data' argument.")

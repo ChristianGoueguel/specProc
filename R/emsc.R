@@ -69,23 +69,13 @@
 #' @export emsc
 #'
 #' @examples
-#' set.seed(1)
-#' wl <- seq(390, 400, length.out = 100)
-#' pure <- exp(-(wl - 393.4)^2 / 0.05) + 0.6 * exp(-(wl - 396.8)^2 / 0.05)
-#' # multiplicative effect, offset and a curved baseline for each spectrum
-#' x <- t(sapply(1:10, function(i) {
-#'   runif(1, 0.5, 2) * pure + runif(1, 0, 1) + runif(1, -1, 1) * ((wl - 395) / 5)^2
-#' }))
-#' colnames(x) <- wl
-#'
-#' fit <- emsc(x, degree = 2)
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]  # the spectral channels
+#' fit <- emsc(spectra[1:300, ], degree = 2)
 #' head(fit$coefficients)
-#' # the corrected spectra are nearly identical
-#' range(apply(as.matrix(fit$correction), 2, sd))
-#'
 #' # new spectra are corrected with the calibration reference
-#' corrected <- predict(fit, x[1:2, ])
-#'
+#' corrected <- predict(fit, spectra[301:368, ])
+#' dim(corrected)
 emsc <- function(x, xref = NULL, degree = 2, interferents = NULL, wavelength = NULL, robust = TRUE) {
   if (missing(x)) {
     stop("Missing 'x' argument.")

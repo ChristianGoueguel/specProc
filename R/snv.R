@@ -20,9 +20,10 @@
 #' @export snv
 #'
 #' @examples
-#' x <- rbind(c(1, 2, 3, 4), c(10, 20, 30, 40))
-#' snv(x)$correction
-#'
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]  # the spectral channels
+#' corrected <- snv(spectra)$correction
+#' corrected[1:3, 1:4]
 snv <- function(x, drop.na = TRUE) {
 
   if (missing(x)) {

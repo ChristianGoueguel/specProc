@@ -25,10 +25,10 @@ and biweight midcovariance, as described by Wilcox (1994). It is bounded
 between -1 and 1.
 }
 \examples{
-set.seed(11230)
-x <- rnorm(100)
-y <- 2 * x + rnorm(100)
-biweight_midcorrelation(x, y)
+data(forageLIBS)
+ok <- !is.na(forageLIBS$Fe)
+c(pearson = stats::cor(forageLIBS$Fe[ok], forageLIBS$Mn[ok]),
+  biweight = biweight_midcorrelation(forageLIBS$Fe[ok], forageLIBS$Mn[ok]))
 
 }
 \references{

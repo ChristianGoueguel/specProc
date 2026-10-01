@@ -102,17 +102,16 @@ selected predictors), \code{num_comp} and \code{id}.
 \examples{
 \dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
 library(recipes)
-set.seed(1)
-x <- matrix(rnorm(60 * 20), 60, 20, dimnames = list(NULL, paste0("wl", 1:20)))
-dat <- data.frame(y = x[, 1] + rnorm(60, sd = 0.1), x)
-
-rec <- recipe(y ~ ., data = dat[1:40, ]) |>
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+rec <- recipe(K ~ ., data = dat[1:300, ]) |>
   step_osc(all_predictors(), method = "fearn", num_comp = 2)
 prepped <- prep(rec)
 tidy(prepped, number = 1)
-
 # new spectra are corrected with the filter estimated on the training data
-bake(prepped, new_data = dat[41:60, -1])
+bake(prepped, new_data = dat[301:368, -1])
 \dontshow{\}) # examplesIf}
 }
 \seealso{

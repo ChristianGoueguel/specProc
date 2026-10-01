@@ -5,8 +5,8 @@
 #' @description
 #' Retrieves the lines of an atom or ion in a wavelength range from the NIST
 #' Atomic Spectra Database (ASD): wavelengths, transition probabilities,
-#' level energies and statistical weights, as needed by [boltzmann_plot()]
-#' and [saha_boltzmann_plot()]. The data are downloaded on demand; they are
+#' level energies and statistical weights, as needed by [boltzmann()]
+#' and [saha_boltzmann()]. The data are downloaded on demand; they are
 #' not distributed with specProc.
 #'
 #' @details
@@ -39,8 +39,8 @@
 #'   term and J of the levels) and `intensity` (the relative intensity
 #'   listed by the ASD, as text).
 #'
-#' @seealso [nist_ionization_energy()], [boltzmann_plot()],
-#'   [saha_boltzmann_plot()], [starkb_lines()]
+#' @seealso [nist_ionization_energy()], [boltzmann()],
+#'   [saha_boltzmann()], [starkb_lines()]
 #' @export nist_lines
 #'
 #' @examples
@@ -85,7 +85,7 @@ nist_lines <- function(species, wavelength, with_aki = TRUE, timeout = 120) {
 #' @description
 #' Retrieves ionization energies from the NIST Atomic Spectra Database, for
 #' example the ionization energy of the neutral atom needed by
-#' [saha_boltzmann_plot()].
+#' [saha_boltzmann()].
 #'
 #' @param species A character vector of emitters in spectroscopic notation:
 #'   `"Ca I"` gives the energy needed to ionize neutral calcium, `"Ca II"`
@@ -94,7 +94,7 @@ nist_lines <- function(species, wavelength, with_aki = TRUE, timeout = 120) {
 #'
 #' @return A named numeric vector of ionization energies, in eV.
 #'
-#' @seealso [nist_lines()], [saha_boltzmann_plot()]
+#' @seealso [nist_lines()], [saha_boltzmann()]
 #' @export nist_ionization_energy
 #'
 #' @examples

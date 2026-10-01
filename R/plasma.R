@@ -48,24 +48,29 @@
 #'    equilibrium in laser-induced breakdown spectroscopy: beyond the
 #'    McWhirter criterion. Spectrochimica Acta Part B, 65(1):86-95.
 #'
-#' @seealso [saha_boltzmann_plot()], [plot_boltzmann()],
+#' @seealso [saha_boltzmann()], [plot_boltzmann()],
 #'   [mcwhirter_criterion()]
-#' @export boltzmann_plot
+#' @export boltzmann
 #'
 #' @examples
-#' # Lines of a hypothetical species emitted by a plasma at 10000 K
-#' kB <- 8.617333262e-5
-#' lines <- data.frame(
-#'   wavelength = c(400, 420, 450, 480, 500),
-#'   Aki = c(1e8, 5e7, 2e7, 8e7, 3e7),
-#'   gk = c(3, 5, 7, 5, 9),
-#'   Ek = c(3.1, 3.9, 4.6, 5.3, 6.0)
+#' data(forageLIBS)
+#' mean_spectrum <- colMeans(forageLIBS[-(1:14)])
+#' # calcium lines, with their atomic data from the NIST database
+#' atomic <- data.frame(
+#'   species = c(rep("Ca I", 6), rep("Ca II", 4)),
+#'   stage = c(rep(1, 6), rep(2, 4)),
+#'   wavelength = c(428.301, 430.253, 431.865, 445.478, 612.222, 616.217,
+#'                  315.887, 317.933, 370.603, 373.690),
+#'   Aki = c(4.34e7, 1.36e8, 7.40e7, 8.70e7, 2.87e7, 4.77e7, 3.10e8, 3.60e8, 8.80e7, 1.70e8),
+#'   gk = c(5, 5, 3, 7, 3, 3, 4, 6, 2, 2),
+#'   Ek = c(4.780, 4.780, 4.769, 4.681, 3.910, 3.910, 7.047, 7.050, 6.468, 6.468)
 #' )
-#' lines$intensity <- with(lines, gk * Aki / wavelength * exp(-Ek / (kB * 10000)))
-#' fit <- boltzmann_plot(lines)
+#' lines <- line_intensities(mean_spectrum, atomic, baseline = TRUE)
+#' fit <- boltzmann(lines[lines$stage == 1, ])
 #' fit
 #' plot_boltzmann(fit)
-boltzmann_plot <- function(lines, units = "energy") {
+#'
+boltzmann <- function(lines, units = "energy") {
   units <- match.arg(units, c("energy", "photons"))
   lines <- check_lines(lines, c("intensity", "wavelength", "Aki", "gk", "Ek"))
   if (nrow(lines) < 3) {
@@ -98,7 +103,7 @@ boltzmann_plot <- function(lines, units = "energy") {
 #' neglected. The much wider energy range than in a Boltzmann plot of a
 #' single species gives a more precise temperature.
 #'
-#' @param lines A data frame as for [boltzmann_plot()], with an additional
+#' @param lines A data frame as for [boltzmann()], with an additional
 #'   column `stage`: 1 for lines of the neutral atom, 2 for lines of the
 #'   singly charged ion.
 #' @param ionization_energy The ionization energy of the neutral atom, in eV.
@@ -110,7 +115,7 @@ boltzmann_plot <- function(lines, units = "energy") {
 #' @param tol The relative tolerance on the temperature. Default is 1e-8.
 #'
 #' @return An object of class `specproc_boltzmann`, as for
-#'   [boltzmann_plot()], with the number of iterations in `iterations`.
+#'   [boltzmann()], with the number of iterations in `iterations`.
 #'
 #' @references
 #'  - Aguilera, J.A., Aragón, C. (2004). Characterization of a laser-induced
@@ -118,24 +123,29 @@ boltzmann_plot <- function(lines, units = "energy") {
 #'    emissions: comparison of local and spatially integrated measurements.
 #'    Spectrochimica Acta Part B, 59(12):1861-1876.
 #'
-#' @seealso [boltzmann_plot()], [electron_density()], [plot_boltzmann()]
-#' @export saha_boltzmann_plot
+#' @seealso [boltzmann()], [electron_density()], [plot_boltzmann()]
+#' @export saha_boltzmann
 #'
 #' @examples
-#' kB <- 8.617333262e-5
-#' T <- 12000; ne <- 1e17; E_ion <- 6.11
-#' lines <- data.frame(
-#'   stage = c(1, 1, 1, 2, 2, 2),
-#'   wavelength = c(420, 445, 560, 390, 395, 850),
-#'   Aki = c(2e8, 8e7, 5e7, 1.5e8, 1.4e8, 1e7),
-#'   gk = c(3, 5, 7, 4, 2, 6),
-#'   Ek = c(2.9, 4.7, 5.0, 3.1, 3.2, 3.2)
+#' data(forageLIBS)
+#' mean_spectrum <- colMeans(forageLIBS[-(1:14)])
+#' # calcium lines, with their atomic data from the NIST database
+#' atomic <- data.frame(
+#'   species = c(rep("Ca I", 6), rep("Ca II", 4)),
+#'   stage = c(rep(1, 6), rep(2, 4)),
+#'   wavelength = c(428.301, 430.253, 431.865, 445.478, 612.222, 616.217,
+#'                  315.887, 317.933, 370.603, 373.690),
+#'   Aki = c(4.34e7, 1.36e8, 7.40e7, 8.70e7, 2.87e7, 4.77e7, 3.10e8, 3.60e8, 8.80e7, 1.70e8),
+#'   gk = c(5, 5, 3, 7, 3, 3, 4, 6, 2, 2),
+#'   Ek = c(4.780, 4.780, 4.769, 4.681, 3.910, 3.910, 7.047, 7.050, 6.468, 6.468)
 #' )
-#' saha <- 2 * (2 * pi * 9.1093837015e-31 * 1.380649e-23 * T / 6.62607015e-34^2)^1.5 * 1e-6 / ne
-#' lines$intensity <- with(lines, gk * Aki / wavelength *
-#'   exp(-(Ek + (stage == 2) * E_ion) / (kB * T)) * ifelse(stage == 2, saha, 1))
-#' saha_boltzmann_plot(lines, ionization_energy = E_ion, electron_density = ne)
-saha_boltzmann_plot <- function(lines, ionization_energy, electron_density, units = "energy",
+#' lines <- line_intensities(mean_spectrum, atomic, baseline = TRUE)
+#' # with the ionization energy of Ca I (eV) and the electron density (cm-3)
+#' fit <- saha_boltzmann(lines, ionization_energy = 6.113, electron_density = 1.9e17)
+#' fit
+#' plot_boltzmann(fit)
+#'
+saha_boltzmann <- function(lines, ionization_energy, electron_density, units = "energy",
                                 max_iter = 100, tol = 1e-8) {
   units <- match.arg(units, c("energy", "photons"))
   lines <- check_lines(lines, c("intensity", "wavelength", "Aki", "gk", "Ek", "stage"))
@@ -177,30 +187,40 @@ saha_boltzmann_plot <- function(lines, ionization_energy, electron_density, unit
 #' @title Draw a Boltzmann or Saha-Boltzmann Plot
 #'
 #' @description
-#' Plots the points and the fitted line of [boltzmann_plot()] or
-#' [saha_boltzmann_plot()], with the estimated temperature, or the parallel
+#' Plots the points and the fitted line of [boltzmann()] or
+#' [saha_boltzmann()], with the estimated temperature, or the parallel
 #' Boltzmann plots of the species of [cf_libs()].
 #'
-#' @param object An object returned by [boltzmann_plot()],
-#'   [saha_boltzmann_plot()] or [cf_libs()].
+#' @param object An object returned by [boltzmann()],
+#'   [saha_boltzmann()] or [cf_libs()].
 #' @param title The plot title. By default, the method and temperature.
 #'
 #' @return A ggplot object.
-#' @seealso [boltzmann_plot()], [saha_boltzmann_plot()]
+#' @seealso [boltzmann()], [saha_boltzmann()]
 #' @export
 #'
 #' @examples
-#' kB <- 8.617333262e-5
-#' lines <- data.frame(wavelength = c(400, 450, 500), Aki = c(1e8, 2e7, 3e7),
-#'                     gk = c(3, 7, 9), Ek = c(3.1, 4.6, 6.0))
-#' lines$intensity <- with(lines, gk * Aki / wavelength * exp(-Ek / (kB * 9000)))
-#' plot_boltzmann(boltzmann_plot(lines))
+#' data(forageLIBS)
+#' mean_spectrum <- colMeans(forageLIBS[-(1:14)])
+#' # calcium lines, with their atomic data from the NIST database
+#' atomic <- data.frame(
+#'   species = c(rep("Ca I", 6), rep("Ca II", 4)),
+#'   stage = c(rep(1, 6), rep(2, 4)),
+#'   wavelength = c(428.301, 430.253, 431.865, 445.478, 612.222, 616.217,
+#'                  315.887, 317.933, 370.603, 373.690),
+#'   Aki = c(4.34e7, 1.36e8, 7.40e7, 8.70e7, 2.87e7, 4.77e7, 3.10e8, 3.60e8, 8.80e7, 1.70e8),
+#'   gk = c(5, 5, 3, 7, 3, 3, 4, 6, 2, 2),
+#'   Ek = c(4.780, 4.780, 4.769, 4.681, 3.910, 3.910, 7.047, 7.050, 6.468, 6.468)
+#' )
+#' lines <- line_intensities(mean_spectrum, atomic, baseline = TRUE)
+#' plot_boltzmann(saha_boltzmann(lines, ionization_energy = 6.113, electron_density = 1.9e17))
+#'
 plot_boltzmann <- function(object, title = NULL) {
   if (inherits(object, "specproc_cflibs")) {
     return(plot_cf_libs(object, title))
   }
   if (!inherits(object, "specproc_boltzmann")) {
-    stop("'object' must be returned by boltzmann_plot(), saha_boltzmann_plot() or cf_libs().",
+    stop("'object' must be returned by boltzmann(), saha_boltzmann() or cf_libs().",
          call. = FALSE)
   }
   if (is.null(title)) {

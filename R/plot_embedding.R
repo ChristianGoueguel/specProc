@@ -60,8 +60,7 @@
 #' PCA or PLS; on a UMAP
 #' map, whose distances are not meaningful, prefer `ellipse`.
 #'
-#' **Style.** The panel is drawn in the style of SIMCA score plots: grey
-#' outside the outermost ellipse (of \eqn{T^2}, or of each group) and white
+#' **Style.** The panel is grey outside the outermost ellipse (of \eqn{T^2}, or of each group) and white
 #' inside, so that the samples beyond the limits stand out, with no grid and
 #' a fixed `aspect_ratio` (0.7 by default; `NULL` lets the plot fill the
 #' space), and thin black lines through the origin (when it lies in the
@@ -378,7 +377,7 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
       ggplot2::scale_x_continuous(sec.axis = ggplot2::sec_axis(~ . / fx, name = paste(x, "loading"))) +
       ggplot2::scale_y_continuous(sec.axis = ggplot2::sec_axis(~ . / fy, name = paste(y, "loading")))
   }
-  # SIMCA style: grey outside the ellipses, white inside
+  # grey outside the ellipses, white inside
   p <- p +
     ggplot2::labs(x = axis_title(x, variance), y = axis_title(y, variance), title = title,
                   subtitle = subtitle) +

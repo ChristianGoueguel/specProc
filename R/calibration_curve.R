@@ -89,16 +89,18 @@
 #' @export calibration_curve
 #'
 #' @examples
-#' # standards with a slightly curved response
-#' set.seed(1)
-#' standards <- data.frame(concentration = rep(c(0, 0.5, 1, 2, 4, 8), each = 3))
-#' standards$intensity <- with(standards, 50 + 1000 * concentration - 15 * concentration^2 +
-#'                               rnorm(18, sd = 20))
-#' cal <- calibration_curve(standards, intensity, concentration)
+#' data(forageLIBS)
+#' # the K I 769.90 nm line, normalized to the C I 247.86 nm line of the matrix
+#' lines <- line_intensities(forageLIBS[-(1:14)], c(C = 247.856, K = 769.896), baseline = TRUE)
+#' standards <- data.frame(
+#'   K = forageLIBS$K,
+#'   signal = lines$intensity[lines$line == "K"] / lines$intensity[lines$line == "C"]
+#' )
+#' cal <- calibration_curve(standards[1:300, ], signal, K)
 #' cal
-#' cal2 <- calibration_curve(standards, intensity, concentration, model = "quadratic")
-#' predict(cal2, c(1500, 5000))
-#' plot_calibration(cal2)
+#' # the concentrations of new samples, from their signals
+#' head(predict(cal, standards$signal[301:368]))
+#'
 calibration_curve <- function(data, signal, concentration, model = "linear", weights = NULL,
                               blank = NULL, lod_method = NULL, level = 0.95) {
   if (!is.data.frame(data)) {
@@ -209,13 +211,19 @@ calibration_curve <- function(data, signal, concentration, model = "linear", wei
 #' @export
 #'
 #' @examples
-#' set.seed(1)
-#' standards <- data.frame(concentration = rep(c(0, 0.5, 1, 2, 4, 8), each = 3))
-#' standards$intensity <- 50 + 1000 * standards$concentration + rnorm(18, sd = 30)
-#' cal <- calibration_curve(standards, intensity, concentration)
-#' predict(cal, c(800, 3000), replicates = 3)
-#' predict(cal, c(1, 5), type = "signal")
-#' predict(cal, c(1, 5), type = "signal", interval = "confidence")
+#' data(forageLIBS)
+#' # the K I 769.90 nm line, normalized to the C I 247.86 nm line of the matrix
+#' lines <- line_intensities(forageLIBS[-(1:14)], c(C = 247.856, K = 769.896), baseline = TRUE)
+#' standards <- data.frame(
+#'   K = forageLIBS$K,
+#'   signal = lines$intensity[lines$line == "K"] / lines$intensity[lines$line == "C"]
+#' )
+#' cal <- calibration_curve(standards[1:300, ], signal, K)
+#' predict(cal, standards$signal[301:305])
+#' # the signal expected at given contents (% K)
+#' predict(cal, c(1, 2, 3), type = "signal")
+#' predict(cal, c(1, 2, 3), type = "signal", interval = "confidence")
+#'
 predict.specproc_calibration <- function(object, newdata, replicates = 1, level = 0.95,
                                          type = "concentration", interval = "prediction", ...) {
   type <- match.arg(type, c("concentration", "signal"))
@@ -296,12 +304,17 @@ predict.specproc_calibration <- function(object, newdata, replicates = 1, level 
 #' @export plot_calibration
 #'
 #' @examples
-#' set.seed(1)
-#' standards <- data.frame(concentration = rep(c(0, 0.5, 1, 2, 4, 8), each = 3))
-#' standards$intensity <- 50 + 1000 * standards$concentration + rnorm(18, sd = 300)
-#' cal <- calibration_curve(standards, intensity, concentration)
+#' data(forageLIBS)
+#' # the K I 769.90 nm line, normalized to the C I 247.86 nm line of the matrix
+#' lines <- line_intensities(forageLIBS[-(1:14)], c(C = 247.856, K = 769.896), baseline = TRUE)
+#' standards <- data.frame(
+#'   K = forageLIBS$K,
+#'   signal = lines$intensity[lines$line == "K"] / lines$intensity[lines$line == "C"]
+#' )
+#' cal <- calibration_curve(standards[1:300, ], signal, K)
 #' plot_calibration(cal)
-#' plot_calibration(cal, newdata = c(800, 3000, 6500))
+#' plot_calibration(cal, newdata = standards$signal[301:305])
+#'
 plot_calibration <- function(object, interval = "both", level = 0.95, newdata = NULL,
                              replicates = 1, title = NULL) {
   if (!inherits(object, "specproc_calibration")) {

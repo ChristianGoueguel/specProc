@@ -54,12 +54,17 @@
 #' @export glsw
 #'
 #' @examples
-#' set.seed(1)
-#' x1 <- matrix(rnorm(20 * 30), 20, 30)
-#' x2 <- x1 + outer(rnorm(20), cos(seq(0, pi, length.out = 30)))
-#' G <- glsw(x1, x2, alpha = 0.01)
-#' x1_filtered <- x1 %*% as.matrix(G)
-#'
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]
+#' wl <- as.numeric(names(spectra))
+#' x <- spectra[wl > 760 & wl < 780]  # the K I resonance lines
+#' # the three samples measured twice
+#' twice <- forageLIBS$Sample[duplicated(forageLIBS$Sample)]
+#' first <- match(twice, forageLIBS$Sample)
+#' second <- vapply(twice, function(s) max(which(forageLIBS$Sample == s)), integer(1))
+#' G <- glsw(x[first, ], x[second, ], alpha = 0.01)
+#' filtered <- as.matrix(x) %*% as.matrix(G)
+#' dim(filtered)
 glsw <- function(x1, x2, alpha = 0.01) {
 
   if (missing(x1)) {

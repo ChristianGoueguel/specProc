@@ -33,21 +33,10 @@
 #'      The Astronomical Journal, 100:32-46.
 #'
 #' @examples
-#' # Example 1: Compute biweight scale for a vector
-#' x <- c(seq(1,100))
-#' tibble::tibble(
-#' sd = stats::sd(x),
-#' mad = stats::mad(x),
-#' biscale = biweight_scale(x)
-#' )
-#'
-#' # Example 2: Biweight scale is robust to outliers
-#' x <- c(seq(1,99), 1e3) # An outlier at 1000
-#' tibble::tibble(
-#' sd = stats::sd(x),
-#' mad = stats::mad(x),
-#' biscale = biweight_scale(x)
-#' )
+#' data(forageLIBS)
+#' # iron contents (mg/kg): a few samples are far above the others
+#' fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+#' c(sd = stats::sd(fe), mad = stats::mad(fe), biweight = biweight_scale(fe))
 #'
 #' @export biweight_scale
 #'

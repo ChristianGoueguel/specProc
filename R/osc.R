@@ -70,12 +70,12 @@
 #' @export osc
 #'
 #' @examples
-#' set.seed(1)
-#' x <- matrix(rnorm(20 * 50), 20, 50)
-#' y <- x[, 1] + rnorm(20, sd = 0.1)
-#' res <- osc(x, y, method = "fearn", ncomp = 2)
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]
+#' wl <- as.numeric(names(spectra))
+#' x <- spectra[wl > 760 & wl < 780]  # the K I resonance lines
+#' res <- osc(x, forageLIBS$K, method = "fearn", ncomp = 2)
 #' res$angle
-#'
 osc <- function(x, y, method = "sjoblom", center = TRUE, scale = FALSE, ncomp = 10, tol = 1e-3, max.iter = 10, pls.ncomp = 5) {
 
   if (missing(x) || missing(y)) {
