@@ -25,8 +25,12 @@
 #' \eqn{k(n+1)(n-1)/(n(n-k))\,F(k, n-k)}. The limit of Q is that of Jackson
 #' and Mudholkar (1979), from the eigenvalues of the components left out, or
 #' Box's (1954) scaled chi-square approximation (`method = "box"`); both
-#' tend to be slightly conservative. Samples are classified at the highest
-#' confidence level.
+#' tend to be slightly conservative. The Jackson-Mudholkar limit depends on
+#' a power \eqn{h_0} of Q computed from these eigenvalues; when \eqn{h_0} is
+#' close to zero (a few large eigenvalues followed by a long tail of small
+#' ones, common for spectra), its limit as \eqn{h_0 \to 0}, a lognormal
+#' approximation, is used. Samples are classified at the highest confidence
+#' level.
 #'
 #' These are classical estimates, themselves affected by outliers: see
 #' [robpca()] and [plot_outlier_map()] for robust score and orthogonal
@@ -250,6 +254,10 @@ dmodx <- function(model, k, newdata = NULL, conf_level = 0.975, normalized = TRU
 #' # shaded outlying regions, logarithmic axes and colors by distance
 #' plot_influence(influence, relative = TRUE, shade = TRUE, log = TRUE, colour_by = "distance")
 #'
+#' # a single limit at 97.5%, with the outlying regions shaded
+#' influence_975 <- q_residuals(pca, k = 3, conf_level = 0.975)
+#' plot_influence(influence_975, label = forageLIBS$Measurement, shade = TRUE)
+#'
 plot_influence <- function(x, label = NULL, labels = 3, relative = FALSE, shade = FALSE,
                            log = FALSE, colour_by = c("type", "distance"), title = NULL, ...) {
   if (!inherits(x, "specproc_influence")) {
@@ -380,6 +388,13 @@ q_limit <- function(rest, level, method) {
   }
   h0 <- 1 - 2 * theta[1] * theta[3] / (3 * theta[2]^2)
   z <- stats::qnorm(level)
-  theta[1] * (z * sqrt(2 * theta[2] * h0^2) / theta[1] + 1 +
-                theta[2] * h0 * (h0 - 1) / theta[1]^2)^(1 / h0)
+  # Near h0 = 0 (a few large eigenvalues followed by a long tail of small
+  # ones, common for spectra), the power 1 / h0 is numerically unstable: use
+  # its limit as h0 tends to 0, a lognormal approximation. Elsewhere, h0 keeps
+  # its sign in the first term, so that the limit is continuous in h0.
+  if (abs(h0) < 1e-3) {
+    return(theta[1] * exp(z * sqrt(2 * theta[2]) / theta[1] - theta[2] / theta[1]^2))
+  }
+  base <- h0 * z * sqrt(2 * theta[2]) / theta[1] + 1 + theta[2] * h0 * (h0 - 1) / theta[1]^2
+  theta[1] * base^(1 / h0)
 }

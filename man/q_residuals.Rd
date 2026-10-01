@@ -69,8 +69,12 @@ the limit is that of a new observation,
 \eqn{k(n+1)(n-1)/(n(n-k))\,F(k, n-k)}. The limit of Q is that of Jackson
 and Mudholkar (1979), from the eigenvalues of the components left out, or
 Box's (1954) scaled chi-square approximation (\code{method = "box"}); both
-tend to be slightly conservative. Samples are classified at the highest
-confidence level.
+tend to be slightly conservative. The Jackson-Mudholkar limit depends on
+a power \eqn{h_0} of Q computed from these eigenvalues; when \eqn{h_0} is
+close to zero (a few large eigenvalues followed by a long tail of small
+ones, common for spectra), its limit as \eqn{h_0 \to 0}, a lognormal
+approximation, is used. Samples are classified at the highest confidence
+level.
 
 These are classical estimates, themselves affected by outliers: see
 \code{\link[=robpca]{robpca()}} and \code{\link[=plot_outlier_map]{plot_outlier_map()}} for robust score and orthogonal

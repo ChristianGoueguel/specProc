@@ -181,3 +181,28 @@ test_that("dmodx of new samples uses the calibration s0", {
   expect_equal(g$labels$y, "DModX (normalized)")
   expect_error(dmodx(pca, 3, df = "other"))
 })
+
+test_that("the Jackson-Mudholkar limit is valid whatever the sign of h0", {
+  h0_of <- function(rest) {
+    th <- vapply(1:3, function(j) sum(rest^j), numeric(1))
+    1 - 2 * th[1] * th[3] / (3 * th[2]^2)
+  }
+  # a large eigenvalue and a tail of small ones: h0 goes from positive to
+  # negative as the tail grows
+  for (m in c(2, 5, 9, 10, 11, 20, 60)) {
+    rest <- c(10, rep(1, m))
+    limits <- vapply(c(0.9, 0.95, 0.99), function(l) q_limit(rest, l, "jackson"), numeric(1))
+    expect_true(all(limits > sum(rest)))   # above the mean of Q
+    expect_true(!is.unsorted(limits))      # increasing with the level
+  }
+  # continuous through h0 = 0
+  f <- function(m) q_limit(c(10, rep(1, m)), 0.99, "jackson")
+  root <- stats::uniroot(function(m) h0_of(c(10, rep(1, round(m)))), c(5, 10))$root
+  near <- vapply(c(floor(root), ceiling(root)), f, numeric(1))
+  expect_lt(abs(diff(near)) / mean(near), 0.1)
+  # on the forage spectra (h0 close to 0 with 3 components), most spectra
+  # are within the limits
+  data(forageLIBS, envir = environment())
+  pca <- stats::prcomp(forageLIBS[-(1:14)])
+  expect_gt(mean(q_residuals(pca, k = 3, conf_level = 0.99)$outlier == "regular"), 0.9)
+})
