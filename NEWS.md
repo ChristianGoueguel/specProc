@@ -18,8 +18,7 @@
   calibration curves and figures of merit (`vignette("calibration")`) and
   plasma diagnostics (`vignette("plasma-diagnostics")`). The
   orthogonalization vignette is folded into the preprocessing one.
-* The README is shorter, with an example and an overview of the functions
-  by task.
+* The README is shorter, with an overview of the functions by task.
 
 # specProc 0.7.0
 

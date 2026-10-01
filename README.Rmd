@@ -71,36 +71,6 @@ of forage samples:
 They are also available as [articles on the package
 website](https://christiangoueguel.com/specProc/articles/).
 
-## Example
-
-A calibration curve for potassium, from the intensity of the K I 769.90
-nm line normalized to the carbon line C I 247.86 nm:
-
-```{r example, message = FALSE}
-library(specProc)
-library(dplyr)
-
-data("forageLIBS")
-spectra_id <- forageLIBS |> select(1:2) |> names()
-minerals <- forageLIBS |> select(3:14) |> names()
-spectra <- forageLIBS |> select(-all_of(c(spectra_id, minerals)))
-
-corrected <- baseline_arpls(spectra, lambda = 1e5, max.iter = 20)$correction
-intensities <- line_intensities(corrected, c(C = 247.856, K = 769.896))
-
-data <- tibble(
-  K = forageLIBS$K,
-  signal = intensities$intensity[intensities$line == "K"] /
-    intensities$intensity[intensities$line == "C"]
-)
-curve <- calibration_curve(data, signal, K)
-curve$figures_of_merit
-```
-
-```{r example-plot}
-plot_calibration(curve)
-```
-
 ## Function overview
 
 | Task | Functions |
