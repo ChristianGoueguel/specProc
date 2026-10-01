@@ -66,11 +66,11 @@
 #' @export
 #'
 #' @examples
-#' spectra_id <- forageLIBS |> select(1:2) |> names()
-#' minerals <- forageLIBS |> select(3:14) |> names()
+#' spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()
+#' minerals <- forageLIBS |> dplyr::select(3:14) |> names()
 #' set.seed(1)
 #' fit <- forageLIBS |>
-#'   select(-all_of(c(spectra_id, minerals))) |>
+#'   dplyr::select(-dplyr::all_of(c(spectra_id, minerals))) |>
 #'   center() |>
 #'   robpca()
 #'
@@ -195,11 +195,11 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
 #' @export
 #'
 #' @examples
-#' spectra_id <- forageLIBS |> select(1:2) |> names()
-#' minerals <- forageLIBS |> select(3:14) |> names()
+#' spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()
+#' minerals <- forageLIBS |> dplyr::select(3:14) |> names()
 #' set.seed(1)
 #' fit <- forageLIBS |>
-#'   select(-all_of(c(spectra_id, minerals))) |>
+#'   dplyr::select(-dplyr::all_of(c(spectra_id, minerals))) |>
 #'   center() |>
 #'   macropca(k = 3)
 #'
@@ -302,11 +302,11 @@ plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(20
 #' @export
 #'
 #' @examples
-#' spectra_id <- forageLIBS |> select(1:2) |> names()
-#' minerals <- forageLIBS |> select(3:14) |> names()
+#' spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()
+#' minerals <- forageLIBS |> dplyr::select(3:14) |> names()
 #' set.seed(1)
 #' fit <- forageLIBS |>
-#'   select(-all_of(c(spectra_id, minerals))) |>
+#'   dplyr::select(-dplyr::all_of(c(spectra_id, minerals))) |>
 #'   center() |>
 #'   macropca(k = 3)
 #'
