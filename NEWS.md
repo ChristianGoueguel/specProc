@@ -2,11 +2,34 @@
 
 ## Breaking changes
 
+* `macropca()` and `robust_bcyj()` (and `step_macropca()`,
+  `step_robust_bcyj()`) are implemented natively, after the published
+  algorithms, and no longer depend on cellWise, which moves to Suggests.
+  - `macropca()` detects the deviating cells with DDC (Rousseeuw and Van
+    den Bossche, 2018), whose neighbor search and cell predictions are
+    computed in C++ by blocks of variables: on the 368 x 7152 `forageLIBS`
+    spectra, DDC takes about 5 s instead of 13 s, and `macropca()` about
+    12 s instead of 16 s. The results are close to, but not the same as,
+    those of `cellWise::MacroPCA()` (orthogonal distances correlated at
+    0.99 on `forageLIBS`, nearly the same subspace); the score and
+    orthogonal distance cut-offs are those of `robpca()`. In simulations
+    with known rowwise and cellwise outliers and missing values, it
+    estimates the PCA subspace more accurately than `cellWise::MacroPCA()`,
+    imputes the missing values as accurately, and flags far fewer regular
+    observations as outliers (cellWise compares the distances computed with
+    the outlying cells to a cut-off estimated with them imputed). Its arguments
+    `scale`, `ndir`, `maxiter` and `tol` replace the `...` passed to
+    `cellWise::MacroPCA()`, the result has no `fit` element any more,
+    and `imputed` holds the data with the missing values imputed.
+  - `robust_bcyj()` fits the transformations of Raymaekers and Rousseeuw
+    (2021), with nearly the same parameters as `cellWise::transfo()`, and
+    leaves the variables that cannot be transformed unchanged (method
+  `"none"`).
 * `boltzmann_plot()` and `saha_boltzmann_plot()` are renamed `boltzmann()`
   and `saha_boltzmann()`, so that they are not confused with
   `plot_boltzmann()`, which draws their result. The old names still work,
   with a deprecation warning.
-* In `dmodx()`, the nominal degrees of freedom (\eqn{K - k}) are now
+* In `dmodx()`, the nominal degrees of freedom (K - k) are now
   selected with `df = "nominal"`.
 
 ## Documentation

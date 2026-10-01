@@ -16,10 +16,9 @@
 #' @details
 #' The transformation parameter \eqn{\lambda} of each variable is estimated
 #' on the training data by re-weighted maximum likelihood (Raymaekers and
-#' Rousseeuw, 2021) with [cellWise::transfo()], and applied unchanged to new
-#' data with [cellWise::transfo_newdata()]. With `standardize = TRUE`, the
-#' transformed variables are also robustly centered and scaled with the
-#' training estimates. Variables that cannot be transformed (for example,
+#' Rousseeuw, 2021), as in [robust_bcyj()], and applied unchanged to new data.
+#' With `standardize = TRUE`, the transformed variables are also centered and
+#' scaled with the mean and standard deviation of the training inliers. Variables that cannot be transformed (for example,
 #' constant ones) are left unchanged.
 #'
 #' [tidy()][recipes::tidy.recipe] returns a tibble with columns `terms`,
@@ -203,14 +202,6 @@ robust_titles <- c(
   macropca = "MacroPCA on "
 )
 
-# Keeps only what transfo_newdata() needs. Recent cellWise versions read the
-# variable names from the transformed training data `Y`, so a zero-row copy
-# of it is kept.
-strip_transfo <- function(fit) {
-  if (!is.null(fit$Y)) fit$Y <- fit$Y[0, , drop = FALSE]
-  fit[c("Xt", "weights", "remX", "rowInAnalysis", "namesCaseNumber")] <- NULL
-  fit
-}
 
 # Keeps only what predict() needs from a robust PCA model.
 strip_robust_pca <- function(fit) {
@@ -234,10 +225,8 @@ prep_robust_step <- function(x, training, info = NULL, ...) {
     opts <- x$options %||% list()
     x$res <- switch(
       step,
-      step_robust_bcyj = strip_transfo(cellWise::transfo(
-        xmat, type = x$type, robust = TRUE, standardize = x$standardize,
-        quant = x$quantile, nbsteps = x$nbsteps, checkPars = list(silent = TRUE)
-      )),
+      step_robust_bcyj = robust_transformation(xmat, type = x$type, quantile = x$quantile,
+                                               nbsteps = x$nbsteps, standardize = x$standardize),
       step_robpca = strip_robust_pca(do.call(robpca, c(list(xmat, k = x$num_comp), opts))),
       step_rospca = strip_robust_pca(do.call(rospca, c(list(xmat, k = x$num_comp, lambda = x$lambda), opts))),
       step_macropca = strip_robust_pca(do.call(macropca, c(list(xmat, k = x$num_comp), opts)))
@@ -259,9 +248,8 @@ bake_robust_step <- function(object, new_data, ...) {
   }
   xmat <- step_matrix(new_data, cols)
   if (class(object)[1] == "step_robust_bcyj") {
-    out <- cellWise::transfo_newdata(xmat, object$res)
-    transformed <- intersect(colnames(out), cols)
-    new_data[transformed] <- as.data.frame(out[, transformed, drop = FALSE])
+    out <- apply_transformation(xmat, object$res)
+    new_data[cols] <- as.data.frame(out)
     return(new_data)
   }
   pred <- stats::predict(object$res, xmat)
@@ -288,8 +276,8 @@ tidy_robust_step <- function(x, ...) {
   if (class(x)[1] == "step_robust_bcyj") {
     if (trained) {
       res <- tibble::tibble(terms = x$res$colnamX %||% x$columns,
-                            lambda = unname(x$res$lambdahats),
-                            method = unname(x$res$ttypes))
+                            lambda = unname(vapply(x$res$fits, `[[`, numeric(1), "lambda")),
+                            method = unname(vapply(x$res$fits, `[[`, character(1), "type")))
     } else {
       terms <- if (recipes::is_trained(x)) x$columns else recipes::sel2char(x$terms)
       res <- tibble::tibble(terms = terms, lambda = NA_real_, method = NA_character_)
@@ -324,7 +312,7 @@ tunable_robust_step <- function(x, ...) {
 }
 
 required_pkgs_robust_step <- function(x, ...) {
-  c("specProc", "cellWise")
+  c("specProc")
 }
 
 # ---- S3 methods (registered when recipes / generics are loaded) ---------------

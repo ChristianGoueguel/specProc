@@ -10,11 +10,30 @@
 #' aimed at making the data distribution more normal-like. The Box-Cox
 #' transformation is suitable for strictly positive values, while the
 #' Yeo-Johnson transformation can handle both positive and negative values.
-#' The function is a wrapper around the `transfo` function
-#' from the `cellWise` package, which applies a robust version of these
-#' transformations by using re-weighted maximum likelihood estimation.
-#' This approach downweights outlying observations to make the transformation
-#' more robust to their influence.
+#' The transformations are fitted robustly (Raymaekers and Rousseeuw, 2021),
+#' so that outlying observations do not drive the estimate of \eqn{\lambda}:
+#'  1. Each variable is pre-standardized: divided by its median for Box-Cox,
+#'     which needs strictly positive values, and centered by its median and
+#'     divided by its MAD for Yeo-Johnson.
+#'  2. An initial \eqn{\lambda} (between -4 and 6) minimizes a robust
+#'     distance (Tukey's biweight) between the sorted, robustly standardized
+#'     transformed values and the quantiles of the normal distribution. For
+#'     this step, the transformation is continued linearly on the side that
+#'     it compresses (the upper side for \eqn{\lambda < 1}, the lower side
+#'     for \eqn{\lambda > 1}), beyond the point where the transformed value
+#'     is 1.5 times that of the quartile, so that outliers on that side
+#'     cannot dictate \eqn{\lambda}.
+#'  3. The values whose standardized transformed value exceeds the
+#'     `quantile` of the normal distribution are given weight zero (first
+#'     with the rectified transformation), and
+#'     \eqn{\lambda} is re-estimated by maximum likelihood on the others,
+#'     `nbsteps` times.
+#'  4. The transformed variable is standardized by the mean and standard
+#'     deviation of these inliers.
+#'
+#' Variables with fewer than 5 values or no spread (zero MAD) are left
+#' unchanged (method `"none"`), as are variables with non-positive values
+#' when `type = "BC"`.
 #'
 #'
 #' The `type` parameter controls which transformation method(s) to use:
@@ -38,7 +57,8 @@
 #'  - `summary`:
 #'    - `variable`: the variable(s) name
 #'    - `lambda`: the estimated lambda parameter
-#'    - `method`: the method used ('BC' for Box-Cox or 'YJ' for Yeo-Johnson)
+#'    - `method`: the method used ('BC' for Box-Cox, 'YJ' for Yeo-Johnson, or
+#'      'none')
 #'    - `objective`: the objective function value
 #'  - `transformation`:
 #'    - the transformed variable(s)
@@ -87,26 +107,16 @@ robust_bcyj <- function(x, var = NULL, type = "bestObj", quantile = 0.99, nbstep
     dplyr::select(dplyr::where(is.numeric)) %>%
     { if (!is.null(var)) dplyr::select(., dplyr::all_of(var)) else . }
 
-  tf_out <- s_tbl %>%
-    as.matrix() %>%
-    cellWise::transfo(
-      type = type,
-      robust = TRUE,
-      standardize = TRUE,
-      quant = quantile,
-      nbsteps = nbsteps,
-      checkPars = list(silent = TRUE)
-    )
+  xmat <- as.matrix(s_tbl)
+  fit <- robust_transformation(xmat, type = type, quantile = quantile, nbsteps = nbsteps)
   summary_tbl <- tibble::tibble(
     variable = colnames(s_tbl),
-    lambda = tf_out$lambdahats,
-    method = tf_out$ttypes,
-    objective = tf_out$objective
+    lambda = unname(vapply(fit$fits, function(f) if (f$type == "none") NA_real_ else f$lambda,
+                           numeric(1))),
+    method = unname(vapply(fit$fits, `[[`, character(1), "type")),
+    objective = unname(vapply(fit$fits, `[[`, numeric(1), "objective"))
   )
-  transfo_tbl <- s_tbl %>%
-    as.matrix() %>%
-    cellWise::transfo_newdata(tf_out) %>%
-    tibble::as_tibble()
+  transfo_tbl <- tibble::as_tibble(apply_transformation(xmat, fit))
 
   res <- list(
     summary = summary_tbl,

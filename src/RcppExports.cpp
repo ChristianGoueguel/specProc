@@ -62,6 +62,35 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// ddc_neighbors_cpp
+Rcpp::List ddc_neighbors_cpp(const Eigen::Map<Eigen::MatrixXd> u, double corrlim, int maxnb, double min_abs, int block);
+RcppExport SEXP _specProc_ddc_neighbors_cpp(SEXP uSEXP, SEXP corrlimSEXP, SEXP maxnbSEXP, SEXP min_absSEXP, SEXP blockSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type u(uSEXP);
+    Rcpp::traits::input_parameter< double >::type corrlim(corrlimSEXP);
+    Rcpp::traits::input_parameter< int >::type maxnb(maxnbSEXP);
+    Rcpp::traits::input_parameter< double >::type min_abs(min_absSEXP);
+    Rcpp::traits::input_parameter< int >::type block(blockSEXP);
+    rcpp_result_gen = Rcpp::wrap(ddc_neighbors_cpp(u, corrlim, maxnb, min_abs, block));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ddc_predict_cpp
+Eigen::MatrixXd ddc_predict_cpp(const Eigen::Map<Eigen::MatrixXd> u, const Rcpp::IntegerMatrix index, const Rcpp::NumericMatrix correlation, const Rcpp::NumericMatrix slope);
+RcppExport SEXP _specProc_ddc_predict_cpp(SEXP uSEXP, SEXP indexSEXP, SEXP correlationSEXP, SEXP slopeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type u(uSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::IntegerMatrix >::type index(indexSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type correlation(correlationSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type slope(slopeSEXP);
+    rcpp_result_gen = Rcpp::wrap(ddc_predict_cpp(u, index, correlation, slope));
+    return rcpp_result_gen;
+END_RCPP
+}
 // epo_cpp
 Rcpp::List epo_cpp(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> D, int ncomp);
 RcppExport SEXP _specProc_epo_cpp(SEXP XSEXP, SEXP DSEXP, SEXP ncompSEXP) {
@@ -173,6 +202,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_specProc_col_medians_cpp", (DL_FUNC) &_specProc_col_medians_cpp, 2},
     {"_specProc_computeGroupedMeans", (DL_FUNC) &_specProc_computeGroupedMeans, 3},
     {"_specProc_computeMeans", (DL_FUNC) &_specProc_computeMeans, 1},
+    {"_specProc_ddc_neighbors_cpp", (DL_FUNC) &_specProc_ddc_neighbors_cpp, 5},
+    {"_specProc_ddc_predict_cpp", (DL_FUNC) &_specProc_ddc_predict_cpp, 4},
     {"_specProc_epo_cpp", (DL_FUNC) &_specProc_epo_cpp, 3},
     {"_specProc_glsw_cpp", (DL_FUNC) &_specProc_glsw_cpp, 2},
     {"_specProc_univariate_mcd_cpp", (DL_FUNC) &_specProc_univariate_mcd_cpp, 2},

@@ -68,10 +68,9 @@ outliers.
 \details{
 The transformation parameter \eqn{\lambda} of each variable is estimated
 on the training data by re-weighted maximum likelihood (Raymaekers and
-Rousseeuw, 2021) with \code{\link[cellWise:transfo]{cellWise::transfo()}}, and applied unchanged to new
-data with \code{\link[cellWise:transfo_newdata]{cellWise::transfo_newdata()}}. With \code{standardize = TRUE}, the
-transformed variables are also robustly centered and scaled with the
-training estimates. Variables that cannot be transformed (for example,
+Rousseeuw, 2021), as in \code{\link[=robust_bcyj]{robust_bcyj()}}, and applied unchanged to new data.
+With \code{standardize = TRUE}, the transformed variables are also centered and
+scaled with the mean and standard deviation of the training inliers. Variables that cannot be transformed (for example,
 constant ones) are left unchanged.
 
 \link[recipes:tidy.recipe]{tidy()} returns a tibble with columns \code{terms},

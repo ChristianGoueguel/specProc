@@ -28,14 +28,13 @@ test_that("step_robust_bcyj applies the training transformation to new data", {
     recipes::update_role(id, new_role = "id") |>
     step_robust_bcyj(recipes::all_predictors())
   prepped <- recipes::prep(rec)
-  ref <- cellWise::transfo(as.matrix(pos[1:60, 2:4]), type = "bestObj", robust = TRUE,
-                           standardize = TRUE, checkPars = list(silent = TRUE))
+  ref <- robust_transformation(as.matrix(pos[1:60, 2:4]))
   out <- recipes::bake(prepped, new_data = pos[61:80, ])
-  expect_equal(as.matrix(out[2:4]), cellWise::transfo_newdata(as.matrix(pos[61:80, 2:4]), ref),
+  expect_equal(as.matrix(out[2:4]), apply_transformation(as.matrix(pos[61:80, 2:4]), ref),
                ignore_attr = TRUE)
   td <- recipes::tidy(prepped, number = 1)
   expect_named(td, c("terms", "lambda", "method", "id"))
-  expect_equal(td$lambda, unname(ref$lambdahats))
+  expect_equal(td$lambda, unname(vapply(ref$fits, `[[`, numeric(1), "lambda")))
   expect_equal(out$id, 61:80)
 })
 
@@ -99,5 +98,6 @@ test_that("robust steps have tidy, tunable, print and required_pkgs methods", {
 
   printed <- cli::cli_fmt(print(prepped))
   expect_true(any(grepl("Robust PCA \\(ROBPCA\\) on", printed)))
-  expect_true(all(c("specProc", "cellWise") %in% generics::required_pkgs(rec)))
+  expect_true("specProc" %in% generics::required_pkgs(rec))
+  expect_false("cellWise" %in% generics::required_pkgs(rec))
 })

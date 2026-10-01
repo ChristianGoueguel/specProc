@@ -1,7 +1,7 @@
 Package: specProc
 Type: Package
 Title: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy
-Version: 0.7.0.9003
+Version: 0.7.0.9004
 Authors@R:
     person("Christian L.", "Goueguel", , "christian.goueguel@gmail.com",
            role = c("aut", "cre"),
@@ -22,7 +22,6 @@ LazyDataCompression: xz
 Depends:
     R (>= 4.1.0)
 Imports:
-    cellWise,
     dplyr,
     ggplot2,
     ggsci,
@@ -41,6 +40,7 @@ Imports:
     XICOR
 Suggests:
     bslib,
+    cellWise,
     cli,
     ConfidenceEllipse,
     dials,

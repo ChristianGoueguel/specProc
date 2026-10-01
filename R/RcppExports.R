@@ -17,6 +17,14 @@ computeMeans <- function(data) {
     .Call(`_specProc_computeMeans`, data)
 }
 
+ddc_neighbors_cpp <- function(u, corrlim, maxnb, min_abs, block) {
+    .Call(`_specProc_ddc_neighbors_cpp`, u, corrlim, maxnb, min_abs, block)
+}
+
+ddc_predict_cpp <- function(u, index, correlation, slope) {
+    .Call(`_specProc_ddc_predict_cpp`, u, index, correlation, slope)
+}
+
 epo_cpp <- function(X, D, ncomp) {
     .Call(`_specProc_epo_cpp`, X, D, ncomp)
 }

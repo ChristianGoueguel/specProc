@@ -319,53 +319,77 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE
 #'
 #' @description
 #' Robust PCA that handles both outlying observations (casewise outliers),
-#' outlying cells (cellwise outliers) and missing values, by the MacroPCA
-#' algorithm of Hubert, Rousseeuw and Van den Bossche (2019). This function
-#' is a wrapper around [cellWise::MacroPCA()] that returns the results in the
-#' same form as [robpca()], so that [predict()][predict.specproc_robpca] and
-#' [plot_outlier_map()] work the same way, and adds [plot_cell_map()].
+#' outlying cells (cellwise outliers) and missing values, after the MacroPCA
+#' algorithm of Hubert, Rousseeuw and Van den Bossche (2019). The results
+#' have the same form as those of [robpca()], so that
+#' [predict()][predict.specproc_robpca] and [plot_outlier_map()] work the
+#' same way, and [plot_cell_map()] shows the outlying cells.
 #'
 #' @details
-#' MacroPCA first detects outlying cells with the DetectDeviatingCells
-#' algorithm, imputes them and the missing values, and then iterates a
-#' robust PCA that down-weights outlying observations. The standardized
-#' residuals of each cell show which cells deviate from the PCA fit; they
-#' are displayed by [plot_cell_map()].
+#' The algorithm has four steps:
+#'  1. **Deviating cells.** The cells that deviate from the values predicted
+#'     by the most correlated variables are detected and imputed by the
+#'     detection of deviating cells (DDC) of Rousseeuw and Van den Bossche
+#'     (2018), as are the missing values. The neighbor search and the
+#'     predictions of DDC are computed in C++, by blocks of variables, so
+#'     that spectra with thousands of channels are handled quickly.
+#'  2. **Initial subspace.** The `h` observations with the smallest
+#'     Stahel-Donoho outlyingness (as in [robpca()], with `ndir` directions)
+#'     give an initial PCA of the imputed data. When `k` is `NULL`, it is the
+#'     smallest number of components that explain `var_explained` of the
+#'     variance of these observations (at most `kmax`).
+#'  3. **Iterations.** The flagged and missing cells are imputed by the
+#'     fitted values of the current PCA, the observations within the cut-off
+#'     of the orthogonal distances are kept, and the PCA is refitted on them,
+#'     until the subspace changes by less than `tol` (at most `maxiter`
+#'     times).
+#'  4. **Final fit.** The center and the eigenvalues are re-estimated by the
+#'     minimum covariance determinant of the scores, as in [robpca()].
 #'
-#' Spectra often have many more channels than observations; MacroPCA's DDC
-#' step can then be slow, and averaging adjacent channels first helps.
-#'
-#' When `k` is `NULL`, MacroPCA is run a first time to estimate the variance
-#' explained by up to `kmax` components, and `k` is the smallest number of
-#' components that explain `var_explained` of it (or `kmax`, if none does),
-#' as in [robpca()]. MacroPCA is then run again with this `k`, so giving `k`
-#' halves the computing time.
+#' The residuals of each variable are robustly standardized (median and
+#' MAD), and the cells beyond \eqn{\sqrt{\chi^2_{1, 0.99}}} are flagged. The
+#' scores of each observation are then computed with its flagged and missing
+#' cells imputed by the fit (iteratively, as for new data with
+#' [predict()][predict.specproc_robpca]), while its orthogonal distance and
+#' cell residuals use its observed cells, so that the deviating cells of an
+#' observation count in its orthogonal distance. The cut-offs of the score
+#' and orthogonal distances are those of [robpca()], so that the outlier
+#' maps of the robust PCA methods of specProc can be compared.
 #'
 #' @param x A numeric matrix or data frame, with one observation per row.
 #'   Missing values are allowed.
 #' @param k The number of principal components. If `NULL` (default), it is
 #'   chosen from `var_explained` and `kmax`.
-#' @param alpha The robustness parameter, between 0.5 and 1. Default is 0.5.
+#' @param alpha The robustness parameter, between 0.5 and 1: the fraction of
+#'   observations used in the fit. Default is 0.5.
 #' @param kmax The maximum number of components. Default is 10.
 #' @param var_explained The fraction of variance used to choose `k` when it
 #'   is not given. Default is 0.8.
-#' @param ... Further parameters of MacroPCA, passed in `MacroPCApars` (see
-#'   [cellWise::MacroPCA()]), for example `maxdir`, or `scale = TRUE` to
-#'   scale the variables (by default, they are only centered, unlike in
-#'   `cellWise::MacroPCA()`, so that intense emission lines are not
-#'   outweighed by noise and continuum channels).
+#' @param scale A logical: scale the variables by their robust scale (`FALSE`,
+#'   default: they are only centered, so that intense emission lines are
+#'   not outweighed by noise and continuum channels).
+#' @param ndir The number of random directions of the outlyingness, or `"all"`.
+#'   Default is 250.
+#' @param maxiter,tol The maximum number of iterations and the tolerance on
+#'   the change of the subspace. Defaults are 20 and 1e-4.
 #'
 #' @return An object of class `specproc_macropca` (inheriting from
 #'   `specproc_robpca`), with the components described in [robpca()], and:
-#'  - `std_resid`: the standardized cell residuals.
+#'  - `std_resid`: the standardized cell residuals (`NA` for missing cells).
 #'  - `flagged_cells`: a logical matrix of the flagged cells.
-#'  - `imputed`: the data with outlying cells and missing values imputed.
-#'  - `fit`: the object returned by [cellWise::MacroPCA()].
+#'  - `imputed`: the data with the missing values imputed by the PCA fit
+#'    (the flagged cells keep their values).
+#'  - `resid_center`, `resid_scale`: the robust center and scale of the
+#'    residuals of each variable, used to standardize those of new data.
 #'
 #' @references
 #'  - Hubert, M., Rousseeuw, P.J., Van den Bossche, W. (2019). MacroPCA: an
 #'    all-in-one PCA method allowing for missing values as well as cellwise
 #'    and rowwise outliers. Technometrics, 61(4):459-473.
+#'  - Rousseeuw, P.J., Van den Bossche, W. (2018). Detecting deviating data
+#'    cells. Technometrics, 60(2):135-145.
+#'  - Raymaekers, J., Rousseeuw, P.J. (2021). Fast robust correlation for
+#'    high-dimensional data. Technometrics, 63(2):184-198.
 #'
 #' @seealso [robpca()], [step_macropca()], [plot_outlier_map()],
 #'   [plot_cell_map()]
@@ -375,9 +399,8 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE
 #' @examples
 #' \donttest{
 #' set.seed(1)
-#' # LIBS spectra of forage samples (MacroPCA is run twice to choose k)
+#' # LIBS spectra of forage samples
 #' minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
-#' set.seed(1)
 #' forageLIBS |>
 #'   dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
 #'   center() |>
@@ -385,62 +408,178 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE
 #'   print()
 #' }
 #'
-macropca <- function(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, ...) {
+macropca <- function(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, scale = FALSE,
+                     ndir = 250, maxiter = 20, tol = 1e-4) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
   x <- as_numeric_matrix(x, "x")
   if (is.null(colnames(x))) colnames(x) <- paste0("V", seq_len(ncol(x)))
-  if (!is.null(k)) check_count(k, "k")
-  check_number(alpha, "alpha", lower = 0.5, upper = 1)
-  check_count(kmax, "kmax")
-  check_number(var_explained, "var_explained", lower = 0, upper = 1, lower_open = TRUE)
-  pars <- utils::modifyList(list(alpha = alpha, silent = TRUE, kmax = kmax, scale = FALSE),
-                            list(...))
-  if (is.null(k)) {
-    # with k = 0, MacroPCA only reports the explained variance (with a scree
-    # plot and a message) and does not fit the model
-    device <- grDevices::dev.cur()
-    grDevices::pdf(NULL)
-    on.exit({
-      grDevices::dev.off()
-      if (device > 1) grDevices::dev.set(device)
-    }, add = TRUE)
-    utils::capture.output(explained <- cellWise::MacroPCA(x, k = 0, MacroPCApars = pars))
-    cumulative <- explained$cumulativeVar
-    k <- which(cumulative >= var_explained - 1e-12)[1]
-    if (is.na(k)) k <- length(cumulative)
+  if (nrow(x) < 5 || ncol(x) < 2) {
+    stop("At least 5 observations and 2 variables are needed.", call. = FALSE)
   }
-  fit <- cellWise::MacroPCA(x, k = k, MacroPCApars = pars)
+  check_robust_args(k, kmax, alpha, var_explained)
+  check_flag(scale, "scale")
+  check_count(maxiter, "maxiter")
+  check_number(tol, "tol", lower = 0, lower_open = TRUE)
+  n <- nrow(x)
+  missing_cells <- is.na(x)
 
-  k <- as.integer(fit$k)
-  loadings <- matrix(fit$loadings, ncol = k)
-  scores <- matrix(fit$scores, ncol = k)
-  flagged <- matrix(FALSE, nrow(x), ncol(x), dimnames = dimnames(x))
-  flagged[fit$indcells] <- TRUE
-  res <- list(
-    loadings = loadings,
-    eigenvalues = fit$eigenvalues,
-    center = fit$center,
-    scale = if (is.null(fit$scaleX)) rep(1, ncol(x)) else fit$scaleX,
-    scores = scores,
-    sd = unname(fit$SD),
-    od = unname(fit$OD),
-    cutoff_sd = fit$cutoffSD,
-    cutoff_od = fit$cutoffOD,
-    k = k,
-    h = as.integer(fit$h),
-    alpha = alpha,
-    std_resid = fit$stdResid,
-    flagged_cells = flagged,
-    imputed = fit$X.NAimp,
-    fit = fit
-  )
+  # Step 1: deviating cells
+  cells <- ddc(x)
+  sc <- if (scale) cells$scale else rep(1, ncol(x))
+  y_na <- sweep(x, 2, sc, "/")
+  replace <- cells$flagged_cells | missing_cells
+  y <- y_na
+  y[replace] <- (cells$imputed / rep(sc, each = n))[replace]
+
+  # Step 2: initial subspace from the h least outlying observations
+  red <- svd_reduce(y)
+  kmax <- min(kmax, ncol(red$z), n - 1)
+  h <- robust_h(n, alpha, kmax)
+  H <- least_outlying(red$z, h, ndir)
+  pca <- macropca_pca(y[H, , drop = FALSE])
+  if (is.null(k)) {
+    k <- choose_k(pca$values, kmax, var_explained)
+  } else if (k > kmax) {
+    warning("'k' reduced to ", kmax, ".", call. = FALSE)
+    k <- kmax
+  }
+  center <- pca$center
+  loadings <- pca$vectors[, seq_len(k), drop = FALSE]
+
+  # Step 3: impute the flagged and missing cells from the PCA fit, and refit
+  # on the observations within the cut-off of the orthogonal distances
+  for (iter in seq_len(maxiter)) {
+    yc <- sweep(y, 2, center)
+    fitted <- sweep(yc %*% loadings %*% t(loadings), 2, center, "+")
+    y[replace] <- fitted[replace]
+    yc <- sweep(y, 2, center)
+    od <- orthogonal_distance(yc, loadings)
+    keep <- od <= od_cutoff(od, h)
+    if (sum(keep) <= k) keep <- seq_len(n) %in% order(od)[seq_len(h)]
+    pca <- macropca_pca(y[keep, , drop = FALSE])
+    new_loadings <- pca$vectors[, seq_len(k), drop = FALSE]
+    change <- k - sum(crossprod(loadings, new_loadings)^2)
+    center <- pca$center
+    loadings <- new_loadings
+    if (change < tol) break
+  }
+
+  # Step 4: the scores of each observation with its deviating cells imputed
+  # by the fit (as for new data), starting from the observed cells, so that
+  # a leverage observation whose cells DDC flagged is not kept away from the
+  # subspace by its own imputation; then the center and eigenvalues from the
+  # MCD of these scores
+  names(center) <- colnames(x)
+  res <- list(loadings = loadings, eigenvalues = rep(1, k), center = center, scale = sc,
+              k = as.integer(k), h = as.integer(h), alpha = alpha, cutoff = cells$cutoff)
+  first <- macropca_distances(res, y, y_na, missing_cells, cells$cutoff)
+  res$resid_center <- first$resid_center
+  res$resid_scale <- first$resid_scale
+  start <- y_na
+  start[missing_cells] <- y[missing_cells]
+  scores <- macropca_refine(res, start, y_na, missing_cells)$scores
+  mcd <- if (k == 1) {
+    u <- univariate_mcd_cpp(scores[, 1], h)
+    list(center = u[["location"]], cov = matrix(u[["scale"]]^2), singular = FALSE)
+  } else {
+    fast_mcd_cpp(scores, h, 500L)
+  }
+  if (isTRUE(mcd$singular)) {
+    stop("More than h observations lie on a lower-dimensional subspace of the ",
+         k, "-dimensional PCA space; try a smaller 'k'.", call. = FALSE)
+  }
+  e <- eigen(mcd$cov, symmetric = TRUE)
+  res$center <- center <- center + drop(loadings %*% mcd$center)
+  res$loadings <- loadings <- loadings %*% e$vectors
+  res$eigenvalues <- e$values
+  names(res$center) <- colnames(x)
+  final <- macropca_refine(res, start, y_na, missing_cells)
+  res[c("scores", "sd", "od", "std_resid", "flagged_cells")] <-
+    final[c("scores", "sd", "od", "std_resid", "flagged_cells")]
+  res$cutoff_sd <- sqrt(stats::qchisq(0.975, k))
+  res$cutoff_od <- od_cutoff(res$od, h)
   res$outlier_type <- outlier_type(res$sd, res$od, res$cutoff_sd, res$cutoff_od)
+  # the data with the missing values imputed by the fit
+  imputed <- y_na
+  fitted <- sweep(final$scores %*% t(loadings), 2, center, "+")
+  imputed[missing_cells] <- fitted[missing_cells]
+  res$imputed <- sweep(imputed, 2, sc, "*")
+  dimnames(res$imputed) <- dimnames(x)
   colnames(res$loadings) <- colnames(res$scores) <- paste0("PC", seq_len(k))
   rownames(res$loadings) <- colnames(x)
   structure(res, variables = colnames(x), nvar = ncol(x),
             class = c("specproc_macropca", "specproc_robpca"))
+}
+
+# Classical PCA (center and eigenvectors) of the rows of y.
+macropca_pca <- function(y) {
+  center <- colMeans(y)
+  s <- svd(sweep(y, 2, center), nu = 0)
+  list(center = center, vectors = s$v, values = s$d^2 / max(nrow(y) - 1, 1))
+}
+
+# Scores, distances and standardized cell residuals of a MacroPCA fit, for
+# the fully imputed data `y` (scores) and the data with only the missing
+# values imputed `y_na` (orthogonal distances and residuals). With
+# `resid_center` and `resid_scale` (new data), the residuals are
+# standardized with those of the calibration data.
+macropca_distances <- function(fit, y, y_na, missing_cells, cutoff, resid_center = NULL,
+                               resid_scale = NULL) {
+  scores <- sweep(y, 2, fit$center) %*% fit$loadings
+  fitted <- sweep(scores %*% t(fit$loadings), 2, fit$center, "+")
+  y_na[missing_cells] <- fitted[missing_cells]
+  resid <- y_na - fitted
+  if (is.null(resid_center)) {
+    resid_center <- apply(resid, 2, stats::median)
+    resid_scale <- apply(resid, 2, stats::mad)
+    resid_scale[!is.finite(resid_scale) | resid_scale <= 0] <- 1
+  }
+  std_resid <- sweep(sweep(resid, 2, resid_center), 2, resid_scale, "/")
+  std_resid[missing_cells] <- NA
+  flagged <- !is.na(std_resid) & abs(std_resid) > cutoff
+  dimnames(std_resid) <- dimnames(flagged) <- dimnames(y)
+  list(scores = scores,
+       sd = sqrt(rowSums(sweep(scores^2, 2, fit$eigenvalues, "/"))),
+       od = orthogonal_distance(sweep(y_na, 2, fit$center), fit$loadings),
+       std_resid = std_resid, flagged_cells = flagged,
+       resid_center = resid_center, resid_scale = resid_scale, cutoff = cutoff)
+}
+
+# Imputes the flagged and missing cells of each observation by the fit
+# until they no longer change, and returns its distances and residuals
+# (standardized with the residual scales of the calibration data).
+macropca_refine <- function(fit, y, y_na, missing_cells, maxiter = 20) {
+  cutoff <- fit$cutoff %||% sqrt(stats::qchisq(0.99, 1))
+  for (iter in seq_len(maxiter)) {
+    dist <- macropca_distances(fit, y, y_na, missing_cells, cutoff, fit$resid_center, fit$resid_scale)
+    replace <- dist$flagged_cells | missing_cells
+    fitted <- sweep(dist$scores %*% t(fit$loadings), 2, fit$center, "+")
+    updated <- y_na
+    updated[replace] <- fitted[replace]
+    converged <- max(abs(updated - y)) < 1e-8 * max(1, max(abs(y)))
+    y <- updated
+    if (converged) break
+  }
+  macropca_distances(fit, y, y_na, missing_cells, cutoff, fit$resid_center, fit$resid_scale)
+}
+
+#' @rdname predict.specproc_robpca
+#' @export
+predict.specproc_macropca <- function(object, newdata, ...) {
+  x <- as_numeric_matrix(newdata, "newdata")
+  if (ncol(x) != attr(object, "nvar")) {
+    stop("'newdata' must have ", attr(object, "nvar"), " columns, like the calibration data.", call. = FALSE)
+  }
+  colnames(x) <- attr(object, "variables")
+  missing_cells <- is.na(x)
+  y_na <- sweep(x, 2, object$scale, "/")
+  # missing cells start at the center
+  y <- y_na
+  y[missing_cells] <- matrix(object$center, nrow(y), ncol(y), byrow = TRUE)[missing_cells]
+  dist <- macropca_refine(object, y, y_na, missing_cells)
+  robust_pca_output(object, dist$scores, dist$od, dist$sd)
 }
 
 #' @title Scores and Distances of New Observations
@@ -471,17 +610,6 @@ predict.specproc_robpca <- function(object, newdata, ...) {
   robust_pca_output(object, scores, orthogonal_distance(xs, object$loadings))
 }
 
-#' @rdname predict.specproc_robpca
-#' @export
-predict.specproc_macropca <- function(object, newdata, ...) {
-  x <- as_numeric_matrix(newdata, "newdata")
-  if (ncol(x) != attr(object, "nvar")) {
-    stop("'newdata' must have ", attr(object, "nvar"), " columns, like the calibration data.", call. = FALSE)
-  }
-  colnames(x) <- attr(object, "variables")
-  pred <- cellWise::MacroPCApredict(x, object$fit)
-  robust_pca_output(object, matrix(pred$scores, ncol = object$k), unname(pred$OD), unname(pred$SD))
-}
 
 #' @export
 print.specproc_robpca <- function(x, ...) {

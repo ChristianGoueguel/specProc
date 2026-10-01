@@ -120,7 +120,34 @@ test_that("rospca recovers a block-sparse structure", {
   expect_gt(sum(dense$loadings != 0), sum(support))
 })
 
-test_that("macropca wraps cellWise::MacroPCA and predicts with missing values", {
+test_that("macropca detects outlying rows and cells and predicts with missing values", {
+  set.seed(13)
+  x <- matrix(rnorm(60 * 8), 60, 8) %*% diag(8:1)
+  x[1:3, ] <- x[1:3, ] + 20
+  x[10, 2] <- 40
+  x[12, 5] <- NA
+  fit <- macropca(x, k = 2)
+  expect_s3_class(fit, c("specproc_macropca", "specproc_robpca"))
+  expect_true(fit$flagged_cells[10, 2])
+  expect_true(all(c(1:3, 10) %in% which(fit$outlier_type != "regular")))
+  # the missing cell is imputed and has no residual
+  expect_false(anyNA(fit$imputed))
+  expect_true(is.na(fit$std_resid[12, 5]))
+  expect_false(fit$flagged_cells[12, 5])
+  # orthonormal loadings, eigenvalues in decreasing order
+  expect_equal(crossprod(fit$loadings), diag(2), tolerance = 1e-8, ignore_attr = TRUE)
+  expect_true(!is.unsorted(rev(fit$eigenvalues)))
+  new <- x[1:5, ]
+  new[2, 3] <- NA
+  pred <- predict(fit, new)
+  expect_equal(nrow(pred), 5L)
+  expect_false(anyNA(pred$PC1))
+  # new data identical to calibration rows get (nearly) the same distances
+  expect_equal(predict(fit, x[20:30, ])$od, fit$od[20:30], tolerance = 1e-6)
+})
+
+test_that("macropca agrees with cellWise::MacroPCA", {
+  skip_if_not_installed("cellWise")
   set.seed(13)
   x <- matrix(rnorm(60 * 8), 60, 8) %*% diag(8:1)
   x[1:3, ] <- x[1:3, ] + 20
@@ -128,15 +155,11 @@ test_that("macropca wraps cellWise::MacroPCA and predicts with missing values", 
   x[12, 5] <- NA
   fit <- macropca(x, k = 2)
   ref <- cellWise::MacroPCA(x, k = 2, MacroPCApars = list(alpha = 0.5, silent = TRUE, scale = FALSE))
-  expect_equal(fit$sd, unname(ref$SD))
-  expect_equal(fit$od, unname(ref$OD))
-  expect_true(fit$flagged_cells[10, 2])
-  expect_true(all(1:3 %in% which(fit$outlier_type != "regular")))
-  new <- x[1:5, ]
-  new[2, 3] <- NA
-  pred <- predict(fit, new)
-  expect_equal(nrow(pred), 5L)
-  expect_false(anyNA(pred$PC1))
+  expect_gt(stats::cor(fit$od, ref$OD), 0.95)
+  # nearly the same subspace
+  expect_gt(min(svd(crossprod(fit$loadings, ref$loadings))$d), 0.9)
+  ref_type <- outlier_type(ref$SD, ref$OD, ref$cutoffSD, ref$cutoffOD)
+  expect_true(all(which(ref_type != "regular") %in% which(fit$outlier_type != "regular")))
 })
 
 test_that("macropca chooses k from the explained variance", {
@@ -144,25 +167,38 @@ test_that("macropca chooses k from the explained variance", {
   x <- matrix(rnorm(60 * 8), 60, 8) %*% diag(8:1)
   x[1:3, ] <- x[1:3, ] + 20
   devices <- grDevices::dev.list()
-  # MacroPCA with k = 0 prints a message and draws a scree plot: both hidden
   expect_silent(fit <- macropca(x))
   expect_identical(grDevices::dev.list(), devices)
-  explained <- utils::capture.output(ref <- {
-    grDevices::pdf(NULL)
-    on.exit(grDevices::dev.off())
-    cellWise::MacroPCA(x, k = 0, MacroPCApars = list(alpha = 0.5, silent = TRUE, scale = FALSE))
-  })
-  expect_equal(fit$k, which(ref$cumulativeVar >= 0.8)[1])
-  direct <- cellWise::MacroPCA(x, k = fit$k, MacroPCApars = list(alpha = 0.5, silent = TRUE, scale = FALSE))
-  expect_equal(fit$od, unname(direct$OD))
+  # variances 64, 49, 36, 25, ... of a total of 204: 4 components for 80%
+  expect_equal(fit$k, 4L)
   # kmax components when they explain less than var_explained
   expect_equal(macropca(x, kmax = 2, var_explained = 0.99)$k, 2L)
   expect_error(macropca(x, var_explained = 0), "var_explained")
-  # scale = TRUE is passed to MacroPCA
+  # scale = TRUE scales the variables by their robust scale
   scaled <- macropca(x, k = 2, scale = TRUE)
-  ref <- cellWise::MacroPCA(x, k = 2, MacroPCApars = list(alpha = 0.5, silent = TRUE))
-  expect_equal(scaled$od, unname(ref$OD))
+  expect_true(all(scaled$scale != 1))
   expect_false(isTRUE(all.equal(scaled$od, macropca(x, k = 2)$od)))
+})
+
+test_that("ddc flags deviating cells and rows and imputes them", {
+  set.seed(1)
+  f <- matrix(rnorm(100 * 3), 100) %*% matrix(rnorm(3 * 30), 3)
+  x <- f + matrix(rnorm(100 * 30, sd = 0.1), 100)
+  x[5, 3] <- x[5, 3] + 8
+  x[20, 10] <- x[20, 10] - 6
+  x[40, ] <- x[40, ] + stats::rnorm(30, sd = 3)
+  x[7, 4] <- NA
+  d <- ddc(x)
+  expect_true(d$flagged_cells[5, 3])
+  expect_true(d$flagged_cells[20, 10])
+  expect_true(d$flagged_rows[40])
+  expect_false(d$flagged_cells[7, 4])
+  # the missing and flagged cells are imputed close to the underlying values
+  expect_lt(abs(d$imputed[7, 4] - f[7, 4]), 0.5)
+  expect_lt(abs(d$imputed[5, 3] - f[5, 3]), 1)
+  # a constant column is never flagged
+  x[, 30] <- 1
+  expect_false(any(ddc(x)$flagged_cells[, 30]))
 })
 
 test_that("robust PCA functions validate their inputs", {
@@ -283,11 +319,14 @@ test_that("flagged_regions finds the channels flagged in many observations", {
   expect_named(regions, c("start", "end", "peak", "channels", "share", "mean_share", "direction"))
   expect_equal(nrow(regions), 1)
   expect_equal(c(regions$start, regions$end), c(400.7, 400.8))
-  expect_equal(regions$share, 15 / 60)
+  # the 15 shifted observations, and at most a stray flagged cell
+  expect_gte(regions$share, 15 / 60)
+  expect_lte(regions$share, 16 / 60)
+  expect_true(all(fit$flagged_cells[1:15, 8]))
   expect_equal(regions$channels, 2L)
   expect_equal(regions$direction, "higher")
   # the share is over the selected rows
-  expect_equal(flagged_regions(fit, threshold = 0.2, rows = 1:30)$share[1], 15 / 30)
+  expect_gte(flagged_regions(fit, threshold = 0.2, rows = 1:30)$share[1], 15 / 30)
   expect_equal(nrow(flagged_regions(fit, threshold = 0.9)), 0)
 
   lines <- tibble::tibble(species = c("Ca II", "K I"), stage = c(2L, 1L),
@@ -318,8 +357,7 @@ test_that("plot_cell_map clusters the rows and draws the mean spectrum", {
   cell <- ifelse(fit$flagged_cells, sign(fit$std_resid), 0)
   o <- cell_map_cluster(cell, cell_map_columns(rep(1L, 20), 20, 400))
   expect_setequal(o, 1:60)
-  flagged_rows <- which(rowSums(fit$flagged_cells[, 8:9]) > 0)
-  expect_lte(diff(range(match(flagged_rows, o))), length(flagged_rows) + 5)
+  expect_lte(diff(range(match(1:15, o))), 15 + 3)
   p <- plot_cell_map(fit, order = "cluster", threshold = 0.2)
   expect_s3_class(p, "ggplot")
   # the profile has the mean spectrum (raw data), not with centered data

@@ -28,7 +28,8 @@ A list containing two data frames:
 \itemize{
 \item \code{variable}: the variable(s) name
 \item \code{lambda}: the estimated lambda parameter
-\item \code{method}: the method used ('BC' for Box-Cox or 'YJ' for Yeo-Johnson)
+\item \code{method}: the method used ('BC' for Box-Cox, 'YJ' for Yeo-Johnson, or
+'none')
 \item \code{objective}: the objective function value
 }
 \item \code{transformation}:
@@ -47,11 +48,32 @@ The Box-Cox and Yeo-Johnson transformations are power transformations
 aimed at making the data distribution more normal-like. The Box-Cox
 transformation is suitable for strictly positive values, while the
 Yeo-Johnson transformation can handle both positive and negative values.
-The function is a wrapper around the \code{transfo} function
-from the \code{cellWise} package, which applies a robust version of these
-transformations by using re-weighted maximum likelihood estimation.
-This approach downweights outlying observations to make the transformation
-more robust to their influence.
+The transformations are fitted robustly (Raymaekers and Rousseeuw, 2021),
+so that outlying observations do not drive the estimate of \eqn{\lambda}:
+\enumerate{
+\item Each variable is pre-standardized: divided by its median for Box-Cox,
+which needs strictly positive values, and centered by its median and
+divided by its MAD for Yeo-Johnson.
+\item An initial \eqn{\lambda} (between -4 and 6) minimizes a robust
+distance (Tukey's biweight) between the sorted, robustly standardized
+transformed values and the quantiles of the normal distribution. For
+this step, the transformation is continued linearly on the side that
+it compresses (the upper side for \eqn{\lambda < 1}, the lower side
+for \eqn{\lambda > 1}), beyond the point where the transformed value
+is 1.5 times that of the quartile, so that outliers on that side
+cannot dictate \eqn{\lambda}.
+\item The values whose standardized transformed value exceeds the
+\code{quantile} of the normal distribution are given weight zero (first
+with the rectified transformation), and
+\eqn{\lambda} is re-estimated by maximum likelihood on the others,
+\code{nbsteps} times.
+\item The transformed variable is standardized by the mean and standard
+deviation of these inliers.
+}
+
+Variables with fewer than 5 values or no spread (zero MAD) are left
+unchanged (method \code{"none"}), as are variables with non-positive values
+when \code{type = "BC"}.
 
 The \code{type} parameter controls which transformation method(s) to use:
 \itemize{
