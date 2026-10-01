@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,8 +43,15 @@
 <div class="section level3">
 <h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
 <ul><li>
+<code><a href="../reference/macropca.html">macropca()</a></code> and <code><a href="../reference/robust_bcyj.html">robust_bcyj()</a></code> (and <code><a href="../reference/step_macropca.html">step_macropca()</a></code>, <code><a href="../reference/step_robust_bcyj.html">step_robust_bcyj()</a></code>) are implemented natively, after the published algorithms, and no longer depend on cellWise, which moves to Suggests.
+<ul><li>
+<code><a href="../reference/macropca.html">macropca()</a></code> detects the deviating cells with DDC (Rousseeuw and Van den Bossche, 2018), whose neighbor search and cell predictions are computed in C++ by blocks of variables: on the 368 x 7152 <code>forageLIBS</code> spectra, DDC takes about 5 s instead of 13 s, and <code><a href="../reference/macropca.html">macropca()</a></code> about 12 s instead of 16 s. The results are close to, but not the same as, those of <code><a href="https://rdrr.io/pkg/cellWise/man/MacroPCA.html" class="external-link">cellWise::MacroPCA()</a></code> (orthogonal distances correlated at 0.99 on <code>forageLIBS</code>, nearly the same subspace); the score and orthogonal distance cut-offs are those of <code><a href="../reference/robpca.html">robpca()</a></code>. In simulations with known rowwise and cellwise outliers and missing values, it estimates the PCA subspace more accurately than <code><a href="https://rdrr.io/pkg/cellWise/man/MacroPCA.html" class="external-link">cellWise::MacroPCA()</a></code>, imputes the missing values as accurately, and flags far fewer regular observations as outliers (cellWise compares the distances computed with the outlying cells to a cut-off estimated with them imputed). Its arguments <code>scale</code>, <code>ndir</code>, <code>maxiter</code> and <code>tol</code> replace the <code>...</code> passed to <code><a href="https://rdrr.io/pkg/cellWise/man/MacroPCA.html" class="external-link">cellWise::MacroPCA()</a></code>, the result has no <code>fit</code> element any more, and <code>imputed</code> holds the data with the missing values imputed.</li>
+<li>
+<code><a href="../reference/robust_bcyj.html">robust_bcyj()</a></code> fits the transformations of Raymaekers and Rousseeuw (2021), with nearly the same parameters as <code><a href="https://rdrr.io/pkg/cellWise/man/transfo.html" class="external-link">cellWise::transfo()</a></code>, and leaves the variables that cannot be transformed unchanged (method <code>"none"</code>).</li>
+</ul></li>
+<li>
 <code><a href="../reference/specProc-deprecated.html">boltzmann_plot()</a></code> and <code><a href="../reference/specProc-deprecated.html">saha_boltzmann_plot()</a></code> are renamed <code><a href="../reference/boltzmann.html">boltzmann()</a></code> and <code><a href="../reference/saha_boltzmann.html">saha_boltzmann()</a></code>, so that they are not confused with <code><a href="../reference/plot_boltzmann.html">plot_boltzmann()</a></code>, which draws their result. The old names still work, with a deprecation warning.</li>
-<li>In <code><a href="../reference/dmodx.html">dmodx()</a></code>, the nominal degrees of freedom () are now selected with <code>df = "nominal"</code>.</li>
+<li>In <code><a href="../reference/dmodx.html">dmodx()</a></code>, the nominal degrees of freedom (K - k) are now selected with <code>df = "nominal"</code>.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>

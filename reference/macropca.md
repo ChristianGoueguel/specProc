@@ -1,23 +1,32 @@
 # Robust PCA for Cellwise and Casewise Outliers (MacroPCA)
 
 Robust PCA that handles both outlying observations (casewise outliers),
-outlying cells (cellwise outliers) and missing values, by the MacroPCA
-algorithm of Hubert, Rousseeuw and Van den Bossche (2019). This function
-is a wrapper around
-[`cellWise::MacroPCA()`](https://rdrr.io/pkg/cellWise/man/MacroPCA.html)
-that returns the results in the same form as
+outlying cells (cellwise outliers) and missing values, after the
+MacroPCA algorithm of Hubert, Rousseeuw and Van den Bossche (2019). The
+results have the same form as those of
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
 so that
 [predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
 and
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
-work the same way, and adds
-[`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md).
+work the same way, and
+[`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
+shows the outlying cells.
 
 ## Usage
 
 ``` r
-macropca(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, ...)
+macropca(
+  x,
+  k = NULL,
+  alpha = 0.5,
+  kmax = 10,
+  var_explained = 0.8,
+  scale = FALSE,
+  ndir = 250,
+  maxiter = 20,
+  tol = 1e-04
+)
 ```
 
 ## Arguments
@@ -34,7 +43,8 @@ macropca(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, ...)
 
 - alpha:
 
-  The robustness parameter, between 0.5 and 1. Default is 0.5.
+  The robustness parameter, between 0.5 and 1: the fraction of
+  observations used in the fit. Default is 0.5.
 
 - kmax:
 
@@ -45,15 +55,21 @@ macropca(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, ...)
   The fraction of variance used to choose `k` when it is not given.
   Default is 0.8.
 
-- ...:
+- scale:
 
-  Further parameters of MacroPCA, passed in `MacroPCApars` (see
-  [`cellWise::MacroPCA()`](https://rdrr.io/pkg/cellWise/man/MacroPCA.html)),
-  for example `maxdir`, or `scale = TRUE` to scale the variables (by
-  default, they are only centered, unlike in
-  [`cellWise::MacroPCA()`](https://rdrr.io/pkg/cellWise/man/MacroPCA.html),
-  so that intense emission lines are not outweighed by noise and
-  continuum channels).
+  A logical: scale the variables by their robust scale (`FALSE`,
+  default: they are only centered, so that intense emission lines are
+  not outweighed by noise and continuum channels).
+
+- ndir:
+
+  The number of random directions of the outlyingness, or `"all"`.
+  Default is 250.
+
+- maxiter, tol:
+
+  The maximum number of iterations and the tolerance on the change of
+  the subspace. Defaults are 20 and 1e-4.
 
 ## Value
 
@@ -62,40 +78,69 @@ An object of class `specproc_macropca` (inheriting from
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
 and:
 
-- `std_resid`: the standardized cell residuals.
+- `std_resid`: the standardized cell residuals (`NA` for missing cells).
 
 - `flagged_cells`: a logical matrix of the flagged cells.
 
-- `imputed`: the data with outlying cells and missing values imputed.
+- `imputed`: the data with the missing values imputed by the PCA fit
+  (the flagged cells keep their values).
 
-- `fit`: the object returned by
-  [`cellWise::MacroPCA()`](https://rdrr.io/pkg/cellWise/man/MacroPCA.html).
+- `resid_center`, `resid_scale`: the robust center and scale of the
+  residuals of each variable, used to standardize those of new data.
 
 ## Details
 
-MacroPCA first detects outlying cells with the DetectDeviatingCells
-algorithm, imputes them and the missing values, and then iterates a
-robust PCA that down-weights outlying observations. The standardized
-residuals of each cell show which cells deviate from the PCA fit; they
-are displayed by
-[`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md).
+The algorithm has four steps:
 
-Spectra often have many more channels than observations; MacroPCA's DDC
-step can then be slow, and averaging adjacent channels first helps.
+1.  **Deviating cells.** The cells that deviate from the values
+    predicted by the most correlated variables are detected and imputed
+    by the detection of deviating cells (DDC) of Rousseeuw and Van den
+    Bossche (2018), as are the missing values. The neighbor search and
+    the predictions of DDC are computed in C++, by blocks of variables,
+    so that spectra with thousands of channels are handled quickly.
 
-When `k` is `NULL`, MacroPCA is run a first time to estimate the
-variance explained by up to `kmax` components, and `k` is the smallest
-number of components that explain `var_explained` of it (or `kmax`, if
-none does), as in
-[`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md).
-MacroPCA is then run again with this `k`, so giving `k` halves the
-computing time.
+2.  **Initial subspace.** The `h` observations with the smallest
+    Stahel-Donoho outlyingness (as in
+    [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
+    with `ndir` directions) give an initial PCA of the imputed data.
+    When `k` is `NULL`, it is the smallest number of components that
+    explain `var_explained` of the variance of these observations (at
+    most `kmax`).
+
+3.  **Iterations.** The flagged and missing cells are imputed by the
+    fitted values of the current PCA, the observations within the
+    cut-off of the orthogonal distances are kept, and the PCA is
+    refitted on them, until the subspace changes by less than `tol` (at
+    most `maxiter` times).
+
+4.  **Final fit.** The center and the eigenvalues are re-estimated by
+    the minimum covariance determinant of the scores, as in
+    [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md).
+
+The residuals of each variable are robustly standardized (median and
+MAD), and the cells beyond \\\sqrt{\chi^2\_{1, 0.99}}\\ are flagged. The
+scores of each observation are then computed with its flagged and
+missing cells imputed by the fit (iteratively, as for new data with
+[predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)),
+while its orthogonal distance and cell residuals use its observed cells,
+so that the deviating cells of an observation count in its orthogonal
+distance. The cut-offs of the score and orthogonal distances are those
+of
+[`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
+so that the outlier maps of the robust PCA methods of specProc can be
+compared.
 
 ## References
 
 - Hubert, M., Rousseeuw, P.J., Van den Bossche, W. (2019). MacroPCA: an
   all-in-one PCA method allowing for missing values as well as cellwise
   and rowwise outliers. Technometrics, 61(4):459-473.
+
+- Rousseeuw, P.J., Van den Bossche, W. (2018). Detecting deviating data
+  cells. Technometrics, 60(2):135-145.
+
+- Raymaekers, J., Rousseeuw, P.J. (2021). Fast robust correlation for
+  high-dimensional data. Technometrics, 63(2):184-198.
 
 ## See also
 
@@ -113,9 +158,8 @@ Christian L. Goueguel
 ``` r
 # \donttest{
 set.seed(1)
-# LIBS spectra of forage samples (MacroPCA is run twice to choose k)
+# LIBS spectra of forage samples
 minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
-set.seed(1)
 forageLIBS |>
   dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
   center() |>
@@ -123,15 +167,15 @@ forageLIBS |>
   print()
 #> Robust PCA for cellwise and casewise outliers (MacroPCA)
 #> 
-#> Observations:   368 (h = 186)
+#> Observations:   368 (h = 189)
 #> Variables:      7152
 #> Components:     3
-#> Eigenvalues:    1.951e+09 5.207e+08 1.389e+08
-#> Flagged cells:  59386
+#> Eigenvalues:    2.467e+09 5.716e+08 1.225e+08
+#> Flagged cells:  72011
 #> 
 #> Outlier types:
 #> 
 #>            regular      good leverage orthogonal outlier       bad leverage 
-#>                266                 10                 78                 14 
+#>                301                 16                 41                 10 
 # }
 ```

@@ -93,8 +93,8 @@ for MacroPCA, outlying cells and missing values).
   : Robust Sparse Principal Component Analysis (ROSPCA)
 - [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
   : Robust PCA for Cellwise and Casewise Outliers (MacroPCA)
-- [`predict(`*`<specproc_robpca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
-  [`predict(`*`<specproc_macropca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
+- [`predict(`*`<specproc_macropca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
+  [`predict(`*`<specproc_robpca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
   : Scores and Distances of New Observations
 - [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
   : Outlier Map of a Robust PCA

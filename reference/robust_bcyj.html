@@ -11,7 +11,7 @@ transformation."><meta property="og:image" content="https://christiangoueguel.co
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9003</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9004</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,7 +86,8 @@ Default is 2.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A list containing two data frames:</p><ul><li><p><code>summary</code>:</p><ul><li><p><code>variable</code>: the variable(s) name</p></li>
 <li><p><code>lambda</code>: the estimated lambda parameter</p></li>
-<li><p><code>method</code>: the method used ('BC' for Box-Cox or 'YJ' for Yeo-Johnson)</p></li>
+<li><p><code>method</code>: the method used ('BC' for Box-Cox, 'YJ' for Yeo-Johnson, or
+'none')</p></li>
 <li><p><code>objective</code>: the objective function value</p></li>
 </ul></li>
 <li><p><code>transformation</code>:</p><ul><li><p>the transformed variable(s)</p></li>
@@ -98,11 +99,28 @@ Default is 2.</p></dd>
 aimed at making the data distribution more normal-like. The Box-Cox
 transformation is suitable for strictly positive values, while the
 Yeo-Johnson transformation can handle both positive and negative values.
-The function is a wrapper around the <code>transfo</code> function
-from the <code>cellWise</code> package, which applies a robust version of these
-transformations by using re-weighted maximum likelihood estimation.
-This approach downweights outlying observations to make the transformation
-more robust to their influence.</p>
+The transformations are fitted robustly (Raymaekers and Rousseeuw, 2021),
+so that outlying observations do not drive the estimate of \(\lambda\):</p><ol><li><p>Each variable is pre-standardized: divided by its median for Box-Cox,
+which needs strictly positive values, and centered by its median and
+divided by its MAD for Yeo-Johnson.</p></li>
+<li><p>An initial \(\lambda\) (between -4 and 6) minimizes a robust
+distance (Tukey's biweight) between the sorted, robustly standardized
+transformed values and the quantiles of the normal distribution. For
+this step, the transformation is continued linearly on the side that
+it compresses (the upper side for \(\lambda &lt; 1\), the lower side
+for \(\lambda &gt; 1\)), beyond the point where the transformed value
+is 1.5 times that of the quartile, so that outliers on that side
+cannot dictate \(\lambda\).</p></li>
+<li><p>The values whose standardized transformed value exceeds the
+<code>quantile</code> of the normal distribution are given weight zero (first
+with the rectified transformation), and
+\(\lambda\) is re-estimated by maximum likelihood on the others,
+<code>nbsteps</code> times.</p></li>
+<li><p>The transformed variable is standardized by the mean and standard
+deviation of these inliers.</p></li>
+</ol><p>Variables with fewer than 5 values or no spread (zero MAD) are left
+unchanged (method <code>"none"</code>), as are variables with non-positive values
+when <code>type = "BC"</code>.</p>
 <p>The <code>type</code> parameter controls which transformation method(s) to use:</p><ul><li><p>"BC": Only applies the Box-Cox transformation to strictly positive variables.</p></li>
 <li><p>"YJ": Only applies the Yeo-Johnson transformation to all variables.</p></li>
 <li><p>"bestObj" (default): For strictly positive variables, both BC and YJ are

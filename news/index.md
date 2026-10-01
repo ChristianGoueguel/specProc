@@ -4,6 +4,44 @@
 
 ### Breaking changes
 
+- [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  and
+  [`robust_bcyj()`](https://christiangoueguel.com/specProc/reference/robust_bcyj.md)
+  (and
+  [`step_macropca()`](https://christiangoueguel.com/specProc/reference/step_macropca.md),
+  [`step_robust_bcyj()`](https://christiangoueguel.com/specProc/reference/step_robust_bcyj.md))
+  are implemented natively, after the published algorithms, and no
+  longer depend on cellWise, which moves to Suggests.
+  - [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+    detects the deviating cells with DDC (Rousseeuw and Van den Bossche,
+    2018), whose neighbor search and cell predictions are computed in
+    C++ by blocks of variables: on the 368 x 7152 `forageLIBS` spectra,
+    DDC takes about 5 s instead of 13 s, and
+    [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+    about 12 s instead of 16 s. The results are close to, but not the
+    same as, those of
+    [`cellWise::MacroPCA()`](https://rdrr.io/pkg/cellWise/man/MacroPCA.html)
+    (orthogonal distances correlated at 0.99 on `forageLIBS`, nearly the
+    same subspace); the score and orthogonal distance cut-offs are those
+    of
+    [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md).
+    In simulations with known rowwise and cellwise outliers and missing
+    values, it estimates the PCA subspace more accurately than
+    [`cellWise::MacroPCA()`](https://rdrr.io/pkg/cellWise/man/MacroPCA.html),
+    imputes the missing values as accurately, and flags far fewer
+    regular observations as outliers (cellWise compares the distances
+    computed with the outlying cells to a cut-off estimated with them
+    imputed). Its arguments `scale`, `ndir`, `maxiter` and `tol` replace
+    the `...` passed to
+    [`cellWise::MacroPCA()`](https://rdrr.io/pkg/cellWise/man/MacroPCA.html),
+    the result has no `fit` element any more, and `imputed` holds the
+    data with the missing values imputed.
+  - [`robust_bcyj()`](https://christiangoueguel.com/specProc/reference/robust_bcyj.md)
+    fits the transformations of Raymaekers and Rousseeuw (2021), with
+    nearly the same parameters as
+    [`cellWise::transfo()`](https://rdrr.io/pkg/cellWise/man/transfo.html),
+    and leaves the variables that cannot be transformed unchanged
+    (method `"none"`).
 - [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
   and
   [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
@@ -17,7 +55,7 @@
   warning.
 - In
   [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md),
-  the nominal degrees of freedom () are now selected with
+  the nominal degrees of freedom (K - k) are now selected with
   `df = "nominal"`.
 
 ### Documentation

@@ -11,10 +11,10 @@ the calibration data.
 ## Usage
 
 ``` r
-# S3 method for class 'specproc_robpca'
+# S3 method for class 'specproc_macropca'
 predict(object, newdata, ...)
 
-# S3 method for class 'specproc_macropca'
+# S3 method for class 'specproc_robpca'
 predict(object, newdata, ...)
 ```
 
