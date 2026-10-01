@@ -32,6 +32,15 @@
 * In `dmodx()`, the nominal degrees of freedom (K - k) are now
   selected with `df = "nominal"`.
 
+## Plots
+
+* `plot_embedding()` recognizes UMAP maps (axes named `UMAP1`, `UMAP2`, ...,
+  as by `embed::step_umap()`): it leaves out the lines through the origin,
+  whose position means nothing on such a map, and ignores `hotelling`
+  (`"all"` or `"group"`), with a warning, since its T-squared limits
+  assume linear scores. On other maps, the lines through the origin are light grey
+  instead of black.
+
 ## Documentation
 
 * The examples use the `forageLIBS` spectra and mineral contents instead

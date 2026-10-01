@@ -276,3 +276,28 @@ test_that("the circles and labels of the flagged samples are optional", {
   expect_equal(texts(plot_embedding(pca, hotelling = "all", flag = TRUE, label = x$id))[[1]]$data$.label, "s1")
   expect_error(plot_embedding(pca, hotelling = "all", flag = NA), "flag")
 })
+
+test_that("UMAP maps have no origin lines and no T-squared limits", {
+  set.seed(5)
+  umap <- data.frame(UMAP1 = rnorm(30), UMAP2 = rnorm(30),
+                     group = factor(rep(c("a", "b", "c"), each = 10)))
+  is_line <- function(p) vapply(p$layers, function(l) inherits(l$geom, c("GeomHline", "GeomVline")),
+                                logical(1))
+  p <- plot_embedding(umap, colour = group)
+  expect_false(any(is_line(p)))
+  expect_warning(q <- plot_embedding(umap, colour = group, hotelling = "all"), "UMAP")
+  expect_null(q$labels$subtitle)
+  expect_warning(g <- plot_embedding(umap, colour = group, hotelling = "group"), "UMAP")
+  expect_null(g$labels$subtitle)
+  # confidence ellipses of the groups are still drawn
+  skip_if_not_installed("ConfidenceEllipse")
+  expect_s3_class(plot_embedding(umap, colour = group, ellipse = TRUE), "ggplot")
+})
+
+test_that("the lines through the origin of linear scores are light grey", {
+  pca <- stats::prcomp(matrix(stats::rnorm(200), 40))
+  p <- plot_embedding(pca)
+  lines <- Filter(function(l) inherits(l$geom, c("GeomHline", "GeomVline")), p$layers)
+  expect_length(lines, 2)
+  expect_true(all(vapply(lines, function(l) l$aes_params$colour, character(1)) == "grey75"))
+})

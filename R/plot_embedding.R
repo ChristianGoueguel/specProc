@@ -63,7 +63,7 @@
 #' **Style.** The panel is grey outside the outermost ellipse (of \eqn{T^2}, or of each group) and white
 #' inside, so that the samples beyond the limits stand out, with no grid and
 #' a fixed `aspect_ratio` (0.7 by default; `NULL` lets the plot fill the
-#' space), and thin black lines through the origin (when it lies in the
+#' space), and thin light grey lines through the origin (when it lies in the
 #' range of the samples, as for centered scores). Without ellipses, the
 #' panel is white.
 #'
@@ -90,7 +90,11 @@
 #' In a UMAP embedding, only the neighborhoods are meaningful: the sizes of
 #' the clusters and the distances between them are not, and they change
 #' with `neighbors` and `min_dist`. Read the plot as a map of which samples
-#' are similar, not as a quantitative projection.
+#' are similar, not as a quantitative projection. When both axes are UMAP
+#' coordinates (named `UMAP1`, `UMAP2`, ..., as by `embed::step_umap()`),
+#' the lines through the origin are left out, and `hotelling` (`"all"` or
+#' `"group"`) is ignored, with a warning: its \eqn{T^2} limits assume linear
+#' scores.
 #'
 #' @param data The embedding: a data frame (such as a baked recipe), a
 #'   matrix, a [stats::prcomp()] fit, or an object of [robpca()],
@@ -150,6 +154,18 @@
 #'     plot_embedding(hotelling = "all", flag = FALSE, label = TRUE)
 #' }
 #'
+#' # UMAP map of the iris flowers, from embed::step_umap(): no lines through
+#' # the origin, whose position means nothing on such a map
+#' if (rlang::is_installed(c("recipes", "embed"))) {
+#'   set.seed(1)
+#'   umap <- recipes::recipe(Species ~ ., data = iris) |>
+#'     recipes::step_normalize(recipes::all_predictors()) |>
+#'     embed::step_umap(recipes::all_predictors(), neighbors = 15) |>
+#'     recipes::prep() |>
+#'     recipes::bake(new_data = NULL)
+#'   plot_embedding(umap, colour = Species, title = "UMAP of the iris flowers")
+#' }
+#'
 plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, alpha = 0.8,
                            ellipse = FALSE, conf_level = 0.975, robust = FALSE,
                            distribution = "normal", hotelling = "none", k = 2,
@@ -182,6 +198,14 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
   distribution <- match.arg(distribution, c("normal", "hotelling"))
   hotelling <- match.arg(hotelling, c("none", "all", "group"))
   t2_method <- match.arg(t2_method, c("f", "beta"))
+  # a UMAP map (embed::step_umap()): its coordinates are not linear scores,
+  # so it has no meaningful origin and no T-squared limits
+  umap <- all(grepl("^UMAP_?[0-9]+$", c(x, y), ignore.case = TRUE))
+  if (umap && hotelling != "none") {
+    warning("`hotelling = \"", hotelling, "\"` is ignored on a UMAP map: Hotelling's ",
+            "T-squared limits assume linear scores, such as those of a PCA.", call. = FALSE)
+    hotelling <- "none"
+  }
 
   colour_info <- embedding_values(colour_quo, df, "colour")
   colour_values <- colour_info$values
@@ -295,12 +319,13 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
   }
   for (layer in layers) p <- p + layer
   # the axes through the origin, when it lies in the range of the samples
-  # (they would otherwise stretch the axes)
-  if (min(plot_df$.y, na.rm = TRUE) <= 0 && max(plot_df$.y, na.rm = TRUE) >= 0) {
-    p <- p + ggplot2::geom_hline(yintercept = 0, colour = "black", linewidth = 0.3)
+  # (they would otherwise stretch the axes), except on a UMAP map, whose
+  # origin means nothing
+  if (!umap && min(plot_df$.y, na.rm = TRUE) <= 0 && max(plot_df$.y, na.rm = TRUE) >= 0) {
+    p <- p + ggplot2::geom_hline(yintercept = 0, colour = "grey75", linewidth = 0.3)
   }
-  if (min(plot_df$.x, na.rm = TRUE) <= 0 && max(plot_df$.x, na.rm = TRUE) >= 0) {
-    p <- p + ggplot2::geom_vline(xintercept = 0, colour = "black", linewidth = 0.3)
+  if (!umap && min(plot_df$.x, na.rm = TRUE) <= 0 && max(plot_df$.x, na.rm = TRUE) >= 0) {
+    p <- p + ggplot2::geom_vline(xintercept = 0, colour = "grey75", linewidth = 0.3)
   }
 
   loadings <- NULL

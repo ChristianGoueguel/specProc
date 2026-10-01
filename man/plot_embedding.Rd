@@ -148,7 +148,7 @@ map, whose distances are not meaningful, prefer \code{ellipse}.
 \strong{Style.} The panel is grey outside the outermost ellipse (of \eqn{T^2}, or of each group) and white
 inside, so that the samples beyond the limits stand out, with no grid and
 a fixed \code{aspect_ratio} (0.7 by default; \code{NULL} lets the plot fill the
-space), and thin black lines through the origin (when it lies in the
+space), and thin light grey lines through the origin (when it lies in the
 range of the samples, as for centered scores). Without ellipses, the
 panel is white.
 
@@ -175,7 +175,11 @@ the variables in which it is high.
 In a UMAP embedding, only the neighborhoods are meaningful: the sizes of
 the clusters and the distances between them are not, and they change
 with \code{neighbors} and \code{min_dist}. Read the plot as a map of which samples
-are similar, not as a quantitative projection.
+are similar, not as a quantitative projection. When both axes are UMAP
+coordinates (named \code{UMAP1}, \code{UMAP2}, ..., as by \code{embed::step_umap()}),
+the lines through the origin are left out, and \code{hotelling} (\code{"all"} or
+\code{"group"}) is ignored, with a warning: its \eqn{T^2} limits assume linear
+scores.
 }
 \examples{
 # robust PCA of the forage spectra, with the Hotelling's T-squared limit
@@ -189,6 +193,18 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
     center() |>
     robpca() |>
     plot_embedding(hotelling = "all", flag = FALSE, label = TRUE)
+}
+
+# UMAP map of the iris flowers, from embed::step_umap(): no lines through
+# the origin, whose position means nothing on such a map
+if (rlang::is_installed(c("recipes", "embed"))) {
+  set.seed(1)
+  umap <- recipes::recipe(Species ~ ., data = iris) |>
+    recipes::step_normalize(recipes::all_predictors()) |>
+    embed::step_umap(recipes::all_predictors(), neighbors = 15) |>
+    recipes::prep() |>
+    recipes::bake(new_data = NULL)
+  plot_embedding(umap, colour = Species, title = "UMAP of the iris flowers")
 }
 
 }
