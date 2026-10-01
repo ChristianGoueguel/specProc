@@ -54,6 +54,11 @@
 <li>In <code><a href="../reference/dmodx.html">dmodx()</a></code>, the nominal degrees of freedom (K - k) are now selected with <code>df = "nominal"</code>.</li>
 </ul></div>
 <div class="section level3">
+<h3 id="plots-development-version">Plots<a class="anchor" aria-label="anchor" href="#plots-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/plot_embedding.html">plot_embedding()</a></code> recognizes UMAP maps (axes named <code>UMAP1</code>, <code>UMAP2</code>, …, as by <code><a href="https://embed.tidymodels.org/reference/step_umap.html" class="external-link">embed::step_umap()</a></code>): it leaves out the lines through the origin, whose position means nothing on such a map, and ignores <code>hotelling</code> (<code>"all"</code> or <code>"group"</code>), with a warning, since its T-squared limits assume linear scores. On other maps, the lines through the origin are light grey instead of black.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="documentation-development-version">Documentation<a class="anchor" aria-label="anchor" href="#documentation-development-version"></a></h3>
 <ul><li>The examples use the <code>forageLIBS</code> spectra and mineral contents instead of simulated data, wherever the function applies to them (some taken from the vignettes). Examples of pure helper functions (line profiles, plasma criteria, tuning parameters) keep simple inputs, and the examples of <code><a href="../reference/pds.html">pds()</a></code> and <code><a href="../reference/step_reject_shots.html">step_reject_shots()</a></code>, for which <code>forageLIBS</code> has no suitable data, are removed. <code><a href="../reference/plot_influence.html">plot_influence()</a></code> gains an example.</li>
 <li>Every example calls dplyr functions with <code>dplyr::</code>, so that it runs without dplyr attached.</li>
@@ -63,7 +68,7 @@
 <ul><li>The <code>soilLIBS</code> data set is removed, to keep the package data under the 5 MB CRAN guideline: <code>data(soilLIBS)</code> no longer works. The examples use <code>forageLIBS</code> instead; the example of <code><a href="../reference/reject_shots.html">reject_shots()</a></code>, which relied on the soil replicates, is removed. The raw data and the script that built it remain in <code>data-raw/</code> of the source repository.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="plots-development-version">Plots<a class="anchor" aria-label="anchor" href="#plots-development-version"></a></h3>
+<h3 id="plots-development-version-1">Plots<a class="anchor" aria-label="anchor" href="#plots-development-version-1"></a></h3>
 <ul><li>
 <code><a href="../reference/correlation.html">correlation()</a></code> takes several responses (<code>var = c(K, Ca)</code>, or <code>dplyr::all_of(minerals)</code>), each with its own observations, so that a response with many missing values does not reduce the data of the others. The result gains an <code>outcome</code> column, and <code>plot = TRUE</code> draws a heatmap of the responses against the wavelengths (or the other variables), on a fixed scale from -1 to 1. Pearson and Spearman correlations of spectra are computed in one step: the 12 minerals of <code>forageLIBS</code> against its 7152 channels take under a second. With <code>cluster = TRUE</code>, the rows are ordered by a hierarchical clustering of the responses on their correlation profiles (1 - r, average linkage), so that responses whose correlations rise and fall at the same wavelengths are adjacent, with the dendrogram on the left.</li>
 <li>Plot titles are bold, and a title longer than 45 characters is split at a natural break (“:”, ” (“,” - ” or “,”) into a shorter title and a subtitle, for example <code><a href="../reference/plot_calibration.html">plot_calibration()</a></code>’s “Linear calibration” above its R², LOD and LOQ. This applies to every plot with a title, including the interactive (plotly) ones and <code><a href="../reference/plot_cell_map.html">plot_cell_map()</a></code>. <code><a href="../reference/plot_fit.html">plot_fit()</a></code> now shows its <code>title</code> as a title rather than a subtitle.</li>

@@ -203,7 +203,7 @@ PCA or PLS; on a UMAP map, whose distances are not meaningful, prefer
 **Style.** The panel is grey outside the outermost ellipse (of \\T^2\\,
 or of each group) and white inside, so that the samples beyond the
 limits stand out, with no grid and a fixed `aspect_ratio` (0.7 by
-default; `NULL` lets the plot fill the space), and thin black lines
+default; `NULL` lets the plot fill the space), and thin light grey lines
 through the origin (when it lies in the range of the samples, as for
 centered scores). Without ellipses, the panel is white.
 
@@ -237,7 +237,12 @@ the variables in which it is high.
 In a UMAP embedding, only the neighborhoods are meaningful: the sizes of
 the clusters and the distances between them are not, and they change
 with `neighbors` and `min_dist`. Read the plot as a map of which samples
-are similar, not as a quantitative projection.
+are similar, not as a quantitative projection. When both axes are UMAP
+coordinates (named `UMAP1`, `UMAP2`, ..., as by
+[`embed::step_umap()`](https://embed.tidymodels.org/reference/step_umap.html)),
+the lines through the origin are left out, and `hotelling` (`"all"` or
+`"group"`) is ignored, with a warning: its \\T^2\\ limits assume linear
+scores.
 
 ## See also
 
@@ -264,6 +269,19 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
     center() |>
     robpca() |>
     plot_embedding(hotelling = "all", flag = FALSE, label = TRUE)
+}
+
+
+# UMAP map of the iris flowers, from embed::step_umap(): no lines through
+# the origin, whose position means nothing on such a map
+if (rlang::is_installed(c("recipes", "embed"))) {
+  set.seed(1)
+  umap <- recipes::recipe(Species ~ ., data = iris) |>
+    recipes::step_normalize(recipes::all_predictors()) |>
+    embed::step_umap(recipes::all_predictors(), neighbors = 15) |>
+    recipes::prep() |>
+    recipes::bake(new_data = NULL)
+  plot_embedding(umap, colour = Species, title = "UMAP of the iris flowers")
 }
 
 ```
