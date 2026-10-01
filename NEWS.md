@@ -1,5 +1,13 @@
 # specProc (development version)
 
+## Breaking changes
+
+* The `soilLIBS` data set is removed, to keep the package data under the
+  5 MB CRAN guideline: `data(soilLIBS)` no longer works. The examples use
+  `forageLIBS` instead; the example of `reject_shots()`, which relied on
+  the soil replicates, is removed. The raw data and the script that built it remain in
+  `data-raw/` of the source repository.
+
 ## Plots
 
 * `correlation()` takes several responses (`var = c(K, Ca)`, or

@@ -56,8 +56,8 @@
 #'
 #' @examplesIf rlang::is_installed("recipes")
 #' library(recipes)
-#' data(soilLIBS)
-#' spectra <- soilLIBS[c(1, 9:400)]  # sample id and spectral channels
+#' data(forageLIBS)
+#' spectra <- forageLIBS[c(2, 15:406)]  # sample id and spectral channels
 #'
 #' rec <- recipe(~ ., data = spectra[1:16, ]) |>
 #'   update_role(Sample, new_role = "id") |>

@@ -35,11 +35,12 @@ samples were measured twice, so there are 368 measurements of 365 samples.
 Keep the measurements of a sample together when splitting the data into
 calibration and validation sets.
 
-The spectra were recorded with the same instrument and wavelength grid as
-\link{soilLIBS}: 199.4 to 822.2 nm in 7152 channels, with an overlap of two
-spectrometers near 766 nm and gaps between 781.5 and 789.2 nm and between
-800.7 and 813.9 nm. They are raw detector counts (no background
-subtraction or normalization). The detector saturates at 65535 counts: the
+The spectra cover 199.4 to 822.2 nm in 7152 channels (about 0.084 nm per
+channel) and are raw detector counts (no background subtraction or
+normalization). They are recorded by several spectrometers whose ranges
+are concatenated: the channels are in increasing wavelength order except
+near 766 nm, where two spectrometers overlap by about 0.43 nm, and there
+are gaps between 781.5 and 789.2 nm and between 800.7 and 813.9 nm. The detector saturates at 65535 counts: the
 strongest lines (Ca II 393.37/396.85 nm, K I 766.49/769.90 nm, Mg II
 279.55/280.27 nm) are saturated in many shots and are nonlinear in
 concentration.

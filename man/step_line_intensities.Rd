@@ -80,10 +80,10 @@ estimated from the training data. The Voigt method of
 }
 \examples{
 if (rlang::is_installed("recipes")) {
-  data(soilLIBS)
-  rec <- recipes::recipe(Clay ~ ., data = soilLIBS[-c(1:2, 4:8)]) |>
+  data(forageLIBS)
+  rec <- recipes::recipe(K ~ ., data = forageLIBS[-c(1:10, 12:14)]) |>
     step_line_intensities(recipes::all_predictors(),
-                          lines = c(Mg = 279.55, Ca = 393.37, Al = 396.15)) |>
+                          lines = c(K = 769.90, Mg = 285.21, Ca = 317.93)) |>
     recipes::prep()
   head(recipes::bake(rec, new_data = NULL))
 }

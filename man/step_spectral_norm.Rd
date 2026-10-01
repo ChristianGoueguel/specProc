@@ -63,13 +63,13 @@ spectra), \code{"l2"} (Euclidean norm, also called vector normalization) and
 }
 \examples{
 if (rlang::is_installed("recipes")) {
-  data(soilLIBS)
-  rec <- recipes::recipe(Clay ~ ., data = soilLIBS[-c(1:2, 4:8)]) |>
+  data(forageLIBS)
+  rec <- recipes::recipe(K ~ ., data = forageLIBS[-c(1:10, 12:14)]) |>
     step_baseline(recipes::all_predictors()) |>
     step_spectral_norm(recipes::all_predictors(), method = "l2") |>
     recipes::prep()
   baked <- recipes::bake(rec, new_data = NULL)
-  spectra <- baked[setdiff(names(baked), "Clay")]
+  spectra <- baked[setdiff(names(baked), "K")]
   rowSums(spectra[1:3, ]^2)   # 1
 }
 }

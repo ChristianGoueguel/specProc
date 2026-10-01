@@ -88,18 +88,21 @@
 #' @export wavelength_calibration
 #'
 #' @examples
-#' data(soilLIBS)
-#' reference <- c(`Mg II` = 279.553, `Mg II` = 280.270, `Si I` = 288.158,
-#'                `Al I` = 308.215, `Al I` = 309.271, `Ca II` = 393.366,
-#'                `Al I` = 394.401, `Al I` = 396.152, `Ca II` = 396.847,
-#'                `Ca I` = 422.673, `Na I` = 588.995, `Na I` = 589.592,
-#'                `Li I` = 670.791, `K I` = 766.490, `K I` = 769.896)
-#' cal <- wavelength_calibration(soilLIBS, reference)
+#' # the first detector (199 to 766 nm) of the forage spectra
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]
+#' wl <- as.numeric(names(spectra))
+#' first_detector <- spectra[seq_len(which(diff(wl) < 0)[1])]
+#' reference <- c(`C I` = 247.856, `Mg I` = 285.213, `Ca II` = 317.933, `Ca II` = 370.603,
+#'                `Ca II` = 373.690, `K I` = 404.414, `Ca I` = 430.253, `Ca I` = 445.478,
+#'                `Mg I` = 516.732, `Mg I` = 517.268, `Mg I` = 518.360, `Na I` = 588.995,
+#'                `Na I` = 589.592, `Ca I` = 616.217, `Ca I` = 643.907)
+#' cal <- wavelength_calibration(first_detector, reference)
 #' cal
 #' plot_wavelength_calibration(cal)
 #'
-#' corrected <- apply_calibration(soilLIBS, cal)
-#' head(names(corrected)[-(1:8)])
+#' corrected <- apply_calibration(first_detector, cal)
+#' head(names(corrected))
 wavelength_calibration <- function(spectra, lines, degree = 1, search = 0.3, min_snr = 20,
                                    segments = TRUE, reject = TRUE) {
   if (!degree %in% 0:2) stop("'degree' must be 0, 1 or 2.", call. = FALSE)

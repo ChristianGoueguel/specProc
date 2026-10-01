@@ -53,12 +53,12 @@
 #' @export savitzky_golay
 #'
 #' @examples
-#' data(soilLIBS)
-#' spectrum <- unlist(soilLIBS[1, -(1:8)])
+#' data(forageLIBS)
+#' spectrum <- unlist(forageLIBS[1, -(1:14)])
 #' smooth <- savitzky_golay(spectrum, window = 7)
 #' first <- savitzky_golay(spectrum, window = 11, derivative = 1)
 #' wl <- as.numeric(names(spectrum))
-#' keep <- wl > 392 & wl < 398
+#' keep <- wl > 400 & wl < 410
 #' plot(wl[keep], spectrum[keep], type = "l", col = "grey", xlab = "Wavelength (nm)",
 #'      ylab = "Intensity")
 #' lines(wl[keep], smooth[keep], col = "blue")
@@ -99,8 +99,8 @@ savitzky_golay <- function(x, window = 11, order = 2, derivative = 0, segments =
 #'
 #' @examples
 #' if (rlang::is_installed("recipes")) {
-#'   data(soilLIBS)
-#'   rec <- recipes::recipe(Clay ~ ., data = soilLIBS[-c(1:2, 4:8)]) |>
+#'   data(forageLIBS)
+#'   rec <- recipes::recipe(K ~ ., data = forageLIBS[-c(1:10, 12:14)]) |>
 #'     step_savgol(recipes::all_predictors(), window = 11, derivative = 1) |>
 #'     recipes::prep()
 #'   recipes::tidy(rec, number = 1)

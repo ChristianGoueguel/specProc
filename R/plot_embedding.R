@@ -138,47 +138,19 @@
 #' @export plot_embedding
 #'
 #' @examples
-#' data(soilLIBS)
-#' spectra <- average(soilLIBS[-(2:8)], Sample)
-#'
-#' # soil texture in three classes (USDA general terms: coarse = sands and
-#' # sandy loams, medium = loams and silty loams, fine = clays and clay loams)
-#' classes <- c(Sand = "coarse", `Loamy Sand` = "coarse", `Sandy Loam` = "coarse",
-#'              Loam = "medium", `Silt Loam` = "medium", Silt = "medium",
-#'              `Clay Loam` = "fine", `Silty Clay Loam` = "fine", `Sandy Clay Loam` = "fine",
-#'              Clay = "fine", `Silty Clay` = "fine", `Sandy Clay` = "fine")
-#' texture <- soilLIBS$Texture[match(spectra$Sample, soilLIBS$Sample)]
-#' texture <- factor(classes[as.character(texture)], levels = c("fine", "medium", "coarse"))
-#'
-#' pca <- stats::prcomp(spectra[-1], scale. = TRUE)
-#' plot_embedding(pca, colour = texture, title = "PCA of the sample spectra")
-#'
-#' if (rlang::is_installed("ConfidenceEllipse")) {
-#'   plot_embedding(pca, colour = texture, ellipse = TRUE, distribution = "hotelling")
-#' }
-#'
-#' # Hotelling's T-squared limits of the score plot, on 3 components
-#' if (rlang::is_installed("ConfidenceEllipse")) {
-#'   plot_embedding(pca, colour = texture, hotelling = "all", k = 3, flag = TRUE,
-#'                  label = spectra$Sample)
-#' }
-#'
-#' # point size by clay content, and a biplot of the emission lines
-#' clay <- soilLIBS$Clay[match(spectra$Sample, soilLIBS$Sample)]
-#' plot_embedding(pca, colour = texture, size = clay)
-#' plot_embedding(pca, colour = texture, biplot = TRUE)
-#'
-#' if (rlang::is_installed(c("recipes", "embed"))) {
+#' # robust PCA of the forage spectra, with the Hotelling's T-squared limit
+#' if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
+#'   data(forageLIBS)
+#'   spectra_id <- names(forageLIBS)[1:2]
+#'   minerals <- names(forageLIBS)[3:14]
 #'   set.seed(1)
-#'   umap <- recipes::recipe(~ ., data = spectra) |>
-#'     recipes::update_role(Sample, new_role = "id") |>
-#'     recipes::step_normalize(recipes::all_predictors()) |>
-#'     recipes::step_pca(recipes::all_predictors(), num_comp = 10) |>
-#'     embed::step_umap(recipes::all_predictors(), neighbors = 10) |>
-#'     recipes::prep() |>
-#'     recipes::bake(new_data = NULL)
-#'   plot_embedding(umap, colour = texture)
+#'   forageLIBS |>
+#'     dplyr::select(-dplyr::all_of(c(spectra_id, minerals))) |>
+#'     center() |>
+#'     robpca() |>
+#'     plot_embedding(hotelling = "all", flag = FALSE, label = TRUE)
 #' }
+#'
 plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, alpha = 0.8,
                            ellipse = FALSE, conf_level = 0.975, robust = FALSE,
                            distribution = "normal", hotelling = "none", k = 2,

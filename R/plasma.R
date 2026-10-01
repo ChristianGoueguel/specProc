@@ -419,8 +419,8 @@ self_absorption <- function(width, thin_width, alpha = -0.54) {
 #' @export saturation_summary
 #'
 #' @examples
-#' data(soilLIBS)
-#' sat <- saturation_summary(soilLIBS[-(1:8)], limit = 28000)
+#' data(forageLIBS)
+#' sat <- saturation_summary(forageLIBS[-(1:14)], limit = 65535)
 #' sat$channels
 saturation_summary <- function(x, limit = 65535, tolerance = 0) {
   x <- as_numeric_matrix(x, "x")

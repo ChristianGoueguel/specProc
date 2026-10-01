@@ -1,3 +1,7 @@
+# soilLIBS is no longer shipped with specProc (removed in 0.7.0.9002, to keep
+# the package data under the CRAN size guideline). The raw export and this
+# script are kept to rebuild it, for example for a separate data package.
+#
 # Builds data/soilLIBS.rda from the raw CSV export.
 # Run from the package root: source("data-raw/soilLIBS.R")
 

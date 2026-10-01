@@ -51,8 +51,8 @@
 #'
 #' @examples
 #' if (interactive() && rlang::is_installed(c("shiny", "plotly", "bslib"))) {
-#'   data(soilLIBS)
-#'   line_finder(soilLIBS)
+#'   data(forageLIBS)
+#'   line_finder(forageLIBS[-(1:14)])
 #' }
 line_finder <- function(spectra, launch.browser = interactive(), show_table = TRUE) {
   rlang::check_installed(c("shiny", "plotly", "bslib"), reason = "to run the line finder app.")

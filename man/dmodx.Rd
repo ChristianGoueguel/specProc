@@ -83,12 +83,12 @@ residuals of \code{\link[=q_residuals]{q_residuals()}}, of which it is a scaled 
 }
 \examples{
 if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
-  data(soilLIBS)
-  spectra <- average(soilLIBS[-(2:8)], Sample)
-  pca <- stats::prcomp(spectra[-1], scale. = TRUE)
+  data(forageLIBS)
+  spectra <- forageLIBS[-(1:14)]
+  pca <- stats::prcomp(spectra)
   d <- dmodx(pca, k = 3)
   d[d$outlier != "regular", ]
-  plot_influence(d, label = spectra$Sample)
+  plot_influence(d, label = forageLIBS$Measurement)
 }
 }
 \references{

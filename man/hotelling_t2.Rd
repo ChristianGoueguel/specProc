@@ -74,9 +74,9 @@ sensitive to outliers; with many outliers, prefer the robust distances of
 }
 \examples{
 if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
-  data(soilLIBS)
-  spectra <- average(soilLIBS[-(2:8)], Sample)
-  pca <- stats::prcomp(spectra[-1], scale. = TRUE)
+  data(forageLIBS)
+  spectra <- forageLIBS[-(1:14)]
+  pca <- stats::prcomp(spectra)
   t2 <- hotelling_t2(pca, k = 3)
   t2[t2$outlier_97.5, ]
   # two limits, with the exact distribution of the calibration samples

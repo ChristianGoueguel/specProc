@@ -33,7 +33,7 @@ intensity and width are wrong and they respond nonlinearly to
 concentration.
 }
 \examples{
-data(soilLIBS)
-sat <- saturation_summary(soilLIBS[-(1:8)], limit = 28000)
+data(forageLIBS)
+sat <- saturation_summary(forageLIBS[-(1:14)], limit = 65535)
 sat$channels
 }

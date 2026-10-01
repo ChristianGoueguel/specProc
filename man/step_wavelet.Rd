@@ -82,8 +82,8 @@ the training data (\code{NA} before the step is trained) and \code{id}.
 }
 \examples{
 if (rlang::is_installed("recipes")) {
-  data(soilLIBS)
-  rec <- recipes::recipe(Clay ~ ., data = soilLIBS[-c(1:2, 4:8)]) |>
+  data(forageLIBS)
+  rec <- recipes::recipe(K ~ ., data = forageLIBS[-c(1:10, 12:14)]) |>
     step_wavelet(recipes::all_predictors(), wavelet = "la8", level = 4, num_coef = 50) |>
     recipes::prep()
   dim(recipes::bake(rec, new_data = NULL))

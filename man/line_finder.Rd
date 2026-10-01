@@ -58,8 +58,8 @@ connection for the species not yet fetched.
 }
 \examples{
 if (interactive() && rlang::is_installed(c("shiny", "plotly", "bslib"))) {
-  data(soilLIBS)
-  line_finder(soilLIBS)
+  data(forageLIBS)
+  line_finder(forageLIBS[-(1:14)])
 }
 }
 \seealso{

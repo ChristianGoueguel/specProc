@@ -68,16 +68,6 @@ can be zero; the mean absolute deviation is then used.
 To average the kept shots per sample, use \code{\link[=average]{average()}} on the result with
 \code{drop = TRUE}. In a recipe, use \code{\link[=step_reject_shots]{step_reject_shots()}}.
 }
-\examples{
-data(soilLIBS)
-shots <- reject_shots(soilLIBS[-(2:8)], Sample)
-table(shots$.rejected)
-head(shots[shots$.rejected, c("Sample", ".reason", ".intensity_z", ".correlation_z")])
-
-# mean spectrum of each sample, without the rejected shots
-means <- average(reject_shots(soilLIBS[-(2:8)], Sample, drop = TRUE), Sample)
-dim(means)
-}
 \references{
 \itemize{
 \item Iglewicz, B., Hoaglin, D.C. (1993). How to Detect and Handle

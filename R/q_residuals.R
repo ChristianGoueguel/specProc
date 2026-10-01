@@ -70,12 +70,12 @@
 #'
 #' @examples
 #' if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
-#'   data(soilLIBS)
-#'   spectra <- average(soilLIBS[-(2:8)], Sample)
-#'   pca <- stats::prcomp(spectra[-1], scale. = TRUE)
+#'   data(forageLIBS)
+#'   spectra <- forageLIBS[-(1:14)]
+#'   pca <- stats::prcomp(spectra)
 #'   influence <- q_residuals(pca, k = 3)
 #'   influence[influence$outlier != "regular", ]
-#'   plot_influence(influence, label = spectra$Sample)
+#'   plot_influence(influence, label = forageLIBS$Measurement)
 #'   # several limits
 #'   plot_influence(q_residuals(pca, k = 3, conf_level = c(0.95, 0.99)))
 #' }
@@ -155,12 +155,12 @@ q_residuals <- function(model, k, newdata = NULL, conf_level = 0.975, method = "
 #'
 #' @examples
 #' if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
-#'   data(soilLIBS)
-#'   spectra <- average(soilLIBS[-(2:8)], Sample)
-#'   pca <- stats::prcomp(spectra[-1], scale. = TRUE)
+#'   data(forageLIBS)
+#'   spectra <- forageLIBS[-(1:14)]
+#'   pca <- stats::prcomp(spectra)
 #'   d <- dmodx(pca, k = 3)
 #'   d[d$outlier != "regular", ]
-#'   plot_influence(d, label = spectra$Sample)
+#'   plot_influence(d, label = forageLIBS$Measurement)
 #' }
 dmodx <- function(model, k, newdata = NULL, conf_level = 0.975, normalized = TRUE,
                   df = "effective", t2_method = "f", center = TRUE, scale = FALSE) {

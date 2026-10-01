@@ -60,8 +60,8 @@ most informative coefficients, \code{\link[=step_wavelet]{step_wavelet()}} can s
 largest variance in the training data (Trygg and Wold, 1998).
 }
 \examples{
-data(soilLIBS)
-spectra <- soilLIBS[1:4, -(1:8)]
+data(forageLIBS)
+spectra <- forageLIBS[1:4, -(1:14)]
 approx <- wavelet_features(spectra, wavelet = "la8", level = 4)
 dim(approx)   # 7152 channels -> 447 coefficients
 }
