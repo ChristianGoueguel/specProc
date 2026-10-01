@@ -193,7 +193,7 @@ correlation_spectrum <- function(tbl, wl, label, threshold, color, interactive) 
              line = list(color = color[2], width = 1, dash = "dash"))
       }))
     }
-    return(plotly::layout(p, title = label, shapes = shapes, hovermode = "x",
+    return(plotly::layout(p, title = plotly_title(label), shapes = shapes, hovermode = "x",
                           xaxis = list(title = "Wavelength (nm)"),
                           yaxis = list(title = "Correlation")))
   }
@@ -203,11 +203,12 @@ correlation_spectrum <- function(tbl, wl, label, threshold, color, interactive) 
     p <- p + ggplot2::geom_hline(yintercept = c(-1, 1) * threshold, colour = color[2],
                                  linetype = "dashed", linewidth = 0.4)
   }
-  p +
+  p <- p +
     ggplot2::geom_line(ggplot2::aes(group = .data$segment), colour = color[1], linewidth = 0.3) +
     ggplot2::labs(x = "Wavelength (nm)", y = "Correlation", title = label,
                   subtitle = if (!is.null(threshold)) "Dashed lines: p = 0.05 (not corrected for multiple testing)") +
     ggplot2::theme_bw()
+  finish_title(p)
 }
 
 # Sorted chart of the correlation of each variable.
@@ -229,7 +230,7 @@ correlation_bars <- function(tbl, method, label, threshold, color, interactive) 
              line = list(color = "grey", width = 1, dash = "dash"))
       })
     }
-    return(plotly::layout(p, title = label, shapes = shapes,
+    return(plotly::layout(p, title = plotly_title(label), shapes = shapes,
                           xaxis = list(title = "Correlation", range = c(lower, 1.1), zeroline = TRUE),
                           yaxis = list(title = "")))
   }
@@ -239,7 +240,7 @@ correlation_bars <- function(tbl, method, label, threshold, color, interactive) 
     p <- p + ggplot2::geom_vline(xintercept = c(-1, 1) * threshold, colour = "grey60",
                                  linetype = "dashed", linewidth = 0.4)
   }
-  p +
+  p <- p +
     ggplot2::geom_segment(ggplot2::aes(x = 0, xend = .data$correlation, yend = .data$variable,
                                        colour = .data$sign), linewidth = 0.8) +
     ggplot2::geom_point(ggplot2::aes(colour = .data$sign), size = 2.5) +
@@ -254,4 +255,5 @@ correlation_bars <- function(tbl, method, label, threshold, color, interactive) 
     ggplot2::theme_bw() +
     ggplot2::theme(panel.grid.major.y = ggplot2::element_blank(),
                    panel.grid.minor = ggplot2::element_blank())
+  finish_title(p)
 }

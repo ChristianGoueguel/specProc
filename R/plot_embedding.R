@@ -407,7 +407,7 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
       ggplot2::scale_y_continuous(sec.axis = ggplot2::sec_axis(~ . / fy, name = paste(y, "loading")))
   }
   # SIMCA style: grey outside the ellipses, white inside
-  p +
+  p <- p +
     ggplot2::labs(x = axis_title(x, variance), y = axis_title(y, variance), title = title,
                   subtitle = subtitle) +
     ggplot2::theme_grey() +
@@ -420,6 +420,7 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
       legend.position = "right"
     ) +
     compact_legend()
+  finish_title(p)
 }
 
 # ---- internals ---------------------------------------------------------------

@@ -122,12 +122,12 @@ plot_lines <- function(spectrum, lines, shift = 0, scale_markers = TRUE, interac
     for (trace in stage_traces(segments)) {
       p <- do.call(plotly::add_trace, c(list(p), trace))
     }
-    plotly::layout(p, title = title,
+    plotly::layout(p, title = plotly_title(title),
                    xaxis = list(title = "Wavelength (nm)"), yaxis = list(title = "Intensity"),
                    legend = list(orientation = "h", y = -0.15), hovermode = "closest")
   } else {
     # markers on top of the spectrum, semi-transparent
-    ggplot2::ggplot() +
+    p <- ggplot2::ggplot() +
       ggplot2::geom_line(data = spec, ggplot2::aes(.data$wavelength, .data$intensity),
                          colour = "grey35", linewidth = 0.3) +
       ggplot2::geom_segment(
@@ -139,6 +139,7 @@ plot_lines <- function(spectrum, lines, shift = 0, scale_markers = TRUE, interac
       ggplot2::labs(x = "Wavelength (nm)", y = "Intensity", title = title) +
       ggplot2::theme_bw() +
       ggplot2::theme(legend.position = "bottom")
+    finish_title(p)
   }
 }
 

@@ -279,7 +279,7 @@ plot_wavelength_calibration <- function(object, title = NULL) {
                      nrow(object$lines),
                      sqrt(mean(object$lines$residual[used]^2, na.rm = TRUE)))
   }
-  ggplot2::ggplot() +
+  p <- ggplot2::ggplot() +
     ggplot2::geom_hline(yintercept = 0, colour = "grey60", linewidth = 0.3) +
     ggplot2::geom_line(data = curves, ggplot2::aes(.data$wavelength, .data$correction,
                                                    colour = .data$segment), linewidth = 0.7) +
@@ -292,6 +292,7 @@ plot_wavelength_calibration <- function(object, title = NULL) {
                   colour = "Segment", title = title) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = "bottom")
+  finish_title(p)
 }
 
 #' @export

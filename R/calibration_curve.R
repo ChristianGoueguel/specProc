@@ -360,13 +360,14 @@ plot_calibration <- function(object, interval = "both", level = 0.95, newdata = 
       ggplot2::geom_point(data = unknown, ggplot2::aes(.data$concentration, .data$signal),
                           colour = "#c0392b", shape = 18, size = 3.5)
   }
-  p +
+  p <- p +
     ggplot2::scale_linetype_manual(values = c(LOD = "dashed", LOQ = "dotted"), name = NULL) +
     ggplot2::labs(x = object$names[["concentration"]], y = object$names[["signal"]], title = title,
                   subtitle = if (!is.null(newdata)) paste0("Red: new samples, with the ", pct,
                                                            " interval of their concentration")) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = "bottom")
+  finish_title(p)
 }
 
 #' @export

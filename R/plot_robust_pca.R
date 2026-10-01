@@ -221,6 +221,7 @@ plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(20
   }
   check_count(labels, "labels", lower = 0)
   rlang::check_installed("patchwork", reason = "to combine the panels of the cell map.")
+  heading <- split_title(title)
   cells <- cell_map_data(object, rows, columns)
   check_region_args(threshold, lines, tol, cells$has_wavelength)
 
@@ -246,7 +247,7 @@ plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(20
   if (!profile) {
     return(patchwork::wrap_plots(map, strip, widths = c(1, 0.025)) +
              patchwork::plot_layout(guides = "collect") +
-             patchwork::plot_annotation(title = title) &
+             patchwork::plot_annotation(title = heading$title, subtitle = heading$subtitle, theme = bold_title()) &
              ggplot2::theme(legend.position = "bottom", legend.box = "vertical"))
   }
   if (is.null(spectra)) {
@@ -264,7 +265,7 @@ plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(20
                         ncol = 2, widths = c(1, 0.025),
                         heights = if (labels > 0 && nrow(regions) > 0) c(1.6, 4) else c(1, 4)) +
     patchwork::plot_layout(guides = "collect") +
-    patchwork::plot_annotation(title = title) &
+    patchwork::plot_annotation(title = heading$title, subtitle = heading$subtitle, theme = bold_title()) &
     ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
 }
 
@@ -488,9 +489,9 @@ distance_map <- function(df, cuts, labels, relative, shade, log, colour_by, pale
     x_args <- c(x_args, log_args)
     y_args <- c(y_args, log_args)
   }
-  p +
+  finish_title(p +
     do.call(ggplot2::scale_x_continuous, x_args) +
-    do.call(ggplot2::scale_y_continuous, y_args)
+    do.call(ggplot2::scale_y_continuous, y_args))
 }
 
 # Rainbow of the distances of plot_outlier_map(): dark red at the origin,

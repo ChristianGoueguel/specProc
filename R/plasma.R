@@ -221,7 +221,7 @@ plot_boltzmann <- function(object, title = NULL) {
     ylab <- bquote(.(ylab) ~ "(Saha-corrected for ions)")
   }
   ylab <- as.expression(ylab)
-  ggplot2::ggplot(df, ggplot2::aes(x = .data$x, y = .data$y)) +
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$x, y = .data$y)) +
     ggplot2::geom_abline(intercept = coefs[[1]], slope = coefs[[2]], colour = "grey40") +
     ggplot2::geom_point(ggplot2::aes(colour = .data$stage), size = 2.5) +
     ggplot2::scale_colour_manual(values = c(neutral = "#1b9e77", ion = "#d95f02"), drop = TRUE,
@@ -231,6 +231,7 @@ plot_boltzmann <- function(object, title = NULL) {
                   y = ylab, title = title) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = if (length(unique(df$stage)) > 1) "bottom" else "none")
+  finish_title(p)
 }
 
 # Parallel Boltzmann (or Saha-Boltzmann) plots of a CF-LIBS fit.
@@ -254,7 +255,7 @@ plot_cf_libs <- function(object, title) {
   }
   df <- object$points
   df$stage <- factor(ifelse(df$stage == 2, "ion", "neutral"), levels = c("neutral", "ion"))
-  ggplot2::ggplot(df, ggplot2::aes(x = .data$x, y = .data$y, colour = .data$group)) +
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$x, y = .data$y, colour = .data$group)) +
     ggplot2::geom_abline(data = fitted, ggplot2::aes(intercept = .data$intercept, slope = .data$slope,
                                                      colour = .data$group), alpha = 0.6) +
     ggplot2::geom_point(ggplot2::aes(shape = .data$stage), size = 2.5) +
@@ -264,6 +265,7 @@ plot_cf_libs <- function(object, title) {
                   y = as.expression(ylab), colour = NULL, shape = NULL, title = title) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.position = "bottom")
+  finish_title(p)
 }
 
 #' @export

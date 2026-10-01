@@ -479,7 +479,7 @@ plot_loadings_ggplot <- function(curves, peaks, background, parts, x_lab, y_lab,
       ggplot2::geom_blank(data = room, ggplot2::aes(x = .data$wavelength, y = .data$value),
                           inherit.aes = FALSE)
   }
-  p +
+  p <- p +
     ggplot2::facet_wrap(ggplot2::vars(.data$panel), ncol = 1, scales = "free_y") +
     ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = 0.05)) +
     ggplot2::labs(x = x_lab, y = y_lab, title = title) +
@@ -487,6 +487,7 @@ plot_loadings_ggplot <- function(curves, peaks, background, parts, x_lab, y_lab,
     ggplot2::theme(strip.background = ggplot2::element_rect(fill = "grey95"),
                    strip.text = ggplot2::element_text(hjust = 0),
                    panel.grid.minor = ggplot2::element_blank())
+  finish_title(p)
 }
 
 plot_loadings_plotly <- function(curves, peaks, background, x_lab, y_lab, title) {
@@ -526,5 +527,5 @@ plot_loadings_plotly <- function(curves, peaks, background, x_lab, y_lab, title)
     plotly::layout(p, yaxis = list(title = panel, zeroline = TRUE))
   })
   p <- plotly::subplot(plots, nrows = length(plots), shareX = TRUE, titleY = TRUE)
-  plotly::layout(p, title = title, xaxis = list(title = x_lab), hovermode = "closest")
+  plotly::layout(p, title = plotly_title(title), xaxis = list(title = x_lab), hovermode = "closest")
 }

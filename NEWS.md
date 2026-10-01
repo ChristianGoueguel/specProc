@@ -1,5 +1,14 @@
 # specProc (development version)
 
+## Plots
+
+* Plot titles are bold, and a title longer than 45 characters is split at
+  a natural break (": ", " (", " - " or ", ") into a shorter title and a
+  subtitle, for example `plot_calibration()`'s "Linear calibration" above
+  its R², LOD and LOQ. This applies to every plot with a title, including
+  the interactive (plotly) ones and `plot_cell_map()`. `plot_fit()` now
+  shows its `title` as a title rather than a subtitle.
+
 ## Documentation
 
 * The vignettes are reorganized into the four stages of a LIBS analysis,

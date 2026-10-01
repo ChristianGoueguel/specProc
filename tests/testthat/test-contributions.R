@@ -110,7 +110,9 @@ test_that("plot_contributions draws one panel per sample", {
   # default: the three samples with the largest Q, sample 1 first
   expect_equal(nlevels(p$data$panel), 3)
   expect_match(levels(p$data$panel)[1], "^Sample 1 \\(Q = ")
-  expect_match(p$labels$title, "relative to the regular samples")
+  # the long title is split: the reference is in the subtitle
+  expect_equal(p$labels$title, "PCA Q contributions")
+  expect_equal(p$labels$subtitle, "2 components, relative to the regular samples")
   lines <- tibble::tibble(species = "Fe I", stage = 1L, wavelength = 410.02, relative_intensity = 1)
   p <- plot_contributions(q, samples = 1, lines = lines, spectra = x)
   built <- ggplot2::ggplot_build(p)

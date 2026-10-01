@@ -86,7 +86,7 @@ plot_fit <- function(data, title = NULL, pt.size = 3, pt.colour = "black", pt.sh
 
   plot1 <- plot1 +
     ggplot2::geom_line(data = curve, ggplot2::aes(x = x, y = .fitted), linewidth = line.size, colour = line.colour, linetype = linetype) +
-    ggplot2::labs(subtitle = title, x = NULL, y = "Intensity [arb. units]") +
+    ggplot2::labs(title = title, x = NULL, y = "Intensity [arb. units]") +
     ggplot2::theme_bw(base_size = 10)
   plot2 <- ggplot2::ggplot(aug, ggplot2::aes(x = x, y = .resid)) +
     ggplot2::geom_hline(yintercept = 0) +
@@ -99,5 +99,5 @@ plot_fit <- function(data, title = NULL, pt.size = 3, pt.colour = "black", pt.sh
     plot2 <- plot2 + ggplot2::facet_wrap(ggplot2::vars(.data$.id), nrow = 1, scales = "free_y")
   }
 
-  patchwork::wrap_plots(plot1, plot2, ncol = 1, heights = c(5, 1))
+  patchwork::wrap_plots(finish_title(plot1), plot2, ncol = 1, heights = c(5, 1))
 }
