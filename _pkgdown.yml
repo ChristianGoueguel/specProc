@@ -276,3 +276,12 @@ reference:
   contents:
   - soilLIBS
   - forageLIBS
+
+articles:
+- title: A LIBS workflow
+  navbar: ~
+  contents:
+  - peak-fitting
+  - preprocessing
+  - calibration
+  - plasma-diagnostics

@@ -15,18 +15,13 @@ MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/
 
 <!-- badges: end -->
 
-**specProc** preprocesses and explores spectroscopic data. It was
-developed for laser-induced breakdown spectroscopy (LIBS) but works with
-other techniques such as Raman, infrared, and inductively coupled plasma
-optical emission spectroscopy. It handles the entire preprocessing
-workflow, from raw spectra to a data matrix ready for modeling. Its
-computationally heavy steps run in C++ (via Rcpp), so it stays fast on
-data sets with thousands of spectra and high-resolution wavelength
-channels.
+**specProc** processes and analyzes emission spectra, from raw spectra
+to calibrated concentrations. It was developed for laser-induced
+breakdown spectroscopy (LIBS), and works with other techniques such as
+Raman, infrared and ICP-OES. Spectra are stored one per row, with the
+wavelengths as column names, and the heavy computations run in C++.
 
 ## Installation
-
-Install the development version from GitHub:
 
 ``` r
 # install.packages("remotes")
@@ -34,125 +29,83 @@ remotes::install_github("ChristianGoueguel/specProc", build_vignettes = TRUE)
 ```
 
 A C++ compiler is needed to build the package from source (Rtools on
-Windows, Xcode Command Line Tools on macOS). `opls()` additionally needs
-the Bioconductor package ropls: `BiocManager::install("ropls")`.
+Windows, Xcode Command Line Tools on macOS).
 
-## Design principles
+## A LIBS workflow
 
-- **Tidy in, tidy out.** Spectra are stored one per row, and the column
-  names are the wavelengths. Functions accept matrices, data frames or
-  tibbles and return tibbles.
-- **Built for tidymodels.** Preprocessing, filtering and robust PCA are
-  available as recipe steps, so they are estimated on training data only
-  and can be tuned with the model.
-- **Preprocessing parameters are returned, not hidden.** Centers,
-  scales, reference spectra, filter matrices and loadings come back with
-  the result. You can then estimate a transformation on calibration data
-  and apply exactly the same transformation to new data.
-- **Robust alternatives are available alongside the classical
-  estimators.** Emission spectra contain outlying shots, saturated
-  channels and heavy tails, and the robust estimators are designed for
-  them.
+The vignettes follow a typical LIBS analysis, on the `forageLIBS`
+spectra of forage samples:
 
-## Learn more
-
-The vignettes develop the example above in more depth:
-
-- `vignette("preprocessing", package = "specProc")`: choosing and
-  checking each preprocessing step against replicate data.
-- `vignette("line-fitting", package = "specProc")`: choosing a line
-  profile, and the sources of uncertainty in fitted line areas.
-- `vignette("calibration", package = "specProc")`: predicting soil clay
-  content with a compositional (log-ratio) PLS model, and estimating
-  prediction error without leakage.
-- `vignette("orthogonalization", package = "specProc")`: what each
-  orthogonalization method removes from LIBS spectra of forage samples,
-  whether it improves potassium predictions, the net analyte signal and
-  figures of merit, and the same analysis as a tidymodels workflow.
-- `vignette("plasma-diagnostics", package = "specProc")`: detector
-  saturation, electron density from H-alpha and Stark broadening,
-  Boltzmann and Saha-Boltzmann temperatures with NIST atomic data, and
-  self-absorption.
+1.  **Fitting emission lines** (`vignette("peak-fitting")`): line
+    identification, wavelength calibration, line profiles and
+    overlapping lines.
+2.  **Preprocessing with recipe steps** (`vignette("preprocessing")`):
+    baseline correction, normalization and other `step_*()` functions,
+    in a tidymodels workflow.
+3.  **Calibration curves and figures of merit**
+    (`vignette("calibration")`): univariate curves, limits of detection
+    and quantification, and the net analyte signal of multivariate
+    models.
+4.  **Plasma diagnostics** (`vignette("plasma-diagnostics")`): electron
+    density, temperature, LTE, self-absorption and calibration-free
+    LIBS.
 
 They are also available as [articles on the package
 website](https://christiangoueguel.com/specProc/articles/).
+
+## Example
+
+A calibration curve for potassium, from the intensity of the K I 769.90
+nm line normalized to the carbon line C I 247.86 nm:
+
+``` r
+library(specProc)
+library(dplyr)
+
+data("forageLIBS")
+spectra_id <- forageLIBS |> select(1:2) |> names()
+minerals <- forageLIBS |> select(3:14) |> names()
+spectra <- forageLIBS |> select(-all_of(c(spectra_id, minerals)))
+
+corrected <- baseline_arpls(spectra, lambda = 1e5, max.iter = 20)$correction
+intensities <- line_intensities(corrected, c(C = 247.856, K = 769.896))
+
+data <- tibble(
+  K = forageLIBS$K,
+  signal = intensities$intensity[intensities$line == "K"] /
+    intensities$intensity[intensities$line == "C"]
+)
+curve <- calibration_curve(data, signal, K)
+curve$figures_of_merit
+#> # A tibble: 1 × 7
+#>       n sensitivity r_squared sigma sigma_blank   lod   loq
+#>   <int>       <dbl>     <dbl> <dbl>       <dbl> <dbl> <dbl>
+#> 1   368       0.302     0.575 0.139       0.139  1.52  4.60
+```
+
+``` r
+plot_calibration(curve)
+```
+
+<img src="man/figures/README-example-plot-1.png" alt="" width="80%" />
 
 ## Function overview
 
 | Task | Functions |
 |----|----|
-| Baseline correction | `baseline_arpls()`, `baseline_als()`, `baseline_lsp()` |
-| Normalization | `snv()`, `msc()`, `emsc()`, `normalize()` |
-| Scaling and centering | `center()`, `pareto_scale()`, `poisson_scale()`, `minmax()` |
-| Orthogonal filtering | `osc()`, `direct_osc()`, `direct_orthogonal()`, `projected_osc()`, `o2pls()`, `opls()`, `predict()` |
-| Interference removal | `epo()`, `glsw()`, `y_gradient_glsw()` |
-| Calibration transfer | `pds()` |
-| Robust PCA | `robpca()`, `rospca()`, `macropca()`, `plot_outlier_map()`, `plot_cell_map()`, `flagged_regions()`, `plot_loadings()`, `loading_peaks()`, `contributions()`, `plot_contributions()` |
-| Figures of merit | `nas()` |
-| Recipe steps (tidymodels) | `step_baseline()`, `step_snv()`, `step_msc()`, `step_emsc()`, `step_pareto_scale()`, `step_poisson_scale()`, `step_epo()`, `step_glsw()`, `step_osc()`, `step_direct_orthogonal()`, `step_direct_osc()`, `step_projected_osc()`, `step_y_gradient_glsw()`, `step_robust_bcyj()`, `step_robpca()`, `step_rospca()`, `step_macropca()` |
-| Line profiles | `voigt_profile()`, `pseudo_voigt_profile()`, `gaussian_profile()`, `lorentzian_profile()` |
-| Line fitting | `peak_fit()`, `multipeak_fit()`, `plot_fit()`, `voigt_fwhm()` |
-| Line identification | `line_finder()` (Shiny app), `libs_lines()`, `plot_lines()` |
-| Plasma diagnostics | `nist_lines()`, `nist_ionization_energy()`, `starkb_lines()`, `read_starkb()`, `stark_table()`, `stark_width()`, `electron_density()`, `boltzmann_plot()`, `saha_boltzmann_plot()`, `plot_boltzmann()`, `mcwhirter_criterion()`, `self_absorption()`, `saturation_summary()` |
-| Location and scale | `biweight_location()`, `biweight_scale()`, `biweight_midvariance()`, `rousseeuw_croux()`, `umad()` |
-| Association | `correlation()`, `biweight_midcovariance()`, `biweight_midcorrelation()` |
-| Skewness and tail weight | `medcouple_weight()`, `quantile_weight()`, `tukey_gh()` |
-| Outlier detection | `zscore()`, `iqr_outliers()`, `directional_outlyingness()`, `plot_outliers()` |
-| Exploration | `summary_stats()`, `adjusted_boxplot()`, `generalized_boxplot()`, `plot_spectra()`, `average()` |
-| Transformation to normality | `robust_bcyj()` |
+| Line identification | `libs_lines()`, `plot_lines()`, `line_finder()` (Shiny app), `wavelength_calibration()`, `apply_calibration()` |
+| Line fitting | `peak_fit()`, `multipeak_fit()`, `plot_fit()`, `line_intensities()`, `voigt_profile()`, `pseudo_voigt_profile()`, `gaussian_profile()`, `lorentzian_profile()`, `voigt_fwhm()` |
+| Preprocessing | `baseline_arpls()`, `baseline_als()`, `baseline_lsp()`, `snv()`, `msc()`, `emsc()`, `normalize()`, `savitzky_golay()`, `wavelet_features()`, `reject_shots()`, `average()` |
+| Recipe steps | `step_baseline()`, `step_snv()`, `step_msc()`, `step_emsc()`, `step_spectral_norm()`, `step_line_ratio()`, `step_savgol()`, `step_wavelet()`, `step_line_intensities()`, `step_reject_shots()`, `step_opls()`, `step_o2pls()`, `step_epo()`, `step_glsw()`, and more |
+| Orthogonalization | `osc()`, `direct_osc()`, `projected_osc()`, `opls()`, `o2pls()`, `epo()`, `glsw()`, `y_gradient_glsw()` |
+| Calibration | `calibration_curve()`, `plot_calibration()`, `nas()`, `pds()` |
+| Plasma diagnostics | `saturation_summary()`, `electron_density()`, `boltzmann_plot()`, `saha_boltzmann_plot()`, `plot_boltzmann()`, `mcwhirter_criterion()`, `self_absorption()`, `correct_self_absorption()`, `cf_libs()`, `nist_lines()`, `starkb_lines()` |
+| Outliers and robust PCA | `robpca()`, `rospca()`, `macropca()`, `plot_outlier_map()`, `plot_cell_map()`, `q_residuals()`, `dmodx()`, `plot_influence()`, `hotelling_t2()` |
+| Robust statistics | `summary_stats()`, `biweight_location()`, `biweight_scale()`, `rousseeuw_croux()`, `umad()`, `adjusted_boxplot()`, `robust_bcyj()` |
+| Visualization | `plot_spectra()`, `plot_embedding()`, `plot_loadings()`, `plot_contributions()` |
 
-### Robust estimators at a glance
-
-For estimators of scale, the breakdown point is the largest fraction of
-contaminated observations the estimator can tolerate. The efficiency is
-its asymptotic efficiency relative to the standard deviation for normal
-data.
-
-| Estimator | Function | Breakdown point | Efficiency |
-|----|----|----|----|
-| Standard deviation | `stats::sd()` | 0% | 100% |
-| MAD (bias-corrected) | `umad()` | 50% | 37% |
-| Rousseeuw–Croux Sn | `rousseeuw_croux(estimator = "Sn")` | 50% | 58% |
-| Rousseeuw–Croux Qn | `rousseeuw_croux(estimator = "Qn")` | 50% | 82% |
-| Biweight midvariance | `biweight_midvariance()`, `biweight_scale()` | high | ≈ 87% |
-
-`umad()` and `rousseeuw_croux()` include finite-sample bias corrections
-(Park et al., 2020; Akinshin, 2022), so they are also unbiased at the
-normal distribution for small samples, such as the 8 replicates per
-sample.
-
-## References
-
-The main methodological references are:
-
-- Baek, S.-J., et al. (2015). Baseline correction using asymmetrically
-  reweighted penalized least squares smoothing. *Analyst*, 140, 250–257.
-- Eilers, P.H.C., Boelens, H.F.M. (2005). Baseline correction with
-  asymmetric least squares smoothing.
-- Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003). EPO-PLS
-  external parameter orthogonalisation of PLS. *Chemometr. Intell. Lab.
-  Syst.*, 66, 191–204.
-- Martens, H., et al. (2003). Pre-whitening of data by
-  covariance-weighted pre-processing. *J. Chemometrics*, 17, 153–165.
-- Trygg, J., Wold, S. (2002). Orthogonal projections to latent
-  structures (O-PLS). *J. Chemometrics*, 16, 119–128.
-- Weideman, J.A.C. (1994). Computation of the complex error function.
-  *SIAM J. Numer. Anal.*, 31, 1497–1518.
-- Rousseeuw, P.J., Croux, C. (1993). Alternatives to the median absolute
-  deviation. *JASA*, 88, 1273–1283.
-- Hubert, M., Vandervieren, E. (2008). An adjusted boxplot for skewed
-  distributions. *Comput. Stat. Data Anal.*, 52, 5186–5201.
-- Bruffaerts, C., Verardi, V., Vermandele, C. (2014). A generalized
-  boxplot for skewed and heavy-tailed distributions. *Stat. Probab.
-  Lett.*, 95, 110–117.
-
-Each function’s help page gives the full references for its method.
-
-## Contributing
-
-Bug reports and feature requests are welcome on the [issue
-tracker](https://github.com/ChristianGoueguel/specProc/issues). Please
-include a minimal reproducible example.
+See the [reference](https://christiangoueguel.com/specProc/reference/)
+for the full list.
 
 ## License
 
