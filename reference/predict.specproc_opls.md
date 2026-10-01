@@ -61,7 +61,7 @@ units of y.
 data(forageLIBS)
 spectra <- forageLIBS[-(1:14)]  # the spectral channels
 cal <- 1:300
-fit <- opls(spectra[cal, ], forageLIBS$K[cal], ncomp.ortho = 2, permutation = 0)
+fit <- opls(spectra[cal, ], forageLIBS$K[cal], ncomp = 2)
 head(predict(fit, spectra[-cal, ], type = "response"))
 #> [1] 2.183732 1.970955 2.324240 1.965858 1.842155 2.075535
 ```

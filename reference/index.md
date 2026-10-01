@@ -34,6 +34,20 @@ for MacroPCA, outlying cells and missing values).
 - [`flagged_regions()`](https://christiangoueguel.com/specProc/reference/flagged_regions.md)
   : Flagged Regions of a MacroPCA Fit
 
+### self-organizing maps
+
+Nonlinear maps of the spectra onto a grid of prototype spectra, for
+sorting samples and flagging novel ones.
+
+- [`som()`](https://christiangoueguel.com/specProc/reference/som.md) :
+  Self-Organizing Map of Spectra
+- [`predict(`*`<specproc_som>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_som.md)
+  : Map New Spectra onto a Self-Organizing Map
+- [`plot_som()`](https://christiangoueguel.com/specProc/reference/plot_som.md)
+  : Plot a Self-Organizing Map
+- [`som_stability()`](https://christiangoueguel.com/specProc/reference/som_stability.md)
+  : Stability of a Self-Organizing Map
+
 ### orthogonalization methods
 
 Functions used to identify and remove unwanted covariance structures and

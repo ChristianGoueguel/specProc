@@ -1,9 +1,33 @@
 # Changelog
 
-## specProc (development version)
+## specProc 0.8.0
 
 ### Breaking changes
 
+- [`opls()`](https://christiangoueguel.com/specProc/reference/opls.md)
+  has the arguments of the other orthogonalization methods:
+  `opls(x, y, ncomp = NULL, center = TRUE, scale = FALSE, crossval = 7, permutation = 0)`.
+  `ncomp` (the number of orthogonal components, `NULL` for the automatic
+  choice) replaces `ncomp.ortho`, and the logical `center` and `scale`
+  replace the character `scale`; for Pareto scaling, apply
+  [`pareto_scale()`](https://christiangoueguel.com/specProc/reference/pareto_scale.md)
+  to `x` first (or
+  [`step_pareto_scale()`](https://christiangoueguel.com/specProc/reference/step_pareto_scale.md)
+  before
+  [`step_opls()`](https://christiangoueguel.com/specProc/reference/step_opls.md)),
+  which gives the same filter. The former arguments still work, with a
+  deprecation warning. The permutation test is now skipped by default
+  (`permutation = 0`), as it refits the model as many times.
+- [`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md)’s
+  `ncomp` is now the number of orthogonal components removed, as in
+  [`opls()`](https://christiangoueguel.com/specProc/reference/opls.md),
+  [`osc()`](https://christiangoueguel.com/specProc/reference/osc.md) and
+  [`direct_osc()`](https://christiangoueguel.com/specProc/reference/direct_osc.md),
+  instead of the number of PLS components (one more): replace
+  `ncomp = k + 1` with `ncomp = k`. The default is 4 (formerly 5, the
+  same filter).
+  [`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md)
+  is unchanged.
 - [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
   and
   [`robust_bcyj()`](https://christiangoueguel.com/specProc/reference/robust_bcyj.md)
@@ -57,9 +81,42 @@
   [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md),
   the nominal degrees of freedom (K - k) are now selected with
   `df = "nominal"`.
+- The `soilLIBS` data set is removed, to keep the package data under the
+  5 MB CRAN guideline: `data(soilLIBS)` no longer works. The examples
+  use `forageLIBS` instead; the example of
+  [`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md),
+  which relied on the soil replicates, is removed. The raw data and the
+  script that built it remain in `data-raw/` of the source repository.
+
+### New features
+
+- [`som()`](https://christiangoueguel.com/specProc/reference/som.md)
+  fits a self-organizing map of spectra (batch SOM, in C++), which maps
+  similar spectra onto the same or neighboring units of a hexagonal or
+  rectangular grid and follows nonlinear relations (matrix effects,
+  self-absorption, plasma changes) that PCA can miss. It starts from the
+  plane of the first two principal components (deterministic training),
+  chooses the grid from the number of spectra, and reports the
+  quantization and topographic errors. `robust = TRUE` down-weights
+  outlying spectra by Huber weights of their quantization errors.
+  [`predict()`](https://rdrr.io/r/stats/predict.html) places new spectra
+  on their best-matching unit and flags as novel those beyond a robust
+  cut-off of the training quantization errors.
+  [`plot_som()`](https://christiangoueguel.com/specProc/reference/plot_som.md)
+  draws the counts, the U-matrix, the quantization errors, the component
+  planes (one map per wavelength or line), the spectra on the map and
+  the prototype spectra, and
+  [`som_stability()`](https://christiangoueguel.com/specProc/reference/som_stability.md)
+  measures how consistently the spectra keep their neighbors over
+  resampled fits. On the 368 x 7152 `forageLIBS` spectra, a map takes
+  about 2 s.
 
 ### Plots
 
+- [`plot_spectra()`](https://christiangoueguel.com/specProc/reference/plot_spectra.md)
+  has an `offset` argument, to shift successive spectra vertically and
+  horizontally (`offset = c(horizontal, vertical)`, or a single number
+  for a vertical offset), for example to stack them.
 - [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
   recognizes UMAP maps (axes named `UMAP1`, `UMAP2`, …, as by
   [`embed::step_umap()`](https://embed.tidymodels.org/reference/step_umap.html)):
@@ -68,33 +125,6 @@
   with a warning, since its T-squared limits assume linear scores. On
   other maps, the lines through the origin are light grey instead of
   black.
-
-### Documentation
-
-- The examples use the `forageLIBS` spectra and mineral contents instead
-  of simulated data, wherever the function applies to them (some taken
-  from the vignettes). Examples of pure helper functions (line profiles,
-  plasma criteria, tuning parameters) keep simple inputs, and the
-  examples of
-  [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md) and
-  [`step_reject_shots()`](https://christiangoueguel.com/specProc/reference/step_reject_shots.md),
-  for which `forageLIBS` has no suitable data, are removed.
-  [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
-  gains an example.
-- Every example calls dplyr functions with `dplyr::`, so that it runs
-  without dplyr attached.
-
-### Breaking changes
-
-- The `soilLIBS` data set is removed, to keep the package data under the
-  5 MB CRAN guideline: `data(soilLIBS)` no longer works. The examples
-  use `forageLIBS` instead; the example of
-  [`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md),
-  which relied on the soil replicates, is removed. The raw data and the
-  script that built it remain in `data-raw/` of the source repository.
-
-### Plots
-
 - [`correlation()`](https://christiangoueguel.com/specProc/reference/correlation.md)
   takes several responses (`var = c(K, Ca)`, or
   `dplyr::all_of(minerals)`), each with its own observations, so that a
@@ -120,6 +150,18 @@
 
 ### Documentation
 
+- The examples use the `forageLIBS` spectra and mineral contents instead
+  of simulated data, wherever the function applies to them (some taken
+  from the vignettes). Examples of pure helper functions (line profiles,
+  plasma criteria, tuning parameters) keep simple inputs, and the
+  examples of
+  [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md) and
+  [`step_reject_shots()`](https://christiangoueguel.com/specProc/reference/step_reject_shots.md),
+  for which `forageLIBS` has no suitable data, are removed.
+  [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
+  gains an example.
+- Every example calls dplyr functions with `dplyr::`, so that it runs
+  without dplyr attached.
 - The vignettes are reorganized into the four stages of a LIBS analysis,
   all on the `forageLIBS` spectra: fitting emission lines
   ([`vignette("peak-fitting")`](https://christiangoueguel.com/specProc/articles/peak-fitting.md),

@@ -13,7 +13,7 @@ algorithm for model fitting and prediction."><meta property="og:image" content="
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9004</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,7 @@ algorithm for model fitting and prediction.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">projected_osc</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
-<span>  ncomp <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  ncomp <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  scale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  tol <span class="op">=</span> <span class="fl">1e-10</span>,</span>
@@ -78,7 +78,7 @@ algorithm for model fitting and prediction.</p>
 
 
 <dt id="arg-ncomp">ncomp<a class="anchor" aria-label="anchor" href="#arg-ncomp"></a></dt>
-<dd><p>An integer specifying the number of PLS components (at least 2). <code>ncomp - 1</code> orthogonal components are removed. Default is 5.</p></dd>
+<dd><p>An integer specifying the number of orthogonal components removed (at least 1), as in the other orthogonalization methods. The underlying PLS model has <code>ncomp + 1</code> components. Default is 4.</p></dd>
 
 
 <dt id="arg-center">center<a class="anchor" aria-label="anchor" href="#arg-center"></a></dt>
@@ -109,15 +109,16 @@ algorithm for model fitting and prediction.</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>POSC obtains OPLS-filtered data directly from an ordinary (non-orthogonalized)
-PLS1 model (Kemsley and Tapp, 2009):</p><ol><li><p>A PLS1 model with <code>ncomp</code> components is fitted, giving the score matrix
+PLS1 model (Kemsley and Tapp, 2009):</p><ol><li><p>A PLS1 model with <code>ncomp + 1</code> components is fitted, giving the score matrix
 \(\textbf{T}\) and the fitted response \(\hat{\textbf{y}}\).</p></li>
 <li><p>The part of the score space orthogonal to \(\hat{\textbf{y}}\),
 \(\textbf{T} - \hat{\textbf{y}}(\hat{\textbf{y}}^T\hat{\textbf{y}})^{-1}\hat{\textbf{y}}^T\textbf{T}\),
-spans <code>ncomp - 1</code> orthogonal components with scores \(\textbf{T}_o\).</p></li>
+spans <code>ncomp</code> orthogonal components with scores \(\textbf{T}_o\).</p></li>
 <li><p>The orthogonal loadings are \(\textbf{P}_o = \textbf{X}^T\textbf{T}_o(\textbf{T}_o^T\textbf{T}_o)^{-1}\)
 and the filtered data are \(\textbf{X} - \textbf{T}_o\textbf{P}_o^T\).</p></li>
 </ol><p>The filtered data are identical to those obtained from an OPLS model with one
-predictive and <code>ncomp - 1</code> orthogonal components.</p>
+predictive and <code>ncomp</code> orthogonal components (<code><a href="opls.html">opls()</a></code> with the same
+<code>ncomp</code>).</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -144,7 +145,7 @@ Journal of Chemometrics, 16(3):119-128.</p></li>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span>  <span class="co"># the spectral channels</span></span></span>
 <span class="r-in"><span><span class="va">cal</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">300</span></span></span>
-<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">projected_osc</span><span class="op">(</span><span class="va">spectra</span><span class="op">[</span><span class="va">cal</span>, <span class="op">]</span>, <span class="va">forageLIBS</span><span class="op">$</span><span class="va">K</span><span class="op">[</span><span class="va">cal</span><span class="op">]</span>, ncomp <span class="op">=</span> <span class="fl">3</span>, newdata <span class="op">=</span> <span class="va">spectra</span><span class="op">[</span><span class="op">-</span><span class="va">cal</span>, <span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">projected_osc</span><span class="op">(</span><span class="va">spectra</span><span class="op">[</span><span class="va">cal</span>, <span class="op">]</span>, <span class="va">forageLIBS</span><span class="op">$</span><span class="va">K</span><span class="op">[</span><span class="va">cal</span><span class="op">]</span>, ncomp <span class="op">=</span> <span class="fl">2</span>, newdata <span class="op">=</span> <span class="va">spectra</span><span class="op">[</span><span class="op">-</span><span class="va">cal</span>, <span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">newdata</span><span class="op">$</span><span class="va">correction</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1]   68 7152</span>
 </code></pre></div>

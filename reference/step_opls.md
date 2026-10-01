@@ -58,8 +58,7 @@ step_opls(
 
   A list of further arguments passed to
   [`opls()`](https://christiangoueguel.com/specProc/reference/opls.md):
-  only `scale` (`"center"` by default; `"none"`, `"pareto"` or
-  `"standard"`).
+  `center` and `scale`.
 
 - res:
 
@@ -90,12 +89,12 @@ of existing steps.
 
 The filtered data are the same as those of
 [`step_projected_osc()`](https://christiangoueguel.com/specProc/reference/step_projected_osc.md)
-with the same `num_comp`, but
-[`opls()`](https://christiangoueguel.com/specProc/reference/opls.md)
-also offers Pareto scaling (`options = list(scale = "pareto")`). The
-model is fitted without cross-validation or permutation test, which do
-not change the filter. The number of orthogonal components is not
-selected automatically: tune `num_comp` instead. As for
+with the same `num_comp`. For Pareto scaling, add
+[`step_pareto_scale()`](https://christiangoueguel.com/specProc/reference/step_pareto_scale.md)
+before this step. The model is fitted without cross-validation or
+permutation test, which do not change the filter. The number of
+orthogonal components is not selected automatically: tune `num_comp`
+instead. As for
 [`step_osc()`](https://christiangoueguel.com/specProc/reference/step_osc.md),
 the filter uses the outcome and is estimated on the training data only;
 the outcome is not needed when new data are baked.
@@ -126,8 +125,10 @@ data(forageLIBS)
 # potassium and the K I resonance lines
 wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+# Pareto scaling, then the OPLS filter
 rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
-  step_opls(recipes::all_predictors(), num_comp = 2, options = list(scale = "pareto"))
+  step_pareto_scale(recipes::all_predictors()) |>
+  step_opls(recipes::all_predictors(), num_comp = 2)
 prepped <- recipes::prep(rec)
 recipes::bake(prepped, new_data = dat[301:368, ])
 #> # A tibble: 68 × 246

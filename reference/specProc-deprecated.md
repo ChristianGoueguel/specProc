@@ -86,6 +86,6 @@ used by [`glm()`](https://rdrr.io/r/stats/glm.html).
 | `saha_boltzmann_plot()` | [`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md) |
 
 `boltzmann_plot()` and `saha_boltzmann_plot()` were renamed in specProc
-0.7.0.9003, so that they are not confused with
+0.8.0, so that they are not confused with
 [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md),
 which draws their result.

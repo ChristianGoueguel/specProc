@@ -54,8 +54,8 @@ step_projected_osc(
 
 - num_comp:
 
-  The number of orthogonal components to remove. The underlying PLS
-  model has `num_comp + 1` components.
+  The number of orthogonal components to remove (`ncomp` of
+  [`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md)).
 
 - options:
 

@@ -78,6 +78,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_loadings.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_outlier_map.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_outliers.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/plot_som.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_spectra.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_wavelength_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/poisson_scale.html</loc></url>
@@ -87,6 +88,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_nas.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_opls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_som.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_wavelength_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/projected_osc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.html</loc></url>
@@ -104,6 +106,8 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/savitzky_golay.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/self_absorption.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/snv.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/som.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/som_stability.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/specProc-deprecated.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/specProc-package.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/spectral_norm_method.html</loc></url>

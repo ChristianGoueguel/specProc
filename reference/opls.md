@@ -6,7 +6,16 @@ model to the provided x (predictor) and y (response) data.
 ## Usage
 
 ``` r
-opls(x, y, scale = "center", crossval = 7, permutation = 20, ncomp.ortho = NA)
+opls(
+  x,
+  y,
+  ncomp = NULL,
+  center = TRUE,
+  scale = FALSE,
+  crossval = 7,
+  permutation = 0,
+  ncomp.ortho = deprecated()
+)
 ```
 
 ## Arguments
@@ -20,28 +29,36 @@ opls(x, y, scale = "center", crossval = 7, permutation = 20, ncomp.ortho = NA)
   A numeric vector, or a matrix or data frame with one column, of the
   response variable.
 
+- ncomp:
+
+  The number of orthogonal components removed. If `NULL` (default), it
+  is determined automatically by cross-validation.
+
+- center:
+
+  A logical value indicating whether to mean-center `x` and `y`. Default
+  is `TRUE`.
+
 - scale:
 
-  A character string indicating the scaling method for x and y: "none",
-  "center" (default), "pareto" (divided by the square root of the
-  standard deviation) or "standard" (divided by the standard deviation).
+  A logical value indicating whether to scale `x` and `y` to unit
+  variance. Default is `FALSE`.
 
 - crossval:
 
   An integer giving the number of cross-validation groups (default 7),
   between 2 and the number of observations. With `crossval = 0`, the
   model is not cross-validated (\\Q^2\\ is `NA`), which requires a fixed
-  `ncomp.ortho` and no permutation.
+  `ncomp` and no permutation.
 
 - permutation:
 
   An integer giving the number of permutations for the permutation test.
-  Default is 20; 0 skips the test.
+  Default is 0 (no test).
 
 - ncomp.ortho:
 
-  The number of orthogonal components. If `NA` (default), it is
-  determined automatically by cross-validation.
+  **\[deprecated\]** Use `ncomp`.
 
 ## Value
 
@@ -137,7 +154,7 @@ variation in x into two parts: one that is linearly related to y
 (predictive components) and one that is statistically uncorrelated to
 the response variable y (orthogonal components).
 
-The model has one predictive component and `ncomp.ortho` orthogonal
+The model has one predictive component and `ncomp` orthogonal
 components, fitted with the NIPALS algorithm of Trygg and Wold (2002).
 For each orthogonal component:
 
@@ -157,8 +174,19 @@ For each orthogonal component:
 The predictive component is then computed from the filtered
 \\\textbf{X}\\. The filtered data are the same as those of
 [`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md)
-with `ncomp = ncomp.ortho + 1`, and of
-[`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md).
+with the same `ncomp`, and of
+[`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md)
+with `nx = ncomp`.
+
+**Preprocessing.** x and y are centered (`center`) and scaled to unit
+variance (`scale`) with their means and standard deviations, as in the
+other orthogonalization methods. For Pareto scaling, common in
+metabolomics, apply
+[`pareto_scale()`](https://christiangoueguel.com/specProc/reference/pareto_scale.md)
+to x first (or
+[`step_pareto_scale()`](https://christiangoueguel.com/specProc/reference/step_pareto_scale.md)
+in a recipe): it gives the same filter, scores and \\R^2\\ and \\Q^2\\
+values.
 
 **Cross-validation.** The observations are split into `crossval`
 interleaved groups (observation `i` is in group
@@ -169,13 +197,13 @@ predictive residual sum of squares (PRESS) and \\Q^2 = 1 -
 squares of the preprocessed y. The data are preprocessed once, with the
 centers and scales of all the observations.
 
-**Number of orthogonal components.** If `ncomp.ortho = NA`, components
-are added (up to `min(10, n, p) - 1`) while each is significant: a
-component is significant if it increases \\R^2Y\\ by at least 0.01 and
-\\Q^2\\ by at least 0.01. If the predictive component alone is not
-significant, no model is built. If the first orthogonal component is not
-significant, the model has no orthogonal component (a one-component PLS
-model), with a warning.
+**Number of orthogonal components.** If `ncomp = NULL`, components are
+added (up to `min(10, n, p) - 1`) while each is significant: a component
+is significant if it increases \\R^2Y\\ by at least 0.01 and \\Q^2\\ by
+at least 0.01. If the predictive component alone is not significant, no
+model is built. If the first orthogonal component is not significant,
+the model has no orthogonal component (a one-component PLS model), with
+a warning.
 
 **Permutation test.** The response is permuted `permutation` times and
 the model refitted with the same number of components. `pR2Y` and `pQ2`
@@ -183,16 +211,17 @@ are the proportions of permuted models whose \\R^2Y\\ and \\Q^2\\ are at
 least those of the model, \\(1 + \\\\\text{perm} \geq
 \text{model}\\)/\text{permutation}\\. Use
 [`set.seed()`](https://rdrr.io/r/base/Random.html) for reproducible
-p-values.
+p-values. The test is skipped by default (`permutation = 0`), as it
+refits the model as many times.
 
 The results reproduce those of
 [`ropls::opls()`](https://rdrr.io/pkg/ropls/man/opls.html) with
-`predI = 1` and the same `scaleC`, `crossvalI`, `orthoI` and `permI`
-(apart from rounding): specProc no longer depends on ropls. Unlike
-ropls, variables with zero variance are kept (their centered values are
-zero), and when `ncomp.ortho = NA` a model without orthogonal components
-is returned instead of no model when only the predictive component is
-significant.
+`predI = 1` and the same preprocessing (`scaleC`), `crossvalI`, `orthoI`
+and `permI` (apart from rounding): specProc no longer depends on ropls.
+Unlike ropls, variables with zero variance are kept (their centered
+values are zero), and when `ncomp = NULL` a model without orthogonal
+components is returned instead of no model when only the predictive
+component is significant.
 
 ## References
 
@@ -232,7 +261,7 @@ fit
 #> 
 #> Variables:               7152
 #> Observations:            300
-#> Scaling:                 center
+#> Scaling:                 centered
 #> Predictive components:   1
 #> Orthogonal components:   6
 #> 
@@ -242,4 +271,19 @@ fit
 #> Use predict(<model>, newdata, type = ) to filter new data or predict the response.
 head(predict(fit, spectra[-cal, ], type = "response"))
 #> [1] 2.161563 2.250033 2.605931 2.113430 2.075599 1.665393
+
+# Pareto scaling of the spectra
+opls(pareto_scale(spectra[cal, ]), forageLIBS$K[cal], ncomp = 2)
+#> Orthogonal projections to latent structures (OPLS)
+#> 
+#> Variables:               7152
+#> Observations:            300
+#> Scaling:                 centered
+#> Predictive components:   1
+#> Orthogonal components:   2
+#> 
+#>       R2X(cum) R2Y(cum) Q2(cum) RMSEE
+#> Total    0.765    0.649   0.608 0.314
+#> 
+#> Use predict(<model>, newdata, type = ) to filter new data or predict the response.
 ```
