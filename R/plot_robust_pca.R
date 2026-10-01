@@ -66,17 +66,17 @@
 #' @export
 #'
 #' @examples
-#' # LIBS spectra of forage samples
-#' minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+#' spectra_id <- forageLIBS |> select(1:2) |> names()
+#' minerals <- forageLIBS |> select(3:14) |> names()
 #' set.seed(1)
 #' fit <- forageLIBS |>
-#'   dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+#'   select(-all_of(c(spectra_id, minerals))) |>
 #'   center() |>
 #'   robpca()
 #'
 #' plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE)
 #' plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE,
-#'                  alpha = 0.5, size = 3, stroke = 0.2)
+#' labels = 10, colour_by = "distance")
 #'
 plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALSE,
                              shade = FALSE, log = FALSE, colour_by = c("type", "distance"),
@@ -195,17 +195,16 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
 #' @export
 #'
 #' @examples
-#' \donttest{
-#' minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+#' spectra_id <- forageLIBS |> select(1:2) |> names()
+#' minerals <- forageLIBS |> select(3:14) |> names()
 #' set.seed(1)
 #' fit <- forageLIBS |>
-#'   dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+#'   select(-all_of(c(spectra_id, minerals))) |>
+#'   center() |>
 #'   macropca(k = 3)
 #'
 #' if (requireNamespace("patchwork", quietly = TRUE)) {
-#'   plot_cell_map(fit, order = "cluster")
 #'   plot_cell_map(fit, order = "od")
-#' }
 #' }
 #'
 plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(200, 400),
@@ -303,15 +302,15 @@ plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(20
 #' @export
 #'
 #' @examples
-#' \donttest{
-#' minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+#' spectra_id <- forageLIBS |> select(1:2) |> names()
+#' minerals <- forageLIBS |> select(3:14) |> names()
 #' set.seed(1)
 #' fit <- forageLIBS |>
-#'   dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+#'   select(-all_of(c(spectra_id, minerals))) |>
+#'   center() |>
 #'   macropca(k = 3)
 #'
 #' flagged_regions(fit)
-#' }
 #'
 flagged_regions <- function(object, threshold = 0.1, rows = NULL, columns = NULL, lines = NULL,
                             tol = 0.1) {

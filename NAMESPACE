@@ -317,6 +317,7 @@ export(yGradientglsw)
 export(y_gradient_glsw)
 export(zscore)
 importFrom(Rcpp,sourceCpp)
+importFrom(lifecycle,deprecated)
 importFrom(magrittr,"%>%")
 importFrom(rlang,
   "%||%",

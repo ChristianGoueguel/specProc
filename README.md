@@ -5,8 +5,11 @@
 
 <!-- badges: start -->
 
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![R-CMD-check](https://github.com/ChristianGoueguel/specProc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ChristianGoueguel/specProc/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
 coverage](https://codecov.io/gh/ChristianGoueguel/specProc/branch/main/graph/badge.svg)](https://app.codecov.io/gh/ChristianGoueguel/specProc?branch=main)
@@ -15,11 +18,14 @@ MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/
 
 <!-- badges: end -->
 
-**specProc** processes and analyzes emission spectra, from raw spectra
-to calibrated concentrations. It was developed for laser-induced
-breakdown spectroscopy (LIBS), and works with other techniques such as
-Raman, infrared and ICP-OES. Spectra are stored one per row, with the
-wavelengths as column names, and the heavy computations run in C++.
+**specProc** processes and analyzes emission spectra, streamlining the
+pipeline from raw spectra to calibrated concentrations. While
+specifically developed for laser-induced breakdown spectroscopy (LIBS),
+it seamlessly supports other plasma techniques such as ICP-OES. Select
+functions can also be used to process Raman and infrared
+spectroscopy data. The package structures data with one spectrum per row
+and wavelengths as column names, leveraging a C++ backend to power heavy
+computations.
 
 ## Installation
 

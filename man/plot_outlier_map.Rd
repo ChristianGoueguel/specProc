@@ -89,17 +89,17 @@ cut-off, not how unlikely it is: twice the cut-off is not equally rare
 in every model.
 }
 \examples{
-# LIBS spectra of forage samples
-minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+spectra_id <- forageLIBS |> select(1:2) |> names()
+minerals <- forageLIBS |> select(3:14) |> names()
 set.seed(1)
 fit <- forageLIBS |>
-  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  select(-all_of(c(spectra_id, minerals))) |>
   center() |>
   robpca()
 
 plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE)
 plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE,
-                 alpha = 0.5, size = 3, stroke = 0.2)
+labels = 10, colour_by = "distance")
 
 }
 \seealso{

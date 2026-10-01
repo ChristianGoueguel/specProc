@@ -54,19 +54,15 @@ otherwise. With \code{lines}, the lines between \code{start - tol} and \code{end
 are the candidates, from the nearest to the peak.
 }
 \examples{
-\donttest{
-minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+spectra_id <- forageLIBS |> select(1:2) |> names()
+minerals <- forageLIBS |> select(3:14) |> names()
 set.seed(1)
 fit <- forageLIBS |>
-  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  select(-all_of(c(spectra_id, minerals))) |>
+  center() |>
   macropca(k = 3)
 
-if (requireNamespace("patchwork", quietly = TRUE)) {
-  plot_cell_map(fit, order = "cluster")
-}
-
 flagged_regions(fit)
-}
 
 }
 \seealso{
