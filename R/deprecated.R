@@ -30,7 +30,7 @@
 #' | `saha_boltzmann_plot()` | [saha_boltzmann()] |
 #'
 #' `boltzmann_plot()` and `saha_boltzmann_plot()` were renamed in specProc
-#' 0.7.0.9003, so that they are not confused with [plot_boltzmann()], which
+#' 0.8.0, so that they are not confused with [plot_boltzmann()], which
 #' draws their result.
 #'
 #' @param ... Arguments passed to the new function.

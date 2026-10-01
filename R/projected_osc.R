@@ -11,16 +11,17 @@
 #' @details
 #' POSC obtains OPLS-filtered data directly from an ordinary (non-orthogonalized)
 #' PLS1 model (Kemsley and Tapp, 2009):
-#' 1. A PLS1 model with `ncomp` components is fitted, giving the score matrix
+#' 1. A PLS1 model with `ncomp + 1` components is fitted, giving the score matrix
 #'    \eqn{\textbf{T}} and the fitted response \eqn{\hat{\textbf{y}}}.
 #' 2. The part of the score space orthogonal to \eqn{\hat{\textbf{y}}},
 #'    \eqn{\textbf{T} - \hat{\textbf{y}}(\hat{\textbf{y}}^T\hat{\textbf{y}})^{-1}\hat{\textbf{y}}^T\textbf{T}},
-#'    spans `ncomp - 1` orthogonal components with scores \eqn{\textbf{T}_o}.
+#'    spans `ncomp` orthogonal components with scores \eqn{\textbf{T}_o}.
 #' 3. The orthogonal loadings are \eqn{\textbf{P}_o = \textbf{X}^T\textbf{T}_o(\textbf{T}_o^T\textbf{T}_o)^{-1}}
 #'    and the filtered data are \eqn{\textbf{X} - \textbf{T}_o\textbf{P}_o^T}.
 #'
 #' The filtered data are identical to those obtained from an OPLS model with one
-#' predictive and `ncomp - 1` orthogonal components.
+#' predictive and `ncomp` orthogonal components ([opls()] with the same
+#' `ncomp`).
 #'
 #' @references
 #'  - Kemsley, E.K., Tapp, H.S., (2009).
@@ -32,7 +33,7 @@
 #'
 #' @param x A matrix or data frame of the predictor variables.
 #' @param y A vector of the response variable.
-#' @param ncomp An integer specifying the number of PLS components (at least 2). `ncomp - 1` orthogonal components are removed. Default is 5.
+#' @param ncomp An integer specifying the number of orthogonal components removed (at least 1), as in the other orthogonalization methods. The underlying PLS model has `ncomp + 1` components. Default is 4.
 #' @param center A logical value indicating whether to mean-center `x` and `y`. Default is `TRUE`.
 #' @param scale A logical value indicating whether to scale `x` and `y`. Default is `FALSE`.
 #' @param tol A numeric value; orthogonal components whose singular value is smaller than `tol` times the largest one are discarded. The default value is 1e-10.
@@ -55,14 +56,15 @@
 #' data(forageLIBS)
 #' spectra <- forageLIBS[-(1:14)]  # the spectral channels
 #' cal <- 1:300
-#' res <- projected_osc(spectra[cal, ], forageLIBS$K[cal], ncomp = 3, newdata = spectra[-cal, ])
+#' res <- projected_osc(spectra[cal, ], forageLIBS$K[cal], ncomp = 2, newdata = spectra[-cal, ])
 #' dim(res$newdata$correction)
-projected_osc <- function(x, y, ncomp = 5, center = TRUE, scale = FALSE, tol = 1e-10, newdata = NULL) {
+projected_osc <- function(x, y, ncomp = 4, center = TRUE, scale = FALSE, tol = 1e-10, newdata = NULL) {
 
   if (missing(x) || missing(y)) {
     stop("Both 'x' and 'y' must be provided.")
   }
-  check_count(ncomp, "ncomp", lower = 2)
+  check_count(ncomp, "ncomp", lower = 1)
+  ncomp <- ncomp + 1  # components of the underlying PLS model
   check_number(tol, "tol", lower = 0)
 
   xy <- prepare_xy(x, y, center, scale)
@@ -73,7 +75,7 @@ projected_osc <- function(x, y, ncomp = 5, center = TRUE, scale = FALSE, tol = 1
   y <- xy$y
   ncomp <- min(ncomp, nrow(x) - 1, ncol(x))
   if (ncomp < 2) {
-    stop("At least 2 PLS components are needed; the data have too few observations or variables.")
+    stop("The data have too few observations or variables for an orthogonal component.")
   }
 
   fit <- pls::simpls.fit(x, y, ncomp = ncomp, center = FALSE)

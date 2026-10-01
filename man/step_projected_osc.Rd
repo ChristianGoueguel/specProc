@@ -32,8 +32,8 @@ example, the spectral channels). See \code{\link[recipes:selections]{recipes::se
 \item{outcome}{The outcome variable, as a bare name or a selector. If
 \code{NULL} (default), the single outcome of the recipe is used.}
 
-\item{num_comp}{The number of orthogonal components to remove. The
-underlying PLS model has \code{num_comp + 1} components.}
+\item{num_comp}{The number of orthogonal components to remove (\code{ncomp} of
+\code{\link[=projected_osc]{projected_osc()}}).}
 
 \item{options}{A list of further arguments passed to \code{\link[=projected_osc]{projected_osc()}},
 such as \code{scale} or \code{tol}.}

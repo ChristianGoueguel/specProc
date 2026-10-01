@@ -96,7 +96,7 @@ an exported \code{gaussian()} masks \code{stats::gaussian()}, the family used by
 
 
 \code{boltzmann_plot()} and \code{saha_boltzmann_plot()} were renamed in specProc
-0.7.0.9003, so that they are not confused with \code{\link[=plot_boltzmann]{plot_boltzmann()}}, which
+0.8.0, so that they are not confused with \code{\link[=plot_boltzmann]{plot_boltzmann()}}, which
 draws their result.
 }
 \keyword{internal}

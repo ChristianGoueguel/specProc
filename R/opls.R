@@ -14,7 +14,7 @@
 #'  (predictive components) and one that is statistically uncorrelated to the
 #'  response variable y (orthogonal components).
 #'
-#'  The model has one predictive component and `ncomp.ortho` orthogonal
+#'  The model has one predictive component and `ncomp` orthogonal
 #'  components, fitted with the NIPALS algorithm of Trygg and Wold (2002). For
 #'  each orthogonal component:
 #'  1. The weight \eqn{\textbf{w} = \textbf{X}^T\textbf{y}/\|\textbf{X}^T\textbf{y}\|},
@@ -28,7 +28,14 @@
 #'
 #'  The predictive component is then computed from the filtered
 #'  \eqn{\textbf{X}}. The filtered data are the same as those of
-#'  [projected_osc()] with `ncomp = ncomp.ortho + 1`, and of [o2pls()].
+#'  [projected_osc()] with the same `ncomp`, and of [o2pls()] with `nx = ncomp`.
+#'
+#'  **Preprocessing.** x and y are centered (`center`) and scaled to unit
+#'  variance (`scale`) with their means and standard deviations, as in the
+#'  other orthogonalization methods. For Pareto scaling, common in
+#'  metabolomics, apply [pareto_scale()] to x first (or [step_pareto_scale()]
+#'  in a recipe): it gives the same filter, scores and \eqn{R^2} and
+#'  \eqn{Q^2} values.
 #'
 #'  **Cross-validation.** The observations are split into `crossval`
 #'  interleaved groups (observation `i` is in group `(i - 1) %% crossval + 1`).
@@ -39,7 +46,7 @@
 #'  The data are preprocessed once, with the centers and scales of all the
 #'  observations.
 #'
-#'  **Number of orthogonal components.** If `ncomp.ortho = NA`, components
+#'  **Number of orthogonal components.** If `ncomp = NULL`, components
 #'  are added (up to `min(10, n, p) - 1`) while each is significant: a
 #'  component is significant if it increases \eqn{R^2Y} by at least 0.01 and
 #'  \eqn{Q^2} by at least 0.01. If the predictive component alone is not
@@ -51,13 +58,15 @@
 #'  the model refitted with the same number of components. `pR2Y` and `pQ2`
 #'  are the proportions of permuted models whose \eqn{R^2Y} and \eqn{Q^2}
 #'  are at least those of the model, \eqn{(1 + \#\{\text{perm} \geq \text{model}\})/\text{permutation}}.
-#'  Use [set.seed()] for reproducible p-values.
+#'  Use [set.seed()] for reproducible p-values. The test is skipped by
+#'  default (`permutation = 0`), as it refits the model as many times.
 #'
 #'  The results reproduce those of `ropls::opls()` with `predI = 1` and the
-#'  same `scaleC`, `crossvalI`, `orthoI` and `permI` (apart from rounding):
+#'  same preprocessing (`scaleC`), `crossvalI`, `orthoI` and `permI` (apart
+#'  from rounding):
 #'  specProc no longer depends on ropls. Unlike ropls, variables with zero
 #'  variance are kept (their centered values are zero), and when
-#'  `ncomp.ortho = NA` a model without orthogonal components is returned
+#'  `ncomp = NULL` a model without orthogonal components is returned
 #'  instead of no model when only the predictive component is significant.
 #'
 #' @references
@@ -75,10 +84,13 @@
 #'
 #' @param x A numeric matrix or data frame of the predictor variables.
 #' @param y A numeric vector, or a matrix or data frame with one column, of the response variable.
-#' @param scale A character string indicating the scaling method for x and y: "none", "center" (default), "pareto" (divided by the square root of the standard deviation) or "standard" (divided by the standard deviation).
-#' @param crossval An integer giving the number of cross-validation groups (default 7), between 2 and the number of observations. With `crossval = 0`, the model is not cross-validated (\eqn{Q^2} is `NA`), which requires a fixed `ncomp.ortho` and no permutation.
-#' @param permutation An integer giving the number of permutations for the permutation test. Default is 20; 0 skips the test.
-#' @param ncomp.ortho The number of orthogonal components. If `NA` (default), it is determined automatically by cross-validation.
+#' @param ncomp The number of orthogonal components removed. If `NULL`
+#'   (default), it is determined automatically by cross-validation.
+#' @param center A logical value indicating whether to mean-center `x` and `y`. Default is `TRUE`.
+#' @param scale A logical value indicating whether to scale `x` and `y` to unit variance. Default is `FALSE`.
+#' @param crossval An integer giving the number of cross-validation groups (default 7), between 2 and the number of observations. With `crossval = 0`, the model is not cross-validated (\eqn{Q^2} is `NA`), which requires a fixed `ncomp` and no permutation.
+#' @param permutation An integer giving the number of permutations for the permutation test. Default is 0 (no test).
+#' @param ncomp.ortho `r lifecycle::badge("deprecated")` Use `ncomp`.
 #'
 #' @return An object of class `specproc_opls` (a list), which [predict()][predict.specproc_opls] applies to new data, with the following components:
 #' \describe{
@@ -113,11 +125,32 @@
 #' fit <- opls(spectra[cal, ], forageLIBS$K[cal], permutation = 5)
 #' fit
 #' head(predict(fit, spectra[-cal, ], type = "response"))
-opls <- function(x, y, scale = "center", crossval = 7, permutation = 20, ncomp.ortho = NA) {
+#'
+#' # Pareto scaling of the spectra
+#' opls(pareto_scale(spectra[cal, ]), forageLIBS$K[cal], ncomp = 2)
+opls <- function(x, y, ncomp = NULL, center = TRUE, scale = FALSE, crossval = 7, permutation = 0,
+                 ncomp.ortho = deprecated()) {
   if (missing(x) || missing(y) || is.null(x) || is.null(y)) {
     stop("Both 'x' and 'y' must be provided.", call. = FALSE)
   }
-  scale <- match.arg(scale, c("none", "center", "pareto", "standard"))
+  if (lifecycle::is_present(ncomp.ortho)) {
+    lifecycle::deprecate_warn("0.8.0", "opls(ncomp.ortho)", "opls(ncomp)")
+    ncomp <- if (length(ncomp.ortho) == 1 && is.na(ncomp.ortho)) NULL else ncomp.ortho
+  }
+  # the former character `scale` ("none", "center", "pareto" or "standard")
+  pareto <- FALSE
+  if (is.character(scale)) {
+    old <- match.arg(scale, c("none", "center", "pareto", "standard"))
+    lifecycle::deprecate_warn(
+      "0.8.0", I(sprintf('`opls(scale = "%s")`', old)),
+      details = "Use `center` and `scale = TRUE` (unit variance), or pareto_scale() on `x` for Pareto scaling."
+    )
+    center <- old != "none"
+    pareto <- old == "pareto"
+    scale <- old == "standard"
+  }
+  check_flag(center, "center")
+  check_flag(scale, "scale")
   x <- as_numeric_matrix(x, "x")
   y <- as_response_matrix(y, nrow(x), "y")
   if (ncol(y) != 1) {
@@ -135,30 +168,30 @@ opls <- function(x, y, scale = "center", crossval = 7, permutation = 20, ncomp.o
     stop("'crossval' must be 0 or between 2 and the number of observations (", n, ").", call. = FALSE)
   }
   check_count(permutation, "permutation", lower = 0)
-  auto <- length(ncomp.ortho) == 1 && is.na(ncomp.ortho)
+  auto <- is.null(ncomp)
   max_ortho <- min(10, n, ncol(x)) - 1
   if (auto) {
     if (max_ortho < 1) {
       stop("Too few observations or variables to select the number of orthogonal components.", call. = FALSE)
     }
-    ncomp.ortho <- max_ortho
+    ncomp <- max_ortho
   } else {
-    check_count(ncomp.ortho, "ncomp.ortho", lower = 0)
-    if (ncomp.ortho + 1 > min(n, ncol(x))) {
-      stop("'ncomp.ortho + 1' cannot exceed min(n, number of predictors).", call. = FALSE)
+    check_count(ncomp, "ncomp", lower = 0)
+    if (ncomp + 1 > min(n, ncol(x))) {
+      stop("'ncomp + 1' cannot exceed min(n, number of predictors).", call. = FALSE)
     }
   }
   if (crossval == 0 && (auto || permutation > 0)) {
-    stop("'crossval = 0' requires a fixed 'ncomp.ortho' and 'permutation = 0'.", call. = FALSE)
+    stop("'crossval = 0' requires a fixed 'ncomp' and 'permutation = 0'.", call. = FALSE)
   }
 
-  px <- opls_preprocess(x, scale)
-  py <- opls_preprocess(y, scale)
+  px <- opls_preprocess(x, center, scale, pareto)
+  py <- opls_preprocess(y, center, scale, pareto)
   xs <- px$x
   ys <- drop(py$x)
   folds <- if (crossval > 0) split(seq_len(n), rep(seq_len(crossval), length.out = n)) else list()
 
-  fit <- opls_core(xs, ys, ncomp.ortho, folds, auto)
+  fit <- opls_core(xs, ys, ncomp, folds, auto)
   k <- fit$n_ortho
 
   # Model statistics
@@ -226,19 +259,22 @@ opls <- function(x, y, scale = "center", crossval = 7, permutation = 20, ncomp.o
     y_center = py$center,
     y_scale = py$scale
   )
-  new_filter(res, "specproc_opls", x, scaling = scale)
+  scaling <- if (pareto) "Pareto" else if (scale) "centered and scaled" else if (center) "centered" else "none"
+  new_filter(res, "specproc_opls", x, scaling = scaling)
 }
 
-# Centers and scales the columns as ropls does: "pareto" divides by the square
-# root of the standard deviation. Constant columns are left unscaled.
-opls_preprocess <- function(x, scale) {
-  mu <- if (scale == "none") rep(0, ncol(x)) else colMeans(x)
-  sdev <- switch(
-    scale,
-    none = , center = rep(1, ncol(x)),
-    pareto = sqrt(apply(x, 2, stats::sd)),
-    standard = apply(x, 2, stats::sd)
-  )
+# Centers and scales the columns; `pareto` (the former scale = "pareto")
+# divides by the square root of the standard deviation. Constant columns are
+# left unscaled.
+opls_preprocess <- function(x, center, scale, pareto = FALSE) {
+  mu <- if (center) colMeans(x) else rep(0, ncol(x))
+  sdev <- if (scale) {
+    apply(x, 2, stats::sd)
+  } else if (pareto) {
+    sqrt(apply(x, 2, stats::sd))
+  } else {
+    rep(1, ncol(x))
+  }
   sdev[!is.finite(sdev) | sdev == 0] <- 1
   list(x = apply_preprocess(x, list(center = mu, scale = sdev)), center = mu, scale = sdev)
 }
@@ -334,7 +370,7 @@ opls_core <- function(xs, ys, n_ortho, folds, auto) {
   if (auto && !is.na(stop_at)) {
     if (stop_at == 1) {
       stop("No OPLS model could be built: the predictive component is not significant. ",
-           "Set 'ncomp.ortho' to force the number of orthogonal components.", call. = FALSE)
+           "Set 'ncomp' to force the number of orthogonal components.", call. = FALSE)
     }
     k <- stop_at - 2
     if (k == 0) {
@@ -410,7 +446,7 @@ opls_vip <- function(fit, ys) {
 #' data(forageLIBS)
 #' spectra <- forageLIBS[-(1:14)]  # the spectral channels
 #' cal <- 1:300
-#' fit <- opls(spectra[cal, ], forageLIBS$K[cal], ncomp.ortho = 2, permutation = 0)
+#' fit <- opls(spectra[cal, ], forageLIBS$K[cal], ncomp = 2)
 #' head(predict(fit, spectra[-cal, ], type = "response"))
 predict.specproc_opls <- function(object, newdata, type = c("correction", "response", "scores"), ...) {
   type <- match.arg(type)

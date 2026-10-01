@@ -67,7 +67,7 @@ test_that("o2pls matches OPLS and handles Y-orthogonal variation", {
 })
 
 test_that("projected_osc equals O2PLS/OPLS filtering (Kemsley & Tapp)", {
-  posc <- projected_osc(d$x, d$y, ncomp = 3)
+  posc <- projected_osc(d$x, d$y, ncomp = 2)
   o2 <- o2pls(d$x, d$y, ncomp = 1, nx = 2)
   expect_equal(as.matrix(posc$correction), as.matrix(o2$correction), tolerance = 1e-8)
 })
@@ -79,16 +79,16 @@ test_that("projected_osc and o2pls agree with ropls", {
     fig.pdfC = "none", info.txtC = "none"
   )))
   ref <- xc - m@orthoScoreMN %*% t(m@orthoLoadingMN)
-  posc <- projected_osc(d$x, d$y, ncomp = 3)
+  posc <- projected_osc(d$x, d$y, ncomp = 2)
   expect_equal(as.matrix(posc$correction), ref, tolerance = 1e-8, ignore_attr = TRUE)
 })
 
 test_that("projected_osc corrects new data with the training model", {
-  res <- projected_osc(d$x[1:30, ], d$y[1:30], ncomp = 3, newdata = d$x[1:30, ])
+  res <- projected_osc(d$x[1:30, ], d$y[1:30], ncomp = 2, newdata = d$x[1:30, ])
   expect_equal(as.matrix(res$newdata$correction), as.matrix(res$correction), tolerance = 1e-10)
-  res2 <- projected_osc(d$x[1:30, ], d$y[1:30], ncomp = 3, newdata = d$x[31:40, ])
+  res2 <- projected_osc(d$x[1:30, ], d$y[1:30], ncomp = 2, newdata = d$x[31:40, ])
   expect_equal(dim(res2$newdata$correction), c(10L, 25L))
-  expect_error(projected_osc(d$x, d$y, ncomp = 1), ">= 2")
+  expect_error(projected_osc(d$x, d$y, ncomp = 0), ">= 1")
   expect_error(projected_osc(d$x, d$y, newdata = d$x[, 1:3]), "same number of columns")
 })
 

@@ -27,6 +27,16 @@ reference:
   - plot_cell_map
   - flagged_regions
 
+- subtitle: self-organizing maps
+  desc: >
+    Nonlinear maps of the spectra onto a grid of prototype spectra, for
+    sorting samples and flagging novel ones.
+  contents:
+  - som
+  - predict.specproc_som
+  - plot_som
+  - som_stability
+
 - subtitle: orthogonalization methods
   desc: >
     Functions used to identify and remove unwanted covariance

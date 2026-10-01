@@ -26,11 +26,11 @@ test_that("response-orthogonal steps reproduce the filters and predict()", {
     list(step_osc, list(method = "wold", num_comp = 2), osc(x_cal, y_cal, method = "wold", ncomp = 2)),
     list(step_direct_orthogonal, list(num_comp = 2), direct_orthogonal(x_cal, y_cal, ncomp = 2)),
     list(step_direct_osc, list(num_comp = 2), direct_osc(x_cal, y_cal, ncomp = 2)),
-    list(step_projected_osc, list(num_comp = 2), projected_osc(x_cal, y_cal, ncomp = 3)),
-    list(step_opls, list(num_comp = 2), opls(x_cal, y_cal, ncomp.ortho = 2, permutation = 0)),
+    list(step_projected_osc, list(num_comp = 2), projected_osc(x_cal, y_cal, ncomp = 2)),
+    list(step_opls, list(num_comp = 2), opls(x_cal, y_cal, ncomp = 2)),
     list(step_o2pls, list(num_comp = 2), o2pls(x_cal, y_cal, ncomp = 1, nx = 2)),
-    list(step_opls, list(num_comp = 1, options = list(scale = "pareto")),
-         opls(x_cal, y_cal, scale = "pareto", ncomp.ortho = 1, permutation = 0))
+    list(step_opls, list(num_comp = 1, options = list(scale = TRUE)),
+         opls(x_cal, y_cal, ncomp = 1, scale = TRUE))
   )
   for (case in cases) {
     res <- do.call(baked, c(list(case[[1]]), case[[2]]))

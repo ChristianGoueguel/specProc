@@ -13,7 +13,7 @@ fits <- list(
   osc_scaled = osc(x_cal, y_cal, method = "sjoblom", ncomp = 2, scale = TRUE),
   direct_orthogonal = direct_orthogonal(x_cal, y_cal, ncomp = 2),
   direct_osc = direct_osc(x_cal, y_cal, ncomp = 2),
-  projected_osc = projected_osc(x_cal, y_cal, ncomp = 3),
+  projected_osc = projected_osc(x_cal, y_cal, ncomp = 2),
   o2pls = o2pls(x_cal, y_cal, ncomp = 1, nx = 2)
 )
 

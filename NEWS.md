@@ -1,7 +1,21 @@
-# specProc (development version)
+# specProc 0.8.0
 
 ## Breaking changes
 
+* `opls()` has the arguments of the other orthogonalization methods:
+  `opls(x, y, ncomp = NULL, center = TRUE, scale = FALSE, crossval = 7,
+  permutation = 0)`. `ncomp` (the number of orthogonal components, `NULL`
+  for the automatic choice) replaces `ncomp.ortho`, and the logical `center`
+  and `scale` replace the character `scale`; for Pareto scaling, apply
+  `pareto_scale()` to `x` first (or `step_pareto_scale()` before
+  `step_opls()`), which gives the same filter. The former arguments still
+  work, with a deprecation warning. The permutation test is now skipped by
+  default (`permutation = 0`), as it refits the model as many times.
+* `projected_osc()`'s `ncomp` is now the number of orthogonal components
+  removed, as in `opls()`, `osc()` and `direct_osc()`, instead of the number
+  of PLS components (one more): replace `ncomp = k + 1` with `ncomp = k`.
+  The default is 4 (formerly 5, the same filter). `step_projected_osc()` is
+  unchanged.
 * `macropca()` and `robust_bcyj()` (and `step_macropca()`,
   `step_robust_bcyj()`) are implemented natively, after the published
   algorithms, and no longer depend on cellWise, which moves to Suggests.
@@ -31,37 +45,41 @@
   with a deprecation warning.
 * In `dmodx()`, the nominal degrees of freedom (K - k) are now
   selected with `df = "nominal"`.
-
-## Plots
-
-* `plot_embedding()` recognizes UMAP maps (axes named `UMAP1`, `UMAP2`, ...,
-  as by `embed::step_umap()`): it leaves out the lines through the origin,
-  whose position means nothing on such a map, and ignores `hotelling`
-  (`"all"` or `"group"`), with a warning, since its T-squared limits
-  assume linear scores. On other maps, the lines through the origin are light grey
-  instead of black.
-
-## Documentation
-
-* The examples use the `forageLIBS` spectra and mineral contents instead
-  of simulated data, wherever the function applies to them (some taken
-  from the vignettes). Examples of pure helper functions (line profiles,
-  plasma criteria, tuning parameters) keep simple inputs, and the examples
-  of `pds()` and `step_reject_shots()`, for which `forageLIBS` has no
-  suitable data, are removed. `plot_influence()` gains an example.
-* Every example calls dplyr functions with `dplyr::`, so that it runs
-  without dplyr attached.
-
-## Breaking changes
-
 * The `soilLIBS` data set is removed, to keep the package data under the
   5 MB CRAN guideline: `data(soilLIBS)` no longer works. The examples use
   `forageLIBS` instead; the example of `reject_shots()`, which relied on
   the soil replicates, is removed. The raw data and the script that built it remain in
   `data-raw/` of the source repository.
 
+## New features
+
+* `som()` fits a self-organizing map of spectra (batch SOM, in C++), which
+  maps similar spectra onto the same or neighboring units of a hexagonal or
+  rectangular grid and follows nonlinear relations (matrix effects,
+  self-absorption, plasma changes) that PCA can miss. It starts from the
+  plane of the first two principal components (deterministic training),
+  chooses the grid from the number of spectra, and reports the quantization
+  and topographic errors. `robust = TRUE` down-weights outlying spectra by
+  Huber weights of their quantization errors. `predict()` places new
+  spectra on their best-matching unit and flags as novel those beyond a
+  robust cut-off of the training quantization errors. `plot_som()` draws
+  the counts, the U-matrix, the quantization errors, the component planes
+  (one map per wavelength or line), the spectra on the map and the
+  prototype spectra, and `som_stability()` measures how consistently the
+  spectra keep their neighbors over resampled fits. On the 368 x 7152
+  `forageLIBS` spectra, a map takes about 2 s.
+
 ## Plots
 
+* `plot_spectra()` has an `offset` argument, to shift successive spectra
+  vertically and horizontally (`offset = c(horizontal, vertical)`, or a
+  single number for a vertical offset), for example to stack them.
+* `plot_embedding()` recognizes UMAP maps (axes named `UMAP1`, `UMAP2`, ...,
+  as by `embed::step_umap()`): it leaves out the lines through the origin,
+  whose position means nothing on such a map, and ignores `hotelling`
+  (`"all"` or `"group"`), with a warning, since its T-squared limits
+  assume linear scores. On other maps, the lines through the origin are light grey
+  instead of black.
 * `correlation()` takes several responses (`var = c(K, Ca)`, or
   `dplyr::all_of(minerals)`), each with its own observations, so that a
   response with many missing values does not reduce the data of the others.
@@ -83,6 +101,14 @@
 
 ## Documentation
 
+* The examples use the `forageLIBS` spectra and mineral contents instead
+  of simulated data, wherever the function applies to them (some taken
+  from the vignettes). Examples of pure helper functions (line profiles,
+  plasma criteria, tuning parameters) keep simple inputs, and the examples
+  of `pds()` and `step_reject_shots()`, for which `forageLIBS` has no
+  suitable data, are removed. `plot_influence()` gains an example.
+* Every example calls dplyr functions with `dplyr::`, so that it runs
+  without dplyr attached.
 * The vignettes are reorganized into the four stages of a LIBS analysis,
   all on the `forageLIBS` spectra: fitting emission lines
   (`vignette("peak-fitting")`, which replaces `"line-fitting"`),

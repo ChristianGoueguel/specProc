@@ -168,8 +168,8 @@ step_direct_osc <- function(recipe, ..., role = NA, trained = FALSE,
 #'
 #' @inherit step_osc details return
 #' @inheritParams step_osc
-#' @param num_comp The number of orthogonal components to remove. The
-#'   underlying PLS model has `num_comp + 1` components.
+#' @param num_comp The number of orthogonal components to remove (`ncomp` of
+#'   [projected_osc()]).
 #' @param options A list of further arguments passed to [projected_osc()],
 #'   such as `scale` or `tol`.
 #'
@@ -197,9 +197,9 @@ step_projected_osc <- function(recipe, ..., role = NA, trained = FALSE,
 #'
 #' @details
 #' The filtered data are the same as those of [step_projected_osc()] with the
-#' same `num_comp`, but [opls()] also offers Pareto scaling
-#' (`options = list(scale = "pareto")`). The model is fitted without
-#' cross-validation or permutation test, which do not change the filter.
+#' same `num_comp`. For Pareto scaling, add [step_pareto_scale()] before this
+#' step. The model is fitted without cross-validation or permutation test,
+#' which do not change the filter.
 #' The number of orthogonal components is not selected automatically: tune
 #' `num_comp` instead. As for [step_osc()], the filter uses the outcome and
 #' is estimated on the training data only; the outcome is not needed when new
@@ -218,8 +218,8 @@ step_projected_osc <- function(recipe, ..., role = NA, trained = FALSE,
 #' @inherit step_osc return
 #' @inheritParams step_osc
 #' @param num_comp The number of orthogonal components to remove.
-#' @param options A list of further arguments passed to [opls()]: only
-#'   `scale` (`"center"` by default; `"none"`, `"pareto"` or `"standard"`).
+#' @param options A list of further arguments passed to [opls()]: `center`
+#'   and `scale`.
 #'
 #' @seealso [opls()], [predict.specproc_opls()]
 #' @export
@@ -229,8 +229,10 @@ step_projected_osc <- function(recipe, ..., role = NA, trained = FALSE,
 #' # potassium and the K I resonance lines
 #' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 #' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' # Pareto scaling, then the OPLS filter
 #' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
-#'   step_opls(recipes::all_predictors(), num_comp = 2, options = list(scale = "pareto"))
+#'   step_pareto_scale(recipes::all_predictors()) |>
+#'   step_opls(recipes::all_predictors(), num_comp = 2)
 #' prepped <- recipes::prep(rec)
 #' recipes::bake(prepped, new_data = dat[301:368, ])
 step_opls <- function(recipe, ..., role = NA, trained = FALSE,
@@ -617,12 +619,12 @@ fit_step_filter <- function(x, xmat, y) {
     step_osc = strip_filter(do.call(osc, c(list(xmat, y, method = x$method, ncomp = k), opts))),
     step_direct_orthogonal = strip_filter(do.call(direct_orthogonal, c(list(xmat, y, ncomp = k), opts))),
     step_direct_osc = strip_filter(do.call(direct_osc, c(list(xmat, y, ncomp = k), opts))),
-    step_projected_osc = strip_filter(do.call(projected_osc, c(list(xmat, y, ncomp = k + 1), opts))),
+    step_projected_osc = strip_filter(do.call(projected_osc, c(list(xmat, y, ncomp = k), opts))),
     step_o2pls = {
       check_count(x$joint_comp, "joint_comp")
       strip_filter(do.call(o2pls, c(list(xmat, y, ncomp = x$joint_comp, nx = k, ny = 0), opts)))
     },
-    step_opls = strip_filter(do.call(opls, c(list(xmat, y, crossval = 0, permutation = 0, ncomp.ortho = k), opts))),
+    step_opls = strip_filter(do.call(opls, c(list(xmat, y, ncomp = k, crossval = 0, permutation = 0), opts))),
     step_epo = {
       clutter <- if (is.null(x$clutter)) NULL else step_clutter(x$clutter, colnames(xmat))
       strip_filter(epo(xmat, ncomp = k, clutter = clutter))

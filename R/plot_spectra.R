@@ -24,6 +24,11 @@
 #' enables interactive plot.
 #' @param drop_na Optional (`FALSE` by default). Remove rows with NA intensity
 #' if drop_na is `TRUE`.
+#' @param offset Optional (`NULL` by default). The offsets between successive
+#'   spectra, to separate them: a number (vertical offset, in intensity
+#'   units), or two numbers `c(horizontal, vertical)` (in nm and intensity
+#'   units). The spectrum of row `i` is shifted by `(i - 1)` times the
+#'   offsets, so that the first one stays in place.
 #'
 #' @return Object of class ggplot or of class plotly if `.interactive = TRUE`.
 #'
@@ -35,7 +40,12 @@
 #' k_lines <- names(forageLIBS)[-(1:14)][wl > 764 & wl < 772]
 #' # the K I resonance lines, colored by potassium content
 #' plot_spectra(forageLIBS[1:20, c("K", k_lines)], colvar = K)
-plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop_na = FALSE) {
+#'
+#' # five spectra stacked, each shifted up by 20000 counts and right by 0.5 nm
+#' plot_spectra(forageLIBS[1:5, c("Measurement", k_lines)], id = Measurement,
+#'              offset = c(0.5, 20000))
+plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop_na = FALSE,
+                         offset = NULL) {
   if (missing(x)) {
     stop("Missing 'data' argument.")
   }
@@ -58,6 +68,13 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
   if (!is.logical(drop_na)) {
     stop("The argument 'drop_na' must be of type boolean (TRUE or FALSE)")
   }
+  if (!is.null(offset)) {
+    if (!is.numeric(offset) || !length(offset) %in% 1:2 || anyNA(offset)) {
+      stop("'offset' must be a number (vertical offset) or two numbers c(horizontal, vertical).",
+           call. = FALSE)
+    }
+    offset <- if (length(offset) == 1) c(0, offset) else offset
+  }
 
   spec_cols <- setdiff(names(x), c(id_name, col_name))
   wl <- parse_wavelength(spec_cols)
@@ -79,6 +96,11 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
 
   if (drop_na) {
     x_long <- x_long[!is.na(x_long$intensity), ]
+  }
+  if (!is.null(offset)) {
+    shift <- x_long$.spectrum - 1
+    x_long$wavelength <- x_long$wavelength + shift * offset[1]
+    x_long$intensity <- x_long$intensity + shift * offset[2]
   }
 
   p <- ggplot2::ggplot(x_long) +

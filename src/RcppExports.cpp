@@ -170,6 +170,34 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// som_batch_cpp
+Rcpp::List som_batch_cpp(const Eigen::Map<Eigen::MatrixXd> x, const Eigen::Map<Eigen::MatrixXd> init, const Eigen::Map<Eigen::MatrixXd> grid_dist2, const Eigen::Map<Eigen::VectorXd> sigma, bool robust, double huber_c);
+RcppExport SEXP _specProc_som_batch_cpp(SEXP xSEXP, SEXP initSEXP, SEXP grid_dist2SEXP, SEXP sigmaSEXP, SEXP robustSEXP, SEXP huber_cSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type init(initSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type grid_dist2(grid_dist2SEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type sigma(sigmaSEXP);
+    Rcpp::traits::input_parameter< bool >::type robust(robustSEXP);
+    Rcpp::traits::input_parameter< double >::type huber_c(huber_cSEXP);
+    rcpp_result_gen = Rcpp::wrap(som_batch_cpp(x, init, grid_dist2, sigma, robust, huber_c));
+    return rcpp_result_gen;
+END_RCPP
+}
+// som_map_cpp
+Rcpp::List som_map_cpp(const Eigen::Map<Eigen::MatrixXd> x, const Eigen::Map<Eigen::MatrixXd> codebook);
+RcppExport SEXP _specProc_som_map_cpp(SEXP xSEXP, SEXP codebookSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type codebook(codebookSEXP);
+    rcpp_result_gen = Rcpp::wrap(som_map_cpp(x, codebook));
+    return rcpp_result_gen;
+END_RCPP
+}
 // voigt_cpp
 NumericVector voigt_cpp(NumericVector x, double sigma, double gamma);
 RcppExport SEXP _specProc_voigt_cpp(SEXP xSEXP, SEXP sigmaSEXP, SEXP gammaSEXP) {
@@ -210,6 +238,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_specProc_sd_outlyingness_cpp", (DL_FUNC) &_specProc_sd_outlyingness_cpp, 3},
     {"_specProc_fast_mcd_cpp", (DL_FUNC) &_specProc_fast_mcd_cpp, 3},
     {"_specProc_spca_grid_cpp", (DL_FUNC) &_specProc_spca_grid_cpp, 6},
+    {"_specProc_som_batch_cpp", (DL_FUNC) &_specProc_som_batch_cpp, 6},
+    {"_specProc_som_map_cpp", (DL_FUNC) &_specProc_som_map_cpp, 2},
     {"_specProc_voigt_cpp", (DL_FUNC) &_specProc_voigt_cpp, 3},
     {"_specProc_yGradientglswCpp", (DL_FUNC) &_specProc_yGradientglswCpp, 3},
     {NULL, NULL, 0}

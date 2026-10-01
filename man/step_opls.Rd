@@ -34,8 +34,8 @@ example, the spectral channels). See \code{\link[recipes:selections]{recipes::se
 
 \item{num_comp}{The number of orthogonal components to remove.}
 
-\item{options}{A list of further arguments passed to \code{\link[=opls]{opls()}}: only
-\code{scale} (\code{"center"} by default; \code{"none"}, \code{"pareto"} or \code{"standard"}).}
+\item{options}{A list of further arguments passed to \code{\link[=opls]{opls()}}: \code{center}
+and \code{scale}.}
 
 \item{res}{The fitted filter, stored once the step has been trained.}
 
@@ -60,9 +60,9 @@ OPLS-filtered data.
 }
 \details{
 The filtered data are the same as those of \code{\link[=step_projected_osc]{step_projected_osc()}} with the
-same \code{num_comp}, but \code{\link[=opls]{opls()}} also offers Pareto scaling
-(\code{options = list(scale = "pareto")}). The model is fitted without
-cross-validation or permutation test, which do not change the filter.
+same \code{num_comp}. For Pareto scaling, add \code{\link[=step_pareto_scale]{step_pareto_scale()}} before this
+step. The model is fitted without cross-validation or permutation test,
+which do not change the filter.
 The number of orthogonal components is not selected automatically: tune
 \code{num_comp} instead. As for \code{\link[=step_osc]{step_osc()}}, the filter uses the outcome and
 is estimated on the training data only; the outcome is not needed when new
@@ -84,8 +84,10 @@ data(forageLIBS)
 # potassium and the K I resonance lines
 wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+# Pareto scaling, then the OPLS filter
 rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
-  step_opls(recipes::all_predictors(), num_comp = 2, options = list(scale = "pareto"))
+  step_pareto_scale(recipes::all_predictors()) |>
+  step_opls(recipes::all_predictors(), num_comp = 2)
 prepped <- recipes::prep(rec)
 recipes::bake(prepped, new_data = dat[301:368, ])
 \dontshow{\}) # examplesIf}

@@ -107,6 +107,22 @@ test_that("plot_spectra draws one line per spectrum", {
   expect_error(plot_spectra(df, id = zz), "does not exist")
 })
 
+test_that("plot_spectra offsets successive spectra", {
+  spec <- make_spectra(n = 3, p = 50)
+  df <- as.data.frame(spec$x, check.names = FALSE)
+  base <- ggplot2::ggplot_build(plot_spectra(df))$data[[1]]
+  shifted <- ggplot2::ggplot_build(plot_spectra(df, offset = c(0.5, 10)))$data[[1]]
+  third <- base$group == 3
+  expect_equal(shifted$y[third], base$y[third] + 2 * 10)
+  expect_equal(shifted$x[third], base$x[third] + 2 * 0.5)
+  # a single number is a vertical offset, and the first spectrum stays in place
+  vertical <- ggplot2::ggplot_build(plot_spectra(df, offset = 10))$data[[1]]
+  expect_equal(vertical$x, base$x)
+  expect_equal(vertical$y[base$group == 1], base$y[base$group == 1])
+  expect_error(plot_spectra(df, offset = "a"), "offset")
+  expect_error(plot_spectra(df, offset = 1:3), "offset")
+})
+
 test_that("tukey_gh distribution functions are consistent", {
   u <- c(0.05, 0.3, 0.5, 0.9)
   q <- tukey_gh(u, type = "q", g = 0.3, h = 0.1)

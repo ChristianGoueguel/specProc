@@ -7,7 +7,7 @@
 projected_osc(
   x,
   y,
-  ncomp = 5,
+  ncomp = 4,
   center = TRUE,
   scale = FALSE,
   tol = 1e-10,
@@ -19,7 +19,7 @@ projected_osc(
 
 \item{y}{A vector of the response variable.}
 
-\item{ncomp}{An integer specifying the number of PLS components (at least 2). \code{ncomp - 1} orthogonal components are removed. Default is 5.}
+\item{ncomp}{An integer specifying the number of orthogonal components removed (at least 1), as in the other orthogonalization methods. The underlying PLS model has \code{ncomp + 1} components. Default is 4.}
 
 \item{center}{A logical value indicating whether to mean-center \code{x} and \code{y}. Default is \code{TRUE}.}
 
@@ -50,23 +50,24 @@ algorithm for model fitting and prediction.
 POSC obtains OPLS-filtered data directly from an ordinary (non-orthogonalized)
 PLS1 model (Kemsley and Tapp, 2009):
 \enumerate{
-\item A PLS1 model with \code{ncomp} components is fitted, giving the score matrix
+\item A PLS1 model with \code{ncomp + 1} components is fitted, giving the score matrix
 \eqn{\textbf{T}} and the fitted response \eqn{\hat{\textbf{y}}}.
 \item The part of the score space orthogonal to \eqn{\hat{\textbf{y}}},
 \eqn{\textbf{T} - \hat{\textbf{y}}(\hat{\textbf{y}}^T\hat{\textbf{y}})^{-1}\hat{\textbf{y}}^T\textbf{T}},
-spans \code{ncomp - 1} orthogonal components with scores \eqn{\textbf{T}_o}.
+spans \code{ncomp} orthogonal components with scores \eqn{\textbf{T}_o}.
 \item The orthogonal loadings are \eqn{\textbf{P}_o = \textbf{X}^T\textbf{T}_o(\textbf{T}_o^T\textbf{T}_o)^{-1}}
 and the filtered data are \eqn{\textbf{X} - \textbf{T}_o\textbf{P}_o^T}.
 }
 
 The filtered data are identical to those obtained from an OPLS model with one
-predictive and \code{ncomp - 1} orthogonal components.
+predictive and \code{ncomp} orthogonal components (\code{\link[=opls]{opls()}} with the same
+\code{ncomp}).
 }
 \examples{
 data(forageLIBS)
 spectra <- forageLIBS[-(1:14)]  # the spectral channels
 cal <- 1:300
-res <- projected_osc(spectra[cal, ], forageLIBS$K[cal], ncomp = 3, newdata = spectra[-cal, ])
+res <- projected_osc(spectra[cal, ], forageLIBS$K[cal], ncomp = 2, newdata = spectra[-cal, ])
 dim(res$newdata$correction)
 }
 \references{

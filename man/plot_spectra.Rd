@@ -9,7 +9,8 @@ plot_spectra(
   id = NULL,
   colvar = NULL,
   .interactive = FALSE,
-  drop_na = FALSE
+  drop_na = FALSE,
+  offset = NULL
 )
 }
 \arguments{
@@ -26,6 +27,12 @@ enables interactive plot.}
 
 \item{drop_na}{Optional (\code{FALSE} by default). Remove rows with NA intensity
 if drop_na is \code{TRUE}.}
+
+\item{offset}{Optional (\code{NULL} by default). The offsets between successive
+spectra, to separate them: a number (vertical offset, in intensity
+units), or two numbers \code{c(horizontal, vertical)} (in nm and intensity
+units). The spectrum of row \code{i} is shifted by \code{(i - 1)} times the
+offsets, so that the first one stays in place.}
 }
 \value{
 Object of class ggplot or of class plotly if \code{.interactive = TRUE}.
@@ -49,6 +56,10 @@ wl <- as.numeric(names(forageLIBS)[-(1:14)])
 k_lines <- names(forageLIBS)[-(1:14)][wl > 764 & wl < 772]
 # the K I resonance lines, colored by potassium content
 plot_spectra(forageLIBS[1:20, c("K", k_lines)], colvar = K)
+
+# five spectra stacked, each shifted up by 20000 counts and right by 0.5 nm
+plot_spectra(forageLIBS[1:5, c("Measurement", k_lines)], id = Measurement,
+             offset = c(0.5, 20000))
 }
 \author{
 Christian L. Goueguel

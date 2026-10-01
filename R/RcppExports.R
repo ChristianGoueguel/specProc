@@ -49,6 +49,14 @@ spca_grid_cpp <- function(x_in, k, lambda, ngrid, maxiter, tol) {
     .Call(`_specProc_spca_grid_cpp`, x_in, k, lambda, ngrid, maxiter, tol)
 }
 
+som_batch_cpp <- function(x, init, grid_dist2, sigma, robust, huber_c) {
+    .Call(`_specProc_som_batch_cpp`, x, init, grid_dist2, sigma, robust, huber_c)
+}
+
+som_map_cpp <- function(x, codebook) {
+    .Call(`_specProc_som_map_cpp`, x, codebook)
+}
+
 voigt_cpp <- function(x, sigma, gamma) {
     .Call(`_specProc_voigt_cpp`, x, sigma, gamma)
 }

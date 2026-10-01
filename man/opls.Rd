@@ -4,20 +4,34 @@
 \alias{opls}
 \title{Orthogonal Projections to Latent Structures}
 \usage{
-opls(x, y, scale = "center", crossval = 7, permutation = 20, ncomp.ortho = NA)
+opls(
+  x,
+  y,
+  ncomp = NULL,
+  center = TRUE,
+  scale = FALSE,
+  crossval = 7,
+  permutation = 0,
+  ncomp.ortho = deprecated()
+)
 }
 \arguments{
 \item{x}{A numeric matrix or data frame of the predictor variables.}
 
 \item{y}{A numeric vector, or a matrix or data frame with one column, of the response variable.}
 
-\item{scale}{A character string indicating the scaling method for x and y: "none", "center" (default), "pareto" (divided by the square root of the standard deviation) or "standard" (divided by the standard deviation).}
+\item{ncomp}{The number of orthogonal components removed. If \code{NULL}
+(default), it is determined automatically by cross-validation.}
 
-\item{crossval}{An integer giving the number of cross-validation groups (default 7), between 2 and the number of observations. With \code{crossval = 0}, the model is not cross-validated (\eqn{Q^2} is \code{NA}), which requires a fixed \code{ncomp.ortho} and no permutation.}
+\item{center}{A logical value indicating whether to mean-center \code{x} and \code{y}. Default is \code{TRUE}.}
 
-\item{permutation}{An integer giving the number of permutations for the permutation test. Default is 20; 0 skips the test.}
+\item{scale}{A logical value indicating whether to scale \code{x} and \code{y} to unit variance. Default is \code{FALSE}.}
 
-\item{ncomp.ortho}{The number of orthogonal components. If \code{NA} (default), it is determined automatically by cross-validation.}
+\item{crossval}{An integer giving the number of cross-validation groups (default 7), between 2 and the number of observations. With \code{crossval = 0}, the model is not cross-validated (\eqn{Q^2} is \code{NA}), which requires a fixed \code{ncomp} and no permutation.}
+
+\item{permutation}{An integer giving the number of permutations for the permutation test. Default is 0 (no test).}
+
+\item{ncomp.ortho}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp}.}
 }
 \value{
 An object of class \code{specproc_opls} (a list), which \link[=predict.specproc_opls]{predict()} applies to new data, with the following components:
@@ -53,7 +67,7 @@ variation in x into two parts: one that is linearly related to y
 (predictive components) and one that is statistically uncorrelated to the
 response variable y (orthogonal components).
 
-The model has one predictive component and \code{ncomp.ortho} orthogonal
+The model has one predictive component and \code{ncomp} orthogonal
 components, fitted with the NIPALS algorithm of Trygg and Wold (2002). For
 each orthogonal component:
 \enumerate{
@@ -69,7 +83,14 @@ normalized, with score \eqn{\textbf{t}_o = \textbf{Xw}_o} and loading
 
 The predictive component is then computed from the filtered
 \eqn{\textbf{X}}. The filtered data are the same as those of
-\code{\link[=projected_osc]{projected_osc()}} with \code{ncomp = ncomp.ortho + 1}, and of \code{\link[=o2pls]{o2pls()}}.
+\code{\link[=projected_osc]{projected_osc()}} with the same \code{ncomp}, and of \code{\link[=o2pls]{o2pls()}} with \code{nx = ncomp}.
+
+\strong{Preprocessing.} x and y are centered (\code{center}) and scaled to unit
+variance (\code{scale}) with their means and standard deviations, as in the
+other orthogonalization methods. For Pareto scaling, common in
+metabolomics, apply \code{\link[=pareto_scale]{pareto_scale()}} to x first (or \code{\link[=step_pareto_scale]{step_pareto_scale()}}
+in a recipe): it gives the same filter, scores and \eqn{R^2} and
+\eqn{Q^2} values.
 
 \strong{Cross-validation.} The observations are split into \code{crossval}
 interleaved groups (observation \code{i} is in group \code{(i - 1) \%\% crossval + 1}).
@@ -80,7 +101,7 @@ squares (PRESS) and \eqn{Q^2 = 1 - \text{PRESS}/\text{SS}_y}, where
 The data are preprocessed once, with the centers and scales of all the
 observations.
 
-\strong{Number of orthogonal components.} If \code{ncomp.ortho = NA}, components
+\strong{Number of orthogonal components.} If \code{ncomp = NULL}, components
 are added (up to \code{min(10, n, p) - 1}) while each is significant: a
 component is significant if it increases \eqn{R^2Y} by at least 0.01 and
 \eqn{Q^2} by at least 0.01. If the predictive component alone is not
@@ -92,13 +113,15 @@ model), with a warning.
 the model refitted with the same number of components. \code{pR2Y} and \code{pQ2}
 are the proportions of permuted models whose \eqn{R^2Y} and \eqn{Q^2}
 are at least those of the model, \eqn{(1 + \#\{\text{perm} \geq \text{model}\})/\text{permutation}}.
-Use \code{\link[=set.seed]{set.seed()}} for reproducible p-values.
+Use \code{\link[=set.seed]{set.seed()}} for reproducible p-values. The test is skipped by
+default (\code{permutation = 0}), as it refits the model as many times.
 
 The results reproduce those of \code{ropls::opls()} with \code{predI = 1} and the
-same \code{scaleC}, \code{crossvalI}, \code{orthoI} and \code{permI} (apart from rounding):
+same preprocessing (\code{scaleC}), \code{crossvalI}, \code{orthoI} and \code{permI} (apart
+from rounding):
 specProc no longer depends on ropls. Unlike ropls, variables with zero
 variance are kept (their centered values are zero), and when
-\code{ncomp.ortho = NA} a model without orthogonal components is returned
+\code{ncomp = NULL} a model without orthogonal components is returned
 instead of no model when only the predictive component is significant.
 }
 \examples{
@@ -108,6 +131,9 @@ cal <- 1:300
 fit <- opls(spectra[cal, ], forageLIBS$K[cal], permutation = 5)
 fit
 head(predict(fit, spectra[-cal, ], type = "response"))
+
+# Pareto scaling of the spectra
+opls(pareto_scale(spectra[cal, ]), forageLIBS$K[cal], ncomp = 2)
 }
 \references{
 \itemize{
