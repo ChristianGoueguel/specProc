@@ -2,6 +2,18 @@
 
 ## specProc (development version)
 
+### Plots
+
+- Plot titles are bold, and a title longer than 45 characters is split
+  at a natural break (“:”, ” (“,” - ” or “,”) into a shorter title and a
+  subtitle, for example
+  [`plot_calibration()`](https://christiangoueguel.com/specProc/reference/plot_calibration.md)’s
+  “Linear calibration” above its R², LOD and LOQ. This applies to every
+  plot with a title, including the interactive (plotly) ones and
+  [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md).
+  [`plot_fit()`](https://christiangoueguel.com/specProc/reference/plot_fit.md)
+  now shows its `title` as a title rather than a subtitle.
+
 ### Documentation
 
 - The vignettes are reorganized into the four stages of a LIBS analysis,
@@ -14,8 +26,7 @@
   and plasma diagnostics
   ([`vignette("plasma-diagnostics")`](https://christiangoueguel.com/specProc/articles/plasma-diagnostics.md)).
   The orthogonalization vignette is folded into the preprocessing one.
-- The README is shorter, with an example and an overview of the
-  functions by task.
+- The README is shorter, with an overview of the functions by task.
 
 ## specProc 0.7.0
 

@@ -96,37 +96,6 @@
 <p>They are also available as <a href="https://christiangoueguel.com/specProc/articles/">articles on the package website</a>.</p>
 </div>
 <div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
-</h2>
-<p>A calibration curve for potassium, from the intensity of the K I 769.90 nm line normalized to the carbon line C I 247.86 nm:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ChristianGoueguel/specProc" class="external-link">specProc</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"forageLIBS"</span><span class="op">)</span></span>
-<span><span class="va">spectra_id</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">minerals</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fl">3</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">spectra_id</span>, <span class="va">minerals</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">corrected</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/baseline_arpls.html">baseline_arpls</a></span><span class="op">(</span><span class="va">spectra</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span></span>
-<span><span class="va">intensities</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">corrected</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>C <span class="op">=</span> <span class="fl">247.856</span>, K <span class="op">=</span> <span class="fl">769.896</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>  K <span class="op">=</span> <span class="va">forageLIBS</span><span class="op">$</span><span class="va">K</span>,</span>
-<span>  signal <span class="op">=</span> <span class="va">intensities</span><span class="op">$</span><span class="va">intensity</span><span class="op">[</span><span class="va">intensities</span><span class="op">$</span><span class="va">line</span> <span class="op">==</span> <span class="st">"K"</span><span class="op">]</span> <span class="op">/</span></span>
-<span>    <span class="va">intensities</span><span class="op">$</span><span class="va">intensity</span><span class="op">[</span><span class="va">intensities</span><span class="op">$</span><span class="va">line</span> <span class="op">==</span> <span class="st">"C"</span><span class="op">]</span></span>
-<span><span class="op">)</span></span>
-<span><span class="va">curve</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/calibration_curve.html">calibration_curve</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">signal</span>, <span class="va">K</span><span class="op">)</span></span>
-<span><span class="va">curve</span><span class="op">$</span><span class="va">figures_of_merit</span></span>
-<span><span class="co">#&gt; # A tibble: 1 × 7</span></span>
-<span><span class="co">#&gt;       n sensitivity r_squared sigma sigma_blank   lod   loq</span></span>
-<span><span class="co">#&gt;   &lt;int&gt;       &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1   368       0.302     0.575 0.139       0.139  1.52  4.60</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_calibration.html">plot_calibration</a></span><span class="op">(</span><span class="va">curve</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-example-plot-1.png" alt="" width="80%"></p>
-</div>
-<div class="section level2">
 <h2 id="function-overview">Function overview<a class="anchor" aria-label="anchor" href="#function-overview"></a>
 </h2>
 <table class="table">
