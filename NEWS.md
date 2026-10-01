@@ -2,6 +2,18 @@
 
 ## Plots
 
+* `correlation()` takes several responses (`var = c(K, Ca)`, or
+  `dplyr::all_of(minerals)`), each with its own observations, so that a
+  response with many missing values does not reduce the data of the others.
+  The result gains an `outcome` column, and `plot = TRUE` draws a heatmap of
+  the responses against the wavelengths (or the other variables), on a
+  fixed scale from -1 to 1. Pearson and Spearman correlations of spectra are
+  computed in one step: the 12 minerals of `forageLIBS` against its 7152
+  channels take under a second.
+  With `cluster = TRUE`, the rows are ordered by a hierarchical clustering
+  of the responses on their correlation profiles (1 - r, average linkage),
+  so that responses whose correlations rise and fall at the same
+  wavelengths are adjacent, with the dendrogram on the left.
 * Plot titles are bold, and a title longer than 45 characters is split at
   a natural break (": ", " (", " - " or ", ") into a shorter title and a
   subtitle, for example `plot_calibration()`'s "Linear calibration" above

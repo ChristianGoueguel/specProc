@@ -67,6 +67,78 @@ test_that("correlation plots", {
   expect_equal(plotly::plotly_build(spec_interactive)$x$data[[1]]$type, "scattergl")
 })
 
+test_that("correlation takes several responses, each with its own observations", {
+  d <- test_data
+  d$z <- d$a + stats::rnorm(50)
+  d$z[1:40] <- NA
+  res <- correlation(d, c(y, z))
+  expect_named(res, c("outcome", "variable", ".correlation", "method"))
+  expect_equal(unique(res$outcome), c("y", "z"))
+  # y keeps all its observations although z is mostly missing
+  expect_equal(res$.correlation[res$outcome == "y" & res$variable == "a"], stats::cor(d$a, d$y))
+  ok <- !is.na(d$z)
+  expect_equal(res$.correlation[res$outcome == "z" & res$variable == "b"], stats::cor(d$b[ok], d$z[ok]))
+  expect_equal(correlation(d, dplyr::all_of(c("y", "z"))), res)
+  expect_equal(nrow(correlation(d, c(y, z), method = "kendall")), nrow(res))
+  expect_error(correlation(d[c("y", "z")], c(y, z)), "other than")
+})
+
+test_that("several responses give a heatmap", {
+  set.seed(3)
+  spectra <- as.data.frame(matrix(stats::rnorm(30 * 40), 30, 40,
+                                  dimnames = list(NULL, c(seq(400, 419), seq(450, 469)))))
+  spectra$y1 <- spectra[["405"]] + stats::rnorm(30, sd = 0.2)
+  spectra$y2 <- -spectra[["460"]] + stats::rnorm(30, sd = 0.2)
+  res <- correlation(spectra, c(y1, y2), plot = TRUE)
+  expect_s3_class(res$plot, "ggplot")
+  expect_equal(res$plot$labels$x, "Wavelength (nm)")
+  built <- ggplot2::ggplot_build(res$plot)$data[[1]]
+  expect_equal(nrow(built), 80)
+  # tiles are as wide as the channel spacing, and the detector gap stays empty
+  expect_equal(range(built$xmax - built$xmin), c(1, 1))
+  expect_false(any(built$xmin < 449.5 & built$xmax > 419.5))
+  # a fixed scale, the first response on top
+  expect_equal(res$plot$scales$get_scales("fill")$limits, c(-1, 1))
+  expect_equal(levels(res$plot$data$outcome), c("y2", "y1"))
+  # variables that are not wavelengths: tiles labeled with their value, top ones only
+  bars <- correlation(test_data |> dplyr::mutate(w = y^2), c(y, w), plot = TRUE, top = 2)
+  expect_equal(nlevels(bars$plot$data$variable), 2)
+  xi <- correlation(spectra, c(y1, y2), method = "chatterjee", plot = TRUE)
+  expect_equal(xi$plot$scales$get_scales("fill")$limits, c(0, 1))
+  skip_if_not_installed("plotly")
+  interactive <- correlation(spectra, c(y1, y2), plot = TRUE, interactive = TRUE)
+  expect_s3_class(interactive, "plotly")
+  expect_equal(plotly::plotly_build(interactive)$x$data[[1]]$type, "heatmap")
+})
+
+test_that("cluster orders the responses by their correlation profiles", {
+  set.seed(4)
+  spectra <- as.data.frame(matrix(stats::rnorm(40 * 30), 40, 30, dimnames = list(NULL, 401:430)))
+  # y1 and y3 follow channel 405, y2 and y4 channel 420
+  spectra$y1 <- spectra[["405"]] + stats::rnorm(40, sd = 0.3)
+  spectra$y2 <- spectra[["420"]] + stats::rnorm(40, sd = 0.3)
+  spectra$y3 <- spectra[["405"]] + stats::rnorm(40, sd = 0.3)
+  spectra$y4 <- spectra[["420"]] + stats::rnorm(40, sd = 0.3)
+  plain <- correlation(spectra, c(y1, y2, y3, y4), plot = TRUE)
+  expect_null(plain$clustering)
+  skip_if_not_installed("patchwork")
+  res <- correlation(spectra, c(y1, y2, y3, y4), plot = TRUE, cluster = TRUE)
+  expect_s3_class(res$clustering, "hclust")
+  expect_s3_class(res$plot, "patchwork")
+  order <- res$clustering$labels[res$clustering$order]
+  expect_equal(abs(diff(match(c("y1", "y3"), order))), 1)
+  expect_equal(abs(diff(match(c("y2", "y4"), order))), 1)
+  # the heatmap rows follow the clustering, the first leaf on top
+  expect_equal(rev(levels(res$plot[[2]]$data$outcome)), order)
+  # the table is unchanged
+  expect_equal(res$correlation, plain$correlation)
+  # the dendrogram: 3 segments per merge, leaves at the row positions
+  segments <- dendrogram_segments(res$clustering, stats::setNames(4:1, order))
+  expect_equal(nrow(segments), 9)
+  expect_setequal(segments$y[segments$x == 0], 1:4)
+  expect_error(correlation(spectra, c(y1, y2), cluster = NA), "cluster")
+})
+
 test_that("correlation validates its inputs", {
   expect_error(correlation(list(1, 2, 3), y), "Input 'x' must be a numeric data frame")
   expect_error(correlation(test_data, w), "'var' not found in the data frame")
