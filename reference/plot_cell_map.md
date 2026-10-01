@@ -142,17 +142,19 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-# \donttest{
-minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
+spectra_id <- forageLIBS |> select(1:2) |> names()
+#> Error in select(forageLIBS, 1:2): could not find function "select"
+minerals <- forageLIBS |> select(3:14) |> names()
+#> Error in select(forageLIBS, 3:14): could not find function "select"
 set.seed(1)
 fit <- forageLIBS |>
-  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+  select(-all_of(c(spectra_id, minerals))) |>
+  center() |>
   macropca(k = 3)
+#> Error in select(forageLIBS, -all_of(c(spectra_id, minerals))): could not find function "select"
 
 if (requireNamespace("patchwork", quietly = TRUE)) {
-  plot_cell_map(fit, order = "cluster")
   plot_cell_map(fit, order = "od")
 }
-
-# }
+#> Error: object 'fit' not found
 ```

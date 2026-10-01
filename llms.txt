@@ -1,10 +1,13 @@
 # specProc
 
-**specProc** processes and analyzes emission spectra, from raw spectra
-to calibrated concentrations. It was developed for laser-induced
-breakdown spectroscopy (LIBS), and works with other techniques such as
-Raman, infrared and ICP-OES. Spectra are stored one per row, with the
-wavelengths as column names, and the heavy computations run in C++.
+**specProc** processes and analyzes emission spectra, streamlining the
+pipeline from raw spectra to calibrated concentrations. While
+specifically developed for laser-induced breakdown spectroscopy (LIBS),
+it seamlessly supports other plasma techniques such as ICP-OES. Select
+functions can also be used to process Raman and infrared
+spectroscopy data. The package structures data with one spectrum per row
+and wavelengths as column names, leveraging a C++ backend to power heavy
+computations.
 
 ## Installation
 
