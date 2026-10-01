@@ -304,17 +304,25 @@ predict.specproc_calibration <- function(object, newdata, replicates = 1, level 
 #' @export plot_calibration
 #'
 #' @examples
+#' # the calibration curve of potassium of vignette("calibration")
 #' data(forageLIBS)
-#' # the K I 769.90 nm line, normalized to the C I 247.86 nm line of the matrix
-#' lines <- line_intensities(forageLIBS[-(1:14)], c(C = 247.856, K = 769.896), baseline = TRUE)
-#' standards <- data.frame(
-#'   K = forageLIBS$K,
-#'   signal = lines$intensity[lines$line == "K"] / lines$intensity[lines$line == "C"]
-#' )
-#' cal <- calibration_curve(standards[1:300, ], signal, K)
-#' plot_calibration(cal)
-#' plot_calibration(cal, newdata = standards$signal[301:305])
+#' spectra_id <- names(forageLIBS)[1:2]
+#' minerals <- names(forageLIBS)[3:14]
+#' spectra <- forageLIBS[setdiff(names(forageLIBS), c(spectra_id, minerals))]
+#' corrected <- baseline_arpls(spectra, lambda = 1e5, max.iter = 20)$correction
 #'
+#' # the K I 769.90 nm line, normalized to the C I 247.86 nm line of the matrix
+#' lines <- line_intensities(corrected, c(C = 247.856, K = 769.896))
+#' data <- forageLIBS[c(spectra_id, "K")]
+#' data$K_signal <- lines$intensity[lines$line == "K"] / lines$intensity[lines$line == "C"]
+#'
+#' # a quarter of the samples are set aside to test the calibration
+#' set.seed(1)
+#' test_samples <- sample(unique(data$Sample), round(0.25 * length(unique(data$Sample))))
+#' calibration <- data[!data$Sample %in% test_samples, ]
+#'
+#' k_curve <- calibration_curve(calibration, K_signal, K)
+#' plot_calibration(k_curve)
 plot_calibration <- function(object, interval = "both", level = 0.95, newdata = NULL,
                              replicates = 1, title = NULL) {
   if (!inherits(object, "specproc_calibration")) {
