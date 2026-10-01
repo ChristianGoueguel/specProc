@@ -135,23 +135,23 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-data(soilLIBS)
-spectra <- soilLIBS[1:8, -(2:8)]
-ca <- c(`Ca II 393.37` = 393.37, `Ca II 396.85` = 396.85, `Ca I 422.67` = 422.67)
-line_intensities(spectra, ca, baseline = TRUE)
+data(forageLIBS)
+spectra <- forageLIBS[1:8, -(1:14)]
+k <- c(`K I 404.41` = 404.414, `K I 404.72` = 404.721, `Mg I 518.36` = 518.360)
+line_intensities(spectra, k, baseline = TRUE)
 #> # A tibble: 24 × 10
-#>    Sample       line   wavelength peak_wavelength   shift height intensity   snr
-#>    <chr>        <chr>       <dbl>           <dbl>   <dbl>  <dbl>     <dbl> <dbl>
-#>  1 LSG-S18-0001 Ca II…       393.            393. -0.0934  6699.      558. 128. 
-#>  2 LSG-S18-0001 Ca II…       397.            397. -0.0731  6595.      550. 126. 
-#>  3 LSG-S18-0001 Ca I …       423.            423.  0.0294  2781.      272.  53.1
-#>  4 LSG-S18-0001 Ca II…       393.            393. -0.0934  5877.      490. 110. 
-#>  5 LSG-S18-0001 Ca II…       397.            397. -0.0731  5759.      480. 108. 
-#>  6 LSG-S18-0001 Ca I …       423.            423.  0.0294  2275.      223.  42.6
-#>  7 LSG-S18-0001 Ca II…       393.            393. -0.0934  5463.      455. 104. 
-#>  8 LSG-S18-0001 Ca II…       397.            397. -0.0731  5824.      485. 111. 
-#>  9 LSG-S18-0001 Ca I …       423.            423. -0.0823  1733.      169.  33.1
-#> 10 LSG-S18-0001 Ca II…       393.            393. -0.0934  5989.      499. 110. 
+#>    spectrum line       wavelength peak_wavelength   shift height intensity   snr
+#>       <int> <chr>           <dbl>           <dbl>   <dbl>  <dbl>     <dbl> <dbl>
+#>  1        1 K I 404.41       404.            404. -0.0512  1979.     166.   42.9
+#>  2        1 K I 404.72       405.            405. -0.0233   898.      75.2  19.5
+#>  3        1 Mg I 518.…       518.            518. -0.0560  5399      453.  117. 
+#>  4        2 K I 404.41       404.            404. -0.0512  1688.     141.   36.6
+#>  5        2 K I 404.72       405.            405. -0.0233   550.      46.0  11.9
+#>  6        2 Mg I 518.…       518.            518. -0.0560  3484      293.   75.5
+#>  7        3 K I 404.41       404.            404. -0.0512  2238.     187.   46.4
+#>  8        3 K I 404.72       405.            405. -0.0233  1003.      84.0  20.8
+#>  9        3 Mg I 518.…       518.            518. -0.0560  4444.     373.   92.1
+#> 10        4 K I 404.41       404.            404. -0.0512  2071.     173.   43.0
 #> # ℹ 14 more rows
 #> # ℹ 2 more variables: detected <lgl>, saturated <lgl>
 
@@ -159,14 +159,14 @@ line_intensities(spectra, ca, baseline = TRUE)
 lines <- data.frame(wavelength = c(428.30, 430.25, 443.50, 445.48),
                     Aki = c(4.34e7, 1.36e8, 6.70e7, 8.70e7), gk = c(5, 5, 5, 7),
                     Ek = c(4.78, 4.78, 4.68, 4.68))
-mean_spectrum <- colMeans(soilLIBS[-(1:8)])
+mean_spectrum <- colMeans(forageLIBS[-(1:14)])
 line_intensities(mean_spectrum, lines, baseline = TRUE)
 #> # A tibble: 4 × 11
 #>   wavelength      Aki    gk    Ek peak_wavelength   shift height intensity   snr
 #>        <dbl>    <dbl> <dbl> <dbl>           <dbl>   <dbl>  <dbl>     <dbl> <dbl>
-#> 1       428.   4.34e7     5  4.78            428. -0.0487   404.      33.9  37.2
-#> 2       430.   1.36e8     5  4.78            430. -0.0429   732.      62.2  67.4
-#> 3       444.   6.70e7     5  4.68            443. -0.0721   299.      25.1  27.6
-#> 4       445.   8.70e7     7  4.68            445. -0.0898   477.      40.3  44.0
+#> 1       428.   4.34e7     5  4.78            428. -0.0487  4471.      376.  155.
+#> 2       430.   1.36e8     5  4.78            430. -0.0429  9200.      781.  318.
+#> 3       444.   6.70e7     5  4.68            443. -0.0721  4175.      349.  144.
+#> 4       445.   8.70e7     7  4.68            445. -0.0898  7780.      656.  269.
 #> # ℹ 2 more variables: detected <lgl>, saturated <lgl>
 ```

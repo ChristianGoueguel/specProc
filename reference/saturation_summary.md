@@ -42,11 +42,16 @@ A list with two tibbles:
 ## Examples
 
 ``` r
-data(soilLIBS)
-sat <- saturation_summary(soilLIBS[-(1:8)], limit = 28000)
+data(forageLIBS)
+sat <- saturation_summary(forageLIBS[-(1:14)], limit = 65535)
 sat$channels
-#> # A tibble: 1 × 4
+#> # A tibble: 6 × 4
 #>   wavelength index n_spectra fraction
 #>        <dbl> <int>     <dbl>    <dbl>
-#> 1       393.  2297         1   0.0025
+#> 1       388.  2229        30   0.0815
+#> 2       393.  2297        48   0.130 
+#> 3       393.  2298       133   0.361 
+#> 4       397.  2339        82   0.223 
+#> 5       399.  2368       124   0.337 
+#> 6       399.  2369        46   0.125 
 ```

@@ -81,12 +81,12 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-data(soilLIBS)
-spectrum <- unlist(soilLIBS[1, -(1:8)])
+data(forageLIBS)
+spectrum <- unlist(forageLIBS[1, -(1:14)])
 smooth <- savitzky_golay(spectrum, window = 7)
 first <- savitzky_golay(spectrum, window = 11, derivative = 1)
 wl <- as.numeric(names(spectrum))
-keep <- wl > 392 & wl < 398
+keep <- wl > 400 & wl < 410
 plot(wl[keep], spectrum[keep], type = "l", col = "grey", xlab = "Wavelength (nm)",
      ylab = "Intensity")
 lines(wl[keep], smooth[keep], col = "blue")

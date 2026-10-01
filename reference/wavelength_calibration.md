@@ -146,29 +146,25 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-data(soilLIBS)
-reference <- c(`Mg II` = 279.553, `Mg II` = 280.270, `Si I` = 288.158,
-               `Al I` = 308.215, `Al I` = 309.271, `Ca II` = 393.366,
-               `Al I` = 394.401, `Al I` = 396.152, `Ca II` = 396.847,
-               `Ca I` = 422.673, `Na I` = 588.995, `Na I` = 589.592,
-               `Li I` = 670.791, `K I` = 766.490, `K I` = 769.896)
-cal <- wavelength_calibration(soilLIBS, reference)
-#> Warning: No usable reference line in 2 segment(s) (789.2-800.7 nm, 813.9-822.2 nm): their wavelengths are not corrected.
-#> Warning: Too few usable lines for degree 1 in 1 segment(s): a lower degree is fitted there.
+# the first detector (199 to 766 nm) of the forage spectra
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]
+wl <- as.numeric(names(spectra))
+first_detector <- spectra[seq_len(which(diff(wl) < 0)[1])]
+reference <- c(`C I` = 247.856, `Mg I` = 285.213, `Ca II` = 317.933, `Ca II` = 370.603,
+               `Ca II` = 373.690, `K I` = 404.414, `Ca I` = 430.253, `Ca I` = 445.478,
+               `Mg I` = 516.732, `Mg I` = 517.268, `Mg I` = 518.360, `Na I` = 588.995,
+               `Na I` = 589.592, `Ca I` = 616.217, `Ca I` = 643.907)
+cal <- wavelength_calibration(first_detector, reference)
 cal
-#> Wavelength calibration (degree 1): 14 of 15 reference lines used
+#> Wavelength calibration (degree 1): 15 of 15 reference lines used
 #> 
 #>  segment     from       to degree n_lines   rmse
-#>        1 199.3772 766.1501      1      13 0.0234
-#>        2 765.7158 781.4836      0       1     NA
-#>        3 789.1715 800.7070   none       0     NA
-#>        4 813.8826 822.1849   none       0     NA
-#> 
-#> Not used: K I (edge)
+#>        1 199.3772 766.1501      1      15 0.0136
 plot_wavelength_calibration(cal)
 
 
-corrected <- apply_calibration(soilLIBS, cal)
-head(names(corrected)[-(1:8)])
-#> [1] "199.4295" "199.5168" "199.6040" "199.6913" "199.7785" "199.8658"
+corrected <- apply_calibration(first_detector, cal)
+head(names(corrected))
+#> [1] "199.4025" "199.4897" "199.5770" "199.6643" "199.7515" "199.8388"
 ```

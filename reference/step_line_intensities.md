@@ -120,20 +120,20 @@ returns the `line` names, their `wavelength`, the `method` and `id`.
 
 ``` r
 if (rlang::is_installed("recipes")) {
-  data(soilLIBS)
-  rec <- recipes::recipe(Clay ~ ., data = soilLIBS[-c(1:2, 4:8)]) |>
+  data(forageLIBS)
+  rec <- recipes::recipe(K ~ ., data = forageLIBS[-c(1:10, 12:14)]) |>
     step_line_intensities(recipes::all_predictors(),
-                          lines = c(Mg = 279.55, Ca = 393.37, Al = 396.15)) |>
+                          lines = c(K = 769.90, Mg = 285.21, Ca = 317.93)) |>
     recipes::prep()
   head(recipes::bake(rec, new_data = NULL))
 }
 #> # A tibble: 6 × 4
-#>    Clay line_Mg line_Ca line_Al
-#>   <dbl>   <dbl>   <dbl>   <dbl>
-#> 1    41   3305.   3348.   1772.
-#> 2    41   3025.   3198.   1725.
-#> 3    41   2966.   2980.   1623.
-#> 4    41   2853.   2948.   1702.
-#> 5    41   2980.   3206.   1646.
-#> 6    41   2864.   3214.   1590.
+#>       K line_K line_Mg line_Ca
+#>   <dbl>  <dbl>   <dbl>   <dbl>
+#> 1  3.68  9092.   5285.   1839.
+#> 2  2.52  8092.   4061.   2058.
+#> 3  2.45  8814.   4714.   2184.
+#> 4  2.3   8808.   6390.   2758.
+#> 5  2.87  6487.   4369.   1270.
+#> 6  2.16  7495.   4397.   1995.
 ```

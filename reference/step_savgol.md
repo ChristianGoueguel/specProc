@@ -104,8 +104,8 @@ returns the `terms`, `window`, `order`, `derivative` and `id`.
 
 ``` r
 if (rlang::is_installed("recipes")) {
-  data(soilLIBS)
-  rec <- recipes::recipe(Clay ~ ., data = soilLIBS[-c(1:2, 4:8)]) |>
+  data(forageLIBS)
+  rec <- recipes::recipe(K ~ ., data = forageLIBS[-c(1:10, 12:14)]) |>
     step_savgol(recipes::all_predictors(), window = 11, derivative = 1) |>
     recipes::prep()
   recipes::tidy(rec, number = 1)

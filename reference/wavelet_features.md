@@ -94,8 +94,8 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-data(soilLIBS)
-spectra <- soilLIBS[1:4, -(1:8)]
+data(forageLIBS)
+spectra <- forageLIBS[1:4, -(1:14)]
 approx <- wavelet_features(spectra, wavelet = "la8", level = 4)
 dim(approx)   # 7152 channels -> 447 coefficients
 #> [1]   4 447

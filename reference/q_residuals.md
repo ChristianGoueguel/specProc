@@ -126,12 +126,12 @@ Christian L. Goueguel
 
 ``` r
 if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
-  data(soilLIBS)
-  spectra <- average(soilLIBS[-(2:8)], Sample)
-  pca <- stats::prcomp(spectra[-1], scale. = TRUE)
+  data(forageLIBS)
+  spectra <- forageLIBS[-(1:14)]
+  pca <- stats::prcomp(spectra)
   influence <- q_residuals(pca, k = 3)
   influence[influence$outlier != "regular", ]
-  plot_influence(influence, label = spectra$Sample)
+  plot_influence(influence, label = forageLIBS$Measurement)
   # several limits
   plot_influence(q_residuals(pca, k = 3, conf_level = c(0.95, 0.99)))
 }

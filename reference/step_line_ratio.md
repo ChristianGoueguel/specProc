@@ -143,15 +143,15 @@ Christian L. Goueguel
 
 ``` r
 if (rlang::is_installed("recipes")) {
-  data(soilLIBS)
-  # normalize to the Ca II 393.37 nm line
-  rec <- recipes::recipe(~ ., data = soilLIBS[-(2:8)]) |>
-    step_line_ratio(recipes::all_numeric(), reference = 393.37, window = 0.3) |>
+  data(forageLIBS)
+  # normalize to the C I 247.86 nm line of the organic matrix
+  rec <- recipes::recipe(~ ., data = forageLIBS[-(1:14)]) |>
+    step_line_ratio(recipes::all_numeric(), reference = 247.856, window = 0.15) |>
     recipes::prep()
   recipes::tidy(rec, number = 1)
 }
 #> # A tibble: 1 × 5
 #>   reference window method baseline id              
 #>       <dbl>  <dbl> <chr>  <lgl>    <chr>           
-#> 1      393.    0.3 area   FALSE    line_ratio_7Kxng
+#> 1      248.   0.15 area   FALSE    line_ratio_7Kxng
 ```

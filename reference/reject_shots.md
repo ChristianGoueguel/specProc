@@ -98,29 +98,3 @@ on the result with `drop = TRUE`. In a recipe, use
 ## Author
 
 Christian L. Goueguel
-
-## Examples
-
-``` r
-data(soilLIBS)
-shots <- reject_shots(soilLIBS[-(2:8)], Sample)
-table(shots$.rejected)
-#> 
-#> FALSE  TRUE 
-#>   363    37 
-head(shots[shots$.rejected, c("Sample", ".reason", ".intensity_z", ".correlation_z")])
-#> # A tibble: 6 × 4
-#>   Sample       .reason                .intensity_z .correlation_z
-#>   <chr>        <chr>                         <dbl>          <dbl>
-#> 1 LSG-S18-0003 intensity                      5.50          0.414
-#> 2 LSG-S18-0007 correlation                   -1.03          6.49 
-#> 3 LSG-S18-0007 correlation                    1.01         10.6  
-#> 4 LSG-S18-0009 intensity                     -5.98          0.786
-#> 5 LSG-S18-0009 intensity                     -6.70          0.708
-#> 6 LSG-S18-0010 intensity, correlation         7.29         18.2  
-
-# mean spectrum of each sample, without the rejected shots
-means <- average(reject_shots(soilLIBS[-(2:8)], Sample, drop = TRUE), Sample)
-dim(means)
-#> [1]   50 7153
-```

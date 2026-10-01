@@ -15,7 +15,7 @@ spectra, without changing their intensities."><meta property="og:image" content=
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9001</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9002</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -178,31 +178,27 @@ algorithm for the resolution of spectra. Analytical Chemistry,
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">soilLIBS</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>`Mg II` <span class="op">=</span> <span class="fl">279.553</span>, `Mg II` <span class="op">=</span> <span class="fl">280.270</span>, `Si I` <span class="op">=</span> <span class="fl">288.158</span>,</span></span>
-<span class="r-in"><span>               `Al I` <span class="op">=</span> <span class="fl">308.215</span>, `Al I` <span class="op">=</span> <span class="fl">309.271</span>, `Ca II` <span class="op">=</span> <span class="fl">393.366</span>,</span></span>
-<span class="r-in"><span>               `Al I` <span class="op">=</span> <span class="fl">394.401</span>, `Al I` <span class="op">=</span> <span class="fl">396.152</span>, `Ca II` <span class="op">=</span> <span class="fl">396.847</span>,</span></span>
-<span class="r-in"><span>               `Ca I` <span class="op">=</span> <span class="fl">422.673</span>, `Na I` <span class="op">=</span> <span class="fl">588.995</span>, `Na I` <span class="op">=</span> <span class="fl">589.592</span>,</span></span>
-<span class="r-in"><span>               `Li I` <span class="op">=</span> <span class="fl">670.791</span>, `K I` <span class="op">=</span> <span class="fl">766.490</span>, `K I` <span class="op">=</span> <span class="fl">769.896</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">cal</span> <span class="op">&lt;-</span> <span class="fu">wavelength_calibration</span><span class="op">(</span><span class="va">soilLIBS</span>, <span class="va">reference</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>No usable reference line in 2 segment(s) (789.2-800.7 nm, 813.9-822.2 nm): their wavelengths are not corrected.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Too few usable lines for degree 1 in 1 segment(s): a lower degree is fitted there.</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># the first detector (199 to 766 nm) of the forage spectra</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">first_detector</span> <span class="op">&lt;-</span> <span class="va">spectra</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">wl</span><span class="op">)</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>`C I` <span class="op">=</span> <span class="fl">247.856</span>, `Mg I` <span class="op">=</span> <span class="fl">285.213</span>, `Ca II` <span class="op">=</span> <span class="fl">317.933</span>, `Ca II` <span class="op">=</span> <span class="fl">370.603</span>,</span></span>
+<span class="r-in"><span>               `Ca II` <span class="op">=</span> <span class="fl">373.690</span>, `K I` <span class="op">=</span> <span class="fl">404.414</span>, `Ca I` <span class="op">=</span> <span class="fl">430.253</span>, `Ca I` <span class="op">=</span> <span class="fl">445.478</span>,</span></span>
+<span class="r-in"><span>               `Mg I` <span class="op">=</span> <span class="fl">516.732</span>, `Mg I` <span class="op">=</span> <span class="fl">517.268</span>, `Mg I` <span class="op">=</span> <span class="fl">518.360</span>, `Na I` <span class="op">=</span> <span class="fl">588.995</span>,</span></span>
+<span class="r-in"><span>               `Na I` <span class="op">=</span> <span class="fl">589.592</span>, `Ca I` <span class="op">=</span> <span class="fl">616.217</span>, `Ca I` <span class="op">=</span> <span class="fl">643.907</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">cal</span> <span class="op">&lt;-</span> <span class="fu">wavelength_calibration</span><span class="op">(</span><span class="va">first_detector</span>, <span class="va">reference</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">cal</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Wavelength calibration (degree 1): 14 of 15 reference lines used</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Wavelength calibration (degree 1): 15 of 15 reference lines used</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  segment     from       to degree n_lines   rmse</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        1 199.3772 766.1501      1      13 0.0234</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        2 765.7158 781.4836      0       1     NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        3 789.1715 800.7070   none       0     NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        4 813.8826 822.1849   none       0     NA</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Not used: K I (edge)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        1 199.3772 766.1501      1      15 0.0136</span>
 <span class="r-in"><span><span class="fu"><a href="plot_wavelength_calibration.html">plot_wavelength_calibration</a></span><span class="op">(</span><span class="va">cal</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="wavelength_calibration-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">corrected</span> <span class="op">&lt;-</span> <span class="fu"><a href="apply_calibration.html">apply_calibration</a></span><span class="op">(</span><span class="va">soilLIBS</span>, <span class="va">cal</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">corrected</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "199.4295" "199.5168" "199.6040" "199.6913" "199.7785" "199.8658"</span>
+<span class="r-in"><span><span class="va">corrected</span> <span class="op">&lt;-</span> <span class="fu"><a href="apply_calibration.html">apply_calibration</a></span><span class="op">(</span><span class="va">first_detector</span>, <span class="va">cal</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">corrected</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "199.4025" "199.4897" "199.5770" "199.6643" "199.7515" "199.8388"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

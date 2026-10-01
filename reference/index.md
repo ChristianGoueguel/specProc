@@ -411,7 +411,5 @@ Functions used for charcaterizing plasma emission in laser spectroscopy.
 
 ## Data
 
-- [`soilLIBS`](https://christiangoueguel.com/specProc/reference/soilLIBS.md)
-  : LIBS Spectra of Soil Samples
 - [`forageLIBS`](https://christiangoueguel.com/specProc/reference/forageLIBS.md)
   : LIBS Spectra of Forage Samples

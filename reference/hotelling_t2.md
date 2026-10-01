@@ -117,26 +117,26 @@ Christian L. Goueguel
 
 ``` r
 if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
-  data(soilLIBS)
-  spectra <- average(soilLIBS[-(2:8)], Sample)
-  pca <- stats::prcomp(spectra[-1], scale. = TRUE)
+  data(forageLIBS)
+  spectra <- forageLIBS[-(1:14)]
+  pca <- stats::prcomp(spectra)
   t2 <- hotelling_t2(pca, k = 3)
   t2[t2$outlier_97.5, ]
   # two limits, with the exact distribution of the calibration samples
   hotelling_t2(pca, k = 3, conf_level = c(0.95, 0.99), method = "beta")
 }
-#> # A tibble: 50 × 7
+#> # A tibble: 368 × 7
 #>    sample    t2 limit_95 limit_99 outlier_95 outlier_99     n
 #>     <int> <dbl>    <dbl>    <dbl> <lgl>      <lgl>      <int>
-#>  1      1 4.27      7.43     10.4 FALSE      FALSE         50
-#>  2      2 5.54      7.43     10.4 FALSE      FALSE         50
-#>  3      3 5.72      7.43     10.4 FALSE      FALSE         50
-#>  4      4 6.58      7.43     10.4 FALSE      FALSE         50
-#>  5      5 2.54      7.43     10.4 FALSE      FALSE         50
-#>  6      6 0.947     7.43     10.4 FALSE      FALSE         50
-#>  7      7 1.17      7.43     10.4 FALSE      FALSE         50
-#>  8      8 0.661     7.43     10.4 FALSE      FALSE         50
-#>  9      9 1.06      7.43     10.4 FALSE      FALSE         50
-#> 10     10 2.72      7.43     10.4 FALSE      FALSE         50
-#> # ℹ 40 more rows
+#>  1      1 0.871     7.76     11.2 FALSE      FALSE        368
+#>  2      2 1.23      7.76     11.2 FALSE      FALSE        368
+#>  3      3 1.99      7.76     11.2 FALSE      FALSE        368
+#>  4      4 4.06      7.76     11.2 FALSE      FALSE        368
+#>  5      5 0.752     7.76     11.2 FALSE      FALSE        368
+#>  6      6 1.58      7.76     11.2 FALSE      FALSE        368
+#>  7      7 5.43      7.76     11.2 FALSE      FALSE        368
+#>  8      8 0.103     7.76     11.2 FALSE      FALSE        368
+#>  9      9 0.868     7.76     11.2 FALSE      FALSE        368
+#> 10     10 2.88      7.76     11.2 FALSE      FALSE        368
+#> # ℹ 358 more rows
 ```
