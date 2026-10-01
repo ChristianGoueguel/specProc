@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Predicting soil clay content from LIBS spectra • specProc</title>
+<title>3. Calibration curves and figures of merit • specProc</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -16,7 +16,7 @@
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Predicting soil clay content from LIBS spectra">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="3. Calibration curves and figures of merit">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,11 +39,10 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/calibration.html">Predicting soil clay content from LIBS spectra</a></li>
-    <li><a class="dropdown-item" href="../articles/line-fitting.html">Fitting emission lines</a></li>
-    <li><a class="dropdown-item" href="../articles/orthogonalization.html">Removing unwanted variation: a comparison of orthogonalization methods</a></li>
-    <li><a class="dropdown-item" href="../articles/plasma-diagnostics.html">Plasma diagnostics: electron density, temperature and self-absorption</a></li>
-    <li><a class="dropdown-item" href="../articles/preprocessing.html">Preprocessing LIBS spectra</a></li>
+<li><a class="dropdown-item" href="../articles/peak-fitting.html">1. Fitting emission lines</a></li>
+    <li><a class="dropdown-item" href="../articles/preprocessing.html">2. Preprocessing with recipe steps</a></li>
+    <li><a class="dropdown-item" href="../articles/calibration.html">3. Calibration curves and figures of merit</a></li>
+    <li><a class="dropdown-item" href="../articles/plasma-diagnostics.html">4. Plasma diagnostics</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -65,7 +64,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Predicting soil clay content from LIBS spectra</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>3. Calibration curves and figures of merit</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/ChristianGoueguel/specProc/blob/main/vignettes/calibration.Rmd" class="external-link"><code>vignettes/calibration.Rmd</code></a></small>
@@ -74,608 +73,265 @@
 
     
     
-<p>Preprocessing is only useful if it improves the analysis it serves.
-This vignette uses a concrete goal to evaluate preprocessing choices:
-predicting the clay content of the 50 soil samples in
-<code>soilLIBS</code> with partial least squares (PLS) regression,
-fitted and validated with the <a href="https://www.tidymodels.org" class="external-link">tidymodels</a> framework.</p>
-<p>Two statistical issues shape the analysis:</p>
-<ul>
-<li>
-<strong>Clay content is part of a composition.</strong> Clay, sand
-and silt sum to 100%, so they should be modeled on a log-ratio scale,
-not as three unrelated percentages.</li>
-<li>
-<strong>There are 50 samples and 7152 variables.</strong> A model
-can fit the calibration data almost perfectly, so everything depends on
-estimating the prediction error honestly. Common shortcuts bias it
-downward; the vignette quantifies two of them.</li>
-</ul>
+<p>A calibration relates a signal to the concentration of an element,
+from samples of known composition, and predicts the concentration of new
+samples. This vignette builds univariate calibration curves from line
+intensities, with their limits of detection and quantification, and
+compares them with a multivariate model of the whole spectrum, whose
+figures of merit come from the net analyte signal.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># parsnip attaches the mixOmics engine, which attaches MASS. Attaching it</span></span>
-<span><span class="co"># first keeps dplyr::select() (attached with recipes) ahead of MASS::select()</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.mixOmics.org" class="external-link">mixOmics</a></span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ChristianGoueguel/specProc" class="external-link">specProc</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/recipes" class="external-link">recipes</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/workflows" class="external-link">workflows</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tune.tidymodels.org/" class="external-link">tune</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rsample.tidymodels.org" class="external-link">rsample</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://plsmod.tidymodels.org" class="external-link">plsmod</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ChristianGoueguel/specProc" class="external-link">specProc</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">soilLIBS</span><span class="op">)</span></span>
-<span><span class="va">meta_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sample"</span>, <span class="st">"Location"</span>, <span class="st">"Clay"</span>, <span class="st">"Sand"</span>, <span class="st">"Silt"</span>, <span class="st">"Texture"</span>, <span class="st">"Structure"</span>, <span class="st">"Type"</span><span class="op">)</span></span>
-<span><span class="va">channels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">soilLIBS</span><span class="op">)</span>, <span class="va">meta_cols</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"forageLIBS"</span><span class="op">)</span></span>
+<span><span class="va">spectra_id</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">minerals</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fl">3</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">spectra_id</span>, <span class="va">minerals</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
-<h2 id="the-target-a-composition">The target: a composition<a class="anchor" aria-label="anchor" href="#the-target-a-composition"></a>
+<h2 id="line-intensities">Line intensities<a class="anchor" aria-label="anchor" href="#line-intensities"></a>
 </h2>
+<p>We remove the baseline and measure, in every spectrum, the
+intensities of a potassium line, an iron line and the carbon line C I
+247.86 nm. Carbon is the main element of the forage matrix, and dividing
+by its line compensates for the changes of ablated mass and plasma from
+spectrum to spectrum (the internal standard of
+<code><a href="../articles/preprocessing.html">vignette("preprocessing")</a></code>):</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">texture</span> <span class="op">&lt;-</span> <span class="va">soilLIBS</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html" class="external-link">distinct</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="va">Clay</span>, <span class="va">Sand</span>, <span class="va">Silt</span><span class="op">)</span></span>
-<span><span class="va">texture</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">Sample</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt;       Clay            Sand            Silt      </span></span>
-<span><span class="co">#&gt;  Min.   : 1.10   Min.   : 5.00   Min.   : 4.00  </span></span>
-<span><span class="co">#&gt;  1st Qu.:23.57   1st Qu.:19.05   1st Qu.:30.45  </span></span>
-<span><span class="co">#&gt;  Median :34.55   Median :25.00   Median :39.90  </span></span>
-<span><span class="co">#&gt;  Mean   :31.83   Mean   :33.61   Mean   :34.56  </span></span>
-<span><span class="co">#&gt;  3rd Qu.:38.45   3rd Qu.:30.70   3rd Qu.:43.33  </span></span>
-<span><span class="co">#&gt;  Max.   :81.00   Max.   :92.90   Max.   :65.70</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">texture</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Clay"</span>, <span class="st">"Sand"</span>, <span class="st">"Silt"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">#&gt;     100     100     100     100     100     100</span></span></code></pre></div>
-<p>The three fractions sum to 100% (up to rounding), so they carry only
-two independent pieces of information. Modeling clay percentage directly
-with a linear model ignores this constraint, which has two
-consequences:</p>
-<ul>
-<li>
-<strong>Predictions can leave the range 0–100%.</strong> A linear
-model can predict negative clay contents.</li>
-<li>
-<strong>Errors are treated as equal on an absolute scale.</strong>
-An error of 5 points counts the same at 5% clay as at 50% clay, although
-it is a 100% error in the first case and a 10% error in the second.</li>
-</ul>
-<p>Compositional data analysis (Aitchison, 1986) removes the constraint
-by working with log-ratios. We use the <strong>additive
-log-ratio</strong> (ALR) transformation with silt as the reference
-fraction:</p>
-<p><span class="math display">
-z_1 = \log\frac{\text{clay}}{\text{silt}}, \qquad
-z_2 = \log\frac{\text{sand}}{\text{silt}}
-</span></p>
-<p>The two log-ratios are unconstrained real numbers, so they suit
-linear models such as PLS. We fit one PLS model for each. Their
-predictions <span class="math inline">\hat z_1, \hat z_2</span> are
-transformed back to a composition:</p>
-<p><span class="math display">
-\widehat{\text{clay}} = 100 \, \frac{e^{\hat z_1}}{1 + e^{\hat z_1} +
-e^{\hat z_2}}, \qquad
-\widehat{\text{sand}} = 100 \, \frac{e^{\hat z_2}}{1 + e^{\hat z_1} +
-e^{\hat z_2}}, \qquad
-\widehat{\text{silt}} = 100 - \widehat{\text{clay}} -
-\widehat{\text{sand}}
-</span></p>
-<p>By construction, the predicted fractions are positive and sum to
-100%. None of the fractions is zero in this data set, so the log-ratios
-are defined for every sample. Zeros would need a replacement strategy
-first.</p>
+<code class="sourceCode R"><span><span class="va">corrected</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/baseline_arpls.html">baseline_arpls</a></span><span class="op">(</span><span class="va">spectra</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span></span>
+<span></span>
+<span><span class="va">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>C <span class="op">=</span> <span class="fl">247.856</span>, K <span class="op">=</span> <span class="fl">769.896</span>, Fe <span class="op">=</span> <span class="fl">259.940</span><span class="op">)</span></span>
+<span><span class="va">intensities</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">corrected</span>, <span class="va">lines</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">spectrum</span>, <span class="va">line</span>, <span class="va">intensity</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">line</span>, values_from <span class="op">=</span> <span class="va">intensity</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">spectra_id</span><span class="op">)</span>, <span class="va">K</span>, <span class="va">Fe</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>K_signal <span class="op">=</span> <span class="va">intensities</span><span class="op">$</span><span class="va">K</span> <span class="op">/</span> <span class="va">intensities</span><span class="op">$</span><span class="va">C</span>,</span>
+<span>         Fe_signal <span class="op">=</span> <span class="va">intensities</span><span class="op">$</span><span class="va">Fe</span> <span class="op">/</span> <span class="va">intensities</span><span class="op">$</span><span class="va">C</span><span class="op">)</span></span></code></pre></div>
+<p>We set aside a quarter of the samples to test the calibrations:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">targets</span> <span class="op">&lt;-</span> <span class="va">texture</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    total <span class="op">=</span> <span class="va">Clay</span> <span class="op">+</span> <span class="va">Sand</span> <span class="op">+</span> <span class="va">Silt</span>,        <span class="co"># close to exactly 1</span></span>
-<span>    clay <span class="op">=</span> <span class="fl">100</span> <span class="op">*</span> <span class="va">Clay</span> <span class="op">/</span> <span class="va">total</span>,</span>
-<span>    clay_silt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">Clay</span> <span class="op">/</span> <span class="va">Silt</span><span class="op">)</span>,</span>
-<span>    sand_silt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">Sand</span> <span class="op">/</span> <span class="va">Silt</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="va">clay</span>, <span class="va">clay_silt</span>, <span class="va">sand_silt</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">back_transform</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">z1</span>, <span class="va">z2</span><span class="op">)</span> <span class="fl">100</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">z1</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">z1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="va">z2</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">targets</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">clay</span>, <span class="va">clay_silt</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"scale"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>scale <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/recode.html" class="external-link">recode</a></span><span class="op">(</span><span class="va">scale</span>, clay <span class="op">=</span> <span class="st">"Clay (%)"</span>, clay_silt <span class="op">=</span> <span class="st">"log(clay / silt)"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">15</span>, fill <span class="op">=</span> <span class="st">"grey70"</span>, colour <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">scale</span>, scales <span class="op">=</span> <span class="st">"free_x"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"Samples"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="calibration_files/figure-html/logratio-1.png" class="r-plt" alt="" width="100%"></p>
-<p>On the percentage scale, clay content is left-skewed, with a few
-samples above 55% and several below 10%. On the log-ratio scale, the
-low-clay samples are spread out rather than squeezed against zero.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">test_samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Sample</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fl">0.25</span> <span class="op">*</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/n_distinct.html" class="external-link">n_distinct</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Sample</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">calibration</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">data</span>, <span class="op">!</span><span class="va">Sample</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">test_samples</span><span class="op">)</span></span>
+<span><span class="va">test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">Sample</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">test_samples</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>calibration <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">calibration</span><span class="op">)</span>, test <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">test</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; calibration        test </span></span>
+<span><span class="co">#&gt;         275          93</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="preprocessing-without-leakage">Preprocessing without leakage<a class="anchor" aria-label="anchor" href="#preprocessing-without-leakage"></a>
+<h2 id="a-calibration-curve-for-potassium">A calibration curve for potassium<a class="anchor" aria-label="anchor" href="#a-calibration-curve-for-potassium"></a>
 </h2>
-<p>Preprocessing steps fall into two groups:</p>
-<ul>
-<li>
-<strong>Steps computed from each spectrum alone</strong>
-(<code><a href="../reference/step_baseline.html">step_baseline()</a></code>, <code><a href="../reference/step_snv.html">step_snv()</a></code>): they use no
-information from other samples, so they give the same result whether
-they are applied before or after the data are split.</li>
-<li>
-<strong>Steps estimated from a set of samples</strong>
-(<code><a href="../reference/step_msc.html">step_msc()</a></code>, which estimates a reference spectrum; the EPO,
-GLSW and OSC-family filters; centering and scaling): they must be
-estimated on the calibration part of each cross-validation split only,
-and then applied to the held-out part. Placed in a recipe that is part
-of a workflow, they are re-estimated on every resample
-automatically.</li>
-</ul>
-<p>We apply the per-spectrum steps to the 400 shots now, and average the
-8 shots of each sample:</p>
+<p><code><a href="../reference/calibration_curve.html">calibration_curve()</a></code> fits the signal as a function of the
+concentration, and returns the coefficients, the figures of merit and
+tests of linearity:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">shot_recipe</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></span><span class="op">(</span><span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">soilLIBS</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://recipes.tidymodels.org/reference/roles.html" class="external-link">update_role</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">meta_cols</span><span class="op">)</span>, new_role <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="../reference/step_baseline.html">step_baseline</a></span><span class="op">(</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">baselined_shots</span> <span class="op">&lt;-</span> <span class="va">shot_recipe</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/prep.html" class="external-link">prep</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/bake.html" class="external-link">bake</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span><span class="va">snv_shots</span> <span class="op">&lt;-</span> <span class="va">shot_recipe</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/step_snv.html">step_snv</a></span><span class="op">(</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/prep.html" class="external-link">prep</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://recipes.tidymodels.org/reference/bake.html" class="external-link">bake</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">sample_means</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">shots</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">shots</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">channels</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="../reference/average.html">average</a></span><span class="op">(</span><span class="va">Sample</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">targets</span>, by <span class="op">=</span> <span class="st">"Sample"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/relocate.html" class="external-link">relocate</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="va">clay</span>, <span class="va">clay_silt</span>, <span class="va">sand_silt</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="va">raw_s</span> <span class="op">&lt;-</span> <span class="fu">sample_means</span><span class="op">(</span><span class="va">soilLIBS</span><span class="op">)</span></span>
-<span><span class="va">base_s</span> <span class="op">&lt;-</span> <span class="fu">sample_means</span><span class="op">(</span><span class="va">baselined_shots</span><span class="op">)</span></span>
-<span><span class="va">snv_s</span> <span class="op">&lt;-</span> <span class="fu">sample_means</span><span class="op">(</span><span class="va">snv_shots</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="validation-design">Validation design<a class="anchor" aria-label="anchor" href="#validation-design"></a>
-</h2>
-<p>We use <strong>repeated 5-fold cross-validation</strong> with the
-sample as the unit. Each sample is one row after averaging, so all 8
-shots of a sample are always on the same side of a split. Within each
-calibration set, a PLS model is fitted to each log-ratio, and the two
-predicted log-ratios are back-transformed to clay percentages.</p>
-<p>The number of PLS components (up to 10, the same for both log-ratios)
-is chosen by an inner cross-validation within the calibration set, so
-the outer folds never influence this choice: this is nested
-cross-validation, which <code><a href="https://rsample.tidymodels.org/reference/nested_cv.html" class="external-link">rsample::nested_cv()</a></code> sets up. For
-each inner split, <code><a href="https://tune.tidymodels.org/reference/tune_grid.html" class="external-link">tune_grid()</a></code> fits the two log-ratio
-workflows for 1 to 10 components; their saved predictions are joined and
-back-transformed, and the number of components minimizing the error of
-the <strong>back-transformed clay predictions</strong> is kept. This is
-the same criterion used to evaluate the model. Choosing it instead on
-the log-ratio scale would optimize relative errors, which favors fewer
-components and gives worse clay percentages. With only 40 calibration
-samples per split, the chosen number of components still varies
-considerably from split to split.</p>
-<p>The whole procedure is repeated 3 times with different fold
-assignments, to show how much the error estimate itself varies. (More
-repeats give a more precise comparison, at a proportional cost in
-computing time.)</p>
+<code class="sourceCode R"><span><span class="va">k_curve</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibration_curve.html">calibration_curve</a></span><span class="op">(</span><span class="va">calibration</span>, <span class="va">K_signal</span>, <span class="va">K</span><span class="op">)</span></span>
+<span><span class="va">k_curve</span></span>
+<span><span class="co">#&gt; Linear calibration curve (275 standards)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;       term estimate std_error  lower  upper</span></span>
+<span><span class="co">#&gt;  intercept   1.2570   0.03232 1.1934 1.3206</span></span>
+<span><span class="co">#&gt;      slope   0.3087   0.01524 0.2787 0.3387</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; R-squared:    0.60055</span></span>
+<span><span class="co">#&gt; Sensitivity:  0.3087</span></span>
+<span><span class="co">#&gt; LOD:          1.45  (residual)</span></span>
+<span><span class="co">#&gt; LOQ:          4.39</span></span>
+<span><span class="co">#&gt; Mandel:        F = 4.52, p = 0.0345</span></span>
+<span><span class="co">#&gt; Lack of fit:   F = 1.12, p = 0.258</span></span></code></pre></div>
+<ul>
+<li>
+<strong>The sensitivity</strong> is the slope: the change of the
+signal for 1% of K.</li>
+<li>
+<strong>The limits of detection and quantification</strong>, <span class="math inline">3.3\,\sigma/S</span> and <span class="math inline">10\,\sigma/S</span>, use here the residual standard
+deviation <span class="math inline">\sigma</span> of the fit. It
+includes every source of scatter around the curve, not only the noise of
+a blank, so the limits, 1.4% and 4.4% K, describe this calibration
+rather than the instrument.</li>
+<li>
+<strong>Mandel’s test</strong> compares the straight line with a
+quadratic curve. Its p-value, 0.034, points to a slight curvature, as
+expected for a resonance line, which the plasma partly reabsorbs at high
+concentration.</li>
+</ul>
+<p><code><a href="../reference/plot_calibration.html">plot_calibration()</a></code> draws the curve with its confidence
+band (where the mean signal lies) and its prediction band (where a
+single new measurement is expected):</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2024</span><span class="op">)</span></span>
-<span><span class="va">folds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/nested_cv.html" class="external-link">nested_cv</a></span><span class="op">(</span><span class="va">targets</span>,</span>
-<span>                   outside <span class="op">=</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/vfold_cv.html" class="external-link">vfold_cv</a></span><span class="op">(</span>v <span class="op">=</span> <span class="fl">5</span>, repeats <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span>
-<span>                   inside <span class="op">=</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/vfold_cv.html" class="external-link">vfold_cv</a></span><span class="op">(</span>v <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">folds</span></span>
-<span><span class="co">#&gt; # Nested resampling:</span></span>
-<span><span class="co">#&gt; #  outer: 5-fold cross-validation repeated 3 times</span></span>
-<span><span class="co">#&gt; #  inner: 5-fold cross-validation</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 15 × 4</span></span></span>
-<span><span class="co">#&gt;    splits          id      id2   inner_resamples</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>         </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat1 Fold1 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat1 Fold2 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat1 Fold3 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat1 Fold4 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat1 Fold5 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat2 Fold1 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat2 Fold2 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat2 Fold3 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat2 Fold4 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat2 Fold5 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat3 Fold1 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat3 Fold2 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat3 Fold3 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat3 Fold4 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> <span style="color: #949494;">&lt;split [40/10]&gt;</span> Repeat3 Fold5 <span style="color: #949494;">&lt;vfold [5 × 2]&gt;</span></span></span></code></pre></div>
-<p>The splits index rows, so the same splits apply to every version of
-the data (raw, baseline-corrected, SNV), which have their samples in the
-same order.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_calibration.html">plot_calibration</a></span><span class="op">(</span><span class="va">k_curve</span><span class="op">)</span></span></code></pre></div>
+<p><img src="calibration_files/figure-html/k-plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p><code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> inverts the curve: it gives the concentration
+of new samples from their signals, with a prediction interval, and flags
+the values below the limits of detection and quantification:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># PLS regression; mixOmics scales every channel by default, scale = FALSE</span></span>
-<span><span class="co"># only centers them</span></span>
-<span><span class="va">pls_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/pls.html" class="external-link">pls</a></span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/tune.html" class="external-link">tune</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"mixOmics"</span>, scale <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># A recipe for one log-ratio: the channels are predictors, the other</span></span>
-<span><span class="co"># targets are identifiers</span></span>
-<span><span class="va">logratio_recipe</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">outcome</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://recipes.tidymodels.org/reference/roles.html" class="external-link">update_role</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">channels</span><span class="op">)</span>, new_role <span class="op">=</span> <span class="st">"predictor"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://recipes.tidymodels.org/reference/roles.html" class="external-link">update_role</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">outcome</span><span class="op">)</span>, new_role <span class="op">=</span> <span class="st">"outcome"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://recipes.tidymodels.org/reference/roles.html" class="external-link">update_role</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="va">clay</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">any_of</a></span><span class="op">(</span><span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"clay_silt"</span>, <span class="st">"sand_silt"</span><span class="op">)</span>, <span class="va">outcome</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                new_role <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="co"># The same split, on another table with the samples in the same order</span></span>
-<span><span class="va">reindex</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">split</span>, <span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rsample.tidymodels.org/reference/make_splits.html" class="external-link">make_splits</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>analysis <span class="op">=</span> <span class="va">split</span><span class="op">$</span><span class="va">in_id</span>, assessment <span class="op">=</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/complement.html" class="external-link">complement</a></span><span class="op">(</span><span class="va">split</span><span class="op">)</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">data</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="co"># Number of components minimizing the inner-CV error of the back-transformed</span></span>
-<span><span class="co"># clay predictions, from the two log-ratio workflows and their inner resamples</span></span>
-<span><span class="va">select_ncomp</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">workflows</span>, <span class="va">inner_sets</span>, <span class="va">cal</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">predictions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span><span class="va">workflows</span>, <span class="va">inner_sets</span>, \<span class="op">(</span><span class="va">wf</span>, <span class="va">inner</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://tune.tidymodels.org/reference/tune_grid.html" class="external-link">tune_grid</a></span><span class="op">(</span><span class="va">wf</span>, resamples <span class="op">=</span> <span class="va">inner</span>, grid <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>,</span>
-<span>              control <span class="op">=</span> <span class="fu"><a href="https://tune.tidymodels.org/reference/control_grid.html" class="external-link">control_grid</a></span><span class="op">(</span>save_pred <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://tune.tidymodels.org/reference/collect_predictions.html" class="external-link">collect_predictions</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">.row</span>, <span class="va">num_comp</span>, <span class="va">.pred</span><span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">predictions</span><span class="op">$</span><span class="va">clay_silt</span>, <span class="va">predictions</span><span class="op">$</span><span class="va">sand_silt</span>,</span>
-<span>             by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">".row"</span>, <span class="st">"num_comp"</span><span class="op">)</span>, suffix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"_1"</span>, <span class="st">"_2"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>error <span class="op">=</span> <span class="fu">back_transform</span><span class="op">(</span><span class="va">.pred_1</span>, <span class="va">.pred_2</span><span class="op">)</span> <span class="op">-</span> <span class="va">cal</span><span class="op">$</span><span class="va">clay</span><span class="op">[</span><span class="va">.row</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">num_comp</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>rmse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">error</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_min</a></span><span class="op">(</span><span class="va">rmse</span>, n <span class="op">=</span> <span class="fl">1</span>, with_ties <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">num_comp</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="co"># One outer split: tune on the calibration part, predict the held-out part.</span></span>
-<span><span class="co"># `pipeline` holds the data (or one table per log-ratio), optional recipe</span></span>
-<span><span class="co"># steps and, optionally, a fixed number of components.</span></span>
-<span><span class="va">evaluate_split</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">pipeline</span>, <span class="va">split</span>, <span class="va">inner</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">outcomes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>clay_silt <span class="op">=</span> <span class="st">"clay_silt"</span>, sand_silt <span class="op">=</span> <span class="st">"sand_silt"</span><span class="op">)</span></span>
-<span>  <span class="va">data_for</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">outcome</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">is.data.frame</a></span><span class="op">(</span><span class="va">pipeline</span><span class="op">$</span><span class="va">data</span><span class="op">)</span><span class="op">)</span> <span class="va">pipeline</span><span class="op">$</span><span class="va">data</span> <span class="kw">else</span> <span class="va">pipeline</span><span class="op">$</span><span class="va">data</span><span class="op">[[</span><span class="va">outcome</span><span class="op">]</span><span class="op">]</span></span>
-<span>  <span class="op">}</span></span>
-<span>  <span class="va">splits</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">outcomes</span>, \<span class="op">(</span><span class="va">o</span><span class="op">)</span> <span class="fu">reindex</span><span class="op">(</span><span class="va">split</span>, <span class="fu">data_for</span><span class="op">(</span><span class="va">o</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">cal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html" class="external-link">analysis</a></span><span class="op">(</span><span class="va">splits</span><span class="op">$</span><span class="va">clay_silt</span><span class="op">)</span></span>
-<span>  <span class="va">workflows</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">outcomes</span>, \<span class="op">(</span><span class="va">o</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">rec</span> <span class="op">&lt;-</span> <span class="fu">logratio_recipe</span><span class="op">(</span><span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html" class="external-link">analysis</a></span><span class="op">(</span><span class="va">splits</span><span class="op">[[</span><span class="va">o</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, <span class="va">o</span><span class="op">)</span></span>
-<span>    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">pipeline</span><span class="op">$</span><span class="va">steps</span><span class="op">)</span><span class="op">)</span> <span class="va">rec</span> <span class="op">&lt;-</span> <span class="va">pipeline</span><span class="op">$</span><span class="fu">steps</span><span class="op">(</span><span class="va">rec</span>, <span class="va">cal</span><span class="op">$</span><span class="va">Sample</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://workflows.tidymodels.org/reference/workflow.html" class="external-link">workflow</a></span><span class="op">(</span><span class="va">rec</span>, <span class="va">pls_model</span><span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span></span>
-<span>  <span class="va">ncomp</span> <span class="op">&lt;-</span> <span class="va">pipeline</span><span class="op">$</span><span class="va">ncomp</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">ncomp</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">inner_sets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">outcomes</span>, \<span class="op">(</span><span class="va">o</span><span class="op">)</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/manual_rset.html" class="external-link">manual_rset</a></span><span class="op">(</span></span>
-<span>      <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">inner</span><span class="op">$</span><span class="va">splits</span>, \<span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="fu">reindex</span><span class="op">(</span><span class="va">s</span>, <span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html" class="external-link">analysis</a></span><span class="op">(</span><span class="va">splits</span><span class="op">[[</span><span class="va">o</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="va">inner</span><span class="op">$</span><span class="va">id</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="va">ncomp</span> <span class="op">&lt;-</span> <span class="fu">select_ncomp</span><span class="op">(</span><span class="va">workflows</span>, <span class="va">inner_sets</span>, <span class="va">cal</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span>  <span class="va">predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span><span class="va">workflows</span>, <span class="va">outcomes</span>, \<span class="op">(</span><span class="va">wf</span>, <span class="va">o</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://tune.tidymodels.org/reference/finalize_model.html" class="external-link">finalize_workflow</a></span><span class="op">(</span><span class="va">wf</span>, <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>num_comp <span class="op">=</span> <span class="va">ncomp</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html" class="external-link">analysis</a></span><span class="op">(</span><span class="va">splits</span><span class="op">[[</span><span class="va">o</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html" class="external-link">assessment</a></span><span class="op">(</span><span class="va">splits</span><span class="op">[[</span><span class="va">o</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">.pred</span><span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>Sample <span class="op">=</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html" class="external-link">assessment</a></span><span class="op">(</span><span class="va">splits</span><span class="op">$</span><span class="va">clay_silt</span><span class="op">)</span><span class="op">$</span><span class="va">Sample</span>,</span>
-<span>         clay <span class="op">=</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html" class="external-link">assessment</a></span><span class="op">(</span><span class="va">splits</span><span class="op">$</span><span class="va">clay_silt</span><span class="op">)</span><span class="op">$</span><span class="va">clay</span>,</span>
-<span>         pred <span class="op">=</span> <span class="fu">back_transform</span><span class="op">(</span><span class="va">predicted</span><span class="op">$</span><span class="va">clay_silt</span>, <span class="va">predicted</span><span class="op">$</span><span class="va">sand_silt</span><span class="op">)</span>,</span>
-<span>         ncomp <span class="op">=</span> <span class="va">ncomp</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="co"># Repeated nested CV of a pipeline</span></span>
-<span><span class="va">cross_validate</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">pipeline</span>, <span class="va">folds</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">folds</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>result <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span><span class="va">splits</span>, <span class="va">inner_resamples</span>, \<span class="op">(</span><span class="va">s</span>, <span class="va">i</span><span class="op">)</span> <span class="fu">evaluate_split</span><span class="op">(</span><span class="va">pipeline</span>, <span class="va">s</span>, <span class="va">i</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">splits</span>, <span class="op">-</span><span class="va">inner_resamples</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>repeat_id <span class="op">=</span> <span class="va">id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">k_predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">k_curve</span>, <span class="va">test</span><span class="op">$</span><span class="va">K_signal</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">k_predicted</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span></span>
+<span><span class="co">#&gt;   signal concentration    se lower upper below_lod below_loq</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>   2.23          3.17 0.443 2.29   4.04 FALSE     TRUE     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>   1.89          2.05 0.439 1.18   2.91 FALSE     TRUE     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>   2.06          2.61 0.440 1.74   3.48 FALSE     TRUE     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>   2.16          2.93 0.442 2.06   3.80 FALSE     TRUE     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>   1.83          1.86 0.439 0.996  2.73 FALSE     TRUE     </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>   1.85          1.92 0.439 1.06   2.79 FALSE     TRUE</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">k_predicted</span><span class="op">$</span><span class="va">concentration</span> <span class="op">-</span> <span class="va">test</span><span class="op">$</span><span class="va">K</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>   <span class="co"># RMSEP, % K</span></span>
+<span><span class="co">#&gt; [1] 0.4828623</span></span></code></pre></div>
+<p>The limit of quantification of this curve, 4.4% K, is above the
+potassium content of almost every sample, so 100% of the predictions are
+flagged <code>below_loq</code>: a single line ranks the samples, but
+does not quantify them individually with the usual <span class="math inline">10\,\sigma</span> margin.</p>
 </div>
 <div class="section level2">
-<h2 id="comparing-preprocessing-pipelines">Comparing preprocessing pipelines<a class="anchor" aria-label="anchor" href="#comparing-preprocessing-pipelines"></a>
+<h2 id="trace-elements-weights-and-limits-of-detection">Trace elements: weights and limits of detection<a class="anchor" aria-label="anchor" href="#trace-elements-weights-and-limits-of-detection"></a>
 </h2>
-<p>We compare six pipelines. They share the fold assignments, so the
-comparisons are paired:</p>
+<p>Iron ranges from 50 to 2060 ppm, and its signal is noisier at high
+concentration. An unweighted fit is then dominated by the few rich
+samples, and so is its residual standard deviation, which inflates the
+limit of detection. Weights <code>"1/x"</code> give each sample a weight
+inversely proportional to its concentration. With weights, the residual
+standard deviation depends on their scale, so the blank standard
+deviation is taken from the standard error of the intercept
+(<code>lod_method = "intercept"</code>):</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Clutter for EPO: shot-to-shot deviations of the calibration samples only</span></span>
-<span><span class="va">shot_clutter</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">cal_samples</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">shots</span> <span class="op">&lt;-</span> <span class="va">snv_shots</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Sample</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">cal_samples</span><span class="op">)</span></span>
-<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">shots</span><span class="op">[</span><span class="va">channels</span><span class="op">]</span><span class="op">)</span></span>
-<span>  <span class="va">x</span> <span class="op">-</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rowsum.html" class="external-link">rowsum</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">shots</span><span class="op">$</span><span class="va">Sample</span><span class="op">)</span> <span class="op">/</span> <span class="fl">8</span><span class="op">)</span><span class="op">[</span><span class="va">shots</span><span class="op">$</span><span class="va">Sample</span>, <span class="op">]</span></span>
-<span><span class="op">}</span></span>
+<code class="sourceCode R"><span><span class="va">fe_calibration</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">calibration</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Fe</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">fe_unweighted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibration_curve.html">calibration_curve</a></span><span class="op">(</span><span class="va">fe_calibration</span>, <span class="va">Fe_signal</span>, <span class="va">Fe</span><span class="op">)</span></span>
+<span><span class="va">fe_weighted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibration_curve.html">calibration_curve</a></span><span class="op">(</span><span class="va">fe_calibration</span>, <span class="va">Fe_signal</span>, <span class="va">Fe</span>, weights <span class="op">=</span> <span class="st">"1/x"</span>,</span>
+<span>                                 lod_method <span class="op">=</span> <span class="st">"intercept"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">pipelines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  `raw counts` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">raw_s</span><span class="op">)</span>,</span>
-<span>  `baseline` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">base_s</span><span class="op">)</span>,</span>
-<span>  `baseline + SNV` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">snv_s</span><span class="op">)</span>,</span>
-<span>  <span class="co"># MSC: the reference spectrum is estimated on the calibration samples only</span></span>
-<span>  `baseline + MSC` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">base_s</span>, steps <span class="op">=</span> \<span class="op">(</span><span class="va">rec</span>, <span class="va">cal</span><span class="op">)</span> <span class="fu"><a href="../reference/step_msc.html">step_msc</a></span><span class="op">(</span><span class="va">rec</span>, <span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="co"># EPO: clutter from the calibration samples only</span></span>
-<span>  `SNV + EPO` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">snv_s</span>, steps <span class="op">=</span> \<span class="op">(</span><span class="va">rec</span>, <span class="va">cal</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="../reference/step_epo.html">step_epo</a></span><span class="op">(</span><span class="va">rec</span>, <span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span>, num_comp <span class="op">=</span> <span class="fl">3</span>, clutter <span class="op">=</span> <span class="fu">shot_clutter</span><span class="op">(</span><span class="va">cal</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span>,</span>
-<span>  <span class="co"># OPLS filter (projected OSC) fitted to the calibration samples and to the</span></span>
-<span>  <span class="co"># log-ratio being modeled, followed by a one-component PLS model</span></span>
-<span>  `SNV + OPLS filter` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">snv_s</span>, ncomp <span class="op">=</span> <span class="fl">1</span>, steps <span class="op">=</span> \<span class="op">(</span><span class="va">rec</span>, <span class="va">cal</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="../reference/step_projected_osc.html">step_projected_osc</a></span><span class="op">(</span><span class="va">rec</span>, <span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span>, num_comp <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="va">pipelines</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/map.html" class="external-link">map</a></span><span class="op">(</span>\<span class="op">(</span><span class="va">p</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu">cross_validate</span><span class="op">(</span><span class="va">p</span>, <span class="va">folds</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span>.id <span class="op">=</span> <span class="st">"pipeline"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pipeline <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">pipeline</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pipelines</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">per_repeat</span> <span class="op">&lt;-</span> <span class="va">results</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">pipeline</span>, <span class="va">repeat_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
-<span>    rmse <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">pred</span> <span class="op">-</span> <span class="va">clay</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    r2 <span class="op">=</span> <span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">pred</span> <span class="op">-</span> <span class="va">clay</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">clay</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">clay</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>,</span>
-<span>    ncomp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">ncomp</span><span class="op">)</span>,</span>
-<span>    .groups <span class="op">=</span> <span class="st">"drop"</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="va">summary_table</span> <span class="op">&lt;-</span> <span class="va">per_repeat</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">pipeline</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>RMSE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">rmse</span><span class="op">)</span>, RMSE_sd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">rmse</span><span class="op">)</span>, R2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">r2</span><span class="op">)</span>, ncomp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">ncomp</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">RMSE</span>, <span class="va">RMSE_sd</span>, <span class="va">R2</span><span class="op">)</span>, \<span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">v</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">summary_table</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 5</span></span></span>
-<span><span class="co">#&gt;   pipeline           RMSE RMSE_sd    R2 ncomp</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> raw counts        10.2     1.24  0.58     3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> baseline          10.6     1.01  0.56     3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> baseline + SNV     8.52    0.58  0.71     3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> baseline + MSC     8.02    0.7   0.75     5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> SNV + EPO          8.27    0.34  0.73     5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> SNV + OPLS filter  8.18    0.4   0.74     1</span></span>
-<span></span>
-<span><span class="va">null_rmse</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">targets</span><span class="op">$</span><span class="va">clay</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">targets</span><span class="op">$</span><span class="va">clay</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>null_model_RMSE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">null_rmse</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; null_model_RMSE </span></span>
-<span><span class="co">#&gt;           15.96</span></span></code></pre></div>
-<p><code>RMSE</code> (in % clay) and <code>R2</code> are averages over
-the 3 repeats, <code>RMSE_sd</code> is the standard deviation of the
-RMSE across repeats, and <code>ncomp</code> is the median number of PLS
-components chosen. All pipelines predict clay content far better than
-the null model, which predicts the mean for every sample (RMSE 16%). The
-spectra explain most of the variation in clay content.</p>
-<p>Are the pipelines different from each other? The fold assignments are
-shared, so we compare each pipeline with the baseline-only pipeline
-repeat by repeat:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">paired</span> <span class="op">&lt;-</span> <span class="va">per_repeat</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">pipeline</span>, <span class="va">repeat_id</span>, <span class="va">rmse</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">repeat_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>difference <span class="op">=</span> <span class="va">rmse</span> <span class="op">-</span> <span class="va">rmse</span><span class="op">[</span><span class="va">pipeline</span> <span class="op">==</span> <span class="st">"baseline"</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">pipeline</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>mean_difference <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">difference</span><span class="op">)</span>, min <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">difference</span><span class="op">)</span>, max <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">difference</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="op">-</span><span class="va">pipeline</span>, \<span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">v</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">paired</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span></span>
-<span><span class="co">#&gt;   pipeline          mean_difference   min   max</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> raw counts                  -<span style="color: #BB0000;">0.36</span> -<span style="color: #BB0000;">0.86</span>  0.08</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> baseline                     0     0     0   </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> baseline + SNV              -<span style="color: #BB0000;">2.08</span> -<span style="color: #BB0000;">3.88</span> -<span style="color: #BB0000;">1.07</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> baseline + MSC              -<span style="color: #BB0000;">2.58</span> -<span style="color: #BB0000;">3.7</span>  -<span style="color: #BB0000;">1.54</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> SNV + EPO                   -<span style="color: #BB0000;">2.33</span> -<span style="color: #BB0000;">3.25</span> -<span style="color: #BB0000;">1.36</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> SNV + OPLS filter           -<span style="color: #BB0000;">2.42</span> -<span style="color: #BB0000;">3.75</span> -<span style="color: #BB0000;">1.17</span></span></span></code></pre></div>
-<p>The comparison separates two questions:</p>
-<ul>
-<li>
-<strong>Normalizing helps.</strong> The four pipelines that
-normalize the spectra (SNV, MSC, SNV + EPO and SNV + OPLS filter) have a
-lower RMSE than baseline correction alone in every repeat, by about 2.4
-points of clay on average. This answers the question left open in the
-preprocessing vignette: the between-sample variation that normalization
-removes is mostly unrelated to clay content, so removing it helps.</li>
-<li>
-<strong>The normalized pipelines cannot be ranked.</strong> Their
-mean RMSEs lie within 0.5 points of each other, which is small compared
-with the variation between repeats. The additional filters (EPO, OPLS)
-do not measurably improve on SNV or MSC alone.</li>
-</ul>
-<p>A claim that one normalized pipeline is better than another would
-need more samples, or an independent validation set.</p>
-</div>
-<div class="section level2">
-<h2 id="what-the-log-ratio-model-gains">What the log-ratio model gains<a class="anchor" aria-label="anchor" href="#what-the-log-ratio-model-gains"></a>
-</h2>
-<p>For comparison, we fit PLS directly to the clay percentage, with the
-same preprocessing (baseline + SNV) and the same fold assignments. The
-number of components is chosen by the inner cross-validation with
-<code><a href="https://tune.tidymodels.org/reference/show_best.html" class="external-link">tune::select_best()</a></code>:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">direct_workflow</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://workflows.tidymodels.org/reference/workflow.html" class="external-link">workflow</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></span><span class="op">(</span><span class="va">snv_s</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://recipes.tidymodels.org/reference/roles.html" class="external-link">update_role</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">channels</span><span class="op">)</span>, new_role <span class="op">=</span> <span class="st">"predictor"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://recipes.tidymodels.org/reference/roles.html" class="external-link">update_role</a></span><span class="op">(</span><span class="va">clay</span>, new_role <span class="op">=</span> <span class="st">"outcome"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://recipes.tidymodels.org/reference/roles.html" class="external-link">update_role</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="va">clay_silt</span>, <span class="va">sand_silt</span>, new_role <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span>,</span>
-<span>  <span class="va">pls_model</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">direct</span> <span class="op">&lt;-</span> <span class="va">folds</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>result <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span><span class="va">splits</span>, <span class="va">inner_resamples</span>, \<span class="op">(</span><span class="va">split</span>, <span class="va">inner</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">split</span> <span class="op">&lt;-</span> <span class="fu">reindex</span><span class="op">(</span><span class="va">split</span>, <span class="va">snv_s</span><span class="op">)</span></span>
-<span>    <span class="va">inner</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/manual_rset.html" class="external-link">manual_rset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">inner</span><span class="op">$</span><span class="va">splits</span>, \<span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="fu">reindex</span><span class="op">(</span><span class="va">s</span>, <span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html" class="external-link">analysis</a></span><span class="op">(</span><span class="va">split</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, <span class="va">inner</span><span class="op">$</span><span class="va">id</span><span class="op">)</span></span>
-<span>    <span class="va">best</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tune.tidymodels.org/reference/tune_grid.html" class="external-link">tune_grid</a></span><span class="op">(</span><span class="va">direct_workflow</span>, resamples <span class="op">=</span> <span class="va">inner</span>, grid <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://tune.tidymodels.org/reference/show_best.html" class="external-link">select_best</a></span><span class="op">(</span>metric <span class="op">=</span> <span class="st">"rmse"</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://tune.tidymodels.org/reference/finalize_model.html" class="external-link">finalize_workflow</a></span><span class="op">(</span><span class="va">direct_workflow</span>, <span class="va">best</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html" class="external-link">analysis</a></span><span class="op">(</span><span class="va">split</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://generics.r-lib.org/reference/augment.html" class="external-link">augment</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/as.data.frame.rsplit.html" class="external-link">assessment</a></span><span class="op">(</span><span class="va">split</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="va">clay</span>, pred <span class="op">=</span> <span class="va">.pred</span><span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span>repeat_id <span class="op">=</span> <span class="va">id</span>, <span class="va">result</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">logratio</span> <span class="op">&lt;-</span> <span class="va">results</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pipeline</span> <span class="op">==</span> <span class="st">"baseline + SNV"</span><span class="op">)</span></span>
-<span><span class="va">compare</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">predictions</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">per_sample</span> <span class="op">&lt;-</span> <span class="va">predictions</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="va">clay</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>    RMSE <span class="op">=</span> <span class="va">predictions</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">repeat_id</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">pred</span> <span class="op">-</span> <span class="va">clay</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    median_abs_error <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">per_sample</span><span class="op">$</span><span class="va">pred</span> <span class="op">-</span> <span class="va">per_sample</span><span class="op">$</span><span class="va">clay</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    min_prediction <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">predictions</span><span class="op">$</span><span class="va">pred</span><span class="op">)</span>,</span>
-<span>    RMSE_log_clay <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">pmax</a></span><span class="op">(</span><span class="va">per_sample</span><span class="op">$</span><span class="va">pred</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">per_sample</span><span class="op">$</span><span class="va">clay</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span>direct <span class="op">=</span> <span class="fu">compare</span><span class="op">(</span><span class="va">direct</span><span class="op">)</span>, log_ratio <span class="op">=</span> <span class="fu">compare</span><span class="op">(</span><span class="va">logratio</span><span class="op">)</span>, .id <span class="op">=</span> <span class="st">"model"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="op">-</span><span class="va">model</span>, \<span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">v</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span>unweighted <span class="op">=</span> <span class="va">fe_unweighted</span><span class="op">$</span><span class="va">figures_of_merit</span>,</span>
+<span>          weighted <span class="op">=</span> <span class="va">fe_weighted</span><span class="op">$</span><span class="va">figures_of_merit</span>, .id <span class="op">=</span> <span class="st">"fit"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">n</span>, <span class="va">r_squared</span>, <span class="va">lod</span>, <span class="va">loq</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 5</span></span></span>
-<span><span class="co">#&gt;   model      RMSE median_abs_error min_prediction RMSE_log_clay</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> direct     8.41             4.08          -<span style="color: #BB0000;">5.66</span>          0.73</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> log_ratio  8.52             3.86           1.74          0.41</span></span></code></pre></div>
-<p>The two models have a comparable RMSE (8.41 and 8.52 points). The
-log-ratio model is better on the other criteria:</p>
-<ul>
-<li>
-<strong>Its predictions are always valid percentages.</strong> The
-direct model predicts clay contents as low as -5.7%, while the log-ratio
-predictions are positive by construction.</li>
-<li>
-<strong>Its typical error is smaller,</strong> as the median
-absolute error shows. The RMSE is dominated by the few large errors at
-high clay content.</li>
-<li>
-<strong>Its relative errors are much smaller,</strong> as the RMSE
-of log(clay) shows. The gain comes from the low-clay samples, where the
-direct model’s errors are large relative to the true values.</li>
-</ul>
-<p>The model also predicts the complete composition: the sand and silt
-predictions come with the same fit and are consistent with the clay
-prediction by construction.</p>
-<p>Two caveats apply to back-transformed predictions:</p>
-<ul>
-<li>
-<strong>Back-transformed predictions are not unbiased
-means.</strong> The model is fitted on the log-ratio scale, so the
-back-transformed prediction estimates a typical value on that scale
-(closer to a median than to a mean) of the clay fraction. When residuals
-are large, the mean clay content is slightly different.</li>
-<li>
-<strong>The choice of reference fraction matters a little.</strong>
-With separate PLS models for each log-ratio, choosing silt as the
-denominator gives slightly different predictions than choosing sand.
-Isometric log-ratios (ILR) avoid this arbitrary choice, but are less
-directly interpretable.</li>
-</ul>
+<span><span class="co">#&gt;   fit            n r_squared   lod   loq</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> unweighted   272     0.852 295.  895. </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> weighted     272     0.788  17.4  52.8</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_calibration.html">plot_calibration</a></span><span class="op">(</span><span class="va">fe_weighted</span>, interval <span class="op">=</span> <span class="st">"prediction"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="calibration_files/figure-html/fe-plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p>The weighted fit gives a limit of detection of 17 ppm, instead of 295
+ppm. Its R² is lower, because it no longer favors the rich samples,
+which dominate R².</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fe_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">test</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Fe</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">fe_predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fe_weighted</span>, <span class="va">fe_test</span><span class="op">$</span><span class="va">Fe_signal</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">fe_predicted</span>, <span class="va">below_loq</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 2</span></span></span>
+<span><span class="co">#&gt;   below_loq     n</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> FALSE        84</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> TRUE          9</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">fe_predicted</span><span class="op">$</span><span class="va">concentration</span> <span class="op">-</span> <span class="va">fe_test</span><span class="op">$</span><span class="va">Fe</span><span class="op">)</span> <span class="op">/</span> <span class="va">fe_test</span><span class="op">$</span><span class="va">Fe</span><span class="op">)</span>   <span class="co"># relative error</span></span>
+<span><span class="co">#&gt; [1] 0.2138503</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="how-much-optimism-do-common-shortcuts-add">How much optimism do common shortcuts add?<a class="anchor" aria-label="anchor" href="#how-much-optimism-do-common-shortcuts-add"></a>
+<h2 id="a-multivariate-model-and-its-figures-of-merit">A multivariate model and its figures of merit<a class="anchor" aria-label="anchor" href="#a-multivariate-model-and-its-figures-of-merit"></a>
 </h2>
-<div class="section level3">
-<h3 id="shortcut-1-splitting-replicates-across-folds">Shortcut 1: splitting replicates across folds<a class="anchor" aria-label="anchor" href="#shortcut-1-splitting-replicates-across-folds"></a>
-</h3>
-<p>If the 400 shots are cross-validated as if they were independent,
-shots of the same sample end up in both the calibration and the
-validation folds. The model is then partly validated on the samples it
-was trained on. We run the same nested procedure on the shots, once:</p>
+<p>A single line uses a small part of the spectrum. Partial least
+squares (PLS) regression uses all of it: we divide the
+baseline-corrected spectra by the carbon line, and choose the number of
+components by cross-validation on the calibration samples, with the pls
+package:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">corrected</span><span class="op">)</span> <span class="op">/</span> <span class="va">intensities</span><span class="op">$</span><span class="va">C</span></span>
+<span><span class="va">is_calibration</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="va">data</span><span class="op">$</span><span class="va">Sample</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">test_samples</span></span>
+<span><span class="va">x_calibration</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span><span class="va">is_calibration</span>, <span class="op">]</span></span>
+<span></span>
+<span><span class="va">cv</span> <span class="op">&lt;-</span> <span class="fu">pls</span><span class="fu">::</span><span class="fu"><a href="https://khliland.github.io/pls/reference/mvr.html" class="external-link">plsr</a></span><span class="op">(</span><span class="va">K</span> <span class="op">~</span> <span class="va">x</span>, data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>K <span class="op">=</span> <span class="va">data</span><span class="op">$</span><span class="va">K</span><span class="op">[</span><span class="va">is_calibration</span><span class="op">]</span>, x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="va">x_calibration</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>                ncomp <span class="op">=</span> <span class="fl">15</span>, validation <span class="op">=</span> <span class="st">"CV"</span>, segments <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">ncomp</span> <span class="op">&lt;-</span> <span class="fu">pls</span><span class="fu">::</span><span class="fu"><a href="https://khliland.github.io/pls/reference/selectNcomp.html" class="external-link">selectNcomp</a></span><span class="op">(</span><span class="va">cv</span>, method <span class="op">=</span> <span class="st">"onesigma"</span><span class="op">)</span></span>
+<span><span class="va">ncomp</span></span>
+<span><span class="co">#&gt; [1] 7</span></span></code></pre></div>
+<p><code><a href="../reference/nas.html">nas()</a></code> fits the same model and computes its net analyte
+signal (NAS): the part of each spectrum that is unique to potassium,
+orthogonal to the contributions of the other constituents. The figures
+of merit follow from it:</p>
+<ul>
+<li>
+<strong>Sensitivity</strong>: the NAS produced by 1% of K.</li>
+<li>
+<strong>Selectivity</strong>: the fraction of each spectrum used for
+prediction.</li>
+<li>
+<strong>Limits of detection and quantification</strong>, <span class="math inline">3.3\,\sigma_x/\mathrm{SEN}</span> and <span class="math inline">10\,\sigma_x/\mathrm{SEN}</span>, where <span class="math inline">\sigma_x</span> is the noise of the spectra
+(<code>noise</code>).</li>
+</ul>
+<p>We estimate the noise from the three samples measured twice, as the
+standard deviation of their difference spectra divided by <span class="math inline">\sqrt{2}</span>:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">shot_data</span> <span class="op">&lt;-</span> <span class="va">snv_shots</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">channels</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">targets</span>, by <span class="op">=</span> <span class="st">"Sample"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/relocate.html" class="external-link">relocate</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="va">clay</span>, <span class="va">clay_silt</span>, <span class="va">sand_silt</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2024</span><span class="op">)</span></span>
-<span><span class="va">shot_folds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/nested_cv.html" class="external-link">nested_cv</a></span><span class="op">(</span><span class="va">shot_data</span>, outside <span class="op">=</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/vfold_cv.html" class="external-link">vfold_cv</a></span><span class="op">(</span>v <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>, inside <span class="op">=</span> <span class="fu"><a href="https://rsample.tidymodels.org/reference/vfold_cv.html" class="external-link">vfold_cv</a></span><span class="op">(</span>v <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">shot_level</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu">cross_validate</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">shot_data</span><span class="op">)</span>, <span class="va">shot_folds</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">shot_rmse</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">shot_level</span><span class="op">$</span><span class="va">pred</span> <span class="op">-</span> <span class="va">shot_level</span><span class="op">$</span><span class="va">clay</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">sample_rmse</span> <span class="op">&lt;-</span> <span class="va">summary_table</span><span class="op">$</span><span class="va">RMSE</span><span class="op">[</span><span class="va">summary_table</span><span class="op">$</span><span class="va">pipeline</span> <span class="op">==</span> <span class="st">"baseline + SNV"</span><span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>shot_level_CV <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">shot_rmse</span>, <span class="fl">2</span><span class="op">)</span>, sample_level_CV <span class="op">=</span> <span class="va">sample_rmse</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   shot_level_CV sample_level_CV </span></span>
-<span><span class="co">#&gt;            7.78            8.52</span></span></code></pre></div>
-<p>Shot-level cross-validation reports an RMSE about 9% lower than the
-sample-level estimate. The optimism grows as replicates become more
-alike, and it can be large for homogeneous materials.</p>
-</div>
-<div class="section level3">
-<h3 id="shortcut-2-fitting-a-supervised-filter-before-cross-validating">Shortcut 2: fitting a supervised filter before cross-validating<a class="anchor" aria-label="anchor" href="#shortcut-2-fitting-a-supervised-filter-before-cross-validating"></a>
-</h3>
-<p>The OPLS filter uses the response to decide what to remove. If it is
-fitted once on all 50 samples and cross-validation is run afterwards,
-the validation samples have already influenced the filter. We filter
-each log-ratio’s data once, then cross-validate a one-component model on
-the filtered data:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">prefiltered</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/map.html" class="external-link">map</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>clay_silt <span class="op">=</span> <span class="st">"clay_silt"</span>, sand_silt <span class="op">=</span> <span class="st">"sand_silt"</span><span class="op">)</span>, \<span class="op">(</span><span class="va">o</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">filtered</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/projected_osc.html">projected_osc</a></span><span class="op">(</span><span class="va">snv_s</span><span class="op">[</span><span class="va">channels</span><span class="op">]</span>, <span class="va">snv_s</span><span class="op">[[</span><span class="va">o</span><span class="op">]</span><span class="op">]</span>, ncomp <span class="op">=</span> <span class="fl">4</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">snv_s</span>, <span class="va">Sample</span>, <span class="va">clay</span>, <span class="va">clay_silt</span>, <span class="va">sand_silt</span><span class="op">)</span>, <span class="va">filtered</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">repeated</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">$</span><span class="va">Sample</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">duplicated</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Sample</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">differences</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">repeated</span>, \<span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">rows</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Sample</span> <span class="op">==</span> <span class="va">s</span><span class="op">)</span></span>
+<span>  <span class="va">x</span><span class="op">[</span><span class="va">rows</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="op">]</span> <span class="op">-</span> <span class="va">x</span><span class="op">[</span><span class="va">rows</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="op">]</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="va">leaky</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="fu">cross_validate</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">prefiltered</span>, ncomp <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, <span class="va">folds</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">leaky_rmse</span> <span class="op">&lt;-</span> <span class="va">leaky</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">repeat_id</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">pred</span> <span class="op">-</span> <span class="va">clay</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">r</span><span class="op">)</span></span>
-<span><span class="va">honest_rmse</span> <span class="op">&lt;-</span> <span class="va">summary_table</span><span class="op">$</span><span class="va">RMSE</span><span class="op">[</span><span class="va">summary_table</span><span class="op">$</span><span class="va">pipeline</span> <span class="op">==</span> <span class="st">"SNV + OPLS filter"</span><span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>filter_before_CV <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">leaky_rmse</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>, filter_inside_CV <span class="op">=</span> <span class="va">honest_rmse</span><span class="op">)</span></span>
-<span><span class="co">#&gt; filter_before_CV filter_inside_CV </span></span>
-<span><span class="co">#&gt;             4.97             8.18</span></span></code></pre></div>
-<p>Fitting the filter before cross-validation gives an RMSE 39% lower
-than the honest estimate, a far larger effect than any difference
-between the pipelines above. The same bias affects
-<code><a href="../reference/step_osc.html">step_osc()</a></code>, <code><a href="../reference/step_direct_osc.html">step_direct_osc()</a></code>,
-<code><a href="../reference/step_direct_orthogonal.html">step_direct_orthogonal()</a></code> and the underlying functions, and
-any variable selection that uses the response. Placing the filter in the
-workflow’s recipe, as in the comparison above, refits it inside every
-fold, including the inner loop that chooses the number of
-components.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="looking-at-the-predictions">Looking at the predictions<a class="anchor" aria-label="anchor" href="#looking-at-the-predictions"></a>
-</h2>
-<p>The out-of-fold predictions of the log-ratio model, averaged over the
-3 repeats, show where the model succeeds and where it fails:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mean_predictions</span> <span class="op">&lt;-</span> <span class="va">logratio</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Sample</span>, <span class="va">clay</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>log_ratio <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">direct</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">Sample</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>direct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">pred</span><span class="op">)</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"Sample"</span><span class="op">)</span></span>
+<span><span class="va">noise</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">differences</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">mean_predictions</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">clay</span>, <span class="va">log_ratio</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_abline</a></span><span class="op">(</span>linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="fl">21</span>, fill <span class="op">=</span> <span class="st">"grey70"</span>, size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">85</span><span class="op">)</span>, ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">85</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Measured clay (%)"</span>, y <span class="op">=</span> <span class="st">"Cross-validated prediction (%)"</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="va">k_nas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nas.html">nas</a></span><span class="op">(</span><span class="va">x_calibration</span>, <span class="va">data</span><span class="op">$</span><span class="va">K</span><span class="op">[</span><span class="va">is_calibration</span><span class="op">]</span>, ncomp <span class="op">=</span> <span class="va">ncomp</span>, noise <span class="op">=</span> <span class="va">noise</span><span class="op">)</span></span>
+<span><span class="va">k_nas</span><span class="op">$</span><span class="va">figures_of_merit</span></span>
+<span><span class="co">#&gt;            sensitivity            selectivity analytical_sensitivity </span></span>
+<span><span class="co">#&gt;              4.0183608              0.1183193             29.9163896 </span></span>
+<span><span class="co">#&gt;                    lod                    loq </span></span>
+<span><span class="co">#&gt;              0.1103074              0.3342649</span></span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nas_predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">k_nas</span>, <span class="va">x</span><span class="op">[</span><span class="op">!</span><span class="va">is_calibration</span>, <span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">nas_predicted</span><span class="op">$</span><span class="va">predicted</span> <span class="op">-</span> <span class="va">test</span><span class="op">$</span><span class="va">K</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>   <span class="co"># RMSEP, % K</span></span>
+<span><span class="co">#&gt; [1] 0.2964224</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">nas_predicted</span><span class="op">$</span><span class="va">selectivity</span><span class="op">)</span></span>
+<span><span class="co">#&gt;      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. </span></span>
+<span><span class="co">#&gt; 0.0009985 0.0479909 0.0875087 0.1082689 0.1542453 0.3520663</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
+<span>  `K I 769.90 nm curve` <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>laboratory <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">K</span>, predicted <span class="op">=</span> <span class="va">k_predicted</span><span class="op">$</span><span class="va">concentration</span><span class="op">)</span>,</span>
+<span>  `PLS (NAS)` <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>laboratory <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">K</span>, predicted <span class="op">=</span> <span class="va">nas_predicted</span><span class="op">$</span><span class="va">predicted</span><span class="op">)</span>,</span>
+<span>  .id <span class="op">=</span> <span class="st">"model"</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">laboratory</span>, <span class="va">predicted</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_abline</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"grey50"</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.6</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="va">model</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html" class="external-link">coord_equal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Laboratory K (%)"</span>, y <span class="op">=</span> <span class="st">"Predicted K (%)"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="calibration_files/figure-html/predictions-1.png" class="r-plt" alt="" width="70%"></p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">high</span> <span class="op">&lt;-</span> <span class="va">mean_predictions</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">clay</span> <span class="op">&gt;</span> <span class="fl">55</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="op">-</span><span class="va">Sample</span>, \<span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">v</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">high</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 4</span></span></span>
-<span><span class="co">#&gt;   Sample        clay log_ratio direct</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> LSG-S18-0003  81        62.2   60.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> LSG-S18-0004  69.1      71.8   70.6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> LSG-S18-0018  67.1      52.2   47.5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> MRI011        59.1      43.6   45.8</span></span></code></pre></div>
-<p>The 4 samples above 55% clay remain the weak point: 2 of them are
-underpredicted by more than 15 points with the log-ratio model, and 2
-with the direct model. With so few calibration samples in that range,
-predictions are pulled toward the bulk of the data. The model should not
-be used to predict clay contents above about 55% without more
-calibration data there.</p>
+<p><img src="calibration_files/figure-html/comparison-plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p>The PLS model predicts the test samples with an error of 0.30% K,
+against 0.48% for the calibration curve. Its limit of detection, 0.11%
+K, accounts for the noise of the spectra only, so it is a lower bound,
+far below the limit of the calibration curve, which includes all the
+scatter of the samples. Its mean selectivity, 0.12, means that only
+about a tenth of each spectrum is specific to potassium: the rest is
+shared with the other constituents and the plasma.</p>
 </div>
 <div class="section level2">
-<h2 id="further-considerations">Further considerations<a class="anchor" aria-label="anchor" href="#further-considerations"></a>
+<h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
 <ul>
 <li>
-<strong>Cross-validation estimates error for similar
-samples.</strong> It says nothing about soils from other regions, other
-instruments or other measurement sessions. An independent test set
-measured later is the stronger evidence, and <code><a href="../reference/pds.html">pds()</a></code> or
-<code><a href="../reference/glsw.html">glsw()</a></code> can help when a model must be transferred between
-instruments.</li>
+<strong>Normalize line intensities</strong> to an internal standard,
+such as the carbon line of an organic matrix.</li>
 <li>
-<strong>Report the variability of the error estimate.</strong> A
-single RMSE from a single cross-validation split hides the spread shown
-in the table above.</li>
+<strong>Check the linearity</strong> with Mandel’s test and the
+lack-of-fit test of <code><a href="../reference/calibration_curve.html">calibration_curve()</a></code>; resonance lines
+often curve at high concentration.</li>
 <li>
-<strong>A joint model of both log-ratios</strong> (PLS2, or a
-multivariate method) can exploit the correlation between them. With two
-separate PLS1 models, as here, each log-ratio has its own coefficients
-but shares the number of components.</li>
+<strong>Weight the fit</strong> when the signal is noisier at high
+concentration, and take the limit of detection from the intercept or
+from blanks.</li>
+<li>
+<strong>Report how the limits were estimated</strong>: from the
+residuals of a curve, they include the scatter of the samples; from the
+noise of the spectra (<code><a href="../reference/nas.html">nas()</a></code>), they are lower bounds.</li>
+<li>
+<strong>Validate on samples left out</strong> of the calibration:
+the prediction error on test samples is the most honest figure of
+merit.</li>
 </ul>
-</div>
-<div class="section level2">
-<h2 id="reference">Reference<a class="anchor" aria-label="anchor" href="#reference"></a>
-</h2>
-<p>Aitchison, J. (1986). <em>The Statistical Analysis of Compositional
-Data</em>. Chapman and Hall, London.</p>
+<p>The last vignette, <code><a href="../articles/plasma-diagnostics.html">vignette("plasma-diagnostics")</a></code>,
+measures the plasma itself: electron density, temperature and
+self-absorption.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

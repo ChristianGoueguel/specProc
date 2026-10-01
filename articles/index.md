@@ -1,14 +1,12 @@
 # Articles
 
-### All vignettes
+### A LIBS workflow
 
-- [Predicting soil clay content from LIBS
-  spectra](https://christiangoueguel.com/specProc/articles/calibration.md):
-- [Fitting emission
-  lines](https://christiangoueguel.com/specProc/articles/line-fitting.md):
-- [Removing unwanted variation: a comparison of orthogonalization
-  methods](https://christiangoueguel.com/specProc/articles/orthogonalization.md):
-- [Plasma diagnostics: electron density, temperature and
-  self-absorption](https://christiangoueguel.com/specProc/articles/plasma-diagnostics.md):
-- [Preprocessing LIBS
-  spectra](https://christiangoueguel.com/specProc/articles/preprocessing.md):
+- [1. Fitting emission
+  lines](https://christiangoueguel.com/specProc/articles/peak-fitting.md):
+- [2. Preprocessing with recipe
+  steps](https://christiangoueguel.com/specProc/articles/preprocessing.md):
+- [3. Calibration curves and figures of
+  merit](https://christiangoueguel.com/specProc/articles/calibration.md):
+- [4. Plasma
+  diagnostics](https://christiangoueguel.com/specProc/articles/plasma-diagnostics.md):

@@ -2,6 +2,21 @@
 
 ## specProc (development version)
 
+### Documentation
+
+- The vignettes are reorganized into the four stages of a LIBS analysis,
+  all on the `forageLIBS` spectra: fitting emission lines
+  ([`vignette("peak-fitting")`](https://christiangoueguel.com/specProc/articles/peak-fitting.md),
+  which replaces `"line-fitting"`), preprocessing with recipe steps
+  ([`vignette("preprocessing")`](https://christiangoueguel.com/specProc/articles/preprocessing.md)),
+  calibration curves and figures of merit
+  ([`vignette("calibration")`](https://christiangoueguel.com/specProc/articles/calibration.md))
+  and plasma diagnostics
+  ([`vignette("plasma-diagnostics")`](https://christiangoueguel.com/specProc/articles/plasma-diagnostics.md)).
+  The orthogonalization vignette is folded into the preprocessing one.
+- The README is shorter, with an example and an overview of the
+  functions by task.
+
 ## specProc 0.7.0
 
 ### Performance

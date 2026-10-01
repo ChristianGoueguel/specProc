@@ -29,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,11 +42,10 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/calibration.html">Predicting soil clay content from LIBS spectra</a></li>
-    <li><a class="dropdown-item" href="articles/line-fitting.html">Fitting emission lines</a></li>
-    <li><a class="dropdown-item" href="articles/orthogonalization.html">Removing unwanted variation: a comparison of orthogonalization methods</a></li>
-    <li><a class="dropdown-item" href="articles/plasma-diagnostics.html">Plasma diagnostics: electron density, temperature and self-absorption</a></li>
-    <li><a class="dropdown-item" href="articles/preprocessing.html">Preprocessing LIBS spectra</a></li>
+<li><a class="dropdown-item" href="articles/peak-fitting.html">1. Fitting emission lines</a></li>
+    <li><a class="dropdown-item" href="articles/preprocessing.html">2. Preprocessing with recipe steps</a></li>
+    <li><a class="dropdown-item" href="articles/calibration.html">3. Calibration curves and figures of merit</a></li>
+    <li><a class="dropdown-item" href="articles/plasma-diagnostics.html">4. Plasma diagnostics</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
@@ -71,47 +70,61 @@
 <!-- badges: start -->
 
 <!-- badges: end -->
-<p><strong>specProc</strong> preprocesses and explores spectroscopic data. It was developed for laser-induced breakdown spectroscopy (LIBS) but works with other techniques such as Raman, infrared, and inductively coupled plasma optical emission spectroscopy. It handles the entire preprocessing workflow, from raw spectra to a data matrix ready for modeling. Its computationally heavy steps run in C++ (via Rcpp), so it stays fast on data sets with thousands of spectra and high-resolution wavelength channels.</p>
+<p><strong>specProc</strong> processes and analyzes emission spectra, from raw spectra to calibrated concentrations. It was developed for laser-induced breakdown spectroscopy (LIBS), and works with other techniques such as Raman, infrared and ICP-OES. Spectra are stored one per row, with the wavelengths as column names, and the heavy computations run in C++.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Install the development version from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ChristianGoueguel/specProc"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p>A C++ compiler is needed to build the package from source (Rtools on Windows, Xcode Command Line Tools on macOS). <code><a href="reference/opls.html">opls()</a></code> additionally needs the Bioconductor package ropls: <code>BiocManager::install("ropls")</code>.</p>
+<p>A C++ compiler is needed to build the package from source (Rtools on Windows, Xcode Command Line Tools on macOS).</p>
 </div>
 <div class="section level2">
-<h2 id="design-principles">Design principles<a class="anchor" aria-label="anchor" href="#design-principles"></a>
+<h2 id="a-libs-workflow">A LIBS workflow<a class="anchor" aria-label="anchor" href="#a-libs-workflow"></a>
 </h2>
-<ul>
+<p>The vignettes follow a typical LIBS analysis, on the <code>forageLIBS</code> spectra of forage samples:</p>
+<ol style="list-style-type: decimal">
 <li>
-<strong>Tidy in, tidy out.</strong> Spectra are stored one per row, and the column names are the wavelengths. Functions accept matrices, data frames or tibbles and return tibbles.</li>
+<strong>Fitting emission lines</strong> (<code><a href="articles/peak-fitting.html">vignette("peak-fitting")</a></code>): line identification, wavelength calibration, line profiles and overlapping lines.</li>
 <li>
-<strong>Built for tidymodels.</strong> Preprocessing, filtering and robust PCA are available as recipe steps, so they are estimated on training data only and can be tuned with the model.</li>
+<strong>Preprocessing with recipe steps</strong> (<code><a href="articles/preprocessing.html">vignette("preprocessing")</a></code>): baseline correction, normalization and other <code>step_*()</code> functions, in a tidymodels workflow.</li>
 <li>
-<strong>Preprocessing parameters are returned, not hidden.</strong> Centers, scales, reference spectra, filter matrices and loadings come back with the result. You can then estimate a transformation on calibration data and apply exactly the same transformation to new data.</li>
+<strong>Calibration curves and figures of merit</strong> (<code><a href="articles/calibration.html">vignette("calibration")</a></code>): univariate curves, limits of detection and quantification, and the net analyte signal of multivariate models.</li>
 <li>
-<strong>Robust alternatives are available alongside the classical estimators.</strong> Emission spectra contain outlying shots, saturated channels and heavy tails, and the robust estimators are designed for them.</li>
-</ul>
-</div>
-<div class="section level2">
-<h2 id="learn-more">Learn more<a class="anchor" aria-label="anchor" href="#learn-more"></a>
-</h2>
-<p>The vignettes develop the example above in more depth:</p>
-<ul>
-<li>
-<code><a href="articles/preprocessing.html">vignette("preprocessing", package = "specProc")</a></code>: choosing and checking each preprocessing step against replicate data.</li>
-<li>
-<code><a href="articles/line-fitting.html">vignette("line-fitting", package = "specProc")</a></code>: choosing a line profile, and the sources of uncertainty in fitted line areas.</li>
-<li>
-<code><a href="articles/calibration.html">vignette("calibration", package = "specProc")</a></code>: predicting soil clay content with a compositional (log-ratio) PLS model, and estimating prediction error without leakage.</li>
-<li>
-<code><a href="articles/orthogonalization.html">vignette("orthogonalization", package = "specProc")</a></code>: what each orthogonalization method removes from LIBS spectra of forage samples, whether it improves potassium predictions, the net analyte signal and figures of merit, and the same analysis as a tidymodels workflow.</li>
-<li>
-<code><a href="articles/plasma-diagnostics.html">vignette("plasma-diagnostics", package = "specProc")</a></code>: detector saturation, electron density from H-alpha and Stark broadening, Boltzmann and Saha-Boltzmann temperatures with NIST atomic data, and self-absorption.</li>
-</ul>
+<strong>Plasma diagnostics</strong> (<code><a href="articles/plasma-diagnostics.html">vignette("plasma-diagnostics")</a></code>): electron density, temperature, LTE, self-absorption and calibration-free LIBS.</li>
+</ol>
 <p>They are also available as <a href="https://christiangoueguel.com/specProc/articles/">articles on the package website</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+</h2>
+<p>A calibration curve for potassium, from the intensity of the K I 769.90 nm line normalized to the carbon line C I 247.86 nm:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ChristianGoueguel/specProc" class="external-link">specProc</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"forageLIBS"</span><span class="op">)</span></span>
+<span><span class="va">spectra_id</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">minerals</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fl">3</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">spectra_id</span>, <span class="va">minerals</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">corrected</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/baseline_arpls.html">baseline_arpls</a></span><span class="op">(</span><span class="va">spectra</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>, max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span></span>
+<span><span class="va">intensities</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">corrected</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>C <span class="op">=</span> <span class="fl">247.856</span>, K <span class="op">=</span> <span class="fl">769.896</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
+<span>  K <span class="op">=</span> <span class="va">forageLIBS</span><span class="op">$</span><span class="va">K</span>,</span>
+<span>  signal <span class="op">=</span> <span class="va">intensities</span><span class="op">$</span><span class="va">intensity</span><span class="op">[</span><span class="va">intensities</span><span class="op">$</span><span class="va">line</span> <span class="op">==</span> <span class="st">"K"</span><span class="op">]</span> <span class="op">/</span></span>
+<span>    <span class="va">intensities</span><span class="op">$</span><span class="va">intensity</span><span class="op">[</span><span class="va">intensities</span><span class="op">$</span><span class="va">line</span> <span class="op">==</span> <span class="st">"C"</span><span class="op">]</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">curve</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/calibration_curve.html">calibration_curve</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">signal</span>, <span class="va">K</span><span class="op">)</span></span>
+<span><span class="va">curve</span><span class="op">$</span><span class="va">figures_of_merit</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 7</span></span>
+<span><span class="co">#&gt;       n sensitivity r_squared sigma sigma_blank   lod   loq</span></span>
+<span><span class="co">#&gt;   &lt;int&gt;       &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1   368       0.302     0.575 0.139       0.139  1.52  4.60</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/plot_calibration.html">plot_calibration</a></span><span class="op">(</span><span class="va">curve</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-example-plot-1.png" alt="" width="80%"></p>
 </div>
 <div class="section level2">
 <h2 id="function-overview">Function overview<a class="anchor" aria-label="anchor" href="#function-overview"></a>
@@ -127,191 +140,67 @@
 </tr></thead>
 <tbody>
 <tr>
-<td>Baseline correction</td>
+<td>Line identification</td>
 <td>
-<code><a href="reference/baseline_arpls.html">baseline_arpls()</a></code>, <code><a href="reference/baseline_als.html">baseline_als()</a></code>, <code><a href="reference/baseline_lsp.html">baseline_lsp()</a></code>
-</td>
-</tr>
-<tr>
-<td>Normalization</td>
-<td>
-<code><a href="reference/snv.html">snv()</a></code>, <code><a href="reference/msc.html">msc()</a></code>, <code><a href="reference/emsc.html">emsc()</a></code>, <code><a href="reference/normalize.html">normalize()</a></code>
-</td>
-</tr>
-<tr>
-<td>Scaling and centering</td>
-<td>
-<code><a href="reference/center.html">center()</a></code>, <code><a href="reference/pareto_scale.html">pareto_scale()</a></code>, <code><a href="reference/poisson_scale.html">poisson_scale()</a></code>, <code><a href="reference/minmax.html">minmax()</a></code>
-</td>
-</tr>
-<tr>
-<td>Orthogonal filtering</td>
-<td>
-<code><a href="reference/osc.html">osc()</a></code>, <code><a href="reference/direct_osc.html">direct_osc()</a></code>, <code><a href="reference/direct_orthogonal.html">direct_orthogonal()</a></code>, <code><a href="reference/projected_osc.html">projected_osc()</a></code>, <code><a href="reference/o2pls.html">o2pls()</a></code>, <code><a href="reference/opls.html">opls()</a></code>, <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
-</td>
-</tr>
-<tr>
-<td>Interference removal</td>
-<td>
-<code><a href="reference/epo.html">epo()</a></code>, <code><a href="reference/glsw.html">glsw()</a></code>, <code><a href="reference/y_gradient_glsw.html">y_gradient_glsw()</a></code>
-</td>
-</tr>
-<tr>
-<td>Calibration transfer</td>
-<td><code><a href="reference/pds.html">pds()</a></code></td>
-</tr>
-<tr>
-<td>Robust PCA</td>
-<td>
-<code><a href="reference/robpca.html">robpca()</a></code>, <code><a href="reference/rospca.html">rospca()</a></code>, <code><a href="reference/macropca.html">macropca()</a></code>, <code><a href="reference/plot_outlier_map.html">plot_outlier_map()</a></code>, <code><a href="reference/plot_cell_map.html">plot_cell_map()</a></code>, <code><a href="reference/flagged_regions.html">flagged_regions()</a></code>, <code><a href="reference/plot_loadings.html">plot_loadings()</a></code>, <code><a href="reference/loading_peaks.html">loading_peaks()</a></code>, <code><a href="reference/contributions.html">contributions()</a></code>, <code><a href="reference/plot_contributions.html">plot_contributions()</a></code>
-</td>
-</tr>
-<tr>
-<td>Figures of merit</td>
-<td><code><a href="reference/nas.html">nas()</a></code></td>
-</tr>
-<tr>
-<td>Recipe steps (tidymodels)</td>
-<td>
-<code><a href="reference/step_baseline.html">step_baseline()</a></code>, <code><a href="reference/step_snv.html">step_snv()</a></code>, <code><a href="reference/step_msc.html">step_msc()</a></code>, <code><a href="reference/step_emsc.html">step_emsc()</a></code>, <code><a href="reference/step_pareto_scale.html">step_pareto_scale()</a></code>, <code><a href="reference/step_poisson_scale.html">step_poisson_scale()</a></code>, <code><a href="reference/step_epo.html">step_epo()</a></code>, <code><a href="reference/step_glsw.html">step_glsw()</a></code>, <code><a href="reference/step_osc.html">step_osc()</a></code>, <code><a href="reference/step_direct_orthogonal.html">step_direct_orthogonal()</a></code>, <code><a href="reference/step_direct_osc.html">step_direct_osc()</a></code>, <code><a href="reference/step_projected_osc.html">step_projected_osc()</a></code>, <code><a href="reference/step_y_gradient_glsw.html">step_y_gradient_glsw()</a></code>, <code><a href="reference/step_robust_bcyj.html">step_robust_bcyj()</a></code>, <code><a href="reference/step_robpca.html">step_robpca()</a></code>, <code><a href="reference/step_rospca.html">step_rospca()</a></code>, <code><a href="reference/step_macropca.html">step_macropca()</a></code>
-</td>
-</tr>
-<tr>
-<td>Line profiles</td>
-<td>
-<code><a href="reference/voigt_profile.html">voigt_profile()</a></code>, <code><a href="reference/pseudo_voigt_profile.html">pseudo_voigt_profile()</a></code>, <code><a href="reference/gaussian_profile.html">gaussian_profile()</a></code>, <code><a href="reference/lorentzian_profile.html">lorentzian_profile()</a></code>
+<code><a href="reference/libs_lines.html">libs_lines()</a></code>, <code><a href="reference/plot_lines.html">plot_lines()</a></code>, <code><a href="reference/line_finder.html">line_finder()</a></code> (Shiny app), <code><a href="reference/wavelength_calibration.html">wavelength_calibration()</a></code>, <code><a href="reference/apply_calibration.html">apply_calibration()</a></code>
 </td>
 </tr>
 <tr>
 <td>Line fitting</td>
 <td>
-<code><a href="reference/peak_fit.html">peak_fit()</a></code>, <code><a href="reference/multipeak_fit.html">multipeak_fit()</a></code>, <code><a href="reference/plot_fit.html">plot_fit()</a></code>, <code><a href="reference/voigt_fwhm.html">voigt_fwhm()</a></code>
+<code><a href="reference/peak_fit.html">peak_fit()</a></code>, <code><a href="reference/multipeak_fit.html">multipeak_fit()</a></code>, <code><a href="reference/plot_fit.html">plot_fit()</a></code>, <code><a href="reference/line_intensities.html">line_intensities()</a></code>, <code><a href="reference/voigt_profile.html">voigt_profile()</a></code>, <code><a href="reference/pseudo_voigt_profile.html">pseudo_voigt_profile()</a></code>, <code><a href="reference/gaussian_profile.html">gaussian_profile()</a></code>, <code><a href="reference/lorentzian_profile.html">lorentzian_profile()</a></code>, <code><a href="reference/voigt_fwhm.html">voigt_fwhm()</a></code>
 </td>
 </tr>
 <tr>
-<td>Line identification</td>
+<td>Preprocessing</td>
 <td>
-<code><a href="reference/line_finder.html">line_finder()</a></code> (Shiny app), <code><a href="reference/libs_lines.html">libs_lines()</a></code>, <code><a href="reference/plot_lines.html">plot_lines()</a></code>
+<code><a href="reference/baseline_arpls.html">baseline_arpls()</a></code>, <code><a href="reference/baseline_als.html">baseline_als()</a></code>, <code><a href="reference/baseline_lsp.html">baseline_lsp()</a></code>, <code><a href="reference/snv.html">snv()</a></code>, <code><a href="reference/msc.html">msc()</a></code>, <code><a href="reference/emsc.html">emsc()</a></code>, <code><a href="reference/normalize.html">normalize()</a></code>, <code><a href="reference/savitzky_golay.html">savitzky_golay()</a></code>, <code><a href="reference/wavelet_features.html">wavelet_features()</a></code>, <code><a href="reference/reject_shots.html">reject_shots()</a></code>, <code><a href="reference/average.html">average()</a></code>
+</td>
+</tr>
+<tr>
+<td>Recipe steps</td>
+<td>
+<code><a href="reference/step_baseline.html">step_baseline()</a></code>, <code><a href="reference/step_snv.html">step_snv()</a></code>, <code><a href="reference/step_msc.html">step_msc()</a></code>, <code><a href="reference/step_emsc.html">step_emsc()</a></code>, <code><a href="reference/step_spectral_norm.html">step_spectral_norm()</a></code>, <code><a href="reference/step_line_ratio.html">step_line_ratio()</a></code>, <code><a href="reference/step_savgol.html">step_savgol()</a></code>, <code><a href="reference/step_wavelet.html">step_wavelet()</a></code>, <code><a href="reference/step_line_intensities.html">step_line_intensities()</a></code>, <code><a href="reference/step_reject_shots.html">step_reject_shots()</a></code>, <code><a href="reference/step_opls.html">step_opls()</a></code>, <code><a href="reference/step_o2pls.html">step_o2pls()</a></code>, <code><a href="reference/step_epo.html">step_epo()</a></code>, <code><a href="reference/step_glsw.html">step_glsw()</a></code>, and more</td>
+</tr>
+<tr>
+<td>Orthogonalization</td>
+<td>
+<code><a href="reference/osc.html">osc()</a></code>, <code><a href="reference/direct_osc.html">direct_osc()</a></code>, <code><a href="reference/projected_osc.html">projected_osc()</a></code>, <code><a href="reference/opls.html">opls()</a></code>, <code><a href="reference/o2pls.html">o2pls()</a></code>, <code><a href="reference/epo.html">epo()</a></code>, <code><a href="reference/glsw.html">glsw()</a></code>, <code><a href="reference/y_gradient_glsw.html">y_gradient_glsw()</a></code>
+</td>
+</tr>
+<tr>
+<td>Calibration</td>
+<td>
+<code><a href="reference/calibration_curve.html">calibration_curve()</a></code>, <code><a href="reference/plot_calibration.html">plot_calibration()</a></code>, <code><a href="reference/nas.html">nas()</a></code>, <code><a href="reference/pds.html">pds()</a></code>
 </td>
 </tr>
 <tr>
 <td>Plasma diagnostics</td>
 <td>
-<code><a href="reference/nist_lines.html">nist_lines()</a></code>, <code><a href="reference/nist_ionization_energy.html">nist_ionization_energy()</a></code>, <code><a href="reference/starkb_lines.html">starkb_lines()</a></code>, <code><a href="reference/read_starkb.html">read_starkb()</a></code>, <code><a href="reference/stark_table.html">stark_table()</a></code>, <code><a href="reference/stark_width.html">stark_width()</a></code>, <code><a href="reference/electron_density.html">electron_density()</a></code>, <code><a href="reference/boltzmann_plot.html">boltzmann_plot()</a></code>, <code><a href="reference/saha_boltzmann_plot.html">saha_boltzmann_plot()</a></code>, <code><a href="reference/plot_boltzmann.html">plot_boltzmann()</a></code>, <code><a href="reference/mcwhirter_criterion.html">mcwhirter_criterion()</a></code>, <code><a href="reference/self_absorption.html">self_absorption()</a></code>, <code><a href="reference/saturation_summary.html">saturation_summary()</a></code>
+<code><a href="reference/saturation_summary.html">saturation_summary()</a></code>, <code><a href="reference/electron_density.html">electron_density()</a></code>, <code><a href="reference/boltzmann_plot.html">boltzmann_plot()</a></code>, <code><a href="reference/saha_boltzmann_plot.html">saha_boltzmann_plot()</a></code>, <code><a href="reference/plot_boltzmann.html">plot_boltzmann()</a></code>, <code><a href="reference/mcwhirter_criterion.html">mcwhirter_criterion()</a></code>, <code><a href="reference/self_absorption.html">self_absorption()</a></code>, <code><a href="reference/correct_self_absorption.html">correct_self_absorption()</a></code>, <code><a href="reference/cf_libs.html">cf_libs()</a></code>, <code><a href="reference/nist_lines.html">nist_lines()</a></code>, <code><a href="reference/starkb_lines.html">starkb_lines()</a></code>
 </td>
 </tr>
 <tr>
-<td>Location and scale</td>
+<td>Outliers and robust PCA</td>
 <td>
-<code><a href="reference/biweight_location.html">biweight_location()</a></code>, <code><a href="reference/biweight_scale.html">biweight_scale()</a></code>, <code><a href="reference/biweight_midvariance.html">biweight_midvariance()</a></code>, <code><a href="reference/rousseeuw_croux.html">rousseeuw_croux()</a></code>, <code><a href="reference/umad.html">umad()</a></code>
+<code><a href="reference/robpca.html">robpca()</a></code>, <code><a href="reference/rospca.html">rospca()</a></code>, <code><a href="reference/macropca.html">macropca()</a></code>, <code><a href="reference/plot_outlier_map.html">plot_outlier_map()</a></code>, <code><a href="reference/plot_cell_map.html">plot_cell_map()</a></code>, <code><a href="reference/q_residuals.html">q_residuals()</a></code>, <code><a href="reference/dmodx.html">dmodx()</a></code>, <code><a href="reference/plot_influence.html">plot_influence()</a></code>, <code><a href="reference/hotelling_t2.html">hotelling_t2()</a></code>
 </td>
 </tr>
 <tr>
-<td>Association</td>
+<td>Robust statistics</td>
 <td>
-<code><a href="reference/correlation.html">correlation()</a></code>, <code><a href="reference/biweight_midcovariance.html">biweight_midcovariance()</a></code>, <code><a href="reference/biweight_midcorrelation.html">biweight_midcorrelation()</a></code>
+<code><a href="reference/summary_stats.html">summary_stats()</a></code>, <code><a href="reference/biweight_location.html">biweight_location()</a></code>, <code><a href="reference/biweight_scale.html">biweight_scale()</a></code>, <code><a href="reference/rousseeuw_croux.html">rousseeuw_croux()</a></code>, <code><a href="reference/umad.html">umad()</a></code>, <code><a href="reference/adjusted_boxplot.html">adjusted_boxplot()</a></code>, <code><a href="reference/robust_bcyj.html">robust_bcyj()</a></code>
 </td>
 </tr>
 <tr>
-<td>Skewness and tail weight</td>
+<td>Visualization</td>
 <td>
-<code><a href="reference/medcouple_weight.html">medcouple_weight()</a></code>, <code><a href="reference/quantile_weight.html">quantile_weight()</a></code>, <code><a href="reference/tukey_gh.html">tukey_gh()</a></code>
+<code><a href="reference/plot_spectra.html">plot_spectra()</a></code>, <code><a href="reference/plot_embedding.html">plot_embedding()</a></code>, <code><a href="reference/plot_loadings.html">plot_loadings()</a></code>, <code><a href="reference/plot_contributions.html">plot_contributions()</a></code>
 </td>
-</tr>
-<tr>
-<td>Outlier detection</td>
-<td>
-<code><a href="reference/zscore.html">zscore()</a></code>, <code><a href="reference/iqr_outliers.html">iqr_outliers()</a></code>, <code><a href="reference/directional_outlyingness.html">directional_outlyingness()</a></code>, <code><a href="reference/plot_outliers.html">plot_outliers()</a></code>
-</td>
-</tr>
-<tr>
-<td>Exploration</td>
-<td>
-<code><a href="reference/summary_stats.html">summary_stats()</a></code>, <code><a href="reference/adjusted_boxplot.html">adjusted_boxplot()</a></code>, <code><a href="reference/generalized_boxplot.html">generalized_boxplot()</a></code>, <code><a href="reference/plot_spectra.html">plot_spectra()</a></code>, <code><a href="reference/average.html">average()</a></code>
-</td>
-</tr>
-<tr>
-<td>Transformation to normality</td>
-<td><code><a href="reference/robust_bcyj.html">robust_bcyj()</a></code></td>
 </tr>
 </tbody>
 </table>
-<div class="section level3">
-<h3 id="robust-estimators-at-a-glance">Robust estimators at a glance<a class="anchor" aria-label="anchor" href="#robust-estimators-at-a-glance"></a>
-</h3>
-<p>For estimators of scale, the breakdown point is the largest fraction of contaminated observations the estimator can tolerate. The efficiency is its asymptotic efficiency relative to the standard deviation for normal data.</p>
-<table class="table">
-<colgroup>
-<col width="25%">
-<col width="25%">
-<col width="25%">
-<col width="25%">
-</colgroup>
-<thead><tr>
-<th>Estimator</th>
-<th>Function</th>
-<th>Breakdown point</th>
-<th>Efficiency</th>
-</tr></thead>
-<tbody>
-<tr>
-<td>Standard deviation</td>
-<td><code><a href="https://rdrr.io/r/stats/sd.html" class="external-link">stats::sd()</a></code></td>
-<td>0%</td>
-<td>100%</td>
-</tr>
-<tr>
-<td>MAD (bias-corrected)</td>
-<td><code><a href="reference/umad.html">umad()</a></code></td>
-<td>50%</td>
-<td>37%</td>
-</tr>
-<tr>
-<td>Rousseeuw–Croux Sn</td>
-<td><code>rousseeuw_croux(estimator = "Sn")</code></td>
-<td>50%</td>
-<td>58%</td>
-</tr>
-<tr>
-<td>Rousseeuw–Croux Qn</td>
-<td><code>rousseeuw_croux(estimator = "Qn")</code></td>
-<td>50%</td>
-<td>82%</td>
-</tr>
-<tr>
-<td>Biweight midvariance</td>
-<td>
-<code><a href="reference/biweight_midvariance.html">biweight_midvariance()</a></code>, <code><a href="reference/biweight_scale.html">biweight_scale()</a></code>
-</td>
-<td>high</td>
-<td>≈ 87%</td>
-</tr>
-</tbody>
-</table>
-<p><code><a href="reference/umad.html">umad()</a></code> and <code><a href="reference/rousseeuw_croux.html">rousseeuw_croux()</a></code> include finite-sample bias corrections (Park et al., 2020; Akinshin, 2022), so they are also unbiased at the normal distribution for small samples, such as the 8 replicates per sample.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
-</h2>
-<p>The main methodological references are:</p>
-<ul>
-<li>Baek, S.-J., et al. (2015). Baseline correction using asymmetrically reweighted penalized least squares smoothing. <em>Analyst</em>, 140, 250–257.</li>
-<li>Eilers, P.H.C., Boelens, H.F.M. (2005). Baseline correction with asymmetric least squares smoothing.</li>
-<li>Roger, J.-M., Chauchard, F., Bellon-Maurel, V. (2003). EPO-PLS external parameter orthogonalisation of PLS. <em>Chemometr. Intell. Lab. Syst.</em>, 66, 191–204.</li>
-<li>Martens, H., et al. (2003). Pre-whitening of data by covariance-weighted pre-processing. <em>J. Chemometrics</em>, 17, 153–165.</li>
-<li>Trygg, J., Wold, S. (2002). Orthogonal projections to latent structures (O-PLS). <em>J. Chemometrics</em>, 16, 119–128.</li>
-<li>Weideman, J.A.C. (1994). Computation of the complex error function. <em>SIAM J. Numer. Anal.</em>, 31, 1497–1518.</li>
-<li>Rousseeuw, P.J., Croux, C. (1993). Alternatives to the median absolute deviation. <em>JASA</em>, 88, 1273–1283.</li>
-<li>Hubert, M., Vandervieren, E. (2008). An adjusted boxplot for skewed distributions. <em>Comput. Stat. Data Anal.</em>, 52, 5186–5201.</li>
-<li>Bruffaerts, C., Verardi, V., Vermandele, C. (2014). A generalized boxplot for skewed and heavy-tailed distributions. <em>Stat. Probab. Lett.</em>, 95, 110–117.</li>
-</ul>
-<p>Each function’s help page gives the full references for its method.</p>
-</div>
-<div class="section level2">
-<h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
-</h2>
-<p>Bug reports and feature requests are welcome on the <a href="https://github.com/ChristianGoueguel/specProc/issues" class="external-link">issue tracker</a>. Please include a minimal reproducible example.</p>
+<p>See the <a href="https://christiangoueguel.com/specProc/reference/">reference</a> for the full list.</p>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
