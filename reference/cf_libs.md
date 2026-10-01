@@ -75,7 +75,7 @@ cf_libs(
 - units:
 
   The units of `intensity`: `"energy"` (default) or `"photons"`, as in
-  [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md).
+  [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md).
 
 - timeout:
 
@@ -143,7 +143,7 @@ Two methods place the lines on the plots:
 - `"saha-boltzmann"` (the default when `electron_density` is given): one
   Saha-Boltzmann plot per element, on which the lines of the ion are
   placed with the Saha equation, as in
-  [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md).
+  [`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md).
   The energy range is extended by the ionization energy, which gives a
   much more precise temperature, and the ionization balance of each
   element follows from the Saha equation. It needs the ionization
@@ -182,7 +182,7 @@ and the atomic data accurate (prefer lines of accuracy B or better in
 
 ## See also
 
-[`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md),
+[`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md),
 [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md),
 [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md),
 [`nist_levels()`](https://christiangoueguel.com/specProc/reference/nist_levels.md),
@@ -195,32 +195,38 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-# Simulated lines of a plasma at 9000 K with 70% Fe and 30% Ca (atomic
-# fractions), with made-up atomic data and partition functions
-kB <- 8.617333262e-5
-T <- 9000
-U <- function(species, temperature) c("Fe I" = 30, "Fe II" = 40, "Ca I" = 3, "Ca II" = 2)[species]
-lines <- data.frame(
-  species = c("Fe I", "Fe I", "Fe I", "Fe II", "Fe II", "Ca I", "Ca I", "Ca II"),
-  wavelength = c(371, 404, 438, 259, 275, 422, 445, 393),
-  Aki = c(1.6e7, 8.6e7, 5.0e7, 2.2e8, 2.1e8, 2.2e8, 8.7e7, 1.5e8),
-  gk = c(11, 9, 11, 10, 8, 3, 7, 4),
-  Ek = c(3.33, 4.55, 4.31, 4.77, 5.55, 2.93, 4.68, 3.15)
+data(forageLIBS)
+mean_spectrum <- colMeans(forageLIBS[-(1:14)])
+# calcium and magnesium lines, with their atomic data from the NIST database
+atomic <- data.frame(
+  species = c("Ca I", "Ca I", "Ca I", "Ca II", "Ca II", "Mg I", "Mg I", "Mg I", "Mg II", "Mg II"),
+  wavelength = c(428.301, 430.253, 445.478, 315.887, 317.933,
+                 516.732, 517.268, 518.360, 279.078, 279.800),
+  Aki = c(4.34e7, 1.36e8, 8.70e7, 3.10e8, 3.60e8, 1.13e7, 3.37e7, 5.61e7, 4.01e8, 4.79e8),
+  gk = c(5, 5, 7, 4, 6, 3, 3, 3, 4, 6),
+  Ek = c(4.780, 4.780, 4.681, 7.047, 7.050, 5.108, 5.108, 5.108, 8.864, 8.864)
 )
-# number densities of each species, in arbitrary units
-n <- c("Fe I" = 0.70 * 0.2, "Fe II" = 0.70 * 0.8, "Ca I" = 0.30 * 0.05, "Ca II" = 0.30 * 0.95)
-set.seed(1)  # 5% measurement noise
-lines$intensity <- with(lines, n[species] / U(species) * gk * Aki / wavelength *
-  exp(-Ek / (kB * T)) * exp(rnorm(8, sd = 0.05)))
-fit <- cf_libs(lines, partition = U)
+# partition functions, interpolated from a table (see partition_function())
+partition <- function(species, temperature) {
+  grid <- c(6000, 8000, 10000, 12000)
+  table <- rbind(`Ca I` = c(1.407, 2.401, 4.499, 8.356), `Ca II` = c(2.389, 2.917, 3.560, 4.262),
+                 `Mg I` = c(1.049, 1.207, 1.597, 2.463), `Mg II` = c(2.001, 2.010, 2.036, 2.087))
+  vapply(species, function(s) exp(stats::approx(grid, log(table[s, ]), xout = temperature)$y),
+         numeric(1))
+}
+fit <- cf_libs(line_intensities(mean_spectrum, atomic, baseline = TRUE),
+               electron_density = 1.9e17, partition = partition,
+               ionization_energy = c(Ca = 6.113, Mg = 7.646))
 fit
-#> Calibration-free LIBS (8 lines, 4 species; Boltzmann plots)
+#> Calibration-free LIBS (10 lines, 4 species; Saha-Boltzmann plots)
 #> 
-#> Temperature:  9132 +/- 173 K
+#> Temperature:  8946 +/- 290 K
+#> Ne:           1.9e+17 cm-3
 #> Normalization: closure
 #> 
 #>  element atomic_fraction mass_fraction stages
-#>  Fe      0.6930          0.7588        I, II 
-#>  Ca      0.3070          0.2412        I, II 
+#>  Ca      0.4512          0.5755        I, II 
+#>  Mg      0.5488          0.4245        I, II 
 plot_boltzmann(fit)
+
 ```

@@ -70,11 +70,16 @@ interval of the concentration from
 ## Examples
 
 ``` r
-set.seed(1)
-standards <- data.frame(concentration = rep(c(0, 0.5, 1, 2, 4, 8), each = 3))
-standards$intensity <- 50 + 1000 * standards$concentration + rnorm(18, sd = 300)
-cal <- calibration_curve(standards, intensity, concentration)
+data(forageLIBS)
+# the K I 769.90 nm line, normalized to the C I 247.86 nm line of the matrix
+lines <- line_intensities(forageLIBS[-(1:14)], c(C = 247.856, K = 769.896), baseline = TRUE)
+standards <- data.frame(
+  K = forageLIBS$K,
+  signal = lines$intensity[lines$line == "K"] / lines$intensity[lines$line == "C"]
+)
+cal <- calibration_curve(standards[1:300, ], signal, K)
 plot_calibration(cal)
 
-plot_calibration(cal, newdata = c(800, 3000, 6500))
+plot_calibration(cal, newdata = standards$signal[301:305])
+
 ```

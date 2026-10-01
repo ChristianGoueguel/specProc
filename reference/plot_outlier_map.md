@@ -133,20 +133,17 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-spectra_id <- forageLIBS |> select(1:2) |> names()
-#> Error in select(forageLIBS, 1:2): could not find function "select"
-minerals <- forageLIBS |> select(3:14) |> names()
-#> Error in select(forageLIBS, 3:14): could not find function "select"
+spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()
+minerals <- forageLIBS |> dplyr::select(3:14) |> names()
 set.seed(1)
 fit <- forageLIBS |>
-  select(-all_of(c(spectra_id, minerals))) |>
+  dplyr::select(-dplyr::all_of(c(spectra_id, minerals))) |>
   center() |>
   robpca()
-#> Error in select(forageLIBS, -all_of(c(spectra_id, minerals))): could not find function "select"
 
 plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE)
-#> Error: object 'fit' not found
+
 plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE,
 labels = 10, colour_by = "distance")
-#> Error: object 'fit' not found
+
 ```

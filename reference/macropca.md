@@ -111,6 +111,7 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
+# \donttest{
 set.seed(1)
 # LIBS spectra of forage samples (MacroPCA is run twice to choose k)
 minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
@@ -132,4 +133,5 @@ forageLIBS |>
 #> 
 #>            regular      good leverage orthogonal outlier       bad leverage 
 #>                266                 10                 78                 14 
+# }
 ```

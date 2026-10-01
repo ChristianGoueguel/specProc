@@ -66,10 +66,12 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-wl <- seq(200, 400, length.out = 500)
-spec <- 0.002 * (wl - 200)^2 + 50 * exp(-(wl - 300)^2 / 2) + rnorm(500, sd = 0.5)
-res <- baseline_als(matrix(spec, nrow = 1), lambda = 1e5, p = 0.01)
-plot(wl, spec, type = "l")
-lines(wl, unlist(res$background), col = "red")
-
+data(forageLIBS)
+spectrum <- forageLIBS[1, -(1:14)]
+wl <- as.numeric(names(spectrum))
+region <- spectrum[wl > 240 & wl < 300]
+res <- baseline_als(region, lambda = 1e5, p = 0.01)
+plot(wl[wl > 240 & wl < 300], unlist(region), type = "l", col = "grey40",
+     ylim = c(800, 3000), xlab = "Wavelength (nm)", ylab = "Counts")
+lines(wl[wl > 240 & wl < 300], unlist(res$background), col = "red")
 ```

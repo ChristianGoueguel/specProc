@@ -150,32 +150,44 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(1)
-df <- data.frame(y = rnorm(50))
-df$a <- 2 * df$y + rnorm(50, sd = 0.5)
-df$b <- -df$y + rnorm(50)
-df$c <- rnorm(50)
-correlation(df, y)
-#> # A tibble: 3 × 3
-#>   variable .correlation method 
-#>   <chr>           <dbl> <chr>  
-#> 1 a               0.959 pearson
-#> 2 c              -0.272 pearson
-#> 3 b              -0.668 pearson
-correlation(df, "y", method = "bicor")
-#> # A tibble: 3 × 3
-#>   variable .correlation method
-#>   <chr>           <dbl> <chr> 
-#> 1 a               0.948 bicor 
-#> 2 c              -0.282 bicor 
-#> 3 b              -0.664 bicor 
-correlation(df, y, plot = TRUE)$plot
-
-
 # LIBS spectra of forage samples and their mineral contents
 data(forageLIBS)
 spectra_id <- names(forageLIBS)[1:2]
 minerals <- names(forageLIBS)[3:14]
+
+# potassium against the other mineral contents
+correlation(forageLIBS[minerals], K)
+#> # A tibble: 11 × 3
+#>    variable .correlation method 
+#>    <chr>           <dbl> <chr>  
+#>  1 P           0.548     pearson
+#>  2 Cl          0.390     pearson
+#>  3 S           0.360     pearson
+#>  4 Mg          0.268     pearson
+#>  5 Ca          0.194     pearson
+#>  6 Mo          0.110     pearson
+#>  7 Zn          0.0806    pearson
+#>  8 Fe          0.0309    pearson
+#>  9 Na          0.0000116 pearson
+#> 10 Mn         -0.0482    pearson
+#> 11 Cu         -0.367     pearson
+correlation(forageLIBS[minerals], "K", method = "bicor")
+#> # A tibble: 10 × 3
+#>    variable .correlation method
+#>    <chr>           <dbl> <chr> 
+#>  1 P              0.542  bicor 
+#>  2 Cl             0.411  bicor 
+#>  3 S              0.364  bicor 
+#>  4 Mg             0.248  bicor 
+#>  5 Ca             0.219  bicor 
+#>  6 Mo             0.179  bicor 
+#>  7 Fe             0.140  bicor 
+#>  8 Zn             0.107  bicor 
+#>  9 Mn             0.0224 bicor 
+#> 10 Na            -0.0856 bicor 
+correlation(forageLIBS[minerals], K, plot = TRUE)$plot
+
+
 spectra <- forageLIBS[setdiff(names(forageLIBS), spectra_id)]
 
 # a correlation spectrum: potassium against every channel

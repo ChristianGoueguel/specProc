@@ -88,29 +88,37 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(3317)
-x <- stats::rexp(7, rate = 0.5)
-iqr_outliers(x)
-#> # A tibble: 7 × 2
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+iqr_outliers(fe)
+#> # A tibble: 365 × 2
 #>     data flag 
-#>    <dbl> <lgl>
-#> 1 7.50   FALSE
-#> 2 0.466  FALSE
-#> 3 0.315  FALSE
-#> 4 6.94   FALSE
-#> 5 0.0899 FALSE
-#> 6 0.328  FALSE
-#> 7 1.75   FALSE
-
-iqr_outliers(x, skew = TRUE)
-#> # A tibble: 7 × 2
+#>    <int> <lgl>
+#>  1  1190 TRUE 
+#>  2   391 TRUE 
+#>  3   595 TRUE 
+#>  4   591 TRUE 
+#>  5  1030 TRUE 
+#>  6   454 TRUE 
+#>  7   424 TRUE 
+#>  8  1080 TRUE 
+#>  9  2060 TRUE 
+#> 10   630 TRUE 
+#> # ℹ 355 more rows
+iqr_outliers(fe, skew = TRUE)   # adjusted for the skewness of the contents
+#> # A tibble: 365 × 2
 #>     data flag 
-#>    <dbl> <lgl>
-#> 1 0.0899 TRUE 
-#> 2 7.50   FALSE
-#> 3 0.466  FALSE
-#> 4 0.315  FALSE
-#> 5 6.94   FALSE
-#> 6 0.328  FALSE
-#> 7 1.75   FALSE
+#>    <int> <lgl>
+#>  1    64 TRUE 
+#>  2  1190 TRUE 
+#>  3  1030 TRUE 
+#>  4    62 TRUE 
+#>  5    63 TRUE 
+#>  6  1080 TRUE 
+#>  7  2060 TRUE 
+#>  8    59 TRUE 
+#>  9    50 TRUE 
+#> 10    54 TRUE 
+#> # ℹ 355 more rows
 ```

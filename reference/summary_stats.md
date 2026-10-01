@@ -59,29 +59,23 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-# Load the iris dataset
-data(iris)
-
-# Example1:
-iris |> summary_stats()
-#> # A tibble: 4 × 14
-#>   variable      mean  mode median   IQR    sd variance    cv   min   max range
-#>   <chr>        <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl> <dbl> <dbl> <dbl> <dbl>
-#> 1 Sepal.Length  5.84   5     5.8    1.3  0.83     0.69  14.2   4.3   7.9   3.6
-#> 2 Sepal.Width   3.06   3     3      0.5  0.44     0.19  14.3   2     4.4   2.4
-#> 3 Petal.Length  3.76   1.4   4.35   3.5  1.77     3.12  47.0   1     6.9   5.9
-#> 4 Petal.Width   1.2    0.2   1.3    1.5  0.76     0.58  63.6   0.1   2.5   2.4
+data(forageLIBS)
+# mineral contents (%) of the forage samples
+summary_stats(forageLIBS[c("Ca", "Mg", "P", "K", "S")])
+#> # A tibble: 5 × 14
+#>   variable  mean  mode median   IQR    sd variance    cv    min   max range
+#>   <chr>    <dbl> <dbl>  <dbl> <dbl> <dbl>    <dbl> <dbl>  <dbl> <dbl> <dbl>
+#> 1 Ca        0.65  0.5    0.63  0.26  0.18     0.03  27.8 0.173  1.45  1.28 
+#> 2 Mg        0.21  0.14   0.2   0.07  0.05     0     25.3 0.0527 0.365 0.312
+#> 3 P         0.26  0.21   0.26  0.08  0.06     0     24.3 0.0751 0.522 0.447
+#> 4 K         2.05  2.07   2.01  0.66  0.53     0.29  26.0 0.497  4.04  3.54 
+#> 5 S         0.2   0.19   0.2   0.06  0.04     0     21.6 0.12   0.39  0.27 
 #> # ℹ 3 more variables: skewness <dbl>, kurtosis <dbl>, count <int>
-
-# Example2:
-iris |> summary_stats(
-  var = c("Sepal.Length", "Petal.Length"),
-  robust = TRUE
-  )
+summary_stats(forageLIBS, var = c("Ca", "K"), robust = TRUE)
 #> # A tibble: 2 × 13
-#>   variable    median   mad    Qn    Sn medcouple   LMC   RMC biloc biscale bivar
-#>   <chr>        <dbl> <dbl> <dbl> <dbl>     <dbl> <dbl> <dbl> <dbl>   <dbl> <dbl>
-#> 1 Sepal.Leng…   5.8   1.04  0.87  0.83      0.06 -0.2   0.25  5.82    0.84  0.71
-#> 2 Petal.Leng…   4.35  1.85  1.08  1.91     -0.4  -0.81  0.25  3.83    1.95  3.81
+#>   variable median   mad    Qn    Sn medcouple   LMC   RMC biloc biscale bivar
+#>   <chr>     <dbl> <dbl> <dbl> <dbl>     <dbl> <dbl> <dbl> <dbl>   <dbl> <dbl>
+#> 1 Ca         0.63  0.18  0.18  0.18      0.14  0.08  0.18  0.64    0.18  0.03
+#> 2 K          2.01  0.51  0.51  0.49      0.06  0.29  0.17  2.02    0.53  0.28
 #> # ℹ 2 more variables: rcv <dbl>, count <int>
 ```

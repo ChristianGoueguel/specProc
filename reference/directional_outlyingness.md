@@ -74,19 +74,17 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-x <- c(1, 5, 3, 9, 2, 6, 4, 8, 7, 1e3)
-directional_outlyingness(x)
-#> # A tibble: 10 × 3
-#>     data   score flag 
-#>    <dbl>   <dbl> <lgl>
-#>  1  1000 237.    TRUE 
-#>  2     1   1.51  FALSE
-#>  3     2   1.17  FALSE
-#>  4     3   0.839 FALSE
-#>  5     9   0.835 FALSE
-#>  6     8   0.597 FALSE
-#>  7     4   0.504 FALSE
-#>  8     7   0.358 FALSE
-#>  9     5   0.168 FALSE
-#> 10     6   0.119 FALSE
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+head(directional_outlyingness(fe))
+#> # A tibble: 6 × 3
+#>    data score flag 
+#>   <int> <dbl> <lgl>
+#> 1  2060 13.2  TRUE 
+#> 2  1290  7.92 TRUE 
+#> 3  1210  7.37 FALSE
+#> 4  1190  7.23 FALSE
+#> 5  1080  6.47 FALSE
+#> 6  1060  6.34 FALSE
 ```

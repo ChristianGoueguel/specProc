@@ -223,25 +223,23 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(1)
-x <- matrix(rnorm(40 * 30), 40, 30)
-y <- x[, 1] + rnorm(40, sd = 0.1)
-x[, 2:5] <- x[, 2:5] + rnorm(40, sd = 3)  # response-orthogonal variation
-fit <- opls(x[1:30, ], y[1:30], permutation = 10)
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+cal <- 1:300
+fit <- opls(spectra[cal, ], forageLIBS$K[cal], permutation = 5)
 fit
 #> Orthogonal projections to latent structures (OPLS)
 #> 
-#> Variables:               30
-#> Observations:            30
+#> Variables:               7152
+#> Observations:            300
 #> Scaling:                 center
 #> Predictive components:   1
-#> Orthogonal components:   3
+#> Orthogonal components:   6
 #> 
 #>       R2X(cum) R2Y(cum) Q2(cum) RMSEE pR2Y pQ2
-#> Total    0.677     0.95   0.473 0.224  0.1 0.1
+#> Total    0.906    0.774   0.725 0.253  0.2 0.2
 #> 
 #> Use predict(<model>, newdata, type = ) to filter new data or predict the response.
-predict(fit, x[31:40, ], type = "response")
-#>  [1]  0.98911093 -0.21520551 -0.82803563  0.08133964 -0.26928032 -1.03304174
-#>  [7] -0.43825878  0.21948811  0.39230090  0.96764347
+head(predict(fit, spectra[-cal, ], type = "response"))
+#> [1] 2.161563 2.250033 2.605931 2.113430 2.075599 1.665393
 ```

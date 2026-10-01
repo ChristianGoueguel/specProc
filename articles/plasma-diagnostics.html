@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -236,7 +236,7 @@ so the result goes directly into a Boltzmann plot:</p>
 <h3 id="boltzmann-and-saha-boltzmann-plots">Boltzmann and Saha-Boltzmann plots<a class="anchor" aria-label="anchor" href="#boltzmann-and-saha-boltzmann-plots"></a>
 </h3>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">neutral</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/boltzmann_plot.html">boltzmann_plot</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">lines</span>, <span class="va">stage</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">neutral</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/boltzmann.html">boltzmann</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">lines</span>, <span class="va">stage</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">neutral</span></span>
 <span><span class="co">#&gt; Boltzmann plot (12 lines)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -248,7 +248,7 @@ intensities or transition probabilities. The Saha equation places the
 lines of the ion on the same plot, using the electron density, and
 extends the range of energies to about 13 eV:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">saha</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/saha_boltzmann_plot.html">saha_boltzmann_plot</a></span><span class="op">(</span><span class="va">lines</span>, ionization_energy <span class="op">=</span> <span class="va">ionization_energy</span>, electron_density <span class="op">=</span> <span class="va">ne</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">saha</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/saha_boltzmann.html">saha_boltzmann</a></span><span class="op">(</span><span class="va">lines</span>, ionization_energy <span class="op">=</span> <span class="va">ionization_energy</span>, electron_density <span class="op">=</span> <span class="va">ne</span><span class="op">)</span></span>
 <span><span class="va">saha</span></span>
 <span><span class="co">#&gt; Saha-Boltzmann plot (16 lines)</span></span>
 <span><span class="co">#&gt; </span></span>

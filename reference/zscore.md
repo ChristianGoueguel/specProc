@@ -83,28 +83,27 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-x <- c(1:5, 100)
-# Non-robust approach
-zscore(x)
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+head(zscore(fe))
 #> # A tibble: 6 × 3
-#>    data  score flag 
-#>   <dbl>  <dbl> <lgl>
-#> 1   100  2.04  FALSE
-#> 2     5 -0.358 FALSE
-#> 3     4 -0.383 FALSE
-#> 4     3 -0.408 FALSE
-#> 5     2 -0.433 FALSE
-#> 6     1 -0.458 FALSE
-
-# Robust approach
-zscore(x, robust = TRUE)
+#>    data score flag 
+#>   <int> <dbl> <lgl>
+#> 1  2060  8.82 TRUE 
+#> 2  1290  5.16 TRUE 
+#> 3  1210  4.78 TRUE 
+#> 4  1190  4.68 TRUE 
+#> 5  1080  4.16 TRUE 
+#> 6  1060  4.06 TRUE 
+head(zscore(fe, robust = TRUE))
 #> # A tibble: 6 × 3
-#>    data  score flag 
-#>   <dbl>  <dbl> <lgl>
-#> 1   100 43.4   TRUE 
-#> 2     5  0.674 FALSE
-#> 3     4  0.225 FALSE
-#> 4     3 -0.225 FALSE
-#> 5     2 -0.674 FALSE
-#> 6     1 -1.12  FALSE
+#>    data score flag 
+#>   <int> <dbl> <lgl>
+#> 1  2060  24.5 TRUE 
+#> 2  1290  14.7 TRUE 
+#> 3  1210  13.7 TRUE 
+#> 4  1190  13.4 TRUE 
+#> 5  1080  12.0 TRUE 
+#> 6  1060  11.7 TRUE 
 ```

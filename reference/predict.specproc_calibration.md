@@ -88,26 +88,36 @@ of 1).
 ## Examples
 
 ``` r
-set.seed(1)
-standards <- data.frame(concentration = rep(c(0, 0.5, 1, 2, 4, 8), each = 3))
-standards$intensity <- 50 + 1000 * standards$concentration + rnorm(18, sd = 30)
-cal <- calibration_curve(standards, intensity, concentration)
-predict(cal, c(800, 3000), replicates = 3)
-#> # A tibble: 2 × 7
-#>   signal concentration     se lower upper below_lod below_loq
-#>    <dbl>         <dbl>  <dbl> <dbl> <dbl> <lgl>     <lgl>    
-#> 1    800         0.746 0.0188 0.706 0.786 FALSE     FALSE    
-#> 2   3000         2.95  0.0183 2.91  2.98  FALSE     FALSE    
-predict(cal, c(1, 5), type = "signal")
-#> # A tibble: 2 × 5
+data(forageLIBS)
+# the K I 769.90 nm line, normalized to the C I 247.86 nm line of the matrix
+lines <- line_intensities(forageLIBS[-(1:14)], c(C = 247.856, K = 769.896), baseline = TRUE)
+standards <- data.frame(
+  K = forageLIBS$K,
+  signal = lines$intensity[lines$line == "K"] / lines$intensity[lines$line == "C"]
+)
+cal <- calibration_curve(standards[1:300, ], signal, K)
+predict(cal, standards$signal[301:305])
+#> # A tibble: 5 × 7
+#>   signal concentration    se   lower upper below_lod below_loq
+#>    <dbl>         <dbl> <dbl>   <dbl> <dbl> <lgl>     <lgl>    
+#> 1  0.459          1.36  1.03 -0.665   3.38 TRUE      TRUE     
+#> 2  0.543          1.97  1.03 -0.0538  3.99 TRUE      TRUE     
+#> 3  0.580          2.23  1.03  0.212   4.25 TRUE      TRUE     
+#> 4  0.492          1.59  1.03 -0.427   3.62 TRUE      TRUE     
+#> 5  0.481          1.52  1.03 -0.507   3.54 TRUE      TRUE     
+# the signal expected at given contents (% K)
+predict(cal, c(1, 2, 3), type = "signal")
+#> # A tibble: 3 × 5
 #>   concentration signal    se lower upper
 #>           <dbl>  <dbl> <dbl> <dbl> <dbl>
-#> 1             1  1054.  30.3  990. 1118.
-#> 2             5  5054.  30.7 4989. 5119.
-predict(cal, c(1, 5), type = "signal", interval = "confidence")
-#> # A tibble: 2 × 5
-#>   concentration signal    se lower upper
-#>           <dbl>  <dbl> <dbl> <dbl> <dbl>
-#> 1             1  1054.  7.96 1037. 1071.
-#> 2             5  5054.  9.19 5034. 5073.
+#> 1             1  0.409 0.143 0.128 0.690
+#> 2             2  0.548 0.142 0.268 0.827
+#> 3             3  0.686 0.143 0.405 0.967
+predict(cal, c(1, 2, 3), type = "signal", interval = "confidence")
+#> # A tibble: 3 × 5
+#>   concentration signal      se lower upper
+#>           <dbl>  <dbl>   <dbl> <dbl> <dbl>
+#> 1             1  0.409 0.0178  0.374 0.444
+#> 2             2  0.548 0.00819 0.531 0.564
+#> 3             3  0.686 0.0174  0.652 0.720
 ```

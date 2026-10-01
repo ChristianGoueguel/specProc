@@ -71,27 +71,10 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-# Example 1: Compute biweight scale for a vector
-x <- c(seq(1,100))
-tibble::tibble(
-sd = stats::sd(x),
-mad = stats::mad(x),
-biscale = biweight_scale(x)
-)
-#> # A tibble: 1 × 3
-#>      sd   mad biscale
-#>   <dbl> <dbl>   <dbl>
-#> 1  29.0  37.1    30.1
-
-# Example 2: Biweight scale is robust to outliers
-x <- c(seq(1,99), 1e3) # An outlier at 1000
-tibble::tibble(
-sd = stats::sd(x),
-mad = stats::mad(x),
-biscale = biweight_scale(x)
-)
-#> # A tibble: 1 × 3
-#>      sd   mad biscale
-#>   <dbl> <dbl>   <dbl>
-#> 1  99.2  37.1    29.9
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+c(sd = stats::sd(fe), mad = stats::mad(fe), biweight = biweight_scale(fe))
+#>        sd       mad  biweight 
+#> 210.30037  78.57780  82.19597 
 ```

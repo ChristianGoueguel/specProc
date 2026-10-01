@@ -44,9 +44,10 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(11230)
-x <- rnorm(100)
-y <- 2 * x + rnorm(100)
-biweight_midcorrelation(x, y)
-#> [1] 0.8770336
+data(forageLIBS)
+ok <- !is.na(forageLIBS$Fe)
+c(pearson = stats::cor(forageLIBS$Fe[ok], forageLIBS$Mn[ok]),
+  biweight = biweight_midcorrelation(forageLIBS$Fe[ok], forageLIBS$Mn[ok]))
+#>   pearson  biweight 
+#> 0.2186135 0.2112649 
 ```

@@ -109,49 +109,35 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(123)
-data <- data.frame(
-  normal = rnorm(100),
-  skewed = rexp(100, rate = 0.5),
-  heavy_tailed = rt(100, df = 3)
-)
+data(forageLIBS)
+# mineral contents (%) of the forage samples
+generalized_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")])
 
-# Plot the generalized boxplot
-generalized_boxplot(data)
-
-
-# Retrieve the generalized boxplot statistics
-generalized_boxplot(data, plot = FALSE)
+generalized_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")], plot = FALSE)
 #> $stats
-#> # A tibble: 3 × 10
-#>   variable        lower     q1 median    q3 upper lower_fence upper_fence      g
-#>   <fct>           <dbl>  <dbl>  <dbl> <dbl> <dbl>       <dbl>       <dbl>  <dbl>
-#> 1 normal       -1.55    -0.494 0.0618 0.692  1.79     -1.65          1.86 0.0947
-#> 2 skewed        0.00873  0.685 1.43   2.99   5.91     -0.0666        6.23 0.0925
-#> 3 heavy_tailed -2.63    -0.569 0.146  0.835  2.80     -2.75          3.54 0.153 
-#> # ℹ 1 more variable: h <dbl>
+#> # A tibble: 5 × 10
+#>   variable lower    q1 median    q3 upper lower_fence upper_fence       g      h
+#>   <fct>    <dbl> <dbl>  <dbl> <dbl> <dbl>       <dbl>       <dbl>   <dbl>  <dbl>
+#> 1 Ca       0.372 0.515  0.629 0.772 1.08        0.359       1.09   0.167  0     
+#> 2 Mg       0.116 0.172  0.204 0.240 0.315       0.115       0.317  0.136  0.0636
+#> 3 P        0.162 0.219  0.260 0.300 0.393       0.160       0.394  0.0976 0.0154
+#> 4 K        1.04  1.72   2.01  2.38  3.04        1.02        3.10  -0.0309 0.0851
+#> 5 S        0.14  0.17   0.2   0.23  0.29        0.132       0.290 -0.0961 0     
 #> 
 #> $outliers
-#> # A tibble: 18 × 3
-#>    variable     out   value
-#>    <fct>        <chr> <dbl>
-#>  1 normal       lower -2.31
-#>  2 normal       lower -1.97
-#>  3 normal       lower -1.69
-#>  4 normal       upper  2.05
-#>  5 normal       upper  2.17
-#>  6 normal       upper  2.19
-#>  7 skewed       upper  6.60
-#>  8 skewed       upper  6.93
-#>  9 skewed       upper  7.21
-#> 10 skewed       upper  7.49
-#> 11 skewed       upper  8.73
-#> 12 heavy_tailed lower -8.61
-#> 13 heavy_tailed lower -4.24
-#> 14 heavy_tailed lower -3.22
-#> 15 heavy_tailed lower -3.09
-#> 16 heavy_tailed upper  3.70
-#> 17 heavy_tailed upper  4.51
-#> 18 heavy_tailed upper  6.42
+#> # A tibble: 101 × 3
+#>    variable out   value
+#>    <fct>    <chr> <dbl>
+#>  1 Ca       lower 0.173
+#>  2 Ca       lower 0.292
+#>  3 Ca       lower 0.313
+#>  4 Ca       lower 0.323
+#>  5 Ca       lower 0.337
+#>  6 Ca       lower 0.342
+#>  7 Ca       lower 0.342
+#>  8 Ca       lower 0.347
+#>  9 Ca       lower 0.353
+#> 10 Ca       lower 0.354
+#> # ℹ 91 more rows
 #> 
 ```

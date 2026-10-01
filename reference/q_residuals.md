@@ -96,7 +96,8 @@ and
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
 for robust score and orthogonal distances.
 [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md)
-gives the residual distance in SIMCA's form.
+gives the residual distance as a standard deviation, relative to that of
+the calibration samples.
 
 ## References
 

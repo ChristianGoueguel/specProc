@@ -188,7 +188,7 @@ lines |> select(species, wavelength, peak_wavelength, intensity, snr)
 
 ``` r
 
-neutral <- boltzmann_plot(filter(lines, stage == 1))
+neutral <- boltzmann(filter(lines, stage == 1))
 neutral
 #> Boltzmann plot (12 lines)
 #> 
@@ -204,7 +204,7 @@ extends the range of energies to about 13 eV:
 
 ``` r
 
-saha <- saha_boltzmann_plot(lines, ionization_energy = ionization_energy, electron_density = ne)
+saha <- saha_boltzmann(lines, ionization_energy = ionization_energy, electron_density = ne)
 saha
 #> Saha-Boltzmann plot (16 lines)
 #> 

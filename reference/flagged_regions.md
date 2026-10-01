@@ -82,17 +82,29 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-spectra_id <- forageLIBS |> select(1:2) |> names()
-#> Error in select(forageLIBS, 1:2): could not find function "select"
-minerals <- forageLIBS |> select(3:14) |> names()
-#> Error in select(forageLIBS, 3:14): could not find function "select"
+# \donttest{
+spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()
+minerals <- forageLIBS |> dplyr::select(3:14) |> names()
 set.seed(1)
 fit <- forageLIBS |>
-  select(-all_of(c(spectra_id, minerals))) |>
+  dplyr::select(-dplyr::all_of(c(spectra_id, minerals))) |>
   center() |>
   macropca(k = 3)
-#> Error in select(forageLIBS, -all_of(c(spectra_id, minerals))): could not find function "select"
 
 flagged_regions(fit)
-#> Error: object 'fit' not found
+#> # A tibble: 61 × 7
+#>    start   end  peak channels share mean_share direction
+#>    <dbl> <dbl> <dbl>    <int> <dbl>      <dbl> <chr>    
+#>  1  399.  399.  399.        1 0.391     0.391  lower    
+#>  2  219.  219.  219.        1 0.383     0.383  higher   
+#>  3  393.  393.  393.        2 0.318     0.281  lower    
+#>  4  397.  397.  397.        1 0.207     0.207  lower    
+#>  5  280.  280.  280.        1 0.177     0.177  lower    
+#>  6  793.  793.  793.        2 0.171     0.148  higher   
+#>  7  323.  324.  323.        7 0.149     0.0990 higher   
+#>  8  335.  335.  335.        2 0.130     0.126  higher   
+#>  9  387.  387.  387.        1 0.130     0.130  higher   
+#> 10  338.  338.  338.        1 0.128     0.128  higher   
+#> # ℹ 51 more rows
+# }
 ```

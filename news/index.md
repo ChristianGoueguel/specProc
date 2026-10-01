@@ -4,6 +4,39 @@
 
 ### Breaking changes
 
+- [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  and
+  [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  are renamed
+  [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
+  and
+  [`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md),
+  so that they are not confused with
+  [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md),
+  which draws their result. The old names still work, with a deprecation
+  warning.
+- In
+  [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md),
+  the nominal degrees of freedom () are now selected with
+  `df = "nominal"`.
+
+### Documentation
+
+- The examples use the `forageLIBS` spectra and mineral contents instead
+  of simulated data, wherever the function applies to them (some taken
+  from the vignettes). Examples of pure helper functions (line profiles,
+  plasma criteria, tuning parameters) keep simple inputs, and the
+  examples of
+  [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md) and
+  [`step_reject_shots()`](https://christiangoueguel.com/specProc/reference/step_reject_shots.md),
+  for which `forageLIBS` has no suitable data, are removed.
+  [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
+  gains an example.
+- Every example calls dplyr functions with `dplyr::`, so that it runs
+  without dplyr attached.
+
+### Breaking changes
+
 - The `soilLIBS` data set is removed, to keep the package data under the
   5 MB CRAN guideline: `data(soilLIBS)` no longer works. The examples
   use `forageLIBS` instead; the example of
@@ -163,19 +196,19 @@
   filter still estimated against all the outcomes.
 
 - [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
-  is drawn in the style of SIMCA score plots: grey outside the outermost
-  ellipse (of T-squared, or of each group) and white inside, with no
-  grid, a fixed `aspect_ratio` (0.7) and lines through the origin. The
-  axis titles give the explained variance of the components of PCA fits,
-  and the T-squared ellipses of the groups (`hotelling = "group"`) are
-  filled with their color. `size` can be a variable (such as a
-  concentration) that sets the size of the points, and `biplot = TRUE`
-  draws the loadings of a PCA over the scores, with the `biplot_top`
-  most important variables (emission lines, for spectra) as labeled
-  arrows. With `hotelling = "all"`, the T-squared of a PCA model is that
-  of the model (its eigenvalues, centered at 0): for a robust fit, the
-  ellipses are no longer inflated or tilted by the outlying samples, and
-  the flagged samples are the leverage points of
+  is drawn with a grey panel outside the outermost ellipse (of
+  T-squared, or of each group) and white inside, with no grid, a fixed
+  `aspect_ratio` (0.7) and lines through the origin. The axis titles
+  give the explained variance of the components of PCA fits, and the
+  T-squared ellipses of the groups (`hotelling = "group"`) are filled
+  with their color. `size` can be a variable (such as a concentration)
+  that sets the size of the points, and `biplot = TRUE` draws the
+  loadings of a PCA over the scores, with the `biplot_top` most
+  important variables (emission lines, for spectra) as labeled arrows.
+  With `hotelling = "all"`, the T-squared of a PCA model is that of the
+  model (its eigenvalues, centered at 0): for a robust fit, the ellipses
+  are no longer inflated or tilted by the outlying samples, and the
+  flagged samples are the leverage points of
   [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md).
   Without groups, `ellipse = TRUE` with `hotelling = "all"` draws only
   the T-squared ellipse, with a warning, instead of two ellipses of all
@@ -202,12 +235,11 @@
 
 - [`contributions()`](https://christiangoueguel.com/specProc/reference/contributions.md)
   computes the contributions of each variable to the Q residual or to
-  Hotelling’s T-squared of samples (the definitions of the PLS_Toolbox,
-  whose squares add up to Q and T-squared), for a
-  [`prcomp()`](https://rdrr.io/r/stats/prcomp.html) fit or a robust fit
-  (where they decompose the orthogonal and score distances), and
-  relative contributions against reference samples (`reference`, or
-  `"regular"` for all regular samples).
+  Hotelling’s T-squared of samples (whose squares add up to Q and
+  T-squared), for a [`prcomp()`](https://rdrr.io/r/stats/prcomp.html)
+  fit or a robust fit (where they decompose the orthogonal and score
+  distances), and relative contributions against reference samples
+  (`reference`, or `"regular"` for all regular samples).
   [`plot_contributions()`](https://christiangoueguel.com/specProc/reference/plot_contributions.md)
   draws them against wavelength with the largest labeled and matched to
   emission lines.
@@ -242,11 +274,11 @@
 
 - [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md)
   computes the distance to the model in the space of the variables
-  (DModX, as in SIMCA) of a PCA model, normalized or absolute, for the
-  calibration samples or new ones. Its limits use the effective number
-  of residual dimensions by default (`df = "effective"`), because
-  SIMCA’s degrees of freedom (`df = "simca"`) flag a large share of
-  ordinary samples when spectra have far more channels than samples.
+  (DModX) of a PCA model, normalized or absolute, for the calibration
+  samples or new ones. Its limits use the effective number of residual
+  dimensions by default (`df = "effective"`), because the nominal
+  degrees of freedom (`df = "nominal"`) flag a large share of ordinary
+  samples when spectra have far more channels than samples.
   [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
   draws DModX or Q against T-squared.
 
@@ -403,7 +435,7 @@
   in spectra, searching each peak near its tabulated wavelength, with a
   signal-to-noise ratio and saturation check. It keeps the columns of a
   table of lines, so its result feeds
-  [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md),
+  [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md),
   [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md)
   and
   [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md).
@@ -470,9 +502,9 @@ Stark parameters from STARK-B.
     estimates the electron density from the Stark (Lorentzian) width of
     a line, with STARK-B data or a reference width, or from the H-alpha
     line (Gigosos et al., 2003).
-  - [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md)
+  - [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
     and
-    [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md)
+    [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
     estimate the excitation temperature from line intensities and atomic
     data, and
     [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md)

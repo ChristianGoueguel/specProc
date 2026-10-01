@@ -112,18 +112,18 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-wl <- seq(395, 397, by = 0.02)
-set.seed(1)
-spec <- 10 + gaussian_profile(wl, y0 = 0, xc = 396.15, wG = 0.2, A = 50) + rnorm(length(wl))
-df <- as.data.frame(t(spec))
-names(df) <- wl
-res <- peak_fit(df, profile = "gaussian")
+data(forageLIBS)
+mean_spectrum <- colMeans(forageLIBS[-(1:14)])
+wl <- as.numeric(names(mean_spectrum))
+# the H-alpha line of the hydrogen of the samples, Stark-broadened
+halpha <- tibble::as_tibble(as.list(mean_spectrum[wl > 653.5 & wl < 659.5]))
+res <- peak_fit(halpha, profile = "lorentzian")
 res$tidied[[1]]
 #> # A tibble: 4 × 5
 #>   term  estimate std.error statistic   p.value
 #>   <chr>    <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 y0      10.1    0.102         98.4 5.32e- 99
-#> 2 xc     396.     0.000169 2350805.  0        
-#> 3 wG       0.200  0.000415     481.  1.14e-165
-#> 4 A       50.1    0.0977       513.  2.49e-168
+#> 1 y0     2298.    96.1          23.9 1.54e- 34
+#> 2 xc      656.     0.00935   70231.  2.78e-265
+#> 3 wL        1.70   0.0459       37.1 2.27e- 46
+#> 4 A     26000.   773.           33.6 1.12e- 43
 ```

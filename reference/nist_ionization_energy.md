@@ -2,7 +2,7 @@
 
 Retrieves ionization energies from the NIST Atomic Spectra Database, for
 example the ionization energy of the neutral atom needed by
-[`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md).
+[`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md).
 
 ## Usage
 
@@ -29,7 +29,7 @@ A named numeric vector of ionization energies, in eV.
 ## See also
 
 [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md),
-[`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md)
+[`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md)
 
 ## Examples
 

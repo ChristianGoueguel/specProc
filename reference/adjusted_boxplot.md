@@ -103,38 +103,44 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(123)
-data <- data.frame(
-  normal = rnorm(100),
-  skewed = rexp(100, rate = 0.5),
-  heavy_tailed = rt(100, df = 3)
-)
+data(forageLIBS)
+# mineral contents (%) of the forage samples
+adjusted_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")])
 
-# Plot the adjusted boxplot
-adjusted_boxplot(data)
-
-
-# Retrieve the adjusted boxplot statistics
-adjusted_boxplot(data, plot = FALSE)
+adjusted_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")], plot = FALSE)
 #> $stats
-#> # A tibble: 3 × 7
-#>   variable        lower     q1 median    q3 upper medcouple
-#>   <fct>           <dbl>  <dbl>  <dbl> <dbl> <dbl>     <dbl>
-#> 1 normal       -1.97    -0.497 0.0618 0.695  2.19    0.0338
-#> 2 skewed        0.00873  0.673 1.43   3.02   8.73    0.404 
-#> 3 heavy_tailed -2.63    -0.602 0.146  0.837  2.80   -0.0193
+#> # A tibble: 5 × 7
+#>   variable  lower    q1 median    q3 upper medcouple
+#>   <fct>     <dbl> <dbl>  <dbl> <dbl> <dbl>     <dbl>
+#> 1 Ca       0.292  0.514  0.629 0.772 1.2      0.137 
+#> 2 Mg       0.0798 0.172  0.204 0.24  0.342    0.0168
+#> 3 P        0.114  0.218  0.260 0.301 0.428    0.0143
+#> 4 K        0.981  1.72   2.01  2.38  3.58     0.0645
+#> 5 S        0.12   0.17   0.2   0.23  0.32     0     
 #> 
 #> $outliers
-#> # A tibble: 8 × 2
-#>   variable     value
-#>   <fct>        <dbl>
-#> 1 normal       -2.31
-#> 2 heavy_tailed  3.70
-#> 3 heavy_tailed  6.42
-#> 4 heavy_tailed -3.22
-#> 5 heavy_tailed  4.51
-#> 6 heavy_tailed -8.61
-#> 7 heavy_tailed -3.09
-#> 8 heavy_tailed -4.24
+#> # A tibble: 20 × 2
+#>    variable  value
+#>    <fct>     <dbl>
+#>  1 Ca       1.45  
+#>  2 Ca       0.173 
+#>  3 Mg       0.365 
+#>  4 Mg       0.359 
+#>  5 Mg       0.362 
+#>  6 Mg       0.0527
+#>  7 P        0.0751
+#>  8 P        0.0847
+#>  9 P        0.522 
+#> 10 P        0.436 
+#> 11 K        3.68  
+#> 12 K        0.829 
+#> 13 K        0.497 
+#> 14 K        0.925 
+#> 15 K        4.04  
+#> 16 S        0.35  
+#> 17 S        0.36  
+#> 18 S        0.33  
+#> 19 S        0.39  
+#> 20 S        0.37  
 #> 
 ```

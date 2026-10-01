@@ -1,10 +1,10 @@
 # Distance to the Model (DModX) of a PCA Model
 
 Computes the distance of each sample to a principal component analysis
-(PCA) model in the space of the variables (DModX, as in SIMCA): the
-residual standard deviation of the sample, normalized by that of the
-calibration samples, with its limits at one or more confidence levels,
-and Hotelling's \\T^2\\ for the influence plot.
+(PCA) model in the space of the variables (DModX): the residual standard
+deviation of the sample, normalized by that of the calibration samples,
+with its limits at one or more confidence levels, and Hotelling's
+\\T^2\\ for the influence plot.
 
 ## Usage
 
@@ -55,7 +55,7 @@ dmodx(
 - df:
 
   The degrees of freedom of the limit: `"effective"` (default) or
-  `"simca"` (see details).
+  `"nominal"` (see details).
 
 - t2_method:
 
@@ -91,24 +91,20 @@ ratio follows an F distribution with \\\nu\\ and \\(N - k - A_0)\nu\\
 degrees of freedom, so the limit of the normalized DModX is
 \\\sqrt{F\_{1-\alpha}}\\ (times \\s_0\\ for the absolute DModX).
 
-SIMCA takes \\\nu = K - k\\ (`df = "simca"`), as if the residuals of the
-variables were independent. For spectra, with far more (correlated)
-channels than samples, this gives a limit close to 1 that flags a large
-share of ordinary samples. With `df = "effective"` (default), \\\nu\\ is
-the effective number of residual dimensions, \\\theta_1^2 / \theta_2\\
-from the eigenvalues \\\lambda_a\\ of the components left out
-(\\\theta_j = \sum\_{a \> k} \lambda_a^j\\, as in Box's approximation of
-Q), which is \\K - k\\ when the residuals are independent with equal
-variances. DModX is then consistent with the Q residuals of
+The nominal degrees of freedom are \\\nu = K - k\\ (`df = "nominal"`),
+as if the residuals of the variables were independent. For spectra, with
+far more (correlated) channels than samples, this gives a limit close to
+1 that flags a large share of ordinary samples. With `df = "effective"`
+(default), \\\nu\\ is the effective number of residual dimensions,
+\\\theta_1^2 / \theta_2\\ from the eigenvalues \\\lambda_a\\ of the
+components left out (\\\theta_j = \sum\_{a \> k} \lambda_a^j\\, as in
+Box's approximation of Q), which is \\K - k\\ when the residuals are
+independent with equal variances. DModX is then consistent with the Q
+residuals of
 [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md),
 of which it is a scaled square root.
 
 ## References
-
-- Wold, S., Sjöström, M. (1977). SIMCA: a method for analyzing chemical
-  data in terms of similarity and analogy. In Kowalski, B.R. (ed.),
-  Chemometrics: Theory and Application, ACS Symposium Series 52,
-  American Chemical Society, Washington, pp. 243-282.
 
 - Eriksson, L., Johansson, E., Kettaneh-Wold, N., Trygg, J., Wikström,
   C., Wold, S. (2006). Multi- and Megavariate Data Analysis, Part I, 2nd

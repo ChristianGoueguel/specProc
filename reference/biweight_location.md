@@ -77,27 +77,10 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-# Example 1: Compute biweight location for a vector
-x <- c(seq(1,100))
-tibble::tibble(
-mean = mean(x),
-med = stats::median(x),
-biloc = biweight_location(x)
-)
-#> # A tibble: 1 × 3
-#>    mean   med biloc
-#>   <dbl> <dbl> <dbl>
-#> 1  50.5  50.5  50.5
-
-# Example 2: Biweight location is robust to outliers
-x <- c(seq(1,99), 1e3)  # An outlier at 1000
-tibble::tibble(
-mean = mean(x),
-med = stats::median(x),
-biloc = biweight_location(x)
-)
-#> # A tibble: 1 × 3
-#>    mean   med biloc
-#>   <dbl> <dbl> <dbl>
-#> 1  59.5  50.5  50.0
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+c(mean = mean(fe), median = stats::median(fe), biweight = biweight_location(fe))
+#>     mean   median biweight 
+#> 205.5288 137.0000 139.1975 
 ```

@@ -100,23 +100,29 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-x <- data.frame(`400` = c(1, 2), `401` = c(3, 6), `402` = c(1, 2), check.names = FALSE)
-normalize(x, method = "area")
-#> # A tibble: 2 × 3
-#>   `400` `401` `402`
-#>   <dbl> <dbl> <dbl>
-#> 1   0.2   0.6   0.2
-#> 2   0.2   0.6   0.2
-normalize(x, method = "l2")
-#> # A tibble: 2 × 3
-#>   `400` `401` `402`
-#>   <dbl> <dbl> <dbl>
-#> 1 0.302 0.905 0.302
-#> 2 0.302 0.905 0.302
-normalize(x, method = "internal", wlength = "401")
-#> # A tibble: 2 × 3
-#>   `400` `401` `402`
-#>   <dbl> <dbl> <dbl>
-#> 1 0.333     1 0.333
-#> 2 0.333     1 0.333
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+normalize(spectra[1:3, ], method = "area")[, 1:4]
+#> # A tibble: 3 × 4
+#>   `199.3771616` `199.4644141` `199.5516666` `199.6389192`
+#>           <dbl>         <dbl>         <dbl>         <dbl>
+#> 1     0.0000444     0.0000452     0.0000484     0.0000451
+#> 2     0.0000449     0.0000464     0.0000484     0.0000445
+#> 3     0.0000430     0.0000442     0.0000473     0.0000442
+normalize(spectra[1:3, ], method = "l2")[, 1:4]
+#> # A tibble: 3 × 4
+#>   `199.3771616` `199.4644141` `199.5516666` `199.6389192`
+#>           <dbl>         <dbl>         <dbl>         <dbl>
+#> 1       0.00185       0.00188       0.00201       0.00188
+#> 2       0.00191       0.00197       0.00206       0.00189
+#> 3       0.00183       0.00188       0.00201       0.00188
+# internal standard: the C I 247.86 nm line of the organic matrix
+carbon <- names(spectra)[which.min(abs(as.numeric(names(spectra)) - 247.856))]
+normalize(spectra[1:3, ], method = "internal", wlength = carbon)[, 1:4]
+#> # A tibble: 3 × 4
+#>   `199.3771616` `199.4644141` `199.5516666` `199.6389192`
+#>           <dbl>         <dbl>         <dbl>         <dbl>
+#> 1        0.0207        0.0211        0.0226        0.0210
+#> 2        0.0225        0.0232        0.0242        0.0223
+#> 3        0.0196        0.0202        0.0216        0.0202
 ```

@@ -211,9 +211,9 @@ checks of LTE, self-absorption and detector saturation.
   : Stark Width of a Line at Given Plasma Conditions
 - [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md)
   : Electron Density from Stark Broadening
-- [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md)
+- [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
   : Plasma Temperature from a Boltzmann Plot
-- [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md)
+- [`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md)
   : Plasma Temperature from a Saha-Boltzmann Plot
 - [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md)
   : Draw a Boltzmann or Saha-Boltzmann Plot

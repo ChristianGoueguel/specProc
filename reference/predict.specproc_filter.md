@@ -107,15 +107,15 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(1)
-x <- matrix(rnorm(40 * 30), 40, 30)
-y <- x[, 1] + rnorm(40, sd = 0.1)
-cal <- 1:30
-
-fit <- osc(x[cal, ], y[cal], method = "fearn", ncomp = 2)
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]
+wl <- as.numeric(names(spectra))
+x <- spectra[wl > 760 & wl < 780]  # the K I resonance lines
+cal <- 1:300
+fit <- osc(x[cal, ], forageLIBS$K[cal], method = "fearn", ncomp = 2)
 corrected <- predict(fit, x[-cal, ])
 dim(corrected)
-#> [1] 10 30
+#> [1]  68 245
 
 # applied to the calibration spectra, predict() gives the correction
 all.equal(predict(fit, x[cal, ]), fit$correction)

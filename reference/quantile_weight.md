@@ -82,15 +82,14 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-vec <- c(-100, 0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 100)
-# non-robust approach
-moments::kurtosis(vec)
-#> [1] 6.474793
-
-# robust approach
-quantile_weight(vec)
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+moments::kurtosis(fe)   # classical
+#> [1] 25.01662
+quantile_weight(fe)     # robust, left and right tails
 #> # A tibble: 1 × 2
-#>     LQW   RQW
-#>   <dbl> <dbl>
-#> 1 0.844 0.832
+#>      LQW   RQW
+#>    <dbl> <dbl>
+#> 1 0.0174 0.687
 ```

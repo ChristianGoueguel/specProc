@@ -106,23 +106,3 @@ returns the spectral `terms`, the `sample` column, the criteria
 [`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md),
 [`average()`](https://christiangoueguel.com/specProc/reference/average.md),
 [`step_line_ratio()`](https://christiangoueguel.com/specProc/reference/step_line_ratio.md)
-
-## Examples
-
-``` r
-if (rlang::is_installed("recipes")) {
-  set.seed(1)
-  wl <- seq(390, 400, by = 0.1)
-  line <- exp(-(wl - 393.4)^2 / 0.02)
-  shots <- t(sapply(rep(c(1, 2), each = 6), function(s) 1000 * s * line + rnorm(length(wl), 50, 5)))
-  shots[3, ] <- shots[3, ] / 10     # a weak shot
-  colnames(shots) <- wl
-  df <- data.frame(Sample = rep(c("a", "b"), each = 6), shots, check.names = FALSE)
-  rec <- recipes::recipe(~ ., data = df) |>
-    recipes::update_role(Sample, new_role = "id") |>
-    step_reject_shots(recipes::all_numeric(), sample = Sample) |>
-    recipes::prep()
-  nrow(recipes::bake(rec, new_data = NULL))   # 11 shots kept for training
-}
-#> [1] 9
-```

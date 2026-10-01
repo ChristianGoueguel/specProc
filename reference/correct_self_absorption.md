@@ -53,7 +53,7 @@ correct_self_absorption(
 - units:
 
   The units of `intensity`: `"energy"` (default) or `"photons"`, as in
-  [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md).
+  [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md).
 
 - tol:
 
@@ -68,7 +68,7 @@ correct_self_absorption(
 `lines`, as a tibble, with the corrected `intensity`, the
 `measured_intensity`, the self-absorption coefficient `SA` and a logical
 `reference`, ready for
-[`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md)
+[`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
 or
 [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md).
 The temperature used is in the attribute `temperature`.
@@ -99,7 +99,7 @@ The corrected lines of a species lie, by construction, on the Boltzmann
 plot of its reference line at the temperature used, so they cannot give
 the temperature by themselves. Give `temperature`, measured on optically
 thin lines (for example with
-[`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md)
+[`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md)
 or
 [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md)),
 or give `electron_density`: the temperature is then the one at which the
@@ -134,24 +134,27 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-# Lines of one species at 9000 K; the resonance line at 400 nm keeps only
-# 40% of its intensity
-kB <- 8.617333262e-5
-lines <- data.frame(
-  species = "X I", wavelength = c(400, 420, 450, 480, 500),
-  Aki = c(2e8, 5e7, 2e7, 8e7, 3e7), gk = c(3, 5, 7, 5, 9),
-  Ek = c(3.1, 3.9, 4.6, 5.3, 6.0), Ei = c(0, 1.0, 1.9, 2.7, 3.5)
+data(forageLIBS)
+mean_spectrum <- colMeans(forageLIBS[-(1:14)])
+# potassium lines: the resonance doublet at 766.49 and 769.90 nm ends on
+# the ground state (Ei = 0) and is strongly reabsorbed
+k_lines <- data.frame(
+  species = "K I", wavelength = c(404.414, 404.721, 691.108, 693.877, 766.490, 769.896),
+  Aki = c(1.150e6, 1.070e6, 2.500e6, 4.956e6, 3.779e7, 3.734e7),
+  gk = c(4, 2, 2, 2, 4, 2),
+  Ek = c(3.065, 3.063, 3.403, 3.403, 1.617, 1.610),
+  Ei = c(0, 0, 1.610, 1.617, 0, 0)
 )
-lines$intensity <- with(lines, gk * Aki / wavelength * exp(-Ek / (kB * 9000)))
-lines$intensity[1] <- 0.4 * lines$intensity[1]
-corrected <- correct_self_absorption(lines, temperature = 9000)
+corrected <- correct_self_absorption(line_intensities(mean_spectrum, k_lines), temperature = 8000)
+#> Warning: 1 line(s) have SA > 1: check the reference lines, the atomic data or the intensities.
 corrected[c("wavelength", "measured_intensity", "SA", "reference")]
-#> # A tibble: 5 × 4
-#>   wavelength measured_intensity    SA reference
-#>        <dbl>              <dbl> <dbl> <lgl>    
-#> 1        400             11021.   0.4 FALSE    
-#> 2        420              3898.   1   FALSE    
-#> 3        450               826.   1   FALSE    
-#> 4        480               897.   1   FALSE    
-#> 5        500               236.   1   TRUE     
+#> # A tibble: 6 × 4
+#>   wavelength measured_intensity     SA reference
+#>        <dbl>              <dbl>  <dbl> <lgl>    
+#> 1       404.               449. 0.531  FALSE    
+#> 2       405.               394. 1      TRUE     
+#> 3       691.               407. 1.24   FALSE    
+#> 4       694.               424. 0.651  FALSE    
+#> 5       766.              5418. 0.0452 FALSE    
+#> 6       770.              7178. 0.121  FALSE    
 ```

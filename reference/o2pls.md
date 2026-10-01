@@ -119,20 +119,20 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(1)
-x <- matrix(rnorm(30 * 40), 30, 40)
-y <- x[, 1:2] %*% c(1, -1) + rnorm(30, sd = 0.1)
-fit <- o2pls(x, y, ncomp = 1, nx = 2)
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+# potassium and calcium at once
+fit <- o2pls(spectra, forageLIBS[c("K", "Ca")], ncomp = 2, nx = 2)
 fit
 #> An object of class 'o2pls'
 #> 
-#> Joint components:        1
+#> Joint components:        2
 #> X-orthogonal components: 2
 #> Y-orthogonal components: 0
 #> 
-#> - correction:  30 x 40
-#> - X weights:   40 x 1
-#> - Y weights:   1 x 1
-#> - X scores:    30 x 1
-#> - X ortho:     30 x 2
+#> - correction:  368 x 7152
+#> - X weights:   7152 x 2
+#> - Y weights:   2 x 2
+#> - X scores:    368 x 2
+#> - X ortho:     368 x 2
 ```

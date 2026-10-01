@@ -151,31 +151,36 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-# standards with a slightly curved response
-set.seed(1)
-standards <- data.frame(concentration = rep(c(0, 0.5, 1, 2, 4, 8), each = 3))
-standards$intensity <- with(standards, 50 + 1000 * concentration - 15 * concentration^2 +
-                              rnorm(18, sd = 20))
-cal <- calibration_curve(standards, intensity, concentration)
+data(forageLIBS)
+# the K I 769.90 nm line, normalized to the C I 247.86 nm line of the matrix
+lines <- line_intensities(forageLIBS[-(1:14)], c(C = 247.856, K = 769.896), baseline = TRUE)
+standards <- data.frame(
+  K = forageLIBS$K,
+  signal = lines$intensity[lines$line == "K"] / lines$intensity[lines$line == "C"]
+)
+cal <- calibration_curve(standards[1:300, ], signal, K)
 cal
-#> Linear calibration curve (18 standards)
+#> Linear calibration curve (300 standards)
 #> 
-#>       term estimate std_error  lower upper
-#>  intercept    152.5    30.854  87.06 217.9
-#>      slope    878.9     8.185 861.51 896.2
+#>       term estimate std_error  lower  upper
+#>  intercept   0.2708   0.03240 0.2070 0.3345
+#>      slope   0.1384   0.01556 0.1078 0.1690
 #> 
-#> R-squared:    0.99861
-#> Sensitivity:  878.9
-#> LOD:          0.358  (residual)
-#> LOQ:          1.08
-#> Mandel:        F = 344.90, p = 9.21e-12
-#> Lack of fit:   F = 92.42, p = 6.58e-09
-cal2 <- calibration_curve(standards, intensity, concentration, model = "quadratic")
-predict(cal2, c(1500, 5000))
-#> # A tibble: 2 × 7
-#>   signal concentration     se lower upper below_lod below_loq
-#>    <dbl>         <dbl>  <dbl> <dbl> <dbl> <lgl>     <lgl>    
-#> 1   1500          1.48 0.0219  1.43  1.53 FALSE     FALSE    
-#> 2   5000          5.38 0.0263  5.33  5.44 FALSE     FALSE    
-plot_calibration(cal2)
+#> R-squared:    0.20976
+#> Sensitivity:  0.1384
+#> LOD:          3.38  (residual)
+#> LOQ:          10.2
+#> Mandel:        F = 4.03, p = 0.0457
+#> Lack of fit:   F = 1.13, p = 0.239
+# the concentrations of new samples, from their signals
+head(predict(cal, standards$signal[301:368]))
+#> # A tibble: 6 × 7
+#>   signal concentration    se   lower upper below_lod below_loq
+#>    <dbl>         <dbl> <dbl>   <dbl> <dbl> <lgl>     <lgl>    
+#> 1  0.459          1.36  1.03 -0.665   3.38 TRUE      TRUE     
+#> 2  0.543          1.97  1.03 -0.0538  3.99 TRUE      TRUE     
+#> 3  0.580          2.23  1.03  0.212   4.25 TRUE      TRUE     
+#> 4  0.492          1.59  1.03 -0.427   3.62 TRUE      TRUE     
+#> 5  0.481          1.52  1.03 -0.507   3.54 TRUE      TRUE     
+#> 6  0.501          1.67  1.03 -0.355   3.69 TRUE      TRUE     
 ```

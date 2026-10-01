@@ -92,10 +92,14 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(1)
-base <- sin(seq(0, pi, length.out = 50))
-x <- t(sapply(1:10, function(i) runif(1, 0, 1) + runif(1, 0.5, 2) * base))
-res <- msc(x)
-range(apply(as.matrix(res$correction), 2, sd))
-#> [1] 1.046728e-16 3.051711e-16
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+res <- msc(spectra)
+res$correction[1:3, 1:4]
+#> # A tibble: 3 × 4
+#>   `199.3771616` `199.4644141` `199.5516666` `199.6389192`
+#>           <dbl>         <dbl>         <dbl>         <dbl>
+#> 1          698.          709.          755.          708.
+#> 2          664.          686.          716.          658.
+#> 3          632.          650.          696.          650.
 ```

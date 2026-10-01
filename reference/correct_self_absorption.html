@@ -13,7 +13,7 @@ the same species that is little self-absorbed."><meta property="og:image" conten
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,7 +100,7 @@ species, or <code>NULL</code> (default) to choose them by optical depth.</p></dd
 
 <dt id="arg-units">units<a class="anchor" aria-label="anchor" href="#arg-units"></a></dt>
 <dd><p>The units of <code>intensity</code>: <code>"energy"</code> (default) or
-<code>"photons"</code>, as in <code><a href="boltzmann_plot.html">boltzmann_plot()</a></code>.</p></dd>
+<code>"photons"</code>, as in <code><a href="boltzmann.html">boltzmann()</a></code>.</p></dd>
 
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
@@ -116,7 +116,7 @@ Default is 1e-8.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p><code>lines</code>, as a tibble, with the corrected <code>intensity</code>, the
 <code>measured_intensity</code>, the self-absorption coefficient <code>SA</code> and a
-logical <code>reference</code>, ready for <code><a href="boltzmann_plot.html">boltzmann_plot()</a></code> or <code><a href="cf_libs.html">cf_libs()</a></code>. The
+logical <code>reference</code>, ready for <code><a href="boltzmann.html">boltzmann()</a></code> or <code><a href="cf_libs.html">cf_libs()</a></code>. The
 temperature used is in the attribute <code>temperature</code>.</p>
     </div>
     <div class="section level2">
@@ -142,7 +142,7 @@ must be well measured: its noise propagates to every coefficient.</p>
 <p>The corrected lines of a species lie, by construction, on the Boltzmann
 plot of its reference line at the temperature used, so they cannot give
 the temperature by themselves. Give <code>temperature</code>, measured on optically
-thin lines (for example with <code><a href="saha_boltzmann_plot.html">saha_boltzmann_plot()</a></code> or <code><a href="cf_libs.html">cf_libs()</a></code>), or
+thin lines (for example with <code><a href="saha_boltzmann.html">saha_boltzmann()</a></code> or <code><a href="cf_libs.html">cf_libs()</a></code>), or
 give <code>electron_density</code>: the temperature is then the one at which the
 corrected lines of the neutral atom and of the ion of each element lie on
 a common Saha-Boltzmann plot (as in <code><a href="cf_libs.html">cf_libs()</a></code>), which needs lines of
@@ -171,26 +171,30 @@ reference method. Talanta, 79(2):388-395.</p></li>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Lines of one species at 9000 K; the resonance line at 400 nm keeps only</span></span></span>
-<span class="r-in"><span><span class="co"># 40% of its intensity</span></span></span>
-<span class="r-in"><span><span class="va">kB</span> <span class="op">&lt;-</span> <span class="fl">8.617333262e-5</span></span></span>
-<span class="r-in"><span><span class="va">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  species <span class="op">=</span> <span class="st">"X I"</span>, wavelength <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">400</span>, <span class="fl">420</span>, <span class="fl">450</span>, <span class="fl">480</span>, <span class="fl">500</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  Aki <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2e8</span>, <span class="fl">5e7</span>, <span class="fl">2e7</span>, <span class="fl">8e7</span>, <span class="fl">3e7</span><span class="op">)</span>, gk <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">7</span>, <span class="fl">5</span>, <span class="fl">9</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  Ek <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3.1</span>, <span class="fl">3.9</span>, <span class="fl">4.6</span>, <span class="fl">5.3</span>, <span class="fl">6.0</span><span class="op">)</span>, Ei <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1.0</span>, <span class="fl">1.9</span>, <span class="fl">2.7</span>, <span class="fl">3.5</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mean_spectrum</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># potassium lines: the resonance doublet at 766.49 and 769.90 nm ends on</span></span></span>
+<span class="r-in"><span><span class="co"># the ground state (Ei = 0) and is strongly reabsorbed</span></span></span>
+<span class="r-in"><span><span class="va">k_lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  species <span class="op">=</span> <span class="st">"K I"</span>, wavelength <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">404.414</span>, <span class="fl">404.721</span>, <span class="fl">691.108</span>, <span class="fl">693.877</span>, <span class="fl">766.490</span>, <span class="fl">769.896</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  Aki <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1.150e6</span>, <span class="fl">1.070e6</span>, <span class="fl">2.500e6</span>, <span class="fl">4.956e6</span>, <span class="fl">3.779e7</span>, <span class="fl">3.734e7</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  gk <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  Ek <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3.065</span>, <span class="fl">3.063</span>, <span class="fl">3.403</span>, <span class="fl">3.403</span>, <span class="fl">1.617</span>, <span class="fl">1.610</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  Ei <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">1.610</span>, <span class="fl">1.617</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">lines</span><span class="op">$</span><span class="va">intensity</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">lines</span>, <span class="va">gk</span> <span class="op">*</span> <span class="va">Aki</span> <span class="op">/</span> <span class="va">wavelength</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="op">-</span><span class="va">Ek</span> <span class="op">/</span> <span class="op">(</span><span class="va">kB</span> <span class="op">*</span> <span class="fl">9000</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">lines</span><span class="op">$</span><span class="va">intensity</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0.4</span> <span class="op">*</span> <span class="va">lines</span><span class="op">$</span><span class="va">intensity</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></span>
-<span class="r-in"><span><span class="va">corrected</span> <span class="op">&lt;-</span> <span class="fu">correct_self_absorption</span><span class="op">(</span><span class="va">lines</span>, temperature <span class="op">=</span> <span class="fl">9000</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">corrected</span> <span class="op">&lt;-</span> <span class="fu">correct_self_absorption</span><span class="op">(</span><span class="fu"><a href="line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">mean_spectrum</span>, <span class="va">k_lines</span><span class="op">)</span>, temperature <span class="op">=</span> <span class="fl">8000</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>1 line(s) have SA &gt; 1: check the reference lines, the atomic data or the intensities.</span>
 <span class="r-in"><span><span class="va">corrected</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wavelength"</span>, <span class="st">"measured_intensity"</span>, <span class="st">"SA"</span>, <span class="st">"reference"</span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   wavelength measured_intensity    SA reference</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>        400             <span style="text-decoration: underline;">11</span>021.   0.4 FALSE    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>        420              <span style="text-decoration: underline;">3</span>898.   1   FALSE    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>        450               826.   1   FALSE    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>        480               897.   1   FALSE    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>        500               236.   1   TRUE     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   wavelength measured_intensity     SA reference</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>       404.               449. 0.531  FALSE    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>       405.               394. 1      TRUE     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>       691.               407. 1.24   FALSE    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>       694.               424. 0.651  FALSE    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>       766.              <span style="text-decoration: underline;">5</span>418. 0.045<span style="text-decoration: underline;">2</span> FALSE    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>       770.              <span style="text-decoration: underline;">7</span>178. 0.121  FALSE    </span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

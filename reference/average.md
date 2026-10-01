@@ -47,21 +47,9 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-spectra <- data.frame(
-  sample = rep(c("a", "b"), each = 3),
-  `200.1` = c(1, 2, 3, 10, 11, 12),
-  `200.2` = c(2, 3, 4, 20, 21, 22),
-  check.names = FALSE
-)
-average(spectra[, -1])
-#> # A tibble: 1 × 2
-#>   `200.1` `200.2`
-#>     <dbl>   <dbl>
-#> 1     6.5      12
-average(spectra, sample)
-#> # A tibble: 2 × 3
-#>   sample `200.1` `200.2`
-#>   <chr>    <dbl>   <dbl>
-#> 1 a            2       3
-#> 2 b           11      21
+data(forageLIBS)
+# one mean spectrum per sample: three samples were measured twice
+means <- average(forageLIBS[-c(1, 3:14)], Sample)
+dim(means)
+#> [1]  365 7153
 ```

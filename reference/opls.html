@@ -9,7 +9,7 @@ model to the provided x (predictor) and y (response) data."><meta property="og:i
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -209,28 +209,25 @@ filter in a tidymodels recipe.</p></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">40</span> <span class="op">*</span> <span class="fl">30</span><span class="op">)</span>, <span class="fl">40</span>, <span class="fl">30</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">40</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">x</span><span class="op">[</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">40</span>, sd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>  <span class="co"># response-orthogonal variation</span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">opls</span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">30</span>, <span class="op">]</span>, <span class="va">y</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">30</span><span class="op">]</span>, permutation <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span>  <span class="co"># the spectral channels</span></span></span>
+<span class="r-in"><span><span class="va">cal</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">300</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">opls</span><span class="op">(</span><span class="va">spectra</span><span class="op">[</span><span class="va">cal</span>, <span class="op">]</span>, <span class="va">forageLIBS</span><span class="op">$</span><span class="va">K</span><span class="op">[</span><span class="va">cal</span><span class="op">]</span>, permutation <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Orthogonal projections to latent structures (OPLS)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Variables:               30</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Observations:            30</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Variables:               7152</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Observations:            300</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Scaling:                 center</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Predictive components:   1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Orthogonal components:   3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Orthogonal components:   6</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>       R2X(cum) R2Y(cum) Q2(cum) RMSEE pR2Y pQ2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Total    0.677     0.95   0.473 0.224  0.1 0.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Total    0.906    0.774   0.725 0.253  0.2 0.2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Use predict(&lt;model&gt;, newdata, type = ) to filter new data or predict the response.</span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">x</span><span class="op">[</span><span class="fl">31</span><span class="op">:</span><span class="fl">40</span>, <span class="op">]</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1]  0.98911093 -0.21520551 -0.82803563  0.08133964 -0.26928032 -1.03304174</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] -0.43825878  0.21948811  0.39230090  0.96764347</span>
-<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">spectra</span><span class="op">[</span><span class="op">-</span><span class="va">cal</span>, <span class="op">]</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2.161563 2.250033 2.605931 2.113430 2.075599 1.665393</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

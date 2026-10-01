@@ -75,36 +75,22 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(1)
-x <- matrix(rnorm(100 * 4), ncol = 4, dimnames = list(NULL, paste0("V", 1:4)))
-x[1:5, ] <- x[1:5, ] + 4 # five multivariate outliers
+data(forageLIBS)
+# mineral contents (%) of the forage samples
+contents <- forageLIBS[c("Ca", "Mg", "P", "K")]
+plot_outliers(contents)
 
-# Basic usage with default parameters
-plot_outliers(x)
+plot_outliers(contents, show.outlier = FALSE, show.mahal = TRUE)
 
-
-# Adjust the proportion of observations used for MCD estimation
-plot_outliers(x, quan = 0.75)
-
-
-# Show Mahalanobis distances instead of outlier highlighting
-plot_outliers(x, show.outlier = FALSE, show.mahal = TRUE)
-
-
-# Combine outlier highlighting and Mahalanobis distance color-coding
-plot_outliers(x, show.outlier = TRUE, show.mahal = TRUE)
-
-
-# Return data frame instead of plot
-result_df <- plot_outliers(x, show.outlier = FALSE, show.mahal = FALSE)
-head(result_df)
+# a data frame instead of a plot
+head(plot_outliers(contents, show.outlier = FALSE, show.mahal = FALSE))
 #> # A tibble: 6 × 6
-#>      V1    V2    V3    V4 outlier mahalanobis
-#>   <dbl> <dbl> <dbl> <dbl> <lgl>         <dbl>
-#> 1  3.76  3.54  4.72  5.28 TRUE           8.91
-#> 2  4.69  4.23  6.10  3.17 TRUE           9.53
-#> 3  3.52  3.24  5.99  6.46 TRUE          10.1 
-#> 4  6.31  4.35  3.93  3.89 TRUE           9.69
-#> 5  4.85  3.51  1.83  6.11 TRUE           8.93
-#> 6 -1.05  1.87  2.67  1.59 TRUE           3.82
+#>       Ca     Mg      P     K outlier mahalanobis
+#>    <dbl>  <dbl>  <dbl> <dbl> <lgl>         <dbl>
+#> 1  0.671  0.196  0.228 3.37  TRUE          4.37 
+#> 2  0.647 -1.02   0.407 0.993 FALSE         2.40 
+#> 3 -0.240 -1.21  -0.783 0.849 FALSE         2.03 
+#> 4  1.54   1.58   1.55  0.541 FALSE         1.93 
+#> 5  0.498 -0.401 -0.881 1.71  FALSE         3.16 
+#> 6  0.207 -0.316 -0.343 0.254 FALSE         0.761
 ```

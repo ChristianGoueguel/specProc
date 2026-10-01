@@ -169,41 +169,46 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-# Three constituents with overlapping lines; the analyte is the first one
-set.seed(1)
-wl <- seq(390, 400, length.out = 200)
-line <- function(center) exp(-(wl - center)^2 / 0.1)
-pure <- rbind(line(393.4) + 0.3 * line(396.8), line(393.8), line(396.5))
-conc <- matrix(runif(30 * 3, 0, 1), 30, 3)
-x <- conc %*% pure + matrix(rnorm(30 * 200, sd = 0.002), 30)
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+# the three samples measured twice
+twice <- forageLIBS$Sample[duplicated(forageLIBS$Sample)]
+first <- match(twice, forageLIBS$Sample)
+second <- vapply(twice, function(s) max(which(forageLIBS$Sample == s)), integer(1))
+# the noise of the spectra, from the differences between repeated measurements
+noise <- stats::sd(as.matrix(spectra[second, ]) - as.matrix(spectra[first, ])) / sqrt(2)
 
-fit <- nas(x, conc[, 1], ncomp = 3, noise = 0.002)
+cal <- 1:300
+fit <- nas(spectra[cal, ], forageLIBS$K[cal], ncomp = 7, noise = noise)
 fit
-#> Net analyte signal (PLS model, 3 components)
+#> Net analyte signal (PLS model, 7 components)
 #> 
-#> Calibration samples:     30
-#> Sensitivity:             2.59
-#> Mean selectivity:        0.565
-#> Noise (sd):              0.002
-#> Analytical sensitivity:  1295
-#> LOD:                     0.002548
-#> LOQ:                     0.007722
+#> Calibration samples:     300
+#> Sensitivity:             15538
+#> Mean selectivity:        0.108
+#> Noise (sd):              694.6
+#> Analytical sensitivity:  22.37
+#> LOD:                     0.1475
+#> LOQ:                     0.447
 head(fit$nas)
 #> # A tibble: 6 × 4
-#>      nas selectivity fitted    snr
-#>    <dbl>       <dbl>  <dbl>  <dbl>
-#> 1 -0.633       0.510  0.265 -317. 
-#> 2 -0.358       0.460  0.371 -179. 
-#> 3  0.164       0.803  0.573   82.1
-#> 4  1.03        0.895  0.908  516. 
-#> 5 -0.795       0.829  0.202 -398. 
-#> 6  1.01        0.692  0.898  503. 
-
-# the sensitivity equals the length of the analyte spectrum orthogonal
-# to the interferent spectra
-interf <- t(pure[2:3, ])
-net <- pure[1, ] - interf %*% qr.solve(interf, pure[1, ])
-c(model = fit$figures_of_merit[["sensitivity"]], theory = sqrt(sum(net^2)))
-#>    model   theory 
-#> 2.590138 2.591504 
+#>      nas selectivity fitted   snr
+#>    <dbl>       <dbl>  <dbl> <dbl>
+#> 1 13972.      0.354    2.91 20.1 
+#> 2  5715.      0.155    2.38  8.23
+#> 3  2864.      0.0570   2.20  4.12
+#> 4  3420.      0.0452   2.23  4.92
+#> 5 -5771.      0.130    1.64 -8.31
+#> 6   955.      0.0332   2.08  1.37
+# the net analyte signal and selectivity of new spectra
+head(predict(fit, spectra[-cal, ]))
+#> # A tibble: 6 × 4
+#>      nas selectivity predicted   snr
+#>    <dbl>       <dbl>     <dbl> <dbl>
+#> 1  2284.      0.0194      2.16  3.29
+#> 2  3659.      0.0376      2.25  5.27
+#> 3  9189.      0.173       2.61 13.2 
+#> 4  1537.      0.0181      2.11  2.21
+#> 5   949.      0.0129      2.08  1.37
+#> 6 -5425.      0.0648      1.67 -7.81
 ```

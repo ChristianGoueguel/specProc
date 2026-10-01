@@ -3,9 +3,9 @@
 Retrieves the lines of an atom or ion in a wavelength range from the
 NIST Atomic Spectra Database (ASD): wavelengths, transition
 probabilities, level energies and statistical weights, as needed by
-[`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md)
+[`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
 and
-[`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md).
+[`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md).
 The data are downloaded on demand; they are not distributed with
 specProc.
 
@@ -63,8 +63,8 @@ when you use these data:
 ## See also
 
 [`nist_ionization_energy()`](https://christiangoueguel.com/specProc/reference/nist_ionization_energy.md),
-[`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md),
-[`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md),
+[`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md),
+[`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md),
 [`starkb_lines()`](https://christiangoueguel.com/specProc/reference/starkb_lines.md)
 
 ## Author

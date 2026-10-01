@@ -72,9 +72,12 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(1)
-x <- matrix(rnorm(30 * 20), 30, 20)
-y <- x[, 1] + rnorm(30, sd = 0.1)
-G <- y_gradient_glsw(x, y, alpha = 0.01)
-x_filtered <- x %*% as.matrix(G)
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]
+wl <- as.numeric(names(spectra))
+x <- spectra[wl > 760 & wl < 780]  # the K I resonance lines
+G <- y_gradient_glsw(x, forageLIBS$K, alpha = 0.01)
+filtered <- as.matrix(x) %*% as.matrix(G)
+dim(filtered)
+#> [1] 368 245
 ```

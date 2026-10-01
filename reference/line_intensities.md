@@ -3,8 +3,8 @@
 Measures the intensity of emission lines in spectra: for each line, the
 peak is searched near its tabulated wavelength, and its area or height
 is measured. The result feeds
-[`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/boltzmann_plot.md),
-[`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann_plot.md),
+[`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md),
+[`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md),
 [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md)
 and
 [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md).

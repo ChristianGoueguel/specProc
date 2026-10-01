@@ -45,11 +45,14 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-x <- rbind(c(1, 2, 3, 4), c(10, 20, 30, 40))
-snv(x)$correction
-#> # A tibble: 2 × 4
-#>      V1     V2    V3    V4
-#>   <dbl>  <dbl> <dbl> <dbl>
-#> 1 -1.16 -0.387 0.387  1.16
-#> 2 -1.16 -0.387 0.387  1.16
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+corrected <- snv(spectra)$correction
+corrected[1:3, 1:4]
+#> # A tibble: 3 × 4
+#>   `199.3771616` `199.4644141` `199.5516666` `199.6389192`
+#>           <dbl>         <dbl>         <dbl>         <dbl>
+#> 1        -0.386        -0.383        -0.370        -0.383
+#> 2        -0.395        -0.389        -0.381        -0.397
+#> 3        -0.402        -0.397        -0.384        -0.397
 ```

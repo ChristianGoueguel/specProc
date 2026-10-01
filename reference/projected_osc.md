@@ -120,10 +120,10 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(1)
-x <- matrix(rnorm(30 * 40), 30, 40)
-y <- x[, 1] + rnorm(30, sd = 0.1)
-res <- projected_osc(x[1:20, ], y[1:20], ncomp = 3, newdata = x[21:30, ])
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+cal <- 1:300
+res <- projected_osc(spectra[cal, ], forageLIBS$K[cal], ncomp = 3, newdata = spectra[-cal, ])
 dim(res$newdata$correction)
-#> [1] 10 40
+#> [1]   68 7152
 ```

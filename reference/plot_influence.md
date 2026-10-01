@@ -117,3 +117,16 @@ which puts plots of different models on the same scale.
 ## Author
 
 Christian L. Goueguel
+
+## Examples
+
+``` r
+data(forageLIBS)
+pca <- stats::prcomp(forageLIBS[-(1:14)])
+influence <- q_residuals(pca, k = 3, conf_level = c(0.95, 0.99))
+plot_influence(influence, label = forageLIBS$Measurement)
+
+# the same options as plot_outlier_map(): distances relative to the limits,
+# shaded outlying regions, logarithmic axes and colors by distance
+plot_influence(influence, relative = TRUE, shade = TRUE, log = TRUE, colour_by = "distance")
+```

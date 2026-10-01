@@ -49,15 +49,10 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-vec <- c(1, 2, 3, 4, 4, 2)
-stats::var(vec)
-#> [1] 1.466667
-biweight_midvariance(vec)
-#> [1] 1.364769
-
-vec <- c(1, 2, 3, 4, 4, 100)
-stats::var(vec)
-#> [1] 1576
-biweight_midvariance(vec)
-#> [1] 2.311135
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+c(variance = stats::var(fe), biweight = biweight_midvariance(fe))
+#>  variance  biweight 
+#> 44226.244  6756.178 
 ```

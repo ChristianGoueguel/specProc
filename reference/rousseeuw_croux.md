@@ -60,29 +60,11 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-# Example 1:
-x <- c(seq(1,100))
-tibble::tibble(
-sd = stats::sd(x),
-mad = stats::mad(x),
-Sn = rousseeuw_croux(x, estimator = "Sn"),
-Qn = rousseeuw_croux(x, estimator = "Qn")
-)
-#> # A tibble: 1 × 4
-#>      sd   mad    Sn    Qn
-#>   <dbl> <dbl> <dbl> <dbl>
-#> 1  29.0  37.1  29.8  30.0
-
-# Example 2:
-x <- c(seq(1,99), 1e3) # An outlier at 1000
-tibble::tibble(
-sd = stats::sd(x),
-mad = stats::mad(x),
-Sn = rousseeuw_croux(x, estimator = "Sn"),
-Qn = rousseeuw_croux(x, estimator = "Qn")
-)
-#> # A tibble: 1 × 4
-#>      sd   mad    Sn    Qn
-#>   <dbl> <dbl> <dbl> <dbl>
-#> 1  99.2  37.1  31.0  30.0
+data(forageLIBS)
+# iron contents (mg/kg): a few samples are far above the others
+fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
+c(sd = stats::sd(fe), mad = stats::mad(fe),
+  Sn = rousseeuw_croux(fe, estimator = "Sn"), Qn = rousseeuw_croux(fe, estimator = "Qn"))
+#>        sd       mad        Sn        Qn 
+#> 210.30037  78.57780  76.47013  75.12173 
 ```

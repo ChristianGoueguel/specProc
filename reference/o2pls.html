@@ -17,7 +17,7 @@ orthogonal variations in both the \(X\)- and \(Y\)-space are filtered out."><met
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -146,23 +146,22 @@ outcomes.</p></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">30</span> <span class="op">*</span> <span class="fl">40</span><span class="op">)</span>, <span class="fl">30</span>, <span class="fl">40</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">30</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">o2pls</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, ncomp <span class="op">=</span> <span class="fl">1</span>, nx <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span>  <span class="co"># the spectral channels</span></span></span>
+<span class="r-in"><span><span class="co"># potassium and calcium at once</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">o2pls</span><span class="op">(</span><span class="va">spectra</span>, <span class="va">forageLIBS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"K"</span>, <span class="st">"Ca"</span><span class="op">)</span><span class="op">]</span>, ncomp <span class="op">=</span> <span class="fl">2</span>, nx <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> An object of class 'o2pls'</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Joint components:        1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Joint components:        2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> X-orthogonal components: 2</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Y-orthogonal components: 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - correction:  30 x 40</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - X weights:   40 x 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - Y weights:   1 x 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - X scores:    30 x 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> - X ortho:     30 x 2</span>
-<span class="r-in"><span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - correction:  368 x 7152</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - X weights:   7152 x 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - Y weights:   2 x 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - X scores:    368 x 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - X ortho:     368 x 2</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

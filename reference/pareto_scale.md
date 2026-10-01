@@ -34,9 +34,13 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-pareto_scale(matrix(c(1, 2, 3, 10, 20, 30), ncol = 2))
-#>      [,1]     [,2]
-#> [1,]    1 3.162278
-#> [2,]    2 6.324555
-#> [3,]    3 9.486833
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+pareto_scale(spectra)[1:3, 1:4]
+#> # A tibble: 3 × 4
+#>   `199.3771616` `199.4644141` `199.5516666` `199.6389192`
+#>           <dbl>         <dbl>         <dbl>         <dbl>
+#> 1          221.          215.          133.          214.
+#> 2          221.          218.          132.          209.
+#> 3          219.          215.          133.          214.
 ```

@@ -200,13 +200,12 @@ groups, both are drawn: the confidence ellipses of the groups and the
 PCA or PLS; on a UMAP map, whose distances are not meaningful, prefer
 `ellipse`.
 
-**Style.** The panel is drawn in the style of SIMCA score plots: grey
-outside the outermost ellipse (of \\T^2\\, or of each group) and white
-inside, so that the samples beyond the limits stand out, with no grid
-and a fixed `aspect_ratio` (0.7 by default; `NULL` lets the plot fill
-the space), and thin black lines through the origin (when it lies in the
-range of the samples, as for centered scores). Without ellipses, the
-panel is white.
+**Style.** The panel is grey outside the outermost ellipse (of \\T^2\\,
+or of each group) and white inside, so that the samples beyond the
+limits stand out, with no grid and a fixed `aspect_ratio` (0.7 by
+default; `NULL` lets the plot fill the space), and thin black lines
+through the origin (when it lies in the range of the samples, as for
+centered scores). Without ellipses, the panel is white.
 
 **Axes.** For a [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html)
 fit or a robust PCA, the axis titles give the share of the variance of

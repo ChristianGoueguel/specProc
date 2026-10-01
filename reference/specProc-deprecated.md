@@ -1,8 +1,8 @@
 # Deprecated functions in specProc
 
-These functions were renamed in specProc 0.2.0 to follow a consistent
-snake_case naming scheme. The old names still work but issue a
-deprecation warning and will be removed in a future release.
+These functions were renamed, most of them in specProc 0.2.0 to follow a
+consistent snake_case naming scheme. The old names still work but issue
+a deprecation warning and will be removed in a future release.
 
 ## Usage
 
@@ -38,6 +38,10 @@ tukeyGH(...)
 yGradientglsw(...)
 
 pareto(...)
+
+boltzmann_plot(...)
+
+saha_boltzmann_plot(...)
 ```
 
 ## Arguments
@@ -78,3 +82,10 @@ used by [`glm()`](https://rdrr.io/r/stats/glm.html).
 | `tukeyGH()` | [`tukey_gh()`](https://christiangoueguel.com/specProc/reference/tukey_gh.md) |
 | `yGradientglsw()` | [`y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/y_gradient_glsw.md) |
 | `pareto()` | [`pareto_scale()`](https://christiangoueguel.com/specProc/reference/pareto_scale.md) |
+| `boltzmann_plot()` | [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md) |
+| `saha_boltzmann_plot()` | [`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md) |
+
+`boltzmann_plot()` and `saha_boltzmann_plot()` were renamed in specProc
+0.7.0.9003, so that they are not confused with
+[`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md),
+which draws their result.

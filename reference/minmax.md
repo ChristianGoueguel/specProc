@@ -42,8 +42,9 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-minmax(c(2, 4, 6, 10))
-#> [1] 0.00 0.25 0.50 1.00
-minmax(c(2, 4, NA, 10), a = -1, b = 1, drop.na = FALSE)
-#> [1] -1.0 -0.5   NA  1.0
+data(forageLIBS)
+head(minmax(forageLIBS$K))
+#> [1] 0.8983912 0.5709850 0.5512278 0.5088908 0.6697714 0.4693762
+head(minmax(forageLIBS$S, a = -1, b = 1, drop.na = FALSE))
+#> [1] -0.3333333 -0.4814815 -0.3333333 -0.3333333 -0.7037037 -0.4074074
 ```

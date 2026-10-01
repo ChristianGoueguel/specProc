@@ -68,14 +68,16 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(1)
-x <- matrix(rpois(40, lambda = rep(c(5, 50, 500, 5000), each = 10)), ncol = 4)
-res <- poisson_scale(x)
-res$sc
-#> [1] 12.46455 14.07356 25.55514 71.73120
-# apply the same scales to new data
-poisson_scale(x[1:2, ], sc = res$sc)
-#>           [,1]     [,2]     [,3]     [,4]
-#> [1,] 0.3209101 3.126431 20.26990 69.46768
-#> [2,] 0.3209101 3.339596 20.07424 69.59315
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+res <- poisson_scale(spectra[1:300, ])
+head(res$sc)
+#> 199.3771616 199.4644141 199.5516666 199.6389192 199.7261717 199.8134242 
+#>    51.53800    51.59162    51.94261    51.63528    51.66161    51.70972 
+# the same scales for new spectra
+poisson_scale(spectra[301:368, ], sc = res$sc)[1:3, 1:4]
+#>      199.3771616 199.4644141 199.5516666 199.6389192
+#> [1,]    13.27176    13.47118    14.74704    13.45979
+#> [2,]    13.25236    13.23858    14.51602    13.24676
+#> [3,]    13.46579    13.49056    14.49677    13.69219
 ```

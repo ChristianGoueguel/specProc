@@ -118,30 +118,21 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-set.seed(1)
-wl <- seq(390, 400, length.out = 100)
-pure <- exp(-(wl - 393.4)^2 / 0.05) + 0.6 * exp(-(wl - 396.8)^2 / 0.05)
-# multiplicative effect, offset and a curved baseline for each spectrum
-x <- t(sapply(1:10, function(i) {
-  runif(1, 0.5, 2) * pure + runif(1, 0, 1) + runif(1, -1, 1) * ((wl - 395) / 5)^2
-}))
-colnames(x) <- wl
-
-fit <- emsc(x, degree = 2)
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]  # the spectral channels
+fit <- emsc(spectra[1:300, ], degree = 2)
 head(fit$coefficients)
 #> # A tibble: 6 × 4
-#>   slope  offset     poly1   poly2
-#>   <dbl>   <dbl>     <dbl>   <dbl>
-#> 1 0.619  0.0781 -0.000211 -0.0270
-#> 2 1.28  -0.408  -0.000437  0.439 
-#> 3 1.32   0.0333 -0.000450 -0.110 
-#> 4 0.409  0.0120 -0.000139 -0.761 
-#> 5 1.06  -0.117  -0.000359  0.245 
-#> 6 0.859  0.310  -0.000292  0.744 
-# the corrected spectra are nearly identical
-range(apply(as.matrix(fit$correction), 2, sd))
-#> [1] 4.251830e-16 1.768865e-13
-
+#>   slope offset  poly1  poly2
+#>   <dbl>  <dbl>  <dbl>  <dbl>
+#> 1 1.06   -89.9 104.    152. 
+#> 2 1.02    35.2  88.9   -36.2
+#> 3 1.05    58.3   9.46 -106. 
+#> 4 1.13    41.2 -77.5  -310. 
+#> 5 0.894   99.9  79.5    61.2
+#> 6 1.000   54.8  32.3   -35.6
 # new spectra are corrected with the calibration reference
-corrected <- predict(fit, x[1:2, ])
+corrected <- predict(fit, spectra[301:368, ])
+dim(corrected)
+#> [1]   68 7152
 ```

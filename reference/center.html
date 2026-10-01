@@ -9,7 +9,7 @@ data frame."><meta property="og:image" content="https://christiangoueguel.com/sp
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -90,22 +90,18 @@ rather than the mean.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">30</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">center</span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]   -1  -10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    0    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    1   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"center")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  2 20</span>
-<span class="r-in"><span><span class="fu">center</span><span class="op">(</span><span class="va">m</span>, method <span class="op">=</span> <span class="st">"median"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      [,1] [,2]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]   -1  -10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]    0    0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]    1   10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"center")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1]  2 20</span>
-<span class="r-in"><span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span>  <span class="co"># the spectral channels</span></span></span>
+<span class="r-in"><span><span class="fu">center</span><span class="op">(</span><span class="va">spectra</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      199.3771616 199.4644141 199.5516666 199.6389192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]   0.6929348    5.831522    22.22826   0.4918478</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]   0.6929348   16.831522    14.22826 -16.5081522</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]  -6.3070652    6.831522    22.22826   2.4918478</span>
+<span class="r-in"><span><span class="fu">center</span><span class="op">(</span><span class="va">spectra</span>, method <span class="op">=</span> <span class="st">"median"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      199.3771616 199.4644141 199.5516666 199.6389192</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]           1           7           6           1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]           1          18          -2         -16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,]          -6           8           6           3</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

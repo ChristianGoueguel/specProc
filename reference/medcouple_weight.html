@@ -13,7 +13,7 @@ or contaminated data."><meta property="og:image" content="https://christiangoueg
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9002</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.7.0.9003</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,17 +105,16 @@ Journal of Computational and Graphical Statistics, 13(4):996-1017</p></li>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">100</span>, <span class="fl">0.5</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">7</span>, <span class="fl">8</span>, <span class="fl">9</span>, <span class="fl">10</span>, <span class="fl">100</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># non-robust approach</span></span></span>
-<span class="r-in"><span><span class="fu">moments</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/moments/man/kurtosis.html" class="external-link">kurtosis</a></span><span class="op">(</span><span class="va">vec</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6.474793</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># robust approach</span></span></span>
-<span class="r-in"><span><span class="fu">medcouple_weight</span><span class="op">(</span><span class="va">vec</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># iron contents (mg/kg): a few samples are far above the others</span></span></span>
+<span class="r-in"><span><span class="va">fe</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">$</span><span class="va">Fe</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">$</span><span class="va">Fe</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="fu">moments</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/moments/man/kurtosis.html" class="external-link">kurtosis</a></span><span class="op">(</span><span class="va">fe</span><span class="op">)</span>   <span class="co"># classical</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 25.01662</span>
+<span class="r-in"><span><span class="fu">medcouple_weight</span><span class="op">(</span><span class="va">fe</span><span class="op">)</span>    <span class="co"># robust, left and right tails</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 2</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     LMC   RMC</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     0     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      LMC   RMC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 0.016<span style="text-decoration: underline;">4</span> 0.602</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
