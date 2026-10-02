@@ -70,8 +70,8 @@ When you use these data, cite the STARK-B database and the original
 publications, listed in the `source` column:
 
 - Sahal-Bréchot, S., Dimitrijević, M.S., Moreau, N. STARK-B database,
-  <https://stark-b.obspm.fr>. Observatoire de Paris and Astronomical
-  Observatory of Belgrade.
+  `stark-b.obspm.fr`. Observatoire de Paris and Astronomical Observatory
+  of Belgrade (see the References).
 
 ## References
 
@@ -79,6 +79,7 @@ publications, listed in the `source` column:
   (2015). The STARK-B database VAMDC node: a repository for spectral
   line broadening and shifts due to collisions with charged particles.
   Physica Scripta, 90(5):054008.
+  [doi:10.1088/0031-8949/90/5/054008](https://doi.org/10.1088/0031-8949/90/5/054008)
 
 ## See also
 
@@ -100,16 +101,7 @@ Christian L. Goueguel
 # \donttest{
 # needs an internet connection
 ca <- try(starkb_lines("Ca II", wavelength = c(390, 400), perturber = "electron"))
+#> Error : Could not download STARK-B data for Ca II (downloaded length 0 != reported length 160). Check the internet connection, or try again later.
 if (!inherits(ca, "try-error")) head(ca)
-#> # A tibble: 6 × 10
-#>   species wavelength upper  lower perturber temperature density   width    shift
-#>   <chr>        <dbl> <chr>  <chr> <chr>           <dbl>   <dbl>   <dbl>    <dbl>
-#> 1 Ca II         395. 3p6.4… 3p6.… electron         5000    1e13 2.96e-6 -5.18e-7
-#> 2 Ca II         395. 3p6.4… 3p6.… electron        10000    1e13 2.28e-6 -4.23e-7
-#> 3 Ca II         395. 3p6.4… 3p6.… electron        20000    1e13 1.88e-6 -3.27e-7
-#> 4 Ca II         395. 3p6.4… 3p6.… electron        30000    1e13 1.77e-6 -2.78e-7
-#> 5 Ca II         395. 3p6.4… 3p6.… electron        50000    1e13 1.71e-6 -2.57e-7
-#> 6 Ca II         395. 3p6.4… 3p6.… electron       100000    1e13 1.66e-6 -2.14e-7
-#> # ℹ 1 more variable: source <chr>
 # }
 ```
