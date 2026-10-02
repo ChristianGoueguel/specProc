@@ -162,4 +162,18 @@ bake(prepped, new_data = spectra[17:24, ])[, 1:6]
 #> 6 FEN6585…        -0.517        -0.544        0.499       -0.361          -0.184
 #> 7 FEN6585…        -0.512        -0.211        0.422       -0.275          -0.220
 #> 8 FEN6585…        -0.611        -0.528        0.620       -0.183          -0.552
+
+# five spectra between 240 and 300 nm, before and after the baseline correction
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+region <- forageLIBS[1:5, c(2, which(wl > 240 & wl < 300))]
+corrected <- recipe(~ ., data = region) |>
+  update_role(Sample, new_role = "id") |>
+  step_baseline(all_predictors(), method = "arpls", lambda = 1e5) |>
+  prep() |>
+  bake(new_data = NULL)
+plot_spectra(region, id = Sample) +
+  ggplot2::coord_cartesian(ylim = c(500, 3000))
+
+plot_spectra(corrected, id = Sample) +
+  ggplot2::coord_cartesian(ylim = c(-200, 2500))
 ```

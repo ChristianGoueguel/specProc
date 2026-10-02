@@ -41,6 +41,11 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.8.2" id="specproc-082">specProc 0.8.2<a class="anchor" aria-label="anchor" href="#specproc-082"></a></h2>
 <div class="section level3">
+<h3 id="bug-fixes-0-8-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-2"></a></h3>
+<ul><li>
+<code><a href="../reference/baseline_lsp.html">baseline_lsp()</a></code> uses the improved modified polynomial fit (IModPoly) of Zhao et al. (2007) by default (<code>method = "imodpoly"</code>). The modified polynomial fit of Lieber and Mahadevan-Jansen (2003), still available with <code>method = "modpoly"</code>, is pulled up by strong lines, and its baseline could then fall far below the background at the ends of the spectrum (for example above 290 nm in the 240-300 nm window of the <code>forageLIBS</code> spectra). The default <code>max.iter</code> is now 100.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="dependencies-0-8-2">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies-0-8-2"></a></h3>
 <ul><li>
 <code>ggsci</code>, <code>prospectr</code> and <code>XICOR</code> move from Imports to Suggests. <code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code> uses the default ggplot2 palette when <code>ggsci</code> is not installed, and <code>correlation(method = "chatterjee")</code> asks for <code>XICOR</code>. <code><a href="../reference/y_gradient_glsw.html">y_gradient_glsw()</a></code> computes its Savitzky-Golay derivatives with the package’s own filter (same results).</li>
