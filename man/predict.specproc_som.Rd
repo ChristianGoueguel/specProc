@@ -26,7 +26,9 @@ with their quantization error, and flags the spectra that fit no unit.
 }
 \examples{
 data(forageLIBS)
-spectra <- forageLIBS[-(1:14)]
+# the Na I and K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which((wl > 585 & wl < 595) | (wl > 760 & wl < 780))]
 fit <- som(spectra[1:300, ])
 head(predict(fit, spectra[301:368, ]))
 }

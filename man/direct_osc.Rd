@@ -57,7 +57,8 @@ after applying the returned \code{center} and \code{scale}.
 }
 \examples{
 data(forageLIBS)
-spectra <- forageLIBS[-(1:14)]  # the spectral channels
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
 res <- direct_osc(spectra, forageLIBS$K, ncomp = 2)
 dim(res$correction)
 }

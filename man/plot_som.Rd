@@ -65,7 +65,9 @@ farthest from those already chosen.
 }
 \examples{
 data(forageLIBS)
-spectra <- forageLIBS[-(1:14)]
+# the Na I and K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which((wl > 585 & wl < 595) | (wl > 760 & wl < 780))]
 fit <- som(spectra)
 plot_som(fit, type = "umatrix")
 # component planes of the K I and Na I lines

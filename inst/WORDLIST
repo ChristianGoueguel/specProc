@@ -1,5 +1,4 @@
 ACS
-Alhoniemi
 ALR
 ALS
 ASD
@@ -10,6 +9,7 @@ Aguilera
 Ahn
 Aitchison
 Akinshin
+Alhoniemi
 Analyte
 Analytica
 Andersson
@@ -30,8 +30,8 @@ Brockhoff
 Bruffaerts
 Brys
 Bréchot
-cellWise
 CMD
+CN
 Cardeñoso
 Caruana
 Casewise
@@ -47,7 +47,6 @@ Chemometrics
 Chimica
 Choo
 Ciucci
-CN
 Codecov
 Colour
 Commun
@@ -60,7 +59,6 @@ Croux
 DDC
 DModX
 DOSC
-dplyr
 DWT
 Daubechies
 De
@@ -89,9 +87,9 @@ Fearn
 Fearn's
 Ferré
 Filzmoser
-Galindo
 GLSW
 Gaithersburg
+Galindo
 Gaudiuso
 Gebhardt
 Giacomo
@@ -99,13 +97,13 @@ Gigosos
 Golay
 González
 Gurden
-Himberg
 HWHM
 Haar
 Harmonisation
 Harynuk
 Hegazy
 Hilferty
+Himberg
 Hinkley
 Hoaglin
 Hotelling
@@ -118,7 +116,6 @@ Hückel
 ICH
 ICP
 ILR
-inliers
 IUPAC
 Iglewicz
 Intell
@@ -156,9 +153,6 @@ Lindgren
 Longbothum
 Lorber
 Lorentzian's
-metabolome
-metabolomics
-mixOmics
 MSC
 MacGregor
 MacroPCA
@@ -179,14 +173,12 @@ Midvariance
 Moreau
 Mosteller
 Mudholkar
-natively
 NIPALS
 NIR
 NIST
 Nessib
 Nomikos
 Noord
-normalizations
 Numer
 OES
 OPLS
@@ -199,13 +191,12 @@ Omenetto
 Optimalität
 Orthogonalization
 Outlyingness
-Parhankangas
 PDS
-pls
 PLSR
 POSC
 Palleschi
 Pardini
+Parhankangas
 Pascale
 Ph
 Physica
@@ -221,7 +212,6 @@ RMC
 RMSEE
 RMSEP
 ROBPCA
-Rogel
 ROSPCA
 RQW
 RSD
@@ -235,6 +225,7 @@ Reynkens
 Ricoux
 Rinnan
 Robuste
+Rogel
 Rousseeuw
 Rtools
 SCP
@@ -273,7 +264,6 @@ Tapp
 Technometrics
 Teghil
 Thévenot
-tidyselect
 Tognoni
 Toraya
 Trautmann
@@ -298,7 +288,6 @@ Westerhuis
 Whittaker
 Wikström
 Windig
-workflowsets
 XSAMS
 Xcode
 Xu
@@ -322,6 +311,7 @@ bremsstrahlung
 bslib
 casewise
 cdot
+cellWise
 cellwise
 chatterjee
 clays
@@ -335,6 +325,7 @@ defocused
 doi
 downweighted
 downweights
+dplyr
 eV
 embeddings
 equilibration
@@ -352,6 +343,7 @@ https
 hydrogenic
 infinitesimale
 inhomogeneous
+inliers
 interferences
 interferent
 interferents
@@ -366,17 +358,22 @@ mathbf
 mathrm
 medcouple
 medcouples
+metabolome
+metabolomics
 midcorrelation
 midcovariance
 midvariance
 midvariances
+mixOmics
 multiplet
 multiplets
 multiresolution
 na
+natively
 nd
 nm
 nonlinearly
+normalizations
 orthogonalisation
 orthogonalization
 orthogonalize
@@ -388,6 +385,7 @@ perturber
 perturbers
 plasmas
 plotly
+pls
 pre
 preprocess
 qquad
@@ -406,6 +404,7 @@ th
 tibble
 tibbles
 tidymodels
+tidyselect
 tidyverse
 tunable
 uncalibrated
@@ -416,6 +415,7 @@ voigt
 von
 widehat
 williams
+workflowsets
 Á
 Å
 Ångström

@@ -5,8 +5,7 @@ This is a new submission.
 ## Test environments
 
 * local macOS (aarch64-apple-darwin), R 4.6.1
-* win-builder (devel and release)
-* R-hub (Linux, Windows, macOS)
+* win-builder, R-devel (Windows Server 2022, x86_64-w64-mingw32)
 
 ## R CMD check results
 
@@ -16,15 +15,12 @@ This is a new submission.
 
   New submission.
 
-* Installed package size (reported as INFO locally, may be a NOTE on other
-  platforms):
-
-  installed size is 8.1Mb; sub-directories of 1Mb or more: data 4.2Mb, doc 1.0Mb.
-
-  The `data` directory holds `forageLIBS`, a dataset of 368 LIBS spectra
-  (7152 channels each), compressed with xz. It is used by the examples and
-  vignettes to show the methods on real spectra. The size of the compiled
-  code depends on the platform.
+  Possibly misspelled words in DESCRIPTION: Bossche, Kohonen, LIBS,
+  MacroPCA, OPLS, Raman, Raymaekers, Rousseeuw, Saha, Trygg, Vanden,
+  cellwise. These are author names, method names (MacroPCA, OPLS,
+  Saha-Boltzmann), the acronym of laser-induced breakdown spectroscopy
+  (LIBS), Raman spectroscopy, and the statistical term "cellwise"
+  (cellwise outliers).
 
 ## Suggested packages
 

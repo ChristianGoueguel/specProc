@@ -39,7 +39,8 @@ data, back in the units of y.
 }
 \examples{
 data(forageLIBS)
-spectra <- forageLIBS[-(1:14)]  # the spectral channels
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
 cal <- 1:300
 fit <- opls(spectra[cal, ], forageLIBS$K[cal], ncomp = 2)
 head(predict(fit, spectra[-cal, ], type = "response"))

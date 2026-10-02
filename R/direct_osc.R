@@ -54,7 +54,8 @@
 #'
 #' @examples
 #' data(forageLIBS)
-#' spectra <- forageLIBS[-(1:14)]  # the spectral channels
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
 #' res <- direct_osc(spectra, forageLIBS$K, ncomp = 2)
 #' dim(res$correction)
 direct_osc <- function(x, y, ncomp = 10, center = TRUE, scale = FALSE, tol = 1e-3) {

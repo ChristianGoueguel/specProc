@@ -104,6 +104,7 @@
 #' k <- correlation(spectra[setdiff(names(spectra), setdiff(minerals, "K"))], K, plot = TRUE)
 #' k$plot
 #'
+#' \donttest{
 #' # a heatmap: every mineral against every channel
 #' all_minerals <- correlation(spectra, dplyr::all_of(minerals), plot = TRUE)
 #' all_minerals$plot
@@ -111,6 +112,7 @@
 #' # the same, with the minerals clustered by their correlation profiles
 #' if (requireNamespace("patchwork", quietly = TRUE)) {
 #'   correlation(spectra, dplyr::all_of(minerals), plot = TRUE, cluster = TRUE)$plot
+#' }
 #' }
 #'
 correlation <- function(x, var, method = "pearson", plot = FALSE,
