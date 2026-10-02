@@ -712,9 +712,9 @@ macropca <- function(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, s
 #' set.seed(1)
 #' fit <- cellpca(spectra, k = 2, od_cutoff = "chisq")
 #' fit
-#' # the observations with the lowest casewise weights
-#' head(sort(fit$case_weights))
-#' plot_outlier_map(fit)
+#' plot_outlier_map(fit, shade = TRUE, relative = TRUE, log = TRUE, colour_by = "distance")
+#' plot_cell_map(fit, order = "od")
+#'
 cellpca <- function(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, scale = FALSE,
                     ndir = 250, maxiter = 1000, tol = 1e-6, max_col_frac = 0.5,
                     od_cutoff = c("simulated", "chisq")) {

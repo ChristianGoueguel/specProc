@@ -146,9 +146,9 @@ spectra <- forageLIBS[which(wl > 760 & wl < 780)]
 set.seed(1)
 fit <- cellpca(spectra, k = 2, od_cutoff = "chisq")
 fit
-# the observations with the lowest casewise weights
-head(sort(fit$case_weights))
-plot_outlier_map(fit)
+plot_outlier_map(fit, shade = TRUE, relative = TRUE, log = TRUE, colour_by = "distance")
+plot_cell_map(fit, order = "od")
+
 }
 \references{
 \itemize{

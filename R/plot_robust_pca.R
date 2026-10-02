@@ -213,7 +213,7 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
 #'   macropca(k = 3)
 #'
 #' if (requireNamespace("patchwork", quietly = TRUE)) {
-#'   plot_cell_map(fit, order = "od")
+#'   plot_cell_map(fit, order = "cluster")
 #' }
 #' }
 #'
