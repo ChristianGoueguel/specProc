@@ -1,29 +1,29 @@
-# MacroPCA Recipe Step
+# cellPCA Recipe Step
 
-`step_macropca()` creates a *specification* of a recipe step that
+`step_cellpca()` creates a *specification* of a recipe step that
 converts the selected variables into robust principal component scores
 with
-[`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
-which handles cellwise outliers and missing values as well as outlying
-observations.
+[`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md),
+which weights the outlying cells and observations and handles missing
+values.
 
 ## Usage
 
 ``` r
-step_macropca(
+step_cellpca(
   recipe,
   ...,
   role = "predictor",
   trained = FALSE,
   num_comp = 2,
   options = list(),
-  prefix = "MPC",
+  prefix = "CPC",
   distances = FALSE,
   keep_original_cols = FALSE,
   res = NULL,
   columns = NULL,
   skip = FALSE,
-  id = recipes::rand_id("macropca")
+  id = recipes::rand_id("cellpca")
 )
 ```
 
@@ -55,12 +55,12 @@ step_macropca(
 - options:
 
   A list of further arguments passed to
-  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
-  such as `alpha` or MacroPCA parameters.
+  [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md),
+  such as `alpha`, `maxiter` or `tol`.
 
 - prefix:
 
-  The prefix of the new column names. Default is `"MPC"`.
+  The prefix of the new column names. Default is `"CPC"`.
 
 - distances:
 
@@ -101,11 +101,14 @@ of existing steps.
 As
 [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md).
 Missing values are allowed in the selected columns, both when the recipe
-is prepped and when it is baked.
+is prepped and when it is baked. New observations are projected by the
+robust regression of their observed cells on the loadings, so that their
+outlying cells do not distort their scores.
 
 ## See also
 
-[`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
+[`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md),
+[`step_macropca()`](https://christiangoueguel.com/specProc/reference/step_macropca.md),
 [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md)
 
 ## Examples
@@ -116,21 +119,21 @@ data(forageLIBS)
 wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
 set.seed(1)
-rec <- recipes::recipe(K ~ ., data = dat) |>
-  step_macropca(recipes::all_predictors(), num_comp = 2)
-recipes::bake(recipes::prep(rec), new_data = NULL)
-#> # A tibble: 368 × 3
-#>        K   MPC1     MPC2
-#>    <dbl>  <dbl>    <dbl>
-#>  1  3.68 33973.  -2430. 
-#>  2  2.52 16119.   1776. 
-#>  3  2.45 28441. -13594. 
-#>  4  2.3  27116. -10038. 
-#>  5  2.87 -8891.   1166. 
-#>  6  2.16  5785.   2203. 
-#>  7  2.94 49413. -15087. 
-#>  8  2.43  9682.   3483. 
-#>  9  1.81 -9352.   2485. 
-#> 10  2.07 26759.    -59.2
-#> # ℹ 358 more rows
+rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+  step_cellpca(recipes::all_predictors(), num_comp = 2, distances = TRUE)
+recipes::bake(recipes::prep(rec), new_data = dat[301:368, ])
+#> # A tibble: 68 × 5
+#>        K    CPC1   CPC2 CPC_SD CPC_OD
+#>    <dbl>   <dbl>  <dbl>  <dbl>  <dbl>
+#>  1  2.25 -17363.  375.   0.920  17.7 
+#>  2  1.91 -27529. -472.   1.82   32.3 
+#>  3  2.61   1731. 1248.   0.831  13.8 
+#>  4  2.11 -19592. -134.   1.03   14.6 
+#>  5  2.17 -22224.  -10.4  1.16   15.0 
+#>  6  1.61   2360. 2403.   2.02   15.6 
+#>  7  1.46 -23785.  257.   1.24    9.53
+#>  8  1.87 -18414.  266.   0.957  10.3 
+#>  9  2.84 -22866.  565.   1.30   27.6 
+#> 10  2.32 -12227.  504.   0.638   8.68
+#> # ℹ 58 more rows
 ```

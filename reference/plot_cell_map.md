@@ -1,7 +1,9 @@
-# Cell Map of a MacroPCA Fit
+# Cell Map of a MacroPCA or cellPCA Fit
 
 Shows which cells of the data deviate from a
 [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+or
+[`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md)
 fit: one row per observation, the variables (wavelengths) along the
 horizontal axis, and the flagged cells colored red when the observed
 value is higher than the fit and blue when it is lower. A strip on the
@@ -25,7 +27,7 @@ plot_cell_map(
   labels = 5,
   lines = NULL,
   tol = 0.1,
-  title = "MacroPCA cell map"
+  title = NULL
 )
 ```
 
@@ -34,7 +36,9 @@ plot_cell_map(
 - object:
 
   An object returned by
-  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md).
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  or
+  [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md).
 
 - rows, columns:
 
@@ -63,7 +67,7 @@ plot_cell_map(
   Optional spectra whose mean is drawn behind the profile (a data frame
   or matrix with the variables of the model, other columns being
   ignored, or a single named spectrum). Default is the data imputed by
-  MacroPCA.
+  the fit.
 
 - threshold:
 
@@ -88,7 +92,7 @@ plot_cell_map(
 
 - title:
 
-  The plot title.
+  The plot title. Default is "MacroPCA cell map" or "cellPCA cell map".
 
 ## Value
 
@@ -121,9 +125,9 @@ same regions form bands (for example, a batch or a type of matrix).
 the fit, below zero when lower. The mean spectrum is drawn in grey
 behind it, rescaled, to show whether the flagged channels are on
 emission lines, on the continuum or in noise. It is the mean of
-`spectra` or, by default, of the data imputed by MacroPCA; it is left
-out when this mean is close to zero, as for centered data (then give the
-raw spectra in `spectra`). The dashed lines are at `threshold`, and the
+`spectra` or, by default, of the data imputed by the fit; it is left out
+when this mean is close to zero, as for centered data (then give the raw
+spectra in `spectra`). The dashed lines are at `threshold`, and the
 `labels` flagged regions with the largest share (see
 [`flagged_regions()`](https://christiangoueguel.com/specProc/reference/flagged_regions.md))
 are labeled with their peak wavelength, or with the emission line they

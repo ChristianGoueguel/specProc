@@ -75,7 +75,7 @@
       <dl></dl></div><div class="section level2">
 
       <h3 id="robust-pca">robust PCA<a class="anchor" aria-label="anchor" href="#robust-pca"></a></h3>
-      <div class="section-desc"><p>Principal component analysis that resists outlying observations (and, for MacroPCA, outlying cells and missing values).</p></div>
+      <div class="section-desc"><p>Principal component analysis that resists outlying observations (and, for MacroPCA and cellPCA, outlying cells and missing values).</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -105,7 +105,14 @@
 
         <dt>
 
-          <code><a href="predict.specproc_robpca.html">predict(<i>&lt;specproc_macropca&gt;</i>)</a></code> <code><a href="predict.specproc_robpca.html">predict(<i>&lt;specproc_robpca&gt;</i>)</a></code>
+          <code><a href="cellpca.html">cellpca()</a></code>
+
+        </dt>
+        <dd>Robust PCA by Casewise and Cellwise Weighting (cellPCA)</dd>
+
+        <dt>
+
+          <code><a href="predict.specproc_robpca.html">predict(<i>&lt;specproc_macropca&gt;</i>)</a></code> <code><a href="predict.specproc_robpca.html">predict(<i>&lt;specproc_cellpca&gt;</i>)</a></code> <code><a href="predict.specproc_robpca.html">predict(<i>&lt;specproc_robpca&gt;</i>)</a></code>
 
         </dt>
         <dd>Scores and Distances of New Observations</dd>
@@ -122,14 +129,14 @@
           <code><a href="plot_cell_map.html">plot_cell_map()</a></code>
 
         </dt>
-        <dd>Cell Map of a MacroPCA Fit</dd>
+        <dd>Cell Map of a MacroPCA or cellPCA Fit</dd>
 
         <dt>
 
           <code><a href="flagged_regions.html">flagged_regions()</a></code>
 
         </dt>
-        <dd>Flagged Regions of a MacroPCA Fit</dd>
+        <dd>Flagged Regions of a MacroPCA or cellPCA Fit</dd>
       </dl></div><div class="section level2">
 
       <h3 id="self-organizing-maps">self-organizing maps<a class="anchor" aria-label="anchor" href="#self-organizing-maps"></a></h3>
@@ -436,6 +443,13 @@
 
         </dt>
         <dd>MacroPCA Recipe Step</dd>
+
+        <dt>
+
+          <code><a href="step_cellpca.html">step_cellpca()</a></code>
+
+        </dt>
+        <dd>cellPCA Recipe Step</dd>
       </dl></div><div class="section level2">
 
       <h3 id="orthogonalization">orthogonalization<a class="anchor" aria-label="anchor" href="#orthogonalization"></a></h3>

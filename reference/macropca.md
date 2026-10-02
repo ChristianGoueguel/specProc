@@ -1,9 +1,11 @@
 # Robust PCA for Cellwise and Casewise Outliers (MacroPCA)
 
 Robust PCA that handles both outlying observations (casewise outliers),
-outlying cells (cellwise outliers) and missing values, after the
-MacroPCA algorithm of Hubert, Rousseeuw and Van den Bossche (2019). The
-results have the same form as those of
+outlying cells (cellwise outliers) and missing values, by the MacroPCA
+algorithm of Hubert, Rousseeuw and Van den Bossche (2019), which
+combines the detection of deviating cells (DDC) with the steps of ROBPCA
+(Hubert, Rousseeuw and Vanden Branden, 2005). The results have the same
+form as those of
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
 so that
 [predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
@@ -12,6 +14,8 @@ and
 work the same way, and
 [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
 shows the outlying cells.
+[`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md)
+starts from a MacroPCA fit.
 
 ## Usage
 
@@ -25,7 +29,7 @@ macropca(
   scale = FALSE,
   ndir = 250,
   maxiter = 20,
-  tol = 1e-04
+  tol = 0.005
 )
 ```
 
@@ -68,8 +72,9 @@ macropca(
 
 - maxiter, tol:
 
-  The maximum number of iterations and the tolerance on the change of
-  the subspace. Defaults are 20 and 1e-4.
+  The maximum number of iterations of step 3, and the tolerance on the
+  largest angle (in radians) between successive subspaces. Defaults are
+  20 and 0.005, as in the paper.
 
 ## Value
 
@@ -82,6 +87,8 @@ and:
 
 - `flagged_cells`: a logical matrix of the flagged cells.
 
+- `flagged_rows`: the observations flagged by DDC.
+
 - `imputed`: the data with the missing values imputed by the PCA fit
   (the flagged cells keep their values).
 
@@ -90,45 +97,55 @@ and:
 
 ## Details
 
-The algorithm has four steps:
+The algorithm follows the steps of Hubert, Rousseeuw and Van den Bossche
+(2019): 0. **Deviating cells.** The cells that deviate from the values
+predicted by the most correlated variables, and the outlying
+observations, are detected by the DDC of Rousseeuw and Van den Bossche
+(2018), which also imputes the flagged and missing cells. The neighbor
+search and the predictions of DDC are computed in C++, by blocks of
+variables, so that spectra with thousands of channels are handled
+quickly.
 
-1.  **Deviating cells.** The cells that deviate from the values
-    predicted by the most correlated variables are detected and imputed
-    by the detection of deviating cells (DDC) of Rousseeuw and Van den
-    Bossche (2018), as are the missing values. The neighbor search and
-    the predictions of DDC are computed in C++, by blocks of variables,
-    so that spectra with thousands of channels are handled quickly.
-
-2.  **Initial subspace.** The `h` observations with the smallest
-    Stahel-Donoho outlyingness (as in
+1.  **Projection pursuit.** As in
     [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
-    with `ndir` directions) give an initial PCA of the imputed data.
-    When `k` is `NULL`, it is the smallest number of components that
-    explain `var_explained` of the variance of these observations (at
-    most `kmax`).
+    the Stahel-Donoho outlyingness (with `ndir` directions) is computed
+    on the data in which only the missing cells of the observations
+    flagged by DDC are imputed (imputing their outlying cells could mask
+    them), and the flagged cells of the `h` unflagged observations with
+    the fewest flagged cells are imputed. The `h` least outlying
+    observations not flagged by DDC form the set \\H_0\\.
 
-3.  **Iterations.** The flagged and missing cells are imputed by the
-    fitted values of the current PCA, the observations within the
-    cut-off of the orthogonal distances are kept, and the PCA is
-    refitted on them, until the subspace changes by less than `tol` (at
-    most `maxiter` times).
+2.  **Subspace dimension.** A classical PCA of the observations of
+    \\H_0\\, with their flagged and missing cells imputed, gives the
+    eigenvalues: when `k` is `NULL`, it is the smallest number of
+    components that explain `var_explained` of their variance (at most
+    `kmax`).
 
-4.  **Final fit.** The center and the eigenvalues are re-estimated by
-    the minimum covariance determinant of the scores, as in
-    [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md).
+3.  **Iterative subspace estimation.** The missing cells of all the
+    observations, and the flagged cells of the observations of \\H_0\\,
+    are imputed by the fitted values of the current PCA, and the PCA of
+    \\H_0\\ is refitted, until the largest angle between the old and the
+    new subspace is below `tol` (at most `maxiter` times).
 
-The residuals of each variable are robustly standardized (median and
-MAD), and the cells beyond \\\sqrt{\chi^2\_{1, 0.99}}\\ are flagged. The
-scores of each observation are then computed with its flagged and
-missing cells imputed by the fit (iteratively, as for new data with
-[predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)),
-while its orthogonal distance and cell residuals use its observed cells,
-so that the deviating cells of an observation count in its orthogonal
-distance. The cut-offs of the score and orthogonal distances are those
-of
-[`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
-so that the outlier maps of the robust PCA methods of specProc can be
-compared.
+4.  **Reweighting.** The observations whose orthogonal distance is below
+    the cut-off, and not flagged by DDC, form the set \\H^\*\\; their
+    flagged cells are imputed, and the PCA is refitted on them.
+
+5.  **Robust basis.** The center and the eigenvectors within the
+    subspace are estimated by the deterministic MCD (DetMCD) of the
+    scores of \\H^\*\\, so that good leverage observations do not tilt
+    the loadings.
+
+6.  **Output.** The scores, the orthogonal distances and the cell
+    residuals of all the observations are computed from the data with
+    only the missing cells imputed (by the fit, iteratively). The
+    residuals of each variable are robustly standardized (median and
+    MAD), and the cells beyond \\\sqrt{\chi^2\_{1, 0.99}}\\ are flagged.
+
+As in the paper, the cut-offs of the score distances
+(\\\sqrt{\chi^2\_{k, 0.99}}\\) and of the orthogonal distances (the
+Wilson-Hilferty approximation with the 0.99 quantile) are at the 99%
+level.
 
 ## References
 
@@ -137,14 +154,20 @@ compared.
   and rowwise outliers. Technometrics, 61(4):459-473.
   [doi:10.1080/00401706.2018.1562989](https://doi.org/10.1080/00401706.2018.1562989)
 
+- Hubert, M., Rousseeuw, P.J., Vanden Branden, K. (2005). ROBPCA: a new
+  approach to robust principal component analysis. Technometrics,
+  47(1):64-79.
+
 - Rousseeuw, P.J., Van den Bossche, W. (2018). Detecting deviating data
   cells. Technometrics, 60(2):135-145.
 
-- Raymaekers, J., Rousseeuw, P.J. (2021). Fast robust correlation for
-  high-dimensional data. Technometrics, 63(2):184-198.
+- Hubert, M., Rousseeuw, P.J., Verdonck, T. (2012). A deterministic
+  algorithm for robust location and scatter. Journal of Computational
+  and Graphical Statistics, 21(3):618-637.
 
 ## See also
 
+[`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md),
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
 [`step_macropca()`](https://christiangoueguel.com/specProc/reference/step_macropca.md),
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md),
@@ -171,12 +194,12 @@ forageLIBS |>
 #> Observations:   368 (h = 189)
 #> Variables:      7152
 #> Components:     3
-#> Eigenvalues:    2.467e+09 5.716e+08 1.225e+08
-#> Flagged cells:  72011
+#> Eigenvalues:    1.934e+09 5.125e+08 1.366e+08
+#> Flagged cells:  60069
 #> 
 #> Outlier types:
 #> 
 #>            regular      good leverage orthogonal outlier       bad leverage 
-#>                301                 16                 41                 10 
+#>                267                  9                 77                 15 
 # }
 ```

@@ -16,7 +16,7 @@ Functions used to assess individual variables or features independently.
 ### robust PCA
 
 Principal component analysis that resists outlying observations (and,
-for MacroPCA, outlying cells and missing values).
+for MacroPCA and cellPCA, outlying cells and missing values).
 
 - [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
   : Robust Principal Component Analysis (ROBPCA)
@@ -24,15 +24,18 @@ for MacroPCA, outlying cells and missing values).
   : Robust Sparse Principal Component Analysis (ROSPCA)
 - [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
   : Robust PCA for Cellwise and Casewise Outliers (MacroPCA)
+- [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md)
+  : Robust PCA by Casewise and Cellwise Weighting (cellPCA)
 - [`predict(`*`<specproc_macropca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
+  [`predict(`*`<specproc_cellpca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
   [`predict(`*`<specproc_robpca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
   : Scores and Distances of New Observations
 - [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
   : Outlier Map of a Robust PCA
 - [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
-  : Cell Map of a MacroPCA Fit
+  : Cell Map of a MacroPCA or cellPCA Fit
 - [`flagged_regions()`](https://christiangoueguel.com/specProc/reference/flagged_regions.md)
-  : Flagged Regions of a MacroPCA Fit
+  : Flagged Regions of a MacroPCA or cellPCA Fit
 
 ### self-organizing maps
 
@@ -145,6 +148,8 @@ and can be tuned within a tidymodels workflow.
   : Robust Sparse PCA (ROSPCA) Recipe Step
 - [`step_macropca()`](https://christiangoueguel.com/specProc/reference/step_macropca.md)
   : MacroPCA Recipe Step
+- [`step_cellpca()`](https://christiangoueguel.com/specProc/reference/step_cellpca.md)
+  : cellPCA Recipe Step
 
 ### orthogonalization
 

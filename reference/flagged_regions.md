@@ -1,8 +1,10 @@
-# Flagged Regions of a MacroPCA Fit
+# Flagged Regions of a MacroPCA or cellPCA Fit
 
 Lists the wavelength regions where many observations have cells flagged
 by
-[`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md):
+[`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+or
+[`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md):
 runs of adjacent channels (on the same detector segment) whose share of
 flagged observations is at least `threshold`. These are the channels
 that persistently deviate from the PCA fit, for example emission lines
@@ -29,7 +31,9 @@ flagged_regions(
 - object:
 
   An object returned by
-  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md).
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  or
+  [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md).
 
 - threshold:
 
@@ -92,19 +96,19 @@ fit <- forageLIBS |>
   macropca(k = 3)
 
 flagged_regions(fit)
-#> # A tibble: 108 × 7
+#> # A tibble: 57 × 7
 #>    start   end  peak channels share mean_share direction
 #>    <dbl> <dbl> <dbl>    <int> <dbl>      <dbl> <chr>    
-#>  1  393.  393.  393.        2 0.318      0.226 lower    
-#>  2  399.  399.  399.        3 0.310      0.141 lower    
-#>  3  280.  280.  280.        1 0.182      0.182 lower    
-#>  4  793.  793.  793.        3 0.179      0.157 higher   
-#>  5  219.  219.  219.        1 0.177      0.177 higher   
-#>  6  403.  403.  403.        2 0.174      0.166 mixed    
-#>  7  744.  745.  745.        4 0.171      0.139 mixed    
-#>  8  790.  790.  790.        2 0.171      0.151 higher   
-#>  9  387.  388.  387.        3 0.155      0.123 higher   
-#> 10  576.  576.  576.        2 0.155      0.128 higher   
-#> # ℹ 98 more rows
+#>  1  399.  399.  399.        1 0.397     0.397  lower    
+#>  2  219.  219.  219.        1 0.378     0.378  higher   
+#>  3  393.  393.  393.        2 0.318     0.284  lower    
+#>  4  397.  397.  397.        1 0.204     0.204  lower    
+#>  5  280.  280.  280.        1 0.177     0.177  lower    
+#>  6  793.  793.  793.        2 0.168     0.148  higher   
+#>  7  323.  324.  323.        7 0.144     0.0967 higher   
+#>  8  335.  335.  335.        2 0.128     0.125  higher   
+#>  9  338.  338.  338.        1 0.128     0.128  higher   
+#> 10  387.  388.  387.        3 0.128     0.0933 higher   
+#> # ℹ 47 more rows
 # }
 ```

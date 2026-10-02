@@ -222,16 +222,16 @@ recipes::tidy(prepped, number = 1)
 #> # A tibble: 7,152 × 4
 #>    terms       num_comp joint_comp id         
 #>    <chr>          <dbl>      <dbl> <chr>      
-#>  1 199.3771616        2          2 o2pls_wZqpL
-#>  2 199.4644141        2          2 o2pls_wZqpL
-#>  3 199.5516666        2          2 o2pls_wZqpL
-#>  4 199.6389192        2          2 o2pls_wZqpL
-#>  5 199.7261717        2          2 o2pls_wZqpL
-#>  6 199.8134242        2          2 o2pls_wZqpL
-#>  7 199.9006767        2          2 o2pls_wZqpL
-#>  8 199.9879292        2          2 o2pls_wZqpL
-#>  9 200.0751817        2          2 o2pls_wZqpL
-#> 10 200.1624343        2          2 o2pls_wZqpL
+#>  1 199.3771616        2          2 o2pls_6YGuu
+#>  2 199.4644141        2          2 o2pls_6YGuu
+#>  3 199.5516666        2          2 o2pls_6YGuu
+#>  4 199.6389192        2          2 o2pls_6YGuu
+#>  5 199.7261717        2          2 o2pls_6YGuu
+#>  6 199.8134242        2          2 o2pls_6YGuu
+#>  7 199.9006767        2          2 o2pls_6YGuu
+#>  8 199.9879292        2          2 o2pls_6YGuu
+#>  9 200.0751817        2          2 o2pls_6YGuu
+#> 10 200.1624343        2          2 o2pls_6YGuu
 #> # ℹ 7,142 more rows
 dim(recipes::bake(prepped, new_data = dat[301:368, ]))
 #> [1]   68 7154

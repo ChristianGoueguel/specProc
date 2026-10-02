@@ -23,6 +23,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/biweight_scale.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/boltzmann.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/calibration_curve.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/cellpca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/center.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/cf_libs.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/contributions.html</loc></url>
@@ -115,6 +116,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/stark_width.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/starkb_lines.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_baseline.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/step_cellpca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_direct_orthogonal.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_direct_osc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_emsc.html</loc></url>

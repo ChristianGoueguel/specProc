@@ -3,10 +3,14 @@
 Plots the orthogonal distance of each observation against its score
 distance, for a robust PCA fitted by
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
-[`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
-or
+[`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md),
 [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
-(Hubert, Rousseeuw and Vanden Branden, 2005).
+or
+[`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md)
+(Hubert, Rousseeuw and Vanden Branden, 2005). For
+[`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md),
+the vertical axis is the norm of the standardized residuals, as in the
+enhanced outlier map of Centofanti, Hubert and Rousseeuw.
 
 ## Usage
 
@@ -30,9 +34,10 @@ plot_outlier_map(
 
   An object returned by
   [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
-  [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
+  [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md),
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
   or
-  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md).
+  [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md).
 
 - newdata:
 

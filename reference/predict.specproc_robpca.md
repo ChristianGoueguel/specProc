@@ -14,6 +14,9 @@ the calibration data.
 # S3 method for class 'specproc_macropca'
 predict(object, newdata, ...)
 
+# S3 method for class 'specproc_cellpca'
+predict(object, newdata, ...)
+
 # S3 method for class 'specproc_robpca'
 predict(object, newdata, ...)
 ```

@@ -2,6 +2,57 @@
 
 ## specProc 0.8.2
 
+### New features
+
+- [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md):
+  robust PCA by casewise and cellwise weighting (cellPCA, Centofanti,
+  Hubert and Rousseeuw). It handles outlying observations, outlying
+  cells and missing values by minimizing a single objective, with
+  weights between 0 and 1 for every cell and observation. The
+  iteratively reweighted least squares and the predictions of new data
+  are computed in C++; the results agree with the reference code of the
+  authors to numerical precision.
+  [`predict()`](https://rdrr.io/r/stats/predict.html),
+  [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
+  (enhanced outlier map),
+  [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
+  and
+  [`flagged_regions()`](https://christiangoueguel.com/specProc/reference/flagged_regions.md)
+  accept its fits, and
+  [`step_cellpca()`](https://christiangoueguel.com/specProc/reference/step_cellpca.md)
+  is its recipe step.
+
+### Breaking changes
+
+- The detection of deviating cells (DDC) behind
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  and
+  [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md)
+  now follows the DDC algorithm of the cellWise package: 1-step M
+  estimators for the standardization and the residual scales, the robust
+  Gnanadesikan-Kettenring correlations for the neighbors (wrapped
+  correlations, found exactly, for more than 750 variables), robust
+  slopes refined by least squares, each cell included in its own
+  prediction, and the standalone variables. It flags the same cells as
+  cellWise, and more of the outlying cells with far fewer false flags
+  than before.
+- [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  now follows the MacroPCA algorithm of Hubert, Rousseeuw and Van den
+  Bossche (2019), built on ROBPCA, as implemented in cellWise, whose
+  results it reproduces (with `scale = FALSE`): projection pursuit on
+  the data where only the observations with the fewest flagged cells are
+  cell-imputed, iterative subspace estimation on a fixed set of
+  observations, one reweighting step on the orthogonal distances,
+  concentration steps and the deterministic MCD within the subspace, and
+  distances from the data with only the missing cells imputed. New data
+  are analyzed as by MacroPCApredict (with the DDC model of the fit).
+  Its results change. `tol` is now the largest angle between successive
+  subspaces as a fraction of a right angle (default 0.005, as in the
+  paper), the cut-offs of the score and orthogonal distances are at the
+  99% level as in the paper, the residual scales are 1-step M scales,
+  and the fit returns the observations set aside by DDC
+  (`flagged_rows`).
+
 ### Bug fixes
 
 - [`baseline_lsp()`](https://christiangoueguel.com/specProc/reference/baseline_lsp.md)

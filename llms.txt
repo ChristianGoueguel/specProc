@@ -56,7 +56,7 @@ website](https://christiangoueguel.com/specProc/articles/).
 | Orthogonalization | [`osc()`](https://christiangoueguel.com/specProc/reference/osc.md), [`direct_osc()`](https://christiangoueguel.com/specProc/reference/direct_osc.md), [`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md), [`opls()`](https://christiangoueguel.com/specProc/reference/opls.md), [`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md), [`epo()`](https://christiangoueguel.com/specProc/reference/epo.md), [`glsw()`](https://christiangoueguel.com/specProc/reference/glsw.md), [`y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/y_gradient_glsw.md) |
 | Calibration | [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md), [`plot_calibration()`](https://christiangoueguel.com/specProc/reference/plot_calibration.md), [`nas()`](https://christiangoueguel.com/specProc/reference/nas.md), [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md) |
 | Plasma diagnostics | [`saturation_summary()`](https://christiangoueguel.com/specProc/reference/saturation_summary.md), [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md), [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md), [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md), [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md), [`mcwhirter_criterion()`](https://christiangoueguel.com/specProc/reference/mcwhirter_criterion.md), [`self_absorption()`](https://christiangoueguel.com/specProc/reference/self_absorption.md), [`correct_self_absorption()`](https://christiangoueguel.com/specProc/reference/correct_self_absorption.md), [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md), [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md), [`starkb_lines()`](https://christiangoueguel.com/specProc/reference/starkb_lines.md) |
-| Outliers and robust PCA | [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md), [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md), [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md), [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md), [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md), [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md), [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md), [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md), [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md) |
+| Outliers and robust PCA | [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md), [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md), [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md), [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md), [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md), [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md), [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md), [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md), [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md), [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md) |
 | Robust statistics | [`summary_stats()`](https://christiangoueguel.com/specProc/reference/summary_stats.md), [`biweight_location()`](https://christiangoueguel.com/specProc/reference/biweight_location.md), [`biweight_scale()`](https://christiangoueguel.com/specProc/reference/biweight_scale.md), [`rousseeuw_croux()`](https://christiangoueguel.com/specProc/reference/rousseeuw_croux.md), [`umad()`](https://christiangoueguel.com/specProc/reference/umad.md), [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md), [`robust_bcyj()`](https://christiangoueguel.com/specProc/reference/robust_bcyj.md) |
 | Visualization | [`plot_spectra()`](https://christiangoueguel.com/specProc/reference/plot_spectra.md), [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md), [`plot_loadings()`](https://christiangoueguel.com/specProc/reference/plot_loadings.md), [`plot_contributions()`](https://christiangoueguel.com/specProc/reference/plot_contributions.md) |
 
@@ -85,7 +85,7 @@ Functions used to assess individual variables or features independently.
 ### robust PCA
 
 Principal component analysis that resists outlying observations (and,
-for MacroPCA, outlying cells and missing values).
+for MacroPCA and cellPCA, outlying cells and missing values).
 
 - [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
   : Robust Principal Component Analysis (ROBPCA)
@@ -93,15 +93,18 @@ for MacroPCA, outlying cells and missing values).
   : Robust Sparse Principal Component Analysis (ROSPCA)
 - [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
   : Robust PCA for Cellwise and Casewise Outliers (MacroPCA)
+- [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md)
+  : Robust PCA by Casewise and Cellwise Weighting (cellPCA)
 - [`predict(`*`<specproc_macropca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
+  [`predict(`*`<specproc_cellpca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
   [`predict(`*`<specproc_robpca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
   : Scores and Distances of New Observations
 - [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
   : Outlier Map of a Robust PCA
 - [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
-  : Cell Map of a MacroPCA Fit
+  : Cell Map of a MacroPCA or cellPCA Fit
 - [`flagged_regions()`](https://christiangoueguel.com/specProc/reference/flagged_regions.md)
-  : Flagged Regions of a MacroPCA Fit
+  : Flagged Regions of a MacroPCA or cellPCA Fit
 
 ### self-organizing maps
 
@@ -214,6 +217,8 @@ and can be tuned within a tidymodels workflow.
   : Robust Sparse PCA (ROSPCA) Recipe Step
 - [`step_macropca()`](https://christiangoueguel.com/specProc/reference/step_macropca.md)
   : MacroPCA Recipe Step
+- [`step_cellpca()`](https://christiangoueguel.com/specProc/reference/step_cellpca.md)
+  : cellPCA Recipe Step
 
 ### orthogonalization
 
