@@ -89,7 +89,20 @@ glsw <- function(x1, x2, alpha = 0.01) {
   }
 
   x_diff <- scale(x2, scale = FALSE) - scale(x1, scale = FALSE)
-  .filter <- glsw_cpp(unname(x_diff), alpha)
+  .filter <- glsw_filter(unname(x_diff), alpha)
 
   return(as_tbl(.filter, colnames(x1)))
+}
+
+# Generalized least squares weighting filter (Martens et al., 2003). With
+# C = Xd' Xd = V diag(lambda) V', the filter is G = V D^-1 V' where
+# D = sqrt(lambda / alpha + 1); directions outside the row space of Xd have
+# lambda = 0 (D = 1), so G = I - V (I - D^-1) V' with the thin SVD of Xd,
+# without forming the p x p covariance matrix.
+glsw_filter <- function(xd, alpha) {
+  if (!(alpha > 0)) stop("'alpha' must be positive.", call. = FALSE)
+  s <- svd(xd, nu = 0)
+  shrink <- 1 - 1 / sqrt(s$d^2 / alpha + 1)
+  G <- diag(ncol(xd))
+  G - s$v %*% (shrink * t(s$v))
 }

@@ -95,9 +95,9 @@ results.
 }
 \examples{
 set.seed(1)
-minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
-forageLIBS |>
-  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+# the 380-430 nm window (Ca II H and K lines)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+forageLIBS[which(wl > 380 & wl < 430)] |>
   center() |>
   robpca() |>
   print()

@@ -186,31 +186,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// epo_cpp
-Rcpp::List epo_cpp(const Eigen::Map<Eigen::MatrixXd> X, const Eigen::Map<Eigen::MatrixXd> D, int ncomp);
-RcppExport SEXP _specProc_epo_cpp(SEXP XSEXP, SEXP DSEXP, SEXP ncompSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X(XSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type D(DSEXP);
-    Rcpp::traits::input_parameter< int >::type ncomp(ncompSEXP);
-    rcpp_result_gen = Rcpp::wrap(epo_cpp(X, D, ncomp));
-    return rcpp_result_gen;
-END_RCPP
-}
-// glsw_cpp
-Eigen::MatrixXd glsw_cpp(const Eigen::Map<Eigen::MatrixXd> X_diff, double alpha);
-RcppExport SEXP _specProc_glsw_cpp(SEXP X_diffSEXP, SEXP alphaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X_diff(X_diffSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    rcpp_result_gen = Rcpp::wrap(glsw_cpp(X_diff, alpha));
-    return rcpp_result_gen;
-END_RCPP
-}
 // univariate_mcd_cpp
 Rcpp::NumericVector univariate_mcd_cpp(const Eigen::Map<Eigen::VectorXd> x, int h);
 RcppExport SEXP _specProc_univariate_mcd_cpp(SEXP xSEXP, SEXP hSEXP) {
@@ -306,19 +281,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// yGradientglswCpp
-Eigen::MatrixXd yGradientglswCpp(const Eigen::Map<Eigen::MatrixXd> X_diff, const Eigen::Map<Eigen::VectorXd> w_i, double alpha);
-RcppExport SEXP _specProc_yGradientglswCpp(SEXP X_diffSEXP, SEXP w_iSEXP, SEXP alphaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type X_diff(X_diffSEXP);
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type w_i(w_iSEXP);
-    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
-    rcpp_result_gen = Rcpp::wrap(yGradientglswCpp(X_diff, w_i, alpha));
-    return rcpp_result_gen;
-END_RCPP
-}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_specProc_whittaker_baseline_cpp", (DL_FUNC) &_specProc_whittaker_baseline_cpp, 5},
@@ -333,8 +295,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_specProc_ddc_apply_cpp", (DL_FUNC) &_specProc_ddc_apply_cpp, 12},
     {"_specProc_unimcd_cpp", (DL_FUNC) &_specProc_unimcd_cpp, 2},
     {"_specProc_scale_1step_cols_cpp", (DL_FUNC) &_specProc_scale_1step_cols_cpp, 1},
-    {"_specProc_epo_cpp", (DL_FUNC) &_specProc_epo_cpp, 3},
-    {"_specProc_glsw_cpp", (DL_FUNC) &_specProc_glsw_cpp, 2},
     {"_specProc_univariate_mcd_cpp", (DL_FUNC) &_specProc_univariate_mcd_cpp, 2},
     {"_specProc_sd_outlyingness_cpp", (DL_FUNC) &_specProc_sd_outlyingness_cpp, 3},
     {"_specProc_fast_mcd_cpp", (DL_FUNC) &_specProc_fast_mcd_cpp, 3},
@@ -342,7 +302,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_specProc_som_batch_cpp", (DL_FUNC) &_specProc_som_batch_cpp, 6},
     {"_specProc_som_map_cpp", (DL_FUNC) &_specProc_som_map_cpp, 2},
     {"_specProc_voigt_cpp", (DL_FUNC) &_specProc_voigt_cpp, 3},
-    {"_specProc_yGradientglswCpp", (DL_FUNC) &_specProc_yGradientglswCpp, 3},
     {NULL, NULL, 0}
 };
 

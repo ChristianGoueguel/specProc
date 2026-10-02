@@ -80,7 +80,8 @@ wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
 set.seed(1)
 rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
-  step_cellpca(recipes::all_predictors(), num_comp = 2, distances = TRUE)
+  step_cellpca(recipes::all_predictors(), num_comp = 2, distances = TRUE,
+               options = list(od_cutoff = "chisq"))
 recipes::bake(recipes::prep(rec), new_data = dat[301:368, ])
 \dontshow{\}) # examplesIf}
 }

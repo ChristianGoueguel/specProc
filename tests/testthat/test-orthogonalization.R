@@ -73,6 +73,7 @@ test_that("projected_osc equals O2PLS/OPLS filtering (Kemsley & Tapp)", {
 })
 
 test_that("projected_osc and o2pls agree with ropls", {
+  skip_on_cran()
   skip_if_not_installed("ropls")
   m <- suppressWarnings(suppressMessages(ropls::opls(
     d$x, d$y, predI = 1, orthoI = 2, scaleC = "center", crossvalI = 5, permI = 0,

@@ -88,7 +88,9 @@ columns \code{terms}, \code{value}, \code{component} and \code{id}.
 \dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
 library(recipes)
 data(forageLIBS)
-spectra <- forageLIBS[-(1:14)]
+# the 380-430 nm window (Ca II H and K lines)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 set.seed(1)
 rec <- recipe(~ ., data = spectra) |>
   step_robpca(all_predictors(), num_comp = 3, distances = TRUE)

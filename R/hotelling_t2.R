@@ -67,7 +67,9 @@
 #' @examples
 #' if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
 #'   data(forageLIBS)
-#'   spectra <- forageLIBS[-(1:14)]
+#'   # the 380-430 nm window (Ca II H and K lines)
+#'   wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#'   spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 #'   pca <- stats::prcomp(spectra)
 #'   t2 <- hotelling_t2(pca, k = 3)
 #'   t2[t2$outlier_97.5, ]

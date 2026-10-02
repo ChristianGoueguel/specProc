@@ -31,6 +31,7 @@ test_that("robust_bcyj validates its inputs", {
 })
 
 test_that("the transformations agree with cellWise", {
+  skip_on_cran()
   skip_if_not_installed("cellWise")
   set.seed(1)
   x <- cbind(lognormal = stats::rlnorm(200), gamma = stats::rgamma(200, 2),

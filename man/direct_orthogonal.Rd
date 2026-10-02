@@ -49,7 +49,8 @@ vectors and apply \eqn{\textbf{X}_{new} - \textbf{X}_{new}\textbf{PP}^T}.
 }
 \examples{
 data(forageLIBS)
-spectra <- forageLIBS[-(1:14)]  # the spectral channels
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
 res <- direct_orthogonal(spectra, forageLIBS$K, ncomp = 2)
 dim(res$correction)
 }

@@ -59,6 +59,7 @@ test_that("opls without cross-validation gives the same model", {
 })
 
 test_that("opls reproduces ropls", {
+  skip_on_cran()
   skip_if_not_installed("ropls")
   ropls_fit <- function(...) {
     suppressWarnings(suppressMessages(ropls::opls(

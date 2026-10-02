@@ -89,6 +89,7 @@ test_that("predict() reproduces the calibration scores and distances", {
 })
 
 test_that("robpca agrees with rospca::robpca", {
+  skip_on_cran()
   skip_if_not_installed("rospca")
   d <- make_lowrank(seed = 10)
   ref <- rospca::robpca(d$x, k = 3)
@@ -147,6 +148,7 @@ test_that("macropca detects outlying rows and cells and predicts with missing va
 })
 
 test_that("macropca reproduces cellWise::MacroPCA", {
+  skip_on_cran()
   skip_if_not_installed("cellWise")
   set.seed(13)
   x <- matrix(rnorm(60 * 8), 60, 8) %*% diag(8:1)
@@ -205,6 +207,7 @@ test_that("macropca chooses k from the explained variance", {
 })
 
 test_that("ddc reproduces cellWise::DDC", {
+  skip_on_cran()
   skip_if_not_installed("cellWise")
   set.seed(4)
   f <- matrix(rnorm(80 * 3), 80) %*% matrix(rnorm(3 * 15), 3)

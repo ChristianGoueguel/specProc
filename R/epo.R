@@ -85,7 +85,7 @@ epo <- function(x, ncomp = 2, clutter = NULL) {
   }
   ncomp <- min(ncomp, dim(d))
 
-  result <- epo_cpp(x, d, as.integer(ncomp))
+  result <- epo_project(x, d, ncomp)
   comp <- paste0("comp", seq_len(ncomp))
 
   res <- list(
@@ -95,4 +95,15 @@ epo <- function(x, ncomp = 2, clutter = NULL) {
     singular_values = drop(result$singular_values)
   )
   new_filter(res, "specproc_epo", x)
+}
+
+# Projection of x on the orthogonal complement of the `ncomp` dominant right
+# singular vectors P of the clutter d: x - (x P) P'. The p x p projection
+# matrix is never formed.
+epo_project <- function(x, d, ncomp) {
+  s <- svd(d, nu = 0, nv = ncomp)
+  P <- s$v[, seq_len(ncomp), drop = FALSE]
+  clutter <- (x %*% P) %*% t(P)
+  list(correction = x - clutter, clutter = clutter, loadings = P,
+       singular_values = s$d[seq_len(ncomp)])
 }

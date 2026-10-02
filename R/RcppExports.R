@@ -49,14 +49,6 @@ scale_1step_cols_cpp <- function(x) {
     .Call(`_specProc_scale_1step_cols_cpp`, x)
 }
 
-epo_cpp <- function(X, D, ncomp) {
-    .Call(`_specProc_epo_cpp`, X, D, ncomp)
-}
-
-glsw_cpp <- function(X_diff, alpha) {
-    .Call(`_specProc_glsw_cpp`, X_diff, alpha)
-}
-
 univariate_mcd_cpp <- function(x, h) {
     .Call(`_specProc_univariate_mcd_cpp`, x, h)
 }
@@ -83,9 +75,5 @@ som_map_cpp <- function(x, codebook) {
 
 voigt_cpp <- function(x, sigma, gamma) {
     .Call(`_specProc_voigt_cpp`, x, sigma, gamma)
-}
-
-yGradientglswCpp <- function(X_diff, w_i, alpha) {
-    .Call(`_specProc_yGradientglswCpp`, X_diff, w_i, alpha)
 }
 

@@ -153,6 +153,7 @@
 #'     plot_embedding(hotelling = "all", flag = FALSE, label = TRUE)
 #' }
 #'
+#' \donttest{
 #' # UMAP map of the iris flowers, from embed::step_umap(): no lines through
 #' # the origin, whose position means nothing on such a map
 #' if (rlang::is_installed(c("recipes", "embed"))) {
@@ -163,6 +164,7 @@
 #'     recipes::prep() |>
 #'     recipes::bake(new_data = NULL)
 #'   plot_embedding(umap, colour = Species, title = "UMAP of the iris flowers")
+#' }
 #' }
 #'
 plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, alpha = 0.8,

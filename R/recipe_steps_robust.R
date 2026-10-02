@@ -108,7 +108,9 @@ step_robust_bcyj <- function(recipe, ..., role = NA, trained = FALSE, type = "be
 #' @examplesIf rlang::is_installed("recipes")
 #' library(recipes)
 #' data(forageLIBS)
-#' spectra <- forageLIBS[-(1:14)]
+#' # the 380-430 nm window (Ca II H and K lines)
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 #' set.seed(1)
 #' rec <- recipe(~ ., data = spectra) |>
 #'   step_robpca(all_predictors(), num_comp = 3, distances = TRUE)
@@ -243,7 +245,8 @@ step_macropca <- function(recipe, ..., role = "predictor", trained = FALSE, num_
 #' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
 #' set.seed(1)
 #' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
-#'   step_cellpca(recipes::all_predictors(), num_comp = 2, distances = TRUE)
+#'   step_cellpca(recipes::all_predictors(), num_comp = 2, distances = TRUE,
+#'                options = list(od_cutoff = "chisq"))
 #' recipes::bake(recipes::prep(rec), new_data = dat[301:368, ])
 step_cellpca <- function(recipe, ..., role = "predictor", trained = FALSE, num_comp = 2,
                          options = list(), prefix = "CPC", distances = FALSE,

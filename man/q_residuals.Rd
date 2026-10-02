@@ -84,7 +84,9 @@ relative to that of the calibration samples.
 \examples{
 if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   data(forageLIBS)
-  spectra <- forageLIBS[-(1:14)]
+  # the 380-430 nm window (Ca II H and K lines)
+  wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+  spectra <- forageLIBS[which(wl > 380 & wl < 430)]
   pca <- stats::prcomp(spectra)
   influence <- q_residuals(pca, k = 3)
   influence[influence$outlier != "regular", ]

@@ -79,7 +79,8 @@ y_gradient_glsw <- function(x, y, alpha = 0.01, window = 5) {
   }
 
   g <- y_gradient(x, y, window)
-  G <- yGradientglswCpp(unname(g$x_diff), g$w_i, alpha)
+  # C = X_diff' W^2 X_diff with W = diag(w_i), by scaling the rows of X_diff
+  G <- glsw_filter(g$w_i * unname(g$x_diff), alpha)
   return(as_tbl(G, colnames(x)))
 }
 
