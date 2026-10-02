@@ -59,6 +59,18 @@ and are applied unchanged to new data. \link[recipes:tidy.recipe]{tidy()}
 returns the selected \code{terms}, the \code{scale} each column is divided by (\code{NA}
 before the step is trained) and \code{id}.
 }
+\examples{
+\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+  step_poisson_scale(recipes::all_predictors())
+prepped <- recipes::prep(rec)
+recipes::bake(prepped, new_data = dat[301:368, ])
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link[=poisson_scale]{poisson_scale()}}, \code{\link[=step_pareto_scale]{step_pareto_scale()}}
 }

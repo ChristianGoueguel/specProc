@@ -70,6 +70,18 @@ as outlying observations.
 As \code{\link[=step_robpca]{step_robpca()}}. Missing values are allowed in the selected columns,
 both when the recipe is prepped and when it is baked.
 }
+\examples{
+\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+set.seed(1)
+rec <- recipes::recipe(K ~ ., data = dat) |>
+  step_macropca(recipes::all_predictors(), num_comp = 2)
+recipes::bake(recipes::prep(rec), new_data = NULL)
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link[=macropca]{macropca()}}, \code{\link[=step_robpca]{step_robpca()}}
 }

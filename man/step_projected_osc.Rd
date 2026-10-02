@@ -74,6 +74,18 @@ algorithms. \code{\link[=step_epo]{step_epo()}} and \code{\link[=step_glsw]{step
 external clutter, and \code{\link[=step_y_gradient_glsw]{step_y_gradient_glsw()}} down-weights variation
 between samples with similar outcomes.
 }
+\examples{
+\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+  step_projected_osc(recipes::all_predictors(), num_comp = 2)
+prepped <- recipes::prep(rec)
+recipes::bake(prepped, new_data = dat[301:368, ])
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link[=projected_osc]{projected_osc()}}, \code{\link[=predict.specproc_filter]{predict.specproc_filter()}}
 }

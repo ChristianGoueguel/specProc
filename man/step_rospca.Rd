@@ -73,6 +73,18 @@ As \code{\link[=step_robpca]{step_robpca()}}, with sparse loadings. \code{num_co
 tuned with \code{\link[tune:tune]{tune::tune()}}; \code{lambda} uses \code{\link[dials:penalty]{dials::penalty()}} with a range
 of 0.01 to 100.
 }
+\examples{
+\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+set.seed(1)
+rec <- recipes::recipe(K ~ ., data = dat) |>
+  step_rospca(recipes::all_predictors(), num_comp = 2, distances = TRUE)
+recipes::bake(recipes::prep(rec), new_data = NULL)
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link[=rospca]{rospca()}}, \code{\link[=step_robpca]{step_robpca()}}
 }

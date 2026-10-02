@@ -48,6 +48,18 @@ of the spectrum and only them. Nothing is estimated from the training
 data. The selected columns are replaced by the SNV-transformed values.
 \link[recipes:tidy.recipe]{tidy()} returns the selected \code{terms} and \code{id}.
 }
+\examples{
+\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+  step_snv(recipes::all_predictors())
+prepped <- recipes::prep(rec)
+recipes::bake(prepped, new_data = dat[301:368, ])
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link[=snv]{snv()}}
 }

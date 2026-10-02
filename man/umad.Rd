@@ -30,6 +30,12 @@ proposed by either Hayes (2014) or Williams (2011).
 values proposed by Park \emph{et al.} (2020).
 }
 }
+\examples{
+set.seed(1)
+x <- c(stats::rnorm(50), 10, 12)  # two outliers
+umad(x)
+stats::mad(x)
+}
 \references{
 \itemize{
 \item Park, C., Kim, H., Wang, M., (2020).

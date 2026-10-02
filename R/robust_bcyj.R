@@ -73,6 +73,13 @@
 #'
 #' @export robust_bcyj
 #'
+#' @examples
+#' data(forageLIBS)
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+#' # two lines, transformed to central normality
+#' res <- robust_bcyj(spectra[, c(10, 50)])
+#' res$summary
 robust_bcyj <- function(x, var = NULL, type = "bestObj", quantile = 0.99, nbsteps = 2) {
   if (missing(x)) {
     stop("Missing 'data' argument.")

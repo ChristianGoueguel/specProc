@@ -23,6 +23,7 @@ test_that("all correlation methods work and match their references", {
   }
   bic <- correlation(test_data, y, method = "bicor")
   expect_equal(bic$.correlation[bic$variable == "a"], biweight_midcorrelation(test_data$a, test_data$y))
+  skip_if_not_installed("XICOR")
   xi <- correlation(test_data, y, method = "chatterjee")
   expect_equal(xi$method, rep("chatterjee", 3))
   expect_true(all(xi$.correlation <= 1))
@@ -48,8 +49,10 @@ test_that("correlation plots", {
   top <- correlation(test_data, y, plot = TRUE, top = 1)
   expect_equal(nrow(top$plot$data), 1)
   expect_equal(nrow(top$correlation), nrow(result_plot$correlation))
-  xi <- correlation(test_data, y, method = "chatterjee", plot = TRUE)
-  expect_null(xi$plot$labels$subtitle)   # no t-based threshold for xi
+  if (rlang::is_installed("XICOR")) {
+    xi <- correlation(test_data, y, method = "chatterjee", plot = TRUE)
+    expect_null(xi$plot$labels$subtitle)   # no t-based threshold for xi
+  }
   expect_error(correlation(test_data, y, plot = TRUE, color = 1), "color")
   expect_error(correlation(test_data, y, plot = TRUE, top = 0), "top")
   # variables named by wavelength: a correlation spectrum
@@ -103,8 +106,10 @@ test_that("several responses give a heatmap", {
   # variables that are not wavelengths: tiles labeled with their value, top ones only
   bars <- correlation(test_data |> dplyr::mutate(w = y^2), c(y, w), plot = TRUE, top = 2)
   expect_equal(nlevels(bars$plot$data$variable), 2)
-  xi <- correlation(spectra, c(y1, y2), method = "chatterjee", plot = TRUE)
-  expect_equal(xi$plot$scales$get_scales("fill")$limits, c(0, 1))
+  if (rlang::is_installed("XICOR")) {
+    xi <- correlation(spectra, c(y1, y2), method = "chatterjee", plot = TRUE)
+    expect_equal(xi$plot$scales$get_scales("fill")$limits, c(0, 1))
+  }
   skip_if_not_installed("plotly")
   interactive <- correlation(spectra, c(y1, y2), plot = TRUE, interactive = TRUE)
   expect_s3_class(interactive, "plotly")

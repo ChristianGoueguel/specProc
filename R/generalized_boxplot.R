@@ -154,7 +154,7 @@ boxplot_stats_plot <- function(stats_tbl, outlier_tbl, xlabels.angle, xlabels.vj
       shape = 21,
       size = 2,
       alpha = 1/3) +
-    ggsci::scale_fill_d3(palette = "category20") +
+    boxplot_fill_scale() +
     ggplot2::theme_bw() +
     ggplot2::theme(
       legend.position = "none",
@@ -226,4 +226,13 @@ genboxStats <- function(x, alpha, p) {
   )
 
   list("stats" = stats_tbl, "outliers" = out)
+}
+
+# The D3 palette of ggsci when it is installed, the default palette otherwise.
+boxplot_fill_scale <- function() {
+  if (rlang::is_installed("ggsci")) {
+    ggsci::scale_fill_d3(palette = "category20")
+  } else {
+    ggplot2::scale_fill_hue()
+  }
 }

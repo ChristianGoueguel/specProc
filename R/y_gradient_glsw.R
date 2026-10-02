@@ -90,10 +90,12 @@ y_gradient <- function(x, y, window) {
   x_sorted <- x[sorted_idx, , drop = FALSE]
   y_sorted <- y[sorted_idx]
 
-  # Derivatives along the sample axis: prospectr filters the rows, so the
-  # sample-by-variable matrix is transposed before and after filtering.
-  x_diff <- t(prospectr::savitzkyGolay(t(x_sorted), m = 1, p = 2, w = window))
-  y_diff <- drop(prospectr::savitzkyGolay(matrix(y_sorted, nrow = 1), m = 1, p = 2, w = window))
+  # Derivatives along the sample axis, without the (window - 1) / 2 samples at
+  # each end: savgol_matrix() filters the rows, so the sample-by-variable
+  # matrix is transposed before and after filtering.
+  keep <- seq.int((window + 1) / 2, length(y_sorted) - (window - 1) / 2)
+  x_diff <- t(savgol_matrix(t(unname(x_sorted)), window, 2, 1, FALSE))[keep, , drop = FALSE]
+  y_diff <- drop(savgol_matrix(matrix(y_sorted, nrow = 1), window, 2, 1, FALSE))[keep]
 
   s <- stats::sd(y_diff)
   w_i <- if (is.finite(s) && s > 0) 2^(-abs(y_diff) / s) else rep(1, length(y_diff))

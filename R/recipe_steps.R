@@ -120,6 +120,16 @@ step_osc <- function(recipe, ..., role = NA, trained = FALSE, outcome = NULL,
 #'
 #' @seealso [direct_orthogonal()], [predict.specproc_filter()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+#'   step_direct_orthogonal(recipes::all_predictors(), num_comp = 2)
+#' prepped <- recipes::prep(rec)
+#' recipes::bake(prepped, new_data = dat[301:368, ])
 step_direct_orthogonal <- function(recipe, ..., role = NA, trained = FALSE,
                                    outcome = NULL, num_comp = 2, options = list(),
                                    res = NULL, columns = NULL, skip = FALSE,
@@ -146,6 +156,16 @@ step_direct_orthogonal <- function(recipe, ..., role = NA, trained = FALSE,
 #'
 #' @seealso [direct_osc()], [predict.specproc_filter()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+#'   step_direct_osc(recipes::all_predictors(), num_comp = 2)
+#' prepped <- recipes::prep(rec)
+#' recipes::bake(prepped, new_data = dat[301:368, ])
 step_direct_osc <- function(recipe, ..., role = NA, trained = FALSE,
                             outcome = NULL, num_comp = 2, options = list(),
                             res = NULL, columns = NULL, skip = FALSE,
@@ -175,6 +195,16 @@ step_direct_osc <- function(recipe, ..., role = NA, trained = FALSE,
 #'
 #' @seealso [projected_osc()], [predict.specproc_filter()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+#'   step_projected_osc(recipes::all_predictors(), num_comp = 2)
+#' prepped <- recipes::prep(rec)
+#' recipes::bake(prepped, new_data = dat[301:368, ])
 step_projected_osc <- function(recipe, ..., role = NA, trained = FALSE,
                                outcome = NULL, num_comp = 2, options = list(),
                                res = NULL, columns = NULL, skip = FALSE,
@@ -415,6 +445,22 @@ step_o2pls <- function(recipe, ..., role = NA, trained = FALSE,
 #'
 #' @seealso [epo()], [predict.specproc_filter()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' # the three samples measured twice
+#' twice <- forageLIBS$Sample[duplicated(forageLIBS$Sample)]
+#' first <- match(twice, forageLIBS$Sample)
+#' second <- vapply(twice, function(s) max(which(forageLIBS$Sample == s)), integer(1))
+#' # their differences describe the variation between repeated measurements
+#' clutter <- as.matrix(dat[second, -1]) - as.matrix(dat[first, -1])
+#' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+#'   step_epo(recipes::all_predictors(), clutter = clutter, num_comp = 1)
+#' prepped <- recipes::prep(rec)
+#' recipes::bake(prepped, new_data = dat[301:368, ])
 step_epo <- function(recipe, ..., role = NA, trained = FALSE, clutter = NULL,
                      num_comp = 2, res = NULL, columns = NULL, skip = FALSE,
                      id = recipes::rand_id("epo")) {
@@ -458,6 +504,22 @@ step_epo <- function(recipe, ..., role = NA, trained = FALSE, clutter = NULL,
 #'
 #' @seealso [glsw()], [step_y_gradient_glsw()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' # the three samples measured twice
+#' twice <- forageLIBS$Sample[duplicated(forageLIBS$Sample)]
+#' first <- match(twice, forageLIBS$Sample)
+#' second <- vapply(twice, function(s) max(which(forageLIBS$Sample == s)), integer(1))
+#' # their differences describe the variation between repeated measurements
+#' clutter <- as.matrix(dat[second, -1]) - as.matrix(dat[first, -1])
+#' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+#'   step_glsw(recipes::all_predictors(), clutter = clutter, alpha = 0.01)
+#' prepped <- recipes::prep(rec)
+#' recipes::bake(prepped, new_data = dat[301:368, ])
 step_glsw <- function(recipe, ..., role = NA, trained = FALSE, clutter,
                       alpha = 0.01, res = NULL, columns = NULL, skip = FALSE,
                       id = recipes::rand_id("glsw")) {
@@ -496,6 +558,16 @@ step_glsw <- function(recipe, ..., role = NA, trained = FALSE, clutter,
 #'
 #' @seealso [y_gradient_glsw()], [step_glsw()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+#'   step_y_gradient_glsw(recipes::all_predictors(), alpha = 0.01)
+#' prepped <- recipes::prep(rec)
+#' recipes::bake(prepped, new_data = dat[301:368, ])
 step_y_gradient_glsw <- function(recipe, ..., role = NA, trained = FALSE,
                                  outcome = NULL, alpha = 0.01, window = 5,
                                  res = NULL, columns = NULL, skip = FALSE,
@@ -560,6 +632,7 @@ step_titles <- c(
 
 # Selected predictors, checked to be numeric.
 step_predictors <- function(x, training, info) {
+  rlang::check_installed("recipes")
   cols <- recipes::recipes_eval_select(x$terms, training, info)
   recipes::check_type(training[, cols], types = c("double", "integer"))
   unname(cols)
@@ -568,6 +641,7 @@ step_predictors <- function(x, training, info) {
 # Outcome names: the `outcome` argument, or the recipe's outcomes. Steps
 # other than step_o2pls() need a single outcome.
 step_outcome <- function(x, training, info) {
+  rlang::check_installed("recipes")
   y_name <- if (is.character(x$outcome)) {
     x$outcome  # already resolved when the step was trained
   } else if (length(x$outcome) == 0 || rlang::quo_is_null(x$outcome[[1]])) {
@@ -588,6 +662,7 @@ step_outcome <- function(x, training, info) {
 
 # Clutter columns matching the selected predictors.
 step_clutter <- function(clutter, cols) {
+  rlang::check_installed("recipes")
   clutter <- as_numeric_matrix(clutter, "clutter")
   if (!is.null(colnames(clutter))) {
     missing_cols <- setdiff(cols, colnames(clutter))

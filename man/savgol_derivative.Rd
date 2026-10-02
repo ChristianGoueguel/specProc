@@ -18,6 +18,12 @@ A dials \code{quant_param} object.
 A dials parameter for the \code{derivative} of \code{\link[=step_savgol]{step_savgol()}}: 0 (smoothing),
 1 or 2.
 }
+\examples{
+\dontshow{if (rlang::is_installed("dials")) withAutoprint(\{ # examplesIf}
+savgol_derivative()
+dials::value_seq(savgol_derivative(), 3)
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link[=step_savgol]{step_savgol()}}
 }

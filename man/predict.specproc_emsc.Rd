@@ -21,6 +21,14 @@ A tibble of corrected spectra.
 Corrects new spectra with the reference spectrum, polynomial basis and
 interferents of a model fitted by \code{\link[=emsc]{emsc()}}.
 }
+\examples{
+data(forageLIBS)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+fit <- emsc(spectra[1:300, ], degree = 2)
+corrected <- predict(fit, spectra[301:368, ])
+dim(corrected)
+}
 \seealso{
 \code{\link[=emsc]{emsc()}}, \code{\link[=predict.specproc_filter]{predict.specproc_filter()}}
 }

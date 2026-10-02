@@ -49,7 +49,7 @@ where \eqn{Q} is the quantile function of the data. The defaults
 
 Interpretation of Quantile Weights:
 \itemize{
-\item At the normal distribution, LQW = RQW ≈ 0.2.
+\item At the normal distribution, LQW = RQW = 0.2 (approximately).
 \item Larger values indicate heavier tails than the normal distribution, and
 smaller values lighter tails.
 }

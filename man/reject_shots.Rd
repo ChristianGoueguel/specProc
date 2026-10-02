@@ -68,6 +68,20 @@ can be zero; the mean absolute deviation is then used.
 To average the kept shots per sample, use \code{\link[=average]{average()}} on the result with
 \code{drop = TRUE}. In a recipe, use \code{\link[=step_reject_shots]{step_reject_shots()}}.
 }
+\examples{
+data(forageLIBS)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+# five shots of each of four samples, one of them with a weak plasma
+set.seed(1)
+shots <- spectra[rep(1:4, each = 5), ] * stats::runif(20, 0.95, 1.05)
+shots[7, ] <- 0.2 * shots[7, ]
+shots <- cbind(sample = rep(c("A", "B", "C", "D"), each = 5), shots)
+res <- reject_shots(shots, sample)
+res[res$.rejected, c("sample", ".reason", ".intensity_z")]
+# the kept shots only
+nrow(reject_shots(shots, sample, drop = TRUE))
+}
 \references{
 \itemize{
 \item Iglewicz, B., Hoaglin, D.C. (1993). How to Detect and Handle

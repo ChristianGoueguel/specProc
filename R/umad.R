@@ -35,6 +35,11 @@
 #'
 #' @export umad
 #'
+#' @examples
+#' set.seed(1)
+#' x <- c(stats::rnorm(50), 10, 12)  # two outliers
+#' umad(x)
+#' stats::mad(x)
 umad <- function(x, method = "hayes", drop.na = TRUE) {
   if (missing(x)) {
     stop("Missing 'x' argument.")

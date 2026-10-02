@@ -142,6 +142,10 @@ step_wavelet <- function(recipe, ..., wavelet = "d4", level = 3, coefficients = 
 #' @return A dials `quant_param` object.
 #' @seealso [step_wavelet()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("dials")
+#' wavelet_level()
+#' dials::value_seq(wavelet_level(), 3)
 wavelet_level <- function(range = c(1L, 6L), trans = NULL) {
   rlang::check_installed("dials")
   dials::new_quant_param(type = "integer", range = range, inclusive = c(TRUE, TRUE),

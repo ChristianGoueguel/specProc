@@ -44,6 +44,18 @@ the whole master spectrum is also fitted, and the transfer matrix and
 intercept are \eqn{(1 - \alpha)} times the local ones plus \eqn{\alpha}
 times the global ones.
 }
+\examples{
+data(forageLIBS)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+# a second instrument, with a shifted and less sensitive response
+x1 <- as.matrix(spectra[1:30, ])
+x2 <- 0.8 * cbind(x1[, -1], x1[, ncol(x1)]) + 50
+res <- pds(x1, x2, win = 3, ncomp = 2)
+# spectra of the second instrument transferred to the first one
+transferred <- sweep(x2 \%*\% res$transfer_matrix, 2, res$intercept, "+")
+max(abs(transferred - x1)) / max(x1)
+}
 \references{
 \itemize{
 \item Wang, Y., Veltkamp, D.J., Kowalski, B.R., (1991).

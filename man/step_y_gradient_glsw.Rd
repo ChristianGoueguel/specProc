@@ -67,6 +67,18 @@ replaced by the filtered values (not centered). \code{alpha} can be tuned with
 \code{\link[tune:tune]{tune::tune()}}, using \code{\link[=glsw_alpha]{glsw_alpha()}}. \link[recipes:tidy.recipe]{tidy()}
 returns the selected \code{terms}, \code{alpha} (relative) and \code{id}.
 }
+\examples{
+\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+  step_y_gradient_glsw(recipes::all_predictors(), alpha = 0.01)
+prepped <- recipes::prep(rec)
+recipes::bake(prepped, new_data = dat[301:368, ])
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link[=y_gradient_glsw]{y_gradient_glsw()}}, \code{\link[=step_glsw]{step_glsw()}}
 }

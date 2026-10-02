@@ -17,6 +17,12 @@ A dials \code{quant_param} object.
 \description{
 A dials parameter for the \code{level} of \code{\link[=step_wavelet]{step_wavelet()}}.
 }
+\examples{
+\dontshow{if (rlang::is_installed("dials")) withAutoprint(\{ # examplesIf}
+wavelet_level()
+dials::value_seq(wavelet_level(), 3)
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link[=step_wavelet]{step_wavelet()}}
 }

@@ -193,6 +193,17 @@ wavelength_calibration <- function(spectra, lines, degree = 1, search = 0.3, min
 #' @return `spectra`, with the corrected wavelengths as names.
 #' @seealso [wavelength_calibration()]
 #' @export apply_calibration
+#'
+#' @examples
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]
+#' wl <- as.numeric(names(spectra))
+#' first_detector <- spectra[seq_len(which(diff(wl) < 0)[1])]
+#' reference <- c(`Mg I` = 285.213, `Ca II` = 317.933, `Ca II` = 393.366, `K I` = 404.414,
+#'                `Ca I` = 422.673, `Mg I` = 518.360, `Na I` = 588.995, `Ca I` = 643.907)
+#' cal <- wavelength_calibration(first_detector, reference)
+#' corrected <- apply_calibration(first_detector, cal)
+#' head(names(corrected))
 apply_calibration <- function(spectra, calibration) {
   if (!inherits(calibration, "specproc_wavelength_calibration")) {
     stop("'calibration' must be returned by wavelength_calibration().", call. = FALSE)
@@ -235,6 +246,17 @@ apply_calibration <- function(spectra, calibration) {
 #'   detectors overlap), or of the nearest segment.
 #' @seealso [wavelength_calibration()], [apply_calibration()]
 #' @export
+#'
+#' @examples
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]
+#' wl <- as.numeric(names(spectra))
+#' first_detector <- spectra[seq_len(which(diff(wl) < 0)[1])]
+#' reference <- c(`Mg I` = 285.213, `Ca II` = 317.933, `Ca II` = 393.366, `K I` = 404.414,
+#'                `Ca I` = 422.673, `Mg I` = 518.360, `Na I` = 588.995, `Ca I` = 643.907)
+#' cal <- wavelength_calibration(first_detector, reference)
+#' # the corrected wavelengths of the Ca II H and K lines
+#' predict(cal, c(393.3, 396.8))
 predict.specproc_wavelength_calibration <- function(object, wavelength, ...) {
   if (!is.numeric(wavelength)) stop("'wavelength' must be numeric.", call. = FALSE)
   seg <- object$segments
@@ -261,6 +283,16 @@ predict.specproc_wavelength_calibration <- function(object, wavelength, ...) {
 #' @return A ggplot object.
 #' @seealso [wavelength_calibration()]
 #' @export plot_wavelength_calibration
+#'
+#' @examples
+#' data(forageLIBS)
+#' spectra <- forageLIBS[-(1:14)]
+#' wl <- as.numeric(names(spectra))
+#' first_detector <- spectra[seq_len(which(diff(wl) < 0)[1])]
+#' reference <- c(`Mg I` = 285.213, `Ca II` = 317.933, `Ca II` = 393.366, `K I` = 404.414,
+#'                `Ca I` = 422.673, `Mg I` = 518.360, `Na I` = 588.995, `Ca I` = 643.907)
+#' cal <- wavelength_calibration(first_detector, reference)
+#' plot_wavelength_calibration(cal)
 plot_wavelength_calibration <- function(object, title = NULL) {
   if (!inherits(object, "specproc_wavelength_calibration")) {
     stop("'object' must be returned by wavelength_calibration().", call. = FALSE)

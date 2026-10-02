@@ -72,6 +72,22 @@ the recipe, with \code{\link[=reject_shots]{reject_shots()}} and \code{\link[=av
 \link[recipes:tidy.recipe]{tidy()} returns the spectral \code{terms}, the \code{sample}
 column, the criteria (\code{method}), the \code{cutoff} and \code{id}.
 }
+\examples{
+\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
+data(forageLIBS)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+set.seed(1)
+shots <- spectra[rep(1:4, each = 5), ] * stats::runif(20, 0.95, 1.05)
+shots[7, ] <- 0.2 * shots[7, ]
+shots <- cbind(sample = rep(c("A", "B", "C", "D"), each = 5), shots)
+rec <- recipes::recipe(~ ., data = shots) |>
+  step_reject_shots(recipes::all_numeric(), sample = "sample")
+prepped <- recipes::prep(rec)
+# the rejected shot is removed from the training data
+nrow(recipes::bake(prepped, new_data = NULL))
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link[=reject_shots]{reject_shots()}}, \code{\link[=average]{average()}}, \code{\link[=step_line_ratio]{step_line_ratio()}}
 }

@@ -93,10 +93,11 @@
 #' fit <- robpca(center(spectra))
 #' plot_loadings(fit, spectra = spectra)
 #' plot_loadings(fit, type = "contribution", spectra = spectra)
-#' \dontrun{
-#' # label the peaks with emission lines from the NIST database
-#' lines <- libs_lines(c("Ca I", "Ca II", "K I", "Mg I", "Mg II", "Na I", "C I", "H I"))
-#' plot_loadings(fit, lines = lines, spectra = spectra)
+#' \donttest{
+#' # label the peaks with emission lines from the NIST database (needs an
+#' # internet connection)
+#' lines <- try(libs_lines(c("Ca I", "Ca II", "K I", "Mg I", "Mg II", "Na I", "C I", "H I")))
+#' if (!inherits(lines, "try-error")) plot_loadings(fit, lines = lines, spectra = spectra)
 #' }
 #'
 plot_loadings <- function(model, components = NULL, type = c("loadings", "contribution"),

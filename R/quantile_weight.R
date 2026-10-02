@@ -26,7 +26,7 @@
 #' \eqn{p = 0.125} and \eqn{q = 0.875} give a breakdown value of 12.5%.
 #'
 #' Interpretation of Quantile Weights:
-#'  - At the normal distribution, LQW = RQW ≈ 0.2.
+#'  - At the normal distribution, LQW = RQW = 0.2 (approximately).
 #'  - Larger values indicate heavier tails than the normal distribution, and
 #'    smaller values lighter tails.
 #'

@@ -123,6 +123,19 @@ step_line_ratio <- function(recipe, ..., reference, window = 0.1, method = "area
 #' @seealso [reject_shots()], [average()], [step_line_ratio()]
 #' @export
 #'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+#' set.seed(1)
+#' shots <- spectra[rep(1:4, each = 5), ] * stats::runif(20, 0.95, 1.05)
+#' shots[7, ] <- 0.2 * shots[7, ]
+#' shots <- cbind(sample = rep(c("A", "B", "C", "D"), each = 5), shots)
+#' rec <- recipes::recipe(~ ., data = shots) |>
+#'   step_reject_shots(recipes::all_numeric(), sample = "sample")
+#' prepped <- recipes::prep(rec)
+#' # the rejected shot is removed from the training data
+#' nrow(recipes::bake(prepped, new_data = NULL))
 step_reject_shots <- function(recipe, ..., sample, method = c("intensity", "correlation"),
                               cutoff = 3.5, role = NA, trained = FALSE, columns = NULL,
                               skip = TRUE, id = recipes::rand_id("reject_shots")) {

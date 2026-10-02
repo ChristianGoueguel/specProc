@@ -36,7 +36,7 @@ the upper tail.
 
 The interpretation of LMC and RMC is as follows:
 \itemize{
-\item At the normal distribution, LMC = RMC ≈ 0.2.
+\item At the normal distribution, LMC = RMC = 0.2 (approximately).
 \item Larger values indicate heavier tails than the normal distribution, and
 smaller values lighter tails.
 }

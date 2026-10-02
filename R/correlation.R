@@ -131,6 +131,9 @@ correlation <- function(x, var, method = "pearson", plot = FALSE,
   if (!is.character(method) || length(method) != 1 || !method %in% valid_methods) {
     stop("Invalid method specified.")
   }
+  if (method == "chatterjee") {
+    rlang::check_installed("XICOR", reason = "to compute Chatterjee's correlation.")
+  }
   if (!is.logical(plot)) {
     stop("'plot' must be of type boolean (TRUE or FALSE)")
   }

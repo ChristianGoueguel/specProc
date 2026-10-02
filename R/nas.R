@@ -235,6 +235,14 @@ nas_samples <- function(object, xs) {
 #'
 #' @seealso [nas()]
 #' @export
+#'
+#' @examples
+#' data(forageLIBS)
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+#' cal <- 1:300
+#' fit <- nas(spectra[cal, ], forageLIBS$K[cal], ncomp = 3)
+#' head(predict(fit, spectra[-cal, ]))
 predict.specproc_nas <- function(object, newdata, ...) {
   x <- filter_newdata(object, newdata)
   if (anyNA(x)) {

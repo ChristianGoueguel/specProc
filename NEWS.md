@@ -1,3 +1,25 @@
+# specProc 0.8.2
+
+## Dependencies
+
+* `ggsci`, `prospectr` and `XICOR` move from Imports to Suggests.
+  `generalized_boxplot()` uses the default ggplot2 palette when `ggsci` is
+  not installed, and `correlation(method = "chatterjee")` asks for `XICOR`.
+  `y_gradient_glsw()` computes its Savitzky-Golay derivatives with the
+  package's own filter (same results).
+* `mt` is no longer suggested.
+* Every `step_*()` function checks that `recipes` is installed.
+
+## Documentation
+
+* Examples for the help pages that had none (the `step_*()` functions,
+  `predict()` methods, `reject_shots()`, `pds()`, `robust_bcyj()`, `umad()`,
+  the wavelength calibration helpers and the tuning parameters).
+* The `rospca()` example runs on a spectral window, and the `plot_loadings()`
+  example that queries the NIST database is run with `\donttest` and `try()`.
+* The package description covers the whole workflow, with references.
+* Non-ASCII mathematical symbols removed from the help pages.
+
 # specProc 0.8.1
 
 ## Bug fixes

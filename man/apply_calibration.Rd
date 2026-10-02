@@ -26,6 +26,17 @@ channels, in the same order), so that each channel gets the correction of
 its detector segment. The corrected wavelengths are rounded to 4 decimals
 (0.1 pm) for the column names.
 }
+\examples{
+data(forageLIBS)
+spectra <- forageLIBS[-(1:14)]
+wl <- as.numeric(names(spectra))
+first_detector <- spectra[seq_len(which(diff(wl) < 0)[1])]
+reference <- c(`Mg I` = 285.213, `Ca II` = 317.933, `Ca II` = 393.366, `K I` = 404.414,
+               `Ca I` = 422.673, `Mg I` = 518.360, `Na I` = 588.995, `Ca I` = 643.907)
+cal <- wavelength_calibration(first_detector, reference)
+corrected <- apply_calibration(first_detector, cal)
+head(names(corrected))
+}
 \seealso{
 \code{\link[=wavelength_calibration]{wavelength_calibration()}}
 }

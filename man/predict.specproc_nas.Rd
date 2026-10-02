@@ -22,6 +22,14 @@ A tibble with one row per new sample and columns \code{nas},
 Computes the net analyte signal, selectivity and predicted concentration
 of new samples with a model fitted by \code{\link[=nas]{nas()}}.
 }
+\examples{
+data(forageLIBS)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+cal <- 1:300
+fit <- nas(spectra[cal, ], forageLIBS$K[cal], ncomp = 3)
+head(predict(fit, spectra[-cal, ]))
+}
 \seealso{
 \code{\link[=nas]{nas()}}
 }

@@ -64,6 +64,10 @@ step_spectral_norm <- function(recipe, ..., method = "l1", role = NA, trained = 
 #' @return A dials `qual_param` object.
 #' @seealso [step_spectral_norm()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("dials")
+#' spectral_norm_method()
+#' spectral_norm_method(c("l1", "max"))
 spectral_norm_method <- function(values = c("l1", "area", "l2", "max")) {
   rlang::check_installed("dials")
   dials::new_qual_param(type = "character", values = values,

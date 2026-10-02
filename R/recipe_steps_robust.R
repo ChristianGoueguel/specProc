@@ -147,6 +147,16 @@ step_robpca <- function(recipe, ..., role = "predictor", trained = FALSE, num_co
 #'
 #' @seealso [rospca()], [step_robpca()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' set.seed(1)
+#' rec <- recipes::recipe(K ~ ., data = dat) |>
+#'   step_rospca(recipes::all_predictors(), num_comp = 2, distances = TRUE)
+#' recipes::bake(recipes::prep(rec), new_data = NULL)
 step_rospca <- function(recipe, ..., role = "predictor", trained = FALSE, num_comp = 2,
                         lambda = 1, options = list(), prefix = "RSPC", distances = FALSE,
                         keep_original_cols = FALSE, res = NULL, columns = NULL,
@@ -180,6 +190,16 @@ step_rospca <- function(recipe, ..., role = "predictor", trained = FALSE, num_co
 #'
 #' @seealso [macropca()], [step_robpca()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' set.seed(1)
+#' rec <- recipes::recipe(K ~ ., data = dat) |>
+#'   step_macropca(recipes::all_predictors(), num_comp = 2)
+#' recipes::bake(recipes::prep(rec), new_data = NULL)
 step_macropca <- function(recipe, ..., role = "predictor", trained = FALSE, num_comp = 2,
                           options = list(), prefix = "MPC", distances = FALSE,
                           keep_original_cols = FALSE, res = NULL, columns = NULL,

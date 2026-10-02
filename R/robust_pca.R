@@ -221,9 +221,9 @@ robpca <- function(x, k = NULL, kmax = 10, alpha = 0.75, ndir = 250, var_explain
 #'
 #' @examples
 #' set.seed(1)
-#' minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
-#' forageLIBS |>
-#'   dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+#' # the 380-430 nm window (Ca II H and K lines)
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' forageLIBS[, which(wl > 380 & wl < 430)] |>
 #'   center() |>
 #'   rospca() |>
 #'   print()
@@ -386,6 +386,7 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE
 #'  - Hubert, M., Rousseeuw, P.J., Van den Bossche, W. (2019). MacroPCA: an
 #'    all-in-one PCA method allowing for missing values as well as cellwise
 #'    and rowwise outliers. Technometrics, 61(4):459-473.
+#'    \doi{10.1080/00401706.2018.1562989}
 #'  - Rousseeuw, P.J., Van den Bossche, W. (2018). Detecting deviating data
 #'    cells. Technometrics, 60(2):135-145.
 #'  - Raymaekers, J., Rousseeuw, P.J. (2021). Fast robust correlation for
@@ -600,6 +601,14 @@ predict.specproc_macropca <- function(object, newdata, ...) {
 #'
 #' @seealso [plot_outlier_map()], which can display new observations.
 #' @export
+#'
+#' @examples
+#' data(forageLIBS)
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+#' set.seed(1)
+#' fit <- robpca(spectra[1:300, ])
+#' head(predict(fit, spectra[301:368, ]))
 predict.specproc_robpca <- function(object, newdata, ...) {
   x <- filter_newdata(object, newdata)
   if (anyNA(x)) {

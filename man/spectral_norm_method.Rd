@@ -16,6 +16,12 @@ A dials \code{qual_param} object.
 \description{
 A dials parameter for the \code{method} of \code{\link[=step_spectral_norm]{step_spectral_norm()}}.
 }
+\examples{
+\dontshow{if (rlang::is_installed("dials")) withAutoprint(\{ # examplesIf}
+spectral_norm_method()
+spectral_norm_method(c("l1", "max"))
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link[=step_spectral_norm]{step_spectral_norm()}}
 }

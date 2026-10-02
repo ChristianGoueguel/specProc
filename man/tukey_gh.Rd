@@ -85,7 +85,7 @@ lty = 1
 \itemize{
 \item Tukey, J.W., (1977).
 Modern techniques in data analysis.
-NSF‐sponsored regional research conference at Southeastern Massachusetts
+NSF-sponsored regional research conference at Southeastern Massachusetts
 University, North Dartmouth, MA.
 \item Martinez, J., Iglewicz, B., (1984).
 Some properties of the Tukey g and h family of distributions.

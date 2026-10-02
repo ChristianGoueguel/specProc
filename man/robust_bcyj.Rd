@@ -84,6 +84,14 @@ applied, and the solution with the lowest objective function value is kept.
 For variables with negative values, only YJ is applied.
 }
 }
+\examples{
+data(forageLIBS)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+# two lines, transformed to central normality
+res <- robust_bcyj(spectra[, c(10, 50)])
+res$summary
+}
 \references{
 \itemize{
 \item Raymaekers, J., Rousseeuw, P.J., (2021). Transforming variables to central normality.

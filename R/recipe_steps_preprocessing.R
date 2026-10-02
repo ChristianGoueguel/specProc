@@ -96,6 +96,16 @@ step_baseline <- function(recipe, ..., role = NA, trained = FALSE,
 #'
 #' @seealso [snv()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+#'   step_snv(recipes::all_predictors())
+#' prepped <- recipes::prep(rec)
+#' recipes::bake(prepped, new_data = dat[301:368, ])
 step_snv <- function(recipe, ..., role = NA, trained = FALSE, columns = NULL,
                      skip = FALSE, id = recipes::rand_id("snv")) {
   rlang::check_installed("recipes")
@@ -133,6 +143,16 @@ step_snv <- function(recipe, ..., role = NA, trained = FALSE, columns = NULL,
 #'
 #' @seealso [msc()], [step_emsc()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+#'   step_msc(recipes::all_predictors())
+#' prepped <- recipes::prep(rec)
+#' recipes::bake(prepped, new_data = dat[301:368, ])
 step_msc <- function(recipe, ..., role = NA, trained = FALSE, robust = TRUE,
                      drop.offset = TRUE, window = NULL, reference = NULL,
                      columns = NULL, skip = FALSE, id = recipes::rand_id("msc")) {
@@ -177,6 +197,16 @@ step_msc <- function(recipe, ..., role = NA, trained = FALSE, robust = TRUE,
 #'
 #' @seealso [emsc()], [step_msc()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+#'   step_emsc(recipes::all_predictors(), degree = 2)
+#' prepped <- recipes::prep(rec)
+#' recipes::bake(prepped, new_data = dat[301:368, ])
 step_emsc <- function(recipe, ..., role = NA, trained = FALSE, degree = 2,
                       interferents = NULL, wavelength = NULL, robust = TRUE,
                       res = NULL, columns = NULL, skip = FALSE,
@@ -210,6 +240,16 @@ step_emsc <- function(recipe, ..., role = NA, trained = FALSE, degree = 2,
 #'
 #' @seealso [pareto_scale()], [step_poisson_scale()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+#'   step_pareto_scale(recipes::all_predictors())
+#' prepped <- recipes::prep(rec)
+#' recipes::bake(prepped, new_data = dat[301:368, ])
 step_pareto_scale <- function(recipe, ..., role = NA, trained = FALSE,
                               scales = NULL, columns = NULL, skip = FALSE,
                               id = recipes::rand_id("pareto_scale")) {
@@ -242,6 +282,16 @@ step_pareto_scale <- function(recipe, ..., role = NA, trained = FALSE,
 #'
 #' @seealso [poisson_scale()], [step_pareto_scale()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+#'   step_poisson_scale(recipes::all_predictors())
+#' prepped <- recipes::prep(rec)
+#' recipes::bake(prepped, new_data = dat[301:368, ])
 step_poisson_scale <- function(recipe, ..., role = NA, trained = FALSE,
                                offset = 3, scales = NULL, columns = NULL,
                                skip = FALSE, id = recipes::rand_id("poisson_scale")) {
@@ -293,6 +343,7 @@ preprocessing_titles <- c(
 )
 
 step_matrix <- function(data, cols) {
+  rlang::check_installed("recipes")
   x <- as.matrix(data[, cols])
   storage.mode(x) <- "double"
   x

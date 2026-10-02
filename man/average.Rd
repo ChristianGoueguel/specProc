@@ -29,7 +29,7 @@ specified grouping column.
 \details{
 The function leverages the power of \code{Rcpp} to perform the mean calculations
 in C++. The underlying C++ implementation has a time complexity of
-\emph{O(n × m)}, where \emph{n} is the number of rows and \emph{m} is
+\emph{O(n x m)}, where \emph{n} is the number of rows and \emph{m} is
 the number of columns in the data. Missing values are ignored in the
 computation of each mean.
 }

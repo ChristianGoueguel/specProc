@@ -67,6 +67,18 @@ row. They are replaced by the corrected values. \link[recipes:tidy.recipe]{tidy(
 returns the selected \code{terms}, the \code{reference} value of each (\code{NA} before
 the step is trained) and \code{id}.
 }
+\examples{
+\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+  step_msc(recipes::all_predictors())
+prepped <- recipes::prep(rec)
+recipes::bake(prepped, new_data = dat[301:368, ])
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link[=msc]{msc()}}, \code{\link[=step_emsc]{step_emsc()}}
 }

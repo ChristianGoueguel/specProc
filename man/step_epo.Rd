@@ -67,6 +67,24 @@ The selected columns are replaced by the corrected values (not centered).
 \code{num_comp} can be tuned with \code{\link[tune:tune]{tune::tune()}}. \link[recipes:tidy.recipe]{tidy()}
 returns the selected \code{terms}, \code{num_comp} and \code{id}.
 }
+\examples{
+\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+# the three samples measured twice
+twice <- forageLIBS$Sample[duplicated(forageLIBS$Sample)]
+first <- match(twice, forageLIBS$Sample)
+second <- vapply(twice, function(s) max(which(forageLIBS$Sample == s)), integer(1))
+# their differences describe the variation between repeated measurements
+clutter <- as.matrix(dat[second, -1]) - as.matrix(dat[first, -1])
+rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+  step_epo(recipes::all_predictors(), clutter = clutter, num_comp = 1)
+prepped <- recipes::prep(rec)
+recipes::bake(prepped, new_data = dat[301:368, ])
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link[=epo]{epo()}}, \code{\link[=predict.specproc_filter]{predict.specproc_filter()}}
 }

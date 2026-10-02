@@ -27,6 +27,14 @@ Projects new observations onto a robust PCA model fitted by \code{\link[=robpca]
 \code{\link[=rospca]{rospca()}} or \code{\link[=macropca]{macropca()}}, and computes their score and orthogonal
 distances with the cut-offs of the calibration data.
 }
+\examples{
+data(forageLIBS)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+set.seed(1)
+fit <- robpca(spectra[1:300, ])
+head(predict(fit, spectra[301:368, ]))
+}
 \seealso{
 \code{\link[=plot_outlier_map]{plot_outlier_map()}}, which can display new observations.
 }

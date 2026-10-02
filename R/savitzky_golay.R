@@ -128,6 +128,10 @@ step_savgol <- function(recipe, ..., window = 11, order = 2, derivative = 0, seg
 #' @return A dials `quant_param` object.
 #' @seealso [step_savgol()]
 #' @export
+#'
+#' @examplesIf rlang::is_installed("dials")
+#' savgol_derivative()
+#' dials::value_seq(savgol_derivative(), 3)
 savgol_derivative <- function(range = c(0L, 2L), trans = NULL) {
   rlang::check_installed("dials")
   dials::new_quant_param(type = "integer", range = range, inclusive = c(TRUE, TRUE),

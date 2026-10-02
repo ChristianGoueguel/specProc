@@ -194,6 +194,14 @@ emsc_apply <- function(object, x) {
 #'
 #' @seealso [emsc()], [predict.specproc_filter()]
 #' @export
+#'
+#' @examples
+#' data(forageLIBS)
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+#' fit <- emsc(spectra[1:300, ], degree = 2)
+#' corrected <- predict(fit, spectra[301:368, ])
+#' dim(corrected)
 predict.specproc_emsc <- function(object, newdata, ...) {
   x <- filter_newdata(object, newdata)
   if (anyNA(x)) {
