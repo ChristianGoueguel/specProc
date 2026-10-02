@@ -253,37 +253,38 @@ Christian L. Goueguel
 
 ``` r
 data(forageLIBS)
-spectra <- forageLIBS[-(1:14)]  # the spectral channels
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
 cal <- 1:300
 fit <- opls(spectra[cal, ], forageLIBS$K[cal], permutation = 5)
 fit
 #> Orthogonal projections to latent structures (OPLS)
 #> 
-#> Variables:               7152
+#> Variables:               245
 #> Observations:            300
 #> Scaling:                 centered
 #> Predictive components:   1
 #> Orthogonal components:   6
 #> 
 #>       R2X(cum) R2Y(cum) Q2(cum) RMSEE pR2Y pQ2
-#> Total    0.906    0.774   0.725 0.253  0.2 0.2
+#> Total    0.995     0.66   0.616 0.311  0.2 0.2
 #> 
 #> Use predict(<model>, newdata, type = ) to filter new data or predict the response.
 head(predict(fit, spectra[-cal, ], type = "response"))
-#> [1] 2.161563 2.250033 2.605931 2.113430 2.075599 1.665393
+#> [1] 1.947951 2.248777 2.443311 1.985011 2.025831 1.736219
 
 # Pareto scaling of the spectra
 opls(pareto_scale(spectra[cal, ]), forageLIBS$K[cal], ncomp = 2)
 #> Orthogonal projections to latent structures (OPLS)
 #> 
-#> Variables:               7152
+#> Variables:               245
 #> Observations:            300
 #> Scaling:                 centered
 #> Predictive components:   1
 #> Orthogonal components:   2
 #> 
 #>       R2X(cum) R2Y(cum) Q2(cum) RMSEE
-#> Total    0.765    0.649   0.608 0.314
+#> Total    0.896    0.596   0.569 0.337
 #> 
 #> Use predict(<model>, newdata, type = ) to filter new data or predict the response.
 ```

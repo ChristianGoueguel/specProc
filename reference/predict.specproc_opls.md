@@ -59,9 +59,10 @@ units of y.
 
 ``` r
 data(forageLIBS)
-spectra <- forageLIBS[-(1:14)]  # the spectral channels
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
 cal <- 1:300
 fit <- opls(spectra[cal, ], forageLIBS$K[cal], ncomp = 2)
 head(predict(fit, spectra[-cal, ], type = "response"))
-#> [1] 2.183732 1.970955 2.324240 1.965858 1.842155 2.075535
+#> [1] 1.977714 2.147724 2.209448 1.998919 2.021025 1.675603
 ```

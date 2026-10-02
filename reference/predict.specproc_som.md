@@ -43,16 +43,18 @@ training spectra (the spectrum fits no known group).
 
 ``` r
 data(forageLIBS)
-spectra <- forageLIBS[-(1:14)]
+# the Na I and K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which((wl > 585 & wl < 595) | (wl > 760 & wl < 780))]
 fit <- som(spectra[1:300, ])
 head(predict(fit, spectra[301:368, ]))
 #> # A tibble: 6 × 5
 #>    unit     x     y     qe novel
 #>   <int> <dbl> <dbl>  <dbl> <lgl>
-#> 1    24  12.5  1.87 29413. FALSE
-#> 2    72  12.5  5.33 39763. TRUE 
-#> 3    46  10.5  3.60 23005. FALSE
-#> 4    36  12    2.73 16719. FALSE
-#> 5    47  11.5  3.60 19377. FALSE
-#> 6    11  11    1    34501. FALSE
+#> 1    23   1    2.73  6712. FALSE
+#> 2     6   6    1    16826. TRUE 
+#> 3    38   5.5  3.60  6112. FALSE
+#> 4    13   2.5  1.87  4720. FALSE
+#> 5     3   3    1     5178. FALSE
+#> 6    45   1    4.46  9293. FALSE
 ```

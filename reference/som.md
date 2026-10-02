@@ -161,18 +161,20 @@ Christian L. Goueguel
 
 ``` r
 data(forageLIBS)
-spectra <- forageLIBS[-(1:14)]
+# the Na I and K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which((wl > 585 & wl < 595) | (wl > 760 & wl < 780))]
 fit <- som(spectra)
 fit
 #> Self-organizing map
 #> 
 #> Spectra:             368
-#> Variables:           7152
-#> Grid:                14 x 7 (hexagonal, 98 units)
-#> Units with spectra:  95
-#> Quantization error:  26330
-#> Topographic error:   0.00815
-#> Beyond the cut-off:  47
+#> Variables:           363
+#> Grid:                11 x 9 (hexagonal, 99 units)
+#> Units with spectra:  94
+#> Quantization error:  8673
+#> Topographic error:   0.00272
+#> Beyond the cut-off:  51
 # where the potassium-rich samples are, and how many samples per unit
 plot_som(fit, type = "mapping", colour = forageLIBS$K)
 

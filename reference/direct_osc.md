@@ -108,8 +108,9 @@ Christian L. Goueguel
 
 ``` r
 data(forageLIBS)
-spectra <- forageLIBS[-(1:14)]  # the spectral channels
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
 res <- direct_osc(spectra, forageLIBS$K, ncomp = 2)
 dim(res$correction)
-#> [1]  368 7152
+#> [1] 368 245
 ```

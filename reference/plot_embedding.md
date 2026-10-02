@@ -261,13 +261,12 @@ Christian L. Goueguel
 # robust PCA of the forage spectra, with the Hotelling's T-squared limit
 if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   data(forageLIBS)
-  spectra_id <- names(forageLIBS)[1:2]
-  minerals <- names(forageLIBS)[3:14]
+  # the 380-430 nm window (Ca II H and K lines)
+  wl <- suppressWarnings(as.numeric(names(forageLIBS)))
   set.seed(1)
-  forageLIBS |>
-    dplyr::select(-dplyr::all_of(c(spectra_id, minerals))) |>
+  forageLIBS[which(wl > 380 & wl < 430)] |>
     center() |>
-    robpca() |>
+    robpca(k = 2) |>
     plot_embedding(hotelling = "all", flag = FALSE, label = TRUE)
 }
 
