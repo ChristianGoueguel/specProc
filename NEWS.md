@@ -1,5 +1,15 @@
 # specProc 0.8.2
 
+## Bug fixes
+
+* `baseline_lsp()` uses the improved modified polynomial fit (IModPoly) of
+  Zhao et al. (2007) by default (`method = "imodpoly"`). The modified
+  polynomial fit of Lieber and Mahadevan-Jansen (2003), still available with
+  `method = "modpoly"`, is pulled up by strong lines, and its baseline could
+  then fall far below the background at the ends of the spectrum (for
+  example above 290 nm in the 240-300 nm window of the `forageLIBS`
+  spectra). The default `max.iter` is now 100.
+
 ## Dependencies
 
 * `ggsci`, `prospectr` and `XICOR` move from Imports to Suggests.

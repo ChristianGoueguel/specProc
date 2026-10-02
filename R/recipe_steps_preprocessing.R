@@ -66,6 +66,19 @@
 #' prepped <- prep(rec)
 #' bake(prepped, new_data = spectra[17:24, ])[, 1:6]
 #'
+#' # five spectra between 240 and 300 nm, before and after the baseline correction
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' region <- forageLIBS[1:5, c(2, which(wl > 240 & wl < 300))]
+#' corrected <- recipe(~ ., data = region) |>
+#'   update_role(Sample, new_role = "id") |>
+#'   step_baseline(all_predictors(), method = "arpls", lambda = 1e5) |>
+#'   prep() |>
+#'   bake(new_data = NULL)
+#' plot_spectra(region, id = Sample) +
+#'   ggplot2::coord_cartesian(ylim = c(500, 3000))
+#' plot_spectra(corrected, id = Sample) +
+#'   ggplot2::coord_cartesian(ylim = c(-200, 2500))
+#'
 step_baseline <- function(recipe, ..., role = NA, trained = FALSE,
                           method = "arpls", lambda = 1e3, degree = 4,
                           options = list(), columns = NULL, skip = FALSE,

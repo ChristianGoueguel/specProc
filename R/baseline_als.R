@@ -44,11 +44,20 @@
 #' data(forageLIBS)
 #' spectrum <- forageLIBS[1, -(1:14)]
 #' wl <- as.numeric(names(spectrum))
-#' region <- spectrum[wl > 240 & wl < 300]
-#' res <- baseline_als(region, lambda = 1e5, p = 0.01)
-#' plot(wl[wl > 240 & wl < 300], unlist(region), type = "l", col = "grey40",
-#'      ylim = c(800, 3000), xlab = "Wavelength (nm)", ylab = "Counts")
-#' lines(wl[wl > 240 & wl < 300], unlist(res$background), col = "red")
+#' in_region <- wl > 240 & wl < 300
+#' region <- spectrum[in_region]
+#' res <- baseline_als(region, lambda = 1e6)
+#' oldpar <- par(mfrow = c(2, 1), mar = c(4, 4, 2, 1))
+#' # the spectrum and its fitted baseline
+#' plot(wl[in_region], unlist(region), type = "l", col = "grey40", ylim = c(800, 3000),
+#'      xlab = "Wavelength (nm)", ylab = "Counts", main = "Spectrum and baseline")
+#' lines(wl[in_region], unlist(res$background), col = "red")
+#' # the corrected spectrum: the background is now around zero
+#' plot(wl[in_region], unlist(res$correction), type = "l", col = "grey40",
+#'      ylim = c(-200, 2000), xlab = "Wavelength (nm)", ylab = "Counts",
+#'      main = "Corrected spectrum")
+#' abline(h = 0, col = "red", lty = 2)
+#' par(oldpar)
 baseline_als <- function(x, lambda = 1e3, p = 0.001, max.iter = 10) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
