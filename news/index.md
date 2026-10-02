@@ -1,6 +1,6 @@
 # Changelog
 
-## specProc 0.8.2
+## specProc 0.8.3
 
 ### New features
 
