@@ -1,7 +1,7 @@
 Package: specProc
 Type: Package
 Title: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy
-Version: 0.8.2
+Version: 0.8.3
 Authors@R:
     person("Christian L.", "Goueguel", , "christian.goueguel@gmail.com",
            role = c("aut", "cre"),

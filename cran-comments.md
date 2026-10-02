@@ -1,6 +1,25 @@
+## Resubmission
+
+This is a resubmission. In this version I have:
+
+* Reduced the check time, which exceeded 10 minutes on Windows
+  (r-devel-windows-x86_64, "Overall checktime 13 min > 10 min"):
+  * The preprocessing vignette applies the baseline correction once,
+    instead of in every recipe and every resample (the results are
+    identical, since this correction estimates nothing from the data).
+  * Three small functions of compiled code, each instantiating a large
+    template of the Eigen library, now use `svd()` in R, which shortens the
+    installation.
+  * The tests that compare the results with those of other packages
+    (ropls, rospca, cellWise) are skipped on CRAN.
+  * The examples of several functions run on a window of the spectra
+    instead of all 7152 channels.
+* Kept the possibly misspelled words in DESCRIPTION, which are explained
+  below.
+
 ## Submission
 
-This is a new submission.
+This is a new submission (the package is not yet on CRAN).
 
 ## Test environments
 
@@ -24,9 +43,10 @@ This is a new submission.
 
 ## Suggested packages
 
-* `mixOmics` and `ropls` are Bioconductor packages. They are only used in
-  the tests, as references for the results, and the tests are skipped when
-  they are not installed.
+* `mixOmics` and `ropls` are Bioconductor packages. `ropls` is only used in
+  the tests, as a reference for the results (skipped on CRAN and when it is
+  not installed). `mixOmics` is the PLS engine of a vignette and of some
+  tests, which are skipped when it is not installed.
 * All suggested packages are used conditionally (`rlang::check_installed()`,
   `rlang::is_installed()`, `skip_if_not_installed()` or `@examplesIf`).
 
