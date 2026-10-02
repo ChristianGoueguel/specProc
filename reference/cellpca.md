@@ -229,8 +229,8 @@ fit
 #> 
 #>            regular      good leverage orthogonal outlier       bad leverage 
 #>                255                  1                 90                 22 
-# the observations with the lowest casewise weights
-head(sort(fit$case_weights))
-#> [1] 0 0 0 0 0 0
-plot_outlier_map(fit)
+plot_outlier_map(fit, shade = TRUE, relative = TRUE, log = TRUE, colour_by = "distance")
+
+plot_cell_map(fit, order = "od")
+
 ```

@@ -72,9 +72,9 @@ macropca(
 
 - maxiter, tol:
 
-  The maximum number of iterations of step 3, and the tolerance on the
-  largest angle (in radians) between successive subspaces. Defaults are
-  20 and 0.005, as in the paper.
+  The maximum number of iterations of step 4, and the tolerance on the
+  largest angle between successive subspaces (as a fraction of a right
+  angle). Defaults are 20 and 0.005, as in the paper.
 
 ## Value
 
@@ -92,60 +92,71 @@ and:
 - `imputed`: the data with the missing values imputed by the PCA fit
   (the flagged cells keep their values).
 
-- `resid_center`, `resid_scale`: the robust center and scale of the
-  residuals of each variable, used to standardize those of new data.
+- `resid_scale`: the robust scale of the residuals of each variable,
+  used to standardize those of new data.
 
 ## Details
 
-The algorithm follows the steps of Hubert, Rousseeuw and Van den Bossche
-(2019): 0. **Deviating cells.** The cells that deviate from the values
-predicted by the most correlated variables, and the outlying
-observations, are detected by the DDC of Rousseeuw and Van den Bossche
-(2018), which also imputes the flagged and missing cells. The neighbor
-search and the predictions of DDC are computed in C++, by blocks of
-variables, so that spectra with thousands of channels are handled
-quickly.
+The algorithm follows Hubert, Rousseeuw and Van den Bossche (2019) and
+the MacroPCA code of the cellWise package, whose results it reproduces
+(with `scale = FALSE`): 0. **Deviating cells.** The cells that deviate
+from the values predicted by the most correlated variables, and the
+outlying observations, are detected by the DDC of Rousseeuw and Van den
+Bossche (2018), computed in C++ as in cellWise (for more than 750
+variables, the neighbors are those with the largest wrapped
+correlations, found exactly by blocks of variables). DDC also imputes
+the flagged and missing cells. Of the observations flagged by DDC, at
+most the \\n - h\\ most outlying are set aside.
 
-1.  **Projection pursuit.** As in
+1.  **Standardization.** With `scale = TRUE`, the variables are divided
+    by their robust scale (1-step M-estimator).
+
+2.  **Projection pursuit.** As in
     [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
-    the Stahel-Donoho outlyingness (with `ndir` directions) is computed
-    on the data in which only the missing cells of the observations
-    flagged by DDC are imputed (imputing their outlying cells could mask
-    them), and the flagged cells of the `h` unflagged observations with
-    the fewest flagged cells are imputed. The `h` least outlying
-    observations not flagged by DDC form the set \\H_0\\.
+    the outlyingness of each observation is its largest standardized
+    distance (with the univariate MCD) over `ndir` directions through
+    pairs of observations (all pairs when there are few), on the data in
+    which only the `h` observations with the fewest flagged cells have
+    their flagged cells imputed. The `h` least outlying observations not
+    set aside form \\H_0\\.
 
-2.  **Subspace dimension.** A classical PCA of the observations of
+3.  **Subspace dimension.** A classical PCA of the observations of
     \\H_0\\, with their flagged and missing cells imputed, gives the
     eigenvalues: when `k` is `NULL`, it is the smallest number of
     components that explain `var_explained` of their variance (at most
     `kmax`).
 
-3.  **Iterative subspace estimation.** The missing cells of all the
-    observations, and the flagged cells of the observations of \\H_0\\,
-    are imputed by the fitted values of the current PCA, and the PCA of
+4.  **Iterative subspace estimation.** The flagged and missing cells are
+    imputed by the fitted values of the current PCA, and the PCA of
     \\H_0\\ is refitted, until the largest angle between the old and the
-    new subspace is below `tol` (at most `maxiter` times).
+    new subspace (as a fraction of a right angle) is below `tol` (at
+    most `maxiter` times).
 
-4.  **Reweighting.** The observations whose orthogonal distance is below
-    the cut-off, and not flagged by DDC, form the set \\H^\*\\; their
-    flagged cells are imputed, and the PCA is refitted on them.
+5.  **Reweighting.** The observations whose orthogonal distance is below
+    the cut-off, and not set aside, form \\H^\*\\, and the PCA is
+    refitted on them (with their flagged cells imputed).
 
-5.  **Robust basis.** The center and the eigenvectors within the
-    subspace are estimated by the deterministic MCD (DetMCD) of the
-    scores of \\H^\*\\, so that good leverage observations do not tilt
-    the loadings.
+6.  **Robust basis.** The center and the eigenvectors within the
+    subspace are estimated by concentration steps on the scores of
+    \\H^\*\\ followed by the deterministic MCD (DetMCD), so that good
+    leverage observations do not tilt the loadings.
 
-6.  **Output.** The scores, the orthogonal distances and the cell
-    residuals of all the observations are computed from the data with
-    only the missing cells imputed (by the fit, iteratively). The
-    residuals of each variable are robustly standardized (median and
-    MAD), and the cells beyond \\\sqrt{\chi^2\_{1, 0.99}}\\ are flagged.
+7.  **Distances.** The scores and the distances of all the observations
+    are computed from the data with only the missing cells imputed. The
+    cut-off of the orthogonal distances is computed on the data whose
+    observations of \\H^\*\\ have their flagged cells imputed.
+
+8.  **Residuals.** The residuals of the observed cells are standardized
+    by their 1-step M scale, and the cells beyond \\\sqrt{\chi^2\_{1,
+    0.99}}\\ are flagged.
 
 As in the paper, the cut-offs of the score distances
 (\\\sqrt{\chi^2\_{k, 0.99}}\\) and of the orthogonal distances (the
-Wilson-Hilferty approximation with the 0.99 quantile) are at the 99%
-level.
+Wilson-Hilferty approximation with the univariate MCD and the 0.99
+quantile) are at the 99% level. New observations are analyzed as in
+MacroPCApredict of cellWise: their deviating cells are detected with the
+DDC model of the fit, and their flagged and missing cells are imputed
+iteratively by the fit before their distances are computed.
 
 ## References
 
