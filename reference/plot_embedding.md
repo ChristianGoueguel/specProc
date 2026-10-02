@@ -271,6 +271,7 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
 }
 
 
+# \donttest{
 # UMAP map of the iris flowers, from embed::step_umap(): no lines through
 # the origin, whose position means nothing on such a map
 if (rlang::is_installed(c("recipes", "embed"))) {
@@ -283,4 +284,5 @@ if (rlang::is_installed(c("recipes", "embed"))) {
   plot_embedding(umap, colour = Species, title = "UMAP of the iris flowers")
 }
 
+# }
 ```

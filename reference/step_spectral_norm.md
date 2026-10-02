@@ -105,7 +105,10 @@ Christian L. Goueguel
 ``` r
 if (rlang::is_installed("recipes")) {
   data(forageLIBS)
-  rec <- recipes::recipe(K ~ ., data = forageLIBS[-c(1:10, 12:14)]) |>
+  # potassium and the K I resonance lines
+  wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+  dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+  rec <- recipes::recipe(K ~ ., data = dat) |>
     step_baseline(recipes::all_predictors()) |>
     step_spectral_norm(recipes::all_predictors(), method = "l2") |>
     recipes::prep()

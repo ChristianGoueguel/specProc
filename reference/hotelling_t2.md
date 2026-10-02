@@ -118,7 +118,9 @@ Christian L. Goueguel
 ``` r
 if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   data(forageLIBS)
-  spectra <- forageLIBS[-(1:14)]
+  # the 380-430 nm window (Ca II H and K lines)
+  wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+  spectra <- forageLIBS[which(wl > 380 & wl < 430)]
   pca <- stats::prcomp(spectra)
   t2 <- hotelling_t2(pca, k = 3)
   t2[t2$outlier_97.5, ]
@@ -128,15 +130,15 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
 #> # A tibble: 368 × 7
 #>    sample    t2 limit_95 limit_99 outlier_95 outlier_99     n
 #>     <int> <dbl>    <dbl>    <dbl> <lgl>      <lgl>      <int>
-#>  1      1 0.871     7.76     11.2 FALSE      FALSE        368
-#>  2      2 1.23      7.76     11.2 FALSE      FALSE        368
-#>  3      3 1.99      7.76     11.2 FALSE      FALSE        368
-#>  4      4 4.06      7.76     11.2 FALSE      FALSE        368
-#>  5      5 0.752     7.76     11.2 FALSE      FALSE        368
-#>  6      6 1.58      7.76     11.2 FALSE      FALSE        368
-#>  7      7 5.43      7.76     11.2 FALSE      FALSE        368
-#>  8      8 0.103     7.76     11.2 FALSE      FALSE        368
-#>  9      9 0.868     7.76     11.2 FALSE      FALSE        368
-#> 10     10 2.88      7.76     11.2 FALSE      FALSE        368
+#>  1      1 1.31      7.76     11.2 FALSE      FALSE        368
+#>  2      2 1.15      7.76     11.2 FALSE      FALSE        368
+#>  3      3 0.770     7.76     11.2 FALSE      FALSE        368
+#>  4      4 4.46      7.76     11.2 FALSE      FALSE        368
+#>  5      5 0.903     7.76     11.2 FALSE      FALSE        368
+#>  6      6 0.594     7.76     11.2 FALSE      FALSE        368
+#>  7      7 5.60      7.76     11.2 FALSE      FALSE        368
+#>  8      8 1.16      7.76     11.2 FALSE      FALSE        368
+#>  9      9 1.32      7.76     11.2 FALSE      FALSE        368
+#> 10     10 1.59      7.76     11.2 FALSE      FALSE        368
 #> # ℹ 358 more rows
 ```

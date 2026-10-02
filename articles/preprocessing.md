@@ -96,6 +96,20 @@ corrected <- base |>
   step_baseline(all_predictors(), lambda = 1e5, options = list(max.iter = 20))
 ```
 
+[`step_baseline()`](https://christiangoueguel.com/specProc/reference/step_baseline.md)
+corrects each spectrum on its own and estimates nothing from the
+training data, so it gives the same result inside or outside a
+resampling loop. To avoid repeating it in every recipe and every
+resample below, we apply it once and start the following recipes from
+the corrected spectra:
+
+``` r
+
+corrected_data <- corrected |> prep() |> bake(new_data = NULL)
+base_corrected <- recipe(K ~ ., data = corrected_data) |>
+  update_role(all_of(spectra_id), all_of(setdiff(minerals, "K")), new_role = "id")
+```
+
 ## Normalization
 
 The intensity of every line changes from spectrum to spectrum with the
@@ -129,7 +143,7 @@ normalizations <- list(
 )
 
 imap(normalizations, \(normalize, name) {
-  intensities <- corrected |>
+  intensities <- base_corrected |>
     normalize() |>
     step_line_intensities(all_predictors(), lines = lines) |>
     prep() |>
@@ -175,7 +189,7 @@ smoothed spectrum with 8 times fewer values at `level = 3`:
 
 ``` r
 
-corrected |>
+base_corrected |>
   step_wavelet(all_predictors(), level = 3) |>
   prep() |>
   bake(new_data = NULL) |>
@@ -199,7 +213,7 @@ samples, so the splits keep the spectra of a sample together:
 ``` r
 
 set.seed(1)
-split <- group_initial_split(forageLIBS, group = Sample, prop = 0.8)
+split <- group_initial_split(corrected_data, group = Sample, prop = 0.8)
 training_set <- training(split)
 folds <- group_vfold_cv(training_set, group = Sample, v = 5)
 ```
@@ -211,13 +225,12 @@ standard, or by the carbon standard and a wavelet compression:
 
 ``` r
 
-baseline_step <- \(r) step_baseline(r, all_predictors(), lambda = 1e5, options = list(max.iter = 20))
 carbon_step <- \(r) step_line_ratio(r, all_predictors(), reference = 247.856, window = 0.15)
 
 recipes <- list(
-  SNV = base |> baseline_step() |> step_snv(all_predictors()),
-  carbon = base |> baseline_step() |> carbon_step(),
-  `carbon + wavelet` = base |> baseline_step() |> carbon_step() |>
+  SNV = base_corrected |> step_snv(all_predictors()),
+  carbon = base_corrected |> carbon_step(),
+  `carbon + wavelet` = base_corrected |> carbon_step() |>
     step_wavelet(all_predictors(), level = 3)
 )
 

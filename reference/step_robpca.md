@@ -130,23 +130,25 @@ returns the loadings as a tibble with columns `terms`, `value`,
 ``` r
 library(recipes)
 data(forageLIBS)
-spectra <- forageLIBS[-(1:14)]
+# the 380-430 nm window (Ca II H and K lines)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 set.seed(1)
 rec <- recipe(~ ., data = spectra) |>
   step_robpca(all_predictors(), num_comp = 3, distances = TRUE)
 bake(prep(rec), new_data = NULL)
 #> # A tibble: 368 × 5
-#>        RPC1    RPC2    RPC3 RPC_SD RPC_OD
-#>       <dbl>   <dbl>   <dbl>  <dbl>  <dbl>
-#>  1  -32687. -12474. -17116.  1.49  21629.
-#>  2  -13981. -24566.   8652.  1.23  26145.
-#>  3  -33991. -35791.  -2952.  1.64  26603.
-#>  4  -69163. -30965.  14652.  2.14  30894.
-#>  5   31600.   8062.  -7661.  0.893 16572.
-#>  6   -5945. -24234.  10575.  1.27  12465.
-#>  7 -104498.  -8097. -13373.  2.27  50979.
-#>  8    7033.   -975.  -7733.  0.580 17179.
-#>  9   32048.   7168.  -8145.  0.909 19290.
-#> 10  -70038.  23214.  -5782.  1.72  20868.
+#>       RPC1    RPC2    RPC3 RPC_SD RPC_OD
+#>      <dbl>   <dbl>   <dbl>  <dbl>  <dbl>
+#>  1  15595.   -848.   7049.  1.23   4585.
+#>  2  22905.   6593.  -2477.  1.26  10757.
+#>  3  29122.   -938.  -1470.  1.06   8361.
+#>  4  51124. -16874. -10181.  3.30   8297.
+#>  5 -29159.   2879.   -458.  1.10   9433.
+#>  6  15121.   3329.   1164.  0.718  5557.
+#>  7  53124. -20580.  -4911.  3.42  17121.
+#>  8  -6326.   5495.   6644.  1.29   5966.
+#>  9 -27029.   9313.  -3557.  1.66   8335.
+#> 10  33735.   3858. -10648.  2.11   6894.
 #> # ℹ 358 more rows
 ```
