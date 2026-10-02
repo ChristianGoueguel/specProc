@@ -58,8 +58,8 @@ When you use these data, cite the STARK-B database and the original
 publications, listed in the \code{source} column:
 \itemize{
 \item Sahal-Bréchot, S., Dimitrijević, M.S., Moreau, N. STARK-B database,
-\url{https://stark-b.obspm.fr}. Observatoire de Paris and Astronomical
-Observatory of Belgrade.
+\code{stark-b.obspm.fr}. Observatoire de Paris and Astronomical Observatory
+of Belgrade (see the References).
 }
 }
 \examples{
@@ -74,7 +74,7 @@ if (!inherits(ca, "try-error")) head(ca)
 \item Sahal-Bréchot, S., Dimitrijević, M.S., Moreau, N., Ben Nessib, N.
 (2015). The STARK-B database VAMDC node: a repository for spectral
 line broadening and shifts due to collisions with charged particles.
-Physica Scripta, 90(5):054008.
+Physica Scripta, 90(5):054008. \doi{10.1088/0031-8949/90/5/054008}
 }
 }
 \seealso{
