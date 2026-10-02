@@ -146,7 +146,7 @@ test_that("macropca detects outlying rows and cells and predicts with missing va
   expect_equal(predict(fit, x[20:30, ])$od, fit$od[20:30], tolerance = 1e-6)
 })
 
-test_that("macropca agrees with cellWise::MacroPCA", {
+test_that("macropca reproduces cellWise::MacroPCA", {
   skip_if_not_installed("cellWise")
   set.seed(13)
   x <- matrix(rnorm(60 * 8), 60, 8) %*% diag(8:1)
@@ -155,11 +155,35 @@ test_that("macropca agrees with cellWise::MacroPCA", {
   x[12, 5] <- NA
   fit <- macropca(x, k = 2)
   ref <- cellWise::MacroPCA(x, k = 2, MacroPCApars = list(alpha = 0.5, silent = TRUE, scale = FALSE))
-  expect_gt(stats::cor(fit$od, ref$OD), 0.95)
-  # nearly the same subspace
-  expect_gt(min(svd(crossprod(fit$loadings, ref$loadings))$d), 0.9)
-  ref_type <- outlier_type(ref$SD, ref$OD, ref$cutoffSD, ref$cutoffOD)
-  expect_true(all(which(ref_type != "regular") %in% which(fit$outlier_type != "regular")))
+  expect_equal(abs(fit$loadings), abs(ref$loadings), tolerance = 1e-8, ignore_attr = TRUE)
+  expect_equal(fit$eigenvalues, ref$eigenvalues, tolerance = 1e-8)
+  expect_equal(fit$center, ref$center, tolerance = 1e-8, ignore_attr = TRUE)
+  expect_equal(fit$od, ref$OD, tolerance = 1e-8, ignore_attr = TRUE)
+  expect_equal(fit$sd, ref$SD, tolerance = 1e-8, ignore_attr = TRUE)
+  expect_equal(fit$cutoff_od, ref$cutoffOD, tolerance = 1e-8)
+  expect_equal(which(fit$flagged_cells), sort(ref$indcells))
+  # new data, as MacroPCApredict
+  new <- x[c(1, 10, 12, 20:25), ]
+  new[4, 6] <- NA
+  pred <- predict(fit, new)
+  ref_pred <- cellWise::MacroPCApredict(new, ref)
+  expect_equal(pred$od, ref_pred$OD, tolerance = 1e-8, ignore_attr = TRUE)
+  expect_equal(pred$sd, ref_pred$SD, tolerance = 1e-8, ignore_attr = TRUE)
+})
+
+test_that("macropca follows the steps of the paper", {
+  set.seed(13)
+  x <- matrix(rnorm(60 * 8), 60, 8) %*% diag(8:1)
+  x[1:3, ] <- x[1:3, ] + 20
+  fit <- macropca(x, k = 2)
+  # rows flagged by DDC, and the 99% cut-offs of the paper
+  expect_type(fit$flagged_rows, "logical")
+  expect_length(fit$flagged_rows, 60L)
+  expect_equal(fit$cutoff_sd, sqrt(stats::qchisq(0.99, 2)))
+  expect_equal(h_alpha_n(0.5, 60, 2), 31)
+  # the scores are those of the data (no missing cells to impute)
+  expect_equal(fit$scores, sweep(x, 2, fit$center) %*% fit$loadings, ignore_attr = TRUE)
+  expect_equal(max_angle(diag(8)[, 1:2], diag(8)[, 1:2]), 0)
 })
 
 test_that("macropca chooses k from the explained variance", {
@@ -178,6 +202,29 @@ test_that("macropca chooses k from the explained variance", {
   scaled <- macropca(x, k = 2, scale = TRUE)
   expect_true(all(scaled$scale != 1))
   expect_false(isTRUE(all.equal(scaled$od, macropca(x, k = 2)$od)))
+})
+
+test_that("ddc reproduces cellWise::DDC", {
+  skip_if_not_installed("cellWise")
+  set.seed(4)
+  f <- matrix(rnorm(80 * 3), 80) %*% matrix(rnorm(3 * 15), 3)
+  x <- f + matrix(rnorm(80 * 15, sd = 0.2), 80)
+  cells <- matrix(runif(80 * 15) < 0.05, 80)
+  x[cells] <- x[cells] + 6
+  x[3, ] <- x[3, ] + 4
+  x[matrix(runif(80 * 15) < 0.03, 80)] <- NA
+  colnames(x) <- paste0("V", 1:15)
+  d <- ddc(x)
+  ref <- suppressMessages(cellWise::DDC(x, list(silent = TRUE)))
+  expect_equal(which(d$flagged_cells), sort(ref$indcells))
+  expect_equal(which(d$flagged_rows), sort(ref$indrows))
+  expect_equal(d$std_resid, ref$stdResid, tolerance = 1e-8, ignore_attr = TRUE)
+  expect_equal(d$imputed, ref$Ximp, tolerance = 1e-8, ignore_attr = TRUE)
+  # new data, as DDCpredict
+  pred <- predict_ddc(d, x[1:10, ])
+  ref_pred <- cellWise::DDCpredict(x[1:10, ], ref)
+  expect_equal(which(pred$flagged_cells), sort(ref_pred$indcells))
+  expect_equal(pred$imputed, ref_pred$Ximp, tolerance = 1e-8, ignore_attr = TRUE)
 })
 
 test_that("ddc flags deviating cells and rows and imputes them", {

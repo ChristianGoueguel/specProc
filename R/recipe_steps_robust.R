@@ -213,20 +213,67 @@ step_macropca <- function(recipe, ..., role = "predictor", trained = FALSE, num_
   ))
 }
 
+#' @title cellPCA Recipe Step
+#'
+#' @description
+#' `step_cellpca()` creates a *specification* of a recipe step that converts
+#' the selected variables into robust principal component scores with
+#' [cellpca()], which weights the outlying cells and observations and
+#' handles missing values.
+#'
+#' @details
+#' As [step_robpca()]. Missing values are allowed in the selected columns,
+#' both when the recipe is prepped and when it is baked. New observations
+#' are projected by the robust regression of their observed cells on the
+#' loadings, so that their outlying cells do not distort their scores.
+#'
+#' @inherit step_robpca return
+#' @inheritParams step_robpca
+#' @param options A list of further arguments passed to [cellpca()], such
+#'   as `alpha`, `maxiter` or `tol`.
+#' @param prefix The prefix of the new column names. Default is `"CPC"`.
+#'
+#' @seealso [cellpca()], [step_macropca()], [step_robpca()]
+#' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' data(forageLIBS)
+#' # potassium and the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+#' set.seed(1)
+#' rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+#'   step_cellpca(recipes::all_predictors(), num_comp = 2, distances = TRUE)
+#' recipes::bake(recipes::prep(rec), new_data = dat[301:368, ])
+step_cellpca <- function(recipe, ..., role = "predictor", trained = FALSE, num_comp = 2,
+                         options = list(), prefix = "CPC", distances = FALSE,
+                         keep_original_cols = FALSE, res = NULL, columns = NULL,
+                         skip = FALSE, id = recipes::rand_id("cellpca")) {
+  rlang::check_installed("recipes")
+  recipes::add_step(recipe, specproc_step_new(
+    "cellpca", terms = rlang::enquos(...), role = role, trained = trained,
+    num_comp = num_comp, options = options, prefix = prefix, distances = distances,
+    keep_original_cols = keep_original_cols, res = res, columns = columns,
+    skip = skip, id = id
+  ))
+}
+
 # ---- internals ---------------------------------------------------------------
 
 robust_titles <- c(
   robust_bcyj = "Robust Box-Cox/Yeo-Johnson transformation on ",
   robpca = "Robust PCA (ROBPCA) on ",
   rospca = "Robust sparse PCA (ROSPCA) on ",
-  macropca = "MacroPCA on "
+  macropca = "MacroPCA on ",
+  cellpca = "cellPCA on "
 )
 
 
 # Keeps only what predict() needs from a robust PCA model.
 strip_robust_pca <- function(fit) {
   drop <- c("scores", "sd", "od", "outlier_type", "H0", "H1", "H2", "H3", "std_resid",
-            "flagged_cells", "imputed")
+            "flagged_cells", "flagged_rows", "imputed", "fitted", "cell_weights", "case_weights",
+            "deviation", "scores_imputed")
   fit[drop] <- NULL
   fit
 }
@@ -235,9 +282,11 @@ prep_robust_step <- function(x, training, info = NULL, ...) {
   cols <- step_predictors(x, training, info)
   step <- class(x)[1]
   xmat <- step_matrix(training, cols)
-  if (step != "step_macropca" && length(cols) > 0 && anyNA(xmat)) {
+  if (!step %in% c("step_macropca", "step_cellpca") && length(cols) > 0 && anyNA(xmat)) {
     stop("`", step, "()` does not handle missing values; impute them first",
-         if (step %in% c("step_robpca", "step_rospca")) " or use `step_macropca()`" else "",
+         if (step %in% c("step_robpca", "step_rospca")) {
+           " or use `step_macropca()` or `step_cellpca()`"
+         } else "",
          ".", call. = FALSE)
   }
   if (length(cols) > 0) {
@@ -249,7 +298,8 @@ prep_robust_step <- function(x, training, info = NULL, ...) {
                                                nbsteps = x$nbsteps, standardize = x$standardize),
       step_robpca = strip_robust_pca(do.call(robpca, c(list(xmat, k = x$num_comp), opts))),
       step_rospca = strip_robust_pca(do.call(rospca, c(list(xmat, k = x$num_comp, lambda = x$lambda), opts))),
-      step_macropca = strip_robust_pca(do.call(macropca, c(list(xmat, k = x$num_comp), opts)))
+      step_macropca = strip_robust_pca(do.call(macropca, c(list(xmat, k = x$num_comp), opts))),
+      step_cellpca = strip_robust_pca(do.call(cellpca, c(list(xmat, k = x$num_comp), opts)))
     )
   }
   if (step != "step_robust_bcyj") {
@@ -345,6 +395,8 @@ prep.step_robpca <- prep_robust_step
 prep.step_rospca <- prep_robust_step
 #' @exportS3Method recipes::prep
 prep.step_macropca <- prep_robust_step
+#' @exportS3Method recipes::prep
+prep.step_cellpca <- prep_robust_step
 
 #' @exportS3Method recipes::bake
 bake.step_robust_bcyj <- bake_robust_step
@@ -354,6 +406,8 @@ bake.step_robpca <- bake_robust_step
 bake.step_rospca <- bake_robust_step
 #' @exportS3Method recipes::bake
 bake.step_macropca <- bake_robust_step
+#' @exportS3Method recipes::bake
+bake.step_cellpca <- bake_robust_step
 
 #' @export
 print.step_robust_bcyj <- print_robust_step
@@ -363,6 +417,8 @@ print.step_robpca <- print_robust_step
 print.step_rospca <- print_robust_step
 #' @export
 print.step_macropca <- print_robust_step
+#' @export
+print.step_cellpca <- print_robust_step
 
 #' @exportS3Method generics::tidy
 tidy.step_robust_bcyj <- tidy_robust_step
@@ -372,6 +428,8 @@ tidy.step_robpca <- tidy_robust_step
 tidy.step_rospca <- tidy_robust_step
 #' @exportS3Method generics::tidy
 tidy.step_macropca <- tidy_robust_step
+#' @exportS3Method generics::tidy
+tidy.step_cellpca <- tidy_robust_step
 
 #' @exportS3Method generics::tunable
 tunable.step_robust_bcyj <- tunable_robust_step
@@ -381,6 +439,8 @@ tunable.step_robpca <- tunable_robust_step
 tunable.step_rospca <- tunable_robust_step
 #' @exportS3Method generics::tunable
 tunable.step_macropca <- tunable_robust_step
+#' @exportS3Method generics::tunable
+tunable.step_cellpca <- tunable_robust_step
 
 #' @exportS3Method generics::required_pkgs
 required_pkgs.step_robust_bcyj <- required_pkgs_robust_step
@@ -390,3 +450,5 @@ required_pkgs.step_robpca <- required_pkgs_robust_step
 required_pkgs.step_rospca <- required_pkgs_robust_step
 #' @exportS3Method generics::required_pkgs
 required_pkgs.step_macropca <- required_pkgs_robust_step
+#' @exportS3Method generics::required_pkgs
+required_pkgs.step_cellpca <- required_pkgs_robust_step

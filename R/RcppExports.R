@@ -5,6 +5,22 @@ whittaker_baseline_cpp <- function(x, lambda, param, max_iter, method) {
     .Call(`_specProc_whittaker_baseline_cpp`, x, lambda, param, max_iter, method)
 }
 
+scale_tanh_cols_cpp <- function(x) {
+    .Call(`_specProc_scale_tanh_cols_cpp`, x)
+}
+
+rho_tanh_cpp <- function(z, b1 = 1.5) {
+    .Call(`_specProc_rho_tanh_cpp`, z, b1)
+}
+
+cellpca_irls_cpp <- function(x, m, V0, U0, mu0, sigma1, sigma2, par2, b1, maxiter, tol, max_col_frac) {
+    .Call(`_specProc_cellpca_irls_cpp`, x, m, V0, U0, mu0, sigma1, sigma2, par2, b1, maxiter, tol, max_col_frac)
+}
+
+cellpca_predict_cpp <- function(x, m, V, mu, sigma1, b1, maxiter, tol) {
+    .Call(`_specProc_cellpca_predict_cpp`, x, m, V, mu, sigma1, b1, maxiter, tol)
+}
+
 col_medians_cpp <- function(x, na_rm) {
     .Call(`_specProc_col_medians_cpp`, x, na_rm)
 }
@@ -17,12 +33,20 @@ computeMeans <- function(data) {
     .Call(`_specProc_computeMeans`, data)
 }
 
-ddc_neighbors_cpp <- function(u, corrlim, maxnb, min_abs, block) {
-    .Call(`_specProc_ddc_neighbors_cpp`, u, corrlim, maxnb, min_abs, block)
+ddc_core_cpp <- function(x, tol_prob, corrlim, maxnb, fast, block) {
+    .Call(`_specProc_ddc_core_cpp`, x, tol_prob, corrlim, maxnb, fast, block)
 }
 
-ddc_predict_cpp <- function(u, index, correlation, slope) {
-    .Call(`_specProc_ddc_predict_cpp`, u, index, correlation, slope)
+ddc_apply_cpp <- function(x, loc, scale, ngbrs, weights, slopes, deshrink, res_scale, standalone, tol_prob, med_ti, mad_ti) {
+    .Call(`_specProc_ddc_apply_cpp`, x, loc, scale, ngbrs, weights, slopes, deshrink, res_scale, standalone, tol_prob, med_ti, mad_ti)
+}
+
+unimcd_cpp <- function(x, alpha) {
+    .Call(`_specProc_unimcd_cpp`, x, alpha)
+}
+
+scale_1step_cols_cpp <- function(x) {
+    .Call(`_specProc_scale_1step_cols_cpp`, x)
 }
 
 epo_cpp <- function(X, D, ncomp) {

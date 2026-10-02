@@ -17,8 +17,8 @@ plot_outlier_map(
 )
 }
 \arguments{
-\item{object}{An object returned by \code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}} or
-\code{\link[=macropca]{macropca()}}.}
+\item{object}{An object returned by \code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}},
+\code{\link[=macropca]{macropca()}} or \code{\link[=cellpca]{cellpca()}}.}
 
 \item{newdata}{Optional new observations to add to the map (a numeric
 matrix or data frame with the calibration variables).}
@@ -60,8 +60,11 @@ A ggplot object.
 }
 \description{
 Plots the orthogonal distance of each observation against its score
-distance, for a robust PCA fitted by \code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}} or
-\code{\link[=macropca]{macropca()}} (Hubert, Rousseeuw and Vanden Branden, 2005).
+distance, for a robust PCA fitted by \code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}},
+\code{\link[=macropca]{macropca()}} or \code{\link[=cellpca]{cellpca()}} (Hubert, Rousseeuw and Vanden Branden, 2005).
+For \code{\link[=cellpca]{cellpca()}}, the vertical axis is the norm of the standardized
+residuals, as in the enhanced outlier map of Centofanti, Hubert and
+Rousseeuw.
 }
 \details{
 The dashed lines are the cut-offs of the two distances. They divide the

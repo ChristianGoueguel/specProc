@@ -17,11 +17,12 @@ reference:
 - subtitle: robust PCA
   desc: >
     Principal component analysis that resists outlying observations
-    (and, for MacroPCA, outlying cells and missing values).
+    (and, for MacroPCA and cellPCA, outlying cells and missing values).
   contents:
   - robpca
   - rospca
   - macropca
+  - cellpca
   - predict.specproc_robpca
   - plot_outlier_map
   - plot_cell_map
@@ -99,6 +100,7 @@ reference:
   - step_robpca
   - step_rospca
   - step_macropca
+  - step_cellpca
 
 - subtitle: orthogonalization
   contents:

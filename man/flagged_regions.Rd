@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_robust_pca.R
 \name{flagged_regions}
 \alias{flagged_regions}
-\title{Flagged Regions of a MacroPCA Fit}
+\title{Flagged Regions of a MacroPCA or cellPCA Fit}
 \usage{
 flagged_regions(
   object,
@@ -14,7 +14,7 @@ flagged_regions(
 )
 }
 \arguments{
-\item{object}{An object returned by \code{\link[=macropca]{macropca()}}.}
+\item{object}{An object returned by \code{\link[=macropca]{macropca()}} or \code{\link[=cellpca]{cellpca()}}.}
 
 \item{threshold}{The share of flagged observations above which channels
 form a flagged region. Default is 0.1.}
@@ -39,7 +39,7 @@ number, of the largest share), \code{channels} (the number of channels),
 }
 \description{
 Lists the wavelength regions where many observations have cells flagged
-by \code{\link[=macropca]{macropca()}}: runs of adjacent channels (on the same detector segment)
+by \code{\link[=macropca]{macropca()}} or \code{\link[=cellpca]{cellpca()}}: runs of adjacent channels (on the same detector segment)
 whose share of flagged observations is at least \code{threshold}. These are
 the channels that persistently deviate from the PCA fit, for example
 emission lines affected by self-absorption, saturation or matrix

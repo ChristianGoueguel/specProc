@@ -2,10 +2,13 @@
 % Please edit documentation in R/robust_pca.R
 \name{predict.specproc_macropca}
 \alias{predict.specproc_macropca}
+\alias{predict.specproc_cellpca}
 \alias{predict.specproc_robpca}
 \title{Scores and Distances of New Observations}
 \usage{
 \method{predict}{specproc_macropca}(object, newdata, ...)
+
+\method{predict}{specproc_cellpca}(object, newdata, ...)
 
 \method{predict}{specproc_robpca}(object, newdata, ...)
 }

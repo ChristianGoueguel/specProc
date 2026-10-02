@@ -319,42 +319,66 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE
 #'
 #' @description
 #' Robust PCA that handles both outlying observations (casewise outliers),
-#' outlying cells (cellwise outliers) and missing values, after the MacroPCA
-#' algorithm of Hubert, Rousseeuw and Van den Bossche (2019). The results
-#' have the same form as those of [robpca()], so that
-#' [predict()][predict.specproc_robpca] and [plot_outlier_map()] work the
-#' same way, and [plot_cell_map()] shows the outlying cells.
+#' outlying cells (cellwise outliers) and missing values, by the MacroPCA
+#' algorithm of Hubert, Rousseeuw and Van den Bossche (2019), which combines
+#' the detection of deviating cells (DDC) with the steps of ROBPCA (Hubert,
+#' Rousseeuw and Vanden Branden, 2005). The results have the same form as
+#' those of [robpca()], so that [predict()][predict.specproc_robpca] and
+#' [plot_outlier_map()] work the same way, and [plot_cell_map()] shows the
+#' outlying cells. [cellpca()] starts from a MacroPCA fit.
 #'
 #' @details
-#' The algorithm has four steps:
-#'  1. **Deviating cells.** The cells that deviate from the values predicted
-#'     by the most correlated variables are detected and imputed by the
-#'     detection of deviating cells (DDC) of Rousseeuw and Van den Bossche
-#'     (2018), as are the missing values. The neighbor search and the
-#'     predictions of DDC are computed in C++, by blocks of variables, so
-#'     that spectra with thousands of channels are handled quickly.
-#'  2. **Initial subspace.** The `h` observations with the smallest
-#'     Stahel-Donoho outlyingness (as in [robpca()], with `ndir` directions)
-#'     give an initial PCA of the imputed data. When `k` is `NULL`, it is the
-#'     smallest number of components that explain `var_explained` of the
-#'     variance of these observations (at most `kmax`).
-#'  3. **Iterations.** The flagged and missing cells are imputed by the
-#'     fitted values of the current PCA, the observations within the cut-off
-#'     of the orthogonal distances are kept, and the PCA is refitted on them,
-#'     until the subspace changes by less than `tol` (at most `maxiter`
-#'     times).
-#'  4. **Final fit.** The center and the eigenvalues are re-estimated by the
-#'     minimum covariance determinant of the scores, as in [robpca()].
+#' The algorithm follows Hubert, Rousseeuw and Van den Bossche (2019) and
+#' the MacroPCA code of the cellWise package, whose results it reproduces
+#' (with `scale = FALSE`):
+#'  0. **Deviating cells.** The cells that deviate from the values predicted
+#'     by the most correlated variables, and the outlying observations, are
+#'     detected by the DDC of Rousseeuw and Van den Bossche (2018), computed
+#'     in C++ as in cellWise (for more than 750 variables, the neighbors are
+#'     those with the largest wrapped correlations, found exactly by blocks
+#'     of variables). DDC also imputes the flagged and missing cells. Of the
+#'     observations flagged by DDC, at most the \eqn{n - h} most outlying
+#'     are set aside.
+#'  1. **Standardization.** With `scale = TRUE`, the variables are divided
+#'     by their robust scale (1-step M-estimator).
+#'  2. **Projection pursuit.** As in [robpca()], the outlyingness of each
+#'     observation is its largest standardized distance (with the univariate
+#'     MCD) over `ndir` directions through pairs of observations (all pairs
+#'     when there are few), on the data in which only the `h` observations
+#'     with the fewest flagged cells have their flagged cells imputed. The
+#'     `h` least outlying observations not set aside form \eqn{H_0}.
+#'  3. **Subspace dimension.** A classical PCA of the observations of
+#'     \eqn{H_0}, with their flagged and missing cells imputed, gives the
+#'     eigenvalues: when `k` is `NULL`, it is the smallest number of
+#'     components that explain `var_explained` of their variance (at most
+#'     `kmax`).
+#'  4. **Iterative subspace estimation.** The flagged and missing cells are
+#'     imputed by the fitted values of the current PCA, and the PCA of
+#'     \eqn{H_0} is refitted, until the largest angle between the old and
+#'     the new subspace (as a fraction of a right angle) is below `tol` (at
+#'     most `maxiter` times).
+#'  5. **Reweighting.** The observations whose orthogonal distance is below
+#'     the cut-off, and not set aside, form \eqn{H^*}, and the PCA is
+#'     refitted on them (with their flagged cells imputed).
+#'  6. **Robust basis.** The center and the eigenvectors within the subspace
+#'     are estimated by concentration steps on the scores of \eqn{H^*}
+#'     followed by the deterministic MCD (DetMCD), so that good leverage
+#'     observations do not tilt the loadings.
+#'  7. **Distances.** The scores and the distances of all the observations
+#'     are computed from the data with only the missing cells imputed. The
+#'     cut-off of the orthogonal distances is computed on the data whose
+#'     observations of \eqn{H^*} have their flagged cells imputed.
+#'  8. **Residuals.** The residuals of the observed cells are standardized by
+#'     their 1-step M scale, and the cells beyond
+#'     \eqn{\sqrt{\chi^2_{1, 0.99}}} are flagged.
 #'
-#' The residuals of each variable are robustly standardized (median and
-#' MAD), and the cells beyond \eqn{\sqrt{\chi^2_{1, 0.99}}} are flagged. The
-#' scores of each observation are then computed with its flagged and missing
-#' cells imputed by the fit (iteratively, as for new data with
-#' [predict()][predict.specproc_robpca]), while its orthogonal distance and
-#' cell residuals use its observed cells, so that the deviating cells of an
-#' observation count in its orthogonal distance. The cut-offs of the score
-#' and orthogonal distances are those of [robpca()], so that the outlier
-#' maps of the robust PCA methods of specProc can be compared.
+#' As in the paper, the cut-offs of the score distances
+#' (\eqn{\sqrt{\chi^2_{k, 0.99}}}) and of the orthogonal distances (the
+#' Wilson-Hilferty approximation with the univariate MCD and the 0.99
+#' quantile) are at the 99% level. New observations are analyzed as in
+#' MacroPCApredict of cellWise: their deviating cells are detected with the
+#' DDC model of the fit, and their flagged and missing cells are imputed
+#' iteratively by the fit before their distances are computed.
 #'
 #' @param x A numeric matrix or data frame, with one observation per row.
 #'   Missing values are allowed.
@@ -370,29 +394,35 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE
 #'   not outweighed by noise and continuum channels).
 #' @param ndir The number of random directions of the outlyingness, or `"all"`.
 #'   Default is 250.
-#' @param maxiter,tol The maximum number of iterations and the tolerance on
-#'   the change of the subspace. Defaults are 20 and 1e-4.
+#' @param maxiter,tol The maximum number of iterations of step 4, and the
+#'   tolerance on the largest angle between successive subspaces (as a
+#'   fraction of a right angle). Defaults are 20 and 0.005, as in the paper.
 #'
 #' @return An object of class `specproc_macropca` (inheriting from
 #'   `specproc_robpca`), with the components described in [robpca()], and:
 #'  - `std_resid`: the standardized cell residuals (`NA` for missing cells).
 #'  - `flagged_cells`: a logical matrix of the flagged cells.
+#'  - `flagged_rows`: the observations flagged by DDC.
 #'  - `imputed`: the data with the missing values imputed by the PCA fit
 #'    (the flagged cells keep their values).
-#'  - `resid_center`, `resid_scale`: the robust center and scale of the
-#'    residuals of each variable, used to standardize those of new data.
+#'  - `resid_scale`: the robust scale of the residuals of each variable,
+#'    used to standardize those of new data.
 #'
 #' @references
 #'  - Hubert, M., Rousseeuw, P.J., Van den Bossche, W. (2019). MacroPCA: an
 #'    all-in-one PCA method allowing for missing values as well as cellwise
 #'    and rowwise outliers. Technometrics, 61(4):459-473.
 #'    \doi{10.1080/00401706.2018.1562989}
+#'  - Hubert, M., Rousseeuw, P.J., Vanden Branden, K. (2005). ROBPCA: a new
+#'    approach to robust principal component analysis. Technometrics,
+#'    47(1):64-79.
 #'  - Rousseeuw, P.J., Van den Bossche, W. (2018). Detecting deviating data
 #'    cells. Technometrics, 60(2):135-145.
-#'  - Raymaekers, J., Rousseeuw, P.J. (2021). Fast robust correlation for
-#'    high-dimensional data. Technometrics, 63(2):184-198.
+#'  - Hubert, M., Rousseeuw, P.J., Verdonck, T. (2012). A deterministic
+#'    algorithm for robust location and scatter. Journal of Computational
+#'    and Graphical Statistics, 21(3):618-637.
 #'
-#' @seealso [robpca()], [step_macropca()], [plot_outlier_map()],
+#' @seealso [cellpca()], [robpca()], [step_macropca()], [plot_outlier_map()],
 #'   [plot_cell_map()]
 #'
 #' @export macropca
@@ -410,7 +440,7 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE
 #' }
 #'
 macropca <- function(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, scale = FALSE,
-                     ndir = 250, maxiter = 20, tol = 1e-4) {
+                     ndir = 250, maxiter = 20, tol = 0.005) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -423,147 +453,626 @@ macropca <- function(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, s
   check_flag(scale, "scale")
   check_count(maxiter, "maxiter")
   check_number(tol, "tol", lower = 0, lower_open = TRUE)
+  if (!identical(ndir, "all")) check_count(ndir, "ndir")
   n <- nrow(x)
-  missing_cells <- is.na(x)
-
-  # Step 1: deviating cells
-  cells <- ddc(x)
-  sc <- if (scale) cells$scale else rep(1, ncol(x))
-  y_na <- sweep(x, 2, sc, "/")
-  replace <- cells$flagged_cells | missing_cells
-  y <- y_na
-  y[replace] <- (cells$imputed / rep(sc, each = n))[replace]
-
-  # Step 2: initial subspace from the h least outlying observations
-  red <- svd_reduce(y)
-  kmax <- min(kmax, ncol(red$z), n - 1)
-  h <- robust_h(n, alpha, kmax)
-  H <- least_outlying(red$z, h, ndir)
-  pca <- macropca_pca(y[H, , drop = FALSE])
-  if (is.null(k)) {
-    k <- choose_k(pca$values, kmax, var_explained)
-  } else if (k > kmax) {
+  d <- ncol(x)
+  kmax <- min(kmax, d)
+  if (!is.null(k) && k > kmax) {
     warning("'k' reduced to ", kmax, ".", call. = FALSE)
     k <- kmax
   }
+  h <- h_alpha_n(alpha, n, if (is.null(k)) kmax else k)
+  missing_cells <- is.na(x)
+
+  # Deviating cells, and the most outlying of the rows flagged by DDC
+  cells <- ddc(x)
+  Ti <- abs(cells$Ti)
+  Ti[is.na(Ti)] <- 0
+  rows_ddc <- intersect(order(Ti, decreasing = TRUE)[seq_len(n - h)],
+                        which(Ti > sqrt(stats::qchisq(0.99, 1))))
+  imputable <- cells$flagged_cells | missing_cells
+
+  # Step 1: standardization
+  sc <- if (scale) loc_scale_1step(x)$scale else rep(1, d)
+  sc[!is.finite(sc) | sc <= 0] <- 1
+  x_obs <- sweep(x, 2, sc, "/")
+  x_all <- x_obs
+  x_all[imputable] <- (cells$imputed / rep(sc, each = n))[imputable]
+  x_na <- x_obs
+  x_na[missing_cells] <- x_all[missing_cells]
+  rank <- trunc_pc(x_all)$rank
+  if (rank == 0) stop("All observations collapse.", call. = FALSE)
+
+  # Step 2: projection pursuit, on the data where only the h rows with the
+  # fewest flagged cells (the rows flagged by DDC excluded) are cell-imputed
+  flagged_per_row <- rowSums(cells$flagged_cells)
+  flagged_per_row[rows_ddc] <- d
+  others <- setdiff(seq_len(n), order(flagged_per_row)[seq_len(h)])
+  x_ci <- x_all
+  x_ci[others, ] <- x_na[others, ]
+  outl <- pp_outlyingness(x_ci, ndir, alpha)
+  H0 <- setdiff(order(outl), rows_ddc)[seq_len(h)]
+  x_ci[others, ] <- x_all[others, ]
+
+  # Step 3: subspace dimension, from the PCA of the cell-imputed rows of H0
+  pca <- trunc_pc(x_ci[H0, , drop = FALSE])
+  kmax <- min(pca$rank, kmax)
+  if (is.null(k)) {
+    k <- choose_k(pca$eigenvalues, kmax, var_explained)
+  }
+  k <- min(k, pca$rank)
+  loadings <- pca$loadings[, seq_len(k), drop = FALSE]
   center <- pca$center
-  loadings <- pca$vectors[, seq_len(k), drop = FALSE]
 
-  # Step 3: impute the flagged and missing cells from the PCA fit, and refit
-  # on the observations within the cut-off of the orthogonal distances
-  for (iter in seq_len(maxiter)) {
-    yc <- sweep(y, 2, center)
-    fitted <- sweep(yc %*% loadings %*% t(loadings), 2, center, "+")
-    y[replace] <- fitted[replace]
-    yc <- sweep(y, 2, center)
-    od <- orthogonal_distance(yc, loadings)
-    keep <- od <= od_cutoff(od, h)
-    if (sum(keep) <= k) keep <- seq_len(n) %in% order(od)[seq_len(h)]
-    pca <- macropca_pca(y[keep, , drop = FALSE])
-    new_loadings <- pca$vectors[, seq_len(k), drop = FALSE]
-    change <- k - sum(crossprod(loadings, new_loadings)^2)
-    center <- pca$center
-    loadings <- new_loadings
-    if (change < tol) break
+  # Step 4: iterative subspace estimation, imputing the flagged and missing
+  # cells by the fit, with the PCA of H0
+  iterations <- 0
+  if (any(imputable) && maxiter > 0) {
+    repeat {
+      iterations <- iterations + 1
+      fitted <- pca_fitted(x_ci, center, loadings)
+      x_ci[imputable] <- fitted[imputable]
+      pca <- trunc_pc(x_ci[H0, , drop = FALSE], k)
+      k <- min(k, pca$rank)
+      new_loadings <- pca$loadings[, seq_len(k), drop = FALSE]
+      change <- max_angle(new_loadings, loadings)
+      loadings <- new_loadings
+      center <- pca$center
+      if (iterations >= maxiter || change <= tol) break
+    }
   }
+  fitted <- pca_fitted(x_ci, center, loadings)
+  x_ci[imputable] <- fitted[imputable]
+  x_na[missing_cells] <- x_ci[missing_cells]
+  x_fi <- x_ci
+  x_ci[-H0, ] <- x_na[-H0, ]
 
-  # Step 4: the scores of each observation with its deviating cells imputed
-  # by the fit (as for new data), starting from the observed cells, so that
-  # a leverage observation whose cells DDC flagged is not kept away from the
-  # subspace by its own imputation; then the center and eigenvalues from the
-  # MCD of these scores
-  names(center) <- colnames(x)
-  res <- list(loadings = loadings, eigenvalues = rep(1, k), center = center, scale = sc,
-              k = as.integer(k), h = as.integer(h), alpha = alpha, cutoff = cells$cutoff)
-  first <- macropca_distances(res, y, y_na, missing_cells, cells$cutoff)
-  res$resid_center <- first$resid_center
-  res$resid_scale <- first$resid_scale
-  start <- y_na
-  start[missing_cells] <- y[missing_cells]
-  scores <- macropca_refine(res, start, y_na, missing_cells)$scores
-  mcd <- if (k == 1) {
-    u <- univariate_mcd_cpp(scores[, 1], h)
-    list(center = u[["location"]], cov = matrix(u[["scale"]]^2), singular = FALSE)
+  # Step 5: reweighting on the orthogonal distances of the cell-imputed data
+  if (k < rank) {
+    od <- orthogonal_distance(sweep(x_ci, 2, center), loadings)
+    H_star <- od <= od_cutoff_unimcd(od, alpha)
+    H_star[rows_ddc] <- FALSE
+    pca <- trunc_pc(x_fi[H_star, , drop = FALSE], k)
+    k <- min(pca$rank, k)
   } else {
-    fast_mcd_cpp(scores, h, 500L)
+    H_star <- seq_len(n) %in% H0
   }
-  if (isTRUE(mcd$singular)) {
-    stop("More than h observations lie on a lower-dimensional subspace of the ",
-         k, "-dimensional PCA space; try a smaller 'k'.", call. = FALSE)
+  x_ci <- x_fi
+  x_ci[!H_star, ] <- x_na[!H_star, ]
+
+  # Step 6: center and basis within the subspace (C-steps, then DetMCD)
+  center <- pca$center
+  rot <- pca$loadings[, seq_len(k), drop = FALSE]
+  n1 <- sum(H_star)
+  h1 <- h_alpha_n(alpha, n1, k)
+  scores1 <- sweep(x_ci[H_star, , drop = FALSE], 2, pca$center) %*% rot
+  mah <- mahalanobis_diag(scores1, pca$eigenvalues[seq_len(k)])
+  old_obj <- prod(pca$eigenvalues[seq_len(k)])
+  for (j in seq_len(100)) {
+    sub <- trunc_pc(scores1[order(mah)[seq_len(h1)], , drop = FALSE], k)
+    obj <- prod(sub$eigenvalues)
+    scores1 <- sweep(scores1, 2, sub$center) %*% sub$loadings
+    center <- center + drop(rot %*% sub$center)
+    rot <- rot %*% sub$loadings
+    mah <- mahalanobis_diag(scores1, sub$eigenvalues)
+    if (sub$rank == k && abs(old_obj - obj) < 1e-12) break
+    old_obj <- obj
+    k <- min(k, sub$rank)
   }
-  e <- eigen(mcd$cov, symmetric = TRUE)
-  res$center <- center <- center + drop(loadings %*% mcd$center)
-  res$loadings <- loadings <- loadings %*% e$vectors
-  res$eigenvalues <- e$values
-  names(res$center) <- colnames(x)
-  final <- macropca_refine(res, start, y_na, missing_cells)
-  res[c("scores", "sd", "od", "std_resid", "flagged_cells")] <-
-    final[c("scores", "sd", "od", "std_resid", "flagged_cells")]
-  res$cutoff_sd <- sqrt(stats::qchisq(0.975, k))
-  res$cutoff_od <- od_cutoff(res$od, h)
+  k <- ncol(rot)
+  inner <- final_mcd(scores1, h1 / n1, obj, mah, k)
+  e <- eigen(inner$cov, symmetric = TRUE)
+  center <- center + drop(rot %*% inner$center)
+  loadings <- rot %*% e$vectors
+  loadings <- sweep(loadings, 2, apply(loadings, 2, function(v) if (v[which.max(abs(v))] < 0) -1 else 1), "*")
+  names(center) <- colnames(x)
+  dimnames(loadings) <- list(colnames(x), paste0("PC", seq_len(k)))
+
+  # Step 7: scores and distances of the NA-imputed data; cut-off of the
+  # orthogonal distances from the cell-imputed data
+  res <- list(loadings = loadings, eigenvalues = e$values, center = center, scale = sc,
+              k = as.integer(k), h = as.integer(h), alpha = alpha, cutoff = cells$cutoff,
+              rank = rank, iterations = iterations)
+  od_ci <- orthogonal_distance(sweep(x_ci, 2, center), loadings)
+  res$cutoff_od <- if (k < rank) od_cutoff_unimcd(od_ci, alpha) else 0
+  res$cutoff_sd <- sqrt(stats::qchisq(0.99, k))
+
+  # Step 8: standardized residuals of the observed cells
+  dist <- macropca_distances(res, x_na, x_obs)
+  res[c("scores", "sd", "od", "std_resid", "flagged_cells", "resid_scale")] <-
+    dist[c("scores", "sd", "od", "std_resid", "flagged_cells", "resid_scale")]
+  res$flagged_rows <- seq_len(n) %in% rows_ddc
   res$outlier_type <- outlier_type(res$sd, res$od, res$cutoff_sd, res$cutoff_od)
-  # the data with the missing values imputed by the fit
-  imputed <- y_na
-  fitted <- sweep(final$scores %*% t(loadings), 2, center, "+")
-  imputed[missing_cells] <- fitted[missing_cells]
-  res$imputed <- sweep(imputed, 2, sc, "*")
+  res$imputed <- sweep(x_na, 2, sc, "*")
   dimnames(res$imputed) <- dimnames(x)
-  colnames(res$loadings) <- colnames(res$scores) <- paste0("PC", seq_len(k))
-  rownames(res$loadings) <- colnames(x)
-  structure(res, variables = colnames(x), nvar = ncol(x),
+  # scores of the fully imputed data, the start of cellpca()
+  res$scores_imputed <- sweep(x_fi, 2, center) %*% loadings
+  res$ddc <- cells[c("center", "scale", "cutoff", "tol_prob", "model")]
+  structure(res, variables = colnames(x), nvar = d,
             class = c("specproc_macropca", "specproc_robpca"))
 }
 
-# Classical PCA (center and eigenvectors) of the rows of y.
-macropca_pca <- function(y) {
-  center <- colMeans(y)
-  s <- svd(sweep(y, 2, center), nu = 0)
-  list(center = center, vectors = s$v, values = s$d^2 / max(nrow(y) - 1, 1))
-}
-
-# Scores, distances and standardized cell residuals of a MacroPCA fit, for
-# the fully imputed data `y` (scores) and the data with only the missing
-# values imputed `y_na` (orthogonal distances and residuals). With
-# `resid_center` and `resid_scale` (new data), the residuals are
-# standardized with those of the calibration data.
-macropca_distances <- function(fit, y, y_na, missing_cells, cutoff, resid_center = NULL,
-                               resid_scale = NULL) {
-  scores <- sweep(y, 2, fit$center) %*% fit$loadings
-  fitted <- sweep(scores %*% t(fit$loadings), 2, fit$center, "+")
-  y_na[missing_cells] <- fitted[missing_cells]
-  resid <- y_na - fitted
-  if (is.null(resid_center)) {
-    resid_center <- apply(resid, 2, stats::median)
-    resid_scale <- apply(resid, 2, stats::mad)
-    resid_scale[!is.finite(resid_scale) | resid_scale <= 0] <- 1
+#' @title Robust PCA by Casewise and Cellwise Weighting (cellPCA)
+#'
+#' @author Christian L. Goueguel
+#'
+#' @description
+#' Robust PCA that handles outlying observations (casewise outliers),
+#' outlying cells (cellwise outliers) and missing values by minimizing a
+#' single objective function: the cellPCA method of Centofanti, Hubert and
+#' Rousseeuw. Each cell and each observation gets a weight between 0 and 1
+#' that reflects its outlyingness, and regular cells and observations are
+#' not downweighted, which makes cellPCA more efficient than [macropca()].
+#' The iterations are computed in C++. The results have the same form as
+#' those of [robpca()], so that [predict()][predict.specproc_robpca],
+#' [plot_outlier_map()] and [plot_cell_map()] work the same way.
+#'
+#' @details
+#' cellPCA approximates the data by a fit \eqn{\hat{X} = 1_n \mu^T + U V^T}
+#' of rank `k` that minimizes
+#' \deqn{\hat\sigma_2^2 \frac{1}{n} \sum_{i=1}^n m_i \rho_2\left(\frac{t_i}{\hat\sigma_2}\right),
+#' \quad t_i = \sqrt{\frac{1}{m_i} \sum_{j=1}^p m_{ij} \hat\sigma_{1,j}^2
+#' \rho_1\left(\frac{x_{ij} - \hat{x}_{ij}}{\hat\sigma_{1,j}}\right)}}
+#' where \eqn{m_{ij}} is 0 for a missing cell and 1 otherwise and \eqn{m_i}
+#' is the number of observed cells of observation \eqn{i}. The bounded
+#' function \eqn{\rho_1} limits the effect of the outlying cells (the
+#' residuals of variable \eqn{j} divided by their scale
+#' \eqn{\hat\sigma_{1,j}}), and \eqn{\rho_2} that of the outlying
+#' observations (the casewise total deviations \eqn{t_i} divided by their
+#' scale \eqn{\hat\sigma_2}). Both are hyperbolic tangent functions (Hampel
+#' et al., 1981): \eqn{\rho_1} with \eqn{b = 1.5} and \eqn{c = 4}, and
+#' \eqn{\rho_2} with \eqn{b} and \eqn{c} the 0.70 and 0.99 quantiles of the
+#' standardized total deviations of simulated Gaussian residuals. Their
+#' weights \eqn{\psi(z)/z} are 1 in the central region and 0 beyond
+#' \eqn{c}.
+#'
+#' The algorithm follows the reference code of the authors:
+#'  1. **Initial fit.** A [macropca()] fit (with `alpha`, `kmax`,
+#'     `var_explained`, `scale` and `ndir`), which also chooses `k` when it
+#'     is `NULL`, with its scores computed from the data whose flagged and
+#'     missing cells are imputed by the fit.
+#'  2. **Scales.** \eqn{\hat\sigma_{1,j}} is the M-scale of the residuals of
+#'     variable \eqn{j}, and \eqn{\hat\sigma_2} that of the total deviations
+#'     (with \eqn{\rho_{1.5,4}}: 50% breakdown, consistent at the normal
+#'     distribution). They are kept fixed.
+#'  3. **Iteratively reweighted least squares.** The loadings (one variable
+#'     at a time, with the casewise and cellwise weights) and the scores
+#'     (one observation at a time, with the cellwise weights) are updated by
+#'     weighted least squares, the loadings are orthonormalized, the center
+#'     is updated, and so are the weights, until the fit \eqn{U V^T} changes
+#'     by less than `tol` (relative), at most `maxiter` times. Each iteration
+#'     decreases the objective. If more than `max_col_frac` of the cells of
+#'     a variable get a zero weight, the previous iteration is kept.
+#'  4. **Principal directions.** The center and the eigenvectors within the
+#'     subspace are estimated by the deterministic MCD of the scores of the
+#'     observations with a non-zero casewise weight (the exact MCD when
+#'     `k = 1`), and the sign of each loading vector is set so that its
+#'     largest element is positive.
+#'
+#' The residuals of each variable are then standardized by their M-scale,
+#' and the cells beyond \eqn{\sqrt{\chi^2_{1, 0.99}}} are flagged. As in the
+#' enhanced outlier map of the paper, `od` is the norm of the standardized
+#' residuals of each observation, and `sd` the score distance of its
+#' projection on the subspace (of its robust scores when it has missing
+#' cells). The cut-off of `sd` is \eqn{\sqrt{\chi^2_{k, 0.99}}}. That of
+#' `od` is, by default (`od_cutoff = "simulated"`), the 0.99 quantile of the
+#' `od` of a cellPCA fit to clean data simulated from the fit, as in the
+#' reference code (this needs a second fit); `"chisq"` uses
+#' \eqn{\sqrt{\chi^2_{p, 0.99}}} instead.
+#'
+#' New observations, with missing or outlying cells, are projected by the
+#' robust regression of their observed cells on the loadings, also in C++.
+#'
+#' @inheritParams macropca
+#' @param maxiter,tol The maximum number of iterations, and the tolerance on
+#'   the relative change of the fit. Defaults are 1000 and 1e-6.
+#' @param max_col_frac The largest fraction of cells of a variable that can
+#'   get a zero weight. Default is 0.5.
+#' @param od_cutoff How to compute the cut-off of `od`: `"simulated"`
+#'   (default) or `"chisq"`. See Details.
+#'
+#' @return An object of class `specproc_cellpca` (inheriting from
+#'   `specproc_robpca`), with the components described in [robpca()] and
+#'   [macropca()], and:
+#'  - `cell_weights`: the cellwise weights (0 for missing cells).
+#'  - `case_weights`: the casewise weights.
+#'  - `deviation`: the standardized casewise total deviations.
+#'  - `fitted`: the fitted values \eqn{\hat{X}}.
+#'  - `imputed`: the data in which the outlying cells are moved toward the
+#'    fit in proportion to their weights, and the missing cells are
+#'    replaced by the fit, so that the projection of each observation on
+#'    the subspace is its fitted value.
+#'  - `sigma1`, `sigma2`: the scales of the cellwise residuals and of the
+#'    casewise total deviations; `resid_scale`: the scales of the final
+#'    residuals.
+#'  - `objective`: the objective at each iteration; `iterations` and
+#'    `converged`.
+#'
+#' @references
+#'  - Centofanti, F., Hubert, M., Rousseeuw, P.J. (2026). Robust principal
+#'    components by casewise and cellwise weighting. Technometrics.
+#'    \doi{10.1080/00401706.2026.2643216}
+#'  - Hampel, F.R., Rousseeuw, P.J., Ronchetti, E. (1981). The change-of-
+#'    variance curve and optimal redescending M-estimators. Journal of the
+#'    American Statistical Association, 76(375):643-648.
+#'  - Hubert, M., Rousseeuw, P.J., Van den Bossche, W. (2019). MacroPCA: an
+#'    all-in-one PCA method allowing for missing values as well as cellwise
+#'    and rowwise outliers. Technometrics, 61(4):459-473.
+#'
+#' @seealso [macropca()], [robpca()], [step_cellpca()], [plot_outlier_map()],
+#'   [plot_cell_map()]
+#'
+#' @export cellpca
+#'
+#' @examples
+#' data(forageLIBS)
+#' # the K I resonance lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' spectra <- forageLIBS[which(wl > 760 & wl < 780)]
+#' set.seed(1)
+#' fit <- cellpca(spectra, k = 2, od_cutoff = "chisq")
+#' fit
+#' # the observations with the lowest casewise weights
+#' head(sort(fit$case_weights))
+#' plot_outlier_map(fit)
+cellpca <- function(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, scale = FALSE,
+                    ndir = 250, maxiter = 1000, tol = 1e-6, max_col_frac = 0.5,
+                    od_cutoff = c("simulated", "chisq")) {
+  if (missing(x)) {
+    stop("Missing 'x' argument.")
   }
-  std_resid <- sweep(sweep(resid, 2, resid_center), 2, resid_scale, "/")
-  std_resid[missing_cells] <- NA
-  flagged <- !is.na(std_resid) & abs(std_resid) > cutoff
-  dimnames(std_resid) <- dimnames(flagged) <- dimnames(y)
-  list(scores = scores,
-       sd = sqrt(rowSums(sweep(scores^2, 2, fit$eigenvalues, "/"))),
-       od = orthogonal_distance(sweep(y_na, 2, fit$center), fit$loadings),
-       std_resid = std_resid, flagged_cells = flagged,
-       resid_center = resid_center, resid_scale = resid_scale, cutoff = cutoff)
+  od_cutoff <- match.arg(od_cutoff)
+  x <- as_numeric_matrix(x, "x")
+  if (is.null(colnames(x))) colnames(x) <- paste0("V", seq_len(ncol(x)))
+  check_count(maxiter, "maxiter")
+  check_number(tol, "tol", lower = 0, lower_open = TRUE)
+  check_number(max_col_frac, "max_col_frac", lower = 0, upper = 1)
+  init <- macropca(x, k = k, alpha = alpha, kmax = kmax, var_explained = var_explained,
+                   scale = scale, ndir = ndir)
+  sc <- init$scale
+  y <- sweep(x, 2, sc, "/")
+  fit <- cellpca_fit(y, init, maxiter, tol, max_col_frac)
+  k <- fit$k
+  n <- nrow(x)
+  p <- ncol(x)
+  comp <- paste0("PC", seq_len(k))
+  observed <- !is.na(y)
+
+  res <- list(loadings = fit$loadings, eigenvalues = fit$eigenvalues, center = fit$center,
+              scale = sc, k = as.integer(k), h = init$h, alpha = alpha,
+              cutoff = sqrt(stats::qchisq(0.99, 1)), scores = fit$scores)
+  dimnames(res$loadings) <- list(colnames(x), comp)
+  dimnames(res$scores) <- list(rownames(x), comp)
+  names(res$center) <- colnames(x)
+  res$sd <- cellpca_sd(y, res)
+  res$od <- sqrt(rowSums(fit$std_resid^2, na.rm = TRUE))
+  res$std_resid <- fit$std_resid
+  res$flagged_cells <- observed & abs(fit$std_resid) > res$cutoff
+  res$flagged_cells[is.na(res$flagged_cells)] <- FALSE
+  res$cell_weights <- fit$cell_weights
+  res$case_weights <- fit$case_weights
+  res$deviation <- fit$deviation
+  res$fitted <- sweep(fit$fitted, 2, sc, "*")
+  res$imputed <- sweep(fit$imputed, 2, sc, "*")
+  dimnames(res$std_resid) <- dimnames(res$flagged_cells) <- dimnames(res$cell_weights) <-
+    dimnames(res$fitted) <- dimnames(res$imputed) <- dimnames(x)
+  res[c("sigma1", "sigma2", "resid_scale", "par2", "objective", "iterations", "converged")] <-
+    fit[c("sigma1", "sigma2", "resid_scale", "par2", "objective", "iterations", "converged")]
+  res$cutoff_sd <- sqrt(stats::qchisq(0.99, k))
+  res$cutoff_od <- if (od_cutoff == "chisq") {
+    sqrt(stats::qchisq(0.99, p))
+  } else {
+    cellpca_od_cutoff(fit, init, n, maxiter, tol, max_col_frac)
+  }
+  res$outlier_type <- outlier_type(res$sd, res$od, res$cutoff_sd, res$cutoff_od)
+  structure(res, variables = colnames(x), nvar = p,
+            class = c("specproc_cellpca", "specproc_robpca"))
 }
 
-# Imputes the flagged and missing cells of each observation by the fit
-# until they no longer change, and returns its distances and residuals
-# (standardized with the residual scales of the calibration data).
-macropca_refine <- function(fit, y, y_na, missing_cells, maxiter = 20) {
-  cutoff <- fit$cutoff %||% sqrt(stats::qchisq(0.99, 1))
-  for (iter in seq_len(maxiter)) {
-    dist <- macropca_distances(fit, y, y_na, missing_cells, cutoff, fit$resid_center, fit$resid_scale)
-    replace <- dist$flagged_cells | missing_cells
-    fitted <- sweep(dist$scores %*% t(fit$loadings), 2, fit$center, "+")
-    updated <- y_na
-    updated[replace] <- fitted[replace]
-    converged <- max(abs(updated - y)) < 1e-8 * max(1, max(abs(y)))
-    y <- updated
+# The cellPCA fit of the (scaled) data `y`, from the MacroPCA fit `init`.
+cellpca_fit <- function(y, init, maxiter, tol, max_col_frac, b1 = 1.5) {
+  n <- nrow(y)
+  p <- ncol(y)
+  k <- init$k
+  observed <- !is.na(y)
+  y0 <- y
+  y0[!observed] <- 0
+
+  # Step 1: initial fit, the MacroPCA scores of the fully imputed data
+  V0 <- unname(init$loadings)
+  mu0 <- unname(init$center)
+  U0 <- unname(init$scores_imputed)
+
+  # Step 2: scales of the cellwise residuals and of the casewise deviations
+  resid0 <- y - sweep(U0 %*% t(V0), 2, mu0, "+")
+  sigma1 <- scale_tanh_cols_cpp(resid0)
+  t0 <- total_deviation(resid0, sigma1, b1)
+  sigma2 <- scale_tanh_cols_cpp(matrix(t0[is.finite(t0)]))
+  par2 <- cellpca_rho2_constants(p, b1)
+
+  # Step 3: IRLS
+  fit <- cellpca_irls_cpp(y0, observed * 1, V0, unname(U0), mu0, sigma1, sigma2, par2, b1,
+                          as.integer(maxiter), tol, max_col_frac)
+  if (isTRUE(fit$stopped)) {
+    warning("A variable got zero weights in more than 'max_col_frac' of its cells; ",
+            "the previous iteration was kept.", call. = FALSE)
+  } else if (!fit$converged) {
+    warning("cellPCA did not converge in ", maxiter, " iterations.", call. = FALSE)
+  }
+
+  # Step 4: center and directions from the MCD of the scores of the
+  # observations with a non-zero casewise weight
+  U <- fit$U
+  V <- fit$V
+  out <- fit$case_weights == 0
+  keep <- if (any(out) && !all(out)) !out else rep(TRUE, n)
+  alpha2 <- if (any(out) && !all(out)) min(0.5 * n / sum(keep), 0.8) else 0.5
+  mcd <- cellpca_mcd(U[keep, , drop = FALSE], alpha2)
+  e <- eigen(mcd$cov, symmetric = TRUE)
+  center <- fit$mu + drop(V %*% mcd$center)
+  loadings <- V %*% e$vectors
+  scores <- sweep(U, 2, mcd$center) %*% e$vectors
+  flip <- sign(diag(crossprod(loadings, V)))
+  flip[flip == 0] <- 1
+  # largest element of each loading vector positive
+  flip <- flip * apply(loadings %*% diag(flip, k), 2, function(v) if (v[which.max(abs(v))] < 0) -1 else 1)
+  loadings <- loadings %*% diag(flip, k)
+  scores <- scores %*% diag(flip, k)
+
+  # residuals standardized by their M-scale, and casewise deviations
+  fitted <- sweep(scores %*% t(loadings), 2, center, "+")
+  imputed <- fitted + ifelse(observed, fit$cell_weights * (y0 - fitted), 0)
+  resid <- y - fitted
+  resid_scale <- scale_tanh_cols_cpp(resid)
+  std_resid <- sweep(resid, 2, resid_scale, "/")
+  deviation <- total_deviation(resid, resid_scale, b1) / sigma2
+  list(k = k, loadings = loadings, eigenvalues = e$values, center = center, scores = scores,
+       fitted = fitted, imputed = imputed, std_resid = std_resid, deviation = deviation,
+       cell_weights = fit$cell_weights, case_weights = fit$case_weights, sigma1 = sigma1,
+       sigma2 = sigma2, resid_scale = resid_scale, par2 = par2, objective = fit$objective,
+       iterations = fit$iterations, converged = fit$converged)
+}
+
+# Score distances of a cellPCA fit: those of the projections of the
+# observations, or of their robust scores when they have missing cells.
+cellpca_sd <- function(y, fit) {
+  proj <- sweep(y, 2, fit$center) %*% fit$loadings
+  incomplete <- !stats::complete.cases(proj)
+  proj[incomplete, ] <- fit$scores[incomplete, , drop = FALSE]
+  sqrt(rowSums(sweep(proj^2, 2, fit$eigenvalues, "/")))
+}
+
+# Cut-off of the norms of the standardized residuals: their 0.99 quantile
+# for a cellPCA fit to clean data simulated from the fit (at most 500
+# observations), as in the reference code.
+cellpca_od_cutoff <- function(fit, init, n, maxiter, tol, max_col_frac) {
+  with_seed(0, {
+    n_clean <- min(n, 500)
+    index <- sample(seq_len(n), n_clean, replace = TRUE)
+    noise <- matrix(stats::rnorm(n_clean * length(fit$resid_scale)), n_clean) *
+      rep(fit$resid_scale, each = n_clean)
+    clean <- (fit$scores %*% t(fit$loadings))[index, , drop = FALSE] + noise
+    colnames(clean) <- rownames(fit$loadings) %||% paste0("V", seq_len(ncol(clean)))
+    init_clean <- suppressWarnings(macropca(clean, k = fit$k, alpha = init$alpha))
+    fit_clean <- suppressWarnings(cellpca_fit(clean, init_clean, maxiter, tol, max_col_frac))
+    unname(stats::quantile(sqrt(rowSums(fit_clean$std_resid^2, na.rm = TRUE)), 0.99))
+  })
+}
+
+# Center and scatter of the cellPCA scores: deterministic MCD, or the exact
+# univariate MCD for one component (the deterministic MCD does not handle
+# one variable).
+cellpca_mcd <- function(scores, alpha) {
+  mcd <- if (ncol(scores) == 1) {
+    robustbase::covMcd(scores, alpha = alpha)
+  } else {
+    tryCatch(robustbase::covMcd(scores, alpha = alpha, nsamp = "deterministic", use.correction = TRUE),
+             error = function(e) robustbase::covMcd(scores, alpha = alpha))
+  }
+  list(center = unname(mcd$center), cov = unname(as.matrix(mcd$cov)))
+}
+
+# Tuning constants (b, c, q1, q2) of rho_2, from the standardized total
+# deviations of simulated Gaussian residuals of min(p/2, 10) variables, as
+# get_tuning_const_rho2() of the reference code.
+cellpca_rho2_constants <- local({
+  cache <- list()
+  function(p, b1 = 1.5) {
+    d <- ceiling(min(p / 2, 10))
+    key <- paste(d, b1)
+    if (is.null(cache[[key]])) {
+      cache[[key]] <<- with_seed(10, {
+        n <- 10000
+        r <- matrix(stats::rnorm(n * d), n, d)
+        s1 <- scale_tanh_cols_cpp(r)
+        rho <- matrix(rho_tanh_cpp(sweep(r, 2, s1, "/"), b1), n) * rep(s1^2, each = n)
+        t <- sqrt(rowSums(rho) / d)
+        t <- t / scale_tanh_cols_cpp(matrix(t))
+        b <- max(stats::quantile(t, 0.7), 0)
+        c <- max(stats::quantile(t, 0.99), 0.3)
+        q <- if (b < 100) tanh_q1q2(b, c) else c(NA_real_, NA_real_)
+        unname(c(b, c, q))
+      })
+    }
+    cache[[key]]
+  }
+})
+
+# Constants q1 and q2 that make the tanh psi function continuous for given b
+# and c (calculateq1q2() of the reference code).
+tanh_q1q2 <- function(b, c, maxit = 500, prec = 1e-10) {
+  psi_wrap <- function(x, A, B, k) {
+    mid <- abs(x) >= b & abs(x) <= c
+    up <- abs(x) >= c
+    x[mid] <- sqrt(A * (k - 1)) * tanh(0.5 * sqrt((k - 1) * B^2 / A) * (c - abs(x[mid]))) * sign(x[mid])
+    x[up] <- 0
+    x
+  }
+  A <- 2 * stats::pnorm(c) - 1 - 2 * c * stats::dnorm(c)
+  B <- 2 * stats::pnorm(c) - 1
+  k <- max(1, c)
+  for (iter in seq_len(maxit)) {
+    k_new <- stats::optimize(function(y) abs(b - sqrt(A * (y - 1)) * tanh(0.5 * sqrt((y - 1) * B^2 / A) * (c - b))),
+                             interval = c(1 + prec, 1000), tol = prec)$minimum
+    A_new <- stats::integrate(function(y) psi_wrap(y, A, B, k)^2 * stats::dnorm(y), -c, c)$value
+    B_new <- stats::integrate(function(y) abs(psi_wrap(y, A, B, k)) * abs(y) * stats::dnorm(y), -c, c)$value
+    converged <- max(abs(A_new - A), abs(B_new - B), abs(k_new - k)) < prec
+    A <- A_new
+    B <- B_new
+    k <- k_new
     if (converged) break
   }
-  macropca_distances(fit, y, y_na, missing_cells, cutoff, fit$resid_center, fit$resid_scale)
+  c(sqrt(A * (k - 1)), B / 2 * sqrt((k - 1) / A))
+}
+
+# Casewise total deviations (10): residuals `r` (NA for missing cells) with
+# the scales `sigma` of the variables.
+total_deviation <- function(r, sigma, b1 = 1.5) {
+  z <- sweep(r, 2, sigma, "/")
+  z[!is.finite(z) & !is.na(r)] <- 0
+  rho <- matrix(rho_tanh_cpp(z, b1), nrow(r)) * rep(sigma^2, each = nrow(r))
+  sqrt(rowMeans(rho, na.rm = TRUE))
+}
+
+# Size of the subsets of robust PCA (h.alpha.n of cellWise and rrcov).
+h_alpha_n <- function(alpha, n, p) {
+  n2 <- (n + p + 1) %/% 2
+  floor(2 * n2 - n + 2 * (n - n2) * alpha)
+}
+
+# Classical PCA (truncPC of cellWise): center, the loadings and eigenvalues
+# of the `ncomp` (default all) first components with a non-zero singular
+# value, the largest element of each loading vector positive.
+trunc_pc <- function(y, ncomp = NULL) {
+  y <- as.matrix(y)
+  center <- colMeans(y)
+  s <- svd(sweep(y, 2, center), nu = 0, nv = min(ncomp %||% min(dim(y)), dim(y)))
+  rank <- sum(s$d[seq_len(ncol(s$v))] > 1e-10)
+  v <- s$v[, seq_len(rank), drop = FALSE]
+  v <- sweep(v, 2, apply(v, 2, function(a) if (a[which.max(abs(a))] < 0) -1 else 1), "*")
+  list(rank = rank, eigenvalues = s$d[seq_len(rank)]^2 / (nrow(y) - 1), loadings = v,
+       center = center)
+}
+
+# Largest angle between two subspaces, as a fraction of a right angle
+# (maxAngle of cellWise).
+max_angle <- function(a, b) {
+  lambda <- min(eigen(crossprod(a, b) %*% crossprod(b, a), symmetric = TRUE, only.values = TRUE)$values)
+  acos(sqrt(min(max(lambda, 0), 1))) / (pi / 2)
+}
+
+mahalanobis_diag <- function(scores, values) {
+  rowSums(sweep(scores^2, 2, values, "/"))
+}
+
+# Cut-off of the orthogonal distances: Wilson-Hilferty approximation with
+# the reweighted univariate MCD of OD^(2/3) at the 0.99 quantile (critOD of
+# cellWise).
+od_cutoff_unimcd <- function(od, alpha) {
+  u <- unimcd_cpp(od^(2 / 3), alpha)
+  (u[["location"]] + u[["scale"]] * stats::qnorm(0.99))^(3 / 2)
+}
+
+# Outlyingness of each row: the largest standardized distance (with the
+# reweighted univariate MCD) over directions through pairs of rows, chosen
+# by the deterministic generator of cellWise (all pairs when there are at
+# most `ndir`).
+pp_outlyingness <- function(y, ndir, alpha) {
+  n <- nrow(y)
+  all_pairs <- choose(n, 2)
+  ndir <- if (identical(ndir, "all")) all_pairs else min(ndir, all_pairs)
+  pairs <- if (ndir == all_pairs) t(utils::combn(n, 2)) else direction_pairs(n, ndir)
+  B <- y[pairs[, 1], , drop = FALSE] - y[pairs[, 2], , drop = FALSE]
+  norms <- sqrt(rowSums(B^2))
+  B <- B[norms > 1e-12, , drop = FALSE] / norms[norms > 1e-12]
+  proj <- y %*% t(B)
+  out <- numeric(n)
+  for (j in seq_len(ncol(proj))) {
+    u <- unimcd_cpp(proj[, j], alpha)
+    if (u[["scale"]] > 1e-12) out <- pmax(out, abs(proj[, j] - u[["location"]]) / u[["scale"]])
+  }
+  out
+}
+
+# Pairs of rows of the directions (randomset() of cellWise and rrcov).
+direction_pairs <- function(n, ndir) {
+  seed <- 0
+  draw <- function() {
+    seed <<- floor(seed * 5761) + 999
+    quot <- floor(seed / 65536)
+    seed <<- floor(seed) - floor(quot * 65536)
+    floor(seed / 65536 * n) + 1
+  }
+  out <- matrix(0L, ndir, 2)
+  for (r in seq_len(ndir)) {
+    a <- draw()
+    b <- draw()
+    while (b == a) b <- draw()
+    out[r, ] <- c(a, b)
+  }
+  out
+}
+
+# Center and scatter of the scores within the subspace: the deterministic
+# MCD when its criterion is below that of the C-steps (as in cellWise),
+# otherwise the reweighted covariance of the C-steps.
+final_mcd <- function(scores, alpha, obj, mah, k) {
+  if (k > 1) {
+    mcd <- tryCatch(robustbase::covMcd(scores, nsamp = "deterministic", alpha = alpha),
+                    error = function(e) NULL)
+  } else {
+    # the deterministic MCD does not handle one variable: the exact
+    # univariate MCD
+    mcd <- robustbase::covMcd(scores, alpha = alpha)
+  }
+  if (!is.null(mcd) && mcd$crit < obj + 1e-16) {
+    return(list(center = unname(mcd$center), cov = unname(as.matrix(mcd$cov))))
+  }
+  mah <- mah / (stats::median(mah) / stats::qchisq(0.5, k))
+  w <- stats::cov.wt(scores, wt = as.numeric(mah <= stats::qchisq(0.975, k)), method = "ML")
+  list(center = unname(w$center), cov = unname(w$cov))
+}
+
+# Robust location (1-step biweight) and scale (1-step Huber) of each column.
+loc_scale_1step <- function(x) {
+  loc <- apply(x, 2, function(v) {
+    v <- v[is.finite(v)]
+    m0 <- stats::median(v)
+    s0 <- stats::mad(v, center = m0)
+    if (s0 <= 1e-12) return(m0)
+    u <- 1 - ((v - m0) / s0 * 1.482602218505602 / 3)^2
+    w <- ((u + abs(u)) / 2)^2
+    sum(v * w) / sum(w)
+  })
+  list(loc = loc, scale = scale_1step_cols_cpp(sweep(x, 2, loc)))
+}
+
+# Fitted values of a PCA model.
+pca_fitted <- function(y, center, loadings) {
+  scores <- sweep(y, 2, center) %*% loadings
+  sweep(scores %*% t(loadings), 2, center, "+")
+}
+
+# Scores, distances and standardized residuals of a MacroPCA fit, for the
+# NA-imputed data `y` and the observed data `y_obs` (NA for missing cells).
+# The residual scales are those of the fit when it has them (new data).
+macropca_distances <- function(fit, y, y_obs) {
+  scores <- sweep(y, 2, fit$center) %*% fit$loadings
+  fitted <- sweep(scores %*% t(fit$loadings), 2, fit$center, "+")
+  resid <- y_obs - fitted
+  resid_scale <- fit$resid_scale
+  if (is.null(resid_scale)) {
+    resid_scale <- if (fit$k < fit$rank) scale_1step_cols_cpp(resid) else rep(0, ncol(y))
+  }
+  std_resid <- if (fit$k < fit$rank) sweep(resid, 2, resid_scale, "/") else resid * 0
+  std_resid[!is.finite(std_resid) & !is.na(y_obs)] <- 0
+  flagged <- !is.na(std_resid) & abs(std_resid) > fit$cutoff
+  dimnames(std_resid) <- dimnames(flagged) <- dimnames(y_obs)
+  colnames(scores) <- paste0("PC", seq_len(ncol(scores)))
+  list(scores = scores,
+       sd = sqrt(mahalanobis_diag(scores, fit$eigenvalues)),
+       od = orthogonal_distance(sweep(y, 2, fit$center), fit$loadings),
+       std_resid = std_resid, flagged_cells = flagged, resid_scale = resid_scale)
 }
 
 #' @rdname predict.specproc_robpca
@@ -574,13 +1083,51 @@ predict.specproc_macropca <- function(object, newdata, ...) {
     stop("'newdata' must have ", attr(object, "nvar"), " columns, like the calibration data.", call. = FALSE)
   }
   colnames(x) <- attr(object, "variables")
-  missing_cells <- is.na(x)
-  y_na <- sweep(x, 2, object$scale, "/")
-  # missing cells start at the center
-  y <- y_na
-  y[missing_cells] <- matrix(object$center, nrow(y), ncol(y), byrow = TRUE)[missing_cells]
-  dist <- macropca_refine(object, y, y_na, missing_cells)
+  # MacroPCApredict of cellWise: the cells flagged by the DDC model of the
+  # fit and the missing cells are imputed, then re-imputed by the fit until
+  # they no longer change; the distances use only the missing imputations
+  cells <- predict_ddc(object$ddc, x)
+  sc <- object$scale
+  x_obs <- sweep(x, 2, sc, "/")
+  imputable <- cells$flagged_cells | is.na(x)
+  x_fi <- x_obs
+  x_fi[imputable] <- (cells$imputed / rep(sc, each = nrow(x)))[imputable]
+  if (any(imputable)) {
+    for (iter in seq_len(20)) {
+      old <- x_fi[imputable]
+      x_fi[imputable] <- pca_fitted(x_fi, object$center, object$loadings)[imputable]
+      if (mean((x_fi[imputable] - old)^2) <= 0.005) break
+    }
+  }
+  x_na <- x_obs
+  x_na[is.na(x)] <- x_fi[is.na(x)]
+  dist <- macropca_distances(object, x_na, x_obs)
   robust_pca_output(object, dist$scores, dist$od, dist$sd)
+}
+
+#' @rdname predict.specproc_robpca
+#' @export
+predict.specproc_cellpca <- function(object, newdata, ...) {
+  x <- as_numeric_matrix(newdata, "newdata")
+  if (ncol(x) != attr(object, "nvar")) {
+    stop("'newdata' must have ", attr(object, "nvar"), " columns, like the calibration data.", call. = FALSE)
+  }
+  y <- sweep(x, 2, object$scale, "/")
+  observed <- !is.na(y)
+  y0 <- y
+  y0[!observed] <- 0
+  # robust regression of the observed cells on the loadings (from the
+  # projection), with the cellwise weights of the fit
+  pred <- cellpca_predict_cpp(y0, observed * 1, unname(object$loadings), unname(object$center),
+                              object$sigma1, 1.5, 1000L, 1e-6)
+  scores <- pred$scores
+  fit <- object
+  fit$scores <- scores
+  fitted <- sweep(scores %*% t(object$loadings), 2, object$center, "+")
+  std_resid <- sweep(y - fitted, 2, object$resid_scale, "/")
+  od <- sqrt(rowSums(std_resid^2, na.rm = TRUE))
+  od[rowSums(observed) == 0] <- NA_real_
+  robust_pca_output(object, scores, od, cellpca_sd(y, fit))
 }
 
 #' @title Scores and Distances of New Observations
@@ -626,7 +1173,8 @@ print.specproc_robpca <- function(x, ...) {
     class(x)[1],
     specproc_robpca = "Robust PCA (ROBPCA)",
     specproc_rospca = paste0("Robust sparse PCA (ROSPCA, lambda = ", format(x$lambda), ")"),
-    specproc_macropca = "Robust PCA for cellwise and casewise outliers (MacroPCA)"
+    specproc_macropca = "Robust PCA for cellwise and casewise outliers (MacroPCA)",
+    specproc_cellpca = "Robust PCA by casewise and cellwise weighting (cellPCA)"
   )
   cat(label, "\n\n", sep = "")
   cat("Observations:   ", length(x$sd), " (h = ", x$h, ")\n", sep = "")
@@ -636,8 +1184,12 @@ print.specproc_robpca <- function(x, ...) {
   if (inherits(x, "specproc_rospca")) {
     cat("Non-zero loadings per component: ", paste(colSums(x$loadings != 0), collapse = " "), "\n", sep = "")
   }
-  if (inherits(x, "specproc_macropca")) {
+  if (inherits(x, c("specproc_macropca", "specproc_cellpca"))) {
     cat("Flagged cells:  ", sum(x$flagged_cells), "\n", sep = "")
+  }
+  if (inherits(x, "specproc_cellpca")) {
+    cat("Downweighted observations: ", sum(x$case_weights < 1), "\n", sep = "")
+    cat("IRLS iterations: ", x$iterations, if (!isTRUE(x$converged)) " (not converged)", "\n", sep = "")
   }
   cat("\nOutlier types:\n")
   print(table(x$outlier_type))
@@ -685,20 +1237,24 @@ svd_reduce <- function(x) {
   list(center = center, v = v, z = xc %*% v)
 }
 
-# Indices of the h observations with the smallest Stahel-Donoho outlyingness.
-least_outlying <- function(z, h, ndir) {
+# Stahel-Donoho outlyingness of each observation.
+outlyingness <- function(z, h, ndir) {
   if (identical(ndir, "all")) {
     ndir <- 0L
   } else {
     check_count(ndir, "ndir")
   }
-  outl <- if (ncol(z) == 1) {
+  if (ncol(z) == 1) {
     u <- univariate_mcd_cpp(z[, 1], h)
     abs(z[, 1] - u[["location"]]) / max(u[["scale"]], .Machine$double.eps)
   } else {
     sd_outlyingness_cpp(z, h, as.integer(ndir))
   }
-  sort(order(outl)[seq_len(h)])
+}
+
+# Indices of the h observations with the smallest Stahel-Donoho outlyingness.
+least_outlying <- function(z, h, ndir) {
+  sort(order(outlyingness(z, h, ndir))[seq_len(h)])
 }
 
 choose_k <- function(values, kmax, var_explained) {
@@ -715,13 +1271,13 @@ orthogonal_distance <- function(xc, loadings) {
 }
 
 # Cut-off for orthogonal distances: Wilson-Hilferty approximation with the
-# univariate MCD of OD^(2/3).
-od_cutoff <- function(od, h) {
+# univariate MCD of OD^(2/3), at the given level.
+od_cutoff <- function(od, h, level = 0.975) {
   if (max(od) <= sqrt(.Machine$double.eps) * max(1, max(od))) {
     return(0)
   }
   u <- univariate_mcd_cpp(od^(2 / 3), min(h, length(od)))
-  (u[["location"]] + u[["scale"]] * stats::qnorm(0.975))^(3 / 2)
+  (u[["location"]] + u[["scale"]] * stats::qnorm(level))^(3 / 2)
 }
 
 robust_scale <- function(v) {

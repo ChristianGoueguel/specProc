@@ -35,6 +35,7 @@ Cardeñoso
 Caruana
 Casewise
 Cellwise
+Centofanti
 Centre
 Chatterjee
 Chatterjee's
@@ -60,6 +61,7 @@ De
 Debye
 Dell'Aglio
 Dell’Aglio
+DetMCD
 Dimitrijević
 Donoho
 Driessen
@@ -87,11 +89,13 @@ Gaudiuso
 Gebhardt
 Giacomo
 Gigosos
+Gnanadesikan
 Golay
 González
 Gurden
 HWHM
 Haar
+Hampel
 Harmonisation
 Harynuk
 Hegazy
@@ -120,6 +124,7 @@ Junot
 Kalivas
 Kemsley
 Kettaneh
+Kettenring
 Kohler
 Kohonen
 Konjević
@@ -148,6 +153,7 @@ MSC
 MacGregor
 MacroPCA
 MacroPCA's
+MacroPCApredict
 Mahadevan
 Mallat
 Mandel
@@ -212,11 +218,13 @@ Rastelli
 Raymaekers
 Rcpp
 RcppEigen
+Reweighting
 Reynkens
 Ricoux
 Rinnan
 Robuste
 Rogel
+Ronchetti
 Rousseeuw
 Rtools
 SCP
@@ -301,6 +309,7 @@ bicor
 bslib
 casewise
 cdot
+cellPCA
 cellWise
 cellwise
 cem
@@ -313,6 +322,7 @@ cowplot
 data's
 de
 doi
+downweighted
 downweights
 dplyr
 eV
@@ -362,6 +372,7 @@ nonlinearly
 normalizations
 orthogonalization
 orthogonalize
+orthonormalized
 outlyingness
 pearson
 pentadiagonal
@@ -372,6 +383,7 @@ plotly
 pls
 pre
 preprocess
+redescending
 reweighting
 ropls
 rospca
@@ -390,6 +402,7 @@ tidyselect
 tidyverse
 tunable
 und
+unflagged
 vibrational
 voigt
 von

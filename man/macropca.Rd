@@ -13,7 +13,7 @@ macropca(
   scale = FALSE,
   ndir = 250,
   maxiter = 20,
-  tol = 1e-04
+  tol = 0.005
 )
 }
 \arguments{
@@ -38,8 +38,9 @@ not outweighed by noise and continuum channels).}
 \item{ndir}{The number of random directions of the outlyingness, or \code{"all"}.
 Default is 250.}
 
-\item{maxiter, tol}{The maximum number of iterations and the tolerance on
-the change of the subspace. Defaults are 20 and 1e-4.}
+\item{maxiter, tol}{The maximum number of iterations of step 3, and the
+tolerance on the largest angle (in radians) between successive
+subspaces. Defaults are 20 and 0.005, as in the paper.}
 }
 \value{
 An object of class \code{specproc_macropca} (inheriting from
@@ -47,6 +48,7 @@ An object of class \code{specproc_macropca} (inheriting from
 \itemize{
 \item \code{std_resid}: the standardized cell residuals (\code{NA} for missing cells).
 \item \code{flagged_cells}: a logical matrix of the flagged cells.
+\item \code{flagged_rows}: the observations flagged by DDC.
 \item \code{imputed}: the data with the missing values imputed by the PCA fit
 (the flagged cells keep their values).
 \item \code{resid_center}, \code{resid_scale}: the robust center and scale of the
@@ -55,44 +57,59 @@ residuals of each variable, used to standardize those of new data.
 }
 \description{
 Robust PCA that handles both outlying observations (casewise outliers),
-outlying cells (cellwise outliers) and missing values, after the MacroPCA
-algorithm of Hubert, Rousseeuw and Van den Bossche (2019). The results
-have the same form as those of \code{\link[=robpca]{robpca()}}, so that
-\link[=predict.specproc_robpca]{predict()} and \code{\link[=plot_outlier_map]{plot_outlier_map()}} work the
-same way, and \code{\link[=plot_cell_map]{plot_cell_map()}} shows the outlying cells.
+outlying cells (cellwise outliers) and missing values, by the MacroPCA
+algorithm of Hubert, Rousseeuw and Van den Bossche (2019), which combines
+the detection of deviating cells (DDC) with the steps of ROBPCA (Hubert,
+Rousseeuw and Vanden Branden, 2005). The results have the same form as
+those of \code{\link[=robpca]{robpca()}}, so that \link[=predict.specproc_robpca]{predict()} and
+\code{\link[=plot_outlier_map]{plot_outlier_map()}} work the same way, and \code{\link[=plot_cell_map]{plot_cell_map()}} shows the
+outlying cells. \code{\link[=cellpca]{cellpca()}} starts from a MacroPCA fit.
 }
 \details{
-The algorithm has four steps:
-\enumerate{
-\item \strong{Deviating cells.} The cells that deviate from the values predicted
-by the most correlated variables are detected and imputed by the
-detection of deviating cells (DDC) of Rousseeuw and Van den Bossche
-(2018), as are the missing values. The neighbor search and the
-predictions of DDC are computed in C++, by blocks of variables, so
+The algorithm follows the steps of Hubert, Rousseeuw and Van den Bossche
+(2019):
+0. \strong{Deviating cells.} The cells that deviate from the values predicted
+by the most correlated variables, and the outlying observations, are
+detected by the DDC of Rousseeuw and Van den Bossche (2018), which
+also imputes the flagged and missing cells. The neighbor search and
+the predictions of DDC are computed in C++, by blocks of variables, so
 that spectra with thousands of channels are handled quickly.
-\item \strong{Initial subspace.} The \code{h} observations with the smallest
-Stahel-Donoho outlyingness (as in \code{\link[=robpca]{robpca()}}, with \code{ndir} directions)
-give an initial PCA of the imputed data. When \code{k} is \code{NULL}, it is the
-smallest number of components that explain \code{var_explained} of the
-variance of these observations (at most \code{kmax}).
-\item \strong{Iterations.} The flagged and missing cells are imputed by the
-fitted values of the current PCA, the observations within the cut-off
-of the orthogonal distances are kept, and the PCA is refitted on them,
-until the subspace changes by less than \code{tol} (at most \code{maxiter}
-times).
-\item \strong{Final fit.} The center and the eigenvalues are re-estimated by the
-minimum covariance determinant of the scores, as in \code{\link[=robpca]{robpca()}}.
+\enumerate{
+\item \strong{Projection pursuit.} As in \code{\link[=robpca]{robpca()}}, the Stahel-Donoho
+outlyingness (with \code{ndir} directions) is computed on the data in which
+only the missing cells of the observations flagged by DDC are imputed
+(imputing their outlying cells could mask them), and the flagged cells
+of the \code{h} unflagged observations with the fewest flagged cells are
+imputed. The \code{h} least outlying observations not flagged by DDC form
+the set \eqn{H_0}.
+\item \strong{Subspace dimension.} A classical PCA of the observations of
+\eqn{H_0}, with their flagged and missing cells imputed, gives the
+eigenvalues: when \code{k} is \code{NULL}, it is the smallest number of
+components that explain \code{var_explained} of their variance (at most
+\code{kmax}).
+\item \strong{Iterative subspace estimation.} The missing cells of all the
+observations, and the flagged cells of the observations of
+\eqn{H_0}, are imputed by the fitted values of the current PCA, and
+the PCA of \eqn{H_0} is refitted, until the largest angle between the
+old and the new subspace is below \code{tol} (at most \code{maxiter} times).
+\item \strong{Reweighting.} The observations whose orthogonal distance is below
+the cut-off, and not flagged by DDC, form the set \eqn{H^*}; their
+flagged cells are imputed, and the PCA is refitted on them.
+\item \strong{Robust basis.} The center and the eigenvectors within the subspace
+are estimated by the deterministic MCD (DetMCD) of the scores of
+\eqn{H^*}, so that good leverage observations do not tilt the
+loadings.
+\item \strong{Output.} The scores, the orthogonal distances and the cell
+residuals of all the observations are computed from the data with
+only the missing cells imputed (by the fit, iteratively). The
+residuals of each variable are robustly standardized (median and
+MAD), and the cells beyond \eqn{\sqrt{\chi^2_{1, 0.99}}} are flagged.
 }
 
-The residuals of each variable are robustly standardized (median and
-MAD), and the cells beyond \eqn{\sqrt{\chi^2_{1, 0.99}}} are flagged. The
-scores of each observation are then computed with its flagged and missing
-cells imputed by the fit (iteratively, as for new data with
-\link[=predict.specproc_robpca]{predict()}), while its orthogonal distance and
-cell residuals use its observed cells, so that the deviating cells of an
-observation count in its orthogonal distance. The cut-offs of the score
-and orthogonal distances are those of \code{\link[=robpca]{robpca()}}, so that the outlier
-maps of the robust PCA methods of specProc can be compared.
+As in the paper, the cut-offs of the score distances
+(\eqn{\sqrt{\chi^2_{k, 0.99}}}) and of the orthogonal distances (the
+Wilson-Hilferty approximation with the 0.99 quantile) are at the 99\%
+level.
 }
 \examples{
 \donttest{
@@ -113,14 +130,18 @@ forageLIBS |>
 all-in-one PCA method allowing for missing values as well as cellwise
 and rowwise outliers. Technometrics, 61(4):459-473.
 \doi{10.1080/00401706.2018.1562989}
+\item Hubert, M., Rousseeuw, P.J., Vanden Branden, K. (2005). ROBPCA: a new
+approach to robust principal component analysis. Technometrics,
+47(1):64-79.
 \item Rousseeuw, P.J., Van den Bossche, W. (2018). Detecting deviating data
 cells. Technometrics, 60(2):135-145.
-\item Raymaekers, J., Rousseeuw, P.J. (2021). Fast robust correlation for
-high-dimensional data. Technometrics, 63(2):184-198.
+\item Hubert, M., Rousseeuw, P.J., Verdonck, T. (2012). A deterministic
+algorithm for robust location and scatter. Journal of Computational
+and Graphical Statistics, 21(3):618-637.
 }
 }
 \seealso{
-\code{\link[=robpca]{robpca()}}, \code{\link[=step_macropca]{step_macropca()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}},
+\code{\link[=cellpca]{cellpca()}}, \code{\link[=robpca]{robpca()}}, \code{\link[=step_macropca]{step_macropca()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}},
 \code{\link[=plot_cell_map]{plot_cell_map()}}
 }
 \author{

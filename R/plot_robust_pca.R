@@ -4,8 +4,11 @@
 #'
 #' @description
 #' Plots the orthogonal distance of each observation against its score
-#' distance, for a robust PCA fitted by [robpca()], [rospca()] or
-#' [macropca()] (Hubert, Rousseeuw and Vanden Branden, 2005).
+#' distance, for a robust PCA fitted by [robpca()], [rospca()],
+#' [macropca()] or [cellpca()] (Hubert, Rousseeuw and Vanden Branden, 2005).
+#' For [cellpca()], the vertical axis is the norm of the standardized
+#' residuals, as in the enhanced outlier map of Centofanti, Hubert and
+#' Rousseeuw.
 #'
 #' @details
 #' The dashed lines are the cut-offs of the two distances. They divide the
@@ -30,8 +33,8 @@
 #' cut-off, not how unlikely it is: twice the cut-off is not equally rare
 #' in every model.
 #'
-#' @param object An object returned by [robpca()], [rospca()] or
-#'   [macropca()].
+#' @param object An object returned by [robpca()], [rospca()],
+#'   [macropca()] or [cellpca()].
 #' @param newdata Optional new observations to add to the map (a numeric
 #'   matrix or data frame with the calibration variables).
 #' @param labels The number of most outlying observations to label (by
@@ -82,7 +85,7 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
                              shade = FALSE, log = FALSE, colour_by = c("type", "distance"),
                              title = NULL, ...) {
   if (!inherits(object, "specproc_robpca")) {
-    stop("'object' must be returned by robpca(), rospca() or macropca().", call. = FALSE)
+    stop("'object' must be returned by robpca(), rospca(), macropca() or cellpca().", call. = FALSE)
   }
   check_count(labels, "labels", lower = 0)
   colour_by <- match.arg(colour_by)
@@ -100,7 +103,7 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
 
   if (is.null(title)) {
     title <- switch(class(object)[1], specproc_robpca = "ROBPCA", specproc_rospca = "ROSPCA",
-                    specproc_macropca = "MacroPCA")
+                    specproc_macropca = "MacroPCA", specproc_cellpca = "cellPCA")
     title <- paste0(title, " outlier map (", object$k, " components)")
   }
   point <- map_point_args(rlang::enquos(...), nrow(df),
@@ -114,17 +117,22 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
     # corner, where the most outlying observations usually are
     regions = c("good leverage", "orthogonal outliers", "bad leverage"),
     x_lab = c("Score distance", "Reduced score distance"),
-    y_lab = c("Orthogonal distance", "Reduced orthogonal distance"),
+    y_lab = if (inherits(object, "specproc_cellpca")) {
+      c("Norm of the standardized residuals", "Reduced norm of the standardized residuals")
+    } else {
+      c("Orthogonal distance", "Reduced orthogonal distance")
+    },
     title = title, point = point, show_set = !is.null(newdata)
   )
 }
 
-#' @title Cell Map of a MacroPCA Fit
+#' @title Cell Map of a MacroPCA or cellPCA Fit
 #'
 #' @author Christian L. Goueguel
 #'
 #' @description
-#' Shows which cells of the data deviate from a [macropca()] fit: one row
+#' Shows which cells of the data deviate from a [macropca()] or [cellpca()]
+#' fit: one row
 #' per observation, the variables (wavelengths) along the horizontal axis,
 #' and the flagged cells colored red when the observed value is higher than
 #' the fit and blue when it is lower. A strip on the right shows the outlier
@@ -158,13 +166,13 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
 #' the fit, below zero when lower. The mean spectrum is drawn in grey
 #' behind it, rescaled, to show whether the flagged channels are on emission
 #' lines, on the continuum or in noise. It is the mean of `spectra` or, by
-#' default, of the data imputed by MacroPCA; it is left out when this mean
+#' default, of the data imputed by the fit; it is left out when this mean
 #' is close to zero, as for centered data (then give the raw spectra in
 #' `spectra`). The dashed lines are at `threshold`, and the `labels` flagged
 #' regions with the largest share (see [flagged_regions()]) are labeled with
 #' their peak wavelength, or with the emission line they match.
 #'
-#' @param object An object returned by [macropca()].
+#' @param object An object returned by [macropca()] or [cellpca()].
 #' @param rows,columns Optional indices or names of the rows and columns to
 #'   show. Default is all.
 #' @param resolution The maximum numbers of rows and columns of blocks.
@@ -178,7 +186,7 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
 #' @param spectra Optional spectra whose mean is drawn behind the profile (a
 #'   data frame or matrix with the variables of the model, other columns
 #'   being ignored, or a single named spectrum). Default is the data imputed
-#'   by MacroPCA.
+#'   by the fit.
 #' @param threshold The share of flagged observations above which channels
 #'   form a flagged region. Default is 0.1.
 #' @param labels The number of flagged regions labeled in the profile.
@@ -187,7 +195,7 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
 #'   regions with the emission lines they match.
 #' @param tol The largest distance, in nm, between a region and a line it
 #'   matches. Default is 0.1.
-#' @param title The plot title.
+#' @param title The plot title. Default is "MacroPCA cell map" or "cellPCA cell map".
 #'
 #' @return A patchwork (ggplot2) object.
 #'
@@ -212,8 +220,10 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
 plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(200, 400),
                           order = c("data", "od", "cluster"), profile = TRUE, spectra = NULL,
                           threshold = 0.1, labels = 5, lines = NULL, tol = 0.1,
-                          title = "MacroPCA cell map") {
+                          title = NULL) {
   check_macropca(object)
+  title <- title %||% paste(if (inherits(object, "specproc_cellpca")) "cellPCA" else "MacroPCA",
+                            "cell map")
   order <- match.arg(order)
   check_flag(profile, "profile")
   if (!is.numeric(resolution) || length(resolution) != 2 || anyNA(resolution) ||
@@ -270,13 +280,13 @@ plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(20
     ggplot2::theme(legend.position = "bottom", legend.box = "vertical")
 }
 
-#' @title Flagged Regions of a MacroPCA Fit
+#' @title Flagged Regions of a MacroPCA or cellPCA Fit
 #'
 #' @author Christian L. Goueguel
 #'
 #' @description
 #' Lists the wavelength regions where many observations have cells flagged
-#' by [macropca()]: runs of adjacent channels (on the same detector segment)
+#' by [macropca()] or [cellpca()]: runs of adjacent channels (on the same detector segment)
 #' whose share of flagged observations is at least `threshold`. These are
 #' the channels that persistently deviate from the PCA fit, for example
 #' emission lines affected by self-absorption, saturation or matrix
@@ -528,8 +538,8 @@ distance_fill_scale <- function(range, anchored) {
 # ---- cell map internals ------------------------------------------------------
 
 check_macropca <- function(object) {
-  if (!inherits(object, "specproc_macropca")) {
-    stop("'object' must be returned by macropca().", call. = FALSE)
+  if (!inherits(object, c("specproc_macropca", "specproc_cellpca"))) {
+    stop("'object' must be returned by macropca() or cellpca().", call. = FALSE)
   }
   invisible(object)
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_robust_pca.R
 \name{plot_cell_map}
 \alias{plot_cell_map}
-\title{Cell Map of a MacroPCA Fit}
+\title{Cell Map of a MacroPCA or cellPCA Fit}
 \usage{
 plot_cell_map(
   object,
@@ -16,11 +16,11 @@ plot_cell_map(
   labels = 5,
   lines = NULL,
   tol = 0.1,
-  title = "MacroPCA cell map"
+  title = NULL
 )
 }
 \arguments{
-\item{object}{An object returned by \code{\link[=macropca]{macropca()}}.}
+\item{object}{An object returned by \code{\link[=macropca]{macropca()}} or \code{\link[=cellpca]{cellpca()}}.}
 
 \item{rows, columns}{Optional indices or names of the rows and columns to
 show. Default is all.}
@@ -39,7 +39,7 @@ cells by variable.}
 \item{spectra}{Optional spectra whose mean is drawn behind the profile (a
 data frame or matrix with the variables of the model, other columns
 being ignored, or a single named spectrum). Default is the data imputed
-by MacroPCA.}
+by the fit.}
 
 \item{threshold}{The share of flagged observations above which channels
 form a flagged region. Default is 0.1.}
@@ -53,13 +53,14 @@ regions with the emission lines they match.}
 \item{tol}{The largest distance, in nm, between a region and a line it
 matches. Default is 0.1.}
 
-\item{title}{The plot title.}
+\item{title}{The plot title. Default is "MacroPCA cell map" or "cellPCA cell map".}
 }
 \value{
 A patchwork (ggplot2) object.
 }
 \description{
-Shows which cells of the data deviate from a \code{\link[=macropca]{macropca()}} fit: one row
+Shows which cells of the data deviate from a \code{\link[=macropca]{macropca()}} or \code{\link[=cellpca]{cellpca()}}
+fit: one row
 per observation, the variables (wavelengths) along the horizontal axis,
 and the flagged cells colored red when the observed value is higher than
 the fit and blue when it is lower. A strip on the right shows the outlier
@@ -93,7 +94,7 @@ same regions form bands (for example, a batch or a type of matrix).
 the fit, below zero when lower. The mean spectrum is drawn in grey
 behind it, rescaled, to show whether the flagged channels are on emission
 lines, on the continuum or in noise. It is the mean of \code{spectra} or, by
-default, of the data imputed by MacroPCA; it is left out when this mean
+default, of the data imputed by the fit; it is left out when this mean
 is close to zero, as for centered data (then give the raw spectra in
 \code{spectra}). The dashed lines are at \code{threshold}, and the \code{labels} flagged
 regions with the largest share (see \code{\link[=flagged_regions]{flagged_regions()}}) are labeled with

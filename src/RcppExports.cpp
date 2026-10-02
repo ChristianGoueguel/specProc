@@ -26,6 +26,69 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// scale_tanh_cols_cpp
+Rcpp::NumericVector scale_tanh_cols_cpp(const Rcpp::NumericMatrix x);
+RcppExport SEXP _specProc_scale_tanh_cols_cpp(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(scale_tanh_cols_cpp(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rho_tanh_cpp
+Rcpp::NumericVector rho_tanh_cpp(const Rcpp::NumericVector z, double b1);
+RcppExport SEXP _specProc_rho_tanh_cpp(SEXP zSEXP, SEXP b1SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector >::type z(zSEXP);
+    Rcpp::traits::input_parameter< double >::type b1(b1SEXP);
+    rcpp_result_gen = Rcpp::wrap(rho_tanh_cpp(z, b1));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cellpca_irls_cpp
+Rcpp::List cellpca_irls_cpp(const Eigen::Map<Eigen::MatrixXd> x, const Eigen::Map<Eigen::MatrixXd> m, const Eigen::Map<Eigen::MatrixXd> V0, const Eigen::Map<Eigen::MatrixXd> U0, const Eigen::Map<Eigen::VectorXd> mu0, const Eigen::Map<Eigen::VectorXd> sigma1, double sigma2, const Rcpp::NumericVector par2, double b1, int maxiter, double tol, double max_col_frac);
+RcppExport SEXP _specProc_cellpca_irls_cpp(SEXP xSEXP, SEXP mSEXP, SEXP V0SEXP, SEXP U0SEXP, SEXP mu0SEXP, SEXP sigma1SEXP, SEXP sigma2SEXP, SEXP par2SEXP, SEXP b1SEXP, SEXP maxiterSEXP, SEXP tolSEXP, SEXP max_col_fracSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type m(mSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type V0(V0SEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type U0(U0SEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type mu0(mu0SEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type sigma1(sigma1SEXP);
+    Rcpp::traits::input_parameter< double >::type sigma2(sigma2SEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector >::type par2(par2SEXP);
+    Rcpp::traits::input_parameter< double >::type b1(b1SEXP);
+    Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    Rcpp::traits::input_parameter< double >::type max_col_frac(max_col_fracSEXP);
+    rcpp_result_gen = Rcpp::wrap(cellpca_irls_cpp(x, m, V0, U0, mu0, sigma1, sigma2, par2, b1, maxiter, tol, max_col_frac));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cellpca_predict_cpp
+Rcpp::List cellpca_predict_cpp(const Eigen::Map<Eigen::MatrixXd> x, const Eigen::Map<Eigen::MatrixXd> m, const Eigen::Map<Eigen::MatrixXd> V, const Eigen::Map<Eigen::VectorXd> mu, const Eigen::Map<Eigen::VectorXd> sigma1, double b1, int maxiter, double tol);
+RcppExport SEXP _specProc_cellpca_predict_cpp(SEXP xSEXP, SEXP mSEXP, SEXP VSEXP, SEXP muSEXP, SEXP sigma1SEXP, SEXP b1SEXP, SEXP maxiterSEXP, SEXP tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type m(mSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type V(VSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type sigma1(sigma1SEXP);
+    Rcpp::traits::input_parameter< double >::type b1(b1SEXP);
+    Rcpp::traits::input_parameter< int >::type maxiter(maxiterSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(cellpca_predict_cpp(x, m, V, mu, sigma1, b1, maxiter, tol));
+    return rcpp_result_gen;
+END_RCPP
+}
 // col_medians_cpp
 NumericVector col_medians_cpp(NumericMatrix x, bool na_rm);
 RcppExport SEXP _specProc_col_medians_cpp(SEXP xSEXP, SEXP na_rmSEXP) {
@@ -62,32 +125,64 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// ddc_neighbors_cpp
-Rcpp::List ddc_neighbors_cpp(const Eigen::Map<Eigen::MatrixXd> u, double corrlim, int maxnb, double min_abs, int block);
-RcppExport SEXP _specProc_ddc_neighbors_cpp(SEXP uSEXP, SEXP corrlimSEXP, SEXP maxnbSEXP, SEXP min_absSEXP, SEXP blockSEXP) {
+// ddc_core_cpp
+Rcpp::List ddc_core_cpp(const Eigen::Map<Eigen::MatrixXd> x, double tol_prob, double corrlim, int maxnb, bool fast, int block);
+RcppExport SEXP _specProc_ddc_core_cpp(SEXP xSEXP, SEXP tol_probSEXP, SEXP corrlimSEXP, SEXP maxnbSEXP, SEXP fastSEXP, SEXP blockSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type u(uSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type tol_prob(tol_probSEXP);
     Rcpp::traits::input_parameter< double >::type corrlim(corrlimSEXP);
     Rcpp::traits::input_parameter< int >::type maxnb(maxnbSEXP);
-    Rcpp::traits::input_parameter< double >::type min_abs(min_absSEXP);
+    Rcpp::traits::input_parameter< bool >::type fast(fastSEXP);
     Rcpp::traits::input_parameter< int >::type block(blockSEXP);
-    rcpp_result_gen = Rcpp::wrap(ddc_neighbors_cpp(u, corrlim, maxnb, min_abs, block));
+    rcpp_result_gen = Rcpp::wrap(ddc_core_cpp(x, tol_prob, corrlim, maxnb, fast, block));
     return rcpp_result_gen;
 END_RCPP
 }
-// ddc_predict_cpp
-Eigen::MatrixXd ddc_predict_cpp(const Eigen::Map<Eigen::MatrixXd> u, const Rcpp::IntegerMatrix index, const Rcpp::NumericMatrix correlation, const Rcpp::NumericMatrix slope);
-RcppExport SEXP _specProc_ddc_predict_cpp(SEXP uSEXP, SEXP indexSEXP, SEXP correlationSEXP, SEXP slopeSEXP) {
+// ddc_apply_cpp
+Rcpp::List ddc_apply_cpp(const Eigen::Map<Eigen::MatrixXd> x, const Eigen::Map<Eigen::VectorXd> loc, const Eigen::Map<Eigen::VectorXd> scale, const Rcpp::IntegerMatrix ngbrs, const Rcpp::NumericMatrix weights, const Rcpp::NumericMatrix slopes, const Eigen::Map<Eigen::VectorXd> deshrink, const Eigen::Map<Eigen::VectorXd> res_scale, const Rcpp::LogicalVector standalone, double tol_prob, double med_ti, double mad_ti);
+RcppExport SEXP _specProc_ddc_apply_cpp(SEXP xSEXP, SEXP locSEXP, SEXP scaleSEXP, SEXP ngbrsSEXP, SEXP weightsSEXP, SEXP slopesSEXP, SEXP deshrinkSEXP, SEXP res_scaleSEXP, SEXP standaloneSEXP, SEXP tol_probSEXP, SEXP med_tiSEXP, SEXP mad_tiSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type u(uSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::IntegerMatrix >::type index(indexSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type correlation(correlationSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type slope(slopeSEXP);
-    rcpp_result_gen = Rcpp::wrap(ddc_predict_cpp(u, index, correlation, slope));
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type loc(locSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type scale(scaleSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::IntegerMatrix >::type ngbrs(ngbrsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type weights(weightsSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix >::type slopes(slopesSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type deshrink(deshrinkSEXP);
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::VectorXd> >::type res_scale(res_scaleSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::LogicalVector >::type standalone(standaloneSEXP);
+    Rcpp::traits::input_parameter< double >::type tol_prob(tol_probSEXP);
+    Rcpp::traits::input_parameter< double >::type med_ti(med_tiSEXP);
+    Rcpp::traits::input_parameter< double >::type mad_ti(mad_tiSEXP);
+    rcpp_result_gen = Rcpp::wrap(ddc_apply_cpp(x, loc, scale, ngbrs, weights, slopes, deshrink, res_scale, standalone, tol_prob, med_ti, mad_ti));
+    return rcpp_result_gen;
+END_RCPP
+}
+// unimcd_cpp
+Rcpp::NumericVector unimcd_cpp(const Rcpp::NumericVector x, double alpha);
+RcppExport SEXP _specProc_unimcd_cpp(SEXP xSEXP, SEXP alphaSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type alpha(alphaSEXP);
+    rcpp_result_gen = Rcpp::wrap(unimcd_cpp(x, alpha));
+    return rcpp_result_gen;
+END_RCPP
+}
+// scale_1step_cols_cpp
+Rcpp::NumericVector scale_1step_cols_cpp(const Eigen::Map<Eigen::MatrixXd> x);
+RcppExport SEXP _specProc_scale_1step_cols_cpp(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(scale_1step_cols_cpp(x));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -227,11 +322,17 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_specProc_whittaker_baseline_cpp", (DL_FUNC) &_specProc_whittaker_baseline_cpp, 5},
+    {"_specProc_scale_tanh_cols_cpp", (DL_FUNC) &_specProc_scale_tanh_cols_cpp, 1},
+    {"_specProc_rho_tanh_cpp", (DL_FUNC) &_specProc_rho_tanh_cpp, 2},
+    {"_specProc_cellpca_irls_cpp", (DL_FUNC) &_specProc_cellpca_irls_cpp, 12},
+    {"_specProc_cellpca_predict_cpp", (DL_FUNC) &_specProc_cellpca_predict_cpp, 8},
     {"_specProc_col_medians_cpp", (DL_FUNC) &_specProc_col_medians_cpp, 2},
     {"_specProc_computeGroupedMeans", (DL_FUNC) &_specProc_computeGroupedMeans, 3},
     {"_specProc_computeMeans", (DL_FUNC) &_specProc_computeMeans, 1},
-    {"_specProc_ddc_neighbors_cpp", (DL_FUNC) &_specProc_ddc_neighbors_cpp, 5},
-    {"_specProc_ddc_predict_cpp", (DL_FUNC) &_specProc_ddc_predict_cpp, 4},
+    {"_specProc_ddc_core_cpp", (DL_FUNC) &_specProc_ddc_core_cpp, 6},
+    {"_specProc_ddc_apply_cpp", (DL_FUNC) &_specProc_ddc_apply_cpp, 12},
+    {"_specProc_unimcd_cpp", (DL_FUNC) &_specProc_unimcd_cpp, 2},
+    {"_specProc_scale_1step_cols_cpp", (DL_FUNC) &_specProc_scale_1step_cols_cpp, 1},
     {"_specProc_epo_cpp", (DL_FUNC) &_specProc_epo_cpp, 3},
     {"_specProc_glsw_cpp", (DL_FUNC) &_specProc_glsw_cpp, 2},
     {"_specProc_univariate_mcd_cpp", (DL_FUNC) &_specProc_univariate_mcd_cpp, 2},
