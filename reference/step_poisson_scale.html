@@ -11,7 +11,7 @@ offset, as poisson_scale() does (column mode)."><meta property="og:image" conten
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -130,6 +130,38 @@ before the step is trained) and <code>id</code>.</p>
     <div class="dont-index"><p><code><a href="poisson_scale.html">poisson_scale()</a></code>, <code><a href="step_pareto_scale.html">step_pareto_scale()</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># potassium and the K I resonance lines</span></span></span>
+<span class="r-in"><span><span class="va">wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span> <span class="op">==</span> <span class="st">"K"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">wl</span> <span class="op">&gt;</span> <span class="fl">760</span> <span class="op">&amp;</span> <span class="va">wl</span> <span class="op">&lt;</span> <span class="fl">780</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">rec</span> <span class="op">&lt;-</span> <span class="fu">recipes</span><span class="fu">::</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></span><span class="op">(</span><span class="va">K</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">300</span>, <span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">step_poisson_scale</span><span class="op">(</span><span class="fu">recipes</span><span class="fu">::</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">prepped</span> <span class="op">&lt;-</span> <span class="fu">recipes</span><span class="fu">::</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/prep.html" class="external-link">prep</a></span><span class="op">(</span><span class="va">rec</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">recipes</span><span class="fu">::</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/bake.html" class="external-link">bake</a></span><span class="op">(</span><span class="va">prepped</span>, new_data <span class="op">=</span> <span class="va">dat</span><span class="op">[</span><span class="fl">301</span><span class="op">:</span><span class="fl">368</span>, <span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 68 × 246</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    `760.0161416` `760.1001689` `760.1841961` `760.2682233` `760.3522506`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>          21.1          20.9          20.4          20.3          20.0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>          20.4          19.3          19.7          19.7          19.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>          21.9          22.7          23.1          22.0          21.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>          20.6          21.1          21.6          20.6          20.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>          19.9          20.6          21.1          21.7          21.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>          23.4          23.3          23.3          22.9          22.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>          21.5          22.3          22.0          21.3          20.7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>          22.1          21.2          21.0          21.2          20.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>          19.9          20.1          20.0          20.4          19.8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>          21.6          22.1          21.6          22.0          22.1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 58 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 241 more variables: `760.4362778` &lt;dbl&gt;, `760.520305` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `760.6043323` &lt;dbl&gt;, `760.6883595` &lt;dbl&gt;, `760.7723867` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `760.856414` &lt;dbl&gt;, `760.9404412` &lt;dbl&gt;, `761.0244684` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `761.1084957` &lt;dbl&gt;, `761.1925229` &lt;dbl&gt;, `761.2765501` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `761.3605774` &lt;dbl&gt;, `761.4446046` &lt;dbl&gt;, `761.5286319` &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   `761.6126591` &lt;dbl&gt;, `761.6966863` &lt;dbl&gt;, `761.7807136` &lt;dbl&gt;, …</span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

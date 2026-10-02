@@ -15,7 +15,7 @@ transfer performance when the instrumental differences are not purely local."><m
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -125,6 +125,21 @@ Chemometrics and Intelligent Laboratory Systems, (32)2:201-213.</p></li>
     <p>Christian L. Goueguel</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">wl</span> <span class="op">&gt;</span> <span class="fl">760</span> <span class="op">&amp;</span> <span class="va">wl</span> <span class="op">&lt;</span> <span class="fl">780</span><span class="op">)</span><span class="op">]</span>  <span class="co"># the K I resonance lines</span></span></span>
+<span class="r-in"><span><span class="co"># a second instrument, with a shifted and less sensitive response</span></span></span>
+<span class="r-in"><span><span class="va">x1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">30</span>, <span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">x2</span> <span class="op">&lt;-</span> <span class="fl">0.8</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="va">x1</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>, <span class="va">x1</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span> <span class="fl">50</span></span></span>
+<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">pds</span><span class="op">(</span><span class="va">x1</span>, <span class="va">x2</span>, win <span class="op">=</span> <span class="fl">3</span>, ncomp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># spectra of the second instrument transferred to the first one</span></span></span>
+<span class="r-in"><span><span class="va">transferred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sweep.html" class="external-link">sweep</a></span><span class="op">(</span><span class="va">x2</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">res</span><span class="op">$</span><span class="va">transfer_matrix</span>, <span class="fl">2</span>, <span class="va">res</span><span class="op">$</span><span class="va">intercept</span>, <span class="st">"+"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">transferred</span> <span class="op">-</span> <span class="va">x1</span><span class="op">)</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">x1</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.0313053</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

@@ -9,7 +9,7 @@ of new samples with a model fitted by nas()."><meta property="og:image" content=
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,6 +79,25 @@ variables as the calibration spectra.</p></dd>
     <div class="dont-index"><p><code><a href="nas.html">nas()</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">wl</span> <span class="op">&gt;</span> <span class="fl">760</span> <span class="op">&amp;</span> <span class="va">wl</span> <span class="op">&lt;</span> <span class="fl">780</span><span class="op">)</span><span class="op">]</span>  <span class="co"># the K I resonance lines</span></span></span>
+<span class="r-in"><span><span class="va">cal</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">300</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="nas.html">nas</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">[</span><span class="va">cal</span>, <span class="op">]</span>, <span class="va">forageLIBS</span><span class="op">$</span><span class="va">K</span><span class="op">[</span><span class="va">cal</span><span class="op">]</span>, ncomp <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">spectra</span><span class="op">[</span><span class="op">-</span><span class="va">cal</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       nas selectivity predicted</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  -<span style="color: #BB0000;">144.</span>     0.005<span style="text-decoration: underline;">75</span>       1.98</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>   522.     0.014<span style="text-decoration: underline;">4</span>        2.15</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>   764.     0.104         2.21</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>   -<span style="color: #BB0000;">61.3</span>    0.002<span style="text-decoration: underline;">27</span>       2.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>    25.4    0.000<span style="text-decoration: underline;">857</span>      2.02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">329.</span>     0.140         1.68</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

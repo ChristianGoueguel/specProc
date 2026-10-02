@@ -36,7 +36,7 @@ average(x, .group_by = NULL)
 
 The function leverages the power of `Rcpp` to perform the mean
 calculations in C++. The underlying C++ implementation has a time
-complexity of *O(n × m)*, where *n* is the number of rows and *m* is the
+complexity of *O(n x m)*, where *n* is the number of rows and *m* is the
 number of columns in the data. Missing values are ignored in the
 computation of each mean.
 

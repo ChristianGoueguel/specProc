@@ -13,7 +13,7 @@ as outlying observations."><meta property="og:image" content="https://christiang
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -151,6 +151,32 @@ both when the recipe is prepped and when it is baked.</p>
     <div class="dont-index"><p><code><a href="macropca.html">macropca()</a></code>, <code><a href="step_robpca.html">step_robpca()</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># potassium and the K I resonance lines</span></span></span>
+<span class="r-in"><span><span class="va">wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span> <span class="op">==</span> <span class="st">"K"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">wl</span> <span class="op">&gt;</span> <span class="fl">760</span> <span class="op">&amp;</span> <span class="va">wl</span> <span class="op">&lt;</span> <span class="fl">780</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">rec</span> <span class="op">&lt;-</span> <span class="fu">recipes</span><span class="fu">::</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/recipe.html" class="external-link">recipe</a></span><span class="op">(</span><span class="va">K</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">dat</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">step_macropca</span><span class="op">(</span><span class="fu">recipes</span><span class="fu">::</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/has_role.html" class="external-link">all_predictors</a></span><span class="op">(</span><span class="op">)</span>, num_comp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">recipes</span><span class="fu">::</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/bake.html" class="external-link">bake</a></span><span class="op">(</span><span class="fu">recipes</span><span class="fu">::</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/prep.html" class="external-link">prep</a></span><span class="op">(</span><span class="va">rec</span><span class="op">)</span>, new_data <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 368 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        K    MPC1   MPC2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>  3.68  <span style="text-decoration: underline;">31</span>163.  <span style="text-decoration: underline;">1</span>301.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>  2.52  <span style="text-decoration: underline;">14</span>962. -<span style="color: #BB0000; text-decoration: underline;">2</span><span style="color: #BB0000;">339.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>  2.45  <span style="text-decoration: underline;">27</span>139. <span style="text-decoration: underline;">13</span>087.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>  2.3   <span style="text-decoration: underline;">26</span>085.  <span style="text-decoration: underline;">9</span>377.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>  2.87 -<span style="color: #BB0000; text-decoration: underline;">10</span><span style="color: #BB0000;">016.</span> -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">414.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>  2.16   <span style="text-decoration: underline;">4</span>631. -<span style="color: #BB0000; text-decoration: underline;">2</span><span style="color: #BB0000;">662.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>  2.94  <span style="text-decoration: underline;">37</span>568. <span style="text-decoration: underline;">10</span>883.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>  2.43   <span style="text-decoration: underline;">8</span>490. -<span style="color: #BB0000; text-decoration: underline;">4</span><span style="color: #BB0000;">050.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>  1.81 -<span style="color: #BB0000; text-decoration: underline;">10</span><span style="color: #BB0000;">530.</span> -<span style="color: #BB0000; text-decoration: underline;">2</span><span style="color: #BB0000;">341.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>  2.07  <span style="text-decoration: underline;">25</span>678.  -<span style="color: #BB0000;">538.</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 358 more rows</span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

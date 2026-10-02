@@ -98,3 +98,25 @@ on the result with `drop = TRUE`. In a recipe, use
 ## Author
 
 Christian L. Goueguel
+
+## Examples
+
+``` r
+data(forageLIBS)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+# five shots of each of four samples, one of them with a weak plasma
+set.seed(1)
+shots <- spectra[rep(1:4, each = 5), ] * stats::runif(20, 0.95, 1.05)
+shots[7, ] <- 0.2 * shots[7, ]
+shots <- cbind(sample = rep(c("A", "B", "C", "D"), each = 5), shots)
+res <- reject_shots(shots, sample)
+res[res$.rejected, c("sample", ".reason", ".intensity_z")]
+#> # A tibble: 1 × 3
+#>   sample .reason   .intensity_z
+#>   <chr>  <chr>            <dbl>
+#> 1 B      intensity        -20.1
+# the kept shots only
+nrow(reject_shots(shots, sample, drop = TRUE))
+#> [1] 19
+```

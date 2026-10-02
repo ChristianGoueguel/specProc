@@ -35,3 +35,23 @@ A tibble with one row per new sample and columns `nas`, `selectivity`,
 ## See also
 
 [`nas()`](https://christiangoueguel.com/specProc/reference/nas.md)
+
+## Examples
+
+``` r
+data(forageLIBS)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+cal <- 1:300
+fit <- nas(spectra[cal, ], forageLIBS$K[cal], ncomp = 3)
+head(predict(fit, spectra[-cal, ]))
+#> # A tibble: 6 × 3
+#>       nas selectivity predicted
+#>     <dbl>       <dbl>     <dbl>
+#> 1  -144.     0.00575       1.98
+#> 2   522.     0.0144        2.15
+#> 3   764.     0.104         2.21
+#> 4   -61.3    0.00227       2.00
+#> 5    25.4    0.000857      2.02
+#> 6 -1329.     0.140         1.68
+```

@@ -27,3 +27,13 @@ A dials `quant_param` object.
 ## See also
 
 [`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md)
+
+## Examples
+
+``` r
+savgol_derivative()
+#> Derivative order (quantitative)
+#> Range: [0, 2]
+dials::value_seq(savgol_derivative(), 3)
+#> [1] 0 1 2
+```

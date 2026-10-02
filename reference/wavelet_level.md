@@ -26,3 +26,13 @@ A dials `quant_param` object.
 ## See also
 
 [`step_wavelet()`](https://christiangoueguel.com/specProc/reference/step_wavelet.md)
+
+## Examples
+
+``` r
+wavelet_level()
+#> Wavelet levels (quantitative)
+#> Range: [1, 6]
+dials::value_seq(wavelet_level(), 3)
+#> [1] 1 3 6
+```

@@ -169,16 +169,16 @@ tidy(prepped, number = 1)
 #> # A tibble: 245 × 3
 #>    terms       num_comp id       
 #>    <chr>          <dbl> <chr>    
-#>  1 760.0161416        2 osc_DwBEJ
-#>  2 760.1001689        2 osc_DwBEJ
-#>  3 760.1841961        2 osc_DwBEJ
-#>  4 760.2682233        2 osc_DwBEJ
-#>  5 760.3522506        2 osc_DwBEJ
-#>  6 760.4362778        2 osc_DwBEJ
-#>  7 760.520305         2 osc_DwBEJ
-#>  8 760.6043323        2 osc_DwBEJ
-#>  9 760.6883595        2 osc_DwBEJ
-#> 10 760.7723867        2 osc_DwBEJ
+#>  1 760.0161416        2 osc_5kcDo
+#>  2 760.1001689        2 osc_5kcDo
+#>  3 760.1841961        2 osc_5kcDo
+#>  4 760.2682233        2 osc_5kcDo
+#>  5 760.3522506        2 osc_5kcDo
+#>  6 760.4362778        2 osc_5kcDo
+#>  7 760.520305         2 osc_5kcDo
+#>  8 760.6043323        2 osc_5kcDo
+#>  9 760.6883595        2 osc_5kcDo
+#> 10 760.7723867        2 osc_5kcDo
 #> # ℹ 235 more rows
 # new spectra are corrected with the filter estimated on the training data
 bake(prepped, new_data = dat[301:368, -1])

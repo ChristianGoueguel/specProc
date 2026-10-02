@@ -62,7 +62,7 @@ quantile function of the data. The defaults \\p = 0.125\\ and \\q =
 
 Interpretation of Quantile Weights:
 
-- At the normal distribution, LQW = RQW ≈ 0.2.
+- At the normal distribution, LQW = RQW = 0.2 (approximately).
 
 - Larger values indicate heavier tails than the normal distribution, and
   smaller values lighter tails.

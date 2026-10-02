@@ -77,7 +77,7 @@ adjusted_boxplot(
 ## Details
 
 The function is based on the medcouple (MC) measure computed on the data
-and which robustly measures skewness. This measure is bounded between −1
+and which robustly measures skewness. This measure is bounded between -1
 and 1. The medcouple is equal to zero when the observed distribution is
 symmetric, whereas a positive (resp. negative) value of MC corresponds
 to a right (resp. left) tailed distribution. It worth noting that this

@@ -9,7 +9,7 @@ interquartile range (IQR) method."><meta property="og:image" content="https://ch
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,7 +86,7 @@ In such cases, the code will automatically reset <code>k</code> to 1.5 and proce
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>For symmetric distributions, observations that fall outside the range defined
-by the lower fence (Q1 - k × IQR) and upper fence (Q3 + k × IQR) are considered as
+by the lower fence (Q1 - k * IQR) and upper fence (Q3 + k * IQR) are considered as
 potential outliers, where Q1 and Q3 are the 25th and 75th percentiles, respectively.
 The fence factor can be adjusted to make the method more or less robust
 (often 1.5 or 3). Optionally, the method can account for moderate skewness in data

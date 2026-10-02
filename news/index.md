@@ -1,5 +1,37 @@
 # Changelog
 
+## specProc 0.8.2
+
+### Dependencies
+
+- `ggsci`, `prospectr` and `XICOR` move from Imports to Suggests.
+  [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
+  uses the default ggplot2 palette when `ggsci` is not installed, and
+  `correlation(method = "chatterjee")` asks for `XICOR`.
+  [`y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/y_gradient_glsw.md)
+  computes its Savitzky-Golay derivatives with the package’s own filter
+  (same results).
+- `mt` is no longer suggested.
+- Every `step_*()` function checks that `recipes` is installed.
+
+### Documentation
+
+- Examples for the help pages that had none (the `step_*()` functions,
+  [`predict()`](https://rdrr.io/r/stats/predict.html) methods,
+  [`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md),
+  [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md),
+  [`robust_bcyj()`](https://christiangoueguel.com/specProc/reference/robust_bcyj.md),
+  [`umad()`](https://christiangoueguel.com/specProc/reference/umad.md),
+  the wavelength calibration helpers and the tuning parameters).
+- The
+  [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
+  example runs on a spectral window, and the
+  [`plot_loadings()`](https://christiangoueguel.com/specProc/reference/plot_loadings.md)
+  example that queries the NIST database is run with `\donttest` and
+  [`try()`](https://rdrr.io/r/base/try.html).
+- The package description covers the whole workflow, with references.
+- Non-ASCII mathematical symbols removed from the help pages.
+
 ## specProc 0.8.1
 
 ### Bug fixes

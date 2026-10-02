@@ -135,6 +135,7 @@ compared.
 - Hubert, M., Rousseeuw, P.J., Van den Bossche, W. (2019). MacroPCA: an
   all-in-one PCA method allowing for missing values as well as cellwise
   and rowwise outliers. Technometrics, 61(4):459-473.
+  [doi:10.1080/00401706.2018.1562989](https://doi.org/10.1080/00401706.2018.1562989)
 
 - Rousseeuw, P.J., Van den Bossche, W. (2018). Detecting deviating data
   cells. Technometrics, 60(2):135-145.

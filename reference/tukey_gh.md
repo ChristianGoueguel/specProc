@@ -84,7 +84,7 @@ tails, respectively, of Tukey’s \\g\\-and-\\h\\ distribution.
 
 ## References
 
-- Tukey, J.W., (1977). Modern techniques in data analysis. NSF‐sponsored
+- Tukey, J.W., (1977). Modern techniques in data analysis. NSF-sponsored
   regional research conference at Southeastern Massachusetts University,
   North Dartmouth, MA.
 

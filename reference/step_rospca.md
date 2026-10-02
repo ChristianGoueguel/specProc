@@ -115,3 +115,30 @@ with a range of 0.01 to 100.
 
 [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md),
 [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md)
+
+## Examples
+
+``` r
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+set.seed(1)
+rec <- recipes::recipe(K ~ ., data = dat) |>
+  step_rospca(recipes::all_predictors(), num_comp = 2, distances = TRUE)
+recipes::bake(recipes::prep(rec), new_data = NULL)
+#> # A tibble: 368 × 5
+#>        K RSPC1    RSPC2 RSPC_SD RSPC_OD
+#>    <dbl> <dbl>    <dbl>   <dbl>   <dbl>
+#>  1  3.68 21.1   -7.40     2.76     8.53
+#>  2  2.52 12.8   -0.0993   1.14     5.92
+#>  3  2.45 13.5  -17.6      4.97     7.44
+#>  4  2.3   7.94 -12.5      3.49     5.68
+#>  5  2.87 -4.68   2.84     0.880    5.75
+#>  6  2.16  7.41   2.29     0.909    5.92
+#>  7  2.94 38.0  -23.8      7.32    15.7 
+#>  8  2.43  5.27   2.19     0.759    5.91
+#>  9  1.81 -3.99   3.60     1.05     6.13
+#> 10  2.07 20.2   -1.60     1.85     6.09
+#> # ℹ 358 more rows
+```

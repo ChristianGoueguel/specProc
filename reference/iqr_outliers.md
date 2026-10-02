@@ -57,18 +57,18 @@ A tibble with two columns:
 ## Details
 
 For symmetric distributions, observations that fall outside the range
-defined by the lower fence (Q1 - k × IQR) and upper fence (Q3 + k × IQR)
-are considered as potential outliers, where Q1 and Q3 are the 25th and
-75th percentiles, respectively. The fence factor can be adjusted to make
-the method more or less robust (often 1.5 or 3). Optionally, the method
-can account for moderate skewness in data distributions by incorporating
-the medcouple. In such a case, the lower and upper fences are expressed
-in terms of the medcouple, adjusting the fences asymmetrically to better
-accommodate skewed distributions. Note that the implemented method does
-not explicitly account for tail heaviness. While the medcouple can
-provide some robustness against heavy tails, the method may still
-struggle to accurately identify potential outliers in distributions with
-extreme kurtosis or long-tailed behavior.
+defined by the lower fence (Q1 - k \* IQR) and upper fence (Q3 + k \*
+IQR) are considered as potential outliers, where Q1 and Q3 are the 25th
+and 75th percentiles, respectively. The fence factor can be adjusted to
+make the method more or less robust (often 1.5 or 3). Optionally, the
+method can account for moderate skewness in data distributions by
+incorporating the medcouple. In such a case, the lower and upper fences
+are expressed in terms of the medcouple, adjusting the fences
+asymmetrically to better accommodate skewed distributions. Note that the
+implemented method does not explicitly account for tail heaviness. While
+the medcouple can provide some robustness against heavy tails, the
+method may still struggle to accurately identify potential outliers in
+distributions with extreme kurtosis or long-tailed behavior.
 
 ## References
 

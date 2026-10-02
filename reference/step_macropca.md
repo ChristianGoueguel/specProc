@@ -107,3 +107,30 @@ is prepped and when it is baked.
 
 [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
 [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md)
+
+## Examples
+
+``` r
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+set.seed(1)
+rec <- recipes::recipe(K ~ ., data = dat) |>
+  step_macropca(recipes::all_predictors(), num_comp = 2)
+recipes::bake(recipes::prep(rec), new_data = NULL)
+#> # A tibble: 368 × 3
+#>        K    MPC1   MPC2
+#>    <dbl>   <dbl>  <dbl>
+#>  1  3.68  31163.  1301.
+#>  2  2.52  14962. -2339.
+#>  3  2.45  27139. 13087.
+#>  4  2.3   26085.  9377.
+#>  5  2.87 -10016. -1414.
+#>  6  2.16   4631. -2662.
+#>  7  2.94  37568. 10883.
+#>  8  2.43   8490. -4050.
+#>  9  1.81 -10530. -2341.
+#> 10  2.07  25678.  -538.
+#> # ℹ 358 more rows
+```

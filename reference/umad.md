@@ -61,3 +61,14 @@ sample size \\n\\:
 ## Author
 
 Christian L. Goueguel
+
+## Examples
+
+``` r
+set.seed(1)
+x <- c(stats::rnorm(50), 10, 12)  # two outliers
+umad(x)
+#> [1] 0.7808216
+stats::mad(x)
+#> [1] 0.7691122
+```

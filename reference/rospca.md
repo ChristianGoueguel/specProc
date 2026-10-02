@@ -138,22 +138,22 @@ Christian L. Goueguel
 
 ``` r
 set.seed(1)
-minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
-forageLIBS |>
-  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+# the 380-430 nm window (Ca II H and K lines)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+forageLIBS[, which(wl > 380 & wl < 430)] |>
   center() |>
   rospca() |>
   print()
 #> Robust sparse PCA (ROSPCA, lambda = 1)
 #> 
 #> Observations:   368 (h = 276)
-#> Variables:      7152
+#> Variables:      594
 #> Components:     2
-#> Eigenvalues:    3561.6  166.3
-#> Non-zero loadings per component: 7148 6469
+#> Eigenvalues:    374.97  13.91
+#> Non-zero loadings per component: 594 187
 #> 
 #> Outlier types:
 #> 
 #>            regular      good leverage orthogonal outlier       bad leverage 
-#>                291                 29                 25                 23 
+#>                276                 35                 30                 27 
 ```

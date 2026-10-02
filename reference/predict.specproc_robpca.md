@@ -49,3 +49,23 @@ observation.
 
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md),
 which can display new observations.
+
+## Examples
+
+``` r
+data(forageLIBS)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+set.seed(1)
+fit <- robpca(spectra[1:300, ])
+head(predict(fit, spectra[301:368, ]))
+#> # A tibble: 6 × 4
+#>      PC1    sd     od outlier_type      
+#>    <dbl> <dbl>  <dbl> <fct>             
+#> 1 23113. 1.06   6527. regular           
+#> 2 33447. 1.53  10935. orthogonal outlier
+#> 3  4303. 0.197  4341. regular           
+#> 4 25272. 1.16   5235. regular           
+#> 5 27946. 1.28   5746. regular           
+#> 6  3636. 0.167  6703. regular           
+```

@@ -106,3 +106,21 @@ returns the spectral `terms`, the `sample` column, the criteria
 [`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md),
 [`average()`](https://christiangoueguel.com/specProc/reference/average.md),
 [`step_line_ratio()`](https://christiangoueguel.com/specProc/reference/step_line_ratio.md)
+
+## Examples
+
+``` r
+data(forageLIBS)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+set.seed(1)
+shots <- spectra[rep(1:4, each = 5), ] * stats::runif(20, 0.95, 1.05)
+shots[7, ] <- 0.2 * shots[7, ]
+shots <- cbind(sample = rep(c("A", "B", "C", "D"), each = 5), shots)
+rec <- recipes::recipe(~ ., data = shots) |>
+  step_reject_shots(recipes::all_numeric(), sample = "sample")
+prepped <- recipes::prep(rec)
+# the rejected shot is removed from the training data
+nrow(recipes::bake(prepped, new_data = NULL))
+#> [1] 19
+```

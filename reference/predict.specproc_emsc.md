@@ -35,3 +35,15 @@ A tibble of corrected spectra.
 
 [`emsc()`](https://christiangoueguel.com/specProc/reference/emsc.md),
 [`predict.specproc_filter()`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+
+## Examples
+
+``` r
+data(forageLIBS)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+fit <- emsc(spectra[1:300, ], degree = 2)
+corrected <- predict(fit, spectra[301:368, ])
+dim(corrected)
+#> [1]  68 245
+```

@@ -115,3 +115,36 @@ down-weights variation between samples with similar outcomes.
 
 [`direct_osc()`](https://christiangoueguel.com/specProc/reference/direct_osc.md),
 [`predict.specproc_filter()`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
+
+## Examples
+
+``` r
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+  step_direct_osc(recipes::all_predictors(), num_comp = 2)
+prepped <- recipes::prep(rec)
+recipes::bake(prepped, new_data = dat[301:368, ])
+#> # A tibble: 68 × 246
+#>    `760.0161416` `760.1001689` `760.1841961` `760.2682233` `760.3522506`
+#>            <dbl>         <dbl>         <dbl>         <dbl>         <dbl>
+#>  1          1.77         -24.5         -45.6        -45.5         -50.3 
+#>  2        -25.9         -110.          -76.7        -71.0         -79.9 
+#>  3         11.5           46.3          71.5         19.3           6.38
+#>  4        -26.4          -17.1          17.7        -27.9         -35.6 
+#>  5        -69.1          -51.7         -18.3         20.5          15.6 
+#>  6         64.9           48.7          54.5         37.5           2.97
+#>  7         -2.95          22.3          14.8        -18.1         -40.8 
+#>  8         14.0          -51.6         -52.8        -37.3         -66.7 
+#>  9        -20.9          -32.1         -25.2          2.06        -20.8 
+#> 10        -35.2          -21.5         -48.9        -15.9          -4.34
+#> # ℹ 58 more rows
+#> # ℹ 241 more variables: `760.4362778` <dbl>, `760.520305` <dbl>,
+#> #   `760.6043323` <dbl>, `760.6883595` <dbl>, `760.7723867` <dbl>,
+#> #   `760.856414` <dbl>, `760.9404412` <dbl>, `761.0244684` <dbl>,
+#> #   `761.1084957` <dbl>, `761.1925229` <dbl>, `761.2765501` <dbl>,
+#> #   `761.3605774` <dbl>, `761.4446046` <dbl>, `761.5286319` <dbl>,
+#> #   `761.6126591` <dbl>, `761.6966863` <dbl>, `761.7807136` <dbl>, …
+```

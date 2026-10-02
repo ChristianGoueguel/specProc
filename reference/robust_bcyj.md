@@ -113,3 +113,19 @@ The `type` parameter controls which transformation method(s) to use:
 ## Author
 
 Christian L. Goueguel
+
+## Examples
+
+``` r
+data(forageLIBS)
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
+# two lines, transformed to central normality
+res <- robust_bcyj(spectra[, c(10, 50)])
+res$summary
+#> # A tibble: 2 × 4
+#>   variable    lambda method objective
+#>   <chr>        <dbl> <chr>      <dbl>
+#> 1 760.7723867   1.14 YJ          1.82
+#> 2 764.1334761   2.51 BC          2.26
+```

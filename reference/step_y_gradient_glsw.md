@@ -103,3 +103,36 @@ returns the selected `terms`, `alpha` (relative) and `id`.
 
 [`y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/y_gradient_glsw.md),
 [`step_glsw()`](https://christiangoueguel.com/specProc/reference/step_glsw.md)
+
+## Examples
+
+``` r
+data(forageLIBS)
+# potassium and the K I resonance lines
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+dat <- forageLIBS[c(which(names(forageLIBS) == "K"), which(wl > 760 & wl < 780))]
+rec <- recipes::recipe(K ~ ., data = dat[1:300, ]) |>
+  step_y_gradient_glsw(recipes::all_predictors(), alpha = 0.01)
+prepped <- recipes::prep(rec)
+recipes::bake(prepped, new_data = dat[301:368, ])
+#> # A tibble: 68 × 246
+#>    `760.0161416` `760.1001689` `760.1841961` `760.2682233` `760.3522506`
+#>            <dbl>         <dbl>         <dbl>         <dbl>         <dbl>
+#>  1          707.          739.          718.          684.          669.
+#>  2          713.          688.          721.          693.          673.
+#>  3          686.          778.          803.          716.          694.
+#>  4          682.          749.          785.          704.          686.
+#>  5          656.          731.          766.          769.          755.
+#>  6          753.          794.          802.          747.          705.
+#>  7          725.          804.          802.          731.          701.
+#>  8          756.          746.          748.          727.          689.
+#>  9          670.          719.          724.          719.          684.
+#> 10          719.          788.          763.          760.          764.
+#> # ℹ 58 more rows
+#> # ℹ 241 more variables: `760.4362778` <dbl>, `760.520305` <dbl>,
+#> #   `760.6043323` <dbl>, `760.6883595` <dbl>, `760.7723867` <dbl>,
+#> #   `760.856414` <dbl>, `760.9404412` <dbl>, `761.0244684` <dbl>,
+#> #   `761.1084957` <dbl>, `761.1925229` <dbl>, `761.2765501` <dbl>,
+#> #   `761.3605774` <dbl>, `761.4446046` <dbl>, `761.5286319` <dbl>,
+#> #   `761.6126591` <dbl>, `761.6966863` <dbl>, `761.7807136` <dbl>, …
+```
