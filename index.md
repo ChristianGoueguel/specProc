@@ -177,8 +177,10 @@ and SVR models (on the same coefficients) as references:
 
 All pipelines are evaluated on the same 25 splits, so they can be
 compared split by split. Since the resamples overlap, the standard error
-of the mean difference is corrected ([Nadeau and Bengio,
-2003](https://doi.org/10.1023/A:1024068626366)):
+of the mean difference is inflated as in the corrected repeated k-fold
+test ([Nadeau and Bengio,
+2003](https://doi.org/10.1023/A:1024068626366); [Bouckaert and Frank,
+2004](https://doi.org/10.1007/978-3-540-24775-3_3)):
 
 ![](reference/figures/README-compare-paired-plot-1.png)
 

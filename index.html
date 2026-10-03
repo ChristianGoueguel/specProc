@@ -238,7 +238,7 @@
 <span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="st">"sequential"</span><span class="op">)</span></span></code></pre></div>
 <p>The cross-validated RMSE of the component-based pipelines as a function of the number of components: on the left, the normalizations; on the right, the models of the wavelet coefficients, with the best elastic net and SVR models (on the same coefficients) as references:</p>
 <p><img src="reference/figures/README-compare-rmse-1.png" alt="" width="100%"></p>
-<p>All pipelines are evaluated on the same 25 splits, so they can be compared split by split. Since the resamples overlap, the standard error of the mean difference is corrected (<a href="https://doi.org/10.1023/A:1024068626366" class="external-link">Nadeau and Bengio, 2003</a>):</p>
+<p>All pipelines are evaluated on the same 25 splits, so they can be compared split by split. Since the resamples overlap, the standard error of the mean difference is inflated as in the corrected repeated k-fold test (<a href="https://doi.org/10.1023/A:1024068626366" class="external-link">Nadeau and Bengio, 2003</a>; <a href="https://doi.org/10.1007/978-3-540-24775-3_3" class="external-link">Bouckaert and Frank, 2004</a>):</p>
 <p><img src="reference/figures/README-compare-paired-plot-1.png" alt="" width="100%"></p>
 <p>Contrasts between preprocessing steps and models:</p>
 <table class="table">
