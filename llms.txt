@@ -175,6 +175,22 @@ and SVR models (on the same coefficients) as references:
 
 ![](reference/figures/README-compare-rmse-1.png)
 
+All pipelines are evaluated on the same 25 splits, so they can be
+compared split by split. Since the resamples overlap, the standard error
+of the mean difference is corrected ([Nadeau and Bengio,
+2003](https://doi.org/10.1023/A:1024068626366)):
+
+![](reference/figures/README-compare-paired-plot-1.png)
+
+Contrasts between preprocessing steps and models:
+
+| Contrast | Mean difference (% Ca) | Splits where the first is better | p (corrected) |
+|:---|---:|:---|---:|
+| C I + PLS vs PLS | -0.0019 | 20 / 25 | 0.24 |
+| Area + PLS vs PLS | 0.0018 | 8 / 25 | 0.40 |
+| C I + wavelet + PLS vs C I + PLS | 0.0001 | 12 / 25 | 0.96 |
+| C I + wavelet + SVR vs C I + wavelet + PLS | 0.0035 | 5 / 25 | 0.36 |
+
 ## License
 
 MIT © Christian L. Goueguel

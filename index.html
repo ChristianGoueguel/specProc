@@ -238,6 +238,49 @@
 <span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="st">"sequential"</span><span class="op">)</span></span></code></pre></div>
 <p>The cross-validated RMSE of the component-based pipelines as a function of the number of components: on the left, the normalizations; on the right, the models of the wavelet coefficients, with the best elastic net and SVR models (on the same coefficients) as references:</p>
 <p><img src="reference/figures/README-compare-rmse-1.png" alt="" width="100%"></p>
+<p>All pipelines are evaluated on the same 25 splits, so they can be compared split by split. Since the resamples overlap, the standard error of the mean difference is corrected (<a href="https://doi.org/10.1023/A:1024068626366" class="external-link">Nadeau and Bengio, 2003</a>):</p>
+<p><img src="reference/figures/README-compare-paired-plot-1.png" alt="" width="100%"></p>
+<p>Contrasts between preprocessing steps and models:</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr>
+<th align="left">Contrast</th>
+<th align="right">Mean difference (% Ca)</th>
+<th align="left">Splits where the first is better</th>
+<th align="right">p (corrected)</th>
+</tr></thead>
+<tbody>
+<tr>
+<td align="left">C I + PLS vs PLS</td>
+<td align="right">-0.0019</td>
+<td align="left">20 / 25</td>
+<td align="right">0.24</td>
+</tr>
+<tr>
+<td align="left">Area + PLS vs PLS</td>
+<td align="right">0.0018</td>
+<td align="left">8 / 25</td>
+<td align="right">0.40</td>
+</tr>
+<tr>
+<td align="left">C I + wavelet + PLS vs C I + PLS</td>
+<td align="right">0.0001</td>
+<td align="left">12 / 25</td>
+<td align="right">0.96</td>
+</tr>
+<tr>
+<td align="left">C I + wavelet + SVR vs C I + wavelet + PLS</td>
+<td align="right">0.0035</td>
+<td align="left">5 / 25</td>
+<td align="right">0.36</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
