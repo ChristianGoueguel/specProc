@@ -80,7 +80,7 @@ website](https://christiangoueguel.com/specProc/articles/).
 ## Function overview
 
 | Task | Functions |
-|------------------------------------|------------------------------------|
+|----|----|
 | Line identification | `libs_lines()`, `plot_lines()`, `line_finder()` (Shiny app), `wavelength_calibration()`, `apply_calibration()` |
 | Line fitting | `peak_fit()`, `multipeak_fit()`, `plot_fit()`, `line_intensities()`, `voigt_profile()`, `pseudo_voigt_profile()`, `gaussian_profile()`, `lorentzian_profile()`, `voigt_fwhm()` |
 | Preprocessing | `baseline_arpls()`, `baseline_als()`, `baseline_lsp()`, `snv()`, `msc()`, `emsc()`, `normalize()`, `savitzky_golay()`, `wavelet_features()`, `reject_shots()`, `average()` |
@@ -293,6 +293,74 @@ rmsecv <- setNames(summary_table$`RMSECV`, summary_table$Pipeline)
 fmt <- \(x) sprintf("%.4f", x)
 se <- mean(summary_table$SE)
 variance_share <- with(summary_table, Variance / (`Bias²` + Variance))
+```
+
+All pipelines are evaluated on the same 25 splits, so they can be
+compared split by split. Since the resamples overlap, the standard error
+of the mean difference is corrected ([Nadeau and Bengio,
+2003](https://doi.org/10.1023/A:1024068626366)):
+
+```{r compare-paired, include=FALSE}
+per_split <- imap(results, \(res, name) {
+  collect_metrics(res, summarize = FALSE) |>
+    filter(.metric == "rmse", .config == best$.config[best$pipeline == name]) |>
+    select(id, id2, rmse = .estimate)
+  }) |>
+  bind_rows(.id = "pipeline") |>
+  pivot_wider(names_from = pipeline, values_from = rmse)
+
+# Difference a - b on each split; 1/4 is the test/train ratio of a 5-fold split
+paired <- \(a, b) {
+  d <- per_split[[a]] - per_split[[b]]
+  n <- length(d)
+  se <- sd(d) * sqrt(1 / n + 1 / 4)
+  tibble(
+    a, b, diff = list(d), mean = mean(d), wins = sum(d < 0), n,
+    lo = mean - qt(0.975, n - 1) * se, hi = mean + qt(0.975, n - 1) * se,
+    p = 2 * pt(-abs(mean) / se, n - 1)
+    )
+  }
+
+reference <- as.character(best$pipeline[which.min(best$mean_rmse)])
+vs_reference <- map(setdiff(names(pipelines), reference), paired, b = reference) |>
+  bind_rows() |>
+  mutate(a = reorder(a, -mean))
+```
+
+```{r compare-paired-plot, echo=FALSE, fig.width=8, out.width="100%"}
+vs_reference |>
+  unnest(diff) |>
+  ggplot(aes(diff, a)) +
+  geom_vline(xintercept = 0, colour = "grey40", linetype = "dashed") +
+  geom_point(position = position_jitter(height = 0.15, seed = 1), colour = "grey65", size = 1.6) +
+  geom_errorbar(aes(x = NULL, xmin = lo, xmax = hi), data = vs_reference, orientation = "y", width = 0, linewidth = 1.2, colour = "#2a78d6") +
+  geom_point(aes(mean), data = vs_reference, size = 3, colour = "#2a78d6") +
+  scale_x_continuous(breaks = seq(-0.01, 0.02, by = 0.005)) +
+  labs(
+    x = sprintf("RMSE minus RMSE of %s on the same split (%% Ca)", reference), y = NULL,
+    title = sprintf("Paired differences from %s", reference),
+    subtitle = "Grey: the 25 resamples; blue: mean and corrected 95% interval"
+    ) +
+  theme_bw() +
+  theme(plot.title = element_text(face = "bold"), panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
+```
+
+Contrasts between preprocessing steps and models:
+
+```{r compare-contrasts, echo=FALSE}
+bind_rows(
+  paired("C I + PLS", "PLS"),
+  paired("Area + PLS", "PLS"),
+  paired("C I + wavelet + PLS", "C I + PLS"),
+  paired("C I + wavelet + SVR", "C I + wavelet + PLS")
+  ) |>
+  transmute(
+    Contrast = paste(a, "vs", b),
+    `Mean difference (% Ca)` = mean,
+    `Splits where the first is better` = sprintf("%d / %d", wins, n),
+    `p (corrected)` = p
+    ) |>
+  knitr::kable(digits = c(0, 4, 0, 2))
 ```
 
 ## License
