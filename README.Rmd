@@ -80,7 +80,7 @@ website](https://christiangoueguel.com/specProc/articles/).
 ## Function overview
 
 | Task | Functions |
-|------------------------------------|------------------------------------|
+|----|----|
 | Line identification | `libs_lines()`, `plot_lines()`, `line_finder()` (Shiny app), `wavelength_calibration()`, `apply_calibration()` |
 | Line fitting | `peak_fit()`, `multipeak_fit()`, `plot_fit()`, `line_intensities()`, `voigt_profile()`, `pseudo_voigt_profile()`, `gaussian_profile()`, `lorentzian_profile()`, `voigt_fwhm()` |
 | Preprocessing | `baseline_arpls()`, `baseline_als()`, `baseline_lsp()`, `snv()`, `msc()`, `emsc()`, `normalize()`, `savitzky_golay()`, `wavelet_features()`, `reject_shots()`, `average()` |
@@ -100,11 +100,11 @@ for the full list.
 Which preprocessing and which model suit a LIBS calibration is an
 empirical question. Since every specProc step is a recipe step,
 candidate pipelines can be compared on an equal footing: each recipe is
-re-estimated in every resample, together with the model. Here we
-predict calcium from all 368 `forageLIBS` spectra. Calcium has strong
-lines in these spectra (Ca II 393.37 and 396.85 nm, Ca I 422.67 nm), a
-laboratory value for every sample, and a calibration error that reaches
-its minimum within a few components, so the trade-offs are easy to see.
+re-estimated in every resample, together with the model. Here we predict
+calcium from all 368 `forageLIBS` spectra. Calcium has strong lines in
+these spectra (Ca II 393.37 and 396.85 nm, Ca I 422.67 nm), a laboratory
+value for every sample, and a calibration error that reaches its minimum
+within a few components, so the trade-offs are easy to see.
 
 The pipelines combine the steps that matter for LIBS spectra:
 normalization to the total emission (`step_spectral_norm()`) or to an
@@ -190,7 +190,11 @@ pipelines <- list(
 ```
 
 Each pipeline is cross-validated in five repeats of a 5-fold split that
-keeps the spectra of a sample in the same fold:
+keeps the spectra of a sample in the same fold. The 25 resamples are
+spread over parallel workers with the
+[future](https://future.futureverse.org) package; tune gives each
+resample the same random numbers in parallel as in sequence, so the
+results do not depend on the number of workers:
 
 ```{r compare-tune}
 # the same seed gives the same folds whatever the preprocessed data
@@ -199,20 +203,21 @@ cv_folds <- \(data) {
   group_vfold_cv(data, group = Sample, v = 5, repeats = 5)
 }
 
+future::plan("multisession", workers = parallelly::availableCores(omit = 1))
 results <- map(pipelines, \(p) {
   rec <- p[[1]]
   tune_grid(workflow(rec, p[[2]]), resamples = cv_folds(rec$template), grid = p[[3]],
             metrics = metric_set(rmse, rsq), control = control_grid(save_pred = TRUE))
 })
+future::plan("sequential")
 ```
 
 With repeated cross-validation, every sample is predicted once per
-repeat, by models trained on different subsets. The cross-validated
-mean squared error (MSE) then splits exactly into two terms: the
-squared bias, from the distance between the mean prediction of a sample
-and its laboratory value, and the variance, from the spread of its
-predictions around that mean. Both terms are reported in the table
-below.
+repeat, by models trained on different subsets. The cross-validated mean
+squared error (MSE) then splits exactly into two terms: the squared
+bias, from the distance between the mean prediction of a sample and its
+laboratory value, and the variance, from the spread of its predictions
+around that mean. Both terms are reported in the table below.
 
 ```{r compare-metrics}
 decompose <- \(res) {
@@ -307,12 +312,12 @@ se <- mean(summary_table$SE)
 variance_share <- with(summary_table, Variance / (`Bias²` + Variance))
 ```
 
-- **The internal standard helps; the total emission does not.**
-  Dividing by the C I line lowers the RMSE of PLS from
-  `r fmt(rmsecv["PLS"])` to `r fmt(rmsecv["C I + PLS"])`% Ca, while
-  normalizing to the total area raises it to
-  `r fmt(rmsecv["Area + PLS"])`%: the total emission depends on the
-  composition of the forage, not only on the ablated mass.
+- **The internal standard helps; the total emission does not.** Dividing
+  by the C I line lowers the RMSE of PLS from `r fmt(rmsecv["PLS"])` to
+  `r fmt(rmsecv["C I + PLS"])`% Ca, while normalizing to the total area
+  raises it to `r fmt(rmsecv["Area + PLS"])`%: the total emission
+  depends on the composition of the forage, not only on the ablated
+  mass.
 - **The wavelet compression loses nothing.** With 8 times fewer
   variables, PLS reaches the same error, and its error curve stays flat
   beyond the optimum: the choice of the number of components matters
@@ -322,11 +327,12 @@ variance_share <- with(summary_table, Variance / (`Bias²` + Variance))
   PCR needs more components than PLS, since its components ignore
   calcium, but has the lowest variance. Robust PCA brings no gain on
   these spectra; it pays off when the training set holds outlying
-  spectra. The OPLS filter followed by a lasso (α = 1) matches PLS.
-  The SVR adds nothing either, a sign that the response of the Ca
-  lines is close to linear over this range.
+  spectra. The OPLS filter followed by a lasso (α = 1) matches PLS. The
+  SVR adds nothing either, a sign that the response of the Ca lines is
+  close to linear over this range.
 - **The error is mostly bias.** At the best tuning, the variance makes
-  up only `r round(100 * min(variance_share), 1)`–`r round(100 * max(variance_share), 1)`%
+  up only
+  `r round(100 * min(variance_share), 1)`–`r round(100 * max(variance_share), 1)`%
   of the MSE. The squared bias includes the error of the laboratory
   reference values and the matrix effects the spectra do not resolve,
   which no model removes. The variance sets the number of components:
