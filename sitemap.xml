@@ -61,6 +61,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/nist_levels.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/nist_lines.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/normalize.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/num_intervals.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/o2pls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/opls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/osc.html</loc></url>
@@ -82,6 +83,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_som.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_spectra.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_wavelength_calibration.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/plot_wavelength_selection.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/poisson_scale.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_emsc.html</loc></url>
@@ -89,6 +91,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_nas.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_opls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_rsimpls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_som.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_wavelength_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/projected_osc.html</loc></url>
@@ -101,10 +104,12 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/robust_bcyj.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/rospca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/rousseeuw_croux.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/rsimpls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/saha_boltzmann.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/saturation_summary.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/savgol_derivative.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/savitzky_golay.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/select_wavelengths.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/self_absorption.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/snv.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/som.html</loc></url>
@@ -137,6 +142,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/step_robust_bcyj.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_rospca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_savgol.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/step_select_wavelengths.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_snv.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_spectral_norm.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_wavelet.html</loc></url>

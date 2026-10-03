@@ -17,7 +17,7 @@ a few emission lines. The computational kernels are written in C++."><meta prope
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.3.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -130,13 +130,15 @@ deviation in \(H_2\).</p></li>
 and \(Q_n\)) if <code>stand = TRUE</code>. As in <code><a href="robpca.html">robpca()</a></code>, the <code>h</code> least
 outlying observations form \(H_0\), and those whose orthogonal
 distance to the \(k\)-dimensional PCA subspace of \(H_0\) is below
-the cut-off form \(H_1\)</p></li>
+the cut-off form \(H_1\) (\(H_1 = H_0\) when <code>k</code> equals the rank
+of the data, as the subspace is then the whole space).</p></li>
 <li><p><strong>Sparsification.</strong> The observations of \(H_1\) are standardized and
 the sparse loadings are computed by maximizing, component by component,
 the variance of the scores minus <code>lambda</code> times the \(L_1\) norm of
 the loadings. Variables with zero loadings on all components are set
 aside; the observations whose orthogonal distance to the sparse
-subspace is below the cut-off form \(H_2\), and the sparse loadings
+subspace is below the cut-off form \(H_2\) (\(H_2 = H_1\) when the
+sparse subspace contains all the observations), and the sparse loadings
 are recomputed from \(H_2\), standardized in turn.</p></li>
 <li><p><strong>Eigenvalues and center.</strong> The eigenvalues are first estimated by the
 squared \(Q_n\) of the scores of \(H_2\). The <code>h</code> observations of

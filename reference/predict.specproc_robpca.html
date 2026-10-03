@@ -11,7 +11,7 @@ distances with the cut-offs of the calibration data."><meta property="og:image" 
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.3.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -98,14 +98,14 @@ observation.</p>
 <span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="robpca.html">robpca</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">300</span>, <span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">spectra</span><span class="op">[</span><span class="fl">301</span><span class="op">:</span><span class="fl">368</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      PC1    sd     od outlier_type      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>             </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> <span style="text-decoration: underline;">23</span>113. 1.06   <span style="text-decoration: underline;">6</span>527. regular           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> <span style="text-decoration: underline;">33</span>447. 1.53  <span style="text-decoration: underline;">10</span>935. orthogonal outlier</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">4</span>303. 0.197  <span style="text-decoration: underline;">4</span>341. regular           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> <span style="text-decoration: underline;">25</span>272. 1.16   <span style="text-decoration: underline;">5</span>235. regular           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> <span style="text-decoration: underline;">27</span>946. 1.28   <span style="text-decoration: underline;">5</span>746. regular           </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">3</span>636. 0.167  <span style="text-decoration: underline;">6</span>703. regular           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       PC1    sd     od outlier_type      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> -<span style="color: #BB0000; text-decoration: underline;">23</span><span style="color: #BB0000;">113.</span> 1.06   <span style="text-decoration: underline;">6</span>527. regular           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> -<span style="color: #BB0000; text-decoration: underline;">33</span><span style="color: #BB0000;">447.</span> 1.53  <span style="text-decoration: underline;">10</span>935. orthogonal outlier</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  -<span style="color: #BB0000; text-decoration: underline;">4</span><span style="color: #BB0000;">303.</span> 0.197  <span style="text-decoration: underline;">4</span>341. regular           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> -<span style="color: #BB0000; text-decoration: underline;">25</span><span style="color: #BB0000;">272.</span> 1.16   <span style="text-decoration: underline;">5</span>235. regular           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> -<span style="color: #BB0000; text-decoration: underline;">27</span><span style="color: #BB0000;">946.</span> 1.28   <span style="text-decoration: underline;">5</span>746. regular           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>  -<span style="color: #BB0000; text-decoration: underline;">3</span><span style="color: #BB0000;">636.</span> 0.167  <span style="text-decoration: underline;">6</span>703. regular           </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -31,7 +31,7 @@ for MacroPCA and cellPCA, outlying cells and missing values).
   [`predict(`*`<specproc_robpca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
   : Scores and Distances of New Observations
 - [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
-  : Outlier Map of a Robust PCA
+  : Outlier Map of a Robust PCA or Robust PLS Model
 - [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
   : Cell Map of a MacroPCA or cellPCA Fit
 - [`flagged_regions()`](https://christiangoueguel.com/specProc/reference/flagged_regions.md)
@@ -81,6 +81,21 @@ sources of variance from the multivariate data.
   [`predict(`*`<specproc_projected_osc>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
   [`predict(`*`<o2pls>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
   : Apply an Orthogonalization Filter to New Spectra
+
+### robust PLS regression and wavelength selection
+
+Robust PLS regression that resists outlying spectra and wrong reference
+values, and the selection of the informative wavelengths (VIP,
+selectivity ratio, interval PLS).
+
+- [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+  : Robust Partial Least Squares Regression (RSIMPLS)
+- [`predict(`*`<specproc_rsimpls>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimpls.md)
+  : Predictions of a Robust PLS Model
+- [`select_wavelengths()`](https://christiangoueguel.com/specProc/reference/select_wavelengths.md)
+  : Wavelength Selection for PLS Regression
+- [`plot_wavelength_selection()`](https://christiangoueguel.com/specProc/reference/plot_wavelength_selection.md)
+  : Plot of a Wavelength Selection
 
 ### figures of merit
 
@@ -172,6 +187,11 @@ and can be tuned within a tidymodels workflow.
 - [`step_y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/step_y_gradient_glsw.md)
   : y-Gradient Generalized Least Squares Weighting Recipe Step
 
+### wavelength selection
+
+- [`step_select_wavelengths()`](https://christiangoueguel.com/specProc/reference/step_select_wavelengths.md)
+  : Wavelength Selection Recipe Step
+
 ### tuning parameters
 
 - [`baseline_lambda()`](https://christiangoueguel.com/specProc/reference/baseline_lambda.md)
@@ -184,6 +204,8 @@ and can be tuned within a tidymodels workflow.
   : Number of Levels of a Wavelet Decomposition
 - [`spectral_norm_method()`](https://christiangoueguel.com/specProc/reference/spectral_norm_method.md)
   : Norm of a Spectral Normalization
+- [`num_intervals()`](https://christiangoueguel.com/specProc/reference/num_intervals.md)
+  : Number of Intervals
 
 ## Line identification
 

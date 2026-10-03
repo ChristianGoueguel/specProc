@@ -88,15 +88,18 @@ The algorithm follows the published description in three steps:
     [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
     the `h` least outlying observations form \\H_0\\, and those whose
     orthogonal distance to the \\k\\-dimensional PCA subspace of \\H_0\\
-    is below the cut-off form \\H_1\\
+    is below the cut-off form \\H_1\\ (\\H_1 = H_0\\ when `k` equals the
+    rank of the data, as the subspace is then the whole space).
 
 2.  **Sparsification.** The observations of \\H_1\\ are standardized and
     the sparse loadings are computed by maximizing, component by
     component, the variance of the scores minus `lambda` times the
     \\L_1\\ norm of the loadings. Variables with zero loadings on all
     components are set aside; the observations whose orthogonal distance
-    to the sparse subspace is below the cut-off form \\H_2\\, and the
-    sparse loadings are recomputed from \\H_2\\, standardized in turn.
+    to the sparse subspace is below the cut-off form \\H_2\\ (\\H_2 =
+    H_1\\ when the sparse subspace contains all the observations), and
+    the sparse loadings are recomputed from \\H_2\\, standardized in
+    turn.
 
 3.  **Eigenvalues and center.** The eigenvalues are first estimated by
     the squared \\Q_n\\ of the scores of \\H_2\\. The `h` observations

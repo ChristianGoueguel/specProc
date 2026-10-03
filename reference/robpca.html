@@ -15,7 +15,7 @@ computational kernels (outlyingness, FAST-MCD) are written in C++."><meta proper
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.3.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,7 +108,8 @@ is not given. Default is 0.8.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>An object of class <code>specproc_robpca</code>, a list with:</p><ul><li><p><code>loadings</code>: \(p \times k\) matrix of robust loadings.</p></li>
+    <p>An object of class <code>specproc_robpca</code>, a list with:</p><ul><li><p><code>loadings</code>: \(p \times k\) matrix of robust loadings, the largest
+element of each loading vector positive.</p></li>
 <li><p><code>eigenvalues</code>: robust eigenvalues (variances of the scores).</p></li>
 <li><p><code>center</code>: robust center.</p></li>
 <li><p><code>scores</code>: \(n \times k\) matrix of scores.</p></li>
@@ -135,15 +136,20 @@ observations form the subset \(H_0\).</p></li>
 number that explains <code>var_explained</code> of the variance of \(H_0\), with
 at most <code>kmax</code>. Observations whose orthogonal distance to the
 \(k\)-dimensional PCA subspace of \(H_0\) is below the cut-off form
-\(H_1\), and the subspace is re-estimated from \(H_1\).</p></li>
+\(H_1\), and the subspace is re-estimated from \(H_1\). When <code>k</code>
+equals the rank of the data, this subspace is the whole space and
+\(H_1 = H_0\).</p></li>
 <li><p>All observations are projected onto this subspace, and the reweighted
 FAST-MCD estimator of the scores gives the final center, loadings and
-eigenvalues.</p></li>
+eigenvalues. When <code>k</code> equals the rank, this is the reweighted MCD of the
+data.</p></li>
 </ol><p>Each observation then has a score distance (SD), its robust Mahalanobis
 distance within the PCA subspace, and an orthogonal distance (OD) to the
 subspace. The cut-off for the SD is \(\sqrt{\chi^2_{k,0.975}}\); the
 cut-off for the OD uses the Wilson-Hilferty approximation, with the
-univariate MCD of \(OD^{2/3}\). <code><a href="plot_outlier_map.html">plot_outlier_map()</a></code> plots both.</p>
+univariate MCD of \(OD^{2/3}\). When <code>k</code> equals the rank, the ODs and
+their cut-off are zero: there are no orthogonal outliers.
+<code><a href="plot_outlier_map.html">plot_outlier_map()</a></code> plots both distances.</p>
 <p>This is an independent implementation of the published algorithm, not a
 port of the rospca or rrcov code, so its results can differ slightly from
 theirs (random directions and subsets, and small-sample correction

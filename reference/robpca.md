@@ -61,7 +61,8 @@ robpca(
 
 An object of class `specproc_robpca`, a list with:
 
-- `loadings`: \\p \times k\\ matrix of robust loadings.
+- `loadings`: \\p \times k\\ matrix of robust loadings, the largest
+  element of each loading vector positive.
 
 - `eigenvalues`: robust eigenvalues (variances of the scores).
 
@@ -103,18 +104,22 @@ The algorithm follows the published description:
     \\H_0\\, with at most `kmax`. Observations whose orthogonal distance
     to the \\k\\-dimensional PCA subspace of \\H_0\\ is below the
     cut-off form \\H_1\\, and the subspace is re-estimated from \\H_1\\.
+    When `k` equals the rank of the data, this subspace is the whole
+    space and \\H_1 = H_0\\.
 
 4.  All observations are projected onto this subspace, and the
     reweighted FAST-MCD estimator of the scores gives the final center,
-    loadings and eigenvalues.
+    loadings and eigenvalues. When `k` equals the rank, this is the
+    reweighted MCD of the data.
 
 Each observation then has a score distance (SD), its robust Mahalanobis
 distance within the PCA subspace, and an orthogonal distance (OD) to the
 subspace. The cut-off for the SD is \\\sqrt{\chi^2\_{k,0.975}}\\; the
 cut-off for the OD uses the Wilson-Hilferty approximation, with the
-univariate MCD of \\OD^{2/3}\\.
+univariate MCD of \\OD^{2/3}\\. When `k` equals the rank, the ODs and
+their cut-off are zero: there are no orthogonal outliers.
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
-plots both.
+plots both distances.
 
 This is an independent implementation of the published algorithm, not a
 port of the rospca or rrcov code, so its results can differ slightly

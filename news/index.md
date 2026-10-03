@@ -1,5 +1,107 @@
 # Changelog
 
+## specProc (development version)
+
+### New features
+
+- [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md):
+  robust PLS regression by the RSIMPLS algorithm of Hubert and Vanden
+  Branden (2003), the SIMPLS algorithm computed from a ROBPCA covariance
+  matrix of the spectra and the responses, followed by a robust
+  regression on the scores. Outlying spectra and wrong reference values
+  have little influence on the model. One or several responses; the
+  response is block-scaled before ROBPCA so that wrong reference values
+  are detected whatever its units.
+  [`predict()`](https://rdrr.io/r/stats/predict.html) gives the
+  predictions or scores of new spectra, and
+  [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
+  draws the regression outlier map (vertical outliers, good and bad
+  leverage points).
+- [`select_wavelengths()`](https://christiangoueguel.com/specProc/reference/select_wavelengths.md):
+  selection of the informative wavelengths for PLS regression, by the
+  variable importance in projection (VIP), the selectivity ratio (SR),
+  backward elimination on either, or forward interval PLS (iPLS). With
+  `robust = TRUE`, the selection is made from an
+  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+  model, without the regression outliers. The candidate intervals of
+  iPLS are evaluated in parallel when a
+  [`future::plan()`](https://future.futureverse.org/reference/plan.html)
+  is set.
+  [`plot_wavelength_selection()`](https://christiangoueguel.com/specProc/reference/plot_wavelength_selection.md)
+  shows the selected regions on the mean spectrum with the importance of
+  each variable.
+- [`step_select_wavelengths()`](https://christiangoueguel.com/specProc/reference/step_select_wavelengths.md):
+  the selection as a recipe step, repeated on every resample;
+  `num_terms`, `num_intervals` (new dials parameter
+  [`num_intervals()`](https://christiangoueguel.com/specProc/reference/num_intervals.md))
+  and `num_comp` can be tuned.
+
+### Improvements
+
+- [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
+  and
+  [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
+  are faster on wide data (up to about 4 times on full LIBS spectra):
+  the reduction to the subspace spanned by the observations is now
+  computed in C++ from the smaller cross-product matrix instead of an
+  SVD. The results are unchanged up to numerical precision.
+
+### Breaking changes
+
+- The loadings of
+  [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
+  now have a fixed sign, their largest element positive, as those of
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  and
+  [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md).
+  The signs of loadings and scores may differ from those of earlier
+  versions.
+
+### Bug fixes
+
+- [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
+  and
+  [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
+  failed, or flagged most observations as orthogonal outliers, when `k`
+  equalled the rank of the data (for example `k = 5` with 5 variables,
+  `k = n - 1` with more variables than observations, or a `k` chosen by
+  `var_explained` for data with few variables): the orthogonal distances
+  to a subspace that is the whole space are rounding errors, and their
+  cut-off was zero. As in Hubert, Rousseeuw and Vanden Branden (2005),
+  ROBPCA then reduces to the reweighted MCD of the data: the reweighting
+  on the orthogonal distances is skipped, and H1 is the subset H0 of the
+  least outlying observations (as in the rospca package). The orthogonal
+  distances and their cut-off are now zero, with no orthogonal outliers,
+  in
+  [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
+  [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
+  and
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
+  and for new observations of
+  [`predict()`](https://rdrr.io/r/stats/predict.html) that lie in the
+  subspace.
+- [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
+  [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
+  and
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  no longer depend on the units of the data: their numerical tolerances
+  (singular subsets of FAST-MCD, zero scales of the outlyingness, the
+  cut-off of the orthogonal distances, the rank and the C-steps of
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
+  and the constant variables of the detection of deviating cells) are
+  relative to the scale of the data instead of absolute. Robust PCA
+  failed on data with a small scale (“No non-singular subset found” for
+  values around 1e-8, or a zero cut-off of the orthogonal distances when
+  they were all below 1.5e-8), and
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  gave different results. With the same seed, `robpca(x * c)` now gives
+  the same subsets and outlier types as `robpca(x)` for any `c > 0`. The
+  final step of
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  now always uses the deterministic MCD when it succeeds: cellWise
+  compares its log-determinant with the determinant of the C-steps, a
+  comparison that depends on the units, and keeps it in the usual case.
+
 ## specProc 0.8.3
 
 ### New features

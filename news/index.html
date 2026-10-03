@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">specProc</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.8.3.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,34 @@
       <small>Source: <a href="https://github.com/ChristianGoueguel/specProc/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="specproc-development-version">specProc (development version)<a class="anchor" aria-label="anchor" href="#specproc-development-version"></a></h2>
+<div class="section level3">
+<h3 id="new-features-development-version">New features<a class="anchor" aria-label="anchor" href="#new-features-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/rsimpls.html">rsimpls()</a></code>: robust PLS regression by the RSIMPLS algorithm of Hubert and Vanden Branden (2003), the SIMPLS algorithm computed from a ROBPCA covariance matrix of the spectra and the responses, followed by a robust regression on the scores. Outlying spectra and wrong reference values have little influence on the model. One or several responses; the response is block-scaled before ROBPCA so that wrong reference values are detected whatever its units. <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> gives the predictions or scores of new spectra, and <code><a href="../reference/plot_outlier_map.html">plot_outlier_map()</a></code> draws the regression outlier map (vertical outliers, good and bad leverage points).</li>
+<li>
+<code><a href="../reference/select_wavelengths.html">select_wavelengths()</a></code>: selection of the informative wavelengths for PLS regression, by the variable importance in projection (VIP), the selectivity ratio (SR), backward elimination on either, or forward interval PLS (iPLS). With <code>robust = TRUE</code>, the selection is made from an <code><a href="../reference/rsimpls.html">rsimpls()</a></code> model, without the regression outliers. The candidate intervals of iPLS are evaluated in parallel when a <code><a href="https://future.futureverse.org/reference/plan.html" class="external-link">future::plan()</a></code> is set. <code><a href="../reference/plot_wavelength_selection.html">plot_wavelength_selection()</a></code> shows the selected regions on the mean spectrum with the importance of each variable.</li>
+<li>
+<code><a href="../reference/step_select_wavelengths.html">step_select_wavelengths()</a></code>: the selection as a recipe step, repeated on every resample; <code>num_terms</code>, <code>num_intervals</code> (new dials parameter <code><a href="../reference/num_intervals.html">num_intervals()</a></code>) and <code>num_comp</code> can be tuned.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="improvements-development-version">Improvements<a class="anchor" aria-label="anchor" href="#improvements-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/robpca.html">robpca()</a></code> and <code><a href="../reference/rospca.html">rospca()</a></code> are faster on wide data (up to about 4 times on full LIBS spectra): the reduction to the subspace spanned by the observations is now computed in C++ from the smaller cross-product matrix instead of an SVD. The results are unchanged up to numerical precision.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
+<ul><li>The loadings of <code><a href="../reference/robpca.html">robpca()</a></code> now have a fixed sign, their largest element positive, as those of <code><a href="../reference/macropca.html">macropca()</a></code> and <code><a href="../reference/cellpca.html">cellpca()</a></code>. The signs of loadings and scores may differ from those of earlier versions.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/robpca.html">robpca()</a></code> and <code><a href="../reference/rospca.html">rospca()</a></code> failed, or flagged most observations as orthogonal outliers, when <code>k</code> equalled the rank of the data (for example <code>k = 5</code> with 5 variables, <code>k = n - 1</code> with more variables than observations, or a <code>k</code> chosen by <code>var_explained</code> for data with few variables): the orthogonal distances to a subspace that is the whole space are rounding errors, and their cut-off was zero. As in Hubert, Rousseeuw and Vanden Branden (2005), ROBPCA then reduces to the reweighted MCD of the data: the reweighting on the orthogonal distances is skipped, and H1 is the subset H0 of the least outlying observations (as in the rospca package). The orthogonal distances and their cut-off are now zero, with no orthogonal outliers, in <code><a href="../reference/robpca.html">robpca()</a></code>, <code><a href="../reference/rospca.html">rospca()</a></code> and <code><a href="../reference/macropca.html">macropca()</a></code>, and for new observations of <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> that lie in the subspace.</li>
+<li>
+<code><a href="../reference/robpca.html">robpca()</a></code>, <code><a href="../reference/rospca.html">rospca()</a></code> and <code><a href="../reference/macropca.html">macropca()</a></code> no longer depend on the units of the data: their numerical tolerances (singular subsets of FAST-MCD, zero scales of the outlyingness, the cut-off of the orthogonal distances, the rank and the C-steps of <code><a href="../reference/macropca.html">macropca()</a></code>, and the constant variables of the detection of deviating cells) are relative to the scale of the data instead of absolute. Robust PCA failed on data with a small scale (“No non-singular subset found” for values around 1e-8, or a zero cut-off of the orthogonal distances when they were all below 1.5e-8), and <code><a href="../reference/macropca.html">macropca()</a></code> gave different results. With the same seed, <code>robpca(x * c)</code> now gives the same subsets and outlier types as <code>robpca(x)</code> for any <code>c &gt; 0</code>. The final step of <code><a href="../reference/macropca.html">macropca()</a></code> now always uses the deterministic MCD when it succeeds: cellWise compares its log-determinant with the determinant of the C-steps, a comparison that depends on the units, and keeps it in the usual case.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.8.3" id="specproc-083">specProc 0.8.3<a class="anchor" aria-label="anchor" href="#specproc-083"></a></h2>
 <div class="section level3">

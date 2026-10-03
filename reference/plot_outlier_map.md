@@ -1,4 +1,4 @@
-# Outlier Map of a Robust PCA
+# Outlier Map of a Robust PCA or Robust PLS Model
 
 Plots the orthogonal distance of each observation against its score
 distance, for a robust PCA fitted by
@@ -10,7 +10,12 @@ or
 (Hubert, Rousseeuw and Vanden Branden, 2005). For
 [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md),
 the vertical axis is the norm of the standardized residuals, as in the
-enhanced outlier map of Centofanti, Hubert and Rousseeuw.
+enhanced outlier map of Centofanti, Hubert and Rousseeuw. For a robust
+PLS model fitted by
+[`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md),
+it is the regression outlier map of Hubert and Vanden Branden (2003):
+the residual distance (with one response, the absolute standardized
+residual) against the score distance.
 
 ## Usage
 
@@ -35,14 +40,17 @@ plot_outlier_map(
   An object returned by
   [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
   [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md),
-  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
+  [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md)
   or
-  [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md).
+  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md).
 
 - newdata:
 
   Optional new observations to add to the map (a numeric matrix or data
-  frame with the calibration variables).
+  frame with the calibration variables). Not available for
+  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+  fits.
 
 - labels:
 
@@ -111,6 +119,14 @@ map into four types of observations:
 - **bad leverage** points (top right): far on both counts, the most
   harmful outliers.
 
+In the regression outlier map of
+[`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md),
+the top left region holds the **vertical outliers**: observations with a
+typical spectrum but a large residual, such as a wrong reference value.
+Bad leverage points have both an outlying spectrum and a large residual;
+good leverage points have an outlying spectrum that the model still
+fits.
+
 New observations (`newdata`) are projected onto the model with
 [predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
 and shown with the calibration cut-offs, which is how new spectra are
@@ -129,6 +145,7 @@ model.
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
 [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md),
 [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
+[`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md),
 [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
 
 ## Author
