@@ -166,7 +166,11 @@ pipelines <- list(
 ```
 
 Each pipeline is cross-validated in five repeats of a 5-fold split that
-keeps the spectra of a sample in the same fold:
+keeps the spectra of a sample in the same fold. The 25 resamples are
+spread over parallel workers with the
+[future](https://future.futureverse.org) package; tune gives each
+resample the same random numbers in parallel as in sequence, so the
+results do not depend on the number of workers:
 
 ``` r
 
@@ -176,11 +180,13 @@ cv_folds <- \(data) {
   group_vfold_cv(data, group = Sample, v = 5, repeats = 5)
 }
 
+future::plan("multisession", workers = parallelly::availableCores(omit = 1))
 results <- map(pipelines, \(p) {
   rec <- p[[1]]
   tune_grid(workflow(rec, p[[2]]), resamples = cv_folds(rec$template), grid = p[[3]],
             metrics = metric_set(rmse, rsq), control = control_grid(save_pred = TRUE))
 })
+future::plan("sequential")
 ```
 
 With repeated cross-validation, every sample is predicted once per
