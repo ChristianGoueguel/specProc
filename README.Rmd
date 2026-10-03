@@ -267,9 +267,7 @@ panel(names(groups)[1], groups[[1]]) +
   )
 ```
 
-The best model of each pipeline:
-
-```{r compare-table, echo=FALSE}
+```{r compare-table, eval=FALSE, include=FALSE}
 summary_table <- best |>
   mutate(Tuning = case_when(
     !is.na(cost) ~ sprintf("C = %g, σ = %.1e", cost, rbf_sigma),
@@ -290,7 +288,7 @@ summary_table <- best |>
 knitr::kable(summary_table, digits = c(0, 0, 4, 4, 3, 5, 5))
 ```
 
-```{r compare-numbers, include = FALSE}
+```{r compare-numbers, eval=FALSE, include=FALSE}
 rmsecv <- setNames(summary_table$`RMSECV`, summary_table$Pipeline)
 fmt <- \(x) sprintf("%.4f", x)
 se <- mean(summary_table$SE)

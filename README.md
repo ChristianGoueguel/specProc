@@ -181,19 +181,6 @@ and SVR models (on the same coefficients) as references:
 
 <img src="man/figures/README-compare-rmse-1.png" alt="" width="100%" />
 
-The best model of each pipeline:
-
-| Pipeline | Tuning | RMSECV | SE | R² | Bias² | Variance |
-|:---|:---|---:|---:|---:|---:|---:|
-| C I + PLS | 8 comp | 0.0899 | 0.0017 | 0.762 | 0.00800 | 0.00015 |
-| C I + wavelet + PLS | 14 comp | 0.0900 | 0.0016 | 0.762 | 0.00776 | 0.00040 |
-| C I + wavelet + OPLS + enet | 3 orth, λ = 1.0e-02, α = 1 | 0.0903 | 0.0016 | 0.759 | 0.00809 | 0.00013 |
-| C I + wavelet + PCR | 13 comp | 0.0908 | 0.0016 | 0.754 | 0.00822 | 0.00009 |
-| C I + wavelet + robust PCR | 16 comp | 0.0915 | 0.0015 | 0.750 | 0.00832 | 0.00011 |
-| PLS | 8 comp | 0.0918 | 0.0018 | 0.751 | 0.00837 | 0.00012 |
-| C I + wavelet + SVR | C = 4, σ = 1.0e-04 | 0.0935 | 0.0017 | 0.740 | 0.00865 | 0.00017 |
-| Area + PLS | 7 comp | 0.0935 | 0.0016 | 0.740 | 0.00871 | 0.00010 |
-
 ## License
 
 MIT © Christian L. Goueguel
