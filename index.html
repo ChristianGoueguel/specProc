@@ -172,6 +172,273 @@
 <p>See the <a href="https://christiangoueguel.com/specProc/reference/">reference</a> for the full list.</p>
 </div>
 <div class="section level2">
+<h2 id="comparing-preprocessing-pipelines">Comparing preprocessing pipelines<a class="anchor" aria-label="anchor" href="#comparing-preprocessing-pipelines"></a>
+</h2>
+<p>Which preprocessing and which model suit a LIBS calibration is an empirical question. Since every specProc step is a recipe step, candidate pipelines can be compared on an equal footing: each recipe is re-estimated in every resample, together with the model. Here we predict calcium from all 368 <code>forageLIBS</code> spectra. Calcium has strong lines in these spectra (Ca II 393.37 and 396.85 nm, Ca I 422.67 nm), a laboratory value for every sample, and a calibration error that reaches its minimum within a few components, so the trade-offs are easy to see.</p>
+<p>The pipelines combine the steps that matter for LIBS spectra: normalization to the total emission (<code><a href="reference/step_spectral_norm.html">step_spectral_norm()</a></code>) or to an internal standard (<code><a href="reference/step_line_ratio.html">step_line_ratio()</a></code>), here the C I 247.86 nm line, as carbon is the main element of the organic matrix; compression by a wavelet transform (<code><a href="reference/step_wavelet.html">step_wavelet()</a></code>); classical or robust principal components (<code>step_pca()</code>, <code><a href="reference/step_robpca.html">step_robpca()</a></code>); and orthogonal filtering (<code><a href="reference/step_opls.html">step_opls()</a></code>). The models are PLS, principal component regression (PCR), the elastic net and a support vector regression (SVR).</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressPackageStartupMessages</a></span><span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.mixOmics.org" class="external-link">mixOmics</a></span><span class="op">)</span><span class="op">)</span> <span class="co"># the PLS engine</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ChristianGoueguel/specProc" class="external-link">specProc</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidymodels.tidymodels.org" class="external-link">tidymodels</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://plsmod.tidymodels.org" class="external-link">plsmod</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com" class="external-link">patchwork</a></span><span class="op">)</span></span>
+<span><span class="fu">tidymodels_prefer</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"forageLIBS"</span><span class="op">)</span></span>
+<span><span class="va">spectra_id</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Measurement"</span>, <span class="st">"Sample"</span><span class="op">)</span></span>
+<span><span class="va">minerals</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">14</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># steps that transform each spectrum on its own estimate nothing from the</span></span>
+<span><span class="co"># training data: apply them once, outside the resampling loop</span></span>
+<span><span class="va">per_spectrum</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="va">data</span>, <span class="va">step</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">recipe</span><span class="op">(</span><span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">data</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">update_role</span><span class="op">(</span><span class="fu">all_of</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">spectra_id</span>, <span class="va">minerals</span><span class="op">)</span><span class="op">)</span>, new_role <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/step.html" class="external-link">step</a></span><span class="op">(</span><span class="fu">all_predictors</span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">prep</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">bake</span><span class="op">(</span>new_data <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">corrected</span> <span class="op">&lt;-</span> <span class="fu">per_spectrum</span><span class="op">(</span><span class="va">forageLIBS</span>, <span class="va">step_baseline</span>, lambda <span class="op">=</span> <span class="fl">1e5</span>,</span>
+<span>                          options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>max.iter <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">area</span> <span class="op">&lt;-</span> <span class="fu">per_spectrum</span><span class="op">(</span><span class="va">corrected</span>, <span class="va">step_spectral_norm</span>, method <span class="op">=</span> <span class="st">"area"</span><span class="op">)</span></span>
+<span><span class="va">carbon</span> <span class="op">&lt;-</span> <span class="fu">per_spectrum</span><span class="op">(</span><span class="va">corrected</span>, <span class="va">step_line_ratio</span>, reference <span class="op">=</span> <span class="fl">247.856</span>, window <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span></span>
+<span><span class="va">compressed</span> <span class="op">&lt;-</span> <span class="fu">per_spectrum</span><span class="op">(</span><span class="va">carbon</span>, <span class="va">step_wavelet</span>, level <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="co"># 8 times fewer variables</span></span>
+<span></span>
+<span><span class="va">ca_recipe</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">recipe</span><span class="op">(</span><span class="va">Ca</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">data</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">update_role</span><span class="op">(</span><span class="fu">all_of</span><span class="op">(</span><span class="va">spectra_id</span><span class="op">)</span>, <span class="fu">all_of</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="va">minerals</span>, <span class="st">"Ca"</span><span class="op">)</span><span class="op">)</span>, new_role <span class="op">=</span> <span class="st">"id"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>The baseline is removed in every pipeline. The steps estimated from the training data (principal components, orthogonal filter) and the model parameters are tuned together:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># mixOmics scales every predictor by default; scale = FALSE only centers</span></span>
+<span><span class="va">pls_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/pls.html" class="external-link">pls</a></span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/tune.html" class="external-link">tune</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"mixOmics"</span>, scale <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">pcr_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/linear_reg.html" class="external-link">linear_reg</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"lm"</span><span class="op">)</span></span>
+<span><span class="va">enet_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/linear_reg.html" class="external-link">linear_reg</a></span><span class="op">(</span>penalty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/tune.html" class="external-link">tune</a></span><span class="op">(</span><span class="op">)</span>, mixture <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/tune.html" class="external-link">tune</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"glmnet"</span><span class="op">)</span></span>
+<span><span class="va">svr_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/svm_rbf.html" class="external-link">svm_rbf</a></span><span class="op">(</span>cost <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/tune.html" class="external-link">tune</a></span><span class="op">(</span><span class="op">)</span>, rbf_sigma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/tune.html" class="external-link">tune</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"kernlab"</span><span class="op">)</span></span>
+<span><span class="va">components</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">pipelines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="st">"PLS"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">ca_recipe</span><span class="op">(</span><span class="va">corrected</span><span class="op">)</span>, <span class="va">pls_model</span>, <span class="va">components</span><span class="op">)</span>,</span>
+<span>  <span class="st">"Area + PLS"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">ca_recipe</span><span class="op">(</span><span class="va">area</span><span class="op">)</span>, <span class="va">pls_model</span>, <span class="va">components</span><span class="op">)</span>,</span>
+<span>  <span class="st">"C I + PLS"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">ca_recipe</span><span class="op">(</span><span class="va">carbon</span><span class="op">)</span>, <span class="va">pls_model</span>, <span class="va">components</span><span class="op">)</span>,</span>
+<span>  <span class="st">"C I + wavelet + PLS"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">ca_recipe</span><span class="op">(</span><span class="va">compressed</span><span class="op">)</span>, <span class="va">pls_model</span>, <span class="va">components</span><span class="op">)</span>,</span>
+<span>  <span class="st">"C I + wavelet + PCR"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu">ca_recipe</span><span class="op">(</span><span class="va">compressed</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">step_center</span><span class="op">(</span><span class="fu">all_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">step_pca</span><span class="op">(</span><span class="fu">all_predictors</span><span class="op">(</span><span class="op">)</span>, num_comp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/tune.html" class="external-link">tune</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="va">pcr_model</span>, <span class="va">components</span><span class="op">)</span>,</span>
+<span>  <span class="st">"C I + wavelet + robust PCR"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu">ca_recipe</span><span class="op">(</span><span class="va">compressed</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu"><a href="reference/step_robpca.html">step_robpca</a></span><span class="op">(</span><span class="fu">all_predictors</span><span class="op">(</span><span class="op">)</span>, num_comp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/tune.html" class="external-link">tune</a></span><span class="op">(</span><span class="op">)</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>kmax <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="va">pcr_model</span>, <span class="va">components</span><span class="op">)</span>,</span>
+<span>  <span class="st">"C I + wavelet + OPLS + elastic net"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu">ca_recipe</span><span class="op">(</span><span class="va">compressed</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="reference/step_opls.html">step_opls</a></span><span class="op">(</span><span class="fu">all_predictors</span><span class="op">(</span><span class="op">)</span>, num_comp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/tune.html" class="external-link">tune</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="va">enet_model</span>,</span>
+<span>    <span class="fu">expand_grid</span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, penalty <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">4</span>, <span class="op">-</span><span class="fl">1</span>, by <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
+<span>                mixture <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.5</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="st">"C I + wavelet + SVR"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu">ca_recipe</span><span class="op">(</span><span class="va">compressed</span><span class="op">)</span>, <span class="va">svr_model</span>,</span>
+<span>    <span class="fu">expand_grid</span><span class="op">(</span>cost <span class="op">=</span> <span class="fl">2</span><span class="op">^</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">8</span>, by <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, rbf_sigma <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">4.5</span>, <span class="op">-</span><span class="fl">2.5</span>, by <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Each pipeline is cross-validated in five repeats of a 5-fold split that keeps the spectra of a sample in the same fold:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># the same seed gives the same folds whatever the preprocessed data</span></span>
+<span><span class="va">cv_folds</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2026</span><span class="op">)</span></span>
+<span>  <span class="fu">group_vfold_cv</span><span class="op">(</span><span class="va">data</span>, group <span class="op">=</span> <span class="va">Sample</span>, v <span class="op">=</span> <span class="fl">5</span>, repeats <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">pipelines</span>, \<span class="op">(</span><span class="va">p</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">rec</span> <span class="op">&lt;-</span> <span class="va">p</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span>  <span class="fu">tune_grid</span><span class="op">(</span><span class="fu">workflow</span><span class="op">(</span><span class="va">rec</span>, <span class="va">p</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>, resamples <span class="op">=</span> <span class="fu">cv_folds</span><span class="op">(</span><span class="va">rec</span><span class="op">$</span><span class="va">template</span><span class="op">)</span>, grid <span class="op">=</span> <span class="va">p</span><span class="op">[[</span><span class="fl">3</span><span class="op">]</span><span class="op">]</span>,</span>
+<span>            metrics <span class="op">=</span> <span class="fu">metric_set</span><span class="op">(</span><span class="va">rmse</span>, <span class="va">rsq</span><span class="op">)</span>, control <span class="op">=</span> <span class="fu">control_grid</span><span class="op">(</span>save_pred <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<p>With repeated cross-validation, every sample is predicted once per repeat, by models trained on different subsets. The cross-validated mean squared error (MSE) then splits exactly into two terms: the squared bias, from the distance between the mean prediction of a sample and its laboratory value, and the variance, from the spread of its predictions around that mean. Both terms are reported in the table below.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">decompose</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="va">res</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">collect_predictions</span><span class="op">(</span><span class="va">res</span>, summarize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">summarise</span><span class="op">(</span>bias2 <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">.pred</span><span class="op">)</span> <span class="op">-</span> <span class="va">Ca</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span>,</span>
+<span>              variance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">.pred</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">.pred</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, .by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">.config</span>, <span class="va">.row</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">summarise</span><span class="op">(</span><span class="fu">across</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">bias2</span>, <span class="va">variance</span><span class="op">)</span>, <span class="va">mean</span><span class="op">)</span>, .by <span class="op">=</span> <span class="va">.config</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">mutate</span><span class="op">(</span>mse <span class="op">=</span> <span class="va">bias2</span> <span class="op">+</span> <span class="va">variance</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">metrics</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">results</span>, \<span class="op">(</span><span class="va">res</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">collect_metrics</span><span class="op">(</span><span class="va">res</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lm.ridge.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">.estimator</span>, <span class="op">-</span><span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">pivot_wider</span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">.metric</span>, values_from <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">mean</span>, <span class="va">std_err</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">left_join</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/decompose.html" class="external-link">decompose</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">".config"</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">bind_rows</span><span class="op">(</span>.id <span class="op">=</span> <span class="st">"pipeline"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>pipeline <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">pipeline</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pipelines</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">best</span> <span class="op">&lt;-</span> <span class="fu">slice_min</span><span class="op">(</span><span class="va">metrics</span>, <span class="va">mean_rmse</span>, by <span class="op">=</span> <span class="va">pipeline</span>, with_ties <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p>The cross-validated RMSE of the component-based pipelines as a function of the number of components: on the left, the normalizations; on the right, the models of the wavelet coefficients, with the best elastic net and SVR models (on the same coefficients) as references:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="st">"Normalization"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PLS"</span>, <span class="st">"Area + PLS"</span>, <span class="st">"C I + PLS"</span><span class="op">)</span>,</span>
+<span>  <span class="st">"Wavelet compression"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C I + wavelet + PLS"</span>, <span class="st">"C I + wavelet + PCR"</span>,</span>
+<span>                            <span class="st">"C I + wavelet + robust PCR"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">others</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">best</span>, <span class="op">!</span><span class="va">pipeline</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">panel</span> <span class="op">&lt;-</span> \<span class="op">(</span><span class="va">title</span>, <span class="va">members</span>, <span class="va">references</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">metrics</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">pipeline</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">members</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">mutate</span><span class="op">(</span>pipeline <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">pipeline</span>, levels <span class="op">=</span> <span class="va">members</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">num_comp</span>, <span class="va">mean_rmse</span>, colour <span class="op">=</span> <span class="va">pipeline</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">references</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">p</span> <span class="op">+</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="va">mean_rmse</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">references</span>,</span>
+<span>                 colour <span class="op">=</span> <span class="st">"grey50"</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>      <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>, x <span class="op">=</span> <span class="fl">1</span>, y <span class="op">=</span> <span class="va">references</span><span class="op">$</span><span class="va">mean_rmse</span>,</span>
+<span>               label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"C I + wavelet + "</span>, <span class="st">""</span>, <span class="va">references</span><span class="op">$</span><span class="va">pipeline</span>, fixed <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>               hjust <span class="op">=</span> <span class="fl">0</span>, vjust <span class="op">=</span> <span class="fl">1.4</span>, size <span class="op">=</span> <span class="fl">3</span>, colour <span class="op">=</span> <span class="st">"grey30"</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">p</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">best</span>, <span class="va">pipeline</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">members</span><span class="op">)</span>, size <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#2a78d6"</span>, <span class="st">"#eb6834"</span>, <span class="st">"#1baf7a"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.088</span>, <span class="fl">0.12</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Components"</span>, y <span class="op">=</span> <span class="st">"Cross-validated RMSE (% Ca)"</span>, colour <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>         subtitle <span class="op">=</span> <span class="va">title</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guides.html" class="external-link">guides</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/guide_legend.html" class="external-link">guide_legend</a></span><span class="op">(</span>ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_bw</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span>, legend.key.spacing.y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grid/unit.html" class="external-link">unit</a></span><span class="op">(</span><span class="fl">0</span>, <span class="st">"pt"</span><span class="op">)</span>,</span>
+<span>          panel.grid.minor <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">panel</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">groups</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">panel</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">groups</span><span class="op">)</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span>, <span class="va">groups</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span>, references <span class="op">=</span> <span class="va">others</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_layout.html" class="external-link">plot_layout</a></span><span class="op">(</span>axes <span class="op">=</span> <span class="st">"collect"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://patchwork.data-imaginist.com/reference/plot_annotation.html" class="external-link">plot_annotation</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="st">"Cross-validated error of the Ca models"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Dots: lowest RMSE; dashed lines: best elastic net and SVR models"</span>,</span>
+<span>    theme <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-compare-rmse-1.png" alt="" width="100%"></p>
+<p>The best model of each pipeline:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">summary_table</span> <span class="op">&lt;-</span> <span class="va">best</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>Tuning <span class="op">=</span> <span class="fu">case_when</span><span class="op">(</span></span>
+<span>    <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">cost</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"C = %g, σ = %.1e"</span>, <span class="va">cost</span>, <span class="va">rbf_sigma</span><span class="op">)</span>,</span>
+<span>    <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">penalty</span><span class="op">)</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%d orthogonal, λ = %.1e, α = %g"</span>, <span class="va">num_comp</span>, <span class="va">penalty</span>, <span class="va">mixture</span><span class="op">)</span>,</span>
+<span>    .default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%d components"</span>, <span class="va">num_comp</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">transmute</span><span class="op">(</span>Pipeline <span class="op">=</span> <span class="va">pipeline</span>, <span class="va">Tuning</span>, `RMSECV (% Ca)` <span class="op">=</span> <span class="va">mean_rmse</span>,</span>
+<span>            SE <span class="op">=</span> <span class="va">std_err_rmse</span>, `R²` <span class="op">=</span> <span class="va">mean_rsq</span>, `Bias²` <span class="op">=</span> <span class="va">bias2</span>, Variance <span class="op">=</span> <span class="va">variance</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">arrange</span><span class="op">(</span><span class="va">`RMSECV (% Ca)`</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">summary_table</span>, digits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">4</span>, <span class="fl">3</span>, <span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+</colgroup>
+<thead><tr>
+<th align="left">Pipeline</th>
+<th align="left">Tuning</th>
+<th align="right">RMSECV (% Ca)</th>
+<th align="right">SE</th>
+<th align="right">R²</th>
+<th align="right">Bias²</th>
+<th align="right">Variance</th>
+</tr></thead>
+<tbody>
+<tr>
+<td align="left">C I + PLS</td>
+<td align="left">8 components</td>
+<td align="right">0.0899</td>
+<td align="right">0.0017</td>
+<td align="right">0.762</td>
+<td align="right">0.00800</td>
+<td align="right">0.00015</td>
+</tr>
+<tr>
+<td align="left">C I + wavelet + PLS</td>
+<td align="left">14 components</td>
+<td align="right">0.0900</td>
+<td align="right">0.0016</td>
+<td align="right">0.762</td>
+<td align="right">0.00776</td>
+<td align="right">0.00040</td>
+</tr>
+<tr>
+<td align="left">C I + wavelet + OPLS + elastic net</td>
+<td align="left">3 orthogonal, λ = 1.0e-02, α = 1</td>
+<td align="right">0.0903</td>
+<td align="right">0.0016</td>
+<td align="right">0.759</td>
+<td align="right">0.00809</td>
+<td align="right">0.00013</td>
+</tr>
+<tr>
+<td align="left">C I + wavelet + PCR</td>
+<td align="left">13 components</td>
+<td align="right">0.0908</td>
+<td align="right">0.0016</td>
+<td align="right">0.754</td>
+<td align="right">0.00822</td>
+<td align="right">0.00009</td>
+</tr>
+<tr>
+<td align="left">C I + wavelet + robust PCR</td>
+<td align="left">16 components</td>
+<td align="right">0.0915</td>
+<td align="right">0.0015</td>
+<td align="right">0.750</td>
+<td align="right">0.00832</td>
+<td align="right">0.00011</td>
+</tr>
+<tr>
+<td align="left">PLS</td>
+<td align="left">8 components</td>
+<td align="right">0.0918</td>
+<td align="right">0.0018</td>
+<td align="right">0.751</td>
+<td align="right">0.00837</td>
+<td align="right">0.00012</td>
+</tr>
+<tr>
+<td align="left">C I + wavelet + SVR</td>
+<td align="left">C = 4, σ = 1.0e-04</td>
+<td align="right">0.0935</td>
+<td align="right">0.0017</td>
+<td align="right">0.740</td>
+<td align="right">0.00865</td>
+<td align="right">0.00017</td>
+</tr>
+<tr>
+<td align="left">Area + PLS</td>
+<td align="left">7 components</td>
+<td align="right">0.0935</td>
+<td align="right">0.0016</td>
+<td align="right">0.740</td>
+<td align="right">0.00871</td>
+<td align="right">0.00010</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>
+<strong>The internal standard helps; the total emission does not.</strong> Dividing by the C I line lowers the RMSE of PLS from 0.0918 to 0.0899% Ca, while normalizing to the total area raises it to 0.0935%: the total emission depends on the composition of the forage, not only on the ablated mass.</li>
+<li>
+<strong>The wavelet compression loses nothing.</strong> With 8 times fewer variables, PLS reaches the same error, and its error curve stays flat beyond the optimum: the choice of the number of components matters less. The compression also makes PCA, robust PCA and SVR much faster.</li>
+<li>
+<strong>The models differ little.</strong> All pipelines fall within 2.2 standard errors of each other. PCR needs more components than PLS, since its components ignore calcium, but has the lowest variance. Robust PCA brings no gain on these spectra; it pays off when the training set holds outlying spectra. The OPLS filter followed by a lasso (α = 1) matches PLS. The SVR adds nothing either, a sign that the response of the Ca lines is close to linear over this range.</li>
+<li>
+<strong>The error is mostly bias.</strong> At the best tuning, the variance makes up only 1–4.9% of the MSE. The squared bias includes the error of the laboratory reference values and the matrix effects the spectra do not resolve, which no model removes. The variance sets the number of components: beyond the dots in the figure, the error rises again, as the bias no longer falls while the variance keeps growing.</li>
+</ul>
+</div>
+<div class="section level2">
 <h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
 </h2>
 <p>MIT © Christian L. Goueguel</p>
