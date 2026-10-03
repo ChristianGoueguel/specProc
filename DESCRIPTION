@@ -1,7 +1,7 @@
 Package: specProc
 Type: Package
 Title: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy
-Version: 0.8.3
+Version: 0.8.3.9000
 Authors@R:
     person("Christian L.", "Goueguel", , "christian.goueguel@gmail.com",
            role = c("aut", "cre"),
@@ -13,12 +13,15 @@ Description: Tools for exploring, preprocessing and modeling spectroscopic
     raw spectra to calibrated results: peak finding and fitting, wavelength
     calibration, baseline correction, normalization and scaling, orthogonal
     signal correction including orthogonal partial least squares (OPLS;
-    Trygg and Wold (2002) <doi:10.1002/cem.695>), calibration transfer,
+    Trygg and Wold (2002) <doi:10.1002/cem.695>), wavelength selection
+    (variable importance in projection, selectivity ratio, interval partial
+    least squares), calibration transfer,
     calibration curves and figures of merit, and plasma diagnostics
     (Boltzmann and Saha-Boltzmann plots, Stark broadening). Includes robust
     tools for outlier detection and exploration: robust principal component
     analysis (Hubert, Rousseeuw and Vanden Branden (2005)
-    <doi:10.1198/004017004000000563>), detection of deviating cells
+    <doi:10.1198/004017004000000563>), robust partial least squares
+    regression (Hubert and Vanden Branden (2003) <doi:10.1002/cem.822>), detection of deviating cells
     (Rousseeuw and Van den Bossche (2018)
     <doi:10.1080/00401706.2017.1340909>), PCA with cellwise outliers and
     missing values (MacroPCA; Hubert, Rousseeuw and Van den Bossche (2019)
@@ -55,6 +58,8 @@ Suggests:
     ConfidenceEllipse,
     dials,
     embed,
+    future,
+    future.apply,
     generics,
     ggsci,
     HotellingEllipse (>= 1.3.0),

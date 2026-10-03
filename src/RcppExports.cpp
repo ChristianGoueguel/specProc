@@ -211,6 +211,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// svd_reduce_cpp
+Rcpp::List svd_reduce_cpp(const Eigen::Map<Eigen::MatrixXd> x, double tol);
+RcppExport SEXP _specProc_svd_reduce_cpp(SEXP xSEXP, SEXP tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::Map<Eigen::MatrixXd> >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(svd_reduce_cpp(x, tol));
+    return rcpp_result_gen;
+END_RCPP
+}
 // fast_mcd_cpp
 Rcpp::List fast_mcd_cpp(const Eigen::Map<Eigen::MatrixXd> x, int h, int nsamp);
 RcppExport SEXP _specProc_fast_mcd_cpp(SEXP xSEXP, SEXP hSEXP, SEXP nsampSEXP) {
@@ -297,6 +309,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_specProc_scale_1step_cols_cpp", (DL_FUNC) &_specProc_scale_1step_cols_cpp, 1},
     {"_specProc_univariate_mcd_cpp", (DL_FUNC) &_specProc_univariate_mcd_cpp, 2},
     {"_specProc_sd_outlyingness_cpp", (DL_FUNC) &_specProc_sd_outlyingness_cpp, 3},
+    {"_specProc_svd_reduce_cpp", (DL_FUNC) &_specProc_svd_reduce_cpp, 2},
     {"_specProc_fast_mcd_cpp", (DL_FUNC) &_specProc_fast_mcd_cpp, 3},
     {"_specProc_spca_grid_cpp", (DL_FUNC) &_specProc_spca_grid_cpp, 6},
     {"_specProc_som_batch_cpp", (DL_FUNC) &_specProc_som_batch_cpp, 6},

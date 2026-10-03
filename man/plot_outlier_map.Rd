@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_robust_pca.R
 \name{plot_outlier_map}
 \alias{plot_outlier_map}
-\title{Outlier Map of a Robust PCA}
+\title{Outlier Map of a Robust PCA or Robust PLS Model}
 \usage{
 plot_outlier_map(
   object,
@@ -18,10 +18,11 @@ plot_outlier_map(
 }
 \arguments{
 \item{object}{An object returned by \code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}},
-\code{\link[=macropca]{macropca()}} or \code{\link[=cellpca]{cellpca()}}.}
+\code{\link[=macropca]{macropca()}}, \code{\link[=cellpca]{cellpca()}} or \code{\link[=rsimpls]{rsimpls()}}.}
 
 \item{newdata}{Optional new observations to add to the map (a numeric
-matrix or data frame with the calibration variables).}
+matrix or data frame with the calibration variables). Not available for
+\code{\link[=rsimpls]{rsimpls()}} fits.}
 
 \item{labels}{The number of most outlying observations to label (by
 their row names, or row numbers). Default is 3; use 0 for no labels.}
@@ -64,7 +65,10 @@ distance, for a robust PCA fitted by \code{\link[=robpca]{robpca()}}, \code{\lin
 \code{\link[=macropca]{macropca()}} or \code{\link[=cellpca]{cellpca()}} (Hubert, Rousseeuw and Vanden Branden, 2005).
 For \code{\link[=cellpca]{cellpca()}}, the vertical axis is the norm of the standardized
 residuals, as in the enhanced outlier map of Centofanti, Hubert and
-Rousseeuw.
+Rousseeuw. For a robust PLS model fitted by \code{\link[=rsimpls]{rsimpls()}}, it is the
+regression outlier map of Hubert and Vanden Branden (2003): the residual
+distance (with one response, the absolute standardized residual) against
+the score distance.
 }
 \details{
 The dashed lines are the cut-offs of the two distances. They divide the
@@ -78,6 +82,12 @@ projected, but far from the PCA subspace;
 \item \strong{bad leverage} points (top right): far on both counts, the most
 harmful outliers.
 }
+
+In the regression outlier map of \code{\link[=rsimpls]{rsimpls()}}, the top left region holds
+the \strong{vertical outliers}: observations with a typical spectrum but a
+large residual, such as a wrong reference value. Bad leverage points have
+both an outlying spectrum and a large residual; good leverage points have
+an outlying spectrum that the model still fits.
 
 New observations (\code{newdata}) are projected onto the model with
 \link[=predict.specproc_robpca]{predict()} and shown with the calibration
@@ -106,7 +116,7 @@ labels = 10, colour_by = "distance")
 
 }
 \seealso{
-\code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}}, \code{\link[=macropca]{macropca()}}, \code{\link[=plot_cell_map]{plot_cell_map()}}
+\code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}}, \code{\link[=macropca]{macropca()}}, \code{\link[=rsimpls]{rsimpls()}}, \code{\link[=plot_cell_map]{plot_cell_map()}}
 }
 \author{
 Christian L. Goueguel

@@ -22,6 +22,9 @@ using Eigen::VectorXd;
 
 namespace {
 
+// Relative tolerance: quantities below kTiny times the scale of the data
+// they come from are zero at the rounding level. All the tolerances are
+// relative, so that the results do not depend on the units of the data.
 const double kTiny = 1e-12;
 
 // Consistency factor of the raw MCD covariance for normal data (the
@@ -92,7 +95,8 @@ MeanCov mean_cov(const MatrixXd& x, const std::vector<int>& idx) {
   out.cov /= (m - 1);
   Eigen::LDLT<MatrixXd> ldlt(out.cov);
   const VectorXd diag = ldlt.vectorD();
-  out.singular = (ldlt.info() != Eigen::Success) || (diag.minCoeff() <= kTiny * std::max(1.0, diag.maxCoeff()));
+  // singular when a pivot is negligible relative to the largest one
+  out.singular = (ldlt.info() != Eigen::Success) || (diag.minCoeff() <= kTiny * diag.maxCoeff());
   out.logdet = out.singular ? -std::numeric_limits<double>::infinity() : diag.array().log().sum();
   return out;
 }
@@ -154,6 +158,8 @@ Rcpp::NumericVector sd_outlyingness_cpp(const Eigen::Map<Eigen::MatrixXd> z, int
   const double npairs = 0.5 * n * (n - 1.0);
   const bool all_pairs = ndir <= 0 || ndir >= npairs;
   const long ndirs = all_pairs ? static_cast<long>(npairs) : ndir;
+  // scale of the data: the projections on unit directions are bounded by it
+  const double zscale = z.rowwise().norm().maxCoeff();
   VectorXd outl = VectorXd::Zero(n);
   int used = 0;
   int i = 0, j = 1;
@@ -175,18 +181,63 @@ Rcpp::NumericVector sd_outlyingness_cpp(const Eigen::Map<Eigen::MatrixXd> z, int
     }
     VectorXd v = (z.row(a) - z.row(b)).transpose();
     const double norm = v.norm();
-    if (norm <= kTiny) continue;
+    if (norm <= kTiny * zscale) continue;  // identical rows
     v /= norm;
     const VectorXd proj = z * v;
     double location, scale;
     univariate_mcd(proj, h, location, scale);
-    if (scale <= kTiny) continue;  // exact fit on this direction
+    if (scale <= kTiny * zscale) continue;  // exact fit on this direction
     outl = outl.cwiseMax(((proj.array() - location).abs() / scale).matrix());
     ++used;
     if ((d & 255) == 0) Rcpp::checkUserInterrupt();
   }
   if (used == 0) Rcpp::stop("All directions give a zero scale: the data lie in a lower-dimensional subspace.");
   return Rcpp::wrap(outl);
+}
+
+// Centers the columns of x and writes the observations in an orthonormal
+// basis of the subspace they span: x - 1 center' = z v', with v (p x r)
+// orthonormal and r the rank. The basis comes from the eigen-decomposition of
+// the smaller cross-product matrix, x x' (n x n) when n <= p and x'x
+// otherwise, which is much faster than an SVD of x when p is large. With
+// x x', z = u d comes directly from the eigenvectors, so the reduced
+// observations keep the inner products of the centered data. Eigenvalues
+// below tol times the largest are treated as zero: the cross-product squares
+// the singular values, so smaller ones cannot be resolved.
+// [[Rcpp::export]]
+Rcpp::List svd_reduce_cpp(const Eigen::Map<Eigen::MatrixXd> x, double tol) {
+  const int n = x.rows();
+  const int p = x.cols();
+  const VectorXd center = x.colwise().mean().transpose();
+  const MatrixXd xc = x.rowwise() - center.transpose();
+  const bool wide = n <= p;
+  const int m = wide ? n : p;
+  MatrixXd cross = MatrixXd::Zero(m, m);
+  if (wide) {
+    cross.selfadjointView<Eigen::Lower>().rankUpdate(xc);
+  } else {
+    cross.selfadjointView<Eigen::Lower>().rankUpdate(xc.transpose());
+  }
+  // the solver reads the lower triangle; eigenvalues in increasing order
+  Eigen::SelfAdjointEigenSolver<MatrixXd> es(cross);
+  if (es.info() != Eigen::Success) Rcpp::stop("The eigen-decomposition failed.");
+  const VectorXd values = es.eigenvalues().reverse();
+  const MatrixXd vectors = es.eigenvectors().rowwise().reverse();
+  if (!(values[0] > 0.0)) Rcpp::stop("The data have no variation.");
+  int rank = 0;
+  while (rank < m && values[rank] > tol * values[0]) ++rank;
+  const VectorXd d = values.head(rank).cwiseSqrt();
+  MatrixXd z, v;
+  if (wide) {
+    const MatrixXd u = vectors.leftCols(rank);
+    z = u * d.asDiagonal();
+    v = xc.transpose() * u * d.cwiseInverse().asDiagonal();
+  } else {
+    v = vectors.leftCols(rank);
+    z = xc * v;
+  }
+  return Rcpp::List::create(Rcpp::Named("center") = center, Rcpp::Named("v") = v,
+                            Rcpp::Named("z") = z);
 }
 
 // FAST-MCD of the rows of x with coverage h: nsamp random (p+1)-subsets, two
@@ -284,9 +335,11 @@ namespace {
 // unit vector a. Maximizes var(x a) - lambda * ||a||_1 by rotating a towards
 // each coordinate axis in turn, over a grid of angles refined at every
 // cycle. The angle that sets the coordinate to zero is always among the
-// candidates, so loadings can be exactly zero. Returns the objective.
+// candidates, so loadings can be exactly zero. vscale is the scale of the
+// variances (the mean variance of the variables), to which the tolerances on
+// the objective are relative. Returns the objective.
 double grid_component(const MatrixXd& x, const VectorXd& colvar, VectorXd& a, double lambda,
-                      int ngrid, int maxiter, double tol) {
+                      int ngrid, int maxiter, double tol, double vscale) {
   const int p = x.cols();
   const double denom = std::max<double>(x.rows() - 1, 1);
   const double pi = 3.14159265358979323846;
@@ -310,7 +363,7 @@ double grid_component(const MatrixXd& x, const VectorXd& colvar, VectorXd& a, do
         const double var = (c1 * c1 * vaa + 2.0 * c1 * s1 * caj + s1 * s1 * vjj) / norm2;
         const double l1 = (std::abs(c1) * l1_rest + std::abs(c1 * aj + s1)) / std::sqrt(norm2);
         const double obj = var - lambda * l1;
-        if (obj > best_obj + 1e-14) {
+        if (obj > best_obj + 1e-14 * vscale) {
           best_obj = obj;
           best_phi = phi;
         }
@@ -330,7 +383,7 @@ double grid_component(const MatrixXd& x, const VectorXd& colvar, VectorXd& a, do
       }
     }
     range /= 2.0;
-    if (iter > 0 && std::abs(objective - previous) <= tol * std::max(1.0, std::abs(previous))) break;
+    if (iter > 0 && std::abs(objective - previous) <= tol * std::max(vscale, std::abs(previous))) break;
     Rcpp::checkUserInterrupt();
   }
   return objective;
@@ -357,6 +410,8 @@ Eigen::MatrixXd spca_grid_cpp(const Eigen::Map<Eigen::MatrixXd> x_in, int k, dou
   MatrixXd x = x_in;
   MatrixXd loadings = MatrixXd::Zero(p, k);
   const double denom = std::max(n - 1, 1);
+  // mean variance of the variables: the scale of the objective
+  const double vscale = x.squaredNorm() / (denom * p);
 
   for (int c = 0; c < k; ++c) {
     const VectorXd colvar = x.colwise().squaredNorm().transpose() / denom;
@@ -371,7 +426,7 @@ Eigen::MatrixXd spca_grid_cpp(const Eigen::Map<Eigen::MatrixXd> x_in, int k, dou
     for (int it = 0; it < 500; ++it) {
       VectorXd next = x.transpose() * (x * a1);
       const double norm = next.norm();
-      if (norm <= kTiny) break;
+      if (norm <= kTiny * denom * vscale) break;  // no variance left
       next /= norm;
       const double change = (next - a1).norm();
       a1 = next;
@@ -381,8 +436,8 @@ Eigen::MatrixXd spca_grid_cpp(const Eigen::Map<Eigen::MatrixXd> x_in, int k, dou
     VectorXd a2 = VectorXd::Zero(p);
     a2[j0] = 1.0;
 
-    const double obj1 = grid_component(x, colvar, a1, lambda, ngrid, maxiter, tol);
-    const double obj2 = grid_component(x, colvar, a2, lambda, ngrid, maxiter, tol);
+    const double obj1 = grid_component(x, colvar, a1, lambda, ngrid, maxiter, tol, vscale);
+    const double obj2 = grid_component(x, colvar, a2, lambda, ngrid, maxiter, tol, vscale);
     VectorXd a = obj2 > obj1 ? a2 : a1;
 
     // sign convention: largest absolute loading positive

@@ -69,6 +69,7 @@ website](https://christiangoueguel.com/specProc/articles/).
 | Recipe steps | `step_baseline()`, `step_snv()`, `step_msc()`, `step_emsc()`, `step_spectral_norm()`, `step_line_ratio()`, `step_savgol()`, `step_wavelet()`, `step_line_intensities()`, `step_reject_shots()`, `step_opls()`, `step_o2pls()`, `step_epo()`, `step_glsw()`, and more |
 | Orthogonalization | `osc()`, `direct_osc()`, `projected_osc()`, `opls()`, `o2pls()`, `epo()`, `glsw()`, `y_gradient_glsw()` |
 | Calibration | `calibration_curve()`, `plot_calibration()`, `nas()`, `pds()` |
+| Wavelength selection and robust PLS | `select_wavelengths()`, `plot_wavelength_selection()`, `step_select_wavelengths()`, `rsimpls()` |
 | Plasma diagnostics | `saturation_summary()`, `electron_density()`, `boltzmann()`, `saha_boltzmann()`, `plot_boltzmann()`, `mcwhirter_criterion()`, `self_absorption()`, `correct_self_absorption()`, `cf_libs()`, `nist_lines()`, `starkb_lines()` |
 | Outliers and robust PCA | `robpca()`, `rospca()`, `macropca()`, `cellpca()`, `plot_outlier_map()`, `plot_cell_map()`, `q_residuals()`, `dmodx()`, `plot_influence()`, `hotelling_t2()` |
 | Robust statistics | `summary_stats()`, `biweight_location()`, `biweight_scale()`, `rousseeuw_croux()`, `umad()`, `adjusted_boxplot()`, `robust_bcyj()` |
@@ -119,8 +120,13 @@ ca_recipe <- \(data) {
 ```
 
 The baseline is removed in every pipeline. The steps estimated from the
-training data (principal components, orthogonal filter) and the model
-parameters are tuned together:
+training data (principal components, orthogonal filter, selected
+wavelengths) and the model parameters are tuned together. Wavelength
+selection (`step_select_wavelengths()`) keeps the channels with the
+largest variable importance in projection (VIP) or selectivity ratio
+(SR) in a PLS model, or, with interval PLS (iPLS), the contiguous
+intervals (out of 40) that lower the cross-validated error of a PLS
+model; the number of channels or intervals is tuned with the components:
 
 ``` r
 # mixOmics scales every predictor by default; scale = FALSE only centers
@@ -137,6 +143,9 @@ pipelines <- list(
   "PLS" = list(ca_recipe(corrected), pls_model, components),
   "Area + PLS" = list(ca_recipe(area), pls_model, components),
   "C I + PLS" = list(ca_recipe(carbon), pls_model, components),
+  "C I + iPLS + PLS" = list(ca_recipe(carbon) |> step_select_wavelengths(all_predictors(), method = "ipls", num_intervals = tune(), num_comp = 10), pls_model, expand_grid(components, num_intervals = c(2L, 4L, 6L, 8L))),
+  "C I + VIP + PLS" = list(ca_recipe(carbon) |> step_select_wavelengths(all_predictors(), method = "vip", num_terms = tune()), pls_model, expand_grid(components, num_terms = c(100L, 300L, 1000L, 3000L))),
+  "C I + SR + PLS" = list(ca_recipe(carbon) |> step_select_wavelengths(all_predictors(), method = "sr", num_terms = tune()), pls_model, expand_grid(components, num_terms = c(100L, 300L, 1000L, 3000L))),
   "C I + wavelet + PLS" = list(ca_recipe(compressed), pls_model, components),
   "C I + wavelet + PCR" = list(ca_recipe(compressed) |> step_center(all_predictors()) |> step_pca(all_predictors(), num_comp = tune()), pcr_model, components),
   "C I + wavelet + robust PCR" = list(ca_recipe(compressed) |> step_robpca(all_predictors(), num_comp = tune(), options = list(kmax = 20)), pcr_model, components),
@@ -175,16 +184,18 @@ future::plan("sequential")
 ```
 
 The cross-validated RMSE of the component-based pipelines as a function
-of the number of components: on the left, the normalizations; on the
-right, the models of the wavelet coefficients, with the best elastic net
-and SVR models (on the same coefficients) as references:
+of the number of components: on the left, the normalizations; in the
+middle, the models of the wavelet coefficients, with the best elastic
+net and SVR models (on the same coefficients) as references; on the
+right, the wavelength selections, each with its best number of channels
+or intervals, and PLS on all the channels (grey) as reference:
 
 <img src="man/figures/README-compare-rmse-1.png" alt="" width="100%" />
 
 All pipelines are evaluated on the same 25 splits, so they can be
-compared split by split. Since the resamples overlap, the standard error
-of the mean difference is inflated as in the corrected repeated k-fold
-test ([Nadeau and Bengio,
+compared split by split, here with C I + PLS. Since the resamples
+overlap, the standard error of the mean difference is inflated as in the
+corrected repeated k-fold test ([Nadeau and Bengio,
 2003](https://doi.org/10.1023/A:1024068626366); [Bouckaert and Frank,
 2004](https://doi.org/10.1007/978-3-540-24775-3_3)):
 
@@ -196,6 +207,9 @@ Contrasts between preprocessing steps and models:
 |:---|---:|:---|---:|
 | C I + PLS vs PLS | -0.0019 | 20 / 25 | 0.24 |
 | Area + PLS vs PLS | 0.0018 | 8 / 25 | 0.40 |
+| C I + iPLS + PLS vs C I + PLS | 0.0001 | 12 / 25 | 0.95 |
+| C I + VIP + PLS vs C I + PLS | 0.0000 | 16 / 25 | 0.67 |
+| C I + SR + PLS vs C I + PLS | -0.0002 | 16 / 25 | 0.91 |
 | C I + wavelet + PLS vs C I + PLS | 0.0001 | 12 / 25 | 0.96 |
 | C I + wavelet + SVR vs C I + wavelet + PLS | 0.0035 | 5 / 25 | 0.36 |
 

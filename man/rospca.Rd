@@ -65,13 +65,15 @@ The algorithm follows the published description in three steps:
 and \eqn{Q_n}) if \code{stand = TRUE}. As in \code{\link[=robpca]{robpca()}}, the \code{h} least
 outlying observations form \eqn{H_0}, and those whose orthogonal
 distance to the \eqn{k}-dimensional PCA subspace of \eqn{H_0} is below
-the cut-off form \eqn{H_1}
+the cut-off form \eqn{H_1} (\eqn{H_1 = H_0} when \code{k} equals the rank
+of the data, as the subspace is then the whole space).
 \item \strong{Sparsification.} The observations of \eqn{H_1} are standardized and
 the sparse loadings are computed by maximizing, component by component,
 the variance of the scores minus \code{lambda} times the \eqn{L_1} norm of
 the loadings. Variables with zero loadings on all components are set
 aside; the observations whose orthogonal distance to the sparse
-subspace is below the cut-off form \eqn{H_2}, and the sparse loadings
+subspace is below the cut-off form \eqn{H_2} (\eqn{H_2 = H_1} when the
+sparse subspace contains all the observations), and the sparse loadings
 are recomputed from \eqn{H_2}, standardized in turn.
 \item \strong{Eigenvalues and center.} The eigenvalues are first estimated by the
 squared \eqn{Q_n} of the scores of \eqn{H_2}. The \code{h} observations of

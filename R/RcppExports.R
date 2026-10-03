@@ -57,6 +57,10 @@ sd_outlyingness_cpp <- function(z, h, ndir) {
     .Call(`_specProc_sd_outlyingness_cpp`, z, h, ndir)
 }
 
+svd_reduce_cpp <- function(x, tol) {
+    .Call(`_specProc_svd_reduce_cpp`, x, tol)
+}
+
 fast_mcd_cpp <- function(x, h, nsamp) {
     .Call(`_specProc_fast_mcd_cpp`, x, h, nsamp)
 }

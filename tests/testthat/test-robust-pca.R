@@ -121,6 +121,56 @@ test_that("rospca recovers a block-sparse structure", {
   expect_gt(sum(dense$loadings != 0), sum(support))
 })
 
+test_that("robust PCA with k equal to the rank reduces to the reweighted MCD", {
+  set.seed(14)
+  x <- matrix(rnorm(500), 100, 5)
+  x[1:5, ] <- x[1:5, ] + 6
+  set.seed(15)
+  fit <- robpca(x, k = 5)
+  # the subspace is the whole space: no orthogonal distances or outliers
+  expect_identical(fit$H1, fit$H0)
+  expect_true(all(fit$od == 0))
+  expect_identical(fit$cutoff_od, 0)
+  expect_true(all(fit$outlier_type %in% c("regular", "good leverage")))
+  expect_true(all(fit$outlier_type[1:5] == "good leverage"))
+  mcd <- fast_mcd_cpp(x, fit$h, 500L)
+  expect_equal(unname(fit$center), mcd$center, tolerance = 1e-6)
+  expect_equal(fit$eigenvalues, eigen(mcd$cov, symmetric = TRUE)$values, tolerance = 1e-6)
+  pred <- predict(fit, x)
+  expect_true(all(pred$od == 0))
+  expect_equal(pred$outlier_type, fit$outlier_type)
+  # also when k is chosen
+  set.seed(15)
+  expect_equal(robpca(x, var_explained = 1)$k, 5L)
+
+  sparse <- rospca(x, k = 5)
+  expect_identical(sparse$H1, sparse$H0)
+  expect_identical(sparse$H2, sparse$H1)
+  expect_identical(sparse$cutoff_od, 0)
+  expect_true(all(sparse$outlier_type[1:5] == "good leverage"))
+  expect_false(any(macropca(x, k = 5)$outlier_type %in% c("orthogonal outlier", "bad leverage")))
+
+  # more variables than observations: the rank is n - 1, and new observations
+  # off the subspace are orthogonal outliers
+  set.seed(16)
+  wide <- matrix(rnorm(10 * 30), 10, 30)
+  fit <- robpca(wide, k = 9)
+  expect_true(all(fit$od == 0))
+  expect_identical(fit$cutoff_od, 0)
+  expect_true(all(predict(fit, matrix(rnorm(2 * 30), 2, 30))$od > 0))
+})
+
+test_that("orthogonal distances and their cut-off do not depend on the scale of the data", {
+  d <- make_lowrank(seed = 17)
+  xc <- sweep(d$x, 2, colMeans(d$x))
+  od <- orthogonal_distance(xc, d$loadings)
+  expect_equal(orthogonal_distance(xc * 1e-10, d$loadings) / 1e-10, od)
+  expect_equal(od_cutoff(od * 1e-10, 90) / 1e-10, od_cutoff(od, 90))
+  # rounding errors are zero distances, with a zero cut-off
+  expect_true(all(orthogonal_distance(xc, svd(xc)$v) == 0))
+  expect_identical(od_cutoff(rep(0, 10), 8), 0)
+})
+
 test_that("macropca detects outlying rows and cells and predicts with missing values", {
   set.seed(13)
   x <- matrix(rnorm(60 * 8), 60, 8) %*% diag(8:1)
@@ -249,6 +299,51 @@ test_that("ddc flags deviating cells and rows and imputes them", {
   # a constant column is never flagged
   x[, 30] <- 1
   expect_false(any(ddc(x)$flagged_cells[, 30]))
+})
+
+test_that("robust PCA does not depend on the scale of the data", {
+  set.seed(1)
+  x <- matrix(rnorm(500), 100, 5) %*% diag(c(5, 3, 1, 0.1, 0.1))
+  x[1:4, 3] <- x[1:4, 3] + 6     # orthogonal outliers
+  x[5:7, 1] <- x[5:7, 1] + 25    # good leverage points
+  s <- 1e-8
+  set.seed(2)
+  fit <- robpca(x, k = 2)
+  set.seed(2)
+  small <- robpca(x * s, k = 2)
+  expect_identical(small$H0, fit$H0)
+  expect_identical(small$H1, fit$H1)
+  expect_identical(small$outlier_type, fit$outlier_type)
+  expect_true(all(c("good leverage", "orthogonal outlier") %in% fit$outlier_type))
+  expect_equal(small$eigenvalues, fit$eigenvalues * s^2)
+  expect_equal(abs(small$loadings), abs(fit$loadings))
+  expect_equal(small$center, fit$center * s)
+  expect_equal(small$sd, fit$sd)
+  expect_equal(small$od, fit$od * s)
+  expect_equal(small$cutoff_od, fit$cutoff_od * s)
+
+  # rospca, on block-sparse data (standardized, the sparse loadings are unit-free)
+  set.seed(3)
+  y <- cbind(rnorm(100, sd = 3) + matrix(rnorm(300, sd = 0.5), 100),
+             rnorm(100, sd = 2) + matrix(rnorm(300, sd = 0.5), 100), matrix(rnorm(300), 100))
+  y[1:5, ] <- y[1:5, ] + 8
+  set.seed(4)
+  fit <- rospca(y, k = 2)
+  set.seed(4)
+  small <- rospca(y * s, k = 2)
+  expect_identical(small[c("H0", "H1", "H2", "H3", "outlier_type")], fit[c("H0", "H1", "H2", "H3", "outlier_type")])
+  expect_equal(small$loadings, fit$loadings)
+  expect_equal(small$scale, fit$scale * s)
+
+  # macropca and DDC (deterministic)
+  fit <- macropca(x, k = 2)
+  small <- macropca(x * s, k = 2)
+  expect_identical(small$flagged_cells, fit$flagged_cells)
+  expect_identical(small$outlier_type, fit$outlier_type)
+  expect_equal(small$eigenvalues, fit$eigenvalues * s^2)
+  expect_equal(small$od, fit$od * s)
+  x[, 5] <- 2  # a constant variable
+  expect_equal(ddc(x * 1e-14)$std_resid, ddc(x)$std_resid)
 })
 
 test_that("robust PCA functions validate their inputs", {

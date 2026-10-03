@@ -1,4 +1,4 @@
-#' @title Outlier Map of a Robust PCA
+#' @title Outlier Map of a Robust PCA or Robust PLS Model
 #'
 #' @author Christian L. Goueguel
 #'
@@ -8,7 +8,10 @@
 #' [macropca()] or [cellpca()] (Hubert, Rousseeuw and Vanden Branden, 2005).
 #' For [cellpca()], the vertical axis is the norm of the standardized
 #' residuals, as in the enhanced outlier map of Centofanti, Hubert and
-#' Rousseeuw.
+#' Rousseeuw. For a robust PLS model fitted by [rsimpls()], it is the
+#' regression outlier map of Hubert and Vanden Branden (2003): the residual
+#' distance (with one response, the absolute standardized residual) against
+#' the score distance.
 #'
 #' @details
 #' The dashed lines are the cut-offs of the two distances. They divide the
@@ -20,6 +23,12 @@
 #'    projected, but far from the PCA subspace;
 #'  - **bad leverage** points (top right): far on both counts, the most
 #'    harmful outliers.
+#'
+#' In the regression outlier map of [rsimpls()], the top left region holds
+#' the **vertical outliers**: observations with a typical spectrum but a
+#' large residual, such as a wrong reference value. Bad leverage points have
+#' both an outlying spectrum and a large residual; good leverage points have
+#' an outlying spectrum that the model still fits.
 #'
 #' New observations (`newdata`) are projected onto the model with
 #' [predict()][predict.specproc_robpca] and shown with the calibration
@@ -34,9 +43,10 @@
 #' in every model.
 #'
 #' @param object An object returned by [robpca()], [rospca()],
-#'   [macropca()] or [cellpca()].
+#'   [macropca()], [cellpca()] or [rsimpls()].
 #' @param newdata Optional new observations to add to the map (a numeric
-#'   matrix or data frame with the calibration variables).
+#'   matrix or data frame with the calibration variables). Not available for
+#'   [rsimpls()] fits.
 #' @param labels The number of most outlying observations to label (by
 #'   their row names, or row numbers). Default is 3; use 0 for no labels.
 #' @param relative If `TRUE`, plot the reduced distances (divided by their
@@ -65,7 +75,7 @@
 #'
 #' @return A ggplot object.
 #'
-#' @seealso [robpca()], [rospca()], [macropca()], [plot_cell_map()]
+#' @seealso [robpca()], [rospca()], [macropca()], [rsimpls()], [plot_cell_map()]
 #' @export
 #'
 #' @examples
@@ -84,12 +94,17 @@
 plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALSE,
                              shade = FALSE, log = FALSE, colour_by = c("type", "distance"),
                              title = NULL, ...) {
-  if (!inherits(object, "specproc_robpca")) {
-    stop("'object' must be returned by robpca(), rospca(), macropca() or cellpca().", call. = FALSE)
+  if (!inherits(object, c("specproc_robpca", "specproc_rsimpls"))) {
+    stop("'object' must be returned by robpca(), rospca(), macropca(), cellpca() or rsimpls().",
+         call. = FALSE)
   }
   check_count(labels, "labels", lower = 0)
   colour_by <- match.arg(colour_by)
   check_map_flags(relative, shade, log)
+  if (inherits(object, "specproc_rsimpls")) {
+    return(regression_outlier_map(object, newdata, labels, relative, shade, log, colour_by, title,
+                                  rlang::enquos(...)))
+  }
   ids <- rownames(object$scores) %||% as.character(seq_along(object$sd))
   df <- data.frame(id = ids, x = object$sd, y = object$od, type = object$outlier_type,
                    set = "calibration", stringsAsFactors = FALSE)
@@ -342,6 +357,35 @@ flagged_regions <- function(object, threshold = 0.1, rows = NULL, columns = NULL
 # plot_outlier_map() and plot_influence() draw the same kind of map: a
 # distance within the model (x) against a distance to the model (y), with
 # their cut-offs dividing the map into four types of observations.
+
+# The regression outlier map of an rsimpls() fit: residual distance against
+# score distance (Hubert and Vanden Branden, 2003).
+regression_outlier_map <- function(object, newdata, labels, relative, shade, log, colour_by,
+                                   title, dots) {
+  if (!is.null(newdata)) {
+    stop("'newdata' is not used with rsimpls() fits: residuals need the responses.", call. = FALSE)
+  }
+  ids <- rownames(object$x_scores) %||% as.character(seq_along(object$sd))
+  df <- data.frame(id = ids, x = object$sd, y = object$rd, type = object$outlier_type,
+                   set = "calibration", stringsAsFactors = FALSE)
+  if (is.null(title)) {
+    title <- paste0("RSIMPLS outlier map (", object$ncomp, " components)")
+  }
+  distance_map(
+    df, cuts = data.frame(level = "cut-off", x = object$cutoff_sd, y = object$cutoff_rd),
+    labels = labels, relative = relative, shade = shade, log = log, colour_by = colour_by,
+    palette = c(regular = "grey55", `good leverage` = "#1b9e77",
+                `vertical outlier` = "#d95f02", `bad leverage` = "#e7298a"),
+    regions = c("good leverage", "vertical outliers", "bad leverage"),
+    x_lab = c("Score distance", "Reduced score distance"),
+    y_lab = if (length(object$intercept) == 1) {
+      c("Absolute standardized residual", "Reduced absolute standardized residual")
+    } else {
+      c("Residual distance", "Reduced residual distance")
+    },
+    title = title, point = map_point_args(dots, nrow(df)), show_set = FALSE
+  )
+}
 
 check_map_flags <- function(relative, shade, log) {
   for (arg in c("relative", "shade", "log")) {

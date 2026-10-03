@@ -38,7 +38,8 @@ is not given. Default is 0.8.}
 \value{
 An object of class \code{specproc_robpca}, a list with:
 \itemize{
-\item \code{loadings}: \eqn{p \times k} matrix of robust loadings.
+\item \code{loadings}: \eqn{p \times k} matrix of robust loadings, the largest
+element of each loading vector positive.
 \item \code{eigenvalues}: robust eigenvalues (variances of the scores).
 \item \code{center}: robust center.
 \item \code{scores}: \eqn{n \times k} matrix of scores.
@@ -75,17 +76,22 @@ observations form the subset \eqn{H_0}.
 number that explains \code{var_explained} of the variance of \eqn{H_0}, with
 at most \code{kmax}. Observations whose orthogonal distance to the
 \eqn{k}-dimensional PCA subspace of \eqn{H_0} is below the cut-off form
-\eqn{H_1}, and the subspace is re-estimated from \eqn{H_1}.
+\eqn{H_1}, and the subspace is re-estimated from \eqn{H_1}. When \code{k}
+equals the rank of the data, this subspace is the whole space and
+\eqn{H_1 = H_0}.
 \item All observations are projected onto this subspace, and the reweighted
 FAST-MCD estimator of the scores gives the final center, loadings and
-eigenvalues.
+eigenvalues. When \code{k} equals the rank, this is the reweighted MCD of the
+data.
 }
 
 Each observation then has a score distance (SD), its robust Mahalanobis
 distance within the PCA subspace, and an orthogonal distance (OD) to the
 subspace. The cut-off for the SD is \eqn{\sqrt{\chi^2_{k,0.975}}}; the
 cut-off for the OD uses the Wilson-Hilferty approximation, with the
-univariate MCD of \eqn{OD^{2/3}}. \code{\link[=plot_outlier_map]{plot_outlier_map()}} plots both.
+univariate MCD of \eqn{OD^{2/3}}. When \code{k} equals the rank, the ODs and
+their cut-off are zero: there are no orthogonal outliers.
+\code{\link[=plot_outlier_map]{plot_outlier_map()}} plots both distances.
 
 This is an independent implementation of the published algorithm, not a
 port of the rospca or rrcov code, so its results can differ slightly from

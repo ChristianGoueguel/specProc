@@ -13,6 +13,10 @@ namespace {
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
+// Precision of the scales (precScale of cellWise): smaller scales are zero.
+// It applies as such to standardized values; for the variables in the units
+// of the data, it is relative to the largest scale (absolute in cellWise),
+// so that the results do not depend on the units.
 const double PREC_SCALE = 1e-12;
 
 double median_of(std::vector<double> v) {
@@ -58,30 +62,32 @@ double rho_huber25(double z) {
   return std::min(z * z, 2.8433526444973292) / 1.688942410165249;
 }
 
-// 1-step scale M-estimator around zero with rho_huber25, from the MAD.
-double scale_1step_m(const std::vector<double>& x) {
+// 1-step scale M-estimator around zero with rho_huber25, from the MAD; zero
+// when the MAD is below `prec`.
+double scale_1step_m(const std::vector<double>& x, double prec = PREC_SCALE) {
   if (x.empty()) return 0.0;
   std::vector<double> a(x.size());
   for (std::size_t i = 0; i < x.size(); ++i) a[i] = std::fabs(x[i]);
   const double s0 = 1.482602218505602 * median_of(a);
-  if (s0 < PREC_SCALE) return 0.0;
+  if (s0 < prec || s0 <= 0) return 0.0;
   double sum = 0;
   for (double v : x) sum += rho_huber25(v / s0);
   return s0 * std::sqrt(sum / (0.5 * x.size()));
 }
 
-double scale_1step_m(const double* x, int n) {
-  return scale_1step_m(finite_values(x, n));
+double scale_1step_m(const double* x, int n, double prec = PREC_SCALE) {
+  return scale_1step_m(finite_values(x, n), prec);
 }
 
-// 1-step location M-estimator with biweight weights, from (median, MAD).
-double loc_1step_m_biweight(const std::vector<double>& x) {
+// 1-step location M-estimator with biweight weights, from (median, MAD); the
+// median when the MAD is at most `prec`.
+double loc_1step_m_biweight(const std::vector<double>& x, double prec = PREC_SCALE) {
   if (x.empty()) return 0.0;
   const double m0 = median_of(x);
   std::vector<double> a(x.size());
   for (std::size_t i = 0; i < x.size(); ++i) a[i] = std::fabs(x[i] - m0);
   const double s0 = 1.482602218505602 * median_of(a);
-  if (s0 <= PREC_SCALE) return m0;
+  if (s0 <= prec) return m0;
   double num = 0, den = 0;
   for (double v : x) {
     double u = (v - m0) / s0 * 1.482602218505602 / 3;
@@ -286,14 +292,15 @@ Rcpp::List ddc_core_cpp(const Eigen::Map<Eigen::MatrixXd> x, double tol_prob, do
   const double q_cell = std::sqrt(R::qchisq(tol_prob, 1, true, false));
   const double q_corr = R::qchisq(tol_prob, 2, true, false);
 
-  // Step 1: robust standardization
+  // Step 1: robust standardization. The variables whose scale is at most
+  // PREC_SCALE times the largest one are constant.
   VectorXd loc(p), scale(p);
   for (int j = 0; j < p; ++j) {
     std::vector<double> col = finite_values(x.col(j).data(), n);
     if (fast) {
       const auto mcd = unimcd(col, 0.5);
       double l = mcd.first;
-      if (mcd.second > PREC_SCALE) {
+      if (mcd.second > 0) {
         double num = 0, den = 0;
         for (double v : col) {
           const double w = tanh_location_weight((v - mcd.first) / mcd.second);
@@ -305,15 +312,20 @@ Rcpp::List ddc_core_cpp(const Eigen::Map<Eigen::MatrixXd> x, double tol_prob, do
       loc[j] = l;
       scale[j] = mcd.second;
     } else {
-      loc[j] = loc_1step_m_biweight(col);
+      loc[j] = loc_1step_m_biweight(col, 0.0);
       for (double& v : col) v -= loc[j];
-      scale[j] = scale_1step_m(col);
+      scale[j] = scale_1step_m(col, 0.0);
     }
   }
+  double max_scale = 0;
+  for (int j = 0; j < p; ++j) {
+    if (std::isfinite(scale[j])) max_scale = std::max(max_scale, scale[j]);
+  }
+  const double prec = PREC_SCALE * max_scale;
   std::vector<bool> constant(p);
   MatrixXd Z(n, p);
   for (int j = 0; j < p; ++j) {
-    constant[j] = !(scale[j] > PREC_SCALE) || !std::isfinite(loc[j]);
+    constant[j] = !(scale[j] > prec) || !std::isfinite(loc[j]);
     if (constant[j]) {
       scale[j] = 1;
       if (!std::isfinite(loc[j])) loc[j] = 0;
@@ -541,9 +553,17 @@ Rcpp::NumericVector unimcd_cpp(const Rcpp::NumericVector x, double alpha) {
 }
 
 // 1-step M scale around zero (Huber) of each column, without missing values.
+// The scales at most PREC_SCALE times the largest one are zero.
 // [[Rcpp::export]]
 Rcpp::NumericVector scale_1step_cols_cpp(const Eigen::Map<Eigen::MatrixXd> x) {
   Rcpp::NumericVector out(x.cols());
-  for (int j = 0; j < x.cols(); ++j) out[j] = scale_1step_m(x.col(j).data(), x.rows());
+  double max_scale = 0;
+  for (int j = 0; j < x.cols(); ++j) {
+    out[j] = scale_1step_m(x.col(j).data(), x.rows(), 0.0);
+    if (std::isfinite(out[j])) max_scale = std::max(max_scale, out[j]);
+  }
+  for (int j = 0; j < x.cols(); ++j) {
+    if (out[j] <= PREC_SCALE * max_scale) out[j] = 0.0;
+  }
   return out;
 }

@@ -54,6 +54,17 @@ reference:
   - direct_orthogonal
   - predict.specproc_filter
 
+- subtitle: robust PLS regression and wavelength selection
+  desc: >
+    Robust PLS regression that resists outlying spectra and wrong reference
+    values, and the selection of the informative wavelengths (VIP,
+    selectivity ratio, interval PLS).
+  contents:
+  - rsimpls
+  - predict.specproc_rsimpls
+  - select_wavelengths
+  - plot_wavelength_selection
+
 - subtitle: figures of merit
   desc: >
     Net analyte signal of a multivariate calibration model, with its
@@ -114,6 +125,10 @@ reference:
   - step_o2pls
   - step_y_gradient_glsw
 
+- subtitle: wavelength selection
+  contents:
+  - step_select_wavelengths
+
 - subtitle: tuning parameters
   contents:
   - baseline_lambda
@@ -121,6 +136,7 @@ reference:
   - savgol_derivative
   - wavelet_level
   - spectral_norm_method
+  - num_intervals
 
 - title: Line identification
   desc: >

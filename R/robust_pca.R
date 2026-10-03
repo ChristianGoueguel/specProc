@@ -21,16 +21,21 @@
 #'    number that explains `var_explained` of the variance of \eqn{H_0}, with
 #'    at most `kmax`. Observations whose orthogonal distance to the
 #'    \eqn{k}-dimensional PCA subspace of \eqn{H_0} is below the cut-off form
-#'    \eqn{H_1}, and the subspace is re-estimated from \eqn{H_1}.
+#'    \eqn{H_1}, and the subspace is re-estimated from \eqn{H_1}. When `k`
+#'    equals the rank of the data, this subspace is the whole space and
+#'    \eqn{H_1 = H_0}.
 #' 4. All observations are projected onto this subspace, and the reweighted
 #'    FAST-MCD estimator of the scores gives the final center, loadings and
-#'    eigenvalues.
+#'    eigenvalues. When `k` equals the rank, this is the reweighted MCD of the
+#'    data.
 #'
 #' Each observation then has a score distance (SD), its robust Mahalanobis
 #' distance within the PCA subspace, and an orthogonal distance (OD) to the
 #' subspace. The cut-off for the SD is \eqn{\sqrt{\chi^2_{k,0.975}}}; the
 #' cut-off for the OD uses the Wilson-Hilferty approximation, with the
-#' univariate MCD of \eqn{OD^{2/3}}. [plot_outlier_map()] plots both.
+#' univariate MCD of \eqn{OD^{2/3}}. When `k` equals the rank, the ODs and
+#' their cut-off are zero: there are no orthogonal outliers.
+#' [plot_outlier_map()] plots both distances.
 #'
 #' This is an independent implementation of the published algorithm, not a
 #' port of the rospca or rrcov code, so its results can differ slightly from
@@ -53,7 +58,8 @@
 #' @param nsamp The number of random subsets of FAST-MCD. Default is 500.
 #'
 #' @return An object of class `specproc_robpca`, a list with:
-#'  - `loadings`: \eqn{p \times k} matrix of robust loadings.
+#'  - `loadings`: \eqn{p \times k} matrix of robust loadings, the largest
+#'    element of each loading vector positive.
 #'  - `eigenvalues`: robust eigenvalues (variances of the scores).
 #'  - `center`: robust center.
 #'  - `scores`: \eqn{n \times k} matrix of scores.
@@ -113,10 +119,15 @@ robpca <- function(x, k = NULL, kmax = 10, alpha = 0.75, ndir = 250, var_explain
     k <- choose_k(e0$values, kmax, var_explained)
   }
 
-  # Step 2: reweighting on the orthogonal distances to the H0 subspace
-  m0 <- colMeans(z[H0, , drop = FALSE])
-  od0 <- orthogonal_distance(sweep(z, 2, m0), e0$vectors[, seq_len(k), drop = FALSE])
-  H1 <- od0 <= od_cutoff(od0, h)
+  # Step 2: reweighting on the orthogonal distances to the H0 subspace. When
+  # k equals the rank, the subspace is the whole space and the distances are
+  # zero: H1 = H0, and step 3 gives the reweighted MCD of the data.
+  H1 <- seq_len(n) %in% H0
+  if (k < r) {
+    m0 <- colMeans(z[H0, , drop = FALSE])
+    od0 <- orthogonal_distance(sweep(z, 2, m0), e0$vectors[, seq_len(k), drop = FALSE])
+    H1 <- od0 <= od_cutoff(od0, h)
+  }
   m1 <- colMeans(z[H1, , drop = FALSE])
   p1 <- eigen(stats::cov(z[H1, , drop = FALSE]), symmetric = TRUE)$vectors[, seq_len(k), drop = FALSE]
 
@@ -132,6 +143,8 @@ robpca <- function(x, k = NULL, kmax = 10, alpha = 0.75, ndir = 250, var_explain
   center_z <- m1 + drop(p1 %*% mcd$center)
 
   loadings <- red$v %*% p2
+  # largest element of each loading vector positive
+  loadings <- sweep(loadings, 2, apply(loadings, 2, function(v) if (v[which.max(abs(v))] < 0) -1 else 1), "*")
   center <- red$center + drop(red$v %*% center_z)
   names(center) <- colnames(x)
   res <- list(
@@ -166,13 +179,15 @@ robpca <- function(x, k = NULL, kmax = 10, alpha = 0.75, ndir = 250, var_explain
 #'    and \eqn{Q_n}) if `stand = TRUE`. As in [robpca()], the `h` least
 #'    outlying observations form \eqn{H_0}, and those whose orthogonal
 #'    distance to the \eqn{k}-dimensional PCA subspace of \eqn{H_0} is below
-#'    the cut-off form \eqn{H_1}
+#'    the cut-off form \eqn{H_1} (\eqn{H_1 = H_0} when `k` equals the rank
+#'    of the data, as the subspace is then the whole space).
 #' 2. **Sparsification.** The observations of \eqn{H_1} are standardized and
 #'    the sparse loadings are computed by maximizing, component by component,
 #'    the variance of the scores minus `lambda` times the \eqn{L_1} norm of
 #'    the loadings. Variables with zero loadings on all components are set
 #'    aside; the observations whose orthogonal distance to the sparse
-#'    subspace is below the cut-off form \eqn{H_2}, and the sparse loadings
+#'    subspace is below the cut-off form \eqn{H_2} (\eqn{H_2 = H_1} when the
+#'    sparse subspace contains all the observations), and the sparse loadings
 #'    are recomputed from \eqn{H_2}, standardized in turn.
 #' 3. **Eigenvalues and center.** The eigenvalues are first estimated by the
 #'    squared \eqn{Q_n} of the scores of \eqn{H_2}. The `h` observations of
@@ -251,10 +266,14 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE
   }
   h <- robust_h(n, alpha, k)
   H0 <- least_outlying(z, h, ndir)
-  m0 <- colMeans(z[H0, , drop = FALSE])
-  v0 <- eigen(stats::cov(z[H0, , drop = FALSE]), symmetric = TRUE)$vectors[, seq_len(k), drop = FALSE]
-  od0 <- orthogonal_distance(sweep(z, 2, m0), v0)
-  H1 <- od0 <= od_cutoff(od0, h)
+  # when k equals the rank, the subspace is the whole space: H1 = H0
+  H1 <- seq_len(n) %in% H0
+  if (k < ncol(z)) {
+    m0 <- colMeans(z[H0, , drop = FALSE])
+    v0 <- eigen(stats::cov(z[H0, , drop = FALSE]), symmetric = TRUE)$vectors[, seq_len(k), drop = FALSE]
+    od0 <- orthogonal_distance(sweep(z, 2, m0), v0)
+    H1 <- od0 <= od_cutoff(od0, h)
+  }
 
   # Step 2: sparse PCA on H1, reweighting, sparse PCA on H2. Each subset is
   # standardized by its own mean and standard deviation.
@@ -274,9 +293,11 @@ rospca <- function(x, k = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE
   s1 <- standardize_on(H1)
   p1 <- sparse_fit(s1$z, H1, seq_len(p))
   index <- which(rowSums(p1 != 0) > 0)
-  # distances in the full space: deviations in the discarded variables count
+  # distances in the full space: deviations in the discarded variables count.
+  # They are all zero when the sparse subspace contains the data (k equal to
+  # the rank): H2 = H1.
   od1 <- orthogonal_distance(s1$z, p1)
-  H2 <- od1 <= od_cutoff(od1, h)
+  H2 <- if (any(od1 > 0)) od1 <= od_cutoff(od1, h) else H1
   s2 <- standardize_on(H2)
   loadings <- sparse_fit(s2$z, H2, index)
 
@@ -547,10 +568,13 @@ macropca <- function(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, s
   h1 <- h_alpha_n(alpha, n1, k)
   scores1 <- sweep(x_ci[H_star, , drop = FALSE], 2, pca$center) %*% rot
   mah <- mahalanobis_diag(scores1, pca$eigenvalues[seq_len(k)])
-  old_obj <- prod(pca$eigenvalues[seq_len(k)])
+  # the objective is the log-determinant, and the C-steps stop when its
+  # relative change is below 1e-12 (an absolute change of the determinant in
+  # cellWise), so that they do not depend on the units of the data
+  old_obj <- sum(log(pca$eigenvalues[seq_len(k)]))
   for (j in seq_len(100)) {
     sub <- trunc_pc(scores1[order(mah)[seq_len(h1)], , drop = FALSE], k)
-    obj <- prod(sub$eigenvalues)
+    obj <- sum(log(sub$eigenvalues))
     scores1 <- sweep(scores1, 2, sub$center) %*% sub$loadings
     center <- center + drop(rot %*% sub$center)
     rot <- rot %*% sub$loadings
@@ -560,7 +584,7 @@ macropca <- function(x, k = NULL, alpha = 0.5, kmax = 10, var_explained = 0.8, s
     k <- min(k, sub$rank)
   }
   k <- ncol(rot)
-  inner <- final_mcd(scores1, h1 / n1, obj, mah, k)
+  inner <- final_mcd(scores1, h1 / n1, mah, k)
   e <- eigen(inner$cov, symmetric = TRUE)
   center <- center + drop(rot %*% inner$center)
   loadings <- rot %*% e$vectors
@@ -942,12 +966,14 @@ h_alpha_n <- function(alpha, n, p) {
 
 # Classical PCA (truncPC of cellWise): center, the loadings and eigenvalues
 # of the `ncomp` (default all) first components with a non-zero singular
-# value, the largest element of each loading vector positive.
+# value, the largest element of each loading vector positive. Singular values
+# below 1e-10 times the largest are zero (below 1e-10 in cellWise), so that
+# the rank does not depend on the units of the data.
 trunc_pc <- function(y, ncomp = NULL) {
   y <- as.matrix(y)
   center <- colMeans(y)
   s <- svd(sweep(y, 2, center), nu = 0, nv = min(ncomp %||% min(dim(y)), dim(y)))
-  rank <- sum(s$d[seq_len(ncol(s$v))] > 1e-10)
+  rank <- sum(s$d[seq_len(ncol(s$v))] > 1e-10 * s$d[1])
   v <- s$v[, seq_len(rank), drop = FALSE]
   v <- sweep(v, 2, apply(v, 2, function(a) if (a[which.max(abs(a))] < 0) -1 else 1), "*")
   list(rank = rank, eigenvalues = s$d[seq_len(rank)]^2 / (nrow(y) - 1), loadings = v,
@@ -976,20 +1002,23 @@ od_cutoff_unimcd <- function(od, alpha) {
 # Outlyingness of each row: the largest standardized distance (with the
 # reweighted univariate MCD) over directions through pairs of rows, chosen
 # by the deterministic generator of cellWise (all pairs when there are at
-# most `ndir`).
+# most `ndir`). Directions through identical rows, and those with a zero
+# scale, are skipped: norms and scales below 1e-12 times the largest norm of
+# the rows (below 1e-12 in cellWise).
 pp_outlyingness <- function(y, ndir, alpha) {
   n <- nrow(y)
   all_pairs <- choose(n, 2)
   ndir <- if (identical(ndir, "all")) all_pairs else min(ndir, all_pairs)
   pairs <- if (ndir == all_pairs) t(utils::combn(n, 2)) else direction_pairs(n, ndir)
+  tiny <- 1e-12 * max(sqrt(rowSums(y^2)))
   B <- y[pairs[, 1], , drop = FALSE] - y[pairs[, 2], , drop = FALSE]
   norms <- sqrt(rowSums(B^2))
-  B <- B[norms > 1e-12, , drop = FALSE] / norms[norms > 1e-12]
+  B <- B[norms > tiny, , drop = FALSE] / norms[norms > tiny]
   proj <- y %*% t(B)
   out <- numeric(n)
   for (j in seq_len(ncol(proj))) {
     u <- unimcd_cpp(proj[, j], alpha)
-    if (u[["scale"]] > 1e-12) out <- pmax(out, abs(proj[, j] - u[["location"]]) / u[["scale"]])
+    if (u[["scale"]] > tiny) out <- pmax(out, abs(proj[, j] - u[["location"]]) / u[["scale"]])
   }
   out
 }
@@ -1014,19 +1043,27 @@ direction_pairs <- function(n, ndir) {
 }
 
 # Center and scatter of the scores within the subspace: the deterministic
-# MCD when its criterion is below that of the C-steps (as in cellWise),
-# otherwise the reweighted covariance of the C-steps.
-final_mcd <- function(scores, alpha, obj, mah, k) {
+# MCD, or the reweighted covariance of the C-steps when it fails. cellWise
+# keeps the MCD when its criterion (the log-determinant) is below the
+# determinant of the C-steps, a comparison that depends on the units of the
+# data. As log(d) < d, it keeps it whenever its determinant is below e times
+# that of the C-steps (a larger factor for determinants far from 1), which is
+# the usual case. covMcd() takes a determinant below exp(-50 k) as singular:
+# the scores are divided by a power of 2 close to their median absolute value
+# (exactly, without rounding), and the estimates are scaled back.
+final_mcd <- function(scores, alpha, mah, k) {
+  s <- 2^round(log2(stats::median(abs(scores))))
+  if (!is.finite(s) || s <= 0) s <- 1
   if (k > 1) {
-    mcd <- tryCatch(robustbase::covMcd(scores, nsamp = "deterministic", alpha = alpha),
+    mcd <- tryCatch(robustbase::covMcd(scores / s, nsamp = "deterministic", alpha = alpha),
                     error = function(e) NULL)
   } else {
     # the deterministic MCD does not handle one variable: the exact
     # univariate MCD
-    mcd <- robustbase::covMcd(scores, alpha = alpha)
+    mcd <- robustbase::covMcd(scores / s, alpha = alpha)
   }
-  if (!is.null(mcd) && mcd$crit < obj + 1e-16) {
-    return(list(center = unname(mcd$center), cov = unname(as.matrix(mcd$cov))))
+  if (!is.null(mcd)) {
+    return(list(center = unname(mcd$center) * s, cov = unname(as.matrix(mcd$cov)) * s^2))
   }
   mah <- mah / (stats::median(mah) / stats::qchisq(0.5, k))
   w <- stats::cov.wt(scores, wt = as.numeric(mah <= stats::qchisq(0.975, k)), method = "ML")
@@ -1039,7 +1076,7 @@ loc_scale_1step <- function(x) {
     v <- v[is.finite(v)]
     m0 <- stats::median(v)
     s0 <- stats::mad(v, center = m0)
-    if (s0 <= 1e-12) return(m0)
+    if (s0 <= 0) return(m0)
     u <- 1 - ((v - m0) / s0 * 1.482602218505602 / 3)^2
     w <- ((u + abs(u)) / 2)^2
     sum(v * w) / sum(w)
@@ -1224,17 +1261,15 @@ robust_h <- function(n, alpha, kmax) {
   min(n, max(floor(alpha * n), floor((n + kmax + 1) / 2)))
 }
 
-# Reduces centered data to the affine subspace spanned by the observations.
+# Reduces centered data to the affine subspace spanned by the observations,
+# from the eigen-decomposition of the smaller cross-product matrix (C++).
 svd_reduce <- function(x) {
-  center <- colMeans(x)
-  xc <- sweep(x, 2, center)
-  s <- svd(xc, nu = 0)
-  rank <- sum(s$d > max(dim(x)) * s$d[1] * .Machine$double.eps)
-  if (rank < 1) {
+  if (!any(apply(x, 2, function(v) any(v != v[1])))) {
     stop("The data have no variation.", call. = FALSE)
   }
-  v <- s$v[, seq_len(rank), drop = FALSE]
-  list(center = center, v = v, z = xc %*% v)
+  red <- svd_reduce_cpp(x, 10 * max(dim(x)) * .Machine$double.eps)
+  names(red$center) <- colnames(x)
+  red
 }
 
 # Stahel-Donoho outlyingness of each observation.
@@ -1265,15 +1300,20 @@ choose_k <- function(values, kmax, var_explained) {
 }
 
 # Distance of each (centered) row to the span of the columns of `loadings`.
+# Distances at the rounding level, relative to the norm of the row, are set
+# to zero: rows in the span (all rows when it is the whole space) have none.
 orthogonal_distance <- function(xc, loadings) {
   fitted <- xc %*% loadings %*% solve(crossprod(loadings), t(loadings))
-  sqrt(pmax(rowSums((xc - fitted)^2), 0))
+  od <- sqrt(pmax(rowSums((xc - fitted)^2), 0))
+  od[which(od <= sqrt(.Machine$double.eps) * sqrt(rowSums(xc^2)))] <- 0
+  od
 }
 
 # Cut-off for orthogonal distances: Wilson-Hilferty approximation with the
-# univariate MCD of OD^(2/3), at the given level.
+# univariate MCD of OD^(2/3), at the given level. It is zero when all the
+# distances are, so that no observation is an orthogonal outlier.
 od_cutoff <- function(od, h, level = 0.975) {
-  if (max(od) <= sqrt(.Machine$double.eps) * max(1, max(od))) {
+  if (all(od == 0)) {
     return(0)
   }
   u <- univariate_mcd_cpp(od^(2 / 3), min(h, length(od)))
@@ -1306,6 +1346,8 @@ finish_robust_pca <- function(res, x, class) {
   rownames(res$loadings) <- colnames(x)
   res$scores <- scores
   res$sd <- sqrt(rowSums(sweep(scores^2, 2, res$eigenvalues, "/")))
+  # zero when the subspace contains the data (k equal to the rank), and then
+  # so is the cut-off: no orthogonal outliers
   res$od <- orthogonal_distance(xs, res$loadings)
   res$cutoff_sd <- sqrt(stats::qchisq(0.975, res$k))
   res$cutoff_od <- od_cutoff(res$od, res$h)
