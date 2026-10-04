@@ -280,10 +280,17 @@ Française de Statistique, 157(2):90–114</p></li>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># mineral contents (%) of the forage samples</span></span></span>
 <span class="r-in"><span><span class="va">minerals</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Measurement"</span>, <span class="st">"Ca"</span>, <span class="st">"Mg"</span>, <span class="st">"P"</span>, <span class="st">"K"</span>, <span class="st">"S"</span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-in"><span><span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">minerals</span>, id <span class="op">=</span> <span class="va">Measurement</span>, ylab <span class="op">=</span> <span class="st">"Content (%)"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># mineral contents, each on its own axis, the outlying samples named: a</span></span></span>
+<span class="r-in"><span><span class="co"># figure of a journal page width</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">minerals</span>, id <span class="op">=</span> <span class="va">Measurement</span>, label_outliers <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                         ylab <span class="op">=</span> <span class="st">"Content (%)"</span>, base_size <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">p</span></span></span>
 <span class="r-plt img"><img src="generalized_boxplot-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># ggplot2::ggsave("minerals.pdf", p, width = 175, height = 70, units = "mm")</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># the statistics and the outlying samples</span></span></span>
 <span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">minerals</span>, id <span class="op">=</span> <span class="va">Measurement</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res</span><span class="op">$</span><span class="va">stats</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 15</span></span>
@@ -296,11 +303,54 @@ Française de Statistique, 157(2):90–114</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> S          366 0.13   0.17   0.2   0.23  0.31       0.122        0.316</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 6 more variables: notch_lower &lt;dbl&gt;, notch_upper &lt;dbl&gt;, g &lt;dbl&gt;, h &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   mean &lt;dbl&gt;, n_outliers &lt;int&gt;</span></span>
+<span class="r-in"><span><span class="va">res</span><span class="op">$</span><span class="va">outliers</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 27 × 5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    variable   row     id  value out  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Ca         182 <span style="text-decoration: underline;">121</span>370 1.45   upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Ca         248 <span style="text-decoration: underline;">121</span>094 0.173  lower</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Ca         252 <span style="text-decoration: underline;">121</span>085 0.313  lower</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Ca         274 <span style="text-decoration: underline;">121</span>096 0.292  lower</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Ca         306 <span style="text-decoration: underline;">121</span>404 0.323  lower</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Ca         354 <span style="text-decoration: underline;">121</span>580 1.2    upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Mg          98 <span style="text-decoration: underline;">121</span>144 0.365  upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Mg         140 <span style="text-decoration: underline;">121</span>151 0.359  upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Mg         167 <span style="text-decoration: underline;">121</span>035 0.362  upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Mg         248 <span style="text-decoration: underline;">121</span>094 0.052<span style="text-decoration: underline;">7</span> lower</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 17 more rows</span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># a detection rate of 5%: about 18 of the 368 samples are expected to be</span></span></span>
-<span class="r-in"><span><span class="co"># flagged in clean data</span></span></span>
-<span class="r-in"><span><span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">minerals</span>, id <span class="op">=</span> <span class="va">Measurement</span>, alpha <span class="op">=</span> <span class="fl">0.05</span>, ylab <span class="op">=</span> <span class="st">"Content (%)"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># with a detection rate of 5%, about 18 of the 368 samples would be</span></span></span>
+<span class="r-in"><span><span class="co"># flagged per mineral even in clean data</span></span></span>
+<span class="r-in"><span><span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">minerals</span>, id <span class="op">=</span> <span class="va">Measurement</span>, alpha <span class="op">=</span> <span class="fl">0.05</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">stats</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 15</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   variable     n lower    q1 median    q3 upper lower_fence upper_fence</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Ca         368 0.38  0.515  0.629 0.772 1.03        0.375       1.05 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Mg         368 0.116 0.172  0.204 0.240 0.315       0.114       0.317</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> P          368 0.16  0.219  0.260 0.300 0.393       0.160       0.395</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> K          368 1.04  1.72   2.01  2.38  3.04        1.01        3.10 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> S          366 0.14  0.17   0.2   0.23  0.28        0.133       0.289</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 6 more variables: notch_lower &lt;dbl&gt;, notch_upper &lt;dbl&gt;, g &lt;dbl&gt;, h &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   mean &lt;dbl&gt;, n_outliers &lt;int&gt;</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># potassium and phosphorus by calcium level, with notches and means: a</span></span></span>
+<span class="r-in"><span><span class="co"># figure of a journal column</span></span></span>
+<span class="r-in"><span><span class="va">minerals</span><span class="op">$</span><span class="va">Ca_level</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span><span class="va">minerals</span><span class="op">$</span><span class="va">Ca</span>, <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">quantile</a></span><span class="op">(</span><span class="va">minerals</span><span class="op">$</span><span class="va">Ca</span>, <span class="fl">0</span><span class="op">:</span><span class="fl">3</span> <span class="op">/</span> <span class="fl">3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                         labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Low Ca"</span>, <span class="st">"Mid Ca"</span>, <span class="st">"High Ca"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                         include.lowest <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">minerals</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"K"</span>, <span class="st">"P"</span>, <span class="st">"Ca_level"</span><span class="op">)</span><span class="op">]</span>, group <span class="op">=</span> <span class="va">Ca_level</span>,</span></span>
+<span class="r-in"><span>                         notch <span class="op">=</span> <span class="cn">TRUE</span>, show_mean <span class="op">=</span> <span class="cn">TRUE</span>, ylab <span class="op">=</span> <span class="st">"Content (%)"</span>,</span></span>
+<span class="r-in"><span>                         title <span class="op">=</span> <span class="st">"Potassium and phosphorus by calcium level"</span>,</span></span>
+<span class="r-in"><span>                         base_size <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">p</span></span></span>
 <span class="r-plt img"><img src="generalized_boxplot-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># ggplot2::ggsave("by_calcium.pdf", p, width = 85, height = 75, units = "mm")</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># trace elements on a logarithmic axis, horizontal, with all the samples</span></span></span>
+<span class="r-in"><span><span class="va">traces</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Fe"</span>, <span class="st">"Mn"</span>, <span class="st">"Zn"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">traces</span>, log <span class="op">=</span> <span class="cn">TRUE</span>, horizontal <span class="op">=</span> <span class="cn">TRUE</span>, points <span class="op">=</span> <span class="st">"all"</span>,</span></span>
+<span class="r-in"><span>                    ylab <span class="op">=</span> <span class="st">"Content (mg/kg)"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="generalized_boxplot-3.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

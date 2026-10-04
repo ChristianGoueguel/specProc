@@ -240,10 +240,17 @@ Christian L. Goueguel
 
 ``` r
 data(forageLIBS)
-# mineral contents (%) of the forage samples
 minerals <- forageLIBS[c("Measurement", "Ca", "Mg", "P", "K", "S")]
-generalized_boxplot(minerals, id = Measurement, ylab = "Content (%)")
 
+# mineral contents, each on its own axis, the outlying samples named: a
+# figure of a journal page width
+p <- generalized_boxplot(minerals, id = Measurement, label_outliers = TRUE,
+                         ylab = "Content (%)", base_size = 8)
+p
+
+# ggplot2::ggsave("minerals.pdf", p, width = 175, height = 70, units = "mm")
+
+# the statistics and the outlying samples
 res <- generalized_boxplot(minerals, id = Measurement, plot = FALSE)
 res$stats
 #> # A tibble: 5 × 15
@@ -256,8 +263,51 @@ res$stats
 #> 5 S          366 0.13   0.17   0.2   0.23  0.31       0.122        0.316
 #> # ℹ 6 more variables: notch_lower <dbl>, notch_upper <dbl>, g <dbl>, h <dbl>,
 #> #   mean <dbl>, n_outliers <int>
+res$outliers
+#> # A tibble: 27 × 5
+#>    variable   row     id  value out  
+#>    <fct>    <int>  <int>  <dbl> <chr>
+#>  1 Ca         182 121370 1.45   upper
+#>  2 Ca         248 121094 0.173  lower
+#>  3 Ca         252 121085 0.313  lower
+#>  4 Ca         274 121096 0.292  lower
+#>  5 Ca         306 121404 0.323  lower
+#>  6 Ca         354 121580 1.2    upper
+#>  7 Mg          98 121144 0.365  upper
+#>  8 Mg         140 121151 0.359  upper
+#>  9 Mg         167 121035 0.362  upper
+#> 10 Mg         248 121094 0.0527 lower
+#> # ℹ 17 more rows
 
-# a detection rate of 5%: about 18 of the 368 samples are expected to be
-# flagged in clean data
-generalized_boxplot(minerals, id = Measurement, alpha = 0.05, ylab = "Content (%)")
+# with a detection rate of 5%, about 18 of the 368 samples would be
+# flagged per mineral even in clean data
+generalized_boxplot(minerals, id = Measurement, alpha = 0.05, plot = FALSE)$stats
+#> # A tibble: 5 × 15
+#>   variable     n lower    q1 median    q3 upper lower_fence upper_fence
+#>   <fct>    <int> <dbl> <dbl>  <dbl> <dbl> <dbl>       <dbl>       <dbl>
+#> 1 Ca         368 0.38  0.515  0.629 0.772 1.03        0.375       1.05 
+#> 2 Mg         368 0.116 0.172  0.204 0.240 0.315       0.114       0.317
+#> 3 P          368 0.16  0.219  0.260 0.300 0.393       0.160       0.395
+#> 4 K          368 1.04  1.72   2.01  2.38  3.04        1.01        3.10 
+#> 5 S          366 0.14  0.17   0.2   0.23  0.28        0.133       0.289
+#> # ℹ 6 more variables: notch_lower <dbl>, notch_upper <dbl>, g <dbl>, h <dbl>,
+#> #   mean <dbl>, n_outliers <int>
+
+# potassium and phosphorus by calcium level, with notches and means: a
+# figure of a journal column
+minerals$Ca_level <- cut(minerals$Ca, quantile(minerals$Ca, 0:3 / 3),
+                         labels = c("Low Ca", "Mid Ca", "High Ca"),
+                         include.lowest = TRUE)
+p <- generalized_boxplot(minerals[c("K", "P", "Ca_level")], group = Ca_level,
+                         notch = TRUE, show_mean = TRUE, ylab = "Content (%)",
+                         title = "Potassium and phosphorus by calcium level",
+                         base_size = 8)
+p
+
+# ggplot2::ggsave("by_calcium.pdf", p, width = 85, height = 75, units = "mm")
+
+# trace elements on a logarithmic axis, horizontal, with all the samples
+traces <- forageLIBS[c("Fe", "Mn", "Zn")]
+generalized_boxplot(traces, log = TRUE, horizontal = TRUE, points = "all",
+                    ylab = "Content (mg/kg)")
 ```
