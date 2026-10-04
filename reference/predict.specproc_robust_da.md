@@ -49,19 +49,21 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-data(forageLIBS)
-lines <- forageLIBS[c("393.3599236", "396.8602175")]
-level <- cut(forageLIBS$Ca, c(-Inf, 0.6, Inf), labels = c("low", "high"))
+# iris: train on 100 flowers, predict the 50 others
 set.seed(1)
-fit <- robust_da(lines[1:300, ], level[1:300], method = "quadratic")
-head(predict(fit, lines[301:368, ], type = "prob"))
-#> # A tibble: 6 × 2
-#>     low   high
-#>   <dbl>  <dbl>
-#> 1 0.956 0.0441
-#> 2 0.871 0.129 
-#> 3 0.609 0.391 
-#> 4 0.795 0.205 
-#> 5 0.666 0.334 
-#> 6 0.847 0.153 
+train <- sample(nrow(iris), 100)
+fit <- robust_da(iris[train, 1:4], iris$Species[train], method = "quadratic")
+head(predict(fit, iris[-train, 1:4]))
+#> [1] setosa setosa setosa setosa setosa setosa
+#> Levels: setosa versicolor virginica
+head(predict(fit, iris[-train, 1:4], type = "prob"))
+#> # A tibble: 6 × 3
+#>   setosa versicolor virginica
+#>    <dbl>      <dbl>     <dbl>
+#> 1      1   2.09e-38  1.70e-54
+#> 2      1   1.45e-33  3.66e-48
+#> 3      1   1.77e-50  1.08e-62
+#> 4      1   3.77e-43  2.34e-56
+#> 5      1   1.18e-28  5.02e-45
+#> 6      1   1.50e-53  7.72e-65
 ```

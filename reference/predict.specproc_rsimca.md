@@ -50,20 +50,21 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-data(forageLIBS)
-wl <- suppressWarnings(as.numeric(names(forageLIBS)))
-spectra <- forageLIBS[which(wl > 380 & wl < 430)]
-level <- cut(forageLIBS$Ca, c(-Inf, 0.6, Inf), labels = c("low", "high"))
+# iris: train on 100 flowers, predict the 50 others
 set.seed(1)
-fit <- rsimca(spectra[1:300, ], level[1:300], ncomp = 3)
-head(predict(fit, spectra[301:368, ], type = "distances"))
-#> # A tibble: 6 × 3
-#>     low  high outlying
-#>   <dbl> <dbl> <lgl>   
-#> 1 0.857 3.98  FALSE   
-#> 2 1.41  3.55  TRUE    
-#> 3 0.405 0.533 FALSE   
-#> 4 0.469 1.73  FALSE   
-#> 5 0.494 0.759 FALSE   
-#> 6 0.761 2.51  TRUE    
+train <- sample(nrow(iris), 100)
+fit <- rsimca(iris[train, 1:4], iris$Species[train], ncomp = 2)
+head(predict(fit, iris[-train, 1:4]))
+#> [1] setosa setosa setosa setosa setosa setosa
+#> Levels: setosa versicolor virginica
+head(predict(fit, iris[-train, 1:4], type = "distances"))
+#> # A tibble: 6 × 4
+#>   setosa versicolor virginica outlying
+#>    <dbl>      <dbl>     <dbl> <lgl>   
+#> 1 0.0893       7.77      16.8 FALSE   
+#> 2 0.214        6.41      14.7 FALSE   
+#> 3 0.0472      10.1       19.0 FALSE   
+#> 4 0.0234       8.37      17.2 FALSE   
+#> 5 0.275        5.68      14.0 FALSE   
+#> 6 0.0947      10.7       20.0 FALSE   
 ```

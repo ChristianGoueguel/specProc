@@ -193,32 +193,32 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-data(forageLIBS)
-wl <- suppressWarnings(as.numeric(names(forageLIBS)))
-spectra <- forageLIBS[which(wl > 380 & wl < 430)]
-# forage samples with low and high calcium
-level <- cut(forageLIBS$Ca, c(-Inf, 0.6, Inf), labels = c("low", "high"))
+# iris: train on 100 flowers, predict the 50 others
 set.seed(1)
-fit <- rsimca(spectra[1:300, ], level[1:300], ncomp = 3)
+train <- sample(nrow(iris), 100)
+fit <- rsimca(iris[train, 1:4], iris$Species[train], ncomp = 2)
 fit
 #> Robust SIMCA (RSIMCA)
 #> 
-#> Observations:   300 (89 outliers in their class, 65 in all classes)
-#> Variables:      594
-#> Classes:        low (3 comp.), high (3 comp.)
+#> Observations:   100 (15 outliers in their class, 14 in all classes)
+#> Variables:      4
+#> Classes:        setosa (2 comp.), versicolor (2 comp.), virginica (2 comp.)
 #> Rule:           gamma = 0.5, squared scaled distances
 #> 
 #> Misclassification of the regular training observations:
-#> # A tibble: 3 × 3
-#>   class       n error
-#>   <chr>   <int> <dbl>
-#> 1 low       107 0.187
-#> 2 high      104 0.231
-#> 3 overall   211 0.209
-table(predict(fit, spectra[301:368, ]), level[301:368])
-#>       
-#>        low high
-#>   low   16   28
-#>   high   3   21
-plot_coomans(fit, newdata = spectra[301:368, ], group = level[301:368])
+#> # A tibble: 4 × 3
+#>   class          n  error
+#>   <chr>      <int>  <dbl>
+#> 1 setosa        27 0     
+#> 2 versicolor    28 0.0357
+#> 3 virginica     30 0     
+#> 4 overall       85 0.0118
+table(predicted = predict(fit, iris[-train, 1:4]), true = iris$Species[-train])
+#>             true
+#> predicted    setosa versicolor virginica
+#>   setosa         16          0         0
+#>   versicolor      0         17         0
+#>   virginica       0          2        15
+plot_coomans(fit, classes = c("versicolor", "virginica"),
+             newdata = iris[-train, 1:4], group = iris$Species[-train])
 ```

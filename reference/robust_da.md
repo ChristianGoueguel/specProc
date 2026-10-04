@@ -152,40 +152,40 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
-data(forageLIBS)
-# forage samples with low and high calcium, from two Ca II lines
-lines <- forageLIBS[c("393.3599236", "396.8602175")]
-level <- cut(forageLIBS$Ca, c(-Inf, 0.6, Inf), labels = c("low", "high"))
+# iris: train on 100 flowers, predict the 50 others
 set.seed(1)
-fit <- robust_da(lines[1:300, ], level[1:300])
+train <- sample(nrow(iris), 100)
+fit <- robust_da(iris[train, 1:4], iris$Species[train])
 fit
 #> Robust linear discriminant analysis (MCD)
 #> 
-#> Observations:   300 (9 outliers)
-#> Variables:      2
-#> Classes:        low, high
-#> Prior:          0.46 0.54
+#> Observations:   100 (12 outliers)
+#> Variables:      4
+#> Classes:        setosa, versicolor, virginica
+#> Prior:          0.341 0.352 0.307
 #> 
 #> Misclassification of the regular training observations:
-#> # A tibble: 3 × 3
-#>   class       n error
-#>   <chr>   <int> <dbl>
-#> 1 low       134 0.515
-#> 2 high      157 0.312
-#> 3 overall   291 0.405
-table(predict(fit, lines[301:368, ]), level[301:368])
-#>       
-#>        low high
-#>   low   13   22
-#>   high   6   27
-head(predict(fit, lines[301:368, ], type = "prob"))
-#> # A tibble: 6 × 2
-#>     low  high
-#>   <dbl> <dbl>
-#> 1 0.835 0.165
-#> 2 0.759 0.241
-#> 3 0.591 0.409
-#> 4 0.724 0.276
-#> 5 0.630 0.370
-#> 6 0.740 0.260
+#> # A tibble: 4 × 3
+#>   class          n  error
+#>   <chr>      <int>  <dbl>
+#> 1 setosa        30 0     
+#> 2 versicolor    31 0.0323
+#> 3 virginica     27 0.0370
+#> 4 overall       88 0.0227
+table(predicted = predict(fit, iris[-train, 1:4]), true = iris$Species[-train])
+#>             true
+#> predicted    setosa versicolor virginica
+#>   setosa         16          0         0
+#>   versicolor      0         18         0
+#>   virginica       0          1        15
+head(predict(fit, iris[-train, 1:4], type = "prob"))
+#> # A tibble: 6 × 3
+#>   setosa versicolor virginica
+#>    <dbl>      <dbl>     <dbl>
+#> 1      1   1.01e-23  3.70e-46
+#> 2      1   2.46e-20  9.10e-42
+#> 3      1   2.35e-28  3.66e-52
+#> 4      1   6.15e-25  8.94e-48
+#> 5      1   2.20e-18  3.16e-39
+#> 6      1   1.53e-29  8.77e-54
 ```
