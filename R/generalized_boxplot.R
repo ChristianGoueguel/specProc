@@ -14,175 +14,138 @@
 #' and informative summary of the data's central tendency, spread, and potential
 #' outliers.
 #'
+#' The data \eqn{x_i} are first mapped, preserving their ranks, into (0, 1)
+#' by \eqn{r_i = (\tilde{x}_i - \min_j \tilde{x}_j + 0.1) /
+#' (\max_j \tilde{x}_j - \min_j \tilde{x}_j + 0.2)}, with
+#' \eqn{\tilde{x}_i = (x_i - \text{median}) / \text{IQR}}, and then onto the
+#' real line by \eqn{w_i = \Phi^{-1}(r_i)}. The \eqn{w_i}, standardized by
+#' their median and their interquartile range divided by
+#' \eqn{z_{0.75} - z_{0.25} = 1.349}, are fitted by a Tukey g-and-h
+#' distribution, whose skewness \eqn{g} and tail heaviness \eqn{h} are
+#' estimated from the quantiles of orders \eqn{p} and \eqn{1 - p}. The fences
+#' are the quantiles of orders \eqn{\alpha/2} and \eqn{1 - \alpha/2} of the
+#' fitted distribution, mapped back to the scale of the data: a proportion
+#' \eqn{\alpha} of the observations of a clean distribution, of whatever
+#' skewness and tails, is expected outside. The default \eqn{\alpha =
+#' 2\,\Phi(-4 z_{0.75}) \approx 0.7\%}, the rate of Tukey's boxplot for normal
+#' data, is that of the authors' implementation (the Stata command `robbox`
+#' of Jann, Verardi and Vermandele). The fences are not inside the box, and
+#' the whiskers end at the most extreme observations within the fences.
+#'
+#' The outlying observations are therefore *atypical at the rate*
+#' \eqn{\alpha}: about \eqn{\alpha n} of them are expected in clean data, so
+#' that with a large \eqn{\alpha} (such as 5%) many flagged observations are
+#' not errors. As \eqn{h} may be negative (tails lighter than normal), where
+#' the g-and-h transform turns back before the \eqn{\alpha/2} quantile the
+#' fence is its extreme value.
+#'
+#' The layout, the points and the options for publication figures are those
+#' of [adjusted_boxplot()]: see its details.
+#'
 #' @references
 #'  - Bruffaerts, C., Verardi, V., Vermandele, C. (2014). A generalized boxplot for
 #'    skewed and heavy-tailed distributions. Statistics and Probability Letters 95(C):110–117
+#'  - Verardi, V., Vermandele, C. (2016). Outlier identification for skewed and/or
+#'    heavy-tailed unimodal multivariate distributions. Journal de la Société
+#'    Française de Statistique, 157(2):90–114
 #'
-#' @param x A numeric data frame or tibble.
-#' @param alpha A scalar, between 0 and 1 that specifies the desired detection rate of atypical values.
-#' @param p A scalar, between 0.5 and 1 that specifies the quantile order for estimating g and h.
-#' @param plot Logical value indicating whether to plot the boxplot or return the boxplot statistics.
-#' @param xlabels.angle A numeric value specifying the angle (in degrees) for x-axis labels (default is 90).
-#' @param xlabels.vjust A numeric value specifying the vertical justification of x-axis labels (default is 1).
-#' @param xlabels.hjust A numeric value specifying the horizontal justification of x-axis labels (default is 1).
-#' @param box.width A numeric value specifying the width of the boxplot (default is 0.5).
-#' @param notch A logical value indicating whether to display a notched boxplot (default is `FALSE`).
-#' @param notchwidth A numeric value specifying the width of the notch relative to the body of the boxplot (default is 0.5).
-#' @param staplewidth A numeric value specifying the width of staples at the ends of the whiskers.
+#' @inheritParams adjusted_boxplot
+#' @param alpha The expected proportion of observations outside the fences in
+#'   clean data, between 0 and 1. Default is \eqn{2\,\Phi(-4 z_{0.75}) \approx
+#'   0.007}, as Tukey's boxplot for normal data.
+#' @param p The quantile order, between 0.5 and 1, of the estimation of g and
+#'   h. Default is 0.9 (a breakdown point of 10%).
 #'
 #' @return
-#'    - If `plot = TRUE`, returns a `ggplot2` object containing the generalized boxplot.
-#'    - If `plot = FALSE`, returns a list of tibbles: `stats`, with the whisker
-#'      ends (`lower`, `upper`: the most extreme observations within the fences),
-#'      quartiles, median, fences and the estimated g and h parameters of each variable,
-#'      and `outliers`, with the potential outliers (`out` gives the tail).
+#'    - If `plot = TRUE`, a `ggplot2` object.
+#'    - If `plot = FALSE`, a list of two tibbles: `stats`, with one row per
+#'      variable (and group): the number of values `n`, the whisker ends
+#'      `lower` and `upper` (the most extreme values within the fences), the
+#'      quartiles `q1` and `q3`, the `median`, the fences, the notch limits,
+#'      the estimated `g` and `h`, the `mean` and the number of outlying values
+#'      `n_outliers`; and `outliers`, with the outlying values, their `row` in
+#'      `x`, their `id` and their tail `out` (`"lower"` or `"upper"`).
+#'
+#' @seealso [adjusted_boxplot()]
 #'
 #' @export generalized_boxplot
 #'
 #' @examples
 #' data(forageLIBS)
 #' # mineral contents (%) of the forage samples
-#' generalized_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")])
-#' generalized_boxplot(forageLIBS[c("Ca", "Mg", "P", "K", "S")], plot = FALSE)
-generalized_boxplot <- function(x, alpha = 0.05, p = 0.9, plot = TRUE, xlabels.angle = 90, xlabels.vjust = 1, xlabels.hjust = 1, box.width = .5, notch = FALSE, notchwidth = 0.5, staplewidth = 0.5) {
+#' minerals <- forageLIBS[c("Measurement", "Ca", "Mg", "P", "K", "S")]
+#' generalized_boxplot(minerals, id = Measurement, ylab = "Content (%)")
+#' res <- generalized_boxplot(minerals, id = Measurement, plot = FALSE)
+#' res$stats
+#'
+#' # a detection rate of 5%: about 18 of the 368 samples are expected to be
+#' # flagged in clean data
+#' generalized_boxplot(minerals, id = Measurement, alpha = 0.05, ylab = "Content (%)")
+generalized_boxplot <- function(x, alpha = 2 * stats::pnorm(-4 * stats::qnorm(0.75)), p = 0.9,
+                                plot = TRUE, id = NULL, group = NULL,
+                                scales = c("free_y", "fixed"),
+                                points = c("outliers", "all", "none"), label_outliers = FALSE,
+                                show_n = TRUE, show_mean = FALSE, horizontal = FALSE,
+                                log = FALSE, fill = "grey85", xlab = NULL, ylab = NULL,
+                                title = NULL, caption = TRUE, base_size = 11, x_labels_angle = 0,
+                                box_width = 0.5, notch = FALSE, notch_width = 0.5,
+                                staple_width = 0.5, xlabels.angle = deprecated(),
+                                xlabels.vjust = deprecated(), xlabels.hjust = deprecated(),
+                                box.width = deprecated(), notchwidth = deprecated(),
+                                staplewidth = deprecated()) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (is.matrix(x)) {
-    x <- as.data.frame(x)
-  }
-  if (!is.data.frame(x) || !all(vapply(x, is.numeric, logical(1)))) {
-    stop("Input 'x' must be a numeric data frame.")
-  }
-  if (!is.numeric(alpha) || alpha <= 0 || alpha >= 1) {
+  if (!is.numeric(alpha) || length(alpha) != 1 || is.na(alpha) || alpha <= 0 || alpha >= 1) {
     stop("Argument 'alpha' must be a numeric value between 0 and 1.")
   }
-  if (!is.numeric(p) || p <= 0.5 || p >= 1) {
+  if (!is.numeric(p) || length(p) != 1 || is.na(p) || p <= 0.5 || p >= 1) {
     stop("Argument 'p' must be a numeric value between 0.5 and 1.")
   }
-  if(!is.logical(plot)) {
+  if (!is.logical(plot) || length(plot) != 1 || is.na(plot)) {
     stop("Argument 'plot' must be of type boolean (TRUE or FALSE).")
   }
-  if (!is.logical(notch)) {
-    stop("Argument 'notch' must be of type boolean (TRUE or FALSE).")
-  }
-  if (!is.numeric(xlabels.angle) || xlabels.angle < 0 || xlabels.angle > 360) {
-    stop("Argument 'x_axis_angle' must be a numeric value between 0 and 360.")
-  }
-  if (!is.numeric(xlabels.vjust) || xlabels.vjust < 0 || xlabels.vjust > 1) {
-    stop("Argument 'xlabels.vjust' must be a numeric value between 0 and 1.")
-  }
-  if (!is.numeric(xlabels.hjust) || xlabels.hjust < 0 || xlabels.hjust > 1) {
-    stop("Argument 'xlabels.hjust' must be a numeric value between 0 and 1.")
-  }
-  if (!is.numeric(box.width) || box.width <= 0) {
-    stop("Argument 'box.width' must be a positive numeric value.")
-  }
-  if (!is.logical(notch)) {
-    stop("Argument 'notch' must be of type boolean (TRUE or FALSE).")
-  }
-  if (!is.numeric(notchwidth) || notchwidth < 0 || notchwidth > 1) {
-    stop("Argument 'notchwidth' must be a numeric value between 0 and 1.")
-  }
-  if (!is.numeric(staplewidth) || staplewidth < 0) {
-    stop("Argument 'staplewidth' must be a positive numeric value.")
-  }
-
-  genBoxplot_stats <- list()
-  genBoxplot_out <- list()
-  for (nm in names(x)) {
-    st <- genboxStats(x[[nm]], alpha, p)
-    genBoxplot_stats[[nm]] <- tibble::tibble(
-      lower = st$stats$lower_whisker,
-      q1 = st$stats$lower_quantile,
-      median = st$stats$median,
-      q3 = st$stats$upper_quantile,
-      upper = st$stats$upper_whisker,
-      lower_fence = st$stats$lower_fence,
-      upper_fence = st$stats$upper_fence,
-      g = st$stats$g,
-      h = st$stats$h
-    )
-    genBoxplot_out[[nm]] <- st$outliers
-  }
-  genBoxplot_stats <- dplyr::bind_rows(genBoxplot_stats, .id = "variable")
-  genBoxplot_stats$variable <- factor(genBoxplot_stats$variable, levels = names(x))
-  genBoxplot_out <- dplyr::bind_rows(genBoxplot_out, .id = "variable")
-  if (nrow(genBoxplot_out) == 0) {
-    genBoxplot_out <- tibble::tibble(variable = character(), out = character(), value = numeric())
-  }
-  genBoxplot_out$variable <- factor(genBoxplot_out$variable, levels = names(x))
-
+  args <- boxplot_args(
+    "generalized_boxplot", rlang::caller_env(), scales = scales, points = points,
+    label_outliers = label_outliers, show_n = show_n, show_mean = show_mean,
+    horizontal = horizontal, log = log, fill = fill, xlab = xlab, ylab = ylab, title = title,
+    caption = caption, base_size = base_size, x_labels_angle = x_labels_angle,
+    box_width = box_width, notch = notch, notch_width = notch_width, staple_width = staple_width,
+    xlabels.angle = xlabels.angle, xlabels.vjust = xlabels.vjust, xlabels.hjust = xlabels.hjust,
+    box.width = box.width, notchwidth = notchwidth, staplewidth = staplewidth
+  )
+  input <- boxplot_input(x, rlang::enquo(id), rlang::enquo(group))
+  res <- robust_boxplot_data(input$x, input$vars, input$id, input$group,
+                             function(v) generalized_stats(v, alpha, p))
   if (!plot) {
-    return(list("stats" = genBoxplot_stats, "outliers" = genBoxplot_out))
+    return(res[c("stats", "outliers")])
   }
-  boxplot_stats_plot(genBoxplot_stats, genBoxplot_out, xlabels.angle, xlabels.vjust,
-                     xlabels.hjust, box.width, notch, notchwidth, staplewidth)
+  robust_boxplot_plot(res, args, boxplot_caption("generalized", alpha))
 }
 
-# Draws a boxplot from precomputed statistics (lower, q1, median, q3, upper)
-# and outliers (variable, value). Shared by the adjusted and generalized boxplots.
-boxplot_stats_plot <- function(stats_tbl, outlier_tbl, xlabels.angle, xlabels.vjust,
-                               xlabels.hjust, box.width, notch, notchwidth, staplewidth) {
-  variable <- lower <- q1 <- median <- q3 <- upper <- value <- NULL
-
-  ggplot2::ggplot() +
-    ggplot2::geom_boxplot(
-      data = stats_tbl,
-      ggplot2::aes(
-        x = variable,
-        ymin = lower,
-        lower = q1,
-        middle = median,
-        upper = q3,
-        ymax = upper,
-        group = variable,
-        fill = variable),
-      stat = "identity",
-      width = box.width,
-      colour = "black",
-      notch = notch,
-      notchwidth = notchwidth,
-      staplewidth = staplewidth) +
-    ggplot2::geom_point(
-      data = outlier_tbl,
-      ggplot2::aes(
-        x = variable,
-        y = value,
-        fill = variable,
-        group = variable),
-      shape = 21,
-      size = 2,
-      alpha = 1/3) +
-    boxplot_fill_scale() +
-    ggplot2::theme_bw() +
-    ggplot2::theme(
-      legend.position = "none",
-      panel.grid = ggplot2::element_blank(),
-      axis.text.x = ggplot2::element_text(angle = xlabels.angle, vjust = xlabels.vjust, hjust = xlabels.hjust)) +
-    ggplot2::labs(x = " ", y = " ")
-}
-
-
-# Generalized boxplot statistics for one variable (Bruffaerts et al., 2014).
-genboxStats <- function(x, alpha, p) {
-  x <- x[!is.na(x)]
+# Generalized boxplot statistics of one variable (Bruffaerts et al., 2014),
+# as in the Stata command robbox of Jann, Verardi and Vermandele, with the
+# interquartile range as the scale of the first step, as in the paper.
+generalized_stats <- function(x, alpha, p) {
   if (length(x) < 5 || stats::IQR(x) == 0) {
     stop("Each variable must have at least 5 non-missing values and a non-zero IQR.", call. = FALSE)
   }
   med <- stats::median(x)
   iqr <- stats::IQR(x)
+  quartiles <- unname(stats::quantile(x, c(0.25, 0.75)))
 
-  # 1. Map the data into (0, 1) and then onto the real line.
+  # 1. Map the data into (0, 1), preserving their ranks, then onto the real
+  # line, and standardize them (normal-consistent IQR).
   x_star <- (x - med) / iqr
   r <- x_star - min(x_star) + 0.1
   s <- min(r) + max(r)
   w <- stats::qnorm(r / s)
   w_med <- stats::median(w)
-  w_scale <- stats::IQR(w) / 1.3426
+  w_scale <- stats::IQR(w) / diff(stats::qnorm(c(0.25, 0.75)))
   w_star <- (w - w_med) / w_scale
 
-  # 2. Quantile-based estimates of the Tukey g-and-h parameters.
+  # 2. Quantile-based estimates of the Tukey g-and-h parameters; h may be
+  # negative (tails lighter than normal).
   z <- stats::qnorm(p)
   Qp <- unname(stats::quantile(w_star, p))
   Q1p <- unname(stats::quantile(w_star, 1 - p))
@@ -194,45 +157,30 @@ genboxStats <- function(x, alpha, p) {
     g <- 0
     h <- 2 * log((Qp - Q1p) / (2 * z)) / z^2
   }
-  if (!is.finite(h) || h < 0) h <- 0
+  if (!is.finite(h)) h <- 0
 
-  # 3. Fences as g-and-h quantiles, transformed back to the original scale.
-  xi <- tukey_gh(c(alpha / 2, 1 - alpha / 2), type = "q", location = 0, scale = 1, g = g, h = h)
+  # 3. Fences: the alpha/2 and 1 - alpha/2 quantiles of the fitted g-and-h,
+  # mapped back to the scale of the data, and not inside the box. Where the
+  # transform turns back (h < 0), the fence is its extreme value.
+  tau <- function(u) {
+    if (g == 0) u * exp(h * u^2 / 2) else (exp(g * u) - 1) / g * exp(h * u^2 / 2)
+  }
+  u <- seq(0, stats::qnorm(1 - alpha / 2), length.out = 1001)
+  xi <- c(min(tau(-u)), max(tau(u)))
   back <- function(q) {
     r_q <- stats::pnorm(w_med + w_scale * q) * s
     (r_q + min(x_star) - 0.1) * iqr + med
   }
   fences <- back(xi)
+  fences <- c(min(fences[1], quartiles[1]), max(fences[2], quartiles[2]))
 
   inside <- x[x >= fences[1] & x <= fences[2]]
-  stats_tbl <- tibble::tibble(
-    lower_whisker = min(inside),
-    upper_whisker = max(inside),
-    lower_fence = fences[1],
-    lower_quantile = unname(stats::quantile(x, 0.25)),
-    median = med,
-    upper_quantile = unname(stats::quantile(x, 0.75)),
-    upper_fence = fences[2],
-    g = g,
-    h = h
+  notch <- med + c(-1, 1) * 1.58 * iqr / sqrt(length(x))
+  stats <- data.frame(
+    lower = min(inside), q1 = quartiles[1], median = med, q3 = quartiles[2],
+    upper = max(inside), lower_fence = fences[1], upper_fence = fences[2],
+    notch_lower = notch[1], notch_upper = notch[2], g = g, h = h
   )
-
-  order_x <- sort(x)
-  low <- order_x[order_x < fences[1]]
-  high <- order_x[order_x > fences[2]]
-  out <- tibble::tibble(
-    out = c(rep("lower", length(low)), rep("upper", length(high))),
-    value = c(low, high)
-  )
-
-  list("stats" = stats_tbl, "outliers" = out)
-}
-
-# The D3 palette of ggsci when it is installed, the default palette otherwise.
-boxplot_fill_scale <- function() {
-  if (rlang::is_installed("ggsci")) {
-    ggsci::scale_fill_d3(palette = "category20")
-  } else {
-    ggplot2::scale_fill_hue()
-  }
+  tail <- ifelse(x < fences[1], "lower", ifelse(x > fences[2], "upper", NA_character_))
+  list(stats = stats, tail = tail)
 }

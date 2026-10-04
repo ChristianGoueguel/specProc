@@ -61,7 +61,6 @@ Suggests:
     future,
     future.apply,
     generics,
-    ggsci,
     HotellingEllipse (>= 1.3.0),
     knitr,
     mixOmics,

@@ -42,7 +42,7 @@ test_that("directional_outlyingness flags gross outliers", {
 test_that("generalized_boxplot estimates g and h and sensible fences", {
   set.seed(3)
   df <- data.frame(normal = stats::rnorm(5000), skewed = stats::rexp(5000))
-  res <- generalized_boxplot(df, plot = FALSE)
+  res <- generalized_boxplot(df, alpha = 0.05, plot = FALSE)
   st <- res$stats
   expect_lt(abs(st$g[1]), 0.05)
   expect_lt(st$h[1], 0.1)
