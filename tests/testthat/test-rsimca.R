@@ -1,18 +1,3 @@
-# Two classes lying near different two-dimensional subspaces of a
-# 50-dimensional space; the test set comes from the same model.
-make_simca <- function(n = 40, p = 50, seed = 1) {
-  set.seed(seed)
-  basis_a <- qr.Q(qr(matrix(rnorm(p * 2), p, 2)))
-  basis_b <- qr.Q(qr(matrix(rnorm(p * 2), p, 2)))
-  draw <- function(m) {
-    scores <- function() matrix(rnorm(m * 2), m) %*% diag(c(5, 3))
-    noise <- function() matrix(rnorm(m * p, sd = 0.2), m)
-    list(x = rbind(scores() %*% t(basis_a) + noise(), scores() %*% t(basis_b) + noise() + 1),
-         g = factor(rep(c("a", "b"), each = m)))
-  }
-  list(train = draw(n), test = draw(n))
-}
-
 test_that("rsimca classifies high-dimensional data and resists outliers", {
   d <- make_simca()
   x <- d$train$x
@@ -21,6 +6,7 @@ test_that("rsimca classifies high-dimensional data and resists outliers", {
   set.seed(3)
   fit <- rsimca(x, d$train$g, ncomp = 2)
   expect_s3_class(fit, "specproc_rsimca")
+  expect_identical(fit$group, d$train$g)
   expect_equal(fit$ncomp, c(a = 2L, b = 2L))
   expect_true(all(fit$weights[1:5] == 0))
   expect_true(all(fit$outlying[1:5]))

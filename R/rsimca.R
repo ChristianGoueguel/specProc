@@ -27,6 +27,10 @@
 #' outlier for all of them (`outlying`): it is still assigned to the closest
 #' class, but probably belongs to none.
 #'
+#' [plot_coomans()] draws the distances to two classes against each other
+#' (Coomans plot), and `plot_outlier_map(fit$models[[j]])` the score and
+#' orthogonal distances to the robust PCA model of class `j`.
+#'
 #' The misclassification rates are estimated on the regular observations of
 #' the training data (those regular in the robust PCA of their class), and
 #' the overall rate is weighted by the membership probabilities, by default
@@ -78,7 +82,8 @@
 #'  - `ncomp`: the number of components of each class model.
 #'  - `distances`: a tibble with the combined distance \eqn{D_j} of each
 #'    training observation to each class.
-#'  - `fitted`: the classes assigned to the training observations.
+#'  - `group`: the classes of the training observations, and `fitted`, the
+#'    classes assigned to them.
 #'  - `weights`: 1 for the observations regular in the model of their class,
 #'    0 for the others.
 #'  - `outlying`: `TRUE` for the observations outlying for every class.
@@ -97,7 +102,8 @@
 #'    approach to robust principal component analysis. Technometrics,
 #'    47(1):64-79.
 #'
-#' @seealso [predict.specproc_rsimca()], [simca()], [robpca()], [robust_da()]
+#' @seealso [predict.specproc_rsimca()], [plot_coomans()], [simca()], [robpca()],
+#'   [robust_da()]
 #' @export
 #'
 #' @examples
@@ -110,6 +116,7 @@
 #' fit <- rsimca(spectra[1:300, ], level[1:300], ncomp = 3)
 #' fit
 #' table(predict(fit, spectra[301:368, ]), level[301:368])
+#' plot_coomans(fit, newdata = spectra[301:368, ], group = level[301:368])
 rsimca <- function(x, group, ncomp = NULL, kmax = 10, alpha = 0.75, gamma = 0.5, squared = TRUE,
                    var_explained = 0.8, prior = NULL, ndir = 250, nsamp = 500) {
   if (missing(x) || missing(group)) {
@@ -139,7 +146,8 @@ rsimca <- function(x, group, ncomp = NULL, kmax = 10, alpha = 0.75, gamma = 0.5,
   prior <- class_prior(prior, group, weights)
 
   res <- list(models = models, ncomp = vapply(models, function(m) m$k, integer(1)),
-              distances = NULL, fitted = NULL, weights = as.numeric(weights), outlying = NULL,
+              distances = NULL, group = group, fitted = NULL, weights = as.numeric(weights),
+              outlying = NULL,
               misclassification = NULL, prior = prior, gamma = gamma, squared = squared,
               levels = lev, alpha = alpha)
   res <- structure(res, variables = colnames(x), nvar = ncol(x), class = "specproc_rsimca")

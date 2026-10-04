@@ -42,7 +42,9 @@
   (2005), a robust PCA model of each class and the assignment to the closest
   class from the scaled score and orthogonal distances, for whole spectra.
   `predict()` gives the classes, or the distances to the classes and
-  whether a spectrum is outlying for all of them. `simca()` is a new
+  whether a spectrum is outlying for all of them, and `plot_coomans()` draws
+  the distances to two classes against each other (Coomans plot), with the
+  class and classification boundaries. `simca()` is a new
   parsnip model of SIMCA classification, with `rsimca()` as its `"rsimca"`
   engine, to fit and tune it in tidymodels: `num_comp`, and the rule of
   classification, `gamma` and `squared`, with the new dials parameters

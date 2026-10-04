@@ -42,6 +42,21 @@ make_regression <- function(n = 100, p = 200, seed = 1) {
   list(train = draw(n), test = draw(200))
 }
 
+# Two classes lying near different two-dimensional subspaces of a
+# 50-dimensional space; the test set comes from the same model.
+make_simca <- function(n = 40, p = 50, seed = 1) {
+  set.seed(seed)
+  basis_a <- qr.Q(qr(matrix(rnorm(p * 2), p, 2)))
+  basis_b <- qr.Q(qr(matrix(rnorm(p * 2), p, 2)))
+  draw <- function(m) {
+    scores <- function() matrix(rnorm(m * 2), m) %*% diag(c(5, 3))
+    noise <- function() matrix(rnorm(m * p, sd = 0.2), m)
+    list(x = rbind(scores() %*% t(basis_a) + noise(), scores() %*% t(basis_b) + noise() + 1),
+         g = factor(rep(c("a", "b"), each = m)))
+  }
+  list(train = draw(n), test = draw(n))
+}
+
 # Dense reference implementations of the penalized baselines (O(n^3)).
 dense_als <- function(y, lambda, p, max_iter) {
   n <- length(y)

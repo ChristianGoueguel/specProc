@@ -80,6 +80,7 @@ reference:
   contents:
   - rsimca
   - predict.specproc_rsimca
+  - plot_coomans
   - simca
   - simca_gamma
   - robust_da

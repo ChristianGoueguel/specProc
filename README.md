@@ -70,7 +70,7 @@ website](https://christiangoueguel.com/specProc/articles/).
 | Orthogonalization | `osc()`, `direct_osc()`, `projected_osc()`, `opls()`, `o2pls()`, `epo()`, `glsw()`, `y_gradient_glsw()` |
 | Calibration | `calibration_curve()`, `plot_calibration()`, `nas()`, `pds()` |
 | Wavelength selection and robust calibration | `select_wavelengths()`, `plot_wavelength_selection()`, `step_select_wavelengths()`, `rsimpls()`, `step_rsimpls()`, `rpcr()`, `robust_rmsecv()`, the `"rsimpls"` engine of `parsnip::pls()` and `"lts"` engine of `parsnip::linear_reg()` |
-| Robust classification | `rsimca()`, `robust_da()`, the `simca()` parsnip model, the `"mcd"` engines of `parsnip::discrim_linear()` and `parsnip::discrim_quad()` |
+| Robust classification | `rsimca()`, `plot_coomans()`, `robust_da()`, the `simca()` parsnip model, the `"mcd"` engines of `parsnip::discrim_linear()` and `parsnip::discrim_quad()` |
 | Plasma diagnostics | `saturation_summary()`, `electron_density()`, `boltzmann()`, `saha_boltzmann()`, `plot_boltzmann()`, `mcwhirter_criterion()`, `self_absorption()`, `correct_self_absorption()`, `cf_libs()`, `nist_lines()`, `starkb_lines()` |
 | Outliers and robust PCA | `robpca()`, `rospca()`, `macropca()`, `cellpca()`, `plot_outlier_map()`, `plot_cell_map()`, `q_residuals()`, `dmodx()`, `plot_influence()`, `hotelling_t2()` |
 | Robust statistics | `summary_stats()`, `biweight_location()`, `biweight_scale()`, `rousseeuw_croux()`, `umad()`, `adjusted_boxplot()`, `robust_bcyj()` |

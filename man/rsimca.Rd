@@ -62,7 +62,8 @@ An object of class \code{specproc_rsimca}, a list with:
 \item \code{ncomp}: the number of components of each class model.
 \item \code{distances}: a tibble with the combined distance \eqn{D_j} of each
 training observation to each class.
-\item \code{fitted}: the classes assigned to the training observations.
+\item \code{group}: the classes of the training observations, and \code{fitted}, the
+classes assigned to them.
 \item \code{weights}: 1 for the observations regular in the model of their class,
 0 for the others.
 \item \code{outlying}: \code{TRUE} for the observations outlying for every class.
@@ -99,6 +100,10 @@ An observation whose two scaled distances exceed 1 for every class is an
 outlier for all of them (\code{outlying}): it is still assigned to the closest
 class, but probably belongs to none.
 
+\code{\link[=plot_coomans]{plot_coomans()}} draws the distances to two classes against each other
+(Coomans plot), and \code{plot_outlier_map(fit$models[[j]])} the score and
+orthogonal distances to the robust PCA model of class \code{j}.
+
 The misclassification rates are estimated on the regular observations of
 the training data (those regular in the robust PCA of their class), and
 the overall rate is weighted by the membership probabilities, by default
@@ -128,6 +133,7 @@ set.seed(1)
 fit <- rsimca(spectra[1:300, ], level[1:300], ncomp = 3)
 fit
 table(predict(fit, spectra[301:368, ]), level[301:368])
+plot_coomans(fit, newdata = spectra[301:368, ], group = level[301:368])
 }
 \references{
 \itemize{
@@ -140,7 +146,8 @@ approach to robust principal component analysis. Technometrics,
 }
 }
 \seealso{
-\code{\link[=predict.specproc_rsimca]{predict.specproc_rsimca()}}, \code{\link[=simca]{simca()}}, \code{\link[=robpca]{robpca()}}, \code{\link[=robust_da]{robust_da()}}
+\code{\link[=predict.specproc_rsimca]{predict.specproc_rsimca()}}, \code{\link[=plot_coomans]{plot_coomans()}}, \code{\link[=simca]{simca()}}, \code{\link[=robpca]{robpca()}},
+\code{\link[=robust_da]{robust_da()}}
 }
 \author{
 Christian L. Goueguel
