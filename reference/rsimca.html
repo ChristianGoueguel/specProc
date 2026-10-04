@@ -174,7 +174,8 @@ the proportions of these observations in each class. They tend to
 underestimate the error: estimate it on test data or by
 cross-validation.</p>
 <p>In tidymodels, <code>rsimca()</code> is the <code>"rsimca"</code> engine of the <code><a href="simca.html">simca()</a></code>
-parsnip model, where <code>ncomp</code> (<code>num_comp</code>) and <code>gamma</code> can be tuned.</p>
+parsnip model, where <code>ncomp</code> (<code>num_comp</code>), <code>gamma</code> and <code>squared</code> can be
+tuned.</p>
 <p><strong>Differences from the paper.</strong> The number of components of each class
 is given (<code>ncomp</code>) or chosen by <code><a href="robpca.html">robpca()</a></code> from the proportion of
 variance explained, instead of by robust cross-validation (PRESS).</p>

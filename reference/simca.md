@@ -14,6 +14,7 @@ simca(
   mode = "classification",
   num_comp = NULL,
   gamma = NULL,
+  squared = NULL,
   engine = "rsimca"
 )
 
@@ -23,6 +24,7 @@ update(
   parameters = NULL,
   num_comp = NULL,
   gamma = NULL,
+  squared = NULL,
   fresh = FALSE,
   ...
 )
@@ -43,6 +45,12 @@ update(
 
   The weight of the orthogonal distances in the classification rule,
   between 0 and 1, or `NULL` (default) for 0.5.
+
+- squared:
+
+  A logical: combine the squared scaled distances (`TRUE`) or the scaled
+  distances (`FALSE`) in the classification rule, or `NULL` (default)
+  for `TRUE`.
 
 - engine:
 
@@ -94,12 +102,19 @@ parsnip and specProc are both loaded.
   [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md)).
   With `NULL` (the default), it is 0.5.
 
-Both can be tuned with
+- `squared` chooses the classification rule (`squared` of
+  [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md)):
+  the squared scaled distances (`TRUE`, rule R2 of the paper) or the
+  scaled distances (`FALSE`, rule R1). With `NULL` (the default), it is
+  `TRUE`.
+
+All three can be tuned with
 [`tune::tune()`](https://hardhat.tidymodels.org/reference/tune.html),
 using
-[`dials::num_comp()`](https://dials.tidymodels.org/reference/num_comp.html)
+[`dials::num_comp()`](https://dials.tidymodels.org/reference/num_comp.html),
+[`simca_gamma()`](https://christiangoueguel.com/specProc/reference/simca_gamma.md)
 and
-[`simca_gamma()`](https://christiangoueguel.com/specProc/reference/simca_gamma.md).
+[`simca_squared()`](https://christiangoueguel.com/specProc/reference/simca_gamma.md).
 
 ## Engine arguments
 
@@ -107,8 +122,7 @@ The other arguments of
 [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md)
 are set with
 [`parsnip::set_engine()`](https://parsnip.tidymodels.org/reference/set_engine.html):
-`squared`, `kmax`, `alpha`, `var_explained`, `prior`, `ndir` and
-`nsamp`.
+`kmax`, `alpha`, `var_explained`, `prior`, `ndir` and `nsamp`.
 
 ## Predictions
 
@@ -134,7 +148,8 @@ reproducible results.
 
 [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md),
 [`predict.specproc_rsimca()`](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimca.md),
-[`simca_gamma()`](https://christiangoueguel.com/specProc/reference/simca_gamma.md)
+[`simca_gamma()`](https://christiangoueguel.com/specProc/reference/simca_gamma.md),
+[`simca_squared()`](https://christiangoueguel.com/specProc/reference/simca_gamma.md)
 
 ## Author
 
