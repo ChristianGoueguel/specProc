@@ -81,6 +81,7 @@ reference:
   - rsimca
   - predict.specproc_rsimca
   - simca
+  - simca_gamma
   - robust_da
   - predict.specproc_robust_da
 

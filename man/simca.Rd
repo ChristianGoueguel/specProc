@@ -5,15 +5,30 @@
 \alias{update.simca}
 \title{SIMCA Classification Model (parsnip)}
 \usage{
-simca(mode = "classification", num_comp = NULL, engine = "rsimca")
+simca(
+  mode = "classification",
+  num_comp = NULL,
+  gamma = NULL,
+  engine = "rsimca"
+)
 
-\method{update}{simca}(object, parameters = NULL, num_comp = NULL, fresh = FALSE, ...)
+\method{update}{simca}(
+  object,
+  parameters = NULL,
+  num_comp = NULL,
+  gamma = NULL,
+  fresh = FALSE,
+  ...
+)
 }
 \arguments{
 \item{mode}{The type of model: \code{"classification"}, the only one.}
 
 \item{num_comp}{The number of components of the PCA model of each class,
 or \code{NULL} (default) to let the engine choose them.}
+
+\item{gamma}{The weight of the orthogonal distances in the classification
+rule, between 0 and 1, or \code{NULL} (default) for 0.5.}
 
 \item{engine}{The computational engine: \code{"rsimca"} (default).}
 
@@ -43,19 +58,25 @@ class models resist outlying spectra of the training data.
 parsnip model. It needs the parsnip package, and the \code{"rsimca"} engine is
 available once parsnip and specProc are both loaded.
 }
-\section{Main argument}{
-\code{num_comp} is the number of components of the robust PCA of each class
+\section{Main arguments}{
+\itemize{
+\item \code{num_comp} is the number of components of the robust PCA of each class
 (\code{ncomp} of \code{\link[=rsimca]{rsimca()}}), the same for all the classes. With \code{NULL} (the
 default), each class gets the number chosen by \code{\link[=robpca]{robpca()}} from the
-proportion of variance explained. It can be tuned with \code{\link[tune:tune]{tune::tune()}},
-using \code{\link[dials:num_comp]{dials::num_comp()}}.
+proportion of variance explained.
+\item \code{gamma} is the weight of the orthogonal distances, against the score
+distances, in the classification rule (\code{gamma} of \code{\link[=rsimca]{rsimca()}}). With
+\code{NULL} (the default), it is 0.5.
+}
+
+Both can be tuned with \code{\link[tune:tune]{tune::tune()}}, using \code{\link[dials:num_comp]{dials::num_comp()}} and
+\code{\link[=simca_gamma]{simca_gamma()}}.
 }
 
 \section{Engine arguments}{
 The other arguments of \code{\link[=rsimca]{rsimca()}} are set with \code{\link[parsnip:set_engine]{parsnip::set_engine()}}:
-\code{gamma} (the weight of the orthogonal distances in the classification
-rule, default 0.5), \code{squared}, \code{kmax}, \code{alpha}, \code{var_explained}, \code{prior},
-\code{ndir} and \code{nsamp}.
+\code{squared}, \code{kmax}, \code{alpha}, \code{var_explained}, \code{prior}, \code{ndir} and
+\code{nsamp}.
 }
 
 \section{Predictions}{
@@ -79,8 +100,8 @@ wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 dat <- forageLIBS[which(wl > 380 & wl < 430)]
 # forage samples with low and high calcium
 dat$level <- cut(forageLIBS$Ca, c(-Inf, 0.6, Inf), labels = c("low", "high"))
-spec <- simca(num_comp = 3) |>
-  set_engine("rsimca", gamma = 0.5)
+spec <- simca(num_comp = 3, gamma = 0.5) |>
+  set_engine("rsimca", alpha = 0.75)
 spec
 set.seed(1)
 fit <- fit(spec, level ~ ., data = dat[1:300, ])
@@ -89,7 +110,7 @@ head(predict(fit, dat[301:368, ], type = "raw"))
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link[=rsimca]{rsimca()}}, \code{\link[=predict.specproc_rsimca]{predict.specproc_rsimca()}}
+\code{\link[=rsimca]{rsimca()}}, \code{\link[=predict.specproc_rsimca]{predict.specproc_rsimca()}}, \code{\link[=simca_gamma]{simca_gamma()}}
 }
 \author{
 Christian L. Goueguel

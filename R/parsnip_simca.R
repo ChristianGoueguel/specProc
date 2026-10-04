@@ -15,20 +15,24 @@
 #' parsnip model. It needs the parsnip package, and the `"rsimca"` engine is
 #' available once parsnip and specProc are both loaded.
 #'
-#' # Main argument
+#' # Main arguments
 #'
-#' `num_comp` is the number of components of the robust PCA of each class
-#' (`ncomp` of [rsimca()]), the same for all the classes. With `NULL` (the
-#' default), each class gets the number chosen by [robpca()] from the
-#' proportion of variance explained. It can be tuned with [tune::tune()],
-#' using [dials::num_comp()].
+#' - `num_comp` is the number of components of the robust PCA of each class
+#'   (`ncomp` of [rsimca()]), the same for all the classes. With `NULL` (the
+#'   default), each class gets the number chosen by [robpca()] from the
+#'   proportion of variance explained.
+#' - `gamma` is the weight of the orthogonal distances, against the score
+#'   distances, in the classification rule (`gamma` of [rsimca()]). With
+#'   `NULL` (the default), it is 0.5.
+#'
+#' Both can be tuned with [tune::tune()], using [dials::num_comp()] and
+#' [simca_gamma()].
 #'
 #' # Engine arguments
 #'
 #' The other arguments of [rsimca()] are set with [parsnip::set_engine()]:
-#' `gamma` (the weight of the orthogonal distances in the classification
-#' rule, default 0.5), `squared`, `kmax`, `alpha`, `var_explained`, `prior`,
-#' `ndir` and `nsamp`.
+#' `squared`, `kmax`, `alpha`, `var_explained`, `prior`, `ndir` and
+#' `nsamp`.
 #'
 #' # Predictions
 #'
@@ -46,6 +50,8 @@
 #' @param mode The type of model: `"classification"`, the only one.
 #' @param num_comp The number of components of the PCA model of each class,
 #'   or `NULL` (default) to let the engine choose them.
+#' @param gamma The weight of the orthogonal distances in the classification
+#'   rule, between 0 and 1, or `NULL` (default) for 0.5.
 #' @param engine The computational engine: `"rsimca"` (default).
 #' @param object A `simca` model specification.
 #' @param parameters A one-row tibble or named list of main parameters to
@@ -56,7 +62,7 @@
 #'
 #' @return A model specification of classes `simca` and `model_spec`.
 #'
-#' @seealso [rsimca()], [predict.specproc_rsimca()]
+#' @seealso [rsimca()], [predict.specproc_rsimca()], [simca_gamma()]
 #' @export
 #'
 #' @examplesIf rlang::is_installed("parsnip")
@@ -66,19 +72,19 @@
 #' dat <- forageLIBS[which(wl > 380 & wl < 430)]
 #' # forage samples with low and high calcium
 #' dat$level <- cut(forageLIBS$Ca, c(-Inf, 0.6, Inf), labels = c("low", "high"))
-#' spec <- simca(num_comp = 3) |>
-#'   set_engine("rsimca", gamma = 0.5)
+#' spec <- simca(num_comp = 3, gamma = 0.5) |>
+#'   set_engine("rsimca", alpha = 0.75)
 #' spec
 #' set.seed(1)
 #' fit <- fit(spec, level ~ ., data = dat[1:300, ])
 #' table(predict(fit, dat[301:368, ])$.pred_class, dat$level[301:368])
 #' head(predict(fit, dat[301:368, ], type = "raw"))
-simca <- function(mode = "classification", num_comp = NULL, engine = "rsimca") {
+simca <- function(mode = "classification", num_comp = NULL, gamma = NULL, engine = "rsimca") {
   rlang::check_installed("parsnip")
   if (!identical(mode, "classification")) {
     stop("`mode` must be \"classification\" for SIMCA models.", call. = FALSE)
   }
-  args <- list(num_comp = rlang::enquo(num_comp))
+  args <- list(num_comp = rlang::enquo(num_comp), gamma = rlang::enquo(gamma))
   parsnip::new_model_spec("simca", args = args, eng_args = NULL, mode = mode,
                           user_specified_mode = !missing(mode), method = NULL,
                           engine = engine, user_specified_engine = !missing(engine))
@@ -86,10 +92,42 @@ simca <- function(mode = "classification", num_comp = NULL, engine = "rsimca") {
 
 #' @rdname simca
 #' @exportS3Method stats::update
-update.simca <- function(object, parameters = NULL, num_comp = NULL, fresh = FALSE, ...) {
-  args <- list(num_comp = rlang::enquo(num_comp))
+update.simca <- function(object, parameters = NULL, num_comp = NULL, gamma = NULL,
+                         fresh = FALSE, ...) {
+  args <- list(num_comp = rlang::enquo(num_comp), gamma = rlang::enquo(gamma))
   parsnip::update_spec(object = object, parameters = parameters, args_enquo_list = args,
                        fresh = fresh, cls = "simca", ...)
+}
+
+#' @title SIMCA Distance Weighting Parameter
+#'
+#' @description
+#' A [dials][dials::dials-package] parameter for the `gamma` argument of the
+#' [simca()] parsnip model (and of [rsimca()]): the weight of the orthogonal
+#' distances, against the score distances, in the classification rule.
+#'
+#' @param range A two-element vector with the range of `gamma`. Default is
+#'   `c(0, 1)`.
+#' @param trans A transformation object from the scales package, or `NULL`
+#'   (default) for none.
+#'
+#' @return A `quant_param` object.
+#' @seealso [simca()], [rsimca()]
+#' @export
+#'
+#' @examplesIf rlang::is_installed("dials")
+#' simca_gamma()
+#' dials::value_seq(simca_gamma(), 5)
+simca_gamma <- function(range = c(0, 1), trans = NULL) {
+  rlang::check_installed("dials")
+  dials::new_quant_param(
+    type = "double",
+    range = range,
+    inclusive = c(TRUE, TRUE),
+    trans = trans,
+    label = c(simca_gamma = "Weight of the orthogonal distances"),
+    finalize = NULL
+  )
 }
 
 #' @export
@@ -113,6 +151,10 @@ register_simca_rsimca <- function() {
   parsnip::set_model_arg(
     model = "simca", eng = "rsimca", parsnip = "num_comp", original = "ncomp",
     func = list(pkg = "dials", fun = "num_comp"), has_submodel = FALSE
+  )
+  parsnip::set_model_arg(
+    model = "simca", eng = "rsimca", parsnip = "gamma", original = "gamma",
+    func = list(pkg = "specProc", fun = "simca_gamma"), has_submodel = FALSE
   )
   parsnip::set_fit(
     model = "simca", eng = "rsimca", mode = "classification",

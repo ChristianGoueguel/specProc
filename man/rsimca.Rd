@@ -107,7 +107,7 @@ underestimate the error: estimate it on test data or by
 cross-validation.
 
 In tidymodels, \code{rsimca()} is the \code{"rsimca"} engine of the \code{\link[=simca]{simca()}}
-parsnip model.
+parsnip model, where \code{ncomp} (\code{num_comp}) and \code{gamma} can be tuned.
 
 \strong{Differences from the paper.} The number of components of each class
 is given (\code{ncomp}) or chosen by \code{\link[=robpca]{robpca()}} from the proportion of
