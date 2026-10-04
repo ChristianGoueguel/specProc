@@ -34,6 +34,9 @@
 #' underestimate the error: estimate it on test data or by
 #' cross-validation.
 #'
+#' In tidymodels, `rsimca()` is the `"rsimca"` engine of the [simca()]
+#' parsnip model.
+#'
 #' **Differences from the paper.** The number of components of each class
 #' is given (`ncomp`) or chosen by [robpca()] from the proportion of
 #' variance explained, instead of by robust cross-validation (PRESS).
@@ -93,7 +96,7 @@
 #'    approach to robust principal component analysis. Technometrics,
 #'    47(1):64-79.
 #'
-#' @seealso [predict.specproc_rsimca()], [robpca()], [robust_da()]
+#' @seealso [predict.specproc_rsimca()], [simca()], [robpca()], [robust_da()]
 #' @export
 #'
 #' @examples

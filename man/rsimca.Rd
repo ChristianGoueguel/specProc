@@ -106,6 +106,9 @@ the proportions of these observations in each class. They tend to
 underestimate the error: estimate it on test data or by
 cross-validation.
 
+In tidymodels, \code{rsimca()} is the \code{"rsimca"} engine of the \code{\link[=simca]{simca()}}
+parsnip model.
+
 \strong{Differences from the paper.} The number of components of each class
 is given (\code{ncomp}) or chosen by \code{\link[=robpca]{robpca()}} from the proportion of
 variance explained, instead of by robust cross-validation (PRESS).
@@ -136,7 +139,7 @@ approach to robust principal component analysis. Technometrics,
 }
 }
 \seealso{
-\code{\link[=predict.specproc_rsimca]{predict.specproc_rsimca()}}, \code{\link[=robpca]{robpca()}}, \code{\link[=robust_da]{robust_da()}}
+\code{\link[=predict.specproc_rsimca]{predict.specproc_rsimca()}}, \code{\link[=simca]{simca()}}, \code{\link[=robpca]{robpca()}}, \code{\link[=robust_da]{robust_da()}}
 }
 \author{
 Christian L. Goueguel

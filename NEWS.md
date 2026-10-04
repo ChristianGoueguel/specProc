@@ -42,7 +42,9 @@
   (2005), a robust PCA model of each class and the assignment to the closest
   class from the scaled score and orthogonal distances, for whole spectra.
   `predict()` gives the classes, or the distances to the classes and
-  whether a spectrum is outlying for all of them.
+  whether a spectrum is outlying for all of them. `simca()` is a new
+  parsnip model of SIMCA classification, with `rsimca()` as its `"rsimca"`
+  engine, to fit and tune it in tidymodels (`num_comp`).
 * `robust_da()`: robust linear and quadratic discriminant analysis of Hubert
   and Van Driessen (2004), from the MCD estimates of the classes, for a few
   variables such as line intensities or robust principal component scores.
