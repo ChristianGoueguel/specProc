@@ -102,7 +102,7 @@ step_line_ratio <- function(recipe, ..., reference, window = 0.1, method = "area
 #' the recipe, with [reject_shots()] and [average()].
 #'
 #' [tidy()][recipes::tidy.recipe] returns the spectral `terms`, the `sample`
-#' column, the criteria (`method`), the `cutoff` and `id`.
+#' column, the criteria (`method`), the `cutoff`, the `scale` and `id`.
 #'
 #' @inheritParams step_baseline
 #' @inheritParams reject_shots
@@ -137,18 +137,20 @@ step_line_ratio <- function(recipe, ..., reference, window = 0.1, method = "area
 #' # the rejected shot is removed from the training data
 #' nrow(recipes::bake(prepped, new_data = NULL))
 step_reject_shots <- function(recipe, ..., sample, method = c("intensity", "correlation"),
-                              cutoff = 3.5, role = NA, trained = FALSE, columns = NULL,
-                              skip = TRUE, id = recipes::rand_id("reject_shots")) {
+                              cutoff = 3.5, scale = c("floor", "sample", "pooled"), role = NA,
+                              trained = FALSE, columns = NULL, skip = TRUE,
+                              id = recipes::rand_id("reject_shots")) {
   rlang::check_installed("recipes")
   if (missing(sample)) {
     stop("'sample' must name the column identifying the sample of each shot.", call. = FALSE)
   }
   method <- match.arg(method, shot_criteria, several.ok = TRUE)
+  scale <- match.arg(scale)
   check_number(cutoff, "cutoff", lower = 0, lower_open = TRUE)
   recipes::add_step(recipe, specproc_step_new(
     "reject_shots", terms = rlang::enquos(...), role = role, trained = trained,
-    sample = rlang::enquos(sample), method = method, cutoff = cutoff, columns = columns,
-    skip = skip, id = id
+    sample = rlang::enquos(sample), method = method, cutoff = cutoff, scale = scale,
+    columns = columns, skip = skip, id = id
   ))
 }
 
@@ -263,7 +265,7 @@ bake.step_reject_shots <- function(object, new_data, ...) {
     return(new_data)
   }
   rejected <- shot_flags(step_matrix(new_data, cols), new_data[[object$sample]], object$method,
-                         object$cutoff)$rejected
+                         object$cutoff, object$scale %||% "floor")$rejected
   new_data[!rejected, , drop = FALSE]
 }
 
@@ -280,7 +282,8 @@ tidy.step_reject_shots <- function(x, ...) {
   tibble::tibble(
     terms = if (trained) x$columns else recipes::sel2char(x$terms),
     sample = if (trained) x$sample else paste(recipes::sel2char(x$sample), collapse = ", "),
-    method = paste(x$method, collapse = ", "), cutoff = x$cutoff, id = x$id
+    method = paste(x$method, collapse = ", "), cutoff = x$cutoff,
+    scale = x$scale %||% "floor", id = x$id
   )
 }
 

@@ -10,6 +10,7 @@ step_reject_shots(
   sample,
   method = c("intensity", "correlation"),
   cutoff = 3.5,
+  scale = c("floor", "sample", "pooled"),
   role = NA,
   trained = FALSE,
   columns = NULL,
@@ -34,6 +35,9 @@ name or a selector. Give it the \code{"id"} role (see
 
 \item{cutoff}{The robust z-score above which a shot is rejected. Default
 is 3.5.}
+
+\item{scale}{The robust scale of the z-scores: \code{"floor"} (default),
+\code{"sample"} or \code{"pooled"} (see Details).}
 
 \item{role}{Not used by this step, since no new variables are created.}
 
@@ -70,7 +74,7 @@ To model sample means instead of single shots, average the shots before
 the recipe, with \code{\link[=reject_shots]{reject_shots()}} and \code{\link[=average]{average()}}.
 
 \link[recipes:tidy.recipe]{tidy()} returns the spectral \code{terms}, the \code{sample}
-column, the criteria (\code{method}), the \code{cutoff} and \code{id}.
+column, the criteria (\code{method}), the \code{cutoff}, the \code{scale} and \code{id}.
 }
 \examples{
 \dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}

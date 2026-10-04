@@ -19,6 +19,23 @@
   intervals of iPLS are evaluated in parallel when a `future::plan()` is
   set. `plot_wavelength_selection()` shows the selected regions on the mean
   spectrum with the importance of each variable.
+* `plot_shots()`: views of the laser shots and of their rejection by
+  `reject_shots()`, to judge the rejection before averaging the shots: a map
+  of the samples by the shot number, colored by the robust z-scores in
+  classes up to the cutoff, the rejected shots outlined (`"heatmap"`, the
+  default; `acquisition` orders the samples as measured, `arrange =
+  "extreme"` puts the most extreme first, and `smooth` gives running medians
+  along the acquisition, which show the drift of the shots during a
+  session); the robust z-scores of the shots with the cutoff
+  (`"criteria"`); the shots of a sample with the rejected ones in color
+  (`"spectra"`); the intensity, shape and rejected share along the shot
+  number, which shows cleaning shots and the drift of the ablation
+  (`"order"`); and the rejected shots per sample with the RSD of the
+  samples before and after the rejection (`"samples"`). `plot = FALSE`
+  returns the table of each view.
+* `forageShots`: the single laser shots (8 per measurement, in firing order)
+  of 20 of the measurements of `forageLIBS`, in the windows 380-430 nm and
+  760-780 nm, to study the shot-to-shot variability.
 * `step_select_wavelengths()`: the selection as a recipe step, repeated on
   every resample; `num_terms`, `num_intervals` (new dials parameter
   `num_intervals()`) and `num_comp` can be tuned.
@@ -149,6 +166,23 @@
   follows the angle). The former names still work, with a warning.
 * The `outliers` table of `adjusted_boxplot()` has the columns `row` and
   `out` (the tail), as that of `generalized_boxplot()`.
+* `reject_shots()` (and `step_reject_shots()`) rejects far fewer regular
+  shots. With the few shots of a sample, the MAD of the sample is unstable:
+  shots that differed by little from very similar shots got large
+  z-scores, and the correlations near 1, bounded and skewed, made small
+  differences look extreme. On the 2944 shots of the forage data set, 235
+  shots were rejected, many with a correlation above 0.99 with the median
+  spectrum of their sample; in simulations, 2.5% to 5% of regular shots
+  were. The z-scores of the correlation are now those of Fisher's z, the
+  intensity and the distance are on a log scale, and the scale of a sample
+  is its MAD but not less than the pooled MAD of all the samples (`scale =
+  "floor"`, the default; `"sample"` and `"pooled"` are the others): 10
+  shots of the forage data set are rejected (weak or strong plasmas of
+  other shapes), and 0.1% to 0.5% of regular shots in simulations, while
+  the shots of a plasma weakened by a quarter or more are still detected.
+  The result also gives the shot number `.shot` (new argument `shot`), the
+  raw criteria `.intensity` (relative to the median shot of the sample),
+  `.correlation` and `.distance`, and its settings.
 * The arguments of the points and lines of `plot_fit()` are renamed
   `point_size`, `point_color`, `line_width` and `fit_color` (from `pt.size`,
   `pt.colour`, `line.size` and `line.colour`); `pt.shape`, `pt.fill`,

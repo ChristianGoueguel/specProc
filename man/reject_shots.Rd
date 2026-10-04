@@ -10,7 +10,9 @@ reject_shots(
   method = c("intensity", "correlation"),
   cutoff = 3.5,
   wavelength = NULL,
-  drop = FALSE
+  drop = FALSE,
+  shot = NULL,
+  scale = c("floor", "sample", "pooled")
 )
 }
 \arguments{
@@ -32,12 +34,22 @@ are computed, for example to avoid saturated lines.}
 
 \item{drop}{A logical: return only the kept shots, without the added
 columns (\code{FALSE}, default).}
+
+\item{shot}{An optional column (unquoted or as a string) giving the order
+of the shots in each sample, such as the shot number. Default is the
+order of the rows.}
+
+\item{scale}{The robust scale of the z-scores: \code{"floor"} (default),
+\code{"sample"} or \code{"pooled"} (see Details).}
 }
 \value{
-A tibble: \code{data} with a logical column \code{.rejected}, the criteria
-that rejected each shot in \code{.reason} (\code{NA} for kept shots) and the
-robust z-score of each criterion (\code{.intensity_z}, \code{.correlation_z},
-\code{.distance_z}). With \code{drop = TRUE}, the kept rows of \code{data}.
+A tibble: \code{data} with the shot number in its sample \code{.shot}, a
+logical column \code{.rejected}, the criteria that rejected each shot in
+\code{.reason} (\code{NA} for kept shots), the raw criteria \code{.intensity},
+\code{.correlation} and \code{.distance}, and the robust z-score of each criterion
+used (\code{.intensity_z}, \code{.correlation_z}, \code{.distance_z}). Its attribute
+\code{"reject_shots"} holds the settings. With \code{drop = TRUE}, the kept rows of
+\code{data}.
 }
 \description{
 Flags the outlying shots (spectra) of each sample of a LIBS dataset, such
@@ -46,50 +58,71 @@ contaminated spot, before the shots are averaged.
 }
 \details{
 Each shot is compared with the other shots of its sample, by robust
-z-scores (deviation from the median of the sample divided by the MAD) of
-one or more criteria:
+z-scores of one or more criteria:
 \itemize{
-\item \code{"intensity"}: the total intensity of the spectrum. Both weak and
+\item \code{"intensity"}: the total intensity of the spectrum, on a log scale (its
+deviation is relative to the median shot of the sample). Both weak and
 unusually strong shots are flagged.
-\item \code{"correlation"}: the Pearson correlation of the spectrum with the
-median spectrum of the sample, which detects changes of the shape of
+\item \code{"correlation"}: the Pearson correlation \eqn{r} of the spectrum with
+the median spectrum of the sample, which detects changes of the shape of
 the spectrum (other lines, other line ratios) whatever its intensity.
-Only shots with a low correlation are flagged.
+The z-scores are those of Fisher's \eqn{z = \tanh^{-1}(r)}: correlations
+near 1 are bounded and skewed, so that small differences such as 0.998
+and 0.9995 would otherwise look extreme. Only shots with a low
+correlation are flagged.
 \item \code{"distance"}: the Euclidean distance of the spectrum to the median
-spectrum of the sample, which combines both. Only far shots are
-flagged.
+spectrum of the sample, relative to the norm of the median spectrum, on
+a log scale, which combines both. Only far shots are flagged.
 }
+
+\strong{Scale.} A z-score is the deviation of a shot from the median of its
+sample divided by a robust scale (the MAD). With the few shots of a sample
+(often 5 to 10), the MAD of the sample is unstable: when its shots happen
+to be very similar, a shot that differs by little gets a large z-score.
+With \code{scale = "floor"} (default), the scale of a sample is its own MAD, but
+not less than the pooled MAD of the deviations of all the samples (the
+typical shot-to-shot variability of the data set); \code{"sample"} uses the MAD
+of each sample alone, and \code{"pooled"} the pooled MAD for all samples, which
+suits samples of similar variability. In simulations of 8 shots per sample
+with noise varying between samples, \code{"floor"} with Fisher's \eqn{z}
+rejected 0.1\% to 0.5\% of the regular shots (against 2.5\% to 5\% with the
+MAD of each sample and the raw correlations), and still detected the shots
+of a plasma weakened by a quarter or more, or with an extra line of 10\% of
+the strongest line. Lower \code{cutoff} to detect milder deviations.
 
 A shot is rejected when any criterion exceeds \code{cutoff} (3.5 by default,
 following Iglewicz and Hoaglin, 1993). Samples with fewer than 3 shots are
-not checked. When all shots of a sample vary by the same amount, the MAD
-can be zero; the mean absolute deviation is then used.
+not checked. When a MAD is zero, the mean absolute deviation is used.
 
-To average the kept shots per sample, use \code{\link[=average]{average()}} on the result with
-\code{drop = TRUE}. In a recipe, use \code{\link[=step_reject_shots]{step_reject_shots()}}.
+The result keeps the raw criteria (\code{.intensity}, the total intensity
+relative to the median shot of the sample; \code{.correlation}; \code{.distance}),
+easier to read than the z-scores, and the settings, which
+\code{\link[=plot_shots]{plot_shots()}} uses to show the shots and the rejections. To average the
+kept shots per sample, use \code{\link[=average]{average()}} on the result with \code{drop = TRUE}. In
+a recipe, use \code{\link[=step_reject_shots]{step_reject_shots()}}.
 }
 \examples{
-data(forageLIBS)
-wl <- suppressWarnings(as.numeric(names(forageLIBS)))
-spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
-# five shots of each of four samples, one of them with a weak plasma
-set.seed(1)
-shots <- spectra[rep(1:4, each = 5), ] * stats::runif(20, 0.95, 1.05)
-shots[7, ] <- 0.2 * shots[7, ]
-shots <- cbind(sample = rep(c("A", "B", "C", "D"), each = 5), shots)
-res <- reject_shots(shots, sample)
-res[res$.rejected, c("sample", ".reason", ".intensity_z")]
+data(forageShots)
+# 8 shots of each of 20 forage samples
+res <- reject_shots(forageShots, Measurement, shot = shot)
+res[res$.rejected, c("Measurement", ".shot", ".reason", ".intensity", ".correlation")]
 # the kept shots only
-nrow(reject_shots(shots, sample, drop = TRUE))
+nrow(reject_shots(forageShots, Measurement, drop = TRUE))
+# the former behavior, with the MAD of each sample alone
+sum(reject_shots(forageShots, Measurement, scale = "sample")$.rejected)
 }
 \references{
 \itemize{
 \item Iglewicz, B., Hoaglin, D.C. (1993). How to Detect and Handle
 Outliers. ASQC Quality Press, Milwaukee.
+\item Fisher, R.A. (1915). Frequency distribution of the values of the
+correlation coefficient in samples from an indefinitely large
+population. Biometrika, 10(4):507-521.
 }
 }
 \seealso{
-\code{\link[=step_reject_shots]{step_reject_shots()}}, \code{\link[=average]{average()}}, \code{\link[=saturation_summary]{saturation_summary()}}
+\code{\link[=plot_shots]{plot_shots()}}, \code{\link[=step_reject_shots]{step_reject_shots()}}, \code{\link[=average]{average()}},
+\code{\link[=saturation_summary]{saturation_summary()}}, \link{forageShots}
 }
 \author{
 Christian L. Goueguel

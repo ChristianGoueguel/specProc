@@ -50,3 +50,49 @@
 #' plot_spectra(forageLIBS[1:3, c("Measurement", keep)], id = Measurement)
 #'
 "forageLIBS"
+
+#' @title LIBS Laser Shots of Forage Samples
+#'
+#' @description
+#' The single laser shots of 20 of the measurements of [forageLIBS]: 8
+#' shots per measurement, in two wavelength windows, to study the
+#' shot-to-shot variability and the rejection of outlying shots.
+#'
+#' @details
+#' [forageLIBS] holds the mean of the 8 shots of each measurement; these are
+#' the shots themselves, raw detector counts, in the order in which they
+#' were fired. To keep the package small, only two windows are kept:
+#' 380 to 430 nm (Ca II 393.37 and 396.85 nm, Ca I 422.67 nm, Al I 394.40
+#' and 396.15 nm, the CN band at 388 nm) and 760 to 780 nm (K I 766.49 and
+#' 769.90 nm, O I 777 nm). The strongest lines reach the saturation of the
+#' detector (65535 counts) in most shots (132 of the 160); the `wavelength`
+#' argument of [reject_shots()] can leave them out.
+#'
+#' The 20 measurements are those of the 368 with a shot rejected by
+#' [reject_shots()] in these windows (7), and 13 others drawn at random:
+#' their outlying shots are weak or strong plasmas (total intensity 0.7 or
+#' 1.3 times that of the other shots) with spectra of a different shape.
+#'
+#' @format A tibble with 160 rows (shots) and 844 columns:
+#' \describe{
+#'   \item{Measurement}{Measurement identifier, as in [forageLIBS].}
+#'   \item{Sample}{Sample identifier, as in [forageLIBS].}
+#'   \item{shot}{Shot number in the measurement (1 to 8), in firing order.}
+#'   \item{Ca, K}{Calcium and potassium contents, in percent.}
+#'   \item{380.011254, ..., 779.977295}{Emission intensity (counts) at each
+#'     wavelength, in nm.}
+#' }
+#'
+#' @source Laboratory LIBS measurements provided by Christian L. Goueguel.
+#'   The script `data-raw/forageShots.R` in the package source builds the
+#'   data set from the shot-level export.
+#'
+#' @seealso [reject_shots()], [plot_shots()], [forageLIBS]
+#'
+#' @examples
+#' data(forageShots)
+#' dim(forageShots)
+#' # the shot-to-shot variability of the total intensity, per measurement
+#' total <- rowSums(forageShots[-(1:5)])
+#' round(tapply(total, forageShots$Measurement, function(v) 100 * sd(v) / mean(v)), 1)
+"forageShots"

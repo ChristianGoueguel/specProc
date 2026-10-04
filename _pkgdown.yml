@@ -222,6 +222,7 @@ reference:
   - wavelet_features
   - average
   - reject_shots
+  - plot_shots
 
 - title: Baseline correction
   desc: >
@@ -303,6 +304,7 @@ reference:
 - title: Data
   contents:
   - forageLIBS
+  - forageShots
 
 articles:
 - title: A LIBS workflow

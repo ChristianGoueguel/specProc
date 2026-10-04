@@ -93,3 +93,17 @@ test_that("step_reject_shots removes rejected shots from the training data only"
   expect_error(recipes::recipe(~ ., data = d) |> step_reject_shots(recipes::all_numeric()), "sample")
   expect_equal(nrow(generics::tunable(rec$steps[[1]])), 0)
 })
+
+test_that("step_reject_shots passes the scale of the z-scores", {
+  skip_if_not_installed("recipes")
+  d <- shots_data()
+  rec <- recipes::recipe(~ ., data = d) |>
+    step_reject_shots(recipes::all_numeric(), sample = Sample, scale = "sample")
+  expect_equal(recipes::tidy(rec, 1)$scale, "sample")
+  prepped <- recipes::prep(rec)
+  expect_equal(nrow(recipes::bake(prepped, new_data = NULL)),
+               sum(!reject_shots(d, Sample, scale = "sample")$.rejected))
+  expect_error(recipes::recipe(~ ., data = d) |>
+                 step_reject_shots(recipes::all_numeric(), sample = Sample, scale = "x"),
+               "should be one of")
+})
