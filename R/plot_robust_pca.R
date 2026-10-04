@@ -497,9 +497,6 @@ distance_map <- function(df, cuts, labels, relative, shade, log, colour_by, pale
     }
   }
   cuts$level <- factor(cuts$level, levels = rev(cuts$level))
-  # labels on the right of the points, or on their left near the right edge
-  x_range <- range(c(df$x, cuts$x), finite = TRUE)
-  df$.hjust <- ifelse(df$x > x_range[1] + 0.85 * diff(x_range), 1.2, -0.2)
   shade_x <- cuts$x[nrow(cuts)]
   shade_y <- cuts$y[nrow(cuts)]
 
@@ -540,8 +537,7 @@ distance_map <- function(df, cuts, labels, relative, shade, log, colour_by, pale
     ggplot2::geom_hline(data = cuts, ggplot2::aes(yintercept = .data$y, linetype = .data$level),
                         colour = "grey30", key_glyph = "path") +
     do.call(ggplot2::geom_point, point_args) +
-    ggplot2::geom_text(ggplot2::aes(label = .data$label, hjust = .data$.hjust), size = 3, vjust = -0.4,
-                       colour = "grey20", na.rm = TRUE) +
+    repel_labels() +
     (if (colour_by == "type") {
       ggplot2::scale_fill_manual(values = palette, drop = FALSE, name = NULL,
                                  guide = ggplot2::guide_legend(order = 1, override.aes = list(shape = 21, size = 2.5)))
@@ -581,6 +577,17 @@ distance_map <- function(df, cuts, labels, relative, shade, log, colour_by, pale
   finish_title(p +
     do.call(ggplot2::scale_x_continuous, x_args) +
     do.call(ggplot2::scale_y_continuous, y_args))
+}
+
+# Labels of the points of a distance map (column `label`, empty for the
+# unlabelled points), moved apart so that they overlap neither each other
+# nor the points, with a segment to their point when they are moved far.
+# The fixed seed gives the same layout at each drawing.
+repel_labels <- function() {
+  ggrepel::geom_text_repel(ggplot2::aes(label = .data$label), size = 3, colour = "grey20",
+                           box.padding = 0.35, point.padding = 0.2, min.segment.length = 0.2,
+                           segment.colour = "grey50", max.overlaps = Inf, seed = 1,
+                           na.rm = TRUE)
 }
 
 # Rainbow of the distances of plot_outlier_map(): dark red at the origin,

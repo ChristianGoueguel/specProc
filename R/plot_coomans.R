@@ -150,8 +150,6 @@ coomans_plot <- function(df, classes, lev, labels, log, shade, title, point, sho
   }
   # the same range on both axes, so that the diagonal is at 45 degrees
   limits <- range(c(df$x, df$y, cut), finite = TRUE)
-  # labels on the right of the points, or on their left near the right edge
-  df$.hjust <- ifelse(df$x > limits[1] + 0.85 * diff(limits), 1.2, -0.2)
 
   point_args <- utils::modifyList(list(show.legend = c(fill = TRUE)), point$args)
   point_args$mapping <- ggplot2::aes(fill = .data$class, shape = .data$set)
@@ -176,8 +174,7 @@ coomans_plot <- function(df, classes, lev, labels, log, shade, title, point, sho
     ggplot2::geom_vline(xintercept = cut, linetype = "dashed", colour = "grey30") +
     ggplot2::geom_hline(yintercept = cut, linetype = "dashed", colour = "grey30") +
     do.call(ggplot2::geom_point, point_args) +
-    ggplot2::geom_text(ggplot2::aes(label = .data$label, hjust = .data$.hjust), size = 3,
-                       vjust = -0.4, colour = "grey20", na.rm = TRUE) +
+    repel_labels() +
     ggplot2::scale_fill_manual(values = palette, name = "Class", drop = TRUE,
                                guide = ggplot2::guide_legend(order = 1,
                                                              override.aes = list(shape = 21, size = 2.5))) +
