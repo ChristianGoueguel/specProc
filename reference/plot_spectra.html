@@ -3,11 +3,15 @@
 wavelength and the y-axis represents intensity of a spectrum's signal.
 The function allows to plot a spectrum or several spectra in a single plot,
 identified either by an id (for example, the samples or spectra id) or by a
-target variable (for example, the concentration of a chemical element)."><meta property="og:description" content="Spectrum plots are commonly x–y plots in which the x-axis represents the
+target variable (for example, the concentration of a chemical element).
+The spectra can be split into panels by a grouping variable, summarized by
+their mean or median, and labeled with the emission lines they show."><meta property="og:description" content="Spectrum plots are commonly x–y plots in which the x-axis represents the
 wavelength and the y-axis represents intensity of a spectrum's signal.
 The function allows to plot a spectrum or several spectra in a single plot,
 identified either by an id (for example, the samples or spectra id) or by a
-target variable (for example, the concentration of a chemical element)."><meta property="og:image" content="https://christiangoueguel.com/specProc/logo.png"></head><body>
+target variable (for example, the concentration of a chemical element).
+The spectra can be split into panels by a grouping variable, summarized by
+their mean or median, and labeled with the emission lines they show."><meta property="og:image" content="https://christiangoueguel.com/specProc/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -52,7 +56,9 @@ target variable (for example, the concentration of a chemical element)."><meta p
 wavelength and the y-axis represents intensity of a spectrum's signal.
 The function allows to plot a spectrum or several spectra in a single plot,
 identified either by an id (for example, the samples or spectra id) or by a
-target variable (for example, the concentration of a chemical element).</p>
+target variable (for example, the concentration of a chemical element).
+The spectra can be split into panels by a grouping variable, summarized by
+their mean or median, and labeled with the emission lines they show.</p>
     </div>
 
     <div class="section level2">
@@ -63,7 +69,26 @@ target variable (for example, the concentration of a chemical element).</p>
 <span>  colvar <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  drop_na <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  offset <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  offset <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  panel <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  layout <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"vertical"</span>, <span class="st">"horizontal"</span><span class="op">)</span>,</span>
+<span>  grid <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  color_as <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"line"</span>, <span class="st">"fill"</span><span class="op">)</span>,</span>
+<span>  legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"right"</span>, <span class="st">"top"</span>, <span class="st">"bottom"</span>, <span class="st">"inside"</span><span class="op">)</span>,</span>
+<span>  legend_title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Wavelength (nm)"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"Intensity (arb. units)"</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lines <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  palette <span class="op">=</span> <span class="st">"viridis"</span>,</span>
+<span>  base_size <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>  linewidth <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  xlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fixed"</span>, <span class="st">"free_y"</span><span class="op">)</span>,</span>
+<span>  panel_tags <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  label_spectra <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  summary <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"mean"</span>, <span class="st">"median"</span><span class="op">)</span>,</span>
+<span>  rasterize <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -100,7 +125,114 @@ if drop_na is <code>TRUE</code>.</p></dd>
 spectra, to separate them: a number (vertical offset, in intensity
 units), or two numbers <code>c(horizontal, vertical)</code> (in nm and intensity
 units). The spectrum of row <code>i</code> is shifted by <code>(i - 1)</code> times the
-offsets, so that the first one stays in place.</p></dd>
+offsets, so that the first one stays in place. With <code>panel</code>, the rows
+are counted in each panel, so that the first spectrum of every panel
+stays in place. With <code>summary</code>, the summary spectra are offset.</p></dd>
+
+
+<dt id="arg-panel">panel<a class="anchor" aria-label="anchor" href="#arg-panel"></a></dt>
+<dd><p>Optional (<code>NULL</code> by default). Column name of a grouping
+variable: the spectra of each group are drawn in a separate panel.</p></dd>
+
+
+<dt id="arg-layout">layout<a class="anchor" aria-label="anchor" href="#arg-layout"></a></dt>
+<dd><p>The arrangement of the panels: <code>"vertical"</code> (default), one
+above the other, or <code>"horizontal"</code>, side by side. Ignored without
+<code>panel</code>.</p></dd>
+
+
+<dt id="arg-grid">grid<a class="anchor" aria-label="anchor" href="#arg-grid"></a></dt>
+<dd><p>A logical: draw grid lines at the major breaks of the axes
+(<code>FALSE</code>, default).</p></dd>
+
+
+<dt id="arg-color-as">color_as<a class="anchor" aria-label="anchor" href="#arg-color-as"></a></dt>
+<dd><p>How the colors of <code>colvar</code> (or of <code>id</code>, without <code>colvar</code>)
+are shown: as the color of the lines (<code>"line"</code>, default), or as the fill
+of the area under each spectrum (<code>"fill"</code>).</p></dd>
+
+
+<dt id="arg-legend">legend<a class="anchor" aria-label="anchor" href="#arg-legend"></a></dt>
+<dd><p>The position of the legend of <code>colvar</code> (a color bar) or <code>id</code>:
+<code>"none"</code> (default), <code>"right"</code>, <code>"top"</code>, <code>"bottom"</code>, or <code>"inside"</code> (the
+top right corner of the plot).</p></dd>
+
+
+<dt id="arg-legend-title">legend_title<a class="anchor" aria-label="anchor" href="#arg-legend-title"></a></dt>
+<dd><p>The title of the legend. Default is the name of
+<code>colvar</code> (or <code>id</code>); give it with units, such as <code>"K (%)"</code>.</p></dd>
+
+
+<dt id="arg-xlab-ylab">xlab, ylab<a class="anchor" aria-label="anchor" href="#arg-xlab-ylab"></a></dt>
+<dd><p>The axis titles. Default are <code>"Wavelength (nm)"</code> and
+<code>"Intensity (arb. units)"</code>.</p></dd>
+
+
+<dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
+<dd><p>The plot title. A long title is split into a title and a
+subtitle.</p></dd>
+
+
+<dt id="arg-lines">lines<a class="anchor" aria-label="anchor" href="#arg-lines"></a></dt>
+<dd><p>Optional table of emission lines, such as returned by
+<code><a href="libs_lines.html">libs_lines()</a></code>: a data frame with the columns <code>species</code> (such as
+<code>"K I"</code>) and <code>wavelength</code> (nm). Each line within the wavelength range is
+marked and labeled (see Details).</p></dd>
+
+
+<dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>
+<dd><p>The colors of <code>colvar</code> or <code>id</code>: the name of a viridis
+palette (<code>"viridis"</code>, default, <code>"magma"</code>, <code>"inferno"</code>, <code>"plasma"</code>,
+<code>"cividis"</code>, <code>"rocket"</code>, <code>"mako"</code> or <code>"turbo"</code>), all readable by
+colorblind readers and in grayscale except <code>"turbo"</code>, or a vector of at
+least two colors, interpolated for <code>colvar</code> and for the levels of <code>id</code>
+when there are fewer colors than levels.</p></dd>
+
+
+<dt id="arg-base-size">base_size<a class="anchor" aria-label="anchor" href="#arg-base-size"></a></dt>
+<dd><p>The size of the text, in points. Default is 11; use the
+text size of the journal (often 7 to 9 points) for a figure saved at its
+printed size. The axis lines and labels scale with it.</p></dd>
+
+
+<dt id="arg-linewidth">linewidth<a class="anchor" aria-label="anchor" href="#arg-linewidth"></a></dt>
+<dd><p>The width of the spectra lines. Default is 0.5; about 0.3
+suits small figures.</p></dd>
+
+
+<dt id="arg-xlim">xlim<a class="anchor" aria-label="anchor" href="#arg-xlim"></a></dt>
+<dd><p>Optional wavelength range <code>c(from, to)</code>, in nm: only the
+channels in this range are drawn.</p></dd>
+
+
+<dt id="arg-scales">scales<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
+<dd><p><code>"fixed"</code> (default), the same intensity axis for all panels,
+or <code>"free_y"</code>, an intensity axis fitted to each panel.</p></dd>
+
+
+<dt id="arg-panel-tags">panel_tags<a class="anchor" aria-label="anchor" href="#arg-panel-tags"></a></dt>
+<dd><p>A logical: tag the panels (a), (b), (c), ... before their
+labels (<code>FALSE</code>, default).</p></dd>
+
+
+<dt id="arg-label-spectra">label_spectra<a class="anchor" aria-label="anchor" href="#arg-label-spectra"></a></dt>
+<dd><p>A logical: label each spectrum at its right end
+(<code>FALSE</code>, default), with its <code>id</code>, else its value of <code>colvar</code>, else its
+row number (or <code>"Mean"</code>/<code>"Median"</code> for summaries). Most useful for
+spectra stacked by <code>offset</code>.</p></dd>
+
+
+<dt id="arg-summary">summary<a class="anchor" aria-label="anchor" href="#arg-summary"></a></dt>
+<dd><p><code>"none"</code> (default), each spectrum drawn; <code>"mean"</code>, the mean
+spectrum of each group with a band of plus or minus one standard
+deviation; or <code>"median"</code>, the median spectrum of each group with a band
+of the first to third quartiles (see Details).</p></dd>
+
+
+<dt id="arg-rasterize">rasterize<a class="anchor" aria-label="anchor" href="#arg-rasterize"></a></dt>
+<dd><p><code>FALSE</code> (default), <code>TRUE</code>, or a resolution in dpi: draw
+the spectra as an image, of 300 dpi with <code>TRUE</code>, within an otherwise
+vector plot (see Details). Ignored for interactive plots.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -111,8 +243,42 @@ offsets, so that the first one stays in place.</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function is based on the ggplot2 package, thus allowing users to easily
 add or modify different components of the plot. Each row of <code>x</code> is drawn as
-a separate line. All columns other than <code>id</code> and <code>colvar</code> must be named by
-their wavelength.</p>
+a separate line. All columns other than <code>id</code>, <code>colvar</code> and <code>panel</code> must be
+named by their wavelength.</p>
+<p><strong>Filled spectra.</strong> With <code>color_as = "fill"</code>, the area between each
+spectrum and its baseline (zero intensity, shifted by <code>offset</code>) is filled,
+with the spectrum drawn as a thin dark line. Overlaid spectra are filled
+with translucent colors. Stacked spectra (with a vertical <code>offset</code>) are
+filled with opaque colors and drawn from the back to the front (from the
+top to the bottom of the stack), so that the front spectra hide the back
+ones, as in a waterfall plot.</p>
+<p><strong>Summaries.</strong> With <code>summary = "mean"</code>, each group of spectra is drawn as
+its mean spectrum, in a band of plus or minus one standard deviation; with
+<code>summary = "median"</code>, as its median spectrum, in a band from the first to
+the third quartile. The groups are the panels and, within them, the values
+of <code>id</code>; the color of <code>colvar</code> is then the mean of <code>colvar</code> in each group.
+The band is not drawn with <code>color_as = "fill"</code>.</p>
+<p><strong>Emission lines.</strong> Each line of <code>lines</code> within the wavelength range is
+marked by a dashed vertical line, labeled with its species and wavelength
+above the plot (above the top panels). Lines closer than 2% of the
+wavelength range share a label, such as "Ca II 393.37, 396.85". The
+markers are at the tabulated wavelengths: with a horizontal <code>offset</code>, they
+match the first spectrum of each panel. Over a wide range, keep the
+strongest lines, for example with the <code>top</code> or <code>min_relative</code> arguments of
+<code><a href="libs_lines.html">libs_lines()</a></code>, or labels become long.</p>
+<p><strong>Publication figures.</strong> Journals print figures about 85 mm wide for a
+single column and 175 mm for a double column, with text of 7 to 9 points.
+Make the plot at its printed size, with <code>base_size</code> set to the text size,
+and save it with <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave()</a></code>, in a vector format (PDF or EPS) or
+as a TIFF of 600 dpi, for example
+<code>ggsave("figure.pdf", p, width = 85, height = 65, units = "mm")</code>. Many
+long spectra make large and slow vector files: <code>rasterize = TRUE</code> draws
+the spectra as an image within the plot, keeping the text, axes and
+markers as vectors (this needs the ragg package).</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="libs_lines.html">libs_lines()</a></code> for the emission lines.</p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -125,13 +291,34 @@ their wavelength.</p>
 <span class="r-in"><span><span class="va">wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">k_lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span><span class="op">[</span><span class="va">wl</span> <span class="op">&gt;</span> <span class="fl">764</span> <span class="op">&amp;</span> <span class="va">wl</span> <span class="op">&lt;</span> <span class="fl">772</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="co"># the K I resonance lines, colored by potassium content</span></span></span>
-<span class="r-in"><span><span class="fu">plot_spectra</span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"K"</span>, <span class="va">k_lines</span><span class="op">)</span><span class="op">]</span>, colvar <span class="op">=</span> <span class="va">K</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_spectra</span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"K"</span>, <span class="va">k_lines</span><span class="op">)</span><span class="op">]</span>, colvar <span class="op">=</span> <span class="va">K</span>, legend <span class="op">=</span> <span class="st">"right"</span>,</span></span>
+<span class="r-in"><span>             legend_title <span class="op">=</span> <span class="st">"K (%)"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_spectra-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># five spectra stacked, each shifted up by 20000 counts and right by 0.5 nm</span></span></span>
+<span class="r-in"><span><span class="co"># five spectra stacked, each shifted up by 20000 counts and right by 0.5 nm,</span></span></span>
+<span class="r-in"><span><span class="co"># labeled at their right end</span></span></span>
 <span class="r-in"><span><span class="fu">plot_spectra</span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Measurement"</span>, <span class="va">k_lines</span><span class="op">)</span><span class="op">]</span>, id <span class="op">=</span> <span class="va">Measurement</span>,</span></span>
-<span class="r-in"><span>             offset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">20000</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>             offset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">20000</span><span class="op">)</span>, label_spectra <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_spectra-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># one panel per potassium level, side by side, with the area under the</span></span></span>
+<span class="r-in"><span><span class="co"># spectra filled by potassium content and grid lines</span></span></span>
+<span class="r-in"><span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">30</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"K"</span>, <span class="va">k_lines</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">spectra</span><span class="op">$</span><span class="va">level</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">$</span><span class="va">K</span>, <span class="fl">3</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Low K"</span>, <span class="st">"Medium K"</span>, <span class="st">"High K"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_spectra</span><span class="op">(</span><span class="va">spectra</span>, colvar <span class="op">=</span> <span class="va">K</span>, panel <span class="op">=</span> <span class="va">level</span>, layout <span class="op">=</span> <span class="st">"horizontal"</span>,</span></span>
+<span class="r-in"><span>             offset <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">8000</span><span class="op">)</span>, color_as <span class="op">=</span> <span class="st">"fill"</span>, grid <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_spectra-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># a figure for a journal column: the mean spectrum of each potassium level,</span></span></span>
+<span class="r-in"><span><span class="co"># with the K I lines labeled (from libs_lines() in practice)</span></span></span>
+<span class="r-in"><span><span class="va">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>species <span class="op">=</span> <span class="st">"K I"</span>, wavelength <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">766.49</span>, <span class="fl">769.90</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">plot_spectra</span><span class="op">(</span><span class="va">spectra</span>, colvar <span class="op">=</span> <span class="va">K</span>, panel <span class="op">=</span> <span class="va">level</span>, summary <span class="op">=</span> <span class="st">"mean"</span>,</span></span>
+<span class="r-in"><span>                  lines <span class="op">=</span> <span class="va">lines</span>, panel_tags <span class="op">=</span> <span class="cn">TRUE</span>, legend <span class="op">=</span> <span class="st">"right"</span>,</span></span>
+<span class="r-in"><span>                  legend_title <span class="op">=</span> <span class="st">"K (%)"</span>, ylab <span class="op">=</span> <span class="st">"Intensity (counts)"</span>,</span></span>
+<span class="r-in"><span>                  base_size <span class="op">=</span> <span class="fl">8</span>, linewidth <span class="op">=</span> <span class="fl">0.3</span>, xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">765</span>, <span class="fl">771</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">p</span></span></span>
+<span class="r-plt img"><img src="plot_spectra-4.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># ggplot2::ggsave("figure.pdf", p, width = 85, height = 90, units = "mm")</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

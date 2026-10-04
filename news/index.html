@@ -53,6 +53,34 @@
 <h3 id="improvements-development-version">Improvements<a class="anchor" aria-label="anchor" href="#improvements-development-version"></a></h3>
 <ul><li>
 <code><a href="../reference/robpca.html">robpca()</a></code> and <code><a href="../reference/rospca.html">rospca()</a></code> are faster on wide data (up to about 4 times on full LIBS spectra): the reduction to the subspace spanned by the observations is now computed in C++ from the smaller cross-product matrix instead of an SVD. The results are unchanged up to numerical precision.</li>
+<li>
+<code><a href="../reference/plot_spectra.html">plot_spectra()</a></code> has new arguments: <code>panel</code>, a grouping variable that splits the spectra into panels, arranged one above the other or side by side (<code>layout = "vertical"</code> or <code>"horizontal"</code>), with the <code>offset</code> restarting in each panel; <code>grid</code>, to draw grid lines; and <code>color_as = "fill"</code>, to show the colors of <code>colvar</code> (or <code>id</code>) as the fill of the area under each spectrum instead of the line color. Spectra stacked with a vertical offset are then filled with opaque colors, the front ones hiding the back ones, as in a waterfall plot.</li>
+<li>
+<code><a href="../reference/plot_spectra.html">plot_spectra()</a></code> makes figures ready for publication:
+<ul><li>
+<code>legend</code> shows the legend of <code>colvar</code> (a color bar) or <code>id</code>, on any side or inside the plot, titled by <code>legend_title</code> (such as <code>"K (%)"</code>);</li>
+<li>
+<code>xlab</code>, <code>ylab</code> and <code>title</code> set the axis titles and the plot title (bold, split into a title and a subtitle when long), and the intensities are written in plain notation (“100,000” rather than “1e+05”);</li>
+<li>
+<code>lines</code>, a line list from <code><a href="../reference/libs_lines.html">libs_lines()</a></code>, marks the emission lines with dashed lines, labeled with their species and wavelength above the plot (close lines share a label);</li>
+<li>
+<code>palette</code> sets the colors: a viridis palette (<code>"viridis"</code>, the default, <code>"magma"</code>, <code>"cividis"</code>, …) or any colors;</li>
+<li>
+<code>base_size</code> and <code>linewidth</code> size the text and the lines for the printed figure (such as 8 points and 0.3 for a journal column);</li>
+<li>
+<code>xlim</code> limits the wavelength range, and <code>scales = "free_y"</code> fits the intensity axis to each panel;</li>
+<li>
+<code>panel_tags</code> tags the panels (a), (b), (c), …;</li>
+<li>
+<code>label_spectra</code> labels each spectrum at its right end, with its <code>id</code> or value of <code>colvar</code>;</li>
+<li>
+<code>summary = "mean"</code> or <code>"median"</code> draws the mean spectrum of each group (panel and <code>id</code>) with a band of one standard deviation, or the median with the quartiles;</li>
+<li>
+<code>rasterize</code> draws the spectra as an image within an otherwise vector plot, for small PDF files of many long spectra (needs the ragg package).</li>
+</ul>
+The help page gives the sizes for journal figures. The colors of <code>colvar</code> now go from dark purple to yellow-green (viridis), instead of from blue to red, readable by colorblind readers and in grayscale; use <code>palette = c("blue", "red")</code> for the former colors. The axis lines are slightly thinner.</li>
+<li>The axis titles of <code><a href="../reference/plot_spectra.html">plot_spectra()</a></code> and <code><a href="../reference/plot_fit.html">plot_fit()</a></code> give the units in parentheses, as in the other plots: “Wavelength (nm)” and “Intensity (arb. units)”.</li>
+<li>specProc now requires ggplot2 3.5.0 or later.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
