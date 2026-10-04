@@ -91,15 +91,13 @@
 #' @export
 #'
 #' @examples
-#' data(forageLIBS)
-#' # forage samples with low and high calcium, from two Ca II lines
-#' lines <- forageLIBS[c("393.3599236", "396.8602175")]
-#' level <- cut(forageLIBS$Ca, c(-Inf, 0.6, Inf), labels = c("low", "high"))
+#' # iris: train on 100 flowers, predict the 50 others
 #' set.seed(1)
-#' fit <- robust_da(lines[1:300, ], level[1:300])
+#' train <- sample(nrow(iris), 100)
+#' fit <- robust_da(iris[train, 1:4], iris$Species[train])
 #' fit
-#' table(predict(fit, lines[301:368, ]), level[301:368])
-#' head(predict(fit, lines[301:368, ], type = "prob"))
+#' table(predicted = predict(fit, iris[-train, 1:4]), true = iris$Species[-train])
+#' head(predict(fit, iris[-train, 1:4], type = "prob"))
 robust_da <- function(x, group, method = c("linear", "quadratic"), alpha = 0.75, prior = NULL,
                       nsamp = 500) {
   method <- match.arg(method)
@@ -259,12 +257,12 @@ misclassification_table <- function(fitted, group, weights, prior) {
 #' @export
 #'
 #' @examples
-#' data(forageLIBS)
-#' lines <- forageLIBS[c("393.3599236", "396.8602175")]
-#' level <- cut(forageLIBS$Ca, c(-Inf, 0.6, Inf), labels = c("low", "high"))
+#' # iris: train on 100 flowers, predict the 50 others
 #' set.seed(1)
-#' fit <- robust_da(lines[1:300, ], level[1:300], method = "quadratic")
-#' head(predict(fit, lines[301:368, ], type = "prob"))
+#' train <- sample(nrow(iris), 100)
+#' fit <- robust_da(iris[train, 1:4], iris$Species[train], method = "quadratic")
+#' head(predict(fit, iris[-train, 1:4]))
+#' head(predict(fit, iris[-train, 1:4], type = "prob"))
 predict.specproc_robust_da <- function(object, newdata, type = c("class", "prob"), ...) {
   type <- match.arg(type)
   x <- filter_newdata(object, newdata)

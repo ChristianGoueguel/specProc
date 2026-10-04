@@ -79,14 +79,15 @@ given in \code{group}, or \code{"unknown"}. Observations of a class on the wrong
 side of the diagonal are misclassified.
 }
 \examples{
-data(forageLIBS)
-wl <- suppressWarnings(as.numeric(names(forageLIBS)))
-spectra <- forageLIBS[which(wl > 380 & wl < 430)]
-level <- cut(forageLIBS$Ca, c(-Inf, 0.6, Inf), labels = c("low", "high"))
+# iris: train on 100 flowers, predict the 50 others
 set.seed(1)
-fit <- rsimca(spectra[1:300, ], level[1:300], ncomp = 3)
+train <- sample(nrow(iris), 100)
+fit <- rsimca(iris[train, 1:4], iris$Species[train], ncomp = 2)
+# the first two classes, setosa and versicolor
 plot_coomans(fit)
-plot_coomans(fit, newdata = spectra[301:368, ], group = level[301:368],
+# versicolor and virginica, with the 50 new flowers (triangles)
+plot_coomans(fit, classes = c("versicolor", "virginica"),
+             newdata = iris[-train, 1:4], group = iris$Species[-train],
              log = TRUE, shade = TRUE)
 }
 \references{

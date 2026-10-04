@@ -124,16 +124,14 @@ This is an independent implementation of the published description.
 reproducible results.
 }
 \examples{
-data(forageLIBS)
-wl <- suppressWarnings(as.numeric(names(forageLIBS)))
-spectra <- forageLIBS[which(wl > 380 & wl < 430)]
-# forage samples with low and high calcium
-level <- cut(forageLIBS$Ca, c(-Inf, 0.6, Inf), labels = c("low", "high"))
+# iris: train on 100 flowers, predict the 50 others
 set.seed(1)
-fit <- rsimca(spectra[1:300, ], level[1:300], ncomp = 3)
+train <- sample(nrow(iris), 100)
+fit <- rsimca(iris[train, 1:4], iris$Species[train], ncomp = 2)
 fit
-table(predict(fit, spectra[301:368, ]), level[301:368])
-plot_coomans(fit, newdata = spectra[301:368, ], group = level[301:368])
+table(predicted = predict(fit, iris[-train, 1:4]), true = iris$Species[-train])
+plot_coomans(fit, classes = c("versicolor", "virginica"),
+             newdata = iris[-train, 1:4], group = iris$Species[-train])
 }
 \references{
 \itemize{

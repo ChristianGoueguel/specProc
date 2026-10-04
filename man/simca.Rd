@@ -104,18 +104,15 @@ subsets, so use \code{\link[=set.seed]{set.seed()}} before fitting for reproduci
 \examples{
 \dontshow{if (rlang::is_installed("parsnip")) withAutoprint(\{ # examplesIf}
 library(parsnip)
-data(forageLIBS)
-wl <- suppressWarnings(as.numeric(names(forageLIBS)))
-dat <- forageLIBS[which(wl > 380 & wl < 430)]
-# forage samples with low and high calcium
-dat$level <- cut(forageLIBS$Ca, c(-Inf, 0.6, Inf), labels = c("low", "high"))
-spec <- simca(num_comp = 3, gamma = 0.5) |>
+spec <- simca(num_comp = 2, gamma = 0.5) |>
   set_engine("rsimca", alpha = 0.75)
 spec
+# iris: train on 100 flowers, predict the 50 others
 set.seed(1)
-fit <- fit(spec, level ~ ., data = dat[1:300, ])
-table(predict(fit, dat[301:368, ])$.pred_class, dat$level[301:368])
-head(predict(fit, dat[301:368, ], type = "raw"))
+train <- sample(nrow(iris), 100)
+fit <- fit(spec, Species ~ ., data = iris[train, ])
+table(predict(fit, iris[-train, ])$.pred_class, iris$Species[-train])
+head(predict(fit, iris[-train, ], type = "raw"))
 \dontshow{\}) # examplesIf}
 }
 \seealso{
