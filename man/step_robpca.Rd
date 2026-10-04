@@ -98,5 +98,7 @@ bake(prep(rec), new_data = NULL)
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link[=robpca]{robpca()}}, \code{\link[=step_rospca]{step_rospca()}}, \code{\link[=step_macropca]{step_macropca()}}
+\code{\link[=robpca]{robpca()}}, \code{\link[=step_rospca]{step_rospca()}}, \code{\link[=step_macropca]{step_macropca()}}, and the \code{"lts"} engine of
+\code{\link[parsnip:linear_reg]{parsnip::linear_reg()}} (\link{linear_reg_lts}) for robust principal component
+regression
 }

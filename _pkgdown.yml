@@ -54,17 +54,34 @@ reference:
   - direct_orthogonal
   - predict.specproc_filter
 
-- subtitle: robust PLS regression and wavelength selection
+- subtitle: robust PLS and PCR regression, wavelength selection
   desc: >
-    Robust PLS regression that resists outlying spectra and wrong reference
-    values, and the selection of the informative wavelengths (VIP,
-    selectivity ratio, interval PLS).
+    Robust PLS and principal component regression that resist outlying
+    spectra and wrong reference values, their robust cross-validation, and
+    the selection of the informative wavelengths (VIP, selectivity ratio,
+    interval PLS).
   contents:
   - rsimpls
   - predict.specproc_rsimpls
   - pls_rsimpls
+  - rpcr
+  - predict.specproc_rpcr
+  - robust_rmsecv
+  - linear_reg_lts
   - select_wavelengths
   - plot_wavelength_selection
+
+- subtitle: robust classification
+  desc: >
+    Classification that resists outlying observations of the training data:
+    robust SIMCA for whole spectra, and robust linear and quadratic
+    discriminant analysis for a few variables (line intensities, robust
+    principal component scores).
+  contents:
+  - rsimca
+  - predict.specproc_rsimca
+  - robust_da
+  - predict.specproc_robust_da
 
 - subtitle: figures of merit
   desc: >

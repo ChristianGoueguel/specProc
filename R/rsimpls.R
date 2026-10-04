@@ -57,7 +57,8 @@
 #' components, the robust \eqn{R^2} of the paper (Remark 7) and the root
 #' mean squared error, on the observations that are regular in every one of
 #' these models. They describe the fit to the calibration data; for
-#' predictions, choose `ncomp` by cross-validation, for example with the
+#' predictions, choose `ncomp` by cross-validation: with [robust_rmsecv()],
+#' which leaves the outliers out of the error, or for example with the
 #' `"rsimpls"` engine of [parsnip::pls()] in tidymodels ([pls_rsimpls]).
 #' These models all come from the same ROBPCA fit, with
 #' \eqn{k_0 = k_{max} + q} components, so the model with `ncomp` components
@@ -146,7 +147,8 @@
 #'    approach to robust principal component analysis. Technometrics,
 #'    47(1):64-79.
 #'
-#' @seealso [predict.specproc_rsimpls()], [plot_outlier_map()], [step_rsimpls()], [robpca()]
+#' @seealso [predict.specproc_rsimpls()], [plot_outlier_map()], [step_rsimpls()],
+#'   [robust_rmsecv()], [rpcr()], [robpca()]
 #'
 #' @export rsimpls
 #'
@@ -169,13 +171,7 @@ rsimpls <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 50
     stop("'ncomp', the number of components, must be provided.", call. = FALSE)
   }
   x <- robust_pca_input(x)
-  y <- as_response_matrix(y, nrow(x))
-  if (anyNA(y)) {
-    stop("'y' contains missing values.", call. = FALSE)
-  }
-  if (is.null(colnames(y))) {
-    colnames(y) <- if (ncol(y) == 1) "y" else paste0("y", seq_len(ncol(y)))
-  }
+  y <- calibration_response(y, nrow(x))
   check_count(ncomp, "ncomp")
   check_count(kmax, "kmax")
   check_number(alpha, "alpha", lower = 0.5, upper = 1)
@@ -193,11 +189,7 @@ rsimpls <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 50
                fit$loadings[, k, drop = FALSE])
   cutoff_od <- od_cutoff(od, fit$h)
   # robust R2 on the observations regular in both distances
-  regular <- od <= cutoff_od & model$rd <= cutoff_rd
-  if (sum(regular) <= ncol(y)) regular <- rep(TRUE, nrow(x))
-  yr <- y[regular, , drop = FALSE]
-  r2 <- 1 - det(crossprod(model$residuals[regular, , drop = FALSE])) /
-    det(crossprod(sweep(yr, 2, colMeans(yr))))
+  r2 <- model_r2(model$residuals, y, od <= cutoff_od & model$rd <= cutoff_rd)
   res <- list(
     coefficients = model$coefficients,
     intercept = model$intercept,
@@ -311,19 +303,11 @@ rsimpls_fit <- function(x, y, kmax, alpha, ndir, nsamp) {
   })
 
   # robust R2 and RMSE on the observations regular in every model (Remark 7)
-  regular <- Reduce(`&`, lapply(models, `[[`, "regular"))
-  if (!any(regular)) regular <- rep(TRUE, n)
-  yr <- y[regular, , drop = FALSE]
-  ss_tot <- sum(sweep(yr, 2, colMeans(yr))^2)
-  components <- tibble::tibble(
-    ncomp = seq_len(kmax),
-    R2 = vapply(models, function(m) 1 - sum(m$residuals[regular, ]^2) / ss_tot, numeric(1)),
-    RMSE = vapply(models, function(m) sqrt(mean(m$residuals[regular, ]^2)), numeric(1))
-  )
-
+  regular <- regular_in_all(models)
   list(weights = pls$weights, loadings = pls$loadings, scores = scores, models = models,
        center = mu_x, y_center = stats::setNames(mu_y / y_scale, colnames(y)), w = w,
-       components = components, kmax = kmax, h = rob$h, y_scale = y_scale)
+       regular = regular, components = components_table(models, y, regular), kmax = kmax,
+       h = rob$h, y_scale = y_scale)
 }
 
 # Sum of the squared column MADs (consistent at the normal), with the
@@ -401,18 +385,14 @@ robpca_regression <- function(t, y, w) {
          sigma = stats::cov(yr) - crossprod(slopes, st %*% slopes),
          score_center = colMeans(tr), score_cov = st)
   }
-  residual_distance <- function(fit) {
-    res <- y - sweep(t %*% fit$slopes, 2, fit$intercept, "+")
-    sqrt(pmax(rowSums((res %*% solve(fit$sigma)) * res), 0))
-  }
   cutoff <- stats::qchisq(0.975, q)
   initial <- ls_fit(w)
-  keep <- residual_distance(initial)^2 <= cutoff
+  keep <- residual_distance(t, y, initial)^2 <= cutoff
   final <- ls_fit(keep)
   final$sigma <- final$sigma * 0.975 / stats::pchisq(cutoff, q + 2)
   list(
     slopes = final$slopes, intercept = final$intercept, sigma = final$sigma,
-    rd = residual_distance(final),
+    rd = residual_distance(t, y, final),
     sd = sqrt(pmax(stats::mahalanobis(t, initial$score_center, initial$score_cov), 0)),
     keep = keep, score_center = initial$score_center, score_cov = initial$score_cov
   )
@@ -466,24 +446,13 @@ regression_outlier_type <- function(sd, rd, cutoff_sd, cutoff_rd) {
 predict.specproc_rsimpls <- function(object, newdata, type = c("response", "scores"),
                                      ncomp = NULL, ...) {
   type <- match.arg(type)
-  if (!is.null(ncomp)) {
-    if (type == "scores") {
-      stop("'ncomp' is only used with type = \"response\".", call. = FALSE)
-    }
-    check_count(ncomp, "ncomp")
-    if (ncomp > length(object$models)) {
-      stop("'ncomp' cannot exceed ", length(object$models), ", the 'kmax' of the model.",
-           call. = FALSE)
-    }
-  }
+  check_predict_ncomp(object, type, ncomp)
   x <- filter_newdata(object, newdata)
   if (anyNA(x)) {
     stop("'newdata' contains missing values.", call. = FALSE)
   }
   if (type == "response") {
-    model <- if (is.null(ncomp)) object else object$models[[ncomp]]
-    pred <- sweep(x %*% model$coefficients, 2, model$intercept, "+")
-    return(if (ncol(pred) == 1) drop(pred) else pred)
+    return(predict_calibration(object, x, ncomp))
   }
   xc <- sweep(x, 2, object$center)
   scores <- xc %*% object$x_weights
@@ -495,18 +464,5 @@ predict.specproc_rsimpls <- function(object, newdata, type = c("response", "scor
 
 #' @export
 print.specproc_rsimpls <- function(x, ...) {
-  cat("Robust PLS regression (RSIMPLS)\n\n")
-  cat("Observations:   ", length(x$sd), " (h = ", x$h, ")\n", sep = "")
-  cat("Variables:      ", attr(x, "nvar"), "\n", sep = "")
-  cat("Responses:      ", length(attr(x, "responses")), "\n", sep = "")
-  cat("Components:     ", x$ncomp, " (robust R2 of 1 to ", x$kmax, " components: ",
-      paste(format(x$components$R2, digits = 3), collapse = " "), ")\n", sep = "")
-  cat("Robust R2:      ", format(x$R2, digits = 3), "\n", sep = "")
-  if (length(x$intercept) == 1) {
-    cat("Residual scale: ", format(sqrt(x$sigma[1, 1]), digits = 4), "\n", sep = "")
-  }
-  cat("\nOutlier types:\n")
-  print(table(x$outlier_type))
-  cat("\nOrthogonal outliers: ", sum(x$od > x$cutoff_od), "\n", sep = "")
-  invisible(x)
+  print_calibration(x, "Robust PLS regression (RSIMPLS)")
 }

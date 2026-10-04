@@ -102,7 +102,9 @@ step_robust_bcyj <- function(recipe, ..., role = NA, trained = FALSE, type = "be
 #' @param res The fitted robust PCA model, stored once the step has been
 #'   trained.
 #'
-#' @seealso [robpca()], [step_rospca()], [step_macropca()]
+#' @seealso [robpca()], [step_rospca()], [step_macropca()], and the `"lts"` engine of
+#'   [parsnip::linear_reg()] ([linear_reg_lts]) for robust principal component
+#'   regression
 #' @export
 #'
 #' @examplesIf rlang::is_installed("recipes")

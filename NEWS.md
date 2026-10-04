@@ -25,6 +25,30 @@
   resample for a grid of `num_comp`. `predict()` of an `rsimpls()` model
   gains `ncomp`, for the models with 1 to `kmax` components, which the fit
   now keeps (`models`).
+* `rpcr()`: robust principal component regression (RPCR) of Hubert and
+  Verboven (2003), the robust PCA of the spectra (`robpca()`) followed by
+  the LTS regression of the response on the scores, or the MCD regression of
+  several responses. It has the outputs, `predict()` method and outlier maps
+  of `rsimpls()`.
+* `robust_rmsecv()`: the robust RMSECV of `rsimpls()` or `rpcr()` models
+  with 1 to `kmax` components, which leaves the outliers out of the
+  cross-validated error, and the robust component selection (RCS) criterion
+  of Engelen and Hubert (2005), to choose the number of components. The
+  folds are fitted in parallel when a `future::plan()` is set.
+* The `"lts"` engine of `parsnip::linear_reg()` fits the reweighted LTS
+  regression (`lts_fit()`, from `robustbase::ltsReg()`); after
+  `step_robpca()` in a workflow, it gives robust PCR in tidymodels.
+* `rsimca()`: robust SIMCA classification of Vanden Branden and Hubert
+  (2005), a robust PCA model of each class and the assignment to the closest
+  class from the scaled score and orthogonal distances, for whole spectra.
+  `predict()` gives the classes, or the distances to the classes and
+  whether a spectrum is outlying for all of them.
+* `robust_da()`: robust linear and quadratic discriminant analysis of Hubert
+  and Van Driessen (2004), from the MCD estimates of the classes, for a few
+  variables such as line intensities or robust principal component scores.
+  `predict()` gives the classes or posterior probabilities. It is the
+  `"mcd"` engine of `parsnip::discrim_linear()` and
+  `parsnip::discrim_quad()`.
 * `select_wavelengths()`: selection of the informative wavelengths for PLS
   regression, by the variable importance in projection (VIP), the
   selectivity ratio (SR), backward elimination on either, or forward

@@ -122,7 +122,8 @@ and total sums of squares and cross-products.
 components, the robust \eqn{R^2} of the paper (Remark 7) and the root
 mean squared error, on the observations that are regular in every one of
 these models. They describe the fit to the calibration data; for
-predictions, choose \code{ncomp} by cross-validation, for example with the
+predictions, choose \code{ncomp} by cross-validation: with \code{\link[=robust_rmsecv]{robust_rmsecv()}},
+which leaves the outliers out of the error, or for example with the
 \code{"rsimpls"} engine of \code{\link[parsnip:pls]{parsnip::pls()}} in tidymodels (\link{pls_rsimpls}).
 These models all come from the same ROBPCA fit, with
 \eqn{k_0 = k_{max} + q} components, so the model with \code{ncomp} components
@@ -179,7 +180,8 @@ approach to robust principal component analysis. Technometrics,
 }
 }
 \seealso{
-\code{\link[=predict.specproc_rsimpls]{predict.specproc_rsimpls()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}, \code{\link[=step_rsimpls]{step_rsimpls()}}, \code{\link[=robpca]{robpca()}}
+\code{\link[=predict.specproc_rsimpls]{predict.specproc_rsimpls()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}, \code{\link[=step_rsimpls]{step_rsimpls()}},
+\code{\link[=robust_rmsecv]{robust_rmsecv()}}, \code{\link[=rpcr]{rpcr()}}, \code{\link[=robpca]{robpca()}}
 }
 \author{
 Christian L. Goueguel

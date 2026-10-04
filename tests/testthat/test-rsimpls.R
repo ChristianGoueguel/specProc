@@ -1,17 +1,3 @@
-# Spectra-like data with three latent variables, and a response linear in
-# them. The test set comes from the same model.
-make_regression <- function(n = 100, p = 200, seed = 1) {
-  set.seed(seed)
-  loadings <- qr.Q(qr(matrix(rnorm(p * 3), p, 3)))
-  latent <- function(m) matrix(rnorm(m * 3), m, 3) %*% diag(c(10, 6, 3))
-  draw <- function(m) {
-    l <- latent(m)
-    list(x = l %*% t(loadings) + matrix(rnorm(m * p, sd = 0.3), m, p),
-         y = drop(l %*% c(0.3, -0.5, 0.8)) + rnorm(m, sd = 0.3))
-  }
-  list(train = draw(n), test = draw(200))
-}
-
 test_that("svd_reduce_cpp spans the data and keeps their inner products", {
   set.seed(1)
   for (dims in list(c(30, 80), c(80, 30))) {

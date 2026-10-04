@@ -8,7 +8,8 @@
 #' [macropca()] or [cellpca()] (Hubert, Rousseeuw and Vanden Branden, 2005).
 #' For [cellpca()], the vertical axis is the norm of the standardized
 #' residuals, as in the enhanced outlier map of Centofanti, Hubert and
-#' Rousseeuw. For a robust PLS model fitted by [rsimpls()], it is by default
+#' Rousseeuw. For a robust calibration model fitted by [rsimpls()] or
+#' [rpcr()], it is by default
 #' the regression outlier map of Hubert and Vanden Branden (2003): the
 #' residual distance (with one response, the absolute standardized residual)
 #' against the score distance. With `map = "score"`, it is the score outlier
@@ -26,7 +27,8 @@
 #'  - **bad leverage** points (top right): far on both counts, the most
 #'    harmful outliers.
 #'
-#' In the regression outlier map of [rsimpls()], the top left region holds
+#' In the regression outlier map of [rsimpls()] or [rpcr()], the top left
+#' region holds
 #' the **vertical outliers**: observations with a typical spectrum but a
 #' large residual, such as a wrong reference value. Bad leverage points have
 #' both an outlying spectrum and a large residual; good leverage points have
@@ -35,8 +37,8 @@
 #' New observations (`newdata`) are projected onto the model with
 #' [predict()][predict.specproc_robpca] (or
 #' [predict()][predict.specproc_rsimpls] for the score outlier map of an
-#' [rsimpls()] fit) and shown with the calibration cut-offs, which is how
-#' new spectra are screened before prediction.
+#' [rsimpls()] or [rpcr()] fit) and shown with the calibration cut-offs,
+#' which is how new spectra are screened before prediction.
 #'
 #' With `relative = TRUE`, each distance is divided by its cut-off (the
 #' reduced score and orthogonal distances), so both cut-offs are at 1
@@ -47,10 +49,10 @@
 #' in every model.
 #'
 #' @param object An object returned by [robpca()], [rospca()],
-#'   [macropca()], [cellpca()] or [rsimpls()].
+#'   [macropca()], [cellpca()], [rsimpls()] or [rpcr()].
 #' @param newdata Optional new observations to add to the map (a numeric
 #'   matrix or data frame with the calibration variables). Not available for
-#'   the regression outlier map of [rsimpls()] fits.
+#'   the regression outlier map of [rsimpls()] and [rpcr()] fits.
 #' @param labels The number of most outlying observations to label (by
 #'   their row names, or row numbers). Default is 3; use 0 for no labels.
 #' @param relative If `TRUE`, plot the reduced distances (divided by their
@@ -69,9 +71,9 @@
 #'   both cut-offs are at 1, yellow marks the cut-offs: dark red through
 #'   orange for the regular observations, then green and blue for the
 #'   outlying ones. Otherwise, the colors spread evenly over the distances.
-#' @param map For [rsimpls()] fits, the map to draw: `"regression"`
-#'   (default), the regression outlier map, or `"score"`, the score outlier
-#'   map of the predictors. Not used for robust PCA fits.
+#' @param map For [rsimpls()] and [rpcr()] fits, the map to draw:
+#'   `"regression"` (default), the regression outlier map, or `"score"`,
+#'   the score outlier map of the predictors. Not used for robust PCA fits.
 #' @param title The plot title.
 #' @param ... Further arguments passed to [ggplot2::geom_point()] to style
 #'   the points, such as `alpha` (default 0.85), `size` (2.2), `stroke`
@@ -82,7 +84,8 @@
 #'
 #' @return A ggplot object.
 #'
-#' @seealso [robpca()], [rospca()], [macropca()], [rsimpls()], [plot_cell_map()]
+#' @seealso [robpca()], [rospca()], [macropca()], [rsimpls()], [rpcr()],
+#'   [plot_cell_map()]
 #' @export
 #'
 #' @examples
@@ -101,22 +104,23 @@
 plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALSE,
                              shade = FALSE, log = FALSE, colour_by = c("type", "distance"),
                              title = NULL, map = c("regression", "score"), ...) {
-  if (!inherits(object, c("specproc_robpca", "specproc_rsimpls"))) {
-    stop("'object' must be returned by robpca(), rospca(), macropca(), cellpca() or rsimpls().",
+  if (!inherits(object, c("specproc_robpca", "specproc_rsimpls", "specproc_rpcr"))) {
+    stop("'object' must be returned by robpca(), rospca(), macropca(), cellpca(), rsimpls() ",
+         "or rpcr().",
          call. = FALSE)
   }
   check_count(labels, "labels", lower = 0)
   colour_by <- match.arg(colour_by)
   map <- match.arg(map)
   check_map_flags(relative, shade, log)
-  is_pls <- inherits(object, "specproc_rsimpls")
-  if (is_pls && map == "regression") {
+  is_calibration <- inherits(object, c("specproc_rsimpls", "specproc_rpcr"))
+  if (is_calibration && map == "regression") {
     return(regression_outlier_map(object, newdata, labels, relative, shade, log, colour_by, title,
                                   rlang::enquos(...)))
   }
-  # the score outlier map of an rsimpls() fit classifies the observations
-  # like a robust PCA, from its score and orthogonal distances
-  if (is_pls) {
+  # the score outlier map of an rsimpls() or rpcr() fit classifies the
+  # observations like a robust PCA, from its score and orthogonal distances
+  if (is_calibration) {
     ids <- rownames(object$x_scores) %||% as.character(seq_along(object$sd))
     type <- outlier_type(object$sd, object$od, object$cutoff_sd, object$cutoff_od)
   } else {
@@ -126,7 +130,7 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
   df <- data.frame(id = ids, x = object$sd, y = object$od, type = type,
                    set = "calibration", stringsAsFactors = FALSE)
   if (!is.null(newdata)) {
-    if (is_pls) {
+    if (is_calibration) {
       pred <- stats::predict(object, newdata, type = "scores")
       pred$outlier_type <- outlier_type(pred$sd, pred$od, object$cutoff_sd, object$cutoff_od)
     } else {
@@ -139,8 +143,8 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
   df$type <- factor(df$type, levels = levels(type))
 
   if (is.null(title)) {
-    title <- if (is_pls) {
-      paste0("RSIMPLS score outlier map (", object$ncomp, " components)")
+    title <- if (is_calibration) {
+      paste0(calibration_name(object), " score outlier map (", object$ncomp, " components)")
     } else {
       paste0(switch(class(object)[1], specproc_robpca = "ROBPCA", specproc_rospca = "ROSPCA",
                     specproc_macropca = "MacroPCA", specproc_cellpca = "cellPCA"),
@@ -384,19 +388,20 @@ flagged_regions <- function(object, threshold = 0.1, rows = NULL, columns = NULL
 # distance within the model (x) against a distance to the model (y), with
 # their cut-offs dividing the map into four types of observations.
 
-# The regression outlier map of an rsimpls() fit: residual distance against
-# score distance (Hubert and Vanden Branden, 2003).
+# The regression outlier map of an rsimpls() or rpcr() fit: residual distance
+# against score distance (Hubert and Vanden Branden, 2003).
 regression_outlier_map <- function(object, newdata, labels, relative, shade, log, colour_by,
                                    title, dots) {
   if (!is.null(newdata)) {
-    stop("'newdata' is not used in the regression outlier map of rsimpls() fits: residuals ",
-         "need the responses. Use `map = \"score\"` to screen new spectra.", call. = FALSE)
+    stop("'newdata' is not used in the regression outlier map of rsimpls() and rpcr() ",
+         "fits: residuals need the responses. Use `map = \"score\"` to screen new spectra.",
+         call. = FALSE)
   }
   ids <- rownames(object$x_scores) %||% as.character(seq_along(object$sd))
   df <- data.frame(id = ids, x = object$sd, y = object$rd, type = object$outlier_type,
                    set = "calibration", stringsAsFactors = FALSE)
   if (is.null(title)) {
-    title <- paste0("RSIMPLS outlier map (", object$ncomp, " components)")
+    title <- paste0(calibration_name(object), " outlier map (", object$ncomp, " components)")
   }
   distance_map(
     df, cuts = data.frame(level = "cut-off", x = object$cutoff_sd, y = object$cutoff_rd),
@@ -858,3 +863,9 @@ cell_map_profile <- function(cells, spectrum, regions, threshold, labels, x_limi
                    axis.ticks.x = ggplot2::element_blank(),
                    panel.grid.minor = ggplot2::element_blank())
 }
+
+# Name of a robust calibration model in plot titles.
+calibration_name <- function(object) {
+  if (inherits(object, "specproc_rpcr")) "RPCR" else "RSIMPLS"
+}
+

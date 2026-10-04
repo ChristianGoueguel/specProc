@@ -373,10 +373,12 @@ ipls_cv <- function(x, y, fold, ncomp) {
 }
 
 # lapply(), in parallel with future.apply when a parallel plan is set
-# (future::plan() with more than one worker), sequentially otherwise.
-parallel_lapply <- function(X, FUN) {
+# (future::plan() with more than one worker), sequentially otherwise. With
+# `seed = TRUE`, each element gets its own stream of random numbers (for
+# FUN using random numbers, reproducible with set.seed()).
+parallel_lapply <- function(X, FUN, seed = FALSE) {
   if (length(X) > 1 && rlang::is_installed(c("future", "future.apply")) && future::nbrOfWorkers() > 1) {
-    future.apply::future_lapply(X, FUN)
+    future.apply::future_lapply(X, FUN, future.seed = seed)
   } else {
     lapply(X, FUN)
   }
