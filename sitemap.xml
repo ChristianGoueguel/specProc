@@ -38,6 +38,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/epo.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/flagged_regions.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/forageLIBS.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/forageShots.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/gaussian_profile.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/generalized_boxplot.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/glsw.html</loc></url>
@@ -80,6 +81,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_loadings.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_outlier_map.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_outliers.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/plot_shots.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_som.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_spectra.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_wavelength_calibration.html</loc></url>

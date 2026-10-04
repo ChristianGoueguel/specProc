@@ -14,6 +14,7 @@ step_reject_shots(
   sample,
   method = c("intensity", "correlation"),
   cutoff = 3.5,
+  scale = c("floor", "sample", "pooled"),
   role = NA,
   trained = FALSE,
   columns = NULL,
@@ -51,6 +52,11 @@ step_reject_shots(
 - cutoff:
 
   The robust z-score above which a shot is rejected. Default is 3.5.
+
+- scale:
+
+  The robust scale of the z-scores: `"floor"` (default), `"sample"` or
+  `"pooled"` (see Details).
 
 - role:
 
@@ -99,7 +105,7 @@ and
 
 [tidy()](https://recipes.tidymodels.org/reference/tidy.recipe.html)
 returns the spectral `terms`, the `sample` column, the criteria
-(`method`), the `cutoff` and `id`.
+(`method`), the `cutoff`, the `scale` and `id`.
 
 ## See also
 

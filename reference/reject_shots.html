@@ -57,7 +57,9 @@ contaminated spot, before the shots are averaged.</p>
 <span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"intensity"</span>, <span class="st">"correlation"</span><span class="op">)</span>,</span>
 <span>  cutoff <span class="op">=</span> <span class="fl">3.5</span>,</span>
 <span>  wavelength <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  drop <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  drop <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  shot <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"floor"</span>, <span class="st">"sample"</span>, <span class="st">"pooled"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -95,43 +97,81 @@ are computed, for example to avoid saturated lines.</p></dd>
 <dd><p>A logical: return only the kept shots, without the added
 columns (<code>FALSE</code>, default).</p></dd>
 
+
+<dt id="arg-shot">shot<a class="anchor" aria-label="anchor" href="#arg-shot"></a></dt>
+<dd><p>An optional column (unquoted or as a string) giving the order
+of the shots in each sample, such as the shot number. Default is the
+order of the rows.</p></dd>
+
+
+<dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
+<dd><p>The robust scale of the z-scores: <code>"floor"</code> (default),
+<code>"sample"</code> or <code>"pooled"</code> (see Details).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A tibble: <code>data</code> with a logical column <code>.rejected</code>, the criteria
-that rejected each shot in <code>.reason</code> (<code>NA</code> for kept shots) and the
-robust z-score of each criterion (<code>.intensity_z</code>, <code>.correlation_z</code>,
-<code>.distance_z</code>). With <code>drop = TRUE</code>, the kept rows of <code>data</code>.</p>
+    <p>A tibble: <code>data</code> with the shot number in its sample <code>.shot</code>, a
+logical column <code>.rejected</code>, the criteria that rejected each shot in
+<code>.reason</code> (<code>NA</code> for kept shots), the raw criteria <code>.intensity</code>,
+<code>.correlation</code> and <code>.distance</code>, and the robust z-score of each criterion
+used (<code>.intensity_z</code>, <code>.correlation_z</code>, <code>.distance_z</code>). Its attribute
+<code>"reject_shots"</code> holds the settings. With <code>drop = TRUE</code>, the kept rows of
+<code>data</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Each shot is compared with the other shots of its sample, by robust
-z-scores (deviation from the median of the sample divided by the MAD) of
-one or more criteria:</p><ul><li><p><code>"intensity"</code>: the total intensity of the spectrum. Both weak and
+z-scores of one or more criteria:</p><ul><li><p><code>"intensity"</code>: the total intensity of the spectrum, on a log scale (its
+deviation is relative to the median shot of the sample). Both weak and
 unusually strong shots are flagged.</p></li>
-<li><p><code>"correlation"</code>: the Pearson correlation of the spectrum with the
-median spectrum of the sample, which detects changes of the shape of
+<li><p><code>"correlation"</code>: the Pearson correlation \(r\) of the spectrum with
+the median spectrum of the sample, which detects changes of the shape of
 the spectrum (other lines, other line ratios) whatever its intensity.
-Only shots with a low correlation are flagged.</p></li>
+The z-scores are those of Fisher's \(z = \tanh^{-1}(r)\): correlations
+near 1 are bounded and skewed, so that small differences such as 0.998
+and 0.9995 would otherwise look extreme. Only shots with a low
+correlation are flagged.</p></li>
 <li><p><code>"distance"</code>: the Euclidean distance of the spectrum to the median
-spectrum of the sample, which combines both. Only far shots are
-flagged.</p></li>
-</ul><p>A shot is rejected when any criterion exceeds <code>cutoff</code> (3.5 by default,
+spectrum of the sample, relative to the norm of the median spectrum, on
+a log scale, which combines both. Only far shots are flagged.</p></li>
+</ul><p><strong>Scale.</strong> A z-score is the deviation of a shot from the median of its
+sample divided by a robust scale (the MAD). With the few shots of a sample
+(often 5 to 10), the MAD of the sample is unstable: when its shots happen
+to be very similar, a shot that differs by little gets a large z-score.
+With <code>scale = "floor"</code> (default), the scale of a sample is its own MAD, but
+not less than the pooled MAD of the deviations of all the samples (the
+typical shot-to-shot variability of the data set); <code>"sample"</code> uses the MAD
+of each sample alone, and <code>"pooled"</code> the pooled MAD for all samples, which
+suits samples of similar variability. In simulations of 8 shots per sample
+with noise varying between samples, <code>"floor"</code> with Fisher's \(z\)
+rejected 0.1% to 0.5% of the regular shots (against 2.5% to 5% with the
+MAD of each sample and the raw correlations), and still detected the shots
+of a plasma weakened by a quarter or more, or with an extra line of 10% of
+the strongest line. Lower <code>cutoff</code> to detect milder deviations.</p>
+<p>A shot is rejected when any criterion exceeds <code>cutoff</code> (3.5 by default,
 following Iglewicz and Hoaglin, 1993). Samples with fewer than 3 shots are
-not checked. When all shots of a sample vary by the same amount, the MAD
-can be zero; the mean absolute deviation is then used.</p>
-<p>To average the kept shots per sample, use <code><a href="average.html">average()</a></code> on the result with
-<code>drop = TRUE</code>. In a recipe, use <code><a href="step_reject_shots.html">step_reject_shots()</a></code>.</p>
+not checked. When a MAD is zero, the mean absolute deviation is used.</p>
+<p>The result keeps the raw criteria (<code>.intensity</code>, the total intensity
+relative to the median shot of the sample; <code>.correlation</code>; <code>.distance</code>),
+easier to read than the z-scores, and the settings, which
+<code><a href="plot_shots.html">plot_shots()</a></code> uses to show the shots and the rejections. To average the
+kept shots per sample, use <code><a href="average.html">average()</a></code> on the result with <code>drop = TRUE</code>. In
+a recipe, use <code><a href="step_reject_shots.html">step_reject_shots()</a></code>.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
 
 <ul><li><p>Iglewicz, B., Hoaglin, D.C. (1993). How to Detect and Handle
 Outliers. ASQC Quality Press, Milwaukee.</p></li>
+<li><p>Fisher, R.A. (1915). Frequency distribution of the values of the
+correlation coefficient in samples from an indefinitely large
+population. Biometrika, 10(4):507-521.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="step_reject_shots.html">step_reject_shots()</a></code>, <code><a href="average.html">average()</a></code>, <code><a href="saturation_summary.html">saturation_summary()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="plot_shots.html">plot_shots()</a></code>, <code><a href="step_reject_shots.html">step_reject_shots()</a></code>, <code><a href="average.html">average()</a></code>,
+<code><a href="saturation_summary.html">saturation_summary()</a></code>, <a href="forageShots.html">forageShots</a></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -140,23 +180,27 @@ Outliers. ASQC Quality Press, Milwaukee.</p></li>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">wl</span> <span class="op">&gt;</span> <span class="fl">760</span> <span class="op">&amp;</span> <span class="va">wl</span> <span class="op">&lt;</span> <span class="fl">780</span><span class="op">)</span><span class="op">]</span>  <span class="co"># the K I resonance lines</span></span></span>
-<span class="r-in"><span><span class="co"># five shots of each of four samples, one of them with a weak plasma</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">shots</span> <span class="op">&lt;-</span> <span class="va">spectra</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, each <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>, <span class="op">]</span> <span class="op">*</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">0.95</span>, <span class="fl">1.05</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">shots</span><span class="op">[</span><span class="fl">7</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="va">shots</span><span class="op">[</span><span class="fl">7</span>, <span class="op">]</span></span></span>
-<span class="r-in"><span><span class="va">shots</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span>sample <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>, <span class="st">"D"</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>, <span class="va">shots</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">reject_shots</span><span class="op">(</span><span class="va">shots</span>, <span class="va">sample</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">res</span><span class="op">[</span><span class="va">res</span><span class="op">$</span><span class="va">.rejected</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sample"</span>, <span class="st">".reason"</span>, <span class="st">".intensity_z"</span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 3</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   sample .reason   .intensity_z</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> B      intensity        -<span style="color: #BB0000;">20.1</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageShots</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># 8 shots of each of 20 forage samples</span></span></span>
+<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">reject_shots</span><span class="op">(</span><span class="va">forageShots</span>, <span class="va">Measurement</span>, shot <span class="op">=</span> <span class="va">shot</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">res</span><span class="op">[</span><span class="va">res</span><span class="op">$</span><span class="va">.rejected</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Measurement"</span>, <span class="st">".shot"</span>, <span class="st">".reason"</span>, <span class="st">".intensity"</span>, <span class="st">".correlation"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 8 × 5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Measurement .shot .reason                .intensity .correlation</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>      <span style="text-decoration: underline;">121</span>138     4 intensity, correlation      1.28         0.960</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>      <span style="text-decoration: underline;">121</span>144     7 intensity, correlation      0.729        0.961</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>      <span style="text-decoration: underline;">121</span>238     5 intensity                   0.704        0.956</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>      <span style="text-decoration: underline;">121</span>238     6 intensity                   0.747        0.969</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>      <span style="text-decoration: underline;">121</span>306     6 intensity                   0.697        0.936</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>      <span style="text-decoration: underline;">121</span>382     5 intensity                   1.34         0.958</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">7</span>      <span style="text-decoration: underline;">121</span>618     7 correlation                 0.793        0.970</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">8</span>      <span style="text-decoration: underline;">121</span>645     4 intensity                   0.734        0.956</span>
 <span class="r-in"><span><span class="co"># the kept shots only</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">reject_shots</span><span class="op">(</span><span class="va">shots</span>, <span class="va">sample</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 19</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu">reject_shots</span><span class="op">(</span><span class="va">forageShots</span>, <span class="va">Measurement</span>, drop <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 152</span>
+<span class="r-in"><span><span class="co"># the former behavior, with the MAD of each sample alone</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu">reject_shots</span><span class="op">(</span><span class="va">forageShots</span>, <span class="va">Measurement</span>, scale <span class="op">=</span> <span class="st">"sample"</span><span class="op">)</span><span class="op">$</span><span class="va">.rejected</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 8</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

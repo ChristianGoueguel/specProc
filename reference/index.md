@@ -341,6 +341,8 @@ Functions used to increase the signal-to-noise ratio.
   : Fast Average for Large Spectral Dataset
 - [`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md)
   : Rejection of Outlying Laser Shots
+- [`plot_shots()`](https://christiangoueguel.com/specProc/reference/plot_shots.md)
+  : Plots of the Laser Shots and of their Rejection
 
 ## Baseline correction
 
@@ -454,3 +456,5 @@ Functions used for charcaterizing plasma emission in laser spectroscopy.
 
 - [`forageLIBS`](https://christiangoueguel.com/specProc/reference/forageLIBS.md)
   : LIBS Spectra of Forage Samples
+- [`forageShots`](https://christiangoueguel.com/specProc/reference/forageShots.md)
+  : LIBS Laser Shots of Forage Samples
