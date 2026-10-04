@@ -139,6 +139,14 @@
 
 ### Improvements
 
+- The labels of the most outlying samples in
+  [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md),
+  [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
+  and
+  [`plot_coomans()`](https://christiangoueguel.com/specProc/reference/plot_coomans.md)
+  no longer overlap: they are placed by ggrepel (now imported), away
+  from each other and from the points, with a segment to their point
+  when moved far.
 - [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
   and
   [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)

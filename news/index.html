@@ -65,7 +65,8 @@
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-development-version">Improvements<a class="anchor" aria-label="anchor" href="#improvements-development-version"></a></h3>
-<ul><li>
+<ul><li>The labels of the most outlying samples in <code><a href="../reference/plot_outlier_map.html">plot_outlier_map()</a></code>, <code><a href="../reference/plot_influence.html">plot_influence()</a></code> and <code><a href="../reference/plot_coomans.html">plot_coomans()</a></code> no longer overlap: they are placed by ggrepel (now imported), away from each other and from the points, with a segment to their point when moved far.</li>
+<li>
 <code><a href="../reference/robpca.html">robpca()</a></code> and <code><a href="../reference/rospca.html">rospca()</a></code> are faster on wide data (up to about 4 times on full LIBS spectra): the reduction to the subspace spanned by the observations is now computed in C++ from the smaller cross-product matrix instead of an SVD. The results are unchanged up to numerical precision.</li>
 <li>
 <code><a href="../reference/plot_spectra.html">plot_spectra()</a></code> has new arguments: <code>panel</code>, a grouping variable that splits the spectra into panels, arranged one above the other or side by side (<code>layout = "vertical"</code> or <code>"horizontal"</code>), with the <code>offset</code> restarting in each panel; <code>grid</code>, to draw grid lines; and <code>color_as = "fill"</code>, to show the colors of <code>colvar</code> (or <code>id</code>) as the fill of the area under each spectrum instead of the line color. Spectra stacked with a vertical offset are then filled with opaque colors, the front ones hiding the back ones, as in a waterfall plot.</li>
