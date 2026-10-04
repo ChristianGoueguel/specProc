@@ -255,8 +255,8 @@
         <dd>Apply an Orthogonalization Filter to New Spectra</dd>
       </dl></div><div class="section level2">
 
-      <h3 id="robust-pls-regression-and-wavelength-selection">robust PLS regression and wavelength selection<a class="anchor" aria-label="anchor" href="#robust-pls-regression-and-wavelength-selection"></a></h3>
-      <div class="section-desc"><p>Robust PLS regression that resists outlying spectra and wrong reference values, and the selection of the informative wavelengths (VIP, selectivity ratio, interval PLS).</p></div>
+      <h3 id="robust-pls-and-pcr-regression-wavelength-selection">robust PLS and PCR regression, wavelength selection<a class="anchor" aria-label="anchor" href="#robust-pls-and-pcr-regression-wavelength-selection"></a></h3>
+      <div class="section-desc"><p>Robust PLS and principal component regression that resist outlying spectra and wrong reference values, their robust cross-validation, and the selection of the informative wavelengths (VIP, selectivity ratio, interval PLS).</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -286,6 +286,34 @@
 
         <dt>
 
+          <code><a href="rpcr.html">rpcr()</a></code>
+
+        </dt>
+        <dd>Robust Principal Component Regression (RPCR)</dd>
+
+        <dt>
+
+          <code><a href="predict.specproc_rpcr.html">predict(<i>&lt;specproc_rpcr&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Predictions of a Robust PCR Model</dd>
+
+        <dt>
+
+          <code><a href="robust_rmsecv.html">robust_rmsecv()</a></code>
+
+        </dt>
+        <dd>Robust Cross-Validation of a Robust Calibration Model</dd>
+
+        <dt>
+
+          <code><a href="linear_reg_lts.html">lts_fit()</a></code>
+
+        </dt>
+        <dd>Robust Linear Regression in tidymodels (LTS parsnip Engine)</dd>
+
+        <dt>
+
           <code><a href="select_wavelengths.html">select_wavelengths()</a></code>
 
         </dt>
@@ -297,6 +325,43 @@
 
         </dt>
         <dd>Plot of a Wavelength Selection</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="robust-classification">robust classification<a class="anchor" aria-label="anchor" href="#robust-classification"></a></h3>
+      <div class="section-desc"><p>Classification that resists outlying observations of the training data: robust SIMCA for whole spectra, and robust linear and quadratic discriminant analysis for a few variables (line intensities, robust principal component scores).</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="rsimca.html">rsimca()</a></code>
+
+        </dt>
+        <dd>Robust SIMCA Classification (RSIMCA)</dd>
+
+        <dt>
+
+          <code><a href="predict.specproc_rsimca.html">predict(<i>&lt;specproc_rsimca&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Predictions of a Robust SIMCA Model</dd>
+
+        <dt>
+
+          <code><a href="robust_da.html">robust_da()</a></code>
+
+        </dt>
+        <dd>Robust Linear and Quadratic Discriminant Analysis</dd>
+
+        <dt>
+
+          <code><a href="predict.specproc_robust_da.html">predict(<i>&lt;specproc_robust_da&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Predictions of a Robust Discriminant Analysis</dd>
       </dl></div><div class="section level2">
 
       <h3 id="figures-of-merit">figures of merit<a class="anchor" aria-label="anchor" href="#figures-of-merit"></a></h3>

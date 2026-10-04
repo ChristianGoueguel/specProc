@@ -4,7 +4,8 @@ distance, for a robust PCA fitted by robpca(), rospca(),
 macropca() or cellpca() (Hubert, Rousseeuw and Vanden Branden, 2005).
 For cellpca(), the vertical axis is the norm of the standardized
 residuals, as in the enhanced outlier map of Centofanti, Hubert and
-Rousseeuw. For a robust PLS model fitted by rsimpls(), it is by default
+Rousseeuw. For a robust calibration model fitted by rsimpls() or
+rpcr(), it is by default
 the regression outlier map of Hubert and Vanden Branden (2003): the
 residual distance (with one response, the absolute standardized residual)
 against the score distance. With map = "score", it is the score outlier
@@ -14,7 +15,8 @@ distance, for a robust PCA fitted by robpca(), rospca(),
 macropca() or cellpca() (Hubert, Rousseeuw and Vanden Branden, 2005).
 For cellpca(), the vertical axis is the norm of the standardized
 residuals, as in the enhanced outlier map of Centofanti, Hubert and
-Rousseeuw. For a robust PLS model fitted by rsimpls(), it is by default
+Rousseeuw. For a robust calibration model fitted by rsimpls() or
+rpcr(), it is by default
 the regression outlier map of Hubert and Vanden Branden (2003): the
 residual distance (with one response, the absolute standardized residual)
 against the score distance. With map = "score", it is the score outlier
@@ -65,7 +67,8 @@ distance, for a robust PCA fitted by <code><a href="robpca.html">robpca()</a></c
 <code><a href="macropca.html">macropca()</a></code> or <code><a href="cellpca.html">cellpca()</a></code> (Hubert, Rousseeuw and Vanden Branden, 2005).
 For <code><a href="cellpca.html">cellpca()</a></code>, the vertical axis is the norm of the standardized
 residuals, as in the enhanced outlier map of Centofanti, Hubert and
-Rousseeuw. For a robust PLS model fitted by <code><a href="rsimpls.html">rsimpls()</a></code>, it is by default
+Rousseeuw. For a robust calibration model fitted by <code><a href="rsimpls.html">rsimpls()</a></code> or
+<code><a href="rpcr.html">rpcr()</a></code>, it is by default
 the regression outlier map of Hubert and Vanden Branden (2003): the
 residual distance (with one response, the absolute standardized residual)
 against the score distance. With <code>map = "score"</code>, it is the score outlier
@@ -95,13 +98,13 @@ model against its score distance, as for a robust PCA.</p>
 
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
 <dd><p>An object returned by <code><a href="robpca.html">robpca()</a></code>, <code><a href="rospca.html">rospca()</a></code>,
-<code><a href="macropca.html">macropca()</a></code>, <code><a href="cellpca.html">cellpca()</a></code> or <code><a href="rsimpls.html">rsimpls()</a></code>.</p></dd>
+<code><a href="macropca.html">macropca()</a></code>, <code><a href="cellpca.html">cellpca()</a></code>, <code><a href="rsimpls.html">rsimpls()</a></code> or <code><a href="rpcr.html">rpcr()</a></code>.</p></dd>
 
 
 <dt id="arg-newdata">newdata<a class="anchor" aria-label="anchor" href="#arg-newdata"></a></dt>
 <dd><p>Optional new observations to add to the map (a numeric
 matrix or data frame with the calibration variables). Not available for
-the regression outlier map of <code><a href="rsimpls.html">rsimpls()</a></code> fits.</p></dd>
+the regression outlier map of <code><a href="rsimpls.html">rsimpls()</a></code> and <code><a href="rpcr.html">rpcr()</a></code> fits.</p></dd>
 
 
 <dt id="arg-labels">labels<a class="anchor" aria-label="anchor" href="#arg-labels"></a></dt>
@@ -142,9 +145,9 @@ outlying ones. Otherwise, the colors spread evenly over the distances.</p></dd>
 
 
 <dt id="arg-map">map<a class="anchor" aria-label="anchor" href="#arg-map"></a></dt>
-<dd><p>For <code><a href="rsimpls.html">rsimpls()</a></code> fits, the map to draw: <code>"regression"</code>
-(default), the regression outlier map, or <code>"score"</code>, the score outlier
-map of the predictors. Not used for robust PCA fits.</p></dd>
+<dd><p>For <code><a href="rsimpls.html">rsimpls()</a></code> and <code><a href="rpcr.html">rpcr()</a></code> fits, the map to draw:
+<code>"regression"</code> (default), the regression outlier map, or <code>"score"</code>,
+the score outlier map of the predictors. Not used for robust PCA fits.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -170,7 +173,8 @@ to the PCA subspace, so they follow the structure of the data;</p></li>
 projected, but far from the PCA subspace;</p></li>
 <li><p><strong>bad leverage</strong> points (top right): far on both counts, the most
 harmful outliers.</p></li>
-</ul><p>In the regression outlier map of <code><a href="rsimpls.html">rsimpls()</a></code>, the top left region holds
+</ul><p>In the regression outlier map of <code><a href="rsimpls.html">rsimpls()</a></code> or <code><a href="rpcr.html">rpcr()</a></code>, the top left
+region holds
 the <strong>vertical outliers</strong>: observations with a typical spectrum but a
 large residual, such as a wrong reference value. Bad leverage points have
 both an outlying spectrum and a large residual; good leverage points have
@@ -178,8 +182,8 @@ an outlying spectrum that the model still fits.</p>
 <p>New observations (<code>newdata</code>) are projected onto the model with
 <a href="predict.specproc_robpca.html">predict()</a> (or
 <a href="predict.specproc_rsimpls.html">predict()</a> for the score outlier map of an
-<code><a href="rsimpls.html">rsimpls()</a></code> fit) and shown with the calibration cut-offs, which is how
-new spectra are screened before prediction.</p>
+<code><a href="rsimpls.html">rsimpls()</a></code> or <code><a href="rpcr.html">rpcr()</a></code> fit) and shown with the calibration cut-offs,
+which is how new spectra are screened before prediction.</p>
 <p>With <code>relative = TRUE</code>, each distance is divided by its cut-off (the
 reduced score and orthogonal distances), so both cut-offs are at 1
 whatever the model. This puts maps of different models
@@ -190,7 +194,8 @@ in every model.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="robpca.html">robpca()</a></code>, <code><a href="rospca.html">rospca()</a></code>, <code><a href="macropca.html">macropca()</a></code>, <code><a href="rsimpls.html">rsimpls()</a></code>, <code><a href="plot_cell_map.html">plot_cell_map()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="robpca.html">robpca()</a></code>, <code><a href="rospca.html">rospca()</a></code>, <code><a href="macropca.html">macropca()</a></code>, <code><a href="rsimpls.html">rsimpls()</a></code>, <code><a href="rpcr.html">rpcr()</a></code>,
+<code><a href="plot_cell_map.html">plot_cell_map()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>

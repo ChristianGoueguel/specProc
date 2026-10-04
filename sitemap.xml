@@ -49,6 +49,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/libs_lines.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/line_finder.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/line_intensities.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/linear_reg_lts.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/loading_peaks.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/lorentzian_profile.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/macropca.html</loc></url>
@@ -94,6 +95,9 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_nas.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_opls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_robust_da.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_rpcr.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_rsimca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_rsimpls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_som.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_wavelength_calibration.html</loc></url>
@@ -105,8 +109,12 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/reject_shots.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/robpca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/robust_bcyj.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/robust_da.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/robust_rmsecv.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/rospca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/rousseeuw_croux.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/rpcr.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/rsimca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/rsimpls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/saha_boltzmann.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/saturation_summary.html</loc></url>

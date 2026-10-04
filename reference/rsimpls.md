@@ -160,7 +160,9 @@ and total sums of squares and cross-products.
 components, the robust \\R^2\\ of the paper (Remark 7) and the root mean
 squared error, on the observations that are regular in every one of
 these models. They describe the fit to the calibration data; for
-predictions, choose `ncomp` by cross-validation, for example with the
+predictions, choose `ncomp` by cross-validation: with
+[`robust_rmsecv()`](https://christiangoueguel.com/specProc/reference/robust_rmsecv.md),
+which leaves the outliers out of the error, or for example with the
 `"rsimpls"` engine of
 [`parsnip::pls()`](https://parsnip.tidymodels.org/reference/pls.html) in
 tidymodels
@@ -217,6 +219,8 @@ results.
 [`predict.specproc_rsimpls()`](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimpls.md),
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md),
 [`step_rsimpls()`](https://christiangoueguel.com/specProc/reference/step_rsimpls.md),
+[`robust_rmsecv()`](https://christiangoueguel.com/specProc/reference/robust_rmsecv.md),
+[`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md),
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
 
 ## Author

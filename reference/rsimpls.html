@@ -179,7 +179,8 @@ and total sums of squares and cross-products.</p>
 components, the robust \(R^2\) of the paper (Remark 7) and the root
 mean squared error, on the observations that are regular in every one of
 these models. They describe the fit to the calibration data; for
-predictions, choose <code>ncomp</code> by cross-validation, for example with the
+predictions, choose <code>ncomp</code> by cross-validation: with <code><a href="robust_rmsecv.html">robust_rmsecv()</a></code>,
+which leaves the outliers out of the error, or for example with the
 <code>"rsimpls"</code> engine of <code><a href="https://parsnip.tidymodels.org/reference/pls.html" class="external-link">parsnip::pls()</a></code> in tidymodels (<a href="pls_rsimpls.html">pls_rsimpls</a>).
 These models all come from the same ROBPCA fit, with
 \(k_0 = k_{max} + q\) components, so the model with <code>ncomp</code> components
@@ -220,7 +221,8 @@ approach to robust principal component analysis. Technometrics,
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="predict.specproc_rsimpls.html">predict.specproc_rsimpls()</a></code>, <code><a href="plot_outlier_map.html">plot_outlier_map()</a></code>, <code><a href="step_rsimpls.html">step_rsimpls()</a></code>, <code><a href="robpca.html">robpca()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="predict.specproc_rsimpls.html">predict.specproc_rsimpls()</a></code>, <code><a href="plot_outlier_map.html">plot_outlier_map()</a></code>, <code><a href="step_rsimpls.html">step_rsimpls()</a></code>,
+<code><a href="robust_rmsecv.html">robust_rmsecv()</a></code>, <code><a href="rpcr.html">rpcr()</a></code>, <code><a href="robpca.html">robpca()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>

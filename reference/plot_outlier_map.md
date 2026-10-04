@@ -11,8 +11,9 @@ or
 [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md),
 the vertical axis is the norm of the standardized residuals, as in the
 enhanced outlier map of Centofanti, Hubert and Rousseeuw. For a robust
-PLS model fitted by
-[`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md),
+calibration model fitted by
+[`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+or [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md),
 it is by default the regression outlier map of Hubert and Vanden Branden
 (2003): the residual distance (with one response, the absolute
 standardized residual) against the score distance. With `map = "score"`,
@@ -45,9 +46,10 @@ plot_outlier_map(
   [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
   [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md),
   [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
-  [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md)
+  [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md),
+  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
   or
-  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md).
+  [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md).
 
 - newdata:
 
@@ -55,6 +57,8 @@ plot_outlier_map(
   frame with the calibration variables). Not available for the
   regression outlier map of
   [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+  and
+  [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md)
   fits.
 
 - labels:
@@ -98,6 +102,8 @@ plot_outlier_map(
 
   For
   [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+  and
+  [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md)
   fits, the map to draw: `"regression"` (default), the regression
   outlier map, or `"score"`, the score outlier map of the predictors.
   Not used for robust PCA fits.
@@ -133,7 +139,8 @@ map into four types of observations:
   harmful outliers.
 
 In the regression outlier map of
-[`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md),
+[`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+or [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md),
 the top left region holds the **vertical outliers**: observations with a
 typical spectrum but a large residual, such as a wrong reference value.
 Bad leverage points have both an outlying spectrum and a large residual;
@@ -146,6 +153,7 @@ New observations (`newdata`) are projected onto the model with
 [predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimpls.md)
 for the score outlier map of an
 [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+or [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md)
 fit) and shown with the calibration cut-offs, which is how new spectra
 are screened before prediction.
 
@@ -163,6 +171,7 @@ model.
 [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md),
 [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
 [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md),
+[`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md),
 [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
 
 ## Author

@@ -123,7 +123,11 @@ returns the loadings as a tibble with columns `terms`, `value`,
 
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
 [`step_rospca()`](https://christiangoueguel.com/specProc/reference/step_rospca.md),
-[`step_macropca()`](https://christiangoueguel.com/specProc/reference/step_macropca.md)
+[`step_macropca()`](https://christiangoueguel.com/specProc/reference/step_macropca.md),
+and the `"lts"` engine of
+[`parsnip::linear_reg()`](https://parsnip.tidymodels.org/reference/linear_reg.html)
+([linear_reg_lts](https://christiangoueguel.com/specProc/reference/linear_reg_lts.md))
+for robust principal component regression
 
 ## Examples
 

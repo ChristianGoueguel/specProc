@@ -42,6 +42,51 @@
   [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
   model gains `ncomp`, for the models with 1 to `kmax` components, which
   the fit now keeps (`models`).
+- [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md):
+  robust principal component regression (RPCR) of Hubert and Verboven
+  (2003), the robust PCA of the spectra
+  ([`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md))
+  followed by the LTS regression of the response on the scores, or the
+  MCD regression of several responses. It has the outputs,
+  [`predict()`](https://rdrr.io/r/stats/predict.html) method and outlier
+  maps of
+  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md).
+- [`robust_rmsecv()`](https://christiangoueguel.com/specProc/reference/robust_rmsecv.md):
+  the robust RMSECV of
+  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+  or
+  [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md)
+  models with 1 to `kmax` components, which leaves the outliers out of
+  the cross-validated error, and the robust component selection (RCS)
+  criterion of Engelen and Hubert (2005), to choose the number of
+  components. The folds are fitted in parallel when a
+  [`future::plan()`](https://future.futureverse.org/reference/plan.html)
+  is set.
+- The `"lts"` engine of
+  [`parsnip::linear_reg()`](https://parsnip.tidymodels.org/reference/linear_reg.html)
+  fits the reweighted LTS regression
+  ([`lts_fit()`](https://christiangoueguel.com/specProc/reference/linear_reg_lts.md),
+  from
+  [`robustbase::ltsReg()`](https://rdrr.io/pkg/robustbase/man/ltsReg.html));
+  after
+  [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md)
+  in a workflow, it gives robust PCR in tidymodels.
+- [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md):
+  robust SIMCA classification of Vanden Branden and Hubert (2005), a
+  robust PCA model of each class and the assignment to the closest class
+  from the scaled score and orthogonal distances, for whole spectra.
+  [`predict()`](https://rdrr.io/r/stats/predict.html) gives the classes,
+  or the distances to the classes and whether a spectrum is outlying for
+  all of them.
+- [`robust_da()`](https://christiangoueguel.com/specProc/reference/robust_da.md):
+  robust linear and quadratic discriminant analysis of Hubert and Van
+  Driessen (2004), from the MCD estimates of the classes, for a few
+  variables such as line intensities or robust principal component
+  scores. [`predict()`](https://rdrr.io/r/stats/predict.html) gives the
+  classes or posterior probabilities. It is the `"mcd"` engine of
+  [`parsnip::discrim_linear()`](https://parsnip.tidymodels.org/reference/discrim_linear.html)
+  and
+  [`parsnip::discrim_quad()`](https://parsnip.tidymodels.org/reference/discrim_quad.html).
 - [`select_wavelengths()`](https://christiangoueguel.com/specProc/reference/select_wavelengths.md):
   selection of the informative wavelengths for PLS regression, by the
   variable importance in projection (VIP), the selectivity ratio (SR),

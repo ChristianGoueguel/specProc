@@ -82,11 +82,12 @@ sources of variance from the multivariate data.
   [`predict(`*`<o2pls>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_filter.md)
   : Apply an Orthogonalization Filter to New Spectra
 
-### robust PLS regression and wavelength selection
+### robust PLS and PCR regression, wavelength selection
 
-Robust PLS regression that resists outlying spectra and wrong reference
-values, and the selection of the informative wavelengths (VIP,
-selectivity ratio, interval PLS).
+Robust PLS and principal component regression that resist outlying
+spectra and wrong reference values, their robust cross-validation, and
+the selection of the informative wavelengths (VIP, selectivity ratio,
+interval PLS).
 
 - [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
   : Robust Partial Least Squares Regression (RSIMPLS)
@@ -94,10 +95,34 @@ selectivity ratio, interval PLS).
   : Predictions of a Robust PLS Model
 - [`pls_rsimpls`](https://christiangoueguel.com/specProc/reference/pls_rsimpls.md)
   : Robust PLS Regression in tidymodels (parsnip Engine)
+- [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md) :
+  Robust Principal Component Regression (RPCR)
+- [`predict(`*`<specproc_rpcr>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_rpcr.md)
+  : Predictions of a Robust PCR Model
+- [`robust_rmsecv()`](https://christiangoueguel.com/specProc/reference/robust_rmsecv.md)
+  : Robust Cross-Validation of a Robust Calibration Model
+- [`lts_fit()`](https://christiangoueguel.com/specProc/reference/linear_reg_lts.md)
+  : Robust Linear Regression in tidymodels (LTS parsnip Engine)
 - [`select_wavelengths()`](https://christiangoueguel.com/specProc/reference/select_wavelengths.md)
   : Wavelength Selection for PLS Regression
 - [`plot_wavelength_selection()`](https://christiangoueguel.com/specProc/reference/plot_wavelength_selection.md)
   : Plot of a Wavelength Selection
+
+### robust classification
+
+Classification that resists outlying observations of the training data:
+robust SIMCA for whole spectra, and robust linear and quadratic
+discriminant analysis for a few variables (line intensities, robust
+principal component scores).
+
+- [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md)
+  : Robust SIMCA Classification (RSIMCA)
+- [`predict(`*`<specproc_rsimca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimca.md)
+  : Predictions of a Robust SIMCA Model
+- [`robust_da()`](https://christiangoueguel.com/specProc/reference/robust_da.md)
+  : Robust Linear and Quadratic Discriminant Analysis
+- [`predict(`*`<specproc_robust_da>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robust_da.md)
+  : Predictions of a Robust Discriminant Analysis
 
 ### figures of merit
 
