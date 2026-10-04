@@ -101,8 +101,8 @@ values between 0 and 1. Default is 0.975.</p></dd>
 
 
 <dt id="arg-method">method<a class="anchor" aria-label="anchor" href="#arg-method"></a></dt>
-<dd><p>The distribution of the limits: <code>"f"</code> (default) or
-<code>"beta"</code>.</p></dd>
+<dd><p>The distribution of the limits: <code>"f"</code> (default), <code>"beta"</code>
+or <code>"new"</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -118,12 +118,15 @@ data).</p>
     <p>\(T^2\) is the squared Mahalanobis distance of a sample to the mean of
 the scores, with their covariance. Its limit at the confidence level
 \(1 - \alpha\), for \(n\) samples, is</p><ul><li><p><code>method = "f"</code> (default): \(k(n - 1)/(n - k)\, F_{1-\alpha}(k, n -
-   k)\), the limit for a new sample, more conservative;</p></li>
+   k)\), the conventional limit of score plots (Jackson, 1991);</p></li>
 <li><p><code>method = "beta"</code>: \((n - 1)^2/n\, B_{1-\alpha}(k/2, (n - k -
    1)/2)\), the exact distribution for the samples that estimated the mean
 and covariance (Tracy, Young and Mason, 1992); the F limit can even
 exceed the largest \(T^2\) a sample can reach, \((n - 1)^2 / n\),
-for small \(n\).</p></li>
+for small \(n\);</p></li>
+<li><p><code>method = "new"</code>: \(k(n + 1)(n - 1)/(n(n - k))\, F_{1-\alpha}(k,
+   n - k)\), the exact limit for a new sample, independent of the estimates
+(larger than the F limit by \((n + 1)/n\)).</p></li>
 </ul><p>Within groups (<code>group</code>), each group gets its own mean, covariance and
 limits, which tells whether a sample is typical of its own group rather
 than of the whole data set; each group needs more than <code>k + 1</code> samples.</p>

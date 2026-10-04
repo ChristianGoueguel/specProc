@@ -55,7 +55,7 @@ hotelling_t2(
 
 - method:
 
-  The distribution of the limits: `"f"` (default) or `"beta"`.
+  The distribution of the limits: `"f"` (default), `"beta"` or `"new"`.
 
 ## Value
 
@@ -72,13 +72,17 @@ the scores, with their covariance. Its limit at the confidence level
 \\1 - \alpha\\, for \\n\\ samples, is
 
 - `method = "f"` (default): \\k(n - 1)/(n - k)\\ F\_{1-\alpha}(k, n -
-  k)\\, the limit for a new sample, more conservative;
+  k)\\, the conventional limit of score plots (Jackson, 1991);
 
 - `method = "beta"`: \\(n - 1)^2/n\\ B\_{1-\alpha}(k/2, (n - k -
   1)/2)\\, the exact distribution for the samples that estimated the
   mean and covariance (Tracy, Young and Mason, 1992); the F limit can
   even exceed the largest \\T^2\\ a sample can reach, \\(n - 1)^2 / n\\,
-  for small \\n\\.
+  for small \\n\\;
+
+- `method = "new"`: \\k(n + 1)(n - 1)/(n(n - k))\\ F\_{1-\alpha}(k, n -
+  k)\\, the exact limit for a new sample, independent of the estimates
+  (larger than the F limit by \\(n + 1)/n\\).
 
 Within groups (`group`), each group gets its own mean, covariance and
 limits, which tells whether a sample is typical of its own group rather

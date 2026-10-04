@@ -73,7 +73,14 @@ variable.</p>
 <span>  biplot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  biplot_top <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  aspect_ratio <span class="op">=</span> <span class="fl">0.7</span>,</span>
-<span>  title <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  legend_title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  palette <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  shapes <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"right"</span>, <span class="st">"bottom"</span>, <span class="st">"top"</span>, <span class="st">"inside"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
+<span>  panel <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shaded"</span>, <span class="st">"white"</span><span class="op">)</span>,</span>
+<span>  caption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  base_size <span class="op">=</span> <span class="fl">11</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -140,7 +147,8 @@ next embedding coordinates. Default is 2.</p></dd>
 
 <dt id="arg-t-method">t2_method<a class="anchor" aria-label="anchor" href="#arg-t-method"></a></dt>
 <dd><p>The distribution of the \(T^2\) limits: <code>"f"</code>
-(default) or <code>"beta"</code> (see <code><a href="hotelling_t2.html">hotelling_t2()</a></code>).</p></dd>
+(default), <code>"beta"</code> or <code>"new"</code> (see <code><a href="hotelling_t2.html">hotelling_t2()</a></code>). Ignored for a
+robust PCA, whose limit is the chi-square quantile of ROBPCA.</p></dd>
 
 
 <dt id="arg-flag">flag<a class="anchor" aria-label="anchor" href="#arg-flag"></a></dt>
@@ -167,11 +175,51 @@ Default is 10.</p></dd>
 
 <dt id="arg-aspect-ratio">aspect_ratio<a class="anchor" aria-label="anchor" href="#arg-aspect-ratio"></a></dt>
 <dd><p>The ratio of the height to the width of the panel.
-Default is 0.7; <code>NULL</code> lets the panel fill the plot.</p></dd>
+Default is 0.7; <code>NULL</code> lets the panel fill the plot; <code>"equal"</code> gives
+the two axes the same scale, so that the distances between the samples
+are not distorted (for scores in the same units).</p></dd>
 
 
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>The plot title.</p></dd>
+
+
+<dt id="arg-legend-title">legend_title<a class="anchor" aria-label="anchor" href="#arg-legend-title"></a></dt>
+<dd><p>The title of the legend of <code>colour</code>. Default is its
+name; give it with units, such as <code>"K (%)"</code>.</p></dd>
+
+
+<dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>
+<dd><p>The colors of <code>colour</code>: <code>NULL</code> (default: Dark2 for up to 8
+groups, viridis for a numeric variable), the name of a viridis palette
+(<code>"viridis"</code>, <code>"magma"</code>, <code>"cividis"</code>, ...) or a vector of colors.</p></dd>
+
+
+<dt id="arg-shapes">shapes<a class="anchor" aria-label="anchor" href="#arg-shapes"></a></dt>
+<dd><p>A logical: give each group of a discrete <code>colour</code> its own
+point shape (up to 6 groups), so that the groups stay apart in grayscale
+(<code>TRUE</code>, default).</p></dd>
+
+
+<dt id="arg-legend">legend<a class="anchor" aria-label="anchor" href="#arg-legend"></a></dt>
+<dd><p>The position of the legend: <code>"right"</code> (default), <code>"bottom"</code>,
+<code>"top"</code>, <code>"inside"</code> (the top right corner of the panel) or <code>"none"</code>.</p></dd>
+
+
+<dt id="arg-panel">panel<a class="anchor" aria-label="anchor" href="#arg-panel"></a></dt>
+<dd><p><code>"shaded"</code> (default), the panel grey outside the outermost
+ellipse and white inside, or <code>"white"</code>.</p></dd>
+
+
+<dt id="arg-caption">caption<a class="anchor" aria-label="anchor" href="#arg-caption"></a></dt>
+<dd><p><code>TRUE</code> (default), a caption saying what the ellipses and
+limits are; <code>FALSE</code>, no caption; or a caption of your own.</p></dd>
+
+
+<dt id="arg-base-size">base_size<a class="anchor" aria-label="anchor" href="#arg-base-size"></a></dt>
+<dd><p>The size of the text, in points. Default is 11; use the
+text size of the journal (often 7 to 9 points) for a figure saved at its
+printed size. The points, lines and labels scale with it.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -228,12 +276,21 @@ the confidence ellipses of the groups and the \(T^2\) limits of all
 the samples. \(T^2\) suits linear scores such as
 PCA or PLS; on a UMAP
 map, whose distances are not meaningful, prefer <code>ellipse</code>.</p>
-<p><strong>Style.</strong> The panel is grey outside the outermost ellipse (of \(T^2\), or of each group) and white
-inside, so that the samples beyond the limits stand out, with no grid and
-a fixed <code>aspect_ratio</code> (0.7 by default; <code>NULL</code> lets the plot fill the
-space), and thin light grey lines through the origin (when it lies in the
-range of the samples, as for centered scores). Without ellipses, the
-panel is white.</p>
+<p><strong>Style.</strong> The panel is grey outside the outermost ellipse (of
+\(T^2\), or of each group) and white inside, so that the samples beyond
+the limits stand out (<code>panel = "white"</code> for a white panel), with no grid
+and a fixed <code>aspect_ratio</code> (0.7 by default; <code>NULL</code> lets the plot fill the
+space, <code>"equal"</code> gives both axes the same scale), and thin light grey
+lines through the origin (when it lies in the range of the samples, as for
+centered scores). Without ellipses, the panel is white. The groups of a
+discrete <code>colour</code> also get their own point shapes (<code>shapes</code>), and the axes
+plain numbers. A caption says what the ellipses and limits are (their
+level, distribution and estimates), which readers cannot tell from the
+plot.</p>
+<p><strong>Publication figures.</strong> Make the plot at its printed size, with
+<code>base_size</code> set to the text size of the journal, for example
+<code>ggsave("scores.pdf", p, width = 85, height = 75, units = "mm")</code> with
+<code>base_size = 8</code> for a single column.</p>
 <p><strong>Axes.</strong> For a <code><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">stats::prcomp()</a></code> fit or a robust PCA, the axis titles
 give the share of the variance of each component: of the total variance
 for <code><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">stats::prcomp()</a></code>, and of the variance of the <code>k</code> components of the
@@ -284,6 +341,23 @@ scores.</p>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-plt img"><img src="plot_embedding-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># PCA of the K I lines, the samples grouped by potassium level, for a</span></span></span>
+<span class="r-in"><span><span class="co"># journal column</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/is_installed.html" class="external-link">is_installed</a></span><span class="op">(</span><span class="st">"ConfidenceEllipse"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">pca</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/prcomp.html" class="external-link">prcomp</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">wl</span> <span class="op">&gt;</span> <span class="fl">760</span> <span class="op">&amp;</span> <span class="va">wl</span> <span class="op">&lt;</span> <span class="fl">772</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">level</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">$</span><span class="va">K</span>, <span class="fl">3</span>, labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Low K"</span>, <span class="st">"Mid K"</span>, <span class="st">"High K"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">plot_embedding</span><span class="op">(</span><span class="va">pca</span>, colour <span class="op">=</span> <span class="va">level</span>, ellipse <span class="op">=</span> <span class="cn">TRUE</span>, legend_title <span class="op">=</span> <span class="st">"Potassium"</span>,</span></span>
+<span class="r-in"><span>                      legend <span class="op">=</span> <span class="st">"bottom"</span>, base_size <span class="op">=</span> <span class="fl">8</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">p</span></span></span>
+<span class="r-in"><span>  <span class="co"># ggplot2::ggsave("scores.pdf", p, width = 85, height = 80, units = "mm")</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>RGL: unable to open X11 display</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>'rgl.init' failed, will use the null device.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> See '?rgl.useNULL' for ways to avoid this warning.</span>
+<span class="r-plt img"><img src="plot_embedding-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># UMAP map of the iris flowers, from embed::step_umap(): no lines through</span></span></span>
 <span class="r-in"><span><span class="co"># the origin, whose position means nothing on such a map</span></span></span>
@@ -296,7 +370,7 @@ scores.</p>
 <span class="r-in"><span>    <span class="fu">recipes</span><span class="fu">::</span><span class="fu"><a href="https://recipes.tidymodels.org/reference/bake.html" class="external-link">bake</a></span><span class="op">(</span>new_data <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">plot_embedding</span><span class="op">(</span><span class="va">umap</span>, colour <span class="op">=</span> <span class="va">Species</span>, title <span class="op">=</span> <span class="st">"UMAP of the iris flowers"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-plt img"><img src="plot_embedding-2.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="plot_embedding-3.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

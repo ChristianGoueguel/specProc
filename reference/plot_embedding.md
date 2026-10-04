@@ -31,7 +31,14 @@ plot_embedding(
   biplot = FALSE,
   biplot_top = 10,
   aspect_ratio = 0.7,
-  title = NULL
+  title = NULL,
+  legend_title = NULL,
+  palette = NULL,
+  shapes = TRUE,
+  legend = c("right", "bottom", "top", "inside", "none"),
+  panel = c("shaded", "white"),
+  caption = TRUE,
+  base_size = 11
 )
 ```
 
@@ -99,9 +106,11 @@ plot_embedding(
 
 - t2_method:
 
-  The distribution of the \\T^2\\ limits: `"f"` (default) or `"beta"`
-  (see
+  The distribution of the \\T^2\\ limits: `"f"` (default), `"beta"` or
+  `"new"` (see
   [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)).
+  Ignored for a robust PCA, whose limit is the chi-square quantile of
+  ROBPCA.
 
 - flag:
 
@@ -126,11 +135,51 @@ plot_embedding(
 - aspect_ratio:
 
   The ratio of the height to the width of the panel. Default is 0.7;
-  `NULL` lets the panel fill the plot.
+  `NULL` lets the panel fill the plot; `"equal"` gives the two axes the
+  same scale, so that the distances between the samples are not
+  distorted (for scores in the same units).
 
 - title:
 
   The plot title.
+
+- legend_title:
+
+  The title of the legend of `colour`. Default is its name; give it with
+  units, such as `"K (%)"`.
+
+- palette:
+
+  The colors of `colour`: `NULL` (default: Dark2 for up to 8 groups,
+  viridis for a numeric variable), the name of a viridis palette
+  (`"viridis"`, `"magma"`, `"cividis"`, ...) or a vector of colors.
+
+- shapes:
+
+  A logical: give each group of a discrete `colour` its own point shape
+  (up to 6 groups), so that the groups stay apart in grayscale (`TRUE`,
+  default).
+
+- legend:
+
+  The position of the legend: `"right"` (default), `"bottom"`, `"top"`,
+  `"inside"` (the top right corner of the panel) or `"none"`.
+
+- panel:
+
+  `"shaded"` (default), the panel grey outside the outermost ellipse and
+  white inside, or `"white"`.
+
+- caption:
+
+  `TRUE` (default), a caption saying what the ellipses and limits are;
+  `FALSE`, no caption; or a caption of your own.
+
+- base_size:
+
+  The size of the text, in points. Default is 11; use the text size of
+  the journal (often 7 to 9 points) for a figure saved at its printed
+  size. The points, lines and labels scale with it.
 
 ## Value
 
@@ -202,10 +251,20 @@ PCA or PLS; on a UMAP map, whose distances are not meaningful, prefer
 
 **Style.** The panel is grey outside the outermost ellipse (of \\T^2\\,
 or of each group) and white inside, so that the samples beyond the
-limits stand out, with no grid and a fixed `aspect_ratio` (0.7 by
-default; `NULL` lets the plot fill the space), and thin light grey lines
-through the origin (when it lies in the range of the samples, as for
-centered scores). Without ellipses, the panel is white.
+limits stand out (`panel = "white"` for a white panel), with no grid and
+a fixed `aspect_ratio` (0.7 by default; `NULL` lets the plot fill the
+space, `"equal"` gives both axes the same scale), and thin light grey
+lines through the origin (when it lies in the range of the samples, as
+for centered scores). Without ellipses, the panel is white. The groups
+of a discrete `colour` also get their own point shapes (`shapes`), and
+the axes plain numbers. A caption says what the ellipses and limits are
+(their level, distribution and estimates), which readers cannot tell
+from the plot.
+
+**Publication figures.** Make the plot at its printed size, with
+`base_size` set to the text size of the journal, for example
+`ggsave("scores.pdf", p, width = 85, height = 75, units = "mm")` with
+`base_size = 8` for a single column.
 
 **Axes.** For a [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html)
 fit or a robust PCA, the axis titles give the share of the variance of
@@ -269,6 +328,23 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
     robpca(k = 2) |>
     plot_embedding(hotelling = "all", flag = FALSE, label = TRUE)
 }
+
+
+# PCA of the K I lines, the samples grouped by potassium level, for a
+# journal column
+if (rlang::is_installed("ConfidenceEllipse")) {
+  data(forageLIBS)
+  wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+  pca <- stats::prcomp(forageLIBS[which(wl > 760 & wl < 772)])
+  level <- cut(forageLIBS$K, 3, labels = c("Low K", "Mid K", "High K"))
+  p <- plot_embedding(pca, colour = level, ellipse = TRUE, legend_title = "Potassium",
+                      legend = "bottom", base_size = 8)
+  p
+  # ggplot2::ggsave("scores.pdf", p, width = 85, height = 80, units = "mm")
+}
+#> Warning: RGL: unable to open X11 display
+#> Warning: 'rgl.init' failed, will use the null device.
+#> See '?rgl.useNULL' for ways to avoid this warning.
 
 
 # \donttest{
