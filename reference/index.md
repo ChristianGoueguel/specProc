@@ -153,7 +153,7 @@ and can be tuned within a tidymodels workflow.
 - [`step_reject_shots()`](https://christiangoueguel.com/specProc/reference/step_reject_shots.md)
   : Shot Rejection Recipe Step
 
-### robust transformation and PCA
+### robust transformation, PCA and PLS
 
 - [`step_robust_bcyj()`](https://christiangoueguel.com/specProc/reference/step_robust_bcyj.md)
   : Robust Box-Cox and Yeo-Johnson Transformation Recipe Step
@@ -165,6 +165,8 @@ and can be tuned within a tidymodels workflow.
   : MacroPCA Recipe Step
 - [`step_cellpca()`](https://christiangoueguel.com/specProc/reference/step_cellpca.md)
   : cellPCA Recipe Step
+- [`step_rsimpls()`](https://christiangoueguel.com/specProc/reference/step_rsimpls.md)
+  : Robust PLS (RSIMPLS) Recipe Step
 
 ### orthogonalization
 

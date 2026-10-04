@@ -13,9 +13,12 @@ the vertical axis is the norm of the standardized residuals, as in the
 enhanced outlier map of Centofanti, Hubert and Rousseeuw. For a robust
 PLS model fitted by
 [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md),
-it is the regression outlier map of Hubert and Vanden Branden (2003):
-the residual distance (with one response, the absolute standardized
-residual) against the score distance.
+it is by default the regression outlier map of Hubert and Vanden Branden
+(2003): the residual distance (with one response, the absolute
+standardized residual) against the score distance. With `map = "score"`,
+it is the score outlier map of the predictors: the orthogonal distance
+of each spectrum to the model against its score distance, as for a
+robust PCA.
 
 ## Usage
 
@@ -29,6 +32,7 @@ plot_outlier_map(
   log = FALSE,
   colour_by = c("type", "distance"),
   title = NULL,
+  map = c("regression", "score"),
   ...
 )
 ```
@@ -48,7 +52,8 @@ plot_outlier_map(
 - newdata:
 
   Optional new observations to add to the map (a numeric matrix or data
-  frame with the calibration variables). Not available for
+  frame with the calibration variables). Not available for the
+  regression outlier map of
   [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
   fits.
 
@@ -88,6 +93,14 @@ plot_outlier_map(
 - title:
 
   The plot title.
+
+- map:
+
+  For
+  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+  fits, the map to draw: `"regression"` (default), the regression
+  outlier map, or `"score"`, the score outlier map of the predictors.
+  Not used for robust PCA fits.
 
 - ...:
 
@@ -129,8 +142,12 @@ fits.
 
 New observations (`newdata`) are projected onto the model with
 [predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_robpca.md)
-and shown with the calibration cut-offs, which is how new spectra are
-screened before prediction.
+(or
+[predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimpls.md)
+for the score outlier map of an
+[`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+fit) and shown with the calibration cut-offs, which is how new spectra
+are screened before prediction.
 
 With `relative = TRUE`, each distance is divided by its cut-off (the
 reduced score and orthogonal distances), so both cut-offs are at 1

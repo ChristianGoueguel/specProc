@@ -11,12 +11,20 @@
   regression on the scores. Outlying spectra and wrong reference values
   have little influence on the model. One or several responses; the
   response is block-scaled before ROBPCA so that wrong reference values
-  are detected whatever its units.
-  [`predict()`](https://rdrr.io/r/stats/predict.html) gives the
-  predictions or scores of new spectra, and
+  are detected whatever its units. The fit gives the score, residual and
+  orthogonal distances of each observation, and the robust R² of the
+  model. [`predict()`](https://rdrr.io/r/stats/predict.html) gives the
+  predictions or scores of new spectra, with their score and orthogonal
+  distances, and
   [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
   draws the regression outlier map (vertical outliers, good and bad
-  leverage points).
+  leverage points) or, with `map = "score"`, the score outlier map of
+  the spectra.
+  [`step_rsimpls()`](https://christiangoueguel.com/specProc/reference/step_rsimpls.md)
+  is its recipe step, the robust counterpart of
+  [`recipes::step_pls()`](https://recipes.tidymodels.org/reference/step_pls.html):
+  it replaces the spectra by their robust PLS scores, and optionally
+  their score and orthogonal distances.
 - [`select_wavelengths()`](https://christiangoueguel.com/specProc/reference/select_wavelengths.md):
   selection of the informative wavelengths for PLS regression, by the
   variable importance in projection (VIP), the selectivity ratio (SR),

@@ -189,15 +189,15 @@ tidy(prepped, number = 1)
 #> # A tibble: 594 × 4
 #>    terms       selected importance id                      
 #>    <chr>       <lgl>         <dbl> <chr>                   
-#>  1 380.011254  FALSE     0.0356    select_wavelengths_iuuoY
-#>  2 380.096143  FALSE     0.00637   select_wavelengths_iuuoY
-#>  3 380.202312  FALSE     0.00273   select_wavelengths_iuuoY
-#>  4 380.285294  FALSE     0.00274   select_wavelengths_iuuoY
-#>  5 380.3682761 FALSE     0.000626  select_wavelengths_iuuoY
-#>  6 380.4512581 FALSE     0.000356  select_wavelengths_iuuoY
-#>  7 380.5342402 FALSE     0.00136   select_wavelengths_iuuoY
-#>  8 380.6172222 FALSE     0.00337   select_wavelengths_iuuoY
-#>  9 380.7002042 FALSE     0.0000189 select_wavelengths_iuuoY
-#> 10 380.7831863 FALSE     0.000810  select_wavelengths_iuuoY
+#>  1 380.011254  FALSE     0.0356    select_wavelengths_YPnL6
+#>  2 380.096143  FALSE     0.00637   select_wavelengths_YPnL6
+#>  3 380.202312  FALSE     0.00273   select_wavelengths_YPnL6
+#>  4 380.285294  FALSE     0.00274   select_wavelengths_YPnL6
+#>  5 380.3682761 FALSE     0.000626  select_wavelengths_YPnL6
+#>  6 380.4512581 FALSE     0.000356  select_wavelengths_YPnL6
+#>  7 380.5342402 FALSE     0.00136   select_wavelengths_YPnL6
+#>  8 380.6172222 FALSE     0.00337   select_wavelengths_YPnL6
+#>  9 380.7002042 FALSE     0.0000189 select_wavelengths_YPnL6
+#> 10 380.7831863 FALSE     0.000810  select_wavelengths_YPnL6
 #> # ℹ 584 more rows
 ```

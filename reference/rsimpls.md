@@ -34,10 +34,11 @@ rsimpls(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 500)
 - kmax:
 
   The largest number of components considered. ROBPCA is applied with
-  `kmax` plus the number of responses components. Default is 10, as in
-  the paper; it is raised to `ncomp` if needed, and lowered when there
-  are too few observations or variables (at most one less than the
-  number of variables).
+  `kmax` plus the number of responses components, so the model also
+  depends on `kmax` (see Details). Default is 10, as in the paper; it is
+  raised to `ncomp` if needed, and lowered when there are too few
+  observations or variables (at most one less than the number of
+  variables).
 
 - alpha:
 
@@ -78,8 +79,10 @@ An object of class `specproc_rsimpls`, a list with:
 
 - `sigma`: the robust covariance matrix of the residuals.
 
-- `sd`, `rd`: the score and residual distances of each observation, and
-  `cutoff_sd`, `cutoff_rd` their cut-offs.
+- `sd`, `rd`, `od`: the score, residual and orthogonal distances of each
+  observation, and `cutoff_sd`, `cutoff_rd`, `cutoff_od` their cut-offs.
+
+- `R2`: the robust \\R^2\\ of the model (see Details).
 
 - `outlier_type`: a factor classifying each observation as `"regular"`,
   `"good leverage"`, `"vertical outlier"` or `"bad leverage"`.
@@ -137,12 +140,27 @@ Observations beyond the score cut-off only are **good leverage** points,
 beyond the residual cut-off only **vertical outliers**, and beyond both
 **bad leverage** points.
 
+The orthogonal distance \\OD_i = \\x_i - \hat\mu_x - P t_i\\\\ is the
+norm of the residual of the spectrum, the part that the `ncomp`
+components do not describe, and its cut-off is that of
+[`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md).
+Observations beyond it are orthogonal outliers in the predictor space,
+which the regression outlier map does not show; the score outlier map
+(`plot_outlier_map(fit, map = "score")`) does. The robust \\R^2\\ of the
+model (`R2`) is computed on the observations whose orthogonal and
+residual distances are both below their cut-offs; with several
+responses, it is one minus the ratio of the determinants of the residual
+and total sums of squares and cross-products.
+
 **Number of components.** `components` gives, for 1 to `kmax`
 components, the robust \\R^2\\ of the paper (Remark 7) and the root mean
 squared error, on the observations that are regular in every one of
 these models. They describe the fit to the calibration data; for
 predictions, choose `ncomp` by cross-validation (for example with
-tidymodels).
+tidymodels). These models all come from the same ROBPCA fit, with \\k_0
+= k\_{max} + q\\ components, so the model with `ncomp` components also
+depends on `kmax`. With `kmax = ncomp`, ROBPCA is applied with `ncomp`
+plus \\q\\ components, and `components` stops at `ncomp`.
 
 **Differences from the paper.**
 
@@ -156,7 +174,8 @@ tidymodels).
   predictors (block scaling). The results are returned in the units of
   the responses.
 
-- The cut-off of the orthogonal distances is that of
+- The cut-off of the orthogonal distances, in the ROBPCA step and of the
+  model, is that of
   [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
   (the Wilson-Hilferty approximation of Hubert, Rousseeuw and Vanden
   Branden, 2005), which the paper mentions as an alternative.
@@ -189,6 +208,7 @@ results.
 
 [`predict.specproc_rsimpls()`](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimpls.md),
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md),
+[`step_rsimpls()`](https://christiangoueguel.com/specProc/reference/step_rsimpls.md),
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
 
 ## Author
@@ -211,13 +231,18 @@ fit
 #> Variables:      594
 #> Responses:      1
 #> Components:     4 (robust R2 of 1 to 10 components: 0.211 0.491 0.689 0.761 0.762 0.768 0.767 0.767 0.767 0.775)
+#> Robust R2:      0.738
 #> Residual scale: 0.09176
 #> 
 #> Outlier types:
 #> 
 #>          regular    good leverage vertical outlier     bad leverage 
 #>              243               39               10                8 
+#> 
+#> Orthogonal outliers: 50
 head(predict(fit, spectra[-cal, ]))
 #> [1] 0.4159052 0.5470408 0.7232786 0.6207605 0.8097063 0.1862145
 plot_outlier_map(fit)
+
+plot_outlier_map(fit, map = "score", newdata = spectra[-cal, ])
 ```
