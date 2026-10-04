@@ -127,27 +127,36 @@
 #'
 #' @examples
 #' data(forageLIBS)
-#' # mineral contents (%) of the forage samples, each on its own axis
 #' minerals <- forageLIBS[c("Measurement", "Ca", "Mg", "P", "K", "S")]
-#' adjusted_boxplot(minerals, id = Measurement, ylab = "Content (%)")
+#'
+#' # mineral contents, each on its own axis, the outlying samples named: a
+#' # figure of a journal page width
+#' p <- adjusted_boxplot(minerals, id = Measurement, label_outliers = TRUE,
+#'                       ylab = "Content (%)", base_size = 8)
+#' p
+#' # ggplot2::ggsave("minerals.pdf", p, width = 175, height = 70, units = "mm")
 #'
 #' # the statistics and the outlying samples
 #' res <- adjusted_boxplot(minerals, id = Measurement, plot = FALSE)
 #' res$stats
 #' res$outliers
 #'
+#' # potassium and phosphorus by calcium level, with notches and means: a
+#' # figure of a journal column
+#' minerals$Ca_level <- cut(minerals$Ca, quantile(minerals$Ca, 0:3 / 3),
+#'                          labels = c("Low Ca", "Mid Ca", "High Ca"),
+#'                          include.lowest = TRUE)
+#' p <- adjusted_boxplot(minerals[c("K", "P", "Ca_level")], group = Ca_level,
+#'                       notch = TRUE, show_mean = TRUE, ylab = "Content (%)",
+#'                       title = "Potassium and phosphorus by calcium level",
+#'                       base_size = 8)
+#' p
+#' # ggplot2::ggsave("by_calcium.pdf", p, width = 85, height = 75, units = "mm")
+#'
 #' # trace elements on a logarithmic axis, horizontal, with all the samples
 #' traces <- forageLIBS[c("Fe", "Mn", "Zn")]
 #' adjusted_boxplot(traces, log = TRUE, horizontal = TRUE, points = "all",
 #'                  ylab = "Content (mg/kg)")
-#'
-#' # potassium by calcium level, with notches and means, for a journal column
-#' minerals$Ca_level <- cut(minerals$Ca, quantile(minerals$Ca, 0:3 / 3),
-#'                          labels = c("Low Ca", "Mid Ca", "High Ca"),
-#'                          include.lowest = TRUE)
-#' adjusted_boxplot(minerals[c("K", "P", "Ca_level")], group = Ca_level,
-#'                  notch = TRUE, show_mean = TRUE, ylab = "Content (%)",
-#'                  base_size = 8)
 adjusted_boxplot <- function(x, plot = TRUE, id = NULL, group = NULL,
                              scales = c("free_y", "fixed"),
                              points = c("outliers", "all", "none"), label_outliers = FALSE,
