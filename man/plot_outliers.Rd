@@ -8,52 +8,151 @@ plot_outliers(
   x,
   quan = 1/2,
   alpha = 0.025,
-  show.outlier = TRUE,
-  show.mahal = FALSE
+  plot = TRUE,
+  id = NULL,
+  cutoff = c("adaptive", "quantile"),
+  type = c("scores", "distance"),
+  color_by = c("outlier", "distance", "both"),
+  label_outliers = FALSE,
+  ylab = NULL,
+  title = NULL,
+  caption = TRUE,
+  base_size = 11,
+  show.outlier = deprecated(),
+  show.mahal = deprecated()
 )
 }
 \arguments{
-\item{x}{A matrix or data frame.}
+\item{x}{A matrix or data frame of numeric variables, with optionally the
+column \code{id}.}
 
-\item{quan}{A numeric value, between 0.5 and 1, that specifies the amount of observations which are used for MCD estimations. Default is 0.5.}
+\item{quan}{A numeric value, between 0.5 and 1, the proportion of the
+observations used for the MCD estimates. Default is 0.5 (the largest
+breakdown point).}
 
-\item{alpha}{A numeric value specifying the amount of observations used for calculating the adjusted quantile. Default is 0.025.}
+\item{alpha}{A numeric value between 0 and 1: the quantile
+\eqn{\chi^2_{p, 1-\alpha}} from which the adaptive cutoff is searched
+(or the cutoff itself with \code{cutoff = "quantile"}). Default is 0.025.}
 
-\item{show.outlier}{A logical value, if \code{TRUE} (default), outliers are highlighted in the plot.}
+\item{plot}{A logical: plot (\code{TRUE}, default) or return the table of the
+samples.}
 
-\item{show.mahal}{A logical value, if \code{FALSE} (default), robust Mahalanobis distances are not color-coded in the plot.}
+\item{id}{Optional column of \code{x} (unquoted or as a string) identifying the
+samples, such as sample names: it names the outliers in the table and
+with \code{label_outliers}.}
+
+\item{cutoff}{\code{"adaptive"} (default), the adaptive cutoff of Filzmoser et
+al. (2005), or \code{"quantile"}, the fixed \eqn{\chi^2_{p, 1-\alpha}}
+quantile.}
+
+\item{type}{\code{"scores"} (default), the robust z-scores of each variable, or
+\code{"distance"}, the robust distance of each sample.}
+
+\item{color_by}{The colors of the points: \code{"outlier"} (default), the
+outliers in red and the others in grey; \code{"distance"}, the robust
+distance; or \code{"both"}, the distance, with the outliers as triangles.}
+
+\item{label_outliers}{A logical: label the outliers with their \code{id}, else
+their row number (\code{FALSE}, default). In the panels of robust z-scores,
+only the outliers beyond the univariate limits of the panel are labeled;
+the distance plot names them all.}
+
+\item{ylab}{The title of the value axis. Default is "Robust z-score", or
+"Robust distance" with \code{type = "distance"}.}
+
+\item{title}{The plot title. A long title is split into a title and a
+subtitle.}
+
+\item{caption}{\code{TRUE} (default), a caption saying how the outliers are
+flagged and how to read the plot; \code{FALSE}, no caption; or a caption of
+your own.}
+
+\item{base_size}{The size of the text, in points. Default is 11; use the
+text size of the journal (often 7 to 9 points) for a figure saved at its
+printed size.}
+
+\item{show.outlier, show.mahal}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
+\code{color_by} (\code{"outlier"}, \code{"distance"} or \code{"both"}), and \code{plot = FALSE}
+for the table.}
 }
 \value{
-Depending on the combination of \code{show.outlier} and \code{show.mahal}:
-\itemize{
-\item A \code{ggplot} object with outliers highlighted (if \code{show.outlier = TRUE})
-\item A \code{ggplot} object with Mahalanobis distances color-coded (if \code{show.mahal = TRUE})
-\item A \code{ggplot} object combining both outlier highlighting and Mahalanobis distance color-coding
-(if both \code{show.outlier} and \code{show.mahal} are \code{TRUE})
-\item A tibble containing standardized scores, outlier flags, and robust multivariate Mahalanobis distances
-(if both \code{show.outlier} and \code{show.mahal} are \code{FALSE})
-}
+A \code{ggplot} object, or with \code{plot = FALSE} a tibble with one row per
+sample (without missing values): its \code{row} in \code{x}, its \code{id}, its robust
+Mahalanobis distance \code{mahalanobis}, the \code{cutoff} (on the same scale),
+\code{outlier}, its \code{weight} in the adaptive reweighted estimates (0 for the
+samples at or beyond the adaptive cutoff, 1 for the others), and its
+robust z-score on each variable.
 }
 \description{
 This function creates a visual representation of multivariate outliers using
-a univariate plot.It uses robust covariance estimation methods to identify
-outliers and provides options for displaying the results through various
-plotting styles.
+a univariate plot. It uses robust covariance estimation methods to identify
+outliers, and shows them on each variable, or by their robust distance.
 }
 \details{
-The function uses the Minimum Covariance Determinant (MCD) method to compute robust estimates
-of location and scatter. It then applies an adaptive reweighting step to further improve
-the outlier detection. The results are visualized using \code{ggplot2}, with options to highlight
-outliers and/or color-code points based on their Mahalanobis distances.
+The robust location and scatter of the data are estimated by the Minimum
+Covariance Determinant (MCD, Rousseeuw and Van Driessen, 1999), from which
+the robust Mahalanobis distance of each sample is computed. The outliers
+are the samples whose squared distance exceeds the \strong{adaptive cutoff} of
+Filzmoser, Garrett and Reimann (2005): the tail of the distances is
+compared with the \eqn{\chi^2_p} distribution beyond its \eqn{1 - \alpha}
+quantile, and the cutoff is moved out to where they depart from it. When
+they do not depart from it, no sample is an outlier: unlike a fixed
+quantile, which flags about \eqn{\alpha} of clean data, the adaptive
+cutoff flags (nearly) none. \code{cutoff = "quantile"} uses the fixed
+\eqn{\chi^2_{p, 1-\alpha}} quantile instead. The method follows the
+functions \code{arw()} and \code{aq.plot()} of the mvoutlier package (its
+\code{uni.plot()}, which this plot follows, flags the samples beyond the fixed
+quantile).
+
+The adaptive cutoff exists only when more distances exceed the quantile
+than clean data would give (a proportion of about \eqn{0.24/\sqrt{n}}):
+a single outlier in a small sample, however far, is then not flagged. It
+stands out above the dashed quantile in the distance plot; use
+\code{cutoff = "quantile"} to flag it.
+
+\strong{Robust z-scores} (\code{type = "scores"}, the default). Each variable is
+drawn in its own panel, standardized by the adaptive reweighted location
+and scale (the mean and standard deviation of the samples that are not
+outliers). Each point is a sample, at the same horizontal position in
+every panel, so that a sample can be followed from one variable to the
+next. The outliers are flagged on all the variables jointly: they need
+not be extreme in any single variable, and a sample beyond the dashed
+univariate limits (\eqn{\pm 2.5}) need not be a multivariate outlier.
+
+\strong{Robust distances} (\code{type = "distance"}). The robust distance of each
+sample, in the order of the rows, with the cutoff (solid) and the
+\eqn{\chi^2_{p, 1-\alpha}} quantile (dashed).
+
+Rows with missing values are left out, with a message.
 }
 \examples{
 data(forageLIBS)
 # mineral contents (\%) of the forage samples
-contents <- forageLIBS[c("Ca", "Mg", "P", "K")]
-plot_outliers(contents)
-plot_outliers(contents, show.outlier = FALSE, show.mahal = TRUE)
-# a data frame instead of a plot
-head(plot_outliers(contents, show.outlier = FALSE, show.mahal = FALSE))
+contents <- forageLIBS[c("Measurement", "Ca", "Mg", "P", "K")]
+plot_outliers(contents, id = Measurement)
+
+# the robust distance of each sample, the outliers named
+plot_outliers(contents, id = Measurement, type = "distance", label_outliers = TRUE)
+
+# colored by robust distance, the outliers as triangles
+plot_outliers(contents, id = Measurement, color_by = "both")
+
+# the table of the samples
+res <- plot_outliers(contents, id = Measurement, plot = FALSE)
+res[res$outlier, ]
+}
+\references{
+\itemize{
+\item Filzmoser, P., Garrett, R. G., Reimann, C. (2005). Multivariate outlier
+detection in exploration geochemistry. Computers & Geosciences,
+31(5):579-587
+\item Rousseeuw, P. J., Van Driessen, K. (1999). A fast algorithm for the
+minimum covariance determinant estimator. Technometrics, 41(3):212-223
+}
+}
+\seealso{
+\code{\link[=adjusted_boxplot]{adjusted_boxplot()}} and \code{\link[=generalized_boxplot]{generalized_boxplot()}} for univariate
+outliers.
 }
 \author{
 Christian L. Goueguel

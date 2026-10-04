@@ -94,6 +94,16 @@
     values. The `stats` table gains these values (`n_missing`,
     `median_lower`, `median_upper`, `iqr`, `rcv`, `biweight`,
     `expected_outliers`), and a `tests` table gives the tests.
+* `plot_outliers()` makes figures ready for publication: readable variable
+  names, a "Robust z-score" axis, outliers in red among grey samples
+  ("Regular" and "Outlier"), dashed univariate limits (z = -2.5 and 2.5),
+  and a caption saying how the outliers are flagged and how to read the
+  plot. `type = "distance"` draws the robust distance of each sample with
+  the cutoffs. `id` names the samples, in the table and with
+  `label_outliers`; `color_by` (`"outlier"`, `"distance"` or `"both"`),
+  `plot = FALSE` (the table: row, id, distance, cutoff, outlier, weight and
+  robust z-scores), `title`, `ylab` and `base_size`. Rows with missing values
+  are left out, with a message, instead of stopping.
 * The axis titles of `plot_spectra()` and `plot_fit()` give the units in
   parentheses, as in the other plots: "Wavelength (nm)" and
   "Intensity (arb. units)".
@@ -118,6 +128,15 @@
   follows the angle). The former names still work, with a warning.
 * The `outliers` table of `adjusted_boxplot()` has the columns `row` and
   `out` (the tail), as that of `generalized_boxplot()`.
+* `plot_outliers()` flags the samples beyond the adaptive cutoff of
+  Filzmoser, Garrett and Reimann (2005), as `aq.plot()` of the mvoutlier
+  package, instead of the fixed 97.5% chi-squared quantile, which flags
+  about 2.5% of clean data (the adaptive part had no effect: the cutoff was
+  the smaller of the two). In `forageLIBS`, 29 of the 368 samples are
+  flagged on Ca, Mg, P and K instead of 38. `cutoff = "quantile"` gives the
+  former flags. `show.outlier` and `show.mahal` are deprecated in favor of
+  `color_by` and `plot = FALSE`, and the table gains the columns `row`,
+  `cutoff` and `weight`.
 * The loadings of `robpca()` now have a fixed sign, their largest element
   positive, as those of `macropca()` and `cellpca()`. The signs of loadings
   and scores may differ from those of earlier versions.
