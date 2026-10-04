@@ -17,8 +17,16 @@ outlier detection and exploration: robust principal component analysis
 (Hubert, Rousseeuw and Vanden Branden (2005)
 [doi:10.1198/004017004000000563](https://doi.org/10.1198/004017004000000563)
 ), robust partial least squares regression (Hubert and Vanden Branden
-(2003) [doi:10.1002/cem.822](https://doi.org/10.1002/cem.822) ),
-detection of deviating cells (Rousseeuw and Van den Bossche (2018)
+(2003) [doi:10.1002/cem.822](https://doi.org/10.1002/cem.822) ) and
+principal component regression (Hubert and Verboven (2003)
+[doi:10.1002/cem.783](https://doi.org/10.1002/cem.783) ) with their
+robust cross-validation (Engelen and Hubert (2005)
+[doi:10.1016/j.aca.2005.01.015](https://doi.org/10.1016/j.aca.2005.01.015)
+), robust classification by SIMCA (Vanden Branden and Hubert (2005)
+[doi:10.1016/j.chemolab.2005.03.002](https://doi.org/10.1016/j.chemolab.2005.03.002)
+) and discriminant analysis (Hubert and Van Driessen (2004)
+[doi:10.1016/S0167-9473(02)00299-2](https://doi.org/10.1016/S0167-9473%2802%2900299-2)
+), detection of deviating cells (Rousseeuw and Van den Bossche (2018)
 [doi:10.1080/00401706.2017.1340909](https://doi.org/10.1080/00401706.2017.1340909)
 ), PCA with cellwise outliers and missing values (MacroPCA; Hubert,
 Rousseeuw and Van den Bossche (2019)
@@ -28,9 +36,10 @@ Rousseeuw and Van den Bossche (2019)
 [doi:10.1007/s10994-021-05960-5](https://doi.org/10.1007/s10994-021-05960-5)
 ), and self-organizing maps (Kohonen (1982)
 [doi:10.1007/BF00337288](https://doi.org/10.1007/BF00337288) ).
-Preprocessing steps are also available as 'recipes' steps for
-'tidymodels' workflows. Computationally intensive steps are implemented
-in 'C++' via 'Rcpp' and 'RcppEigen'.
+Preprocessing steps are also available as 'recipes' steps, and the
+robust models as 'parsnip' models and engines, for 'tidymodels'
+workflows. Computationally intensive steps are implemented in 'C++' via
+'Rcpp' and 'RcppEigen'.
 
 ## See also
 

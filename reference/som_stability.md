@@ -53,8 +53,11 @@ or more epochs.
 ``` r
 # \donttest{
 data(forageLIBS)
+# the 380-430 nm window (Ca II H and K lines), faster than all the channels
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 set.seed(1)
-som_stability(forageLIBS[-(1:14)], runs = 5)$stability
-#> [1] 0.9406537
+som_stability(spectra, runs = 5)$stability
+#> [1] 0.9546112
 # }
 ```

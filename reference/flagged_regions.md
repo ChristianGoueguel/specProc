@@ -87,28 +87,20 @@ Christian L. Goueguel
 
 ``` r
 # \donttest{
-spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()
-minerals <- forageLIBS |> dplyr::select(3:14) |> names()
+data(forageLIBS)
+# the 380-430 nm window (Ca II H and K lines), faster than all the channels
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 set.seed(1)
-fit <- forageLIBS |>
-  dplyr::select(-dplyr::all_of(c(spectra_id, minerals))) |>
-  center() |>
-  macropca(k = 3)
+fit <- macropca(center(spectra), k = 3)
 
 flagged_regions(fit)
-#> # A tibble: 57 × 7
-#>    start   end  peak channels share mean_share direction
-#>    <dbl> <dbl> <dbl>    <int> <dbl>      <dbl> <chr>    
-#>  1  399.  399.  399.        1 0.397     0.397  lower    
-#>  2  219.  219.  219.        1 0.378     0.378  higher   
-#>  3  393.  393.  393.        2 0.318     0.284  lower    
-#>  4  397.  397.  397.        1 0.204     0.204  lower    
-#>  5  280.  280.  280.        1 0.177     0.177  lower    
-#>  6  793.  793.  793.        2 0.168     0.148  higher   
-#>  7  323.  324.  323.        7 0.144     0.0967 higher   
-#>  8  335.  335.  335.        2 0.128     0.125  higher   
-#>  9  338.  338.  338.        1 0.128     0.128  higher   
-#> 10  387.  388.  387.        3 0.128     0.0933 higher   
-#> # ℹ 47 more rows
+#> # A tibble: 4 × 7
+#>   start   end  peak channels share mean_share direction
+#>   <dbl> <dbl> <dbl>    <int> <dbl>      <dbl> <chr>    
+#> 1  399.  399.  399.        1 0.402      0.402 lower    
+#> 2  393.  393.  393.        2 0.318      0.236 lower    
+#> 3  397.  397.  397.        1 0.160      0.160 lower    
+#> 4  403.  403.  403.        2 0.106      0.106 mixed    
 # }
 ```

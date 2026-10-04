@@ -393,7 +393,7 @@
   and
   [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
   failed, or flagged most observations as orthogonal outliers, when `k`
-  equalled the rank of the data (for example `k = 5` with 5 variables,
+  equaled the rank of the data (for example `k = 5` with 5 variables,
   `k = n - 1` with more variables than observations, or a `k` chosen by
   `var_explained` for data with few variables): the orthogonal distances
   to a subspace that is the whole space are rounding errors, and their

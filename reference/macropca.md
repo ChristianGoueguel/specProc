@@ -192,25 +192,26 @@ Christian L. Goueguel
 
 ``` r
 # \donttest{
+data(forageLIBS)
+# the 380-430 nm window (Ca II H and K lines), faster than all the channels
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 set.seed(1)
-# LIBS spectra of forage samples
-minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
-forageLIBS |>
-  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+spectra |>
   center() |>
   macropca() |>
   print()
 #> Robust PCA for cellwise and casewise outliers (MacroPCA)
 #> 
 #> Observations:   368 (h = 189)
-#> Variables:      7152
-#> Components:     3
-#> Eigenvalues:    1.934e+09 5.125e+08 1.366e+08
-#> Flagged cells:  60069
+#> Variables:      594
+#> Components:     2
+#> Eigenvalues:    522415940  39758584
+#> Flagged cells:  6561
 #> 
 #> Outlier types:
 #> 
 #>            regular      good leverage orthogonal outlier       bad leverage 
-#>                267                  9                 77                 15 
+#>                246                  8                 71                 43 
 # }
 ```
