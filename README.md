@@ -214,6 +214,32 @@ Contrasts between preprocessing steps and models:
 | C I + wavelet + PLS vs C I + PLS | 0.0001 | 12 / 25 | 0.96 |
 | C I + wavelet + SVR vs C I + wavelet + PLS | 0.0035 | 5 / 25 | 0.36 |
 
+## Citation
+
+If you use specProc in a publication, please cite it. In R,
+`citation("specProc")` gives the reference of the installed version:
+
+> Goueguel, C. L. (2026). *specProc: Preprocessing Tools for Laser-Induced
+> Breakdown Spectroscopy*. R package version 0.8.3.
+> <https://github.com/ChristianGoueguel/specProc>
+
+A BibTeX entry for LaTeX users:
+
+``` bibtex
+@Manual{specProc,
+  title  = {specProc: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy},
+  author = {Christian L. Goueguel},
+  year   = {2026},
+  note   = {R package version 0.8.3},
+  url    = {https://github.com/ChristianGoueguel/specProc},
+}
+```
+
+Replace the version and year with those of the version you used
+(`packageVersion("specProc")`). Please also cite the original papers of the
+methods you use, listed in the References section of their help pages (for
+example, `?robpca` or `?rsimpls`).
+
 ## License
 
 MIT © Christian L. Goueguel
