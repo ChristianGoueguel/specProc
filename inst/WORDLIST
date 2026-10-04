@@ -93,11 +93,13 @@ Faddeeva
 Fearn
 Ferré
 Filzmoser
+Française
 GLSW
 Gaithersburg
 Galindo
 Gaudiuso
 Gebhardt
+Geosciences
 Giacomo
 Gigosos
 Gnanadesikan
@@ -128,6 +130,7 @@ Iglewicz
 Intell
 Interferent
 Interscience
+Jann
 Johansson
 Jong
 Josefson
@@ -177,6 +180,7 @@ Mandel's
 Marquardt
 Massart
 Maurel
+McGill
 McWhirter
 Medcouple
 Megavariate
@@ -247,6 +251,7 @@ Rastelli
 Raymaekers
 Rcpp
 RcppEigen
+Reimann
 Reweighting
 Reynkens
 Ricoux
@@ -281,10 +286,13 @@ Sjöblom
 Skrondal
 Smilde
 Snipen
+Société
 Sparsification
 Spectrochimica
 Spectrosc
 Stahel
+Stata
+Statistique
 Struyf
 Svensson
 Syst
@@ -331,10 +339,12 @@ Zeng
 Zhao
 Zorzetti
 Zürich
+aca
 affine
 al
 analyte
 arPLS
+arb
 arxiv
 autofluorescence
 autoionizing
@@ -350,6 +360,7 @@ cellWise
 cellwise
 cem
 chatterjee
+chemolab
 chemometric
 codebook
 compositional
@@ -372,6 +383,8 @@ extremal
 extremum
 forcats
 ggplot
+ggrepel
+ggsci
 grey
 greys
 hayes
@@ -404,12 +417,14 @@ mixOmics
 multiplet
 multiplets
 multiresolution
+mvoutlier
 na
 natively
 nd
 nm
 nonlinearly
 normalizations
+notchlower
 orthogonalization
 orthogonalize
 orthonormalized
@@ -423,6 +438,7 @@ plotly
 pls
 pre
 preprocess
+ragg
 redescending
 reweighting
 ropls

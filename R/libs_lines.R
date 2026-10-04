@@ -276,7 +276,6 @@ stage_traces <- function(segments) {
   if (nrow(segments) == 0) return(list())
   lapply(levels(droplevels(segments$stage_label)), function(stage) {
     s <- segments[segments$stage_label == stage, ]
-    n <- nrow(s)
     list(
       x = as.vector(rbind(s$x, s$x, NA)),
       y = as.vector(rbind(0, s$height, NA)),

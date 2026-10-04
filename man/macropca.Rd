@@ -122,11 +122,12 @@ iteratively by the fit before their distances are computed.
 }
 \examples{
 \donttest{
+data(forageLIBS)
+# the 380-430 nm window (Ca II H and K lines), faster than all the channels
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 set.seed(1)
-# LIBS spectra of forage samples
-minerals <- c("Ca", "Cl", "Cu", "Fe", "Mg", "Mn", "Mo", "P", "K", "Na", "S", "Zn")
-forageLIBS |>
-  dplyr::select(-Measurement, -Sample, -dplyr::all_of(minerals)) |>
+spectra |>
   center() |>
   macropca() |>
   print()

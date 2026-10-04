@@ -29,10 +29,10 @@
 #' summary_stats(forageLIBS, var = c("Ca", "K"), robust = TRUE)
 summary_stats <- function(x, var = NULL, digits = 2, robust = FALSE, drop.na = TRUE) {
 
-  if (is.null(x) == TRUE) {
+  if (is.null(x)) {
     stop("Data must be provided")
   }
-  if (is.data.frame(x) == FALSE & tibble::is_tibble(x) == FALSE) {
+  if (!is.data.frame(x)) {
     stop("Data must be of class data.frame, tbl_df, or tbl")
   }
   if (!is.null(var)) {

@@ -272,7 +272,7 @@
   channels of overlapping detectors in a zigzag (near 766 nm, on the K I
   766.49 nm line). Each detector is now drawn as its own line.
 * `robpca()` and `rospca()` failed, or flagged most observations as
-  orthogonal outliers, when `k` equalled the rank of the data (for example
+  orthogonal outliers, when `k` equaled the rank of the data (for example
   `k = 5` with 5 variables, `k = n - 1` with more variables than
   observations, or a `k` chosen by `var_explained` for data with few
   variables): the orthogonal distances to a subspace that is the whole space

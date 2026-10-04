@@ -36,8 +36,11 @@ Low values suggest a smaller grid, a larger final radius or more epochs.
 \examples{
 \donttest{
 data(forageLIBS)
+# the 380-430 nm window (Ca II H and K lines), faster than all the channels
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 set.seed(1)
-som_stability(forageLIBS[-(1:14)], runs = 5)$stability
+som_stability(spectra, runs = 5)$stability
 }
 }
 \seealso{

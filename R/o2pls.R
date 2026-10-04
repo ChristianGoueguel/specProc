@@ -119,7 +119,6 @@ o2pls <- function(x, y, ncomp = 1, nx = 1, ny = 0, center = TRUE, scale = FALSE)
   p_joint <- crossprod(ox$m, j$t) %*% solve(crossprod(j$t))
   q_joint <- crossprod(oy$m, j$u) %*% solve(crossprod(j$u))
 
-  comp <- paste0("comp", seq_len(ncomp))
   named <- function(m, prefix) {
     if (is.null(m)) return(NULL)
     colnames(m) <- paste0(prefix, seq_len(ncol(m)))

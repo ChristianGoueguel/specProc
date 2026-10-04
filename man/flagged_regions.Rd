@@ -55,13 +55,12 @@ are the candidates, from the nearest to the peak.
 }
 \examples{
 \donttest{
-spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()
-minerals <- forageLIBS |> dplyr::select(3:14) |> names()
+data(forageLIBS)
+# the 380-430 nm window (Ca II H and K lines), faster than all the channels
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 set.seed(1)
-fit <- forageLIBS |>
-  dplyr::select(-dplyr::all_of(c(spectra_id, minerals))) |>
-  center() |>
-  macropca(k = 3)
+fit <- macropca(center(spectra), k = 3)
 
 flagged_regions(fit)
 }

@@ -133,7 +133,6 @@ orthogonalize <- function(t, y) {
 # Wold and Sjoblom OSC: iterate between orthogonalizing the score to y and
 # re-expressing it as a linear combination of X, then deflate X.
 osc_iterative <- function(x, y, ncomp, tol, max.iter, weight_fun) {
-  n <- nrow(x)
   ws <- ps <- ts <- vector("list", ncomp)
   for (i in seq_len(ncomp)) {
     sv <- svd(x, nu = 1, nv = 0)

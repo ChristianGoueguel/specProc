@@ -255,7 +255,6 @@ fit_pair <- function(aug, curve, summary, label, style) {
   x <- y <- .fitted <- .resid <- value <- peak <- NULL
   peaks <- summary$peaks
   multi <- nrow(peaks) > 1
-  size <- style$base_size / 11
   top <- ggplot2::ggplot(aug, ggplot2::aes(x = x, y = y)) +
     ggplot2::geom_hline(yintercept = summary$y0, colour = "grey55", linewidth = 0.3,
                         linetype = "dotted")

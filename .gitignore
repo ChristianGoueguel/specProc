@@ -5,3 +5,5 @@
 inst/doc
 docs
 data-raw/forageLIBS.csv
+.DS_Store
+Rplots.pdf
