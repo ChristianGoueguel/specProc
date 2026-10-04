@@ -10,10 +10,22 @@ whose class models resist outlying spectra of the training data.
 ## Usage
 
 ``` r
-simca(mode = "classification", num_comp = NULL, engine = "rsimca")
+simca(
+  mode = "classification",
+  num_comp = NULL,
+  gamma = NULL,
+  engine = "rsimca"
+)
 
 # S3 method for class 'simca'
-update(object, parameters = NULL, num_comp = NULL, fresh = FALSE, ...)
+update(
+  object,
+  parameters = NULL,
+  num_comp = NULL,
+  gamma = NULL,
+  fresh = FALSE,
+  ...
+)
 ```
 
 ## Arguments
@@ -26,6 +38,11 @@ update(object, parameters = NULL, num_comp = NULL, fresh = FALSE, ...)
 
   The number of components of the PCA model of each class, or `NULL`
   (default) to let the engine choose them.
+
+- gamma:
+
+  The weight of the orthogonal distances in the classification rule,
+  between 0 and 1, or `NULL` (default) for 0.5.
 
 - engine:
 
@@ -62,18 +79,27 @@ a workflow, and can be tuned and resampled like any parsnip model. It
 needs the parsnip package, and the `"rsimca"` engine is available once
 parsnip and specProc are both loaded.
 
-## Main argument
+## Main arguments
 
-`num_comp` is the number of components of the robust PCA of each class
-(`ncomp` of
-[`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md)),
-the same for all the classes. With `NULL` (the default), each class gets
-the number chosen by
-[`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
-from the proportion of variance explained. It can be tuned with
+- `num_comp` is the number of components of the robust PCA of each class
+  (`ncomp` of
+  [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md)),
+  the same for all the classes. With `NULL` (the default), each class
+  gets the number chosen by
+  [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
+  from the proportion of variance explained.
+
+- `gamma` is the weight of the orthogonal distances, against the score
+  distances, in the classification rule (`gamma` of
+  [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md)).
+  With `NULL` (the default), it is 0.5.
+
+Both can be tuned with
 [`tune::tune()`](https://hardhat.tidymodels.org/reference/tune.html),
 using
-[`dials::num_comp()`](https://dials.tidymodels.org/reference/num_comp.html).
+[`dials::num_comp()`](https://dials.tidymodels.org/reference/num_comp.html)
+and
+[`simca_gamma()`](https://christiangoueguel.com/specProc/reference/simca_gamma.md).
 
 ## Engine arguments
 
@@ -81,9 +107,8 @@ The other arguments of
 [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md)
 are set with
 [`parsnip::set_engine()`](https://parsnip.tidymodels.org/reference/set_engine.html):
-`gamma` (the weight of the orthogonal distances in the classification
-rule, default 0.5), `squared`, `kmax`, `alpha`, `var_explained`,
-`prior`, `ndir` and `nsamp`.
+`squared`, `kmax`, `alpha`, `var_explained`, `prior`, `ndir` and
+`nsamp`.
 
 ## Predictions
 
@@ -108,7 +133,8 @@ reproducible results.
 ## See also
 
 [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md),
-[`predict.specproc_rsimca()`](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimca.md)
+[`predict.specproc_rsimca()`](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimca.md),
+[`simca_gamma()`](https://christiangoueguel.com/specProc/reference/simca_gamma.md)
 
 ## Author
 
@@ -123,16 +149,17 @@ wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 dat <- forageLIBS[which(wl > 380 & wl < 430)]
 # forage samples with low and high calcium
 dat$level <- cut(forageLIBS$Ca, c(-Inf, 0.6, Inf), labels = c("low", "high"))
-spec <- simca(num_comp = 3) |>
-  set_engine("rsimca", gamma = 0.5)
+spec <- simca(num_comp = 3, gamma = 0.5) |>
+  set_engine("rsimca", alpha = 0.75)
 spec
 #> SIMCA Model Specification (classification)
 #> 
 #> Main Arguments:
 #>   num_comp = 3
+#>   gamma = 0.5
 #> 
 #> Engine-Specific Arguments:
-#>   gamma = 0.5
+#>   alpha = 0.75
 #> 
 #> Computational engine: rsimca 
 #> 

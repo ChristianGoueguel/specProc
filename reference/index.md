@@ -122,6 +122,8 @@ principal component scores).
 - [`simca()`](https://christiangoueguel.com/specProc/reference/simca.md)
   [`update(`*`<simca>`*`)`](https://christiangoueguel.com/specProc/reference/simca.md)
   : SIMCA Classification Model (parsnip)
+- [`simca_gamma()`](https://christiangoueguel.com/specProc/reference/simca_gamma.md)
+  : SIMCA Distance Weighting Parameter
 - [`robust_da()`](https://christiangoueguel.com/specProc/reference/robust_da.md)
   : Robust Linear and Quadratic Discriminant Analysis
 - [`predict(`*`<specproc_robust_da>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_robust_da.md)
