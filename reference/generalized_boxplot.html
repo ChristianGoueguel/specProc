@@ -53,16 +53,35 @@ as proposed by Bruffaerts <em>et al</em>. (2014).</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">generalized_boxplot</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
-<span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">pnorm</a></span><span class="op">(</span><span class="op">-</span><span class="fl">4</span> <span class="op">*</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">qnorm</a></span><span class="op">(</span><span class="fl">0.75</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  p <span class="op">=</span> <span class="fl">0.9</span>,</span>
 <span>  plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  xlabels.angle <span class="op">=</span> <span class="fl">90</span>,</span>
-<span>  xlabels.vjust <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  xlabels.hjust <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  box.width <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  id <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  group <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scales <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"free_y"</span>, <span class="st">"fixed"</span><span class="op">)</span>,</span>
+<span>  points <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"outliers"</span>, <span class="st">"all"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
+<span>  label_outliers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  show_n <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  show_mean <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  horizontal <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  log <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  fill <span class="op">=</span> <span class="st">"grey85"</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  caption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  base_size <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>  x_labels_angle <span class="op">=</span> <span class="fl">0</span>,</span>
+<span>  box_width <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  notch <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  notchwidth <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  staplewidth <span class="op">=</span> <span class="fl">0.5</span></span>
+<span>  notch_width <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  staple_width <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  xlabels.angle <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  xlabels.vjust <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  xlabels.hjust <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  box.width <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  notchwidth <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  staplewidth <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -71,57 +90,141 @@ as proposed by Bruffaerts <em>et al</em>. (2014).</p>
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A numeric data frame or tibble.</p></dd>
+<dd><p>A data frame (or matrix) of numeric variables, with optionally
+the columns <code>id</code> and <code>group</code>.</p></dd>
 
 
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
-<dd><p>A scalar, between 0 and 1 that specifies the desired detection rate of atypical values.</p></dd>
+<dd><p>The expected proportion of observations outside the fences in
+clean data, between 0 and 1. Default is \(2\,\Phi(-4 z_{0.75}) \approx
+0.007\), as Tukey's boxplot for normal data.</p></dd>
 
 
 <dt id="arg-p">p<a class="anchor" aria-label="anchor" href="#arg-p"></a></dt>
-<dd><p>A scalar, between 0.5 and 1 that specifies the quantile order for estimating g and h.</p></dd>
+<dd><p>The quantile order, between 0.5 and 1, of the estimation of g and
+h. Default is 0.9 (a breakdown point of 10%).</p></dd>
 
 
 <dt id="arg-plot">plot<a class="anchor" aria-label="anchor" href="#arg-plot"></a></dt>
-<dd><p>Logical value indicating whether to plot the boxplot or return the boxplot statistics.</p></dd>
+<dd><p>A logical value indicating whether to plot the boxplot (default
+is <code>TRUE</code>) or to return its statistics.</p></dd>
 
 
-<dt id="arg-xlabels-angle">xlabels.angle<a class="anchor" aria-label="anchor" href="#arg-xlabels-angle"></a></dt>
-<dd><p>A numeric value specifying the angle (in degrees) for x-axis labels (default is 90).</p></dd>
+<dt id="arg-id">id<a class="anchor" aria-label="anchor" href="#arg-id"></a></dt>
+<dd><p>Optional column of <code>x</code> (unquoted or as a string) identifying the
+observations, such as sample names: it names the outlying observations
+in the <code>outliers</code> table and with <code>label_outliers</code>.</p></dd>
 
 
-<dt id="arg-xlabels-vjust">xlabels.vjust<a class="anchor" aria-label="anchor" href="#arg-xlabels-vjust"></a></dt>
-<dd><p>A numeric value specifying the vertical justification of x-axis labels (default is 1).</p></dd>
+<dt id="arg-group">group<a class="anchor" aria-label="anchor" href="#arg-group"></a></dt>
+<dd><p>Optional column of <code>x</code> (unquoted or as a string) of groups,
+such as sites or treatments: the boxes of each group are drawn side by
+side, with their own statistics. Rows with a missing group are left out.</p></dd>
 
 
-<dt id="arg-xlabels-hjust">xlabels.hjust<a class="anchor" aria-label="anchor" href="#arg-xlabels-hjust"></a></dt>
-<dd><p>A numeric value specifying the horizontal justification of x-axis labels (default is 1).</p></dd>
+<dt id="arg-scales">scales<a class="anchor" aria-label="anchor" href="#arg-scales"></a></dt>
+<dd><p><code>"free_y"</code> (default), one panel per variable with its own
+value axis, or <code>"fixed"</code>, a common value axis.</p></dd>
 
 
-<dt id="arg-box-width">box.width<a class="anchor" aria-label="anchor" href="#arg-box-width"></a></dt>
-<dd><p>A numeric value specifying the width of the boxplot (default is 0.5).</p></dd>
+<dt id="arg-points">points<a class="anchor" aria-label="anchor" href="#arg-points"></a></dt>
+<dd><p>The observations drawn: <code>"outliers"</code> (default), the
+outlying ones; <code>"all"</code>; or <code>"none"</code>.</p></dd>
+
+
+<dt id="arg-label-outliers">label_outliers<a class="anchor" aria-label="anchor" href="#arg-label-outliers"></a></dt>
+<dd><p>A logical: label the outlying observations with
+their <code>id</code>, else their row number (<code>FALSE</code>, default).</p></dd>
+
+
+<dt id="arg-show-n">show_n<a class="anchor" aria-label="anchor" href="#arg-show-n"></a></dt>
+<dd><p>A logical: write the number of values below each box
+(<code>TRUE</code>, default).</p></dd>
+
+
+<dt id="arg-show-mean">show_mean<a class="anchor" aria-label="anchor" href="#arg-show-mean"></a></dt>
+<dd><p>A logical: mark the mean of each box with a diamond
+(<code>FALSE</code>, default).</p></dd>
+
+
+<dt id="arg-horizontal">horizontal<a class="anchor" aria-label="anchor" href="#arg-horizontal"></a></dt>
+<dd><p>A logical: horizontal boxes (<code>FALSE</code>, default), suited
+to many variables or long names.</p></dd>
+
+
+<dt id="arg-log">log<a class="anchor" aria-label="anchor" href="#arg-log"></a></dt>
+<dd><p>A logical: a logarithmic value axis (<code>FALSE</code>, default), for
+variables spanning orders of magnitude. The statistics are those of the
+data, not of their logarithm.</p></dd>
+
+
+<dt id="arg-fill">fill<a class="anchor" aria-label="anchor" href="#arg-fill"></a></dt>
+<dd><p>The fill color of the boxes (default <code>"grey85"</code>), or one color
+per group (or per variable without <code>group</code>).</p></dd>
+
+
+<dt id="arg-xlab-ylab">xlab, ylab<a class="anchor" aria-label="anchor" href="#arg-xlab-ylab"></a></dt>
+<dd><p>The titles of the axis of the variables (or groups) and of
+the value axis. Default is none.</p></dd>
+
+
+<dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
+<dd><p>The plot title. A long title is split into a title and a
+subtitle.</p></dd>
+
+
+<dt id="arg-caption">caption<a class="anchor" aria-label="anchor" href="#arg-caption"></a></dt>
+<dd><p><code>TRUE</code> (default), a caption naming the boxplot and its
+whiskers; <code>FALSE</code>, no caption; or a caption of your own.</p></dd>
+
+
+<dt id="arg-base-size">base_size<a class="anchor" aria-label="anchor" href="#arg-base-size"></a></dt>
+<dd><p>The size of the text, in points. Default is 11.</p></dd>
+
+
+<dt id="arg-x-labels-angle">x_labels_angle<a class="anchor" aria-label="anchor" href="#arg-x-labels-angle"></a></dt>
+<dd><p>The angle (in degrees) of the labels below the
+boxes. Default is 0 (horizontal).</p></dd>
+
+
+<dt id="arg-box-width">box_width<a class="anchor" aria-label="anchor" href="#arg-box-width"></a></dt>
+<dd><p>The width of the boxes (default 0.5).</p></dd>
 
 
 <dt id="arg-notch">notch<a class="anchor" aria-label="anchor" href="#arg-notch"></a></dt>
-<dd><p>A logical value indicating whether to display a notched boxplot (default is <code>FALSE</code>).</p></dd>
+<dd><p>A logical value indicating whether to draw notches (default
+is <code>FALSE</code>): the notch spans the median \(\pm 1.58\,\text{IQR}/\sqrt{n}\)
+(McGill et al., 1978); two medians whose notches do not overlap differ
+roughly at the 5% level.</p></dd>
 
 
-<dt id="arg-notchwidth">notchwidth<a class="anchor" aria-label="anchor" href="#arg-notchwidth"></a></dt>
-<dd><p>A numeric value specifying the width of the notch relative to the body of the boxplot (default is 0.5).</p></dd>
+<dt id="arg-notch-width">notch_width<a class="anchor" aria-label="anchor" href="#arg-notch-width"></a></dt>
+<dd><p>The width of the notch relative to the box (default
+0.5).</p></dd>
 
 
-<dt id="arg-staplewidth">staplewidth<a class="anchor" aria-label="anchor" href="#arg-staplewidth"></a></dt>
-<dd><p>A numeric value specifying the width of staples at the ends of the whiskers.</p></dd>
+<dt id="arg-staple-width">staple_width<a class="anchor" aria-label="anchor" href="#arg-staple-width"></a></dt>
+<dd><p>The width of the staples at the ends of the whiskers,
+relative to the box (default 0.5).</p></dd>
+
+
+<dt id="arg-xlabels-angle-xlabels-vjust-xlabels-hjust-box-width-notchwidth-staplewidth">xlabels.angle, xlabels.vjust, xlabels.hjust, box.width, notchwidth, staplewidth<a class="anchor" aria-label="anchor" href="#arg-xlabels-angle-xlabels-vjust-xlabels-hjust-box-width-notchwidth-staplewidth"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>x_labels_angle</code>, <code>box_width</code>,
+<code>notch_width</code> and <code>staple_width</code>; the justification of the labels now
+follows their angle.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
 
-<ul><li><p>If <code>plot = TRUE</code>, returns a <code>ggplot2</code> object containing the generalized boxplot.</p></li>
-<li><p>If <code>plot = FALSE</code>, returns a list of tibbles: <code>stats</code>, with the whisker
-ends (<code>lower</code>, <code>upper</code>: the most extreme observations within the fences),
-quartiles, median, fences and the estimated g and h parameters of each variable,
-and <code>outliers</code>, with the potential outliers (<code>out</code> gives the tail).</p></li>
+<ul><li><p>If <code>plot = TRUE</code>, a <code>ggplot2</code> object.</p></li>
+<li><p>If <code>plot = FALSE</code>, a list of two tibbles: <code>stats</code>, with one row per
+variable (and group): the number of values <code>n</code>, the whisker ends
+<code>lower</code> and <code>upper</code> (the most extreme values within the fences), the
+quartiles <code>q1</code> and <code>q3</code>, the <code>median</code>, the fences, the notch limits,
+the estimated <code>g</code> and <code>h</code>, the <code>mean</code> and the number of outlying values
+<code>n_outliers</code>; and <code>outliers</code>, with the outlying values, their <code>row</code> in
+<code>x</code>, their <code>id</code> and their tail <code>out</code> (<code>"lower"</code> or <code>"upper"</code>).</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -130,13 +233,45 @@ g-and-h parametric distribution to model the underlying data structure,
 particularly for asymmetric or long-tailed datasets, providing a more nuanced
 and informative summary of the data's central tendency, spread, and potential
 outliers.</p>
+<p>The data \(x_i\) are first mapped, preserving their ranks, into (0, 1)
+by \(r_i = (\tilde{x}_i - \min_j \tilde{x}_j + 0.1) /
+(\max_j \tilde{x}_j - \min_j \tilde{x}_j + 0.2)\), with
+\(\tilde{x}_i = (x_i - \text{median}) / \text{IQR}\), and then onto the
+real line by \(w_i = \Phi^{-1}(r_i)\). The \(w_i\), standardized by
+their median and their interquartile range divided by
+\(z_{0.75} - z_{0.25} = 1.349\), are fitted by a Tukey g-and-h
+distribution, whose skewness \(g\) and tail heaviness \(h\) are
+estimated from the quantiles of orders \(p\) and \(1 - p\). The fences
+are the quantiles of orders \(\alpha/2\) and \(1 - \alpha/2\) of the
+fitted distribution, mapped back to the scale of the data: a proportion
+\(\alpha\) of the observations of a clean distribution, of whatever
+skewness and tails, is expected outside. The default \(\alpha =
+2\,\Phi(-4 z_{0.75}) \approx 0.7\%\), the rate of Tukey's boxplot for normal
+data, is that of the authors' implementation (the Stata command <code>robbox</code>
+of Jann, Verardi and Vermandele). The fences are not inside the box, and
+the whiskers end at the most extreme observations within the fences.</p>
+<p>The outlying observations are therefore <em>atypical at the rate</em>
+\(\alpha\): about \(\alpha n\) of them are expected in clean data, so
+that with a large \(\alpha\) (such as 5%) many flagged observations are
+not errors. As \(h\) may be negative (tails lighter than normal), where
+the g-and-h transform turns back before the \(\alpha/2\) quantile the
+fence is its extreme value.</p>
+<p>The layout, the points and the options for publication figures are those
+of <code><a href="adjusted_boxplot.html">adjusted_boxplot()</a></code>: see its details.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
 
 <ul><li><p>Bruffaerts, C., Verardi, V., Vermandele, C. (2014). A generalized boxplot for
 skewed and heavy-tailed distributions. Statistics and Probability Letters 95(C):110–117</p></li>
+<li><p>Verardi, V., Vermandele, C. (2016). Outlier identification for skewed and/or
+heavy-tailed unimodal multivariate distributions. Journal de la Société
+Française de Statistique, 157(2):90–114</p></li>
 </ul></div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="adjusted_boxplot.html">adjusted_boxplot()</a></code></p></div>
+    </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
     <p>Christian L. Goueguel</p>
@@ -146,35 +281,26 @@ skewed and heavy-tailed distributions. Statistics and Probability Letters 95(C):
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># mineral contents (%) of the forage samples</span></span></span>
-<span class="r-in"><span><span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ca"</span>, <span class="st">"Mg"</span>, <span class="st">"P"</span>, <span class="st">"K"</span>, <span class="st">"S"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">minerals</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Measurement"</span>, <span class="st">"Ca"</span>, <span class="st">"Mg"</span>, <span class="st">"P"</span>, <span class="st">"K"</span>, <span class="st">"S"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">minerals</span>, id <span class="op">=</span> <span class="va">Measurement</span>, ylab <span class="op">=</span> <span class="st">"Content (%)"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="generalized_boxplot-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ca"</span>, <span class="st">"Mg"</span>, <span class="st">"P"</span>, <span class="st">"K"</span>, <span class="st">"S"</span><span class="op">)</span><span class="op">]</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $stats</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 10</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   variable lower    q1 median    q3 upper lower_fence upper_fence       g      h</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Ca       0.372 0.515  0.629 0.772 1.08        0.359       1.09   0.167  0     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Mg       0.116 0.172  0.204 0.240 0.315       0.115       0.317  0.136  0.063<span style="text-decoration: underline;">6</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> P        0.162 0.219  0.260 0.300 0.393       0.160       0.394  0.097<span style="text-decoration: underline;">6</span> 0.015<span style="text-decoration: underline;">4</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> K        1.04  1.72   2.01  2.38  3.04        1.02        3.10  -<span style="color: #BB0000;">0.030</span><span style="color: #BB0000; text-decoration: underline;">9</span> 0.085<span style="text-decoration: underline;">1</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> S        0.14  0.17   0.2   0.23  0.29        0.132       0.290 -<span style="color: #BB0000;">0.096</span><span style="color: #BB0000; text-decoration: underline;">1</span> 0     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $outliers</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 101 × 3</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    variable out   value</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> Ca       lower 0.173</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> Ca       lower 0.292</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> Ca       lower 0.313</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> Ca       lower 0.323</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> Ca       lower 0.337</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> Ca       lower 0.342</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> Ca       lower 0.342</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> Ca       lower 0.347</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> Ca       lower 0.353</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> Ca       lower 0.354</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 91 more rows</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">minerals</span>, id <span class="op">=</span> <span class="va">Measurement</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">res</span><span class="op">$</span><span class="va">stats</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 15</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   variable     n  lower    q1 median    q3 upper lower_fence upper_fence</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Ca         368 0.337  0.515  0.629 0.772 1.12       0.334        1.19 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Mg         368 0.091<span style="text-decoration: underline;">9</span> 0.172  0.204 0.240 0.342      0.085<span style="text-decoration: underline;">0</span>       0.354</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> P          368 0.135  0.219  0.260 0.300 0.436      0.132        0.447</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> K          368 0.829  1.72   2.01  2.38  3.56       0.668        3.58 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> S          366 0.13   0.17   0.2   0.23  0.31       0.122        0.316</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 6 more variables: notch_lower &lt;dbl&gt;, notch_upper &lt;dbl&gt;, g &lt;dbl&gt;, h &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   mean &lt;dbl&gt;, n_outliers &lt;int&gt;</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># a detection rate of 5%: about 18 of the 368 samples are expected to be</span></span></span>
+<span class="r-in"><span><span class="co"># flagged in clean data</span></span></span>
+<span class="r-in"><span><span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">minerals</span>, id <span class="op">=</span> <span class="va">Measurement</span>, alpha <span class="op">=</span> <span class="fl">0.05</span>, ylab <span class="op">=</span> <span class="st">"Content (%)"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="generalized_boxplot-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

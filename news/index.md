@@ -88,6 +88,30 @@
   from blue to red, readable by colorblind readers and in grayscale; use
   `palette = c("blue", "red")` for the former colors. The axis lines are
   slightly thinner.
+- [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md)
+  and
+  [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
+  make figures ready for publication:
+  - each variable is drawn in its own panel, with its own value axis
+    (`scales = "free_y"`, the default), so that variables of different
+    scales stay readable; `scales = "fixed"` keeps a common axis;
+  - `group` draws the boxes of groups (sites, treatments, …) side by
+    side, and `id` names the observations: the `outliers` table gives
+    the `row` and `id` of every outlying value, and `label_outliers`
+    labels them;
+  - the number of values is written below each box (`show_n`), and
+    `show_mean` marks the means;
+  - `points = "all"` draws every observation (`"outliers"` by default,
+    spread sideways so that equal values do not hide each other, or
+    `"none"`);
+  - a caption names the boxplot and its whiskers, which readers would
+    take for Tukey’s otherwise (`caption`); the help pages give a figure
+    legend;
+  - `xlab`, `ylab`, `title` (bold), `base_size`, `horizontal`, `log` (a
+    logarithmic axis) and `fill` (one color, or one per group or
+    variable);
+  - the `stats` table gives `n`, the fences, the notch limits, the
+    `mean` and `n_outliers` of each variable (and group).
 - The axis titles of
   [`plot_spectra()`](https://christiangoueguel.com/specProc/reference/plot_spectra.md)
   and
@@ -98,6 +122,33 @@
 
 ### Breaking changes
 
+- [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
+  flags fewer observations: its default detection rate `alpha` is now
+  about 0.7% (`2 * pnorm(-4 * qnorm(0.75))`), that of Tukey’s boxplot
+  for normal data, as in the authors’ implementation (the Stata command
+  `robbox`), instead of 5%. With 5%, about 18 of the 368 `forageLIBS`
+  samples were flagged per mineral even in clean data; use
+  `alpha = 0.05` for the former fences (see also the bug fixes).
+- [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md)
+  and
+  [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
+  draw one panel per variable, boxes in light grey (the colors of each
+  variable added nothing, and depended on whether ggsci was installed)
+  and horizontal labels. `scales = "fixed"` and `fill` give the former
+  layout and colors.
+- The arguments `xlabels.angle`, `box.width`, `notchwidth` and
+  `staplewidth` of
+  [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md)
+  and
+  [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
+  are renamed `x_labels_angle`, `box_width`, `notch_width` and
+  `staple_width`, and `xlabels.hjust` and `xlabels.vjust` are deprecated
+  (the justification follows the angle). The former names still work,
+  with a warning.
+- The `outliers` table of
+  [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md)
+  has the columns `row` and `out` (the tail), as that of
+  [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md).
 - The loadings of
   [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
   now have a fixed sign, their largest element positive, as those of
@@ -109,6 +160,20 @@
 
 ### Bug fixes
 
+- [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
+  now follows Bruffaerts et al. (2014) and the authors’ implementation:
+  the transformed data are standardized by their interquartile range
+  divided by `diff(qnorm(c(0.25, 0.75)))` = 1.349 (was 1.3426); a
+  negative tail parameter `h` (tails lighter than normal) is kept
+  instead of being set to 0, which widened the fences of such variables
+  (in `forageLIBS`, at alpha = 0.7%, the upper fence of Ca was 1.25
+  instead of 1.19); and the fences are never inside the box.
+- `notch = TRUE` failed in
+  [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md)
+  and
+  [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
+  (“object ‘notchlower’ not found”); the notches span the median plus or
+  minus 1.58 IQR / sqrt(n) (McGill et al., 1978).
 - [`plot_spectra()`](https://christiangoueguel.com/specProc/reference/plot_spectra.md)
   drew straight lines across the gaps between detectors (in
   `forageLIBS`, 781.5 to 789.2 nm and 800.7 to 813.9 nm), and joined the

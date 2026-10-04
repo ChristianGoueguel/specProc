@@ -79,16 +79,39 @@
 <code>rasterize</code> draws the spectra as an image within an otherwise vector plot, for small PDF files of many long spectra (needs the ragg package).</li>
 </ul>
 The help page gives the sizes for journal figures. The colors of <code>colvar</code> now go from dark purple to yellow-green (viridis), instead of from blue to red, readable by colorblind readers and in grayscale; use <code>palette = c("blue", "red")</code> for the former colors. The axis lines are slightly thinner.</li>
+<li>
+<code><a href="../reference/adjusted_boxplot.html">adjusted_boxplot()</a></code> and <code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code> make figures ready for publication:
+<ul><li>each variable is drawn in its own panel, with its own value axis (<code>scales = "free_y"</code>, the default), so that variables of different scales stay readable; <code>scales = "fixed"</code> keeps a common axis;</li>
+<li>
+<code>group</code> draws the boxes of groups (sites, treatments, …) side by side, and <code>id</code> names the observations: the <code>outliers</code> table gives the <code>row</code> and <code>id</code> of every outlying value, and <code>label_outliers</code> labels them;</li>
+<li>the number of values is written below each box (<code>show_n</code>), and <code>show_mean</code> marks the means;</li>
+<li>
+<code>points = "all"</code> draws every observation (<code>"outliers"</code> by default, spread sideways so that equal values do not hide each other, or <code>"none"</code>);</li>
+<li>a caption names the boxplot and its whiskers, which readers would take for Tukey’s otherwise (<code>caption</code>); the help pages give a figure legend;</li>
+<li>
+<code>xlab</code>, <code>ylab</code>, <code>title</code> (bold), <code>base_size</code>, <code>horizontal</code>, <code>log</code> (a logarithmic axis) and <code>fill</code> (one color, or one per group or variable);</li>
+<li>the <code>stats</code> table gives <code>n</code>, the fences, the notch limits, the <code>mean</code> and <code>n_outliers</code> of each variable (and group).</li>
+</ul></li>
 <li>The axis titles of <code><a href="../reference/plot_spectra.html">plot_spectra()</a></code> and <code><a href="../reference/plot_fit.html">plot_fit()</a></code> give the units in parentheses, as in the other plots: “Wavelength (nm)” and “Intensity (arb. units)”.</li>
 <li>specProc now requires ggplot2 3.5.0 or later.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="breaking-changes-development-version">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-development-version"></a></h3>
-<ul><li>The loadings of <code><a href="../reference/robpca.html">robpca()</a></code> now have a fixed sign, their largest element positive, as those of <code><a href="../reference/macropca.html">macropca()</a></code> and <code><a href="../reference/cellpca.html">cellpca()</a></code>. The signs of loadings and scores may differ from those of earlier versions.</li>
+<ul><li>
+<code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code> flags fewer observations: its default detection rate <code>alpha</code> is now about 0.7% (<code>2 * pnorm(-4 * qnorm(0.75))</code>), that of Tukey’s boxplot for normal data, as in the authors’ implementation (the Stata command <code>robbox</code>), instead of 5%. With 5%, about 18 of the 368 <code>forageLIBS</code> samples were flagged per mineral even in clean data; use <code>alpha = 0.05</code> for the former fences (see also the bug fixes).</li>
+<li>
+<code><a href="../reference/adjusted_boxplot.html">adjusted_boxplot()</a></code> and <code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code> draw one panel per variable, boxes in light grey (the colors of each variable added nothing, and depended on whether ggsci was installed) and horizontal labels. <code>scales = "fixed"</code> and <code>fill</code> give the former layout and colors.</li>
+<li>The arguments <code>xlabels.angle</code>, <code>box.width</code>, <code>notchwidth</code> and <code>staplewidth</code> of <code><a href="../reference/adjusted_boxplot.html">adjusted_boxplot()</a></code> and <code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code> are renamed <code>x_labels_angle</code>, <code>box_width</code>, <code>notch_width</code> and <code>staple_width</code>, and <code>xlabels.hjust</code> and <code>xlabels.vjust</code> are deprecated (the justification follows the angle). The former names still work, with a warning.</li>
+<li>The <code>outliers</code> table of <code><a href="../reference/adjusted_boxplot.html">adjusted_boxplot()</a></code> has the columns <code>row</code> and <code>out</code> (the tail), as that of <code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code>.</li>
+<li>The loadings of <code><a href="../reference/robpca.html">robpca()</a></code> now have a fixed sign, their largest element positive, as those of <code><a href="../reference/macropca.html">macropca()</a></code> and <code><a href="../reference/cellpca.html">cellpca()</a></code>. The signs of loadings and scores may differ from those of earlier versions.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li>
+<code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code> now follows Bruffaerts et al. (2014) and the authors’ implementation: the transformed data are standardized by their interquartile range divided by <code>diff(qnorm(c(0.25, 0.75)))</code> = 1.349 (was 1.3426); a negative tail parameter <code>h</code> (tails lighter than normal) is kept instead of being set to 0, which widened the fences of such variables (in <code>forageLIBS</code>, at alpha = 0.7%, the upper fence of Ca was 1.25 instead of 1.19); and the fences are never inside the box.</li>
+<li>
+<code>notch = TRUE</code> failed in <code><a href="../reference/adjusted_boxplot.html">adjusted_boxplot()</a></code> and <code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code> (“object ‘notchlower’ not found”); the notches span the median plus or minus 1.58 IQR / sqrt(n) (McGill et al., 1978).</li>
+<li>
 <code><a href="../reference/plot_spectra.html">plot_spectra()</a></code> drew straight lines across the gaps between detectors (in <code>forageLIBS</code>, 781.5 to 789.2 nm and 800.7 to 813.9 nm), and joined the channels of overlapping detectors in a zigzag (near 766 nm, on the K I 766.49 nm line). Each detector is now drawn as its own line.</li>
 <li>
 <code><a href="../reference/robpca.html">robpca()</a></code> and <code><a href="../reference/rospca.html">rospca()</a></code> failed, or flagged most observations as orthogonal outliers, when <code>k</code> equalled the rank of the data (for example <code>k = 5</code> with 5 variables, <code>k = n - 1</code> with more variables than observations, or a <code>k</code> chosen by <code>var_explained</code> for data with few variables): the orthogonal distances to a subspace that is the whole space are rounding errors, and their cut-off was zero. As in Hubert, Rousseeuw and Vanden Branden (2005), ROBPCA then reduces to the reweighted MCD of the data: the reweighting on the orthogonal distances is skipped, and H1 is the subset H0 of the least outlying observations (as in the rospca package). The orthogonal distances and their cut-off are now zero, with no orthogonal outliers, in <code><a href="../reference/robpca.html">robpca()</a></code>, <code><a href="../reference/rospca.html">rospca()</a></code> and <code><a href="../reference/macropca.html">macropca()</a></code>, and for new observations of <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> that lie in the subspace.</li>
