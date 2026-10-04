@@ -125,7 +125,9 @@ outlying ones; <code>"all"</code>; or <code>"none"</code>.</p></dd>
 
 <dt id="arg-label-outliers">label_outliers<a class="anchor" aria-label="anchor" href="#arg-label-outliers"></a></dt>
 <dd><p>A logical: label the outlying observations with
-their <code>id</code>, else their row number (<code>FALSE</code>, default).</p></dd>
+their <code>id</code>, else their row number (<code>FALSE</code>, default). The labels are
+moved apart so that they do not overlap; where many outliers crowd
+together, some are left unlabeled.</p></dd>
 
 
 <dt id="arg-show-n">show_n<a class="anchor" aria-label="anchor" href="#arg-show-n"></a></dt>

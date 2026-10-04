@@ -78,7 +78,9 @@ adjusted_boxplot(
 - label_outliers:
 
   A logical: label the outlying observations with their `id`, else their
-  row number (`FALSE`, default).
+  row number (`FALSE`, default). The labels are moved apart so that they
+  do not overlap; where many outliers crowd together, some are left
+  unlabeled.
 
 - show_n:
 

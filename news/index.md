@@ -139,14 +139,32 @@
 
 ### Improvements
 
-- The labels of the most outlying samples in
+- The labels of the plots no longer overlap: they are placed by ggrepel
+  (now imported), away from each other and from the points, with a
+  segment to their point when moved far. This applies to the outlying
+  samples of
   [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md),
-  [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md)
+  [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md),
+  [`plot_coomans()`](https://christiangoueguel.com/specProc/reference/plot_coomans.md),
+  [`plot_outliers()`](https://christiangoueguel.com/specProc/reference/plot_outliers.md)
   and
-  [`plot_coomans()`](https://christiangoueguel.com/specProc/reference/plot_coomans.md)
-  no longer overlap: they are placed by ggrepel (now imported), away
-  from each other and from the points, with a segment to their point
-  when moved far.
+  [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md)
+  (and its biplot loadings), the peaks of
+  [`plot_loadings()`](https://christiangoueguel.com/specProc/reference/plot_loadings.md),
+  [`plot_contributions()`](https://christiangoueguel.com/specProc/reference/plot_contributions.md),
+  [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md)
+  and
+  [`plot_fit()`](https://christiangoueguel.com/specProc/reference/plot_fit.md),
+  the outliers of
+  [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md)
+  and
+  [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
+  (where many crowd together, some are left unlabeled), the rejected
+  shots of
+  [`plot_shots()`](https://christiangoueguel.com/specProc/reference/plot_shots.md),
+  the spectra of `plot_spectra(label_spectra = TRUE)`, and the lines of
+  [`plot_wavelength_calibration()`](https://christiangoueguel.com/specProc/reference/plot_wavelength_calibration.md),
+  which are now all labeled.
 - [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
   and
   [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
