@@ -200,6 +200,12 @@ are filled with translucent colors. Stacked spectra (with a vertical
 front (from the top to the bottom of the stack), so that the front
 spectra hide the back ones, as in a waterfall plot.
 
+**Detectors.** The spectra are not drawn across the gaps between
+detectors (wavelength steps of more than 5 times the channel spacing),
+and the channels of overlapping detectors (where the wavelengths step
+back in column order) are drawn as separate lines, not joined in a
+zigzag.
+
 **Summaries.** With `summary = "mean"`, each group of spectra is drawn
 as its mean spectrum, in a band of plus or minus one standard deviation;
 with `summary = "median"`, as its median spectrum, in a band from the
