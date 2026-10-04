@@ -23,7 +23,14 @@ plot_embedding(
   biplot = FALSE,
   biplot_top = 10,
   aspect_ratio = 0.7,
-  title = NULL
+  title = NULL,
+  legend_title = NULL,
+  palette = NULL,
+  shapes = TRUE,
+  legend = c("right", "bottom", "top", "inside", "none"),
+  panel = c("shaded", "white"),
+  caption = TRUE,
+  base_size = 11
 )
 }
 \arguments{
@@ -63,7 +70,8 @@ later).}
 next embedding coordinates. Default is 2.}
 
 \item{t2_method}{The distribution of the \eqn{T^2} limits: \code{"f"}
-(default) or \code{"beta"} (see \code{\link[=hotelling_t2]{hotelling_t2()}}).}
+(default), \code{"beta"} or \code{"new"} (see \code{\link[=hotelling_t2]{hotelling_t2()}}). Ignored for a
+robust PCA, whose limit is the chi-square quantile of ROBPCA.}
 
 \item{flag}{A logical: circle in red the samples beyond the \eqn{T^2}
 limit (\code{FALSE}, default).}
@@ -80,9 +88,35 @@ default).}
 Default is 10.}
 
 \item{aspect_ratio}{The ratio of the height to the width of the panel.
-Default is 0.7; \code{NULL} lets the panel fill the plot.}
+Default is 0.7; \code{NULL} lets the panel fill the plot; \code{"equal"} gives
+the two axes the same scale, so that the distances between the samples
+are not distorted (for scores in the same units).}
 
 \item{title}{The plot title.}
+
+\item{legend_title}{The title of the legend of \code{colour}. Default is its
+name; give it with units, such as \code{"K (\%)"}.}
+
+\item{palette}{The colors of \code{colour}: \code{NULL} (default: Dark2 for up to 8
+groups, viridis for a numeric variable), the name of a viridis palette
+(\code{"viridis"}, \code{"magma"}, \code{"cividis"}, ...) or a vector of colors.}
+
+\item{shapes}{A logical: give each group of a discrete \code{colour} its own
+point shape (up to 6 groups), so that the groups stay apart in grayscale
+(\code{TRUE}, default).}
+
+\item{legend}{The position of the legend: \code{"right"} (default), \code{"bottom"},
+\code{"top"}, \code{"inside"} (the top right corner of the panel) or \code{"none"}.}
+
+\item{panel}{\code{"shaded"} (default), the panel grey outside the outermost
+ellipse and white inside, or \code{"white"}.}
+
+\item{caption}{\code{TRUE} (default), a caption saying what the ellipses and
+limits are; \code{FALSE}, no caption; or a caption of your own.}
+
+\item{base_size}{The size of the text, in points. Default is 11; use the
+text size of the journal (often 7 to 9 points) for a figure saved at its
+printed size. The points, lines and labels scale with it.}
 }
 \value{
 A ggplot object.
@@ -145,12 +179,22 @@ the samples. \eqn{T^2} suits linear scores such as
 PCA or PLS; on a UMAP
 map, whose distances are not meaningful, prefer \code{ellipse}.
 
-\strong{Style.} The panel is grey outside the outermost ellipse (of \eqn{T^2}, or of each group) and white
-inside, so that the samples beyond the limits stand out, with no grid and
-a fixed \code{aspect_ratio} (0.7 by default; \code{NULL} lets the plot fill the
-space), and thin light grey lines through the origin (when it lies in the
-range of the samples, as for centered scores). Without ellipses, the
-panel is white.
+\strong{Style.} The panel is grey outside the outermost ellipse (of
+\eqn{T^2}, or of each group) and white inside, so that the samples beyond
+the limits stand out (\code{panel = "white"} for a white panel), with no grid
+and a fixed \code{aspect_ratio} (0.7 by default; \code{NULL} lets the plot fill the
+space, \code{"equal"} gives both axes the same scale), and thin light grey
+lines through the origin (when it lies in the range of the samples, as for
+centered scores). Without ellipses, the panel is white. The groups of a
+discrete \code{colour} also get their own point shapes (\code{shapes}), and the axes
+plain numbers. A caption says what the ellipses and limits are (their
+level, distribution and estimates), which readers cannot tell from the
+plot.
+
+\strong{Publication figures.} Make the plot at its printed size, with
+\code{base_size} set to the text size of the journal, for example
+\code{ggsave("scores.pdf", p, width = 85, height = 75, units = "mm")} with
+\code{base_size = 8} for a single column.
 
 \strong{Axes.} For a \code{\link[stats:prcomp]{stats::prcomp()}} fit or a robust PCA, the axis titles
 give the share of the variance of each component: of the total variance
@@ -192,6 +236,19 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
     center() |>
     robpca(k = 2) |>
     plot_embedding(hotelling = "all", flag = FALSE, label = TRUE)
+}
+
+# PCA of the K I lines, the samples grouped by potassium level, for a
+# journal column
+if (rlang::is_installed("ConfidenceEllipse")) {
+  data(forageLIBS)
+  wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+  pca <- stats::prcomp(forageLIBS[which(wl > 760 & wl < 772)])
+  level <- cut(forageLIBS$K, 3, labels = c("Low K", "Mid K", "High K"))
+  p <- plot_embedding(pca, colour = level, ellipse = TRUE, legend_title = "Potassium",
+                      legend = "bottom", base_size = 8)
+  p
+  # ggplot2::ggsave("scores.pdf", p, width = 85, height = 80, units = "mm")
 }
 
 \donttest{

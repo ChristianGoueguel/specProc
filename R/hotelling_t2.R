@@ -15,12 +15,15 @@
 #' the scores, with their covariance. Its limit at the confidence level
 #' \eqn{1 - \alpha}, for \eqn{n} samples, is
 #'  - `method = "f"` (default): \eqn{k(n - 1)/(n - k)\, F_{1-\alpha}(k, n -
-#'    k)}, the limit for a new sample, more conservative;
+#'    k)}, the conventional limit of score plots (Jackson, 1991);
 #'  - `method = "beta"`: \eqn{(n - 1)^2/n\, B_{1-\alpha}(k/2, (n - k -
 #'    1)/2)}, the exact distribution for the samples that estimated the mean
 #'    and covariance (Tracy, Young and Mason, 1992); the F limit can even
 #'    exceed the largest \eqn{T^2} a sample can reach, \eqn{(n - 1)^2 / n},
-#'    for small \eqn{n}.
+#'    for small \eqn{n};
+#'  - `method = "new"`: \eqn{k(n + 1)(n - 1)/(n(n - k))\, F_{1-\alpha}(k,
+#'    n - k)}, the exact limit for a new sample, independent of the estimates
+#'    (larger than the F limit by \eqn{(n + 1)/n}).
 #'
 #' Within groups (`group`), each group gets its own mean, covariance and
 #' limits, which tells whether a sample is typical of its own group rather
@@ -43,8 +46,8 @@
 #'   string), or a vector with one value per sample.
 #' @param conf_level The confidence level(s) of the limits: one or more
 #'   values between 0 and 1. Default is 0.975.
-#' @param method The distribution of the limits: `"f"` (default) or
-#'   `"beta"`.
+#' @param method The distribution of the limits: `"f"` (default), `"beta"`
+#'   or `"new"`.
 #'
 #' @return A tibble with one row per sample: its row number `sample`, the
 #'   `group` (with `group`), `t2`, then for each confidence level (in %, e.g.
@@ -81,7 +84,7 @@ hotelling_t2 <- function(data, columns = NULL, k = 2, group = NULL, conf_level =
   rlang::check_installed("HotellingEllipse", version = "1.3.0",
                          reason = "to compute Hotelling's T-squared.")
   conf_level <- check_conf_level(conf_level)
-  method <- match.arg(method, c("f", "beta"))
+  method <- match.arg(method, c("f", "beta", "new"))
   df <- embedding_data(data)
   group_values <- embedding_values(rlang::enquo(group), df, "group")$values
   if (is.null(columns)) {
@@ -108,7 +111,8 @@ hotelling_t2 <- function(data, columns = NULL, k = 2, group = NULL, conf_level =
     } else {
       fit <- tryCatch(
         HotellingEllipse::ellipseParam(scores[r, , drop = FALSE], k = length(columns),
-                                       rel.tol = .Machine$double.eps, method = method,
+                                       rel.tol = .Machine$double.eps,
+                                       method = if (method == "new") "f" else method,
                                        conf.limit = conf_level),
         error = function(e) {
           stop("T-squared failed", if (!is.null(group_values)) paste0(" in group ", g), ": ",
@@ -117,6 +121,8 @@ hotelling_t2 <- function(data, columns = NULL, k = 2, group = NULL, conf_level =
       )
       res$t2 <- fit$Tsquare$value
       limits <- vapply(labels, function(l) fit[[paste0("cutoff.", l, "pct")]], numeric(1))
+      # the limit of a new sample: the F limit times (n + 1) / n
+      if (method == "new") limits <- limits * (length(r) + 1) / length(r)
     }
     for (i in seq_along(labels)) res[[paste0("limit_", labels[i])]] <- unname(limits[i])
     res$n <- length(r)
@@ -138,9 +144,9 @@ hotelling_t2 <- function(data, columns = NULL, k = 2, group = NULL, conf_level =
 
 # ---- internals ---------------------------------------------------------------
 
-# Limit of T-squared on k components for n samples: "f" (new sample),
-# "beta" (the samples of the model) or "new" (a new sample, with the
-# uncertainty of the mean).
+# Limit of T-squared on k components for n samples: "f" (the conventional
+# limit), "beta" (the samples of the model) or "new" (a new sample, with
+# the uncertainty of the mean).
 t2_limit <- function(level, k, n, method = "f") {
   switch(method,
          f = k * (n - 1) / (n - k) * stats::qf(level, k, n - k),

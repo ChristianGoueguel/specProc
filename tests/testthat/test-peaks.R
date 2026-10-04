@@ -150,3 +150,58 @@ test_that("peak_fit recovers the widths of an exact Voigt line", {
   pv <- peak_fit(wide_spectrum(wl, y), profile = "pseudo_voigt")
   expect_gt(stats::deviance(pv$fit[[1]]), stats::deviance(res$fit[[1]]))
 })
+
+test_that("plot_fit gives the parameters of the peaks and the quality of the fit", {
+  set.seed(6)
+  y <- gaussian_profile(wl, 1, 396, 0.2, 10) + stats::rnorm(length(wl), sd = 0.05)
+  res <- peak_fit(wide_spectrum(wl, y), profile = "gaussian")
+  fit <- res$fit[[1]]
+  aug <- res$augmented[[1]]
+  s <- fit_summary(fit, aug, fit_curve(fit, seq(min(wl), max(wl), length.out = 500)))
+  est <- stats::coef(fit)
+  se <- sqrt(diag(stats::vcov(fit)))
+  expect_equal(s$peaks$center, unname(est["xc"]))
+  expect_equal(s$peaks$fwhm, unname(est["wG"]))
+  expect_equal(s$peaks$area_se, unname(se["A"]))
+  expect_equal(s$rmse, summary(fit)$sigma)
+  expect_equal(s$r2, 1 - sum(aug$.resid^2) / sum((aug$y - mean(aug$y))^2))
+  # the FWHM of a Voigt profile, with its standard error by the delta method
+  v <- peak_fit(wide_spectrum(wl, voigt_profile(wl, 1, 396, 0.1, 0.15, 10) +
+                                stats::rnorm(length(wl), sd = 0.05)), profile = "voigt")
+  vf <- v$fit[[1]]
+  sv <- fit_summary(vf, v$augmented[[1]], fit_curve(vf, wl))
+  ev <- stats::coef(vf)
+  expect_equal(sv$peaks$fwhm, voigt_fwhm(ev[["wG"]], ev[["wL"]]))
+  h <- 1e-6
+  grad <- c((voigt_fwhm(ev[["wG"]] + h, ev[["wL"]]) - voigt_fwhm(ev[["wG"]] - h, ev[["wL"]])) / (2 * h),
+            (voigt_fwhm(ev[["wG"]], ev[["wL"]] + h) - voigt_fwhm(ev[["wG"]], ev[["wL"]] - h)) / (2 * h))
+  vc <- stats::vcov(vf)[c("wG", "wL"), c("wG", "wL")]
+  expect_equal(sv$peaks$fwhm_se, sqrt(drop(t(grad) %*% vc %*% grad)), tolerance = 1e-5)
+  # rounded to two significant digits of the standard error
+  expect_equal(estimate_text(656.33124, 0.00942), "656.3312 ± 0.0094")
+  expect_equal(estimate_text(26000.4, 773), "26,000 ± 770")
+  expect_equal(estimate_text(1.23456, NA), "1.235")
+})
+
+test_that("plot_fit annotates, marks the FWHM and keeps the former arguments", {
+  set.seed(7)
+  y <- gaussian_profile(wl, 1, 396, 0.2, 10) + stats::rnorm(length(wl), sd = 0.05)
+  res <- peak_fit(wide_spectrum(wl, y), profile = "gaussian")
+  p <- plot_fit(res, title = "Ca II", show_fwhm = TRUE)
+  expect_s3_class(p, "patchwork")
+  top <- p[[1]][[1]]
+  expect_match(top$labels$subtitle, "^Center .*nm\nFWHM .*nm, area .*\nR² ")
+  expect_true(any(vapply(top$layers, function(l) inherits(l$geom, "GeomSegment"), logical(1))))
+  expect_match(p$patches$annotation$caption, "Gaussian profile")
+  expect_match(p$patches$annotation$caption, "Bars: the FWHM")
+  expect_null(plot_fit(res, annotate = FALSE)[[1]][[1]]$labels$subtitle)
+  expect_null(plot_fit(res, caption = FALSE)$patches$annotation$caption)
+  # the unit of the center and FWHM comes from xlab
+  expect_match(plot_fit(res, xlab = "Wavelength (Å)")[[1]][[1]]$labels$subtitle, "Å\nFWHM")
+  # several spectra: one pair of panels each
+  two <- rbind(wide_spectrum(wl, y), wide_spectrum(wl, 1.2 * y))
+  expect_length(plot_fit(peak_fit(two, profile = "gaussian"))$patches$plots, 2)
+  lifecycle::expect_deprecated(plot_fit(res, pt.size = 2))
+  lifecycle::expect_deprecated(plot_fit(res, resid.fill = "blue"))
+  expect_error(plot_fit(res, fit_color = "nocolor"), "colors")
+})

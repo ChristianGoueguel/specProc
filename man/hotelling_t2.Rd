@@ -30,8 +30,8 @@ string), or a vector with one value per sample.}
 \item{conf_level}{The confidence level(s) of the limits: one or more
 values between 0 and 1. Default is 0.975.}
 
-\item{method}{The distribution of the limits: \code{"f"} (default) or
-\code{"beta"}.}
+\item{method}{The distribution of the limits: \code{"f"} (default), \code{"beta"}
+or \code{"new"}.}
 }
 \value{
 A tibble with one row per sample: its row number \code{sample}, the
@@ -54,12 +54,15 @@ the scores, with their covariance. Its limit at the confidence level
 \eqn{1 - \alpha}, for \eqn{n} samples, is
 \itemize{
 \item \code{method = "f"} (default): \eqn{k(n - 1)/(n - k)\, F_{1-\alpha}(k, n -
-   k)}, the limit for a new sample, more conservative;
+   k)}, the conventional limit of score plots (Jackson, 1991);
 \item \code{method = "beta"}: \eqn{(n - 1)^2/n\, B_{1-\alpha}(k/2, (n - k -
    1)/2)}, the exact distribution for the samples that estimated the mean
 and covariance (Tracy, Young and Mason, 1992); the F limit can even
 exceed the largest \eqn{T^2} a sample can reach, \eqn{(n - 1)^2 / n},
-for small \eqn{n}.
+for small \eqn{n};
+\item \code{method = "new"}: \eqn{k(n + 1)(n - 1)/(n(n - k))\, F_{1-\alpha}(k,
+   n - k)}, the exact limit for a new sample, independent of the estimates
+(larger than the F limit by \eqn{(n + 1)/n}).
 }
 
 Within groups (\code{group}), each group gets its own mean, covariance and

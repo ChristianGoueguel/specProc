@@ -92,3 +92,13 @@ test_that("the default confidence level is 0.975", {
   expect_true("dmodx_limit_97.5" %in% names(dmodx(pca, 2)))
   expect_equal(formals(plot_embedding)$conf_level, 0.975)
 })
+
+test_that("the T-squared limit of a new sample is the F limit times (n + 1) / n", {
+  set.seed(8)
+  x <- data.frame(PC1 = stats::rnorm(40), PC2 = stats::rnorm(40), PC3 = stats::rnorm(40))
+  f <- hotelling_t2(x, k = 3)
+  new <- hotelling_t2(x, k = 3, method = "new")
+  expect_equal(new$limit_97.5, f$limit_97.5 * 41 / 40)
+  expect_equal(new$limit_97.5[1], t2_limit(0.975, 3, 40, "new"))
+  expect_equal(new$t2, f$t2)
+})

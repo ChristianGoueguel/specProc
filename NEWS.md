@@ -104,6 +104,27 @@
   `plot = FALSE` (the table: row, id, distance, cutoff, outlier, weight and
   robust z-scores), `title`, `ylab` and `base_size`. Rows with missing values
   are left out, with a message, instead of stopping.
+* `plot_fit()` gives, above each panel, the center, FWHM and area of each
+  peak with their standard errors (rounded to two significant digits of
+  them), and R^2 and RMSE. The FWHM of a Voigt profile combines its widths
+  (Olivero and Longbothum, 1977), with a standard error from the covariance
+  of the estimates. `show_fwhm` draws the FWHM at half maximum; the baseline
+  is dotted, the peaks of a multi-peak fit are numbered, the residuals have
+  dashed limits at plus or minus twice the RMSE, and a caption names the
+  profiles. The data are small open circles, with a legend; `xlab`, `ylab`,
+  `base_size`, `ncol` (several spectra: a pair of panels each) and `caption`
+  are added.
+* `plot_embedding()` makes figures ready for publication: plain axis numbers
+  ("-100,000" rather than "-1e+05"); `base_size`, which scales the text,
+  points, lines and labels; a caption saying what the ellipses and limits
+  are; `legend_title`; a point shape per group (`shapes`), for grayscale
+  printing; `palette`; `aspect_ratio = "equal"`; `legend` (position) and
+  `panel = "white"`. The labels of the flagged samples alternate above and
+  below the points, and the short loadings of a biplot are drawn without
+  labels, which overlapped near the origin.
+* `hotelling_t2()` and `plot_embedding()` give the limit of a new sample,
+  `method = "new"` (the F limit times (n + 1) / n). The docs no longer call
+  the F limit the limit of a new sample.
 * The axis titles of `plot_spectra()` and `plot_fit()` give the units in
   parentheses, as in the other plots: "Wavelength (nm)" and
   "Intensity (arb. units)".
@@ -128,6 +149,10 @@
   follows the angle). The former names still work, with a warning.
 * The `outliers` table of `adjusted_boxplot()` has the columns `row` and
   `out` (the tail), as that of `generalized_boxplot()`.
+* The arguments of the points and lines of `plot_fit()` are renamed
+  `point_size`, `point_color`, `line_width` and `fit_color` (from `pt.size`,
+  `pt.colour`, `line.size` and `line.colour`); `pt.shape`, `pt.fill`,
+  `linetype` and the `resid.*` arguments are deprecated and ignored.
 * `plot_outliers()` flags the samples beyond the adaptive cutoff of
   Filzmoser, Garrett and Reimann (2005), as `aq.plot()` of the mvoutlier
   package, instead of the fixed 97.5% chi-squared quantile, which flags

@@ -301,3 +301,42 @@ test_that("the lines through the origin of linear scores are light grey", {
   expect_length(lines, 2)
   expect_true(all(vapply(lines, function(l) l$aes_params$colour, character(1)) == "grey75"))
 })
+
+test_that("plot_embedding makes figures for publication", {
+  set.seed(9)
+  df <- data.frame(PC1 = 1e5 * stats::rnorm(60), PC2 = 2e4 * stats::rnorm(60),
+                   group = rep(c("a", "b", "c"), each = 20))
+  p <- plot_embedding(df, colour = group, ellipse = TRUE, legend_title = "Site")
+  built <- ggplot2::ggplot_build(p)
+  expect_false(any(grepl("e+", built$layout$panel_params[[1]]$x$get_labels(), fixed = TRUE)))
+  expect_equal(p$scales$get_scales("colour")$name, "Site")
+  expect_match(p$labels$caption, "97.5% confidence regions of each group")
+  expect_null(plot_embedding(df, colour = group, caption = FALSE)$labels$caption)
+  # a shape per group, or not
+  expect_equal(length(unique(point_data(p)$shape)), 3)
+  expect_equal(length(unique(point_data(plot_embedding(df, colour = group, shapes = FALSE))$shape)), 1)
+  # palette, legend, panel, aspect and text size
+  pal <- plot_embedding(df, colour = group, palette = c("red", "green", "blue"))
+  expect_setequal(unique(point_data(pal)$colour), c("red", "green", "blue"))
+  expect_equal(plot_embedding(df, colour = group, legend = "bottom")$theme$legend.position, "bottom")
+  white <- plot_embedding(df, colour = group, ellipse = TRUE, panel = "white")
+  expect_equal(white$theme$panel.background$fill, "white")
+  expect_equal(plot_embedding(df, aspect_ratio = "equal")$coordinates$ratio, 1)
+  expect_equal(plot_embedding(df, base_size = 8)$theme$text$size, 8)
+  expect_error(plot_embedding(df, legend = "left"), "should be one of")
+  expect_error(plot_embedding(df, palette = "rainbow"), "palette")
+})
+
+test_that("plot_embedding draws the T-squared limit of a new sample", {
+  rlang::local_options(warn = -1)
+  skip_if_not_installed("HotellingEllipse", "1.3.0")
+  set.seed(10)
+  df <- data.frame(Dim1 = stats::rnorm(50), Dim2 = stats::rnorm(50))
+  t2_path <- function(p) Filter(function(l) inherits(l$geom, "GeomPath"), p$layers)[[1]]$data
+  f <- t2_path(plot_embedding(df, hotelling = "all"))
+  new <- t2_path(plot_embedding(df, hotelling = "all", t2_method = "new"))
+  center <- colMeans(df)
+  expect_equal(new$x - center[[1]], (f$x - center[[1]]) * sqrt(51 / 50))
+  expect_match(plot_embedding(df, hotelling = "all", t2_method = "new")$labels$caption,
+               "F distribution of a new sample")
+})
