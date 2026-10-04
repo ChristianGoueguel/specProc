@@ -9,6 +9,7 @@ simca(
   mode = "classification",
   num_comp = NULL,
   gamma = NULL,
+  squared = NULL,
   engine = "rsimca"
 )
 
@@ -17,6 +18,7 @@ simca(
   parameters = NULL,
   num_comp = NULL,
   gamma = NULL,
+  squared = NULL,
   fresh = FALSE,
   ...
 )
@@ -29,6 +31,10 @@ or \code{NULL} (default) to let the engine choose them.}
 
 \item{gamma}{The weight of the orthogonal distances in the classification
 rule, between 0 and 1, or \code{NULL} (default) for 0.5.}
+
+\item{squared}{A logical: combine the squared scaled distances (\code{TRUE}) or
+the scaled distances (\code{FALSE}) in the classification rule, or \code{NULL}
+(default) for \code{TRUE}.}
 
 \item{engine}{The computational engine: \code{"rsimca"} (default).}
 
@@ -67,16 +73,19 @@ proportion of variance explained.
 \item \code{gamma} is the weight of the orthogonal distances, against the score
 distances, in the classification rule (\code{gamma} of \code{\link[=rsimca]{rsimca()}}). With
 \code{NULL} (the default), it is 0.5.
+\item \code{squared} chooses the classification rule (\code{squared} of \code{\link[=rsimca]{rsimca()}}):
+the squared scaled distances (\code{TRUE}, rule R2 of the paper) or the
+scaled distances (\code{FALSE}, rule R1). With \code{NULL} (the default), it is
+\code{TRUE}.
 }
 
-Both can be tuned with \code{\link[tune:tune]{tune::tune()}}, using \code{\link[dials:num_comp]{dials::num_comp()}} and
-\code{\link[=simca_gamma]{simca_gamma()}}.
+All three can be tuned with \code{\link[tune:tune]{tune::tune()}}, using \code{\link[dials:num_comp]{dials::num_comp()}},
+\code{\link[=simca_gamma]{simca_gamma()}} and \code{\link[=simca_squared]{simca_squared()}}.
 }
 
 \section{Engine arguments}{
 The other arguments of \code{\link[=rsimca]{rsimca()}} are set with \code{\link[parsnip:set_engine]{parsnip::set_engine()}}:
-\code{squared}, \code{kmax}, \code{alpha}, \code{var_explained}, \code{prior}, \code{ndir} and
-\code{nsamp}.
+\code{kmax}, \code{alpha}, \code{var_explained}, \code{prior}, \code{ndir} and \code{nsamp}.
 }
 
 \section{Predictions}{
@@ -110,7 +119,8 @@ head(predict(fit, dat[301:368, ], type = "raw"))
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link[=rsimca]{rsimca()}}, \code{\link[=predict.specproc_rsimca]{predict.specproc_rsimca()}}, \code{\link[=simca_gamma]{simca_gamma()}}
+\code{\link[=rsimca]{rsimca()}}, \code{\link[=predict.specproc_rsimca]{predict.specproc_rsimca()}}, \code{\link[=simca_gamma]{simca_gamma()}},
+\code{\link[=simca_squared]{simca_squared()}}
 }
 \author{
 Christian L. Goueguel

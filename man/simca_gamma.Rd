@@ -2,9 +2,12 @@
 % Please edit documentation in R/parsnip_simca.R
 \name{simca_gamma}
 \alias{simca_gamma}
-\title{SIMCA Distance Weighting Parameter}
+\alias{simca_squared}
+\title{Tuning Parameters of the SIMCA Model}
 \usage{
 simca_gamma(range = c(0, 1), trans = NULL)
+
+simca_squared(values = c(TRUE, FALSE))
 }
 \arguments{
 \item{range}{A two-element vector with the range of \code{gamma}. Default is
@@ -12,19 +15,28 @@ simca_gamma(range = c(0, 1), trans = NULL)
 
 \item{trans}{A transformation object from the scales package, or \code{NULL}
 (default) for none.}
+
+\item{values}{The values of \code{squared}. Default is \code{c(TRUE, FALSE)}.}
 }
 \value{
-A \code{quant_param} object.
+A \code{quant_param} object (\code{simca_gamma()}) or a \code{qual_param} object
+(\code{simca_squared()}).
 }
 \description{
-A \link[dials:dials-package]{dials} parameter for the \code{gamma} argument of the
-\code{\link[=simca]{simca()}} parsnip model (and of \code{\link[=rsimca]{rsimca()}}): the weight of the orthogonal
-distances, against the score distances, in the classification rule.
+\link[dials:dials-package]{dials} parameters for the classification rule of
+the \code{\link[=simca]{simca()}} parsnip model (and of \code{\link[=rsimca]{rsimca()}}):
+\itemize{
+\item \code{simca_gamma()}, for \code{gamma}, the weight of the orthogonal distances
+against the score distances;
+\item \code{simca_squared()}, for \code{squared}, the combination of the squared scaled
+distances (rule R2) or of the scaled distances (rule R1).
+}
 }
 \examples{
 \dontshow{if (rlang::is_installed("dials")) withAutoprint(\{ # examplesIf}
 simca_gamma()
 dials::value_seq(simca_gamma(), 5)
+simca_squared()
 \dontshow{\}) # examplesIf}
 }
 \seealso{

@@ -35,7 +35,8 @@
 #' cross-validation.
 #'
 #' In tidymodels, `rsimca()` is the `"rsimca"` engine of the [simca()]
-#' parsnip model, where `ncomp` (`num_comp`) and `gamma` can be tuned.
+#' parsnip model, where `ncomp` (`num_comp`), `gamma` and `squared` can be
+#' tuned.
 #'
 #' **Differences from the paper.** The number of components of each class
 #' is given (`ncomp`) or chosen by [robpca()] from the proportion of
