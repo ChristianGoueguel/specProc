@@ -150,6 +150,11 @@ filled with opaque colors and drawn from the back to the front (from the
 top to the bottom of the stack), so that the front spectra hide the back
 ones, as in a waterfall plot.
 
+\strong{Detectors.} The spectra are not drawn across the gaps between
+detectors (wavelength steps of more than 5 times the channel spacing), and
+the channels of overlapping detectors (where the wavelengths step back in
+column order) are drawn as separate lines, not joined in a zigzag.
+
 \strong{Summaries.} With \code{summary = "mean"}, each group of spectra is drawn as
 its mean spectrum, in a band of plus or minus one standard deviation; with
 \code{summary = "median"}, as its median spectrum, in a band from the first to

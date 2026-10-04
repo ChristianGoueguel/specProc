@@ -240,3 +240,21 @@ test_that("plot_spectra rasterizes the spectra within a vector plot", {
   expect_true(length(grepRaw("/Subtype /Image", readBin(f, "raw", file.size(f)))) > 0)
   expect_error(plot_spectra(df, rasterize = -1), "rasterize")
 })
+
+test_that("plot_spectra does not join detectors across gaps or overlaps", {
+  # two overlapping detectors, then a gap before a third one
+  wl <- c(seq(390, 395, by = 0.1), seq(394.65, 397, by = 0.1), seq(405, 406, by = 0.1))
+  x <- matrix(stats::runif(2 * length(wl)), 2, dimnames = list(NULL, format(wl, nsmall = 2)))
+  df <- as.data.frame(x, check.names = FALSE)
+  built <- ggplot2::ggplot_build(plot_spectra(df))$data[[1]]
+  expect_equal(length(unique(built$group)), 2 * 3)
+  span <- tapply(built$x, built$group, function(x) c(min(x), max(x)))
+  expect_false(any(vapply(span, function(r) r[1] < 397 && r[2] > 405, logical(1))))
+  # the overlapping channels are not interleaved within a line
+  first <- built[built$group == 1, ]
+  expect_equal(range(first$x), c(390, 395))
+  # columns in decreasing order are split at the gaps only
+  reversed <- ggplot2::ggplot_build(plot_spectra(df[, rev(seq_along(wl))]))$data[[1]]
+  expect_equal(length(unique(reversed$group)), 2 * 2)
+  expect_equal(spectra_segments(rev(wl[wl < 395.05])), rep(1L, sum(wl < 395.05)))
+})

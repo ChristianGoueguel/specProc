@@ -25,6 +25,11 @@
 #' top to the bottom of the stack), so that the front spectra hide the back
 #' ones, as in a waterfall plot.
 #'
+#' **Detectors.** The spectra are not drawn across the gaps between
+#' detectors (wavelength steps of more than 5 times the channel spacing), and
+#' the channels of overlapping detectors (where the wavelengths step back in
+#' column order) are drawn as separate lines, not joined in a zigzag.
+#'
 #' **Summaries.** With `summary = "mean"`, each group of spectra is drawn as
 #' its mean spectrum, in a band of plus or minus one standard deviation; with
 #' `summary = "median"`, as its median spectrum, in a band from the first to
@@ -248,10 +253,10 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
     long <- long[!is.na(long$intensity), ]
   }
 
-  intensity <- wavelength <- .draw <- .base <- .lower <- .upper <- NULL
+  intensity <- wavelength <- .group <- .base <- .lower <- .upper <- NULL
 
   p <- ggplot2::ggplot(long) +
-    ggplot2::aes(x = wavelength, y = intensity, group = .draw)
+    ggplot2::aes(x = wavelength, y = intensity, group = .group)
 
   if (!is.null(marks)) {
     p <- p + ggplot2::geom_vline(data = data.frame(wavelength = marks$at),
@@ -425,7 +430,8 @@ summary_band <- function(s, summary) {
 
 # One row per curve and wavelength, offset by the position of the curve in
 # its panel. `.draw` is the drawing order: filled curves are drawn from the
-# back (the top of a stack) to the front.
+# back (the top of a stack) to the front. `.group` draws each detector
+# segment of a curve as its own line, in the drawing order.
 spectra_long <- function(curves, wl, offset, fill) {
   meta <- curves$meta
   n <- nrow(meta)
@@ -439,6 +445,8 @@ spectra_long <- function(curves, wl, offset, fill) {
   rownames(long) <- NULL
   long$.curve <- index
   long$.draw <- if (fill && (is.null(offset) || offset[2] >= 0)) n + 1 - index else index
+  segment <- spectra_segments(wl)
+  long$.group <- (long$.draw - 1) * max(segment) + rep(segment, each = n)
   long$wavelength <- rep(wl, each = n)
   long$intensity <- as.vector(curves$center)
   if (!is.null(curves$lower)) {
@@ -457,6 +465,20 @@ spectra_long <- function(curves, wl, offset, fill) {
     }
   }
   long
+}
+
+# The detector segments of the spectral columns (see wavelength_segments()),
+# drawn as separate lines: a line does not cross a gap between detectors, nor
+# zigzag between the channels of two overlapping ones. Columns in decreasing
+# or no wavelength order, which would make most channels a segment, are
+# split at the gaps only.
+spectra_segments <- function(wl) {
+  segment <- wavelength_segments(wl)
+  if (max(segment) > length(wl) / 4) {
+    o <- order(wl)
+    segment[o] <- wavelength_segments(wl[o])
+  }
+  segment
 }
 
 # The right end of each curve, with its label: the id, else the value of

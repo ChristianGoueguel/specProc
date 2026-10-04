@@ -79,6 +79,10 @@
 
 ## Bug fixes
 
+* `plot_spectra()` drew straight lines across the gaps between detectors
+  (in `forageLIBS`, 781.5 to 789.2 nm and 800.7 to 813.9 nm), and joined the
+  channels of overlapping detectors in a zigzag (near 766 nm, on the K I
+  766.49 nm line). Each detector is now drawn as its own line.
 * `robpca()` and `rospca()` failed, or flagged most observations as
   orthogonal outliers, when `k` equalled the rank of the data (for example
   `k = 5` with 5 variables, `k = n - 1` with more variables than
