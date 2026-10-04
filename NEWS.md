@@ -37,6 +37,35 @@
   spectrum instead of the line color. Spectra stacked with a vertical offset
   are then filled with opaque colors, the front ones hiding the back ones, as
   in a waterfall plot.
+* `plot_spectra()` makes figures ready for publication:
+  - `legend` shows the legend of `colvar` (a color bar) or `id`, on any side
+    or inside the plot, titled by `legend_title` (such as `"K (%)"`);
+  - `xlab`, `ylab` and `title` set the axis titles and the plot title (bold,
+    split into a title and a subtitle when long), and the intensities are
+    written in plain notation ("100,000" rather than "1e+05");
+  - `lines`, a line list from `libs_lines()`, marks the emission lines with
+    dashed lines, labeled with their species and wavelength above the plot
+    (close lines share a label);
+  - `palette` sets the colors: a viridis palette (`"viridis"`, the default,
+    `"magma"`, `"cividis"`, ...) or any colors;
+  - `base_size` and `linewidth` size the text and the lines for the printed
+    figure (such as 8 points and 0.3 for a journal column);
+  - `xlim` limits the wavelength range, and `scales = "free_y"` fits the
+    intensity axis to each panel;
+  - `panel_tags` tags the panels (a), (b), (c), ...;
+  - `label_spectra` labels each spectrum at its right end, with its `id` or
+    value of `colvar`;
+  - `summary = "mean"` or `"median"` draws the mean spectrum of each group
+    (panel and `id`) with a band of one standard deviation, or the median
+    with the quartiles;
+  - `rasterize` draws the spectra as an image within an otherwise vector
+    plot, for small PDF files of many long spectra (needs the ragg package).
+
+  The help page gives the sizes for journal figures. The colors of `colvar`
+  now go from dark purple to yellow-green (viridis), instead of from blue to
+  red, readable by colorblind readers and in grayscale; use
+  `palette = c("blue", "red")` for the former colors. The axis lines are
+  slightly thinner.
 * The axis titles of `plot_spectra()` and `plot_fit()` give the units in
   parentheses, as in the other plots: "Wavelength (nm)" and
   "Intensity (arb. units)".

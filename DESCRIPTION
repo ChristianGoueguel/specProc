@@ -71,6 +71,7 @@ Suggests:
     plsmod,
     prospectr,
     purrr,
+    ragg,
     recipes (>= 1.1.0),
     rmarkdown,
     ropls,

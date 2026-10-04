@@ -14,7 +14,22 @@ plot_spectra(
   panel = NULL,
   layout = c("vertical", "horizontal"),
   grid = FALSE,
-  color_as = c("line", "fill")
+  color_as = c("line", "fill"),
+  legend = c("none", "right", "top", "bottom", "inside"),
+  legend_title = NULL,
+  xlab = "Wavelength (nm)",
+  ylab = "Intensity (arb. units)",
+  title = NULL,
+  lines = NULL,
+  palette = "viridis",
+  base_size = 11,
+  linewidth = 0.5,
+  xlim = NULL,
+  scales = c("fixed", "free_y"),
+  panel_tags = FALSE,
+  label_spectra = FALSE,
+  summary = c("none", "mean", "median"),
+  rasterize = FALSE
 )
 }
 \arguments{
@@ -38,11 +53,10 @@ units), or two numbers \code{c(horizontal, vertical)} (in nm and intensity
 units). The spectrum of row \code{i} is shifted by \code{(i - 1)} times the
 offsets, so that the first one stays in place. With \code{panel}, the rows
 are counted in each panel, so that the first spectrum of every panel
-stays in place.}
+stays in place. With \code{summary}, the summary spectra are offset.}
 
 \item{panel}{Optional (\code{NULL} by default). Column name of a grouping
-variable: the spectra of each group are drawn in a separate panel, with
-the same axes.}
+variable: the spectra of each group are drawn in a separate panel.}
 
 \item{layout}{The arrangement of the panels: \code{"vertical"} (default), one
 above the other, or \code{"horizontal"}, side by side. Ignored without
@@ -54,6 +68,61 @@ above the other, or \code{"horizontal"}, side by side. Ignored without
 \item{color_as}{How the colors of \code{colvar} (or of \code{id}, without \code{colvar})
 are shown: as the color of the lines (\code{"line"}, default), or as the fill
 of the area under each spectrum (\code{"fill"}).}
+
+\item{legend}{The position of the legend of \code{colvar} (a color bar) or \code{id}:
+\code{"none"} (default), \code{"right"}, \code{"top"}, \code{"bottom"}, or \code{"inside"} (the
+top right corner of the plot).}
+
+\item{legend_title}{The title of the legend. Default is the name of
+\code{colvar} (or \code{id}); give it with units, such as \code{"K (\%)"}.}
+
+\item{xlab, ylab}{The axis titles. Default are \code{"Wavelength (nm)"} and
+\code{"Intensity (arb. units)"}.}
+
+\item{title}{The plot title. A long title is split into a title and a
+subtitle.}
+
+\item{lines}{Optional table of emission lines, such as returned by
+\code{\link[=libs_lines]{libs_lines()}}: a data frame with the columns \code{species} (such as
+\code{"K I"}) and \code{wavelength} (nm). Each line within the wavelength range is
+marked and labeled (see Details).}
+
+\item{palette}{The colors of \code{colvar} or \code{id}: the name of a viridis
+palette (\code{"viridis"}, default, \code{"magma"}, \code{"inferno"}, \code{"plasma"},
+\code{"cividis"}, \code{"rocket"}, \code{"mako"} or \code{"turbo"}), all readable by
+colorblind readers and in grayscale except \code{"turbo"}, or a vector of at
+least two colors, interpolated for \code{colvar} and for the levels of \code{id}
+when there are fewer colors than levels.}
+
+\item{base_size}{The size of the text, in points. Default is 11; use the
+text size of the journal (often 7 to 9 points) for a figure saved at its
+printed size. The axis lines and labels scale with it.}
+
+\item{linewidth}{The width of the spectra lines. Default is 0.5; about 0.3
+suits small figures.}
+
+\item{xlim}{Optional wavelength range \code{c(from, to)}, in nm: only the
+channels in this range are drawn.}
+
+\item{scales}{\code{"fixed"} (default), the same intensity axis for all panels,
+or \code{"free_y"}, an intensity axis fitted to each panel.}
+
+\item{panel_tags}{A logical: tag the panels (a), (b), (c), ... before their
+labels (\code{FALSE}, default).}
+
+\item{label_spectra}{A logical: label each spectrum at its right end
+(\code{FALSE}, default), with its \code{id}, else its value of \code{colvar}, else its
+row number (or \code{"Mean"}/\code{"Median"} for summaries). Most useful for
+spectra stacked by \code{offset}.}
+
+\item{summary}{\code{"none"} (default), each spectrum drawn; \code{"mean"}, the mean
+spectrum of each group with a band of plus or minus one standard
+deviation; or \code{"median"}, the median spectrum of each group with a band
+of the first to third quartiles (see Details).}
+
+\item{rasterize}{\code{FALSE} (default), \code{TRUE}, or a resolution in dpi: draw
+the spectra as an image, of 300 dpi with \code{TRUE}, within an otherwise
+vector plot (see Details). Ignored for interactive plots.}
 }
 \value{
 Object of class ggplot or of class plotly if \code{.interactive = TRUE}.
@@ -64,7 +133,8 @@ wavelength and the y-axis represents intensity of a spectrum's signal.
 The function allows to plot a spectrum or several spectra in a single plot,
 identified either by an id (for example, the samples or spectra id) or by a
 target variable (for example, the concentration of a chemical element).
-The spectra can be split into panels by a grouping variable.
+The spectra can be split into panels by a grouping variable, summarized by
+their mean or median, and labeled with the emission lines they show.
 }
 \details{
 This function is based on the ggplot2 package, thus allowing users to easily
@@ -72,23 +142,52 @@ add or modify different components of the plot. Each row of \code{x} is drawn as
 a separate line. All columns other than \code{id}, \code{colvar} and \code{panel} must be
 named by their wavelength.
 
-With \code{color_as = "fill"}, the area between each spectrum and its baseline
-(zero intensity, shifted by \code{offset}) is filled, with the spectrum drawn as
-a thin dark line. Overlaid spectra are filled with translucent colors.
-Stacked spectra (with a vertical \code{offset}) are filled with opaque colors and
-drawn from the back to the front (from the top to the bottom of the stack),
-so that the front spectra hide the back ones, as in a waterfall plot.
+\strong{Filled spectra.} With \code{color_as = "fill"}, the area between each
+spectrum and its baseline (zero intensity, shifted by \code{offset}) is filled,
+with the spectrum drawn as a thin dark line. Overlaid spectra are filled
+with translucent colors. Stacked spectra (with a vertical \code{offset}) are
+filled with opaque colors and drawn from the back to the front (from the
+top to the bottom of the stack), so that the front spectra hide the back
+ones, as in a waterfall plot.
+
+\strong{Summaries.} With \code{summary = "mean"}, each group of spectra is drawn as
+its mean spectrum, in a band of plus or minus one standard deviation; with
+\code{summary = "median"}, as its median spectrum, in a band from the first to
+the third quartile. The groups are the panels and, within them, the values
+of \code{id}; the color of \code{colvar} is then the mean of \code{colvar} in each group.
+The band is not drawn with \code{color_as = "fill"}.
+
+\strong{Emission lines.} Each line of \code{lines} within the wavelength range is
+marked by a dashed vertical line, labeled with its species and wavelength
+above the plot (above the top panels). Lines closer than 2\% of the
+wavelength range share a label, such as "Ca II 393.37, 396.85". The
+markers are at the tabulated wavelengths: with a horizontal \code{offset}, they
+match the first spectrum of each panel. Over a wide range, keep the
+strongest lines, for example with the \code{top} or \code{min_relative} arguments of
+\code{\link[=libs_lines]{libs_lines()}}, or labels become long.
+
+\strong{Publication figures.} Journals print figures about 85 mm wide for a
+single column and 175 mm for a double column, with text of 7 to 9 points.
+Make the plot at its printed size, with \code{base_size} set to the text size,
+and save it with \code{\link[ggplot2:ggsave]{ggplot2::ggsave()}}, in a vector format (PDF or EPS) or
+as a TIFF of 600 dpi, for example
+\code{ggsave("figure.pdf", p, width = 85, height = 65, units = "mm")}. Many
+long spectra make large and slow vector files: \code{rasterize = TRUE} draws
+the spectra as an image within the plot, keeping the text, axes and
+markers as vectors (this needs the ragg package).
 }
 \examples{
 data(forageLIBS)
 wl <- as.numeric(names(forageLIBS)[-(1:14)])
 k_lines <- names(forageLIBS)[-(1:14)][wl > 764 & wl < 772]
 # the K I resonance lines, colored by potassium content
-plot_spectra(forageLIBS[1:20, c("K", k_lines)], colvar = K)
+plot_spectra(forageLIBS[1:20, c("K", k_lines)], colvar = K, legend = "right",
+             legend_title = "K (\%)")
 
-# five spectra stacked, each shifted up by 20000 counts and right by 0.5 nm
+# five spectra stacked, each shifted up by 20000 counts and right by 0.5 nm,
+# labeled at their right end
 plot_spectra(forageLIBS[1:5, c("Measurement", k_lines)], id = Measurement,
-             offset = c(0.5, 20000))
+             offset = c(0.5, 20000), label_spectra = TRUE)
 
 # one panel per potassium level, side by side, with the area under the
 # spectra filled by potassium content and grid lines
@@ -96,6 +195,19 @@ spectra <- forageLIBS[1:30, c("K", k_lines)]
 spectra$level <- cut(spectra$K, 3, labels = c("Low K", "Medium K", "High K"))
 plot_spectra(spectra, colvar = K, panel = level, layout = "horizontal",
              offset = c(0.2, 8000), color_as = "fill", grid = TRUE)
+
+# a figure for a journal column: the mean spectrum of each potassium level,
+# with the K I lines labeled (from libs_lines() in practice)
+lines <- data.frame(species = "K I", wavelength = c(766.49, 769.90))
+p <- plot_spectra(spectra, colvar = K, panel = level, summary = "mean",
+                  lines = lines, panel_tags = TRUE, legend = "right",
+                  legend_title = "K (\%)", ylab = "Intensity (counts)",
+                  base_size = 8, linewidth = 0.3, xlim = c(765, 771))
+p
+# ggplot2::ggsave("figure.pdf", p, width = 85, height = 90, units = "mm")
+}
+\seealso{
+\code{\link[=libs_lines]{libs_lines()}} for the emission lines.
 }
 \author{
 Christian L. Goueguel
