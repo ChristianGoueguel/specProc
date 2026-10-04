@@ -128,6 +128,9 @@ distance below the cut-off of the initial fit), 0 for the others.</p></li>
 <li><p><code>robpca_weights</code>: the weights \(w_i\) of the ROBPCA step.</p></li>
 <li><p><code>components</code>: a tibble with the robust <code>R2</code> and <code>RMSE</code> of the models
 with 1 to <code>kmax</code> components.</p></li>
+<li><p><code>models</code>: the <code>coefficients</code> and <code>intercept</code> of the models with 1 to
+<code>kmax</code> components, for predictions with another number of components
+(<code>predict(fit, newdata, ncomp = )</code>).</p></li>
 <li><p><code>ncomp</code>, <code>kmax</code>, <code>h</code>, <code>alpha</code>: the settings used, and <code>y_scale</code>, the
 factor applied to the responses before ROBPCA.</p></li>
 </ul><p>Use <a href="predict.specproc_rsimpls.html">predict()</a> for the predictions of new
@@ -176,8 +179,9 @@ and total sums of squares and cross-products.</p>
 components, the robust \(R^2\) of the paper (Remark 7) and the root
 mean squared error, on the observations that are regular in every one of
 these models. They describe the fit to the calibration data; for
-predictions, choose <code>ncomp</code> by cross-validation (for example with
-tidymodels). These models all come from the same ROBPCA fit, with
+predictions, choose <code>ncomp</code> by cross-validation, for example with the
+<code>"rsimpls"</code> engine of <code><a href="https://parsnip.tidymodels.org/reference/pls.html" class="external-link">parsnip::pls()</a></code> in tidymodels (<a href="pls_rsimpls.html">pls_rsimpls</a>).
+These models all come from the same ROBPCA fit, with
 \(k_0 = k_{max} + q\) components, so the model with <code>ncomp</code> components
 also depends on <code>kmax</code>. With <code>kmax = ncomp</code>, ROBPCA is applied with
 <code>ncomp</code> plus \(q\) components, and <code>components</code> stops at <code>ncomp</code>.</p>

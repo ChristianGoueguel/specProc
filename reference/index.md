@@ -92,6 +92,8 @@ selectivity ratio, interval PLS).
   : Robust Partial Least Squares Regression (RSIMPLS)
 - [`predict(`*`<specproc_rsimpls>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimpls.md)
   : Predictions of a Robust PLS Model
+- [`pls_rsimpls`](https://christiangoueguel.com/specProc/reference/pls_rsimpls.md)
+  : Robust PLS Regression in tidymodels (parsnip Engine)
 - [`select_wavelengths()`](https://christiangoueguel.com/specProc/reference/select_wavelengths.md)
   : Wavelength Selection for PLS Regression
 - [`plot_wavelength_selection()`](https://christiangoueguel.com/specProc/reference/plot_wavelength_selection.md)

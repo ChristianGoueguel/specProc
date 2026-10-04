@@ -8,7 +8,7 @@ or computes their scores.
 
 ``` r
 # S3 method for class 'specproc_rsimpls'
-predict(object, newdata, type = c("response", "scores"), ...)
+predict(object, newdata, type = c("response", "scores"), ncomp = NULL, ...)
 ```
 
 ## Arguments
@@ -27,6 +27,14 @@ predict(object, newdata, type = c("response", "scores"), ...)
 
   `"response"` (default) for the predicted responses, or `"scores"` for
   the scores and their score and orthogonal distances.
+
+- ncomp:
+
+  With `type = "response"`, the number of components of the predictions,
+  from 1 to the `kmax` of the model. Default is the `ncomp` of the
+  model. The models with fewer or more components come from the same
+  ROBPCA fit (see
+  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)).
 
 - ...:
 
@@ -57,6 +65,8 @@ set.seed(1)
 fit <- rsimpls(spectra[1:300, ], forageLIBS$Ca[1:300], ncomp = 4)
 head(predict(fit, spectra[301:368, ]))
 #> [1] 0.4159052 0.5470408 0.7232786 0.6207605 0.8097063 0.1862145
+head(predict(fit, spectra[301:368, ], ncomp = 2))
+#> [1] 0.5726315 0.5169454 0.6104433 0.6242335 0.6821011 0.4632534
 head(predict(fit, spectra[301:368, ], type = "scores"))
 #> # A tibble: 6 × 6
 #>     Comp1  Comp2   Comp3  Comp4    sd     od

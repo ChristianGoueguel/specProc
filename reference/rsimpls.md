@@ -95,6 +95,10 @@ An object of class `specproc_rsimpls`, a list with:
 - `components`: a tibble with the robust `R2` and `RMSE` of the models
   with 1 to `kmax` components.
 
+- `models`: the `coefficients` and `intercept` of the models with 1 to
+  `kmax` components, for predictions with another number of components
+  (`predict(fit, newdata, ncomp = )`).
+
 - `ncomp`, `kmax`, `h`, `alpha`: the settings used, and `y_scale`, the
   factor applied to the responses before ROBPCA.
 
@@ -156,11 +160,15 @@ and total sums of squares and cross-products.
 components, the robust \\R^2\\ of the paper (Remark 7) and the root mean
 squared error, on the observations that are regular in every one of
 these models. They describe the fit to the calibration data; for
-predictions, choose `ncomp` by cross-validation (for example with
-tidymodels). These models all come from the same ROBPCA fit, with \\k_0
-= k\_{max} + q\\ components, so the model with `ncomp` components also
-depends on `kmax`. With `kmax = ncomp`, ROBPCA is applied with `ncomp`
-plus \\q\\ components, and `components` stops at `ncomp`.
+predictions, choose `ncomp` by cross-validation, for example with the
+`"rsimpls"` engine of
+[`parsnip::pls()`](https://parsnip.tidymodels.org/reference/pls.html) in
+tidymodels
+([pls_rsimpls](https://christiangoueguel.com/specProc/reference/pls_rsimpls.md)).
+These models all come from the same ROBPCA fit, with \\k_0 = k\_{max} +
+q\\ components, so the model with `ncomp` components also depends on
+`kmax`. With `kmax = ncomp`, ROBPCA is applied with `ncomp` plus \\q\\
+components, and `components` stops at `ncomp`.
 
 **Differences from the paper.**
 

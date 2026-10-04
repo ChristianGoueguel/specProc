@@ -25,6 +25,23 @@
   [`recipes::step_pls()`](https://recipes.tidymodels.org/reference/step_pls.html):
   it replaces the spectra by their robust PLS scores, and optionally
   their score and orthogonal distances.
+- The `"rsimpls"` engine of
+  [`parsnip::pls()`](https://parsnip.tidymodels.org/reference/pls.html)
+  fits
+  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+  models in tidymodels, with one or several outcomes; the other
+  arguments of
+  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+  are engine arguments (`set_engine("rsimpls", kmax = , alpha = )`).
+  [`multi_predict()`](https://parsnip.tidymodels.org/reference/multi_predict.html)
+  gives the predictions of the models with fewer components from the
+  same fit, so
+  [`tune::tune_grid()`](https://tune.tidymodels.org/reference/tune_grid.html)
+  fits one model per resample for a grid of `num_comp`.
+  [`predict()`](https://rdrr.io/r/stats/predict.html) of an
+  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+  model gains `ncomp`, for the models with 1 to `kmax` components, which
+  the fit now keeps (`models`).
 - [`select_wavelengths()`](https://christiangoueguel.com/specProc/reference/select_wavelengths.md):
   selection of the informative wavelengths for PLS regression, by the
   variable importance in projection (VIP), the selectivity ratio (SR),
