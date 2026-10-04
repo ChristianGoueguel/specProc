@@ -19,6 +19,7 @@ generalized_boxplot(
   label_outliers = FALSE,
   show_n = TRUE,
   show_mean = FALSE,
+  annotate = NULL,
   horizontal = FALSE,
   log = FALSE,
   fill = "grey85",
@@ -101,6 +102,12 @@ generalized_boxplot(
   A logical: mark the mean of each box with a diamond (`FALSE`,
   default).
 
+- annotate:
+
+  Statistics added to each box (none by default): some of `"shape"`,
+  `"outliers"`, `"fences"`, `"median"`, `"spread"`, `"location"`,
+  `"test"` and `"missing"`, or `"all"` (see Details).
+
 - horizontal:
 
   A logical: horizontal boxes (`FALSE`, default), suited to many
@@ -171,14 +178,11 @@ generalized_boxplot(
 
 - If `plot = TRUE`, a `ggplot2` object.
 
-- If `plot = FALSE`, a list of two tibbles: `stats`, with one row per
-  variable (and group): the number of values `n`, the whisker ends
-  `lower` and `upper` (the most extreme values within the fences), the
-  quartiles `q1` and `q3`, the `median`, the fences, the notch limits,
-  the estimated `g` and `h`, the `mean` and the number of outlying
-  values `n_outliers`; and `outliers`, with the outlying values, their
-  `row` in `x`, their `id` and their tail `out` (`"lower"` or
-  `"upper"`).
+- If `plot = FALSE`, a list of tibbles: `stats`, `outliers` and, with
+  `group`, `tests`, as in
+  [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md),
+  with the estimated `g` and `h` instead of the medcouple, and
+  `alpha * n` expected outlying values.
 
 ## Details
 
@@ -213,8 +217,8 @@ not errors. As \\h\\ may be negative (tails lighter than normal), where
 the g-and-h transform turns back before the \\\alpha/2\\ quantile the
 fence is its extreme value.
 
-The layout, the points and the options for publication figures are those
-of
+The layout, the points, the annotations and the options for publication
+figures are those of
 [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md):
 see its details.
 
@@ -253,16 +257,18 @@ p
 # the statistics and the outlying samples
 res <- generalized_boxplot(minerals, id = Measurement, plot = FALSE)
 res$stats
-#> # A tibble: 5 × 15
-#>   variable     n  lower    q1 median    q3 upper lower_fence upper_fence
-#>   <fct>    <int>  <dbl> <dbl>  <dbl> <dbl> <dbl>       <dbl>       <dbl>
-#> 1 Ca         368 0.337  0.515  0.629 0.772 1.12       0.334        1.19 
-#> 2 Mg         368 0.0919 0.172  0.204 0.240 0.342      0.0850       0.354
-#> 3 P          368 0.135  0.219  0.260 0.300 0.436      0.132        0.447
-#> 4 K          368 0.829  1.72   2.01  2.38  3.56       0.668        3.58 
-#> 5 S          366 0.13   0.17   0.2   0.23  0.31       0.122        0.316
-#> # ℹ 6 more variables: notch_lower <dbl>, notch_upper <dbl>, g <dbl>, h <dbl>,
-#> #   mean <dbl>, n_outliers <int>
+#> # A tibble: 5 × 22
+#>   variable     n n_missing  lower    q1 median    q3 upper lower_fence
+#>   <fct>    <int>     <int>  <dbl> <dbl>  <dbl> <dbl> <dbl>       <dbl>
+#> 1 Ca         368         0 0.337  0.515  0.629 0.772 1.12       0.334 
+#> 2 Mg         368         0 0.0919 0.172  0.204 0.240 0.342      0.0850
+#> 3 P          368         0 0.135  0.219  0.260 0.300 0.436      0.132 
+#> 4 K          368         0 0.829  1.72   2.01  2.38  3.56       0.668 
+#> 5 S          366         2 0.13   0.17   0.2   0.23  0.31       0.122 
+#> # ℹ 13 more variables: upper_fence <dbl>, notch_lower <dbl>, notch_upper <dbl>,
+#> #   g <dbl>, h <dbl>, median_lower <dbl>, median_upper <dbl>, iqr <dbl>,
+#> #   rcv <dbl>, biweight <dbl>, mean <dbl>, n_outliers <int>,
+#> #   expected_outliers <dbl>
 res$outliers
 #> # A tibble: 27 × 5
 #>    variable   row     id  value out  
@@ -282,16 +288,18 @@ res$outliers
 # with a detection rate of 5%, about 18 of the 368 samples would be
 # flagged per mineral even in clean data
 generalized_boxplot(minerals, id = Measurement, alpha = 0.05, plot = FALSE)$stats
-#> # A tibble: 5 × 15
-#>   variable     n lower    q1 median    q3 upper lower_fence upper_fence
-#>   <fct>    <int> <dbl> <dbl>  <dbl> <dbl> <dbl>       <dbl>       <dbl>
-#> 1 Ca         368 0.38  0.515  0.629 0.772 1.03        0.375       1.05 
-#> 2 Mg         368 0.116 0.172  0.204 0.240 0.315       0.114       0.317
-#> 3 P          368 0.16  0.219  0.260 0.300 0.393       0.160       0.395
-#> 4 K          368 1.04  1.72   2.01  2.38  3.04        1.01        3.10 
-#> 5 S          366 0.14  0.17   0.2   0.23  0.28        0.133       0.289
-#> # ℹ 6 more variables: notch_lower <dbl>, notch_upper <dbl>, g <dbl>, h <dbl>,
-#> #   mean <dbl>, n_outliers <int>
+#> # A tibble: 5 × 22
+#>   variable     n n_missing lower    q1 median    q3 upper lower_fence
+#>   <fct>    <int>     <int> <dbl> <dbl>  <dbl> <dbl> <dbl>       <dbl>
+#> 1 Ca         368         0 0.38  0.515  0.629 0.772 1.03        0.375
+#> 2 Mg         368         0 0.116 0.172  0.204 0.240 0.315       0.114
+#> 3 P          368         0 0.16  0.219  0.260 0.300 0.393       0.160
+#> 4 K          368         0 1.04  1.72   2.01  2.38  3.04        1.01 
+#> 5 S          366         2 0.14  0.17   0.2   0.23  0.28        0.133
+#> # ℹ 13 more variables: upper_fence <dbl>, notch_lower <dbl>, notch_upper <dbl>,
+#> #   g <dbl>, h <dbl>, median_lower <dbl>, median_upper <dbl>, iqr <dbl>,
+#> #   rcv <dbl>, biweight <dbl>, mean <dbl>, n_outliers <int>,
+#> #   expected_outliers <dbl>
 
 # potassium and phosphorus by calcium level, with notches and means: a
 # figure of a journal column

@@ -90,7 +90,9 @@ The help page gives the sizes for journal figures. The colors of <code>colvar</c
 <li>a caption names the boxplot and its whiskers, which readers would take for Tukey’s otherwise (<code>caption</code>); the help pages give a figure legend;</li>
 <li>
 <code>xlab</code>, <code>ylab</code>, <code>title</code> (bold), <code>base_size</code>, <code>horizontal</code>, <code>log</code> (a logarithmic axis) and <code>fill</code> (one color, or one per group or variable);</li>
-<li>the <code>stats</code> table gives <code>n</code>, the fences, the notch limits, the <code>mean</code> and <code>n_outliers</code> of each variable (and group).</li>
+<li>the <code>stats</code> table gives <code>n</code>, the fences, the notch limits, the <code>mean</code> and <code>n_outliers</code> of each variable (and group);</li>
+<li>
+<code>annotate</code> writes statistics with each box: the shape measured by the method (medcouple, or g and h), the number of flagged values with the number expected in clean data, the median with its distribution-free 95% confidence interval, the IQR and the robust coefficient of variation; it draws the fences and the biweight location, gives the p-value of a Kruskal-Wallis test between the groups, and the number of missing values. The <code>stats</code> table gains these values (<code>n_missing</code>, <code>median_lower</code>, <code>median_upper</code>, <code>iqr</code>, <code>rcv</code>, <code>biweight</code>, <code>expected_outliers</code>), and a <code>tests</code> table gives the tests.</li>
 </ul></li>
 <li>The axis titles of <code><a href="../reference/plot_spectra.html">plot_spectra()</a></code> and <code><a href="../reference/plot_fit.html">plot_fit()</a></code> give the units in parentheses, as in the other plots: “Wavelength (nm)” and “Intensity (arb. units)”.</li>
 <li>specProc now requires ggplot2 3.5.0 or later.</li>

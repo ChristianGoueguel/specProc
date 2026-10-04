@@ -18,6 +18,7 @@ adjusted_boxplot(
   label_outliers = FALSE,
   show_n = TRUE,
   show_mean = FALSE,
+  annotate = NULL,
   horizontal = FALSE,
   log = FALSE,
   fill = "grey85",
@@ -89,6 +90,12 @@ adjusted_boxplot(
   A logical: mark the mean of each box with a diamond (`FALSE`,
   default).
 
+- annotate:
+
+  Statistics added to each box (none by default): some of `"shape"`,
+  `"outliers"`, `"fences"`, `"median"`, `"spread"`, `"location"`,
+  `"test"` and `"missing"`, or `"all"` (see Details).
+
 - horizontal:
 
   A logical: horizontal boxes (`FALSE`, default), suited to many
@@ -159,13 +166,19 @@ adjusted_boxplot(
 
 - If `plot = TRUE`, a `ggplot2` object.
 
-- If `plot = FALSE`, a list of two tibbles: `stats`, with one row per
-  variable (and group): the number of values `n`, the whisker ends
-  `lower` and `upper` (the most extreme values within the fences), the
-  quartiles `q1` and `q3`, the `median`, the fences, the notch limits,
-  the medcouple, the `mean` and the number of outlying values
-  `n_outliers`; and `outliers`, with the outlying values, their `row` in
-  `x`, their `id` and their tail `out` (`"lower"` or `"upper"`).
+- If `plot = FALSE`, a list of tibbles: `stats`, with one row per
+  variable (and group): the numbers of values `n` and of missing values
+  `n_missing`, the whisker ends `lower` and `upper` (the most extreme
+  values within the fences), the quartiles `q1` and `q3`, the `median`,
+  the fences, the notch limits, the `medcouple`, the 95% confidence
+  interval of the median (`median_lower`, `median_upper`), the `iqr`,
+  the robust coefficient of variation `rcv` (%), the `biweight`
+  location, the `mean`, and the numbers of outlying values `n_outliers`
+  and of expected ones in clean data `expected_outliers`; `outliers`,
+  with the outlying values, their `row` in `x`, their `id` and their
+  tail `out` (`"lower"` or `"upper"`); and, with `group`, `tests`, the
+  Kruskal-Wallis test between the groups of each variable (`statistic`,
+  `df`, `p_value`).
 
 ## Details
 
@@ -202,6 +215,49 @@ spread sideways so that equal values do not hide each other.
 some journals require; `label_outliers = TRUE` names the outlying
 observations by `id` (else by row number), and the `outliers` table of
 `plot = FALSE` gives them all.
+
+**Annotations.** `annotate` adds, for each box:
+
+- `"shape"`: the medcouple (`MC`, marked `(> 0.6)` beyond the range of
+  the method), or the `g` and `h` of the generalized boxplot, which
+  explain the asymmetry of the whiskers;
+
+- `"outliers"`: the number of flagged values, with the number expected
+  in clean data (about 0.7% for the adjusted boxplot, which Hubert and
+  Vandervieren calibrated as Tukey's boxplot for normal data, and
+  `alpha` for the generalized one): many more flagged values than
+  expected point to real outliers;
+
+- `"fences"`: the fences beyond which values are flagged, as dashed
+  marks (on the sides with outlying values), the whiskers ending at the
+  last values inside;
+
+- `"median"`: the median with its distribution-free 95% confidence
+  interval, from the order statistics (`Md`); the notches are made to
+  compare two medians, and are not a confidence interval of one;
+
+- `"spread"`: the interquartile range and the robust coefficient of
+  variation \\\text{rCV} = \text{IQR} / (1.349\\\text{median})\\, in
+  percent, read as a relative standard deviation;
+
+- `"location"`: the biweight location
+  ([`biweight_location()`](https://christiangoueguel.com/specProc/reference/biweight_location.md)),
+  a robust mean, marked by a cross (the mean, with `show_mean`, is
+  pulled by the outlying values);
+
+- `"test"`: with `group`, the p-value of the Kruskal-Wallis test between
+  the groups, below the variable name. With several variables, adjust
+  the p-values for multiple testing (see
+  [`p.adjust()`](https://rdrr.io/r/stats/p.adjust.html) and the `tests`
+  table);
+
+- `"missing"`: the number of missing values, next to `n`.
+
+`annotate = "all"` adds them all (the test only with `group`). The
+caption gives their key. With several boxes in a panel, each statistic
+takes two short lines: for many groups, make the figure wider or choose
+fewer annotations. All the values are in the `stats` and `tests` tables
+of `plot = FALSE`.
 
 **Publication figures.** Give the units of the variables in their names
 (such as `"Ca (%)"`, with `check.names = FALSE` in
@@ -259,16 +315,18 @@ p
 # the statistics and the outlying samples
 res <- adjusted_boxplot(minerals, id = Measurement, plot = FALSE)
 res$stats
-#> # A tibble: 5 × 14
-#>   variable     n  lower    q1 median    q3 upper lower_fence upper_fence
-#>   <fct>    <int>  <dbl> <dbl>  <dbl> <dbl> <dbl>       <dbl>       <dbl>
-#> 1 Ca         368 0.292  0.514  0.629 0.772 1.2        0.291        1.36 
-#> 2 Mg         368 0.0798 0.172  0.204 0.24  0.342      0.0754       0.348
-#> 3 P          368 0.114  0.218  0.260 0.301 0.428      0.102        0.430
-#> 4 K          368 0.981  1.72   2.01  2.38  3.58       0.939        3.60 
-#> 5 S          366 0.12   0.17   0.2   0.23  0.32       0.08         0.32 
-#> # ℹ 5 more variables: notch_lower <dbl>, notch_upper <dbl>, medcouple <dbl>,
-#> #   mean <dbl>, n_outliers <int>
+#> # A tibble: 5 × 21
+#>   variable     n n_missing  lower    q1 median    q3 upper lower_fence
+#>   <fct>    <int>     <int>  <dbl> <dbl>  <dbl> <dbl> <dbl>       <dbl>
+#> 1 Ca         368         0 0.292  0.514  0.629 0.772 1.2        0.291 
+#> 2 Mg         368         0 0.0798 0.172  0.204 0.24  0.342      0.0754
+#> 3 P          368         0 0.114  0.218  0.260 0.301 0.428      0.102 
+#> 4 K          368         0 0.981  1.72   2.01  2.38  3.58       0.939 
+#> 5 S          366         2 0.12   0.17   0.2   0.23  0.32       0.08  
+#> # ℹ 12 more variables: upper_fence <dbl>, notch_lower <dbl>, notch_upper <dbl>,
+#> #   medcouple <dbl>, median_lower <dbl>, median_upper <dbl>, iqr <dbl>,
+#> #   rcv <dbl>, biweight <dbl>, mean <dbl>, n_outliers <int>,
+#> #   expected_outliers <dbl>
 res$outliers
 #> # A tibble: 20 × 5
 #>    variable   row     id  value out  

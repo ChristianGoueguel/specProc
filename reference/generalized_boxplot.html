@@ -63,6 +63,7 @@ as proposed by Bruffaerts <em>et al</em>. (2014).</p>
 <span>  label_outliers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  show_n <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  show_mean <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  annotate <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  horizontal <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  log <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  fill <span class="op">=</span> <span class="st">"grey85"</span>,</span>
@@ -147,6 +148,12 @@ their <code>id</code>, else their row number (<code>FALSE</code>, default).</p><
 (<code>FALSE</code>, default).</p></dd>
 
 
+<dt id="arg-annotate">annotate<a class="anchor" aria-label="anchor" href="#arg-annotate"></a></dt>
+<dd><p>Statistics added to each box (none by default): some of
+<code>"shape"</code>, <code>"outliers"</code>, <code>"fences"</code>, <code>"median"</code>, <code>"spread"</code>,
+<code>"location"</code>, <code>"test"</code> and <code>"missing"</code>, or <code>"all"</code> (see Details).</p></dd>
+
+
 <dt id="arg-horizontal">horizontal<a class="anchor" aria-label="anchor" href="#arg-horizontal"></a></dt>
 <dd><p>A logical: horizontal boxes (<code>FALSE</code>, default), suited
 to many variables or long names.</p></dd>
@@ -218,13 +225,10 @@ follows their angle.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
 
 <ul><li><p>If <code>plot = TRUE</code>, a <code>ggplot2</code> object.</p></li>
-<li><p>If <code>plot = FALSE</code>, a list of two tibbles: <code>stats</code>, with one row per
-variable (and group): the number of values <code>n</code>, the whisker ends
-<code>lower</code> and <code>upper</code> (the most extreme values within the fences), the
-quartiles <code>q1</code> and <code>q3</code>, the <code>median</code>, the fences, the notch limits,
-the estimated <code>g</code> and <code>h</code>, the <code>mean</code> and the number of outlying values
-<code>n_outliers</code>; and <code>outliers</code>, with the outlying values, their <code>row</code> in
-<code>x</code>, their <code>id</code> and their tail <code>out</code> (<code>"lower"</code> or <code>"upper"</code>).</p></li>
+<li><p>If <code>plot = FALSE</code>, a list of tibbles: <code>stats</code>, <code>outliers</code> and, with
+<code>group</code>, <code>tests</code>, as in <code><a href="adjusted_boxplot.html">adjusted_boxplot()</a></code>, with the estimated <code>g</code>
+and <code>h</code> instead of the medcouple, and <code>alpha * n</code> expected outlying
+values.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -256,8 +260,8 @@ that with a large \(\alpha\) (such as 5%) many flagged observations are
 not errors. As \(h\) may be negative (tails lighter than normal), where
 the g-and-h transform turns back before the \(\alpha/2\) quantile the
 fence is its extreme value.</p>
-<p>The layout, the points and the options for publication figures are those
-of <code><a href="adjusted_boxplot.html">adjusted_boxplot()</a></code>: see its details.</p>
+<p>The layout, the points, the annotations and the options for publication
+figures are those of <code><a href="adjusted_boxplot.html">adjusted_boxplot()</a></code>: see its details.</p>
     </div>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
@@ -293,16 +297,18 @@ Française de Statistique, 157(2):90–114</p></li>
 <span class="r-in"><span><span class="co"># the statistics and the outlying samples</span></span></span>
 <span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">minerals</span>, id <span class="op">=</span> <span class="va">Measurement</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">res</span><span class="op">$</span><span class="va">stats</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 15</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   variable     n  lower    q1 median    q3 upper lower_fence upper_fence</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Ca         368 0.337  0.515  0.629 0.772 1.12       0.334        1.19 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Mg         368 0.091<span style="text-decoration: underline;">9</span> 0.172  0.204 0.240 0.342      0.085<span style="text-decoration: underline;">0</span>       0.354</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> P          368 0.135  0.219  0.260 0.300 0.436      0.132        0.447</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> K          368 0.829  1.72   2.01  2.38  3.56       0.668        3.58 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> S          366 0.13   0.17   0.2   0.23  0.31       0.122        0.316</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 6 more variables: notch_lower &lt;dbl&gt;, notch_upper &lt;dbl&gt;, g &lt;dbl&gt;, h &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   mean &lt;dbl&gt;, n_outliers &lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 22</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   variable     n n_missing  lower    q1 median    q3 upper lower_fence</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Ca         368         0 0.337  0.515  0.629 0.772 1.12       0.334 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Mg         368         0 0.091<span style="text-decoration: underline;">9</span> 0.172  0.204 0.240 0.342      0.085<span style="text-decoration: underline;">0</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> P          368         0 0.135  0.219  0.260 0.300 0.436      0.132 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> K          368         0 0.829  1.72   2.01  2.38  3.56       0.668 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> S          366         2 0.13   0.17   0.2   0.23  0.31       0.122 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 13 more variables: upper_fence &lt;dbl&gt;, notch_lower &lt;dbl&gt;, notch_upper &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   g &lt;dbl&gt;, h &lt;dbl&gt;, median_lower &lt;dbl&gt;, median_upper &lt;dbl&gt;, iqr &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   rcv &lt;dbl&gt;, biweight &lt;dbl&gt;, mean &lt;dbl&gt;, n_outliers &lt;int&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   expected_outliers &lt;dbl&gt;</span></span>
 <span class="r-in"><span><span class="va">res</span><span class="op">$</span><span class="va">outliers</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 27 × 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    variable   row     id  value out  </span>
@@ -322,16 +328,18 @@ Française de Statistique, 157(2):90–114</p></li>
 <span class="r-in"><span><span class="co"># with a detection rate of 5%, about 18 of the 368 samples would be</span></span></span>
 <span class="r-in"><span><span class="co"># flagged per mineral even in clean data</span></span></span>
 <span class="r-in"><span><span class="fu">generalized_boxplot</span><span class="op">(</span><span class="va">minerals</span>, id <span class="op">=</span> <span class="va">Measurement</span>, alpha <span class="op">=</span> <span class="fl">0.05</span>, plot <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">$</span><span class="va">stats</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 15</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   variable     n lower    q1 median    q3 upper lower_fence upper_fence</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Ca         368 0.38  0.515  0.629 0.772 1.03        0.375       1.05 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Mg         368 0.116 0.172  0.204 0.240 0.315       0.114       0.317</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> P          368 0.16  0.219  0.260 0.300 0.393       0.160       0.395</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> K          368 1.04  1.72   2.01  2.38  3.04        1.01        3.10 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> S          366 0.14  0.17   0.2   0.23  0.28        0.133       0.289</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 6 more variables: notch_lower &lt;dbl&gt;, notch_upper &lt;dbl&gt;, g &lt;dbl&gt;, h &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   mean &lt;dbl&gt;, n_outliers &lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 22</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   variable     n n_missing lower    q1 median    q3 upper lower_fence</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> Ca         368         0 0.38  0.515  0.629 0.772 1.03        0.375</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> Mg         368         0 0.116 0.172  0.204 0.240 0.315       0.114</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> P          368         0 0.16  0.219  0.260 0.300 0.393       0.160</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> K          368         0 1.04  1.72   2.01  2.38  3.04        1.01 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> S          366         2 0.14  0.17   0.2   0.23  0.28        0.133</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 13 more variables: upper_fence &lt;dbl&gt;, notch_lower &lt;dbl&gt;, notch_upper &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   g &lt;dbl&gt;, h &lt;dbl&gt;, median_lower &lt;dbl&gt;, median_upper &lt;dbl&gt;, iqr &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   rcv &lt;dbl&gt;, biweight &lt;dbl&gt;, mean &lt;dbl&gt;, n_outliers &lt;int&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   expected_outliers &lt;dbl&gt;</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># potassium and phosphorus by calcium level, with notches and means: a</span></span></span>
 <span class="r-in"><span><span class="co"># figure of a journal column</span></span></span>
