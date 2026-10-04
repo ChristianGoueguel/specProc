@@ -98,6 +98,14 @@ test_that("predict() reproduces the fitted values, scores and score distances", 
   expect_equal(as.matrix(scores[1:3]), fit$x_scores, ignore_attr = TRUE)
   expect_equal(scores$sd, fit$sd)
   expect_equal(scores$od, fit$od)
+  # the models with other numbers of components, from the same fit
+  expect_length(fit$models, fit$kmax)
+  expect_equal(predict(fit, d$train$x, ncomp = 3), predict(fit, d$train$x))
+  set.seed(10)
+  fit2 <- rsimpls(d$train$x, d$train$y, ncomp = 2)
+  expect_equal(predict(fit, d$test$x, ncomp = 2), predict(fit2, d$test$x))
+  expect_error(predict(fit, d$test$x, ncomp = fit$kmax + 1), "cannot exceed")
+  expect_error(predict(fit, d$test$x, type = "scores", ncomp = 2), "only used")
   expect_error(predict(fit, d$train$x[, 1:10]), "200 columns")
 })
 

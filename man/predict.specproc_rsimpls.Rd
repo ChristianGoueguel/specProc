@@ -4,7 +4,7 @@
 \alias{predict.specproc_rsimpls}
 \title{Predictions of a Robust PLS Model}
 \usage{
-\method{predict}{specproc_rsimpls}(object, newdata, type = c("response", "scores"), ...)
+\method{predict}{specproc_rsimpls}(object, newdata, type = c("response", "scores"), ncomp = NULL, ...)
 }
 \arguments{
 \item{object}{An object returned by \code{\link[=rsimpls]{rsimpls()}}.}
@@ -14,6 +14,11 @@ the calibration data.}
 
 \item{type}{\code{"response"} (default) for the predicted responses, or
 \code{"scores"} for the scores and their score and orthogonal distances.}
+
+\item{ncomp}{With \code{type = "response"}, the number of components of the
+predictions, from 1 to the \code{kmax} of the model. Default is the \code{ncomp}
+of the model. The models with fewer or more components come from the
+same ROBPCA fit (see \code{\link[=rsimpls]{rsimpls()}}).}
 
 \item{...}{Not used.}
 }
@@ -34,6 +39,7 @@ spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 set.seed(1)
 fit <- rsimpls(spectra[1:300, ], forageLIBS$Ca[1:300], ncomp = 4)
 head(predict(fit, spectra[301:368, ]))
+head(predict(fit, spectra[301:368, ], ncomp = 2))
 head(predict(fit, spectra[301:368, ], type = "scores"))
 }
 \seealso{

@@ -349,7 +349,7 @@ robust_titles <- c(
 # Keeps only what predict() needs from an RSIMPLS model.
 strip_rsimpls <- function(fit) {
   fit[c("x_scores", "fitted", "residuals", "sd", "rd", "od", "outlier_type", "weights",
-        "robpca_weights")] <- NULL
+        "robpca_weights", "models")] <- NULL
   fit
 }
 

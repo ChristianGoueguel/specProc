@@ -64,7 +64,7 @@ Suggests:
     HotellingEllipse (>= 1.3.0),
     knitr,
     mixOmics,
-    parsnip,
+    parsnip (>= 1.0.0),
     patchwork,
     plotly,
     plsmod,

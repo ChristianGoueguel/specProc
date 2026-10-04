@@ -57,8 +57,9 @@
 #' components, the robust \eqn{R^2} of the paper (Remark 7) and the root
 #' mean squared error, on the observations that are regular in every one of
 #' these models. They describe the fit to the calibration data; for
-#' predictions, choose `ncomp` by cross-validation (for example with
-#' tidymodels). These models all come from the same ROBPCA fit, with
+#' predictions, choose `ncomp` by cross-validation, for example with the
+#' `"rsimpls"` engine of [parsnip::pls()] in tidymodels ([pls_rsimpls]).
+#' These models all come from the same ROBPCA fit, with
 #' \eqn{k_0 = k_{max} + q} components, so the model with `ncomp` components
 #' also depends on `kmax`. With `kmax = ncomp`, ROBPCA is applied with
 #' `ncomp` plus \eqn{q} components, and `components` stops at `ncomp`.
@@ -126,6 +127,9 @@
 #'  - `robpca_weights`: the weights \eqn{w_i} of the ROBPCA step.
 #'  - `components`: a tibble with the robust `R2` and `RMSE` of the models
 #'    with 1 to `kmax` components.
+#'  - `models`: the `coefficients` and `intercept` of the models with 1 to
+#'    `kmax` components, for predictions with another number of components
+#'    (`predict(fit, newdata, ncomp = )`).
 #'  - `ncomp`, `kmax`, `h`, `alpha`: the settings used, and `y_scale`, the
 #'    factor applied to the responses before ROBPCA.
 #'
@@ -217,6 +221,7 @@ rsimpls <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 50
     robpca_weights = as.numeric(fit$w),
     R2 = r2,
     components = fit$components,
+    models = lapply(fit$models, `[`, c("coefficients", "intercept")),
     score_center = model$score_center,
     score_cov = model$score_cov,
     ncomp = as.integer(ncomp),
@@ -435,6 +440,10 @@ regression_outlier_type <- function(sd, rd, cutoff_sd, cutoff_rd) {
 #'   the calibration data.
 #' @param type `"response"` (default) for the predicted responses, or
 #'   `"scores"` for the scores and their score and orthogonal distances.
+#' @param ncomp With `type = "response"`, the number of components of the
+#'   predictions, from 1 to the `kmax` of the model. Default is the `ncomp`
+#'   of the model. The models with fewer or more components come from the
+#'   same ROBPCA fit (see [rsimpls()]).
 #' @param ... Not used.
 #'
 #' @return With `type = "response"`, a numeric vector of predictions (one
@@ -452,15 +461,28 @@ regression_outlier_type <- function(sd, rd, cutoff_sd, cutoff_rd) {
 #' set.seed(1)
 #' fit <- rsimpls(spectra[1:300, ], forageLIBS$Ca[1:300], ncomp = 4)
 #' head(predict(fit, spectra[301:368, ]))
+#' head(predict(fit, spectra[301:368, ], ncomp = 2))
 #' head(predict(fit, spectra[301:368, ], type = "scores"))
-predict.specproc_rsimpls <- function(object, newdata, type = c("response", "scores"), ...) {
+predict.specproc_rsimpls <- function(object, newdata, type = c("response", "scores"),
+                                     ncomp = NULL, ...) {
   type <- match.arg(type)
+  if (!is.null(ncomp)) {
+    if (type == "scores") {
+      stop("'ncomp' is only used with type = \"response\".", call. = FALSE)
+    }
+    check_count(ncomp, "ncomp")
+    if (ncomp > length(object$models)) {
+      stop("'ncomp' cannot exceed ", length(object$models), ", the 'kmax' of the model.",
+           call. = FALSE)
+    }
+  }
   x <- filter_newdata(object, newdata)
   if (anyNA(x)) {
     stop("'newdata' contains missing values.", call. = FALSE)
   }
   if (type == "response") {
-    pred <- sweep(x %*% object$coefficients, 2, object$intercept, "+")
+    model <- if (is.null(ncomp)) object else object$models[[ncomp]]
+    pred <- sweep(x %*% model$coefficients, 2, model$intercept, "+")
     return(if (ncol(pred) == 1) drop(pred) else pred)
   }
   xc <- sweep(x, 2, object$center)

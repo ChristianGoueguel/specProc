@@ -62,6 +62,7 @@ reference:
   contents:
   - rsimpls
   - predict.specproc_rsimpls
+  - pls_rsimpls
   - select_wavelengths
   - plot_wavelength_selection
 

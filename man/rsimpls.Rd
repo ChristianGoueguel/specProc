@@ -55,6 +55,9 @@ distance below the cut-off of the initial fit), 0 for the others.
 \item \code{robpca_weights}: the weights \eqn{w_i} of the ROBPCA step.
 \item \code{components}: a tibble with the robust \code{R2} and \code{RMSE} of the models
 with 1 to \code{kmax} components.
+\item \code{models}: the \code{coefficients} and \code{intercept} of the models with 1 to
+\code{kmax} components, for predictions with another number of components
+(\code{predict(fit, newdata, ncomp = )}).
 \item \code{ncomp}, \code{kmax}, \code{h}, \code{alpha}: the settings used, and \code{y_scale}, the
 factor applied to the responses before ROBPCA.
 }
@@ -119,8 +122,9 @@ and total sums of squares and cross-products.
 components, the robust \eqn{R^2} of the paper (Remark 7) and the root
 mean squared error, on the observations that are regular in every one of
 these models. They describe the fit to the calibration data; for
-predictions, choose \code{ncomp} by cross-validation (for example with
-tidymodels). These models all come from the same ROBPCA fit, with
+predictions, choose \code{ncomp} by cross-validation, for example with the
+\code{"rsimpls"} engine of \code{\link[parsnip:pls]{parsnip::pls()}} in tidymodels (\link{pls_rsimpls}).
+These models all come from the same ROBPCA fit, with
 \eqn{k_0 = k_{max} + q} components, so the model with \code{ncomp} components
 also depends on \code{kmax}. With \code{kmax = ncomp}, ROBPCA is applied with
 \code{ncomp} plus \eqn{q} components, and \code{components} stops at \code{ncomp}.

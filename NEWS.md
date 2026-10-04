@@ -17,6 +17,14 @@
   `step_rsimpls()` is its recipe step, the robust counterpart of
   `recipes::step_pls()`: it replaces the spectra by their robust PLS scores,
   and optionally their score and orthogonal distances.
+* The `"rsimpls"` engine of `parsnip::pls()` fits `rsimpls()` models in
+  tidymodels, with one or several outcomes; the other arguments of
+  `rsimpls()` are engine arguments (`set_engine("rsimpls", kmax = , alpha =
+  )`). `multi_predict()` gives the predictions of the models with fewer
+  components from the same fit, so `tune::tune_grid()` fits one model per
+  resample for a grid of `num_comp`. `predict()` of an `rsimpls()` model
+  gains `ncomp`, for the models with 1 to `kmax` components, which the fit
+  now keeps (`models`).
 * `select_wavelengths()`: selection of the informative wavelengths for PLS
   regression, by the variable importance in projection (VIP), the
   selectivity ratio (SR), backward elimination on either, or forward
