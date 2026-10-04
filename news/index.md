@@ -78,6 +78,11 @@
   [`predict()`](https://rdrr.io/r/stats/predict.html) gives the classes,
   or the distances to the classes and whether a spectrum is outlying for
   all of them.
+  [`simca()`](https://christiangoueguel.com/specProc/reference/simca.md)
+  is a new parsnip model of SIMCA classification, with
+  [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md)
+  as its `"rsimca"` engine, to fit and tune it in tidymodels
+  (`num_comp`).
 - [`robust_da()`](https://christiangoueguel.com/specProc/reference/robust_da.md):
   robust linear and quadratic discriminant analysis of Hubert and Van
   Driessen (2004), from the MCD estimates of the classes, for a few

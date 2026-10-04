@@ -173,6 +173,8 @@ the overall rate is weighted by the membership probabilities, by default
 the proportions of these observations in each class. They tend to
 underestimate the error: estimate it on test data or by
 cross-validation.</p>
+<p>In tidymodels, <code>rsimca()</code> is the <code>"rsimca"</code> engine of the <code><a href="simca.html">simca()</a></code>
+parsnip model.</p>
 <p><strong>Differences from the paper.</strong> The number of components of each class
 is given (<code>ncomp</code>) or chosen by <code><a href="robpca.html">robpca()</a></code> from the proportion of
 variance explained, instead of by robust cross-validation (PRESS).</p>
@@ -192,7 +194,7 @@ approach to robust principal component analysis. Technometrics,
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="predict.specproc_rsimca.html">predict.specproc_rsimca()</a></code>, <code><a href="robpca.html">robpca()</a></code>, <code><a href="robust_da.html">robust_da()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="predict.specproc_rsimca.html">predict.specproc_rsimca()</a></code>, <code><a href="simca.html">simca()</a></code>, <code><a href="robpca.html">robpca()</a></code>, <code><a href="robust_da.html">robust_da()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>

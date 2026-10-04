@@ -145,6 +145,10 @@ the proportions of these observations in each class. They tend to
 underestimate the error: estimate it on test data or by
 cross-validation.
 
+In tidymodels, `rsimca()` is the `"rsimca"` engine of the
+[`simca()`](https://christiangoueguel.com/specProc/reference/simca.md)
+parsnip model.
+
 **Differences from the paper.** The number of components of each class
 is given (`ncomp`) or chosen by
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
@@ -170,6 +174,7 @@ results.
 ## See also
 
 [`predict.specproc_rsimca()`](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimca.md),
+[`simca()`](https://christiangoueguel.com/specProc/reference/simca.md),
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
 [`robust_da()`](https://christiangoueguel.com/specProc/reference/robust_da.md)
 
