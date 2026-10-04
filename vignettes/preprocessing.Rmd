@@ -176,7 +176,7 @@ than the normalization factor.
 | Compression | `step_wavelet()` (wavelet coefficients), `step_line_intensities()` (line intensities) |
 | Scaling | `step_pareto_scale()`, `step_poisson_scale()` |
 | Removing unwanted variation | `step_epo()`, `step_glsw()`, `step_osc()`, `step_direct_osc()`, `step_projected_osc()`, `step_opls()`, `step_o2pls()`, `step_y_gradient_glsw()` |
-| Robust transformations | `step_robust_bcyj()`, `step_robpca()`, `step_rospca()`, `step_macropca()`, `step_cellpca()` |
+| Robust transformations, PCA and PLS | `step_robust_bcyj()`, `step_robpca()`, `step_rospca()`, `step_macropca()`, `step_cellpca()`, `step_rsimpls()` |
 | Replicate shots | `step_reject_shots()` |
 
 For example, `step_wavelet()` keeps the approximation coefficients of a

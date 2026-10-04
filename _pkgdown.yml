@@ -105,13 +105,14 @@ reference:
   - step_line_ratio
   - step_reject_shots
 
-- subtitle: robust transformation and PCA
+- subtitle: robust transformation, PCA and PLS
   contents:
   - step_robust_bcyj
   - step_robpca
   - step_rospca
   - step_macropca
   - step_cellpca
+  - step_rsimpls
 
 - subtitle: orthogonalization
   contents:

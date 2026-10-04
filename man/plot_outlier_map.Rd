@@ -13,6 +13,7 @@ plot_outlier_map(
   log = FALSE,
   colour_by = c("type", "distance"),
   title = NULL,
+  map = c("regression", "score"),
   ...
 )
 }
@@ -22,7 +23,7 @@ plot_outlier_map(
 
 \item{newdata}{Optional new observations to add to the map (a numeric
 matrix or data frame with the calibration variables). Not available for
-\code{\link[=rsimpls]{rsimpls()}} fits.}
+the regression outlier map of \code{\link[=rsimpls]{rsimpls()}} fits.}
 
 \item{labels}{The number of most outlying observations to label (by
 their row names, or row numbers). Default is 3; use 0 for no labels.}
@@ -49,6 +50,10 @@ outlying ones. Otherwise, the colors spread evenly over the distances.}
 
 \item{title}{The plot title.}
 
+\item{map}{For \code{\link[=rsimpls]{rsimpls()}} fits, the map to draw: \code{"regression"}
+(default), the regression outlier map, or \code{"score"}, the score outlier
+map of the predictors. Not used for robust PCA fits.}
+
 \item{...}{Further arguments passed to \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} to style
 the points, such as \code{alpha} (default 0.85), \code{size} (2.2), \code{stroke}
 (0.4) or \code{colour} (the outline, \code{"black"}). \code{size} can also be a numeric
@@ -65,10 +70,12 @@ distance, for a robust PCA fitted by \code{\link[=robpca]{robpca()}}, \code{\lin
 \code{\link[=macropca]{macropca()}} or \code{\link[=cellpca]{cellpca()}} (Hubert, Rousseeuw and Vanden Branden, 2005).
 For \code{\link[=cellpca]{cellpca()}}, the vertical axis is the norm of the standardized
 residuals, as in the enhanced outlier map of Centofanti, Hubert and
-Rousseeuw. For a robust PLS model fitted by \code{\link[=rsimpls]{rsimpls()}}, it is the
-regression outlier map of Hubert and Vanden Branden (2003): the residual
-distance (with one response, the absolute standardized residual) against
-the score distance.
+Rousseeuw. For a robust PLS model fitted by \code{\link[=rsimpls]{rsimpls()}}, it is by default
+the regression outlier map of Hubert and Vanden Branden (2003): the
+residual distance (with one response, the absolute standardized residual)
+against the score distance. With \code{map = "score"}, it is the score outlier
+map of the predictors: the orthogonal distance of each spectrum to the
+model against its score distance, as for a robust PCA.
 }
 \details{
 The dashed lines are the cut-offs of the two distances. They divide the
@@ -90,8 +97,10 @@ both an outlying spectrum and a large residual; good leverage points have
 an outlying spectrum that the model still fits.
 
 New observations (\code{newdata}) are projected onto the model with
-\link[=predict.specproc_robpca]{predict()} and shown with the calibration
-cut-offs, which is how new spectra are screened before prediction.
+\link[=predict.specproc_robpca]{predict()} (or
+\link[=predict.specproc_rsimpls]{predict()} for the score outlier map of an
+\code{\link[=rsimpls]{rsimpls()}} fit) and shown with the calibration cut-offs, which is how
+new spectra are screened before prediction.
 
 With \code{relative = TRUE}, each distance is divided by its cut-off (the
 reduced score and orthogonal distances), so both cut-offs are at 1

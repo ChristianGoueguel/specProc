@@ -101,3 +101,57 @@ test_that("robust steps have tidy, tunable, print and required_pkgs methods", {
   expect_true("specProc" %in% generics::required_pkgs(rec))
   expect_false("cellWise" %in% generics::required_pkgs(rec))
 })
+
+test_that("step_rsimpls adds the robust PLS scores of a model of the outcome", {
+  set.seed(5)
+  y <- drop(x %*% c(1, -1, 0.5, rep(0, 7))) + rnorm(n, sd = 0.5)
+  dat_y <- data.frame(dat, y = y)
+  rec <- recipes::recipe(y ~ ., data = dat_y[1:70, ]) |>
+    recipes::update_role(id, new_role = "id") |>
+    step_rsimpls(recipes::all_predictors(), num_comp = 3, distances = TRUE)
+  set.seed(6)
+  prepped <- recipes::prep(rec)
+  out <- recipes::bake(prepped, new_data = dat_y[71:90, ])
+  expect_named(out, c("id", "y", "RPLS1", "RPLS2", "RPLS3", "RPLS_SD", "RPLS_OD"))
+  set.seed(6)
+  fit <- rsimpls(x_train, y[1:70], ncomp = 3)
+  pred <- predict(fit, x_test, type = "scores")
+  expect_equal(as.matrix(out[3:5]), as.matrix(pred[1:3]), ignore_attr = TRUE)
+  expect_equal(out$RPLS_SD, pred$sd)
+  expect_equal(out$RPLS_OD, pred$od)
+  # the outcome is not needed to bake
+  expect_named(recipes::bake(prepped, new_data = test),
+               c("id", "RPLS1", "RPLS2", "RPLS3", "RPLS_SD", "RPLS_OD"))
+
+  td <- recipes::tidy(prepped, number = 1)
+  expect_named(td, c("terms", "value", "component", "id"))
+  expect_equal(td$value, as.vector(fit$x_weights))
+  expect_equal(unique(td$component), c("RPLS1", "RPLS2", "RPLS3"))
+  expect_equal(recipes::tidy(rec, number = 1)$value, rep(NA_real_, 1))
+  expect_equal(generics::tunable(rec)$name, "num_comp")
+  expect_true(any(grepl("Robust PLS \\(RSIMPLS\\) on", cli::cli_fmt(print(prepped)))))
+  expect_true("specProc" %in% generics::required_pkgs(rec))
+})
+
+test_that("step_rsimpls models several outcomes and needs one", {
+  set.seed(7)
+  dat_y <- data.frame(dat, y1 = drop(x %*% c(1, -1, rep(0, 8))) + rnorm(n, sd = 0.5),
+                      y2 = drop(x %*% c(0, 0, 1, 1, rep(0, 6))) + rnorm(n, sd = 0.5))
+  rec <- recipes::recipe(y1 + y2 ~ ., data = dat_y[1:70, ]) |>
+    recipes::update_role(id, new_role = "id") |>
+    step_rsimpls(recipes::all_predictors(), num_comp = 2)
+  set.seed(8)
+  prepped <- recipes::prep(rec)
+  expect_equal(prepped$steps[[1]]$outcome, c("y1", "y2"))
+  expect_equal(dim(prepped$steps[[1]]$res$coefficients), c(10L, 2L))
+  # a chosen outcome
+  rec1 <- recipes::recipe(y1 + y2 ~ ., data = dat_y[1:70, ]) |>
+    recipes::update_role(id, new_role = "id") |>
+    step_rsimpls(recipes::all_predictors(), num_comp = 2, outcome = "y2")
+  set.seed(8)
+  expect_equal(recipes::prep(rec1)$steps[[1]]$outcome, "y2")
+  expect_error(prep_step(step_rsimpls), "needs an outcome")
+  train_na <- train
+  train_na$v1[3] <- NA
+  expect_error(prep_step(step_rsimpls, data = train_na), "impute")
+})

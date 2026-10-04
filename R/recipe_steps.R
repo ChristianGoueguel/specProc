@@ -639,7 +639,7 @@ step_predictors <- function(x, training, info) {
 }
 
 # Outcome names: the `outcome` argument, or the recipe's outcomes. Steps
-# other than step_o2pls() need a single outcome.
+# other than step_o2pls() and step_rsimpls() need a single outcome.
 step_outcome <- function(x, training, info) {
   rlang::check_installed("recipes")
   y_name <- if (is.character(x$outcome)) {
@@ -649,8 +649,10 @@ step_outcome <- function(x, training, info) {
   } else {
     recipes::recipes_argument_select(x$outcome, training, info, single = FALSE)
   }
-  if (length(y_name) == 0 || (length(y_name) > 1 && !inherits(x, "step_o2pls"))) {
-    stop("`", class(x)[1], "()` needs a single outcome: specify `outcome`.", call. = FALSE)
+  several <- inherits(x, c("step_o2pls", "step_rsimpls"))
+  if (length(y_name) == 0 || (length(y_name) > 1 && !several)) {
+    stop("`", class(x)[1], "()` needs ", if (several) "an" else "a single",
+         " outcome: specify `outcome`.", call. = FALSE)
   }
   for (nm in y_name) {
     if (!is.numeric(training[[nm]])) {

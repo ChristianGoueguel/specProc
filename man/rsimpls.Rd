@@ -16,7 +16,8 @@ one row per observation.}
 \item{ncomp}{The number of components of the model.}
 
 \item{kmax}{The largest number of components considered. ROBPCA is
-applied with \code{kmax} plus the number of responses components. Default
+applied with \code{kmax} plus the number of responses components, so the
+model also depends on \code{kmax} (see Details). Default
 is 10, as in the paper; it is raised to \code{ncomp} if needed, and lowered
 when there are too few observations or variables (at most one less than
 the number of variables).}
@@ -43,8 +44,10 @@ the scores (\code{ncomp} rows).
 responses.
 \item \code{fitted}, \code{residuals}: the fitted values and residuals.
 \item \code{sigma}: the robust covariance matrix of the residuals.
-\item \code{sd}, \code{rd}: the score and residual distances of each observation, and
-\code{cutoff_sd}, \code{cutoff_rd} their cut-offs.
+\item \code{sd}, \code{rd}, \code{od}: the score, residual and orthogonal distances of
+each observation, and \code{cutoff_sd}, \code{cutoff_rd}, \code{cutoff_od} their
+cut-offs.
+\item \code{R2}: the robust \eqn{R^2} of the model (see Details).
 \item \code{outlier_type}: a factor classifying each observation as \code{"regular"},
 \code{"good leverage"}, \code{"vertical outlier"} or \code{"bad leverage"}.
 \item \code{weights}: 1 for the observations of the final regression (residual
@@ -101,12 +104,26 @@ standardized residual. Observations beyond the score cut-off only are
 \strong{good leverage} points, beyond the residual cut-off only \strong{vertical
 outliers}, and beyond both \strong{bad leverage} points.
 
+The orthogonal distance \eqn{OD_i = \|x_i - \hat\mu_x - P t_i\|} is the
+norm of the residual of the spectrum, the part that the \code{ncomp}
+components do not describe, and its cut-off is that of \code{\link[=robpca]{robpca()}}.
+Observations beyond it are orthogonal outliers in the predictor space,
+which the regression outlier map does not show; the score outlier map
+(\code{plot_outlier_map(fit, map = "score")}) does. The robust \eqn{R^2} of
+the model (\code{R2}) is computed on the observations whose orthogonal and
+residual distances are both below their cut-offs; with several
+responses, it is one minus the ratio of the determinants of the residual
+and total sums of squares and cross-products.
+
 \strong{Number of components.} \code{components} gives, for 1 to \code{kmax}
 components, the robust \eqn{R^2} of the paper (Remark 7) and the root
 mean squared error, on the observations that are regular in every one of
 these models. They describe the fit to the calibration data; for
 predictions, choose \code{ncomp} by cross-validation (for example with
-tidymodels).
+tidymodels). These models all come from the same ROBPCA fit, with
+\eqn{k_0 = k_{max} + q} components, so the model with \code{ncomp} components
+also depends on \code{kmax}. With \code{kmax = ncomp}, ROBPCA is applied with
+\code{ncomp} plus \eqn{q} components, and \code{components} stops at \code{ncomp}.
 
 \strong{Differences from the paper.}
 \itemize{
@@ -119,7 +136,8 @@ that their total robust variance (the sum of the squared MADs, or
 standard deviations for variables with a zero MAD) equals that of the
 predictors (block scaling). The results are returned in
 the units of the responses.
-\item The cut-off of the orthogonal distances is that of \code{\link[=robpca]{robpca()}} (the
+\item The cut-off of the orthogonal distances, in the ROBPCA step and of the
+model, is that of \code{\link[=robpca]{robpca()}} (the
 Wilson-Hilferty approximation of Hubert, Rousseeuw and Vanden Branden,
 2005), which the paper mentions as an alternative.
 \item The residual covariance of the reweighted regression is multiplied by
@@ -142,6 +160,7 @@ fit <- rsimpls(spectra[cal, ], forageLIBS$Ca[cal], ncomp = 4)
 fit
 head(predict(fit, spectra[-cal, ]))
 plot_outlier_map(fit)
+plot_outlier_map(fit, map = "score", newdata = spectra[-cal, ])
 }
 \references{
 \itemize{
@@ -156,7 +175,7 @@ approach to robust principal component analysis. Technometrics,
 }
 }
 \seealso{
-\code{\link[=predict.specproc_rsimpls]{predict.specproc_rsimpls()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}, \code{\link[=robpca]{robpca()}}
+\code{\link[=predict.specproc_rsimpls]{predict.specproc_rsimpls()}}, \code{\link[=plot_outlier_map]{plot_outlier_map()}}, \code{\link[=step_rsimpls]{step_rsimpls()}}, \code{\link[=robpca]{robpca()}}
 }
 \author{
 Christian L. Goueguel

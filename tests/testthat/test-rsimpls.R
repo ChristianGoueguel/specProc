@@ -94,10 +94,34 @@ test_that("predict() reproduces the fitted values, scores and score distances", 
   expect_equal(predict(fit, d$train$x), drop(fit$fitted), ignore_attr = TRUE)
   expect_equal(d$train$y - predict(fit, d$train$x), drop(fit$residuals), ignore_attr = TRUE)
   scores <- predict(fit, d$train$x, type = "scores")
-  expect_named(scores, c("Comp1", "Comp2", "Comp3", "sd"))
+  expect_named(scores, c("Comp1", "Comp2", "Comp3", "sd", "od"))
   expect_equal(as.matrix(scores[1:3]), fit$x_scores, ignore_attr = TRUE)
   expect_equal(scores$sd, fit$sd)
+  expect_equal(scores$od, fit$od)
   expect_error(predict(fit, d$train$x[, 1:10]), "200 columns")
+})
+
+test_that("rsimpls flags orthogonal outliers and gives the robust R2 of the model", {
+  d <- make_regression(seed = 17)
+  x <- d$train$x
+  # spectra with a pattern outside the latent space, and correct responses
+  set.seed(18)
+  x[1:5, ] <- x[1:5, ] + matrix(rnorm(5 * ncol(x), sd = 2), 5)
+  set.seed(19)
+  fit <- rsimpls(x, d$train$y, ncomp = 3)
+  expect_length(fit$od, nrow(x))
+  expect_gt(fit$cutoff_od, 0)
+  expect_true(all(fit$od[1:5] > fit$cutoff_od))
+  expect_lt(mean(fit$od[-(1:5)] > fit$cutoff_od), 0.1)
+  # X residuals of the components
+  xc <- sweep(x, 2, fit$center)
+  expect_equal(fit$od, sqrt(rowSums((xc - fit$x_scores %*% t(fit$x_loadings))^2)),
+               ignore_attr = TRUE)
+  regular <- fit$od <= fit$cutoff_od & fit$rd <= fit$cutoff_rd
+  yr <- d$train$y[regular]
+  expect_equal(fit$R2, 1 - sum(fit$residuals[regular]^2) / sum((yr - mean(yr))^2))
+  expect_gt(fit$R2, 0.95)
+  expect_output(print(fit), "Orthogonal outliers: ")
 })
 
 test_that("rsimpls handles several responses", {
@@ -108,6 +132,7 @@ test_that("rsimpls handles several responses", {
   expect_equal(dim(fit$coefficients), c(200L, 2L))
   expect_equal(dim(fit$sigma), c(2L, 2L))
   expect_equal(fit$cutoff_rd, sqrt(stats::qchisq(0.975, 2)))
+  expect_true(fit$R2 > 0 && fit$R2 < 1)
   expect_equal(dim(predict(fit, d$test$x)), c(200L, 2L))
   expect_s3_class(plot_outlier_map(fit), "ggplot")
 })
@@ -132,4 +157,22 @@ test_that("plot_outlier_map() draws the regression outlier map", {
   expect_match(p$labels$title, "RSIMPLS")
   expect_equal(p$labels$y, "Absolute standardized residual")
   expect_error(plot_outlier_map(fit, newdata = d$test$x), "not used")
+})
+
+test_that("plot_outlier_map() draws the score outlier map of an rsimpls fit", {
+  d <- make_regression(seed = 15)
+  set.seed(16)
+  fit <- rsimpls(d$train$x, d$train$y, ncomp = 3)
+  p <- plot_outlier_map(fit, map = "score", newdata = d$test$x[1:20, ])
+  expect_s3_class(p, "ggplot")
+  expect_match(p$labels$title, "score outlier map")
+  expect_equal(p$labels$y, "Orthogonal distance")
+  expect_equal(nrow(p$data), 120L)
+  expect_equal(p$data$y[1:100], fit$od)
+  expect_equal(as.character(p$data$type[1:100]),
+               as.character(outlier_type(fit$sd, fit$od, fit$cutoff_sd, fit$cutoff_od)))
+  # map is not used for robust PCA fits
+  set.seed(17)
+  pca <- robpca(d$train$x, k = 3)
+  expect_equal(plot_outlier_map(pca, map = "score")$labels$y, "Orthogonal distance")
 })

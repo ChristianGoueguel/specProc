@@ -42,12 +42,26 @@
 #' **good leverage** points, beyond the residual cut-off only **vertical
 #' outliers**, and beyond both **bad leverage** points.
 #'
+#' The orthogonal distance \eqn{OD_i = \|x_i - \hat\mu_x - P t_i\|} is the
+#' norm of the residual of the spectrum, the part that the `ncomp`
+#' components do not describe, and its cut-off is that of [robpca()].
+#' Observations beyond it are orthogonal outliers in the predictor space,
+#' which the regression outlier map does not show; the score outlier map
+#' (`plot_outlier_map(fit, map = "score")`) does. The robust \eqn{R^2} of
+#' the model (`R2`) is computed on the observations whose orthogonal and
+#' residual distances are both below their cut-offs; with several
+#' responses, it is one minus the ratio of the determinants of the residual
+#' and total sums of squares and cross-products.
+#'
 #' **Number of components.** `components` gives, for 1 to `kmax`
 #' components, the robust \eqn{R^2} of the paper (Remark 7) and the root
 #' mean squared error, on the observations that are regular in every one of
 #' these models. They describe the fit to the calibration data; for
 #' predictions, choose `ncomp` by cross-validation (for example with
-#' tidymodels).
+#' tidymodels). These models all come from the same ROBPCA fit, with
+#' \eqn{k_0 = k_{max} + q} components, so the model with `ncomp` components
+#' also depends on `kmax`. With `kmax = ncomp`, ROBPCA is applied with
+#' `ncomp` plus \eqn{q} components, and `components` stops at `ncomp`.
 #'
 #' **Differences from the paper.**
 #'  - ROBPCA is not scale equivariant, so the scale of the responses
@@ -59,7 +73,8 @@
 #'    standard deviations for variables with a zero MAD) equals that of the
 #'    predictors (block scaling). The results are returned in
 #'    the units of the responses.
-#'  - The cut-off of the orthogonal distances is that of [robpca()] (the
+#'  - The cut-off of the orthogonal distances, in the ROBPCA step and of the
+#'    model, is that of [robpca()] (the
 #'    Wilson-Hilferty approximation of Hubert, Rousseeuw and Vanden Branden,
 #'    2005), which the paper mentions as an alternative.
 #'  - The residual covariance of the reweighted regression is multiplied by
@@ -77,7 +92,8 @@
 #'   one row per observation.
 #' @param ncomp The number of components of the model.
 #' @param kmax The largest number of components considered. ROBPCA is
-#'   applied with `kmax` plus the number of responses components. Default
+#'   applied with `kmax` plus the number of responses components, so the
+#'   model also depends on `kmax` (see Details). Default
 #'   is 10, as in the paper; it is raised to `ncomp` if needed, and lowered
 #'   when there are too few observations or variables (at most one less than
 #'   the number of variables).
@@ -99,8 +115,10 @@
 #'    responses.
 #'  - `fitted`, `residuals`: the fitted values and residuals.
 #'  - `sigma`: the robust covariance matrix of the residuals.
-#'  - `sd`, `rd`: the score and residual distances of each observation, and
-#'    `cutoff_sd`, `cutoff_rd` their cut-offs.
+#'  - `sd`, `rd`, `od`: the score, residual and orthogonal distances of
+#'    each observation, and `cutoff_sd`, `cutoff_rd`, `cutoff_od` their
+#'    cut-offs.
+#'  - `R2`: the robust \eqn{R^2} of the model (see Details).
 #'  - `outlier_type`: a factor classifying each observation as `"regular"`,
 #'    `"good leverage"`, `"vertical outlier"` or `"bad leverage"`.
 #'  - `weights`: 1 for the observations of the final regression (residual
@@ -124,7 +142,7 @@
 #'    approach to robust principal component analysis. Technometrics,
 #'    47(1):64-79.
 #'
-#' @seealso [predict.specproc_rsimpls()], [plot_outlier_map()], [robpca()]
+#' @seealso [predict.specproc_rsimpls()], [plot_outlier_map()], [step_rsimpls()], [robpca()]
 #'
 #' @export rsimpls
 #'
@@ -138,6 +156,7 @@
 #' fit
 #' head(predict(fit, spectra[-cal, ]))
 #' plot_outlier_map(fit)
+#' plot_outlier_map(fit, map = "score", newdata = spectra[-cal, ])
 rsimpls <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 500) {
   if (missing(x) || missing(y) || is.null(x) || is.null(y)) {
     stop("Both 'x' and 'y' must be provided.", call. = FALSE)
@@ -165,6 +184,16 @@ rsimpls <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 50
   model <- fit$models[[ncomp]]
   k <- seq_len(ncomp)
   comp <- paste0("Comp", k)
+  cutoff_rd <- sqrt(stats::qchisq(0.975, ncol(y)))
+  od <- pls_od(sweep(x, 2, fit$center), fit$scores[, k, drop = FALSE],
+               fit$loadings[, k, drop = FALSE])
+  cutoff_od <- od_cutoff(od, fit$h)
+  # robust R2 on the observations regular in both distances
+  regular <- od <= cutoff_od & model$rd <= cutoff_rd
+  if (sum(regular) <= ncol(y)) regular <- rep(TRUE, nrow(x))
+  yr <- y[regular, , drop = FALSE]
+  r2 <- 1 - det(crossprod(model$residuals[regular, , drop = FALSE])) /
+    det(crossprod(sweep(yr, 2, colMeans(yr))))
   res <- list(
     coefficients = model$coefficients,
     intercept = model$intercept,
@@ -179,11 +208,14 @@ rsimpls <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 50
     sigma = model$sigma,
     sd = model$sd,
     rd = model$rd,
+    od = od,
     cutoff_sd = sqrt(stats::qchisq(0.975, ncomp)),
-    cutoff_rd = sqrt(stats::qchisq(0.975, ncol(y))),
+    cutoff_rd = cutoff_rd,
+    cutoff_od = cutoff_od,
     outlier_type = NULL,
     weights = model$weights,
     robpca_weights = as.numeric(fit$w),
+    R2 = r2,
     components = fit$components,
     score_center = model$score_center,
     score_cov = model$score_cov,
@@ -340,6 +372,15 @@ simpls_robust <- function(px, py, values, kmax) {
   list(weights = weights[, seq_len(a), drop = FALSE], loadings = loadings[, seq_len(a), drop = FALSE])
 }
 
+# Orthogonal distances: norms of the residuals xc - t P^T of the centered
+# predictors, with the scores t and loadings P. Norms at the rounding level,
+# relative to the norm of the row, are zero (as in orthogonal_distance()).
+pls_od <- function(xc, scores, loadings) {
+  od <- sqrt(rowSums((xc - tcrossprod(scores, loadings))^2))
+  od[which(od <= sqrt(.Machine$double.eps) * sqrt(rowSums(xc^2)))] <- 0
+  od
+}
+
 # Regression of y on the scores t: least squares on the observations with
 # weight w, then on those whose residual distance is below the cut-off
 # (reweighting). The score distances use the center and covariance of the
@@ -393,13 +434,13 @@ regression_outlier_type <- function(sd, rd, cutoff_sd, cutoff_rd) {
 #' @param newdata A numeric matrix or data frame with the same variables as
 #'   the calibration data.
 #' @param type `"response"` (default) for the predicted responses, or
-#'   `"scores"` for the scores and their score distances.
+#'   `"scores"` for the scores and their score and orthogonal distances.
 #' @param ... Not used.
 #'
 #' @return With `type = "response"`, a numeric vector of predictions (one
 #'   response) or a matrix with one column per response. With
-#'   `type = "scores"`, a tibble with the scores (`Comp1`, ...) and the score
-#'   distance `sd` of each observation.
+#'   `type = "scores"`, a tibble with the scores (`Comp1`, ...), the score
+#'   distance `sd` and the orthogonal distance `od` of each observation.
 #'
 #' @seealso [rsimpls()]
 #' @export
@@ -422,9 +463,11 @@ predict.specproc_rsimpls <- function(object, newdata, type = c("response", "scor
     pred <- sweep(x %*% object$coefficients, 2, object$intercept, "+")
     return(if (ncol(pred) == 1) drop(pred) else pred)
   }
-  scores <- sweep(x, 2, object$center) %*% object$x_weights
+  xc <- sweep(x, 2, object$center)
+  scores <- xc %*% object$x_weights
   out <- tibble::as_tibble(scores)
   out$sd <- sqrt(pmax(stats::mahalanobis(scores, object$score_center, object$score_cov), 0))
+  out$od <- pls_od(xc, scores, object$x_loadings)
   out
 }
 
@@ -436,10 +479,12 @@ print.specproc_rsimpls <- function(x, ...) {
   cat("Responses:      ", length(attr(x, "responses")), "\n", sep = "")
   cat("Components:     ", x$ncomp, " (robust R2 of 1 to ", x$kmax, " components: ",
       paste(format(x$components$R2, digits = 3), collapse = " "), ")\n", sep = "")
+  cat("Robust R2:      ", format(x$R2, digits = 3), "\n", sep = "")
   if (length(x$intercept) == 1) {
     cat("Residual scale: ", format(sqrt(x$sigma[1, 1]), digits = 4), "\n", sep = "")
   }
   cat("\nOutlier types:\n")
   print(table(x$outlier_type))
+  cat("\nOrthogonal outliers: ", sum(x$od > x$cutoff_od), "\n", sep = "")
   invisible(x)
 }

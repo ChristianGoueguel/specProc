@@ -419,7 +419,7 @@ test_that("plot_outlier_map and plot_cell_map return ggplots", {
   expect_equal(unique(styled$data[[3]]$size), 3)
   expect_equal(unique(styled$data[[3]]$colour), "red")
   expect_equal(unique(styled$data[[3]]$stroke), 0.4)
-  expect_error(plot_outlier_map(fit, NULL, 3, FALSE, FALSE, FALSE, "type", NULL, 0.5), "named")
+  expect_error(plot_outlier_map(fit, NULL, 3, FALSE, FALSE, FALSE, "type", NULL, "regression", 0.5), "named")
 
   set.seed(17)
   x <- matrix(rnorm(40 * 8), 40, 8) %*% diag(8:1)

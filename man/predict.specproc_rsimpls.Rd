@@ -13,15 +13,15 @@
 the calibration data.}
 
 \item{type}{\code{"response"} (default) for the predicted responses, or
-\code{"scores"} for the scores and their score distances.}
+\code{"scores"} for the scores and their score and orthogonal distances.}
 
 \item{...}{Not used.}
 }
 \value{
 With \code{type = "response"}, a numeric vector of predictions (one
 response) or a matrix with one column per response. With
-\code{type = "scores"}, a tibble with the scores (\code{Comp1}, ...) and the score
-distance \code{sd} of each observation.
+\code{type = "scores"}, a tibble with the scores (\code{Comp1}, ...), the score
+distance \code{sd} and the orthogonal distance \code{od} of each observation.
 }
 \description{
 Predicts the responses of new observations with a model fitted by

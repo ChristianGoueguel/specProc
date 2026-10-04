@@ -1,6 +1,6 @@
-# Recipe steps for robust transformations and robust PCA (tidymodels):
-# robust Box-Cox / Yeo-Johnson, ROBPCA, ROSPCA and MacroPCA. See
-# recipe_steps.R for the shared helpers.
+# Recipe steps for robust transformations, robust PCA and robust PLS
+# (tidymodels): robust Box-Cox / Yeo-Johnson, ROBPCA, ROSPCA, MacroPCA,
+# cellPCA and RSIMPLS. See recipe_steps.R for the shared helpers.
 
 #' @title Robust Box-Cox and Yeo-Johnson Transformation Recipe Step
 #'
@@ -261,6 +261,80 @@ step_cellpca <- function(recipe, ..., role = "predictor", trained = FALSE, num_c
   ))
 }
 
+#' @title Robust PLS (RSIMPLS) Recipe Step
+#'
+#' @description
+#' `step_rsimpls()` creates a *specification* of a recipe step that converts
+#' the selected variables into robust partial least squares scores, with
+#' [rsimpls()]. It is the robust counterpart of [recipes::step_pls()]:
+#' outlying spectra and wrong reference values have little influence on the
+#' components.
+#'
+#' @details
+#' The RSIMPLS model is estimated on the training data, with the outcome,
+#' when the recipe is prepped, and new data are projected onto it when they
+#' are baked; the outcome is not needed then. As the step uses the outcome,
+#' it must be estimated on the training data only: in a workflow, it is
+#' re-estimated for every resample. Several outcomes give one model of all
+#' of them, as with [rsimpls()].
+#'
+#' The new columns are named with `prefix` followed by the component number,
+#' zero-padded as in [recipes::step_pls()]. With `distances = TRUE`, two
+#' more columns hold the score distance (`<prefix>_SD`) and the orthogonal
+#' distance (`<prefix>_OD`) of each observation, which can be used to screen
+#' new spectra; the residual distance needs the outcome and is not given.
+#' The selected columns are removed unless `keep_original_cols = TRUE`.
+#'
+#' # Tuning
+#'
+#' `num_comp` can be tuned with [tune::tune()], using [dials::num_comp()]
+#' with values 1 to 4.
+#'
+#' # Tidying
+#'
+#' [tidy()][recipes::tidy.recipe] returns the weight vectors, which give the
+#' scores of the centered predictors, as a tibble with columns `terms`,
+#' `value`, `component` and `id`.
+#'
+#' @inherit step_robpca return
+#' @inheritParams step_robpca
+#' @param num_comp The number of PLS components. Default is 2.
+#' @param outcome The outcome variable(s), as bare names or a selector. If
+#'   `NULL` (default), the outcomes of the recipe are used.
+#' @param options A list of further arguments passed to [rsimpls()], such as
+#'   `kmax`, `alpha` or `ndir`.
+#' @param prefix The prefix of the new column names. Default is `"RPLS"`.
+#' @param res The fitted RSIMPLS model, stored once the step has been
+#'   trained.
+#'
+#' @seealso [rsimpls()], [step_robpca()]
+#' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' library(recipes)
+#' data(forageLIBS)
+#' # calcium and the Ca II and Ca I lines
+#' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+#' dat <- forageLIBS[c(which(names(forageLIBS) == "Ca"), which(wl > 380 & wl < 430))]
+#' set.seed(1)
+#' rec <- recipe(Ca ~ ., data = dat[1:300, ]) |>
+#'   step_rsimpls(all_predictors(), num_comp = 4, distances = TRUE)
+#' prepped <- prep(rec)
+#' bake(prepped, new_data = dat[301:368, ])
+#' tidy(prepped, number = 1)
+step_rsimpls <- function(recipe, ..., role = "predictor", trained = FALSE, num_comp = 2,
+                         outcome = NULL, options = list(), prefix = "RPLS", distances = FALSE,
+                         keep_original_cols = FALSE, res = NULL, columns = NULL,
+                         skip = FALSE, id = recipes::rand_id("rsimpls")) {
+  rlang::check_installed("recipes")
+  recipes::add_step(recipe, specproc_step_new(
+    "rsimpls", terms = rlang::enquos(...), role = role, trained = trained,
+    num_comp = num_comp, outcome = rlang::enquos(outcome), options = options,
+    prefix = prefix, distances = distances, keep_original_cols = keep_original_cols,
+    res = res, columns = columns, skip = skip, id = id
+  ))
+}
+
 # ---- internals ---------------------------------------------------------------
 
 robust_titles <- c(
@@ -268,8 +342,22 @@ robust_titles <- c(
   robpca = "Robust PCA (ROBPCA) on ",
   rospca = "Robust sparse PCA (ROSPCA) on ",
   macropca = "MacroPCA on ",
-  cellpca = "cellPCA on "
+  cellpca = "cellPCA on ",
+  rsimpls = "Robust PLS (RSIMPLS) on "
 )
+
+# Keeps only what predict() needs from an RSIMPLS model.
+strip_rsimpls <- function(fit) {
+  fit[c("x_scores", "fitted", "residuals", "sd", "rd", "od", "outlier_type", "weights",
+        "robpca_weights")] <- NULL
+  fit
+}
+
+# Names of the score columns: zero-padded for RSIMPLS, as in
+# recipes::step_pls().
+score_names <- function(x, k) {
+  if (inherits(x, "step_rsimpls")) recipes::names0(k, x$prefix) else paste0(x$prefix, seq_len(k))
+}
 
 
 # Keeps only what predict() needs from a robust PCA model.
@@ -295,6 +383,10 @@ prep_robust_step <- function(x, training, info = NULL, ...) {
   if (length(cols) > 0) {
     if (step != "step_robust_bcyj") check_count(x$num_comp, "num_comp")
     opts <- x$options %||% list()
+    if (step == "step_rsimpls") {
+      x$outcome <- step_outcome(x, training, info)
+      y <- as.matrix(training[x$outcome])
+    }
     x$res <- switch(
       step,
       step_robust_bcyj = robust_transformation(xmat, type = x$type, quantile = x$quantile,
@@ -302,7 +394,8 @@ prep_robust_step <- function(x, training, info = NULL, ...) {
       step_robpca = strip_robust_pca(do.call(robpca, c(list(xmat, k = x$num_comp), opts))),
       step_rospca = strip_robust_pca(do.call(rospca, c(list(xmat, k = x$num_comp, lambda = x$lambda), opts))),
       step_macropca = strip_robust_pca(do.call(macropca, c(list(xmat, k = x$num_comp), opts))),
-      step_cellpca = strip_robust_pca(do.call(cellpca, c(list(xmat, k = x$num_comp), opts)))
+      step_cellpca = strip_robust_pca(do.call(cellpca, c(list(xmat, k = x$num_comp), opts))),
+      step_rsimpls = strip_rsimpls(do.call(rsimpls, c(list(xmat, y, ncomp = x$num_comp), opts)))
     )
   }
   if (step != "step_robust_bcyj") {
@@ -325,10 +418,15 @@ bake_robust_step <- function(object, new_data, ...) {
     new_data[cols] <- as.data.frame(out)
     return(new_data)
   }
-  pred <- stats::predict(object$res, xmat)
-  k <- object$res$k
+  if (inherits(object, "step_rsimpls")) {
+    pred <- stats::predict(object$res, xmat, type = "scores")
+    k <- object$res$ncomp
+  } else {
+    pred <- stats::predict(object$res, xmat)
+    k <- object$res$k
+  }
   comps <- as.matrix(pred[seq_len(k)])
-  colnames(comps) <- paste0(object$prefix, seq_len(k))
+  colnames(comps) <- score_names(object, k)
   if (isTRUE(object$distances)) {
     comps <- cbind(comps, pred$sd, pred$od)
     colnames(comps)[k + 1:2] <- paste0(object$prefix, c("_SD", "_OD"))
@@ -356,11 +454,12 @@ tidy_robust_step <- function(x, ...) {
       res <- tibble::tibble(terms = terms, lambda = NA_real_, method = NA_character_)
     }
   } else if (trained) {
-    loadings <- x$res$loadings
+    # the vectors that give the scores: loadings, or the weights of RSIMPLS
+    loadings <- if (inherits(x, "step_rsimpls")) x$res$x_weights else x$res$loadings
     res <- tibble::tibble(
       terms = rep(x$columns, ncol(loadings)),
       value = as.vector(loadings),
-      component = rep(paste0(x$prefix, seq_len(ncol(loadings))), each = nrow(loadings))
+      component = rep(score_names(x, ncol(loadings)), each = nrow(loadings))
     )
   } else {
     terms <- if (recipes::is_trained(x)) x$columns else recipes::sel2char(x$terms)
@@ -400,6 +499,8 @@ prep.step_rospca <- prep_robust_step
 prep.step_macropca <- prep_robust_step
 #' @exportS3Method recipes::prep
 prep.step_cellpca <- prep_robust_step
+#' @exportS3Method recipes::prep
+prep.step_rsimpls <- prep_robust_step
 
 #' @exportS3Method recipes::bake
 bake.step_robust_bcyj <- bake_robust_step
@@ -411,6 +512,8 @@ bake.step_rospca <- bake_robust_step
 bake.step_macropca <- bake_robust_step
 #' @exportS3Method recipes::bake
 bake.step_cellpca <- bake_robust_step
+#' @exportS3Method recipes::bake
+bake.step_rsimpls <- bake_robust_step
 
 #' @export
 print.step_robust_bcyj <- print_robust_step
@@ -422,6 +525,8 @@ print.step_rospca <- print_robust_step
 print.step_macropca <- print_robust_step
 #' @export
 print.step_cellpca <- print_robust_step
+#' @export
+print.step_rsimpls <- print_robust_step
 
 #' @exportS3Method generics::tidy
 tidy.step_robust_bcyj <- tidy_robust_step
@@ -433,6 +538,8 @@ tidy.step_rospca <- tidy_robust_step
 tidy.step_macropca <- tidy_robust_step
 #' @exportS3Method generics::tidy
 tidy.step_cellpca <- tidy_robust_step
+#' @exportS3Method generics::tidy
+tidy.step_rsimpls <- tidy_robust_step
 
 #' @exportS3Method generics::tunable
 tunable.step_robust_bcyj <- tunable_robust_step
@@ -444,6 +551,8 @@ tunable.step_rospca <- tunable_robust_step
 tunable.step_macropca <- tunable_robust_step
 #' @exportS3Method generics::tunable
 tunable.step_cellpca <- tunable_robust_step
+#' @exportS3Method generics::tunable
+tunable.step_rsimpls <- tunable_robust_step
 
 #' @exportS3Method generics::required_pkgs
 required_pkgs.step_robust_bcyj <- required_pkgs_robust_step
@@ -455,3 +564,5 @@ required_pkgs.step_rospca <- required_pkgs_robust_step
 required_pkgs.step_macropca <- required_pkgs_robust_step
 #' @exportS3Method generics::required_pkgs
 required_pkgs.step_cellpca <- required_pkgs_robust_step
+#' @exportS3Method generics::required_pkgs
+required_pkgs.step_rsimpls <- required_pkgs_robust_step
