@@ -39,8 +39,8 @@
 #' the g-and-h transform turns back before the \eqn{\alpha/2} quantile the
 #' fence is its extreme value.
 #'
-#' The layout, the points and the options for publication figures are those
-#' of [adjusted_boxplot()]: see its details.
+#' The layout, the points, the annotations and the options for publication
+#' figures are those of [adjusted_boxplot()]: see its details.
 #'
 #' @references
 #'  - Bruffaerts, C., Verardi, V., Vermandele, C. (2014). A generalized boxplot for
@@ -58,13 +58,10 @@
 #'
 #' @return
 #'    - If `plot = TRUE`, a `ggplot2` object.
-#'    - If `plot = FALSE`, a list of two tibbles: `stats`, with one row per
-#'      variable (and group): the number of values `n`, the whisker ends
-#'      `lower` and `upper` (the most extreme values within the fences), the
-#'      quartiles `q1` and `q3`, the `median`, the fences, the notch limits,
-#'      the estimated `g` and `h`, the `mean` and the number of outlying values
-#'      `n_outliers`; and `outliers`, with the outlying values, their `row` in
-#'      `x`, their `id` and their tail `out` (`"lower"` or `"upper"`).
+#'    - If `plot = FALSE`, a list of tibbles: `stats`, `outliers` and, with
+#'      `group`, `tests`, as in [adjusted_boxplot()], with the estimated `g`
+#'      and `h` instead of the medcouple, and `alpha * n` expected outlying
+#'      values.
 #'
 #' @seealso [adjusted_boxplot()]
 #'
@@ -110,14 +107,14 @@ generalized_boxplot <- function(x, alpha = 2 * stats::pnorm(-4 * stats::qnorm(0.
                                 plot = TRUE, id = NULL, group = NULL,
                                 scales = c("free_y", "fixed"),
                                 points = c("outliers", "all", "none"), label_outliers = FALSE,
-                                show_n = TRUE, show_mean = FALSE, horizontal = FALSE,
-                                log = FALSE, fill = "grey85", xlab = NULL, ylab = NULL,
-                                title = NULL, caption = TRUE, base_size = 11, x_labels_angle = 0,
-                                box_width = 0.5, notch = FALSE, notch_width = 0.5,
-                                staple_width = 0.5, xlabels.angle = deprecated(),
-                                xlabels.vjust = deprecated(), xlabels.hjust = deprecated(),
-                                box.width = deprecated(), notchwidth = deprecated(),
-                                staplewidth = deprecated()) {
+                                show_n = TRUE, show_mean = FALSE, annotate = NULL,
+                                horizontal = FALSE, log = FALSE, fill = "grey85", xlab = NULL,
+                                ylab = NULL, title = NULL, caption = TRUE, base_size = 11,
+                                x_labels_angle = 0, box_width = 0.5, notch = FALSE,
+                                notch_width = 0.5, staple_width = 0.5,
+                                xlabels.angle = deprecated(), xlabels.vjust = deprecated(),
+                                xlabels.hjust = deprecated(), box.width = deprecated(),
+                                notchwidth = deprecated(), staplewidth = deprecated()) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -133,19 +130,20 @@ generalized_boxplot <- function(x, alpha = 2 * stats::pnorm(-4 * stats::qnorm(0.
   args <- boxplot_args(
     "generalized_boxplot", rlang::caller_env(), scales = scales, points = points,
     label_outliers = label_outliers, show_n = show_n, show_mean = show_mean,
-    horizontal = horizontal, log = log, fill = fill, xlab = xlab, ylab = ylab, title = title,
-    caption = caption, base_size = base_size, x_labels_angle = x_labels_angle,
-    box_width = box_width, notch = notch, notch_width = notch_width, staple_width = staple_width,
+    annotate = annotate, horizontal = horizontal, log = log, fill = fill, xlab = xlab,
+    ylab = ylab, title = title, caption = caption, base_size = base_size,
+    x_labels_angle = x_labels_angle, box_width = box_width, notch = notch,
+    notch_width = notch_width, staple_width = staple_width,
     xlabels.angle = xlabels.angle, xlabels.vjust = xlabels.vjust, xlabels.hjust = xlabels.hjust,
     box.width = box.width, notchwidth = notchwidth, staplewidth = staplewidth
   )
   input <- boxplot_input(x, rlang::enquo(id), rlang::enquo(group))
   res <- robust_boxplot_data(input$x, input$vars, input$id, input$group,
-                             function(v) generalized_stats(v, alpha, p))
+                             function(v) generalized_stats(v, alpha, p), alpha)
   if (!plot) {
-    return(res[c("stats", "outliers")])
+    return(res[c("stats", "outliers", if (!is.null(res$tests)) "tests")])
   }
-  robust_boxplot_plot(res, args, boxplot_caption("generalized", alpha))
+  robust_boxplot_plot(res, args, "generalized", alpha)
 }
 
 # Generalized boxplot statistics of one variable (Bruffaerts et al., 2014),

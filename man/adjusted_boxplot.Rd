@@ -14,6 +14,7 @@ adjusted_boxplot(
   label_outliers = FALSE,
   show_n = TRUE,
   show_mean = FALSE,
+  annotate = NULL,
   horizontal = FALSE,
   log = FALSE,
   fill = "grey85",
@@ -65,6 +66,10 @@ their \code{id}, else their row number (\code{FALSE}, default).}
 \item{show_mean}{A logical: mark the mean of each box with a diamond
 (\code{FALSE}, default).}
 
+\item{annotate}{Statistics added to each box (none by default): some of
+\code{"shape"}, \code{"outliers"}, \code{"fences"}, \code{"median"}, \code{"spread"},
+\code{"location"}, \code{"test"} and \code{"missing"}, or \code{"all"} (see Details).}
+
 \item{horizontal}{A logical: horizontal boxes (\code{FALSE}, default), suited
 to many variables or long names.}
 
@@ -109,13 +114,19 @@ follows their angle.}
 \value{
 \itemize{
 \item If \code{plot = TRUE}, a \code{ggplot2} object.
-\item If \code{plot = FALSE}, a list of two tibbles: \code{stats}, with one row per
-variable (and group): the number of values \code{n}, the whisker ends
-\code{lower} and \code{upper} (the most extreme values within the fences), the
-quartiles \code{q1} and \code{q3}, the \code{median}, the fences, the notch limits,
-the medcouple, the \code{mean} and the number of outlying values
-\code{n_outliers}; and \code{outliers}, with the outlying values, their \code{row} in
-\code{x}, their \code{id} and their tail \code{out} (\code{"lower"} or \code{"upper"}).
+\item If \code{plot = FALSE}, a list of tibbles: \code{stats}, with one row per
+variable (and group): the numbers of values \code{n} and of missing values
+\code{n_missing}, the whisker ends \code{lower} and \code{upper} (the most extreme
+values within the fences), the quartiles \code{q1} and \code{q3}, the \code{median},
+the fences, the notch limits, the \code{medcouple}, the 95\% confidence
+interval of the median (\code{median_lower}, \code{median_upper}), the \code{iqr},
+the robust coefficient of variation \code{rcv} (\%), the \code{biweight}
+location, the \code{mean}, and the numbers of outlying values \code{n_outliers}
+and of expected ones in clean data \code{expected_outliers}; \code{outliers},
+with the outlying values, their \code{row} in \code{x}, their \code{id} and their
+tail \code{out} (\code{"lower"} or \code{"upper"}); and, with \code{group}, \code{tests}, the
+Kruskal-Wallis test between the groups of each variable (\code{statistic},
+\code{df}, \code{p_value}).
 }
 }
 \description{
@@ -154,6 +165,40 @@ spread sideways so that equal values do not hide each other.
 as some journals require; \code{label_outliers = TRUE} names the outlying
 observations by \code{id} (else by row number), and the \code{outliers} table of
 \code{plot = FALSE} gives them all.
+
+\strong{Annotations.} \code{annotate} adds, for each box:
+\itemize{
+\item \code{"shape"}: the medcouple (\code{MC}, marked \verb{(> 0.6)} beyond the range of
+the method), or the \code{g} and \code{h} of the generalized boxplot, which
+explain the asymmetry of the whiskers;
+\item \code{"outliers"}: the number of flagged values, with the number expected in
+clean data (about 0.7\% for the adjusted boxplot, which Hubert and
+Vandervieren calibrated as Tukey's boxplot for normal data, and \code{alpha}
+for the generalized one): many more flagged values than expected point
+to real outliers;
+\item \code{"fences"}: the fences beyond which values are flagged, as dashed marks
+(on the sides with outlying values), the whiskers ending at the last
+values inside;
+\item \code{"median"}: the median with its distribution-free 95\% confidence
+interval, from the order statistics (\code{Md}); the notches are made to
+compare two medians, and are not a confidence interval of one;
+\item \code{"spread"}: the interquartile range and the robust coefficient of
+variation \eqn{\text{rCV} = \text{IQR} / (1.349\,\text{median})}, in
+percent, read as a relative standard deviation;
+\item \code{"location"}: the biweight location (\code{\link[=biweight_location]{biweight_location()}}), a robust
+mean, marked by a cross (the mean, with \code{show_mean}, is pulled by the
+outlying values);
+\item \code{"test"}: with \code{group}, the p-value of the Kruskal-Wallis test between
+the groups, below the variable name. With several variables, adjust the
+p-values for multiple testing (see \code{\link[=p.adjust]{p.adjust()}} and the \code{tests} table);
+\item \code{"missing"}: the number of missing values, next to \code{n}.
+}
+
+\code{annotate = "all"} adds them all (the test only with \code{group}). The
+caption gives their key. With several boxes in a panel, each statistic
+takes two short lines: for many groups, make the figure wider or choose
+fewer annotations. All the values are in the \code{stats} and \code{tests} tables
+of \code{plot = FALSE}.
 
 \strong{Publication figures.} Give the units of the variables in their names
 (such as \code{"Ca (\%)"}, with \code{check.names = FALSE} in \code{\link[=data.frame]{data.frame()}}) or in

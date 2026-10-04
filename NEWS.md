@@ -84,7 +84,16 @@
   - `xlab`, `ylab`, `title` (bold), `base_size`, `horizontal`, `log` (a
     logarithmic axis) and `fill` (one color, or one per group or variable);
   - the `stats` table gives `n`, the fences, the notch limits, the `mean`
-    and `n_outliers` of each variable (and group).
+    and `n_outliers` of each variable (and group);
+  - `annotate` writes statistics with each box: the shape measured by the
+    method (medcouple, or g and h), the number of flagged values with the
+    number expected in clean data, the median with its distribution-free
+    95% confidence interval, the IQR and the robust coefficient of variation;
+    it draws the fences and the biweight location, gives the p-value of a
+    Kruskal-Wallis test between the groups, and the number of missing
+    values. The `stats` table gains these values (`n_missing`,
+    `median_lower`, `median_upper`, `iqr`, `rcv`, `biweight`,
+    `expected_outliers`), and a `tests` table gives the tests.
 * The axis titles of `plot_spectra()` and `plot_fit()` give the units in
   parentheses, as in the other plots: "Wavelength (nm)" and
   "Intensity (arb. units)".

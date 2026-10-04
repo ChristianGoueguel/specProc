@@ -148,3 +148,75 @@ test_that("the boxplots show what is asked, with notches", {
   # the colors do not depend on the packages installed
   expect_equal(unique(ggplot2::ggplot_build(adjusted_boxplot(df))$data[[1]]$fill), "grey85")
 })
+
+test_that("the boxplots give robust summaries, missing values and expected outliers", {
+  set.seed(16)
+  x <- c(stats::rexp(99), NA)
+  rate <- 2 * stats::pnorm(-4 * stats::qnorm(0.75))
+  st <- adjusted_boxplot(data.frame(a = x), plot = FALSE)$stats
+  v <- x[!is.na(x)]
+  expect_equal(st$n_missing, 1)
+  # distribution-free 95% confidence interval of the median
+  j <- stats::qbinom(0.025, 99, 0.5)
+  expect_equal(c(st$median_lower, st$median_upper), sort(v)[c(j, 99 - j + 1)])
+  expect_gte(1 - 2 * stats::pbinom(j - 1, 99, 0.5), 0.95)
+  expect_equal(st$iqr, st$q3 - st$q1)
+  expect_equal(st$rcv, 100 * st$iqr / 1.34898 / st$median, tolerance = 1e-5)
+  expect_equal(st$biweight, biweight_location(v))
+  expect_equal(st$expected_outliers, rate * 99)
+  expect_equal(generalized_boxplot(data.frame(a = v), alpha = 0.05, plot = FALSE)$stats$expected_outliers,
+               0.05 * 99)
+  # too few values for an interval
+  expect_true(is.na(boxplot_summaries(1:5, data.frame(q1 = 2, q3 = 4, median = 3))$median_lower))
+})
+
+test_that("the boxplots test the groups with Kruskal-Wallis", {
+  set.seed(17)
+  df <- data.frame(g = rep(c("a", "b", "c"), each = 30), y = stats::rnorm(90) + rep(0:2, each = 30),
+                   z = stats::rnorm(90))
+  res <- adjusted_boxplot(df, group = g, plot = FALSE)
+  expect_named(res, c("stats", "outliers", "tests"))
+  ref <- stats::kruskal.test(y ~ g, data = df)
+  expect_equal(res$tests$p_value[1], ref$p.value)
+  expect_equal(res$tests$statistic[1], unname(ref$statistic))
+  expect_null(adjusted_boxplot(df[c("y", "z")], plot = FALSE)$tests)
+  expect_equal(format_p(c(0.0004, 0.0213, 0.25)), c("< 0.001", "= 0.021", "= 0.25"))
+})
+
+test_that("the boxplots annotate each box on request", {
+  set.seed(18)
+  df <- data.frame(g = rep(c("a", "b"), each = 40), y = c(stats::rnorm(78), 9, -9),
+                   z = stats::rexp(80))
+  geoms <- function(p) unname(vapply(p$layers, function(l) class(l$geom)[1], character(1)))
+  p <- adjusted_boxplot(df[c("y", "z")], annotate = "all")
+  expect_true(all(c("GeomErrorbar", "GeomText") %in% geoms(p)))
+  expect_equal(sum(geoms(p) == "GeomPoint"), 2) # outliers and the biweight location
+  text <- Filter(function(l) inherits(l$geom, "GeomText"), p$layers)[[1]]$data$.text
+  expect_match(text[1], "MC = ")
+  expect_match(text[1], "flagged \\(")
+  expect_match(text[1], "Md ")
+  expect_match(text[1], "rCV ")
+  expect_false(grepl("Kruskal", p$labels$caption))
+  expect_match(p$labels$caption, "Md: median\\s+\\[95% CI\\]")
+  # the fences drawn are those beyond which there are outlying values
+  fences <- Filter(function(l) inherits(l$geom, "GeomErrorbar"), p$layers)[[1]]$data
+  st <- adjusted_boxplot(df[c("y", "z")], plot = FALSE)
+  expect_true(all(fences$.fence %in% c(st$stats$lower_fence, st$stats$upper_fence)))
+  # with groups: the test below the variable names, the text on short lines
+  q <- generalized_boxplot(df, group = g, annotate = c("test", "shape", "missing"))
+  strips <- ggplot2::ggplot_build(q)$layout$layout
+  expect_s3_class(ggplot2::ggplotGrob(q), "gtable")
+  expect_match(q$facet$params$labeller(data.frame(variable = "y"))[[1]], "Kruskal-Wallis p")
+  qtext <- Filter(function(l) inherits(l$geom, "GeomText"), q$layers)[[1]]$data$.text
+  expect_match(qtext[1], "^g = .*\\nh = ")
+  expect_warning(adjusted_boxplot(df[c("y", "z")], annotate = "test"), "needs 'group'")
+  expect_no_warning(adjusted_boxplot(df[c("y", "z")], annotate = "all"))
+  expect_error(adjusted_boxplot(df[c("y", "z")], annotate = "range"), "'annotate' must be")
+  # missing values next to n
+  m <- adjusted_boxplot(data.frame(a = c(stats::rnorm(30), NA, NA)), annotate = "missing")
+  expect_equal(ggplot2::ggplot_build(m)$layout$panel_params[[1]]$x$get_labels(),
+               "a\nn = 30 (2 missing)")
+  expect_s3_class(ggplot2::ggplotGrob(generalized_boxplot(df[c("y", "z")] + 10, annotate = "all",
+                                                           horizontal = TRUE, log = TRUE)),
+                  "gtable")
+})

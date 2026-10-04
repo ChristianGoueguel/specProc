@@ -16,6 +16,7 @@ generalized_boxplot(
   label_outliers = FALSE,
   show_n = TRUE,
   show_mean = FALSE,
+  annotate = NULL,
   horizontal = FALSE,
   log = FALSE,
   fill = "grey85",
@@ -74,6 +75,10 @@ their \code{id}, else their row number (\code{FALSE}, default).}
 \item{show_mean}{A logical: mark the mean of each box with a diamond
 (\code{FALSE}, default).}
 
+\item{annotate}{Statistics added to each box (none by default): some of
+\code{"shape"}, \code{"outliers"}, \code{"fences"}, \code{"median"}, \code{"spread"},
+\code{"location"}, \code{"test"} and \code{"missing"}, or \code{"all"} (see Details).}
+
 \item{horizontal}{A logical: horizontal boxes (\code{FALSE}, default), suited
 to many variables or long names.}
 
@@ -118,13 +123,10 @@ follows their angle.}
 \value{
 \itemize{
 \item If \code{plot = TRUE}, a \code{ggplot2} object.
-\item If \code{plot = FALSE}, a list of two tibbles: \code{stats}, with one row per
-variable (and group): the number of values \code{n}, the whisker ends
-\code{lower} and \code{upper} (the most extreme values within the fences), the
-quartiles \code{q1} and \code{q3}, the \code{median}, the fences, the notch limits,
-the estimated \code{g} and \code{h}, the \code{mean} and the number of outlying values
-\code{n_outliers}; and \code{outliers}, with the outlying values, their \code{row} in
-\code{x}, their \code{id} and their tail \code{out} (\code{"lower"} or \code{"upper"}).
+\item If \code{plot = FALSE}, a list of tibbles: \code{stats}, \code{outliers} and, with
+\code{group}, \code{tests}, as in \code{\link[=adjusted_boxplot]{adjusted_boxplot()}}, with the estimated \code{g}
+and \code{h} instead of the medcouple, and \code{alpha * n} expected outlying
+values.
 }
 }
 \description{
@@ -164,8 +166,8 @@ not errors. As \eqn{h} may be negative (tails lighter than normal), where
 the g-and-h transform turns back before the \eqn{\alpha/2} quantile the
 fence is its extreme value.
 
-The layout, the points and the options for publication figures are those
-of \code{\link[=adjusted_boxplot]{adjusted_boxplot()}}: see its details.
+The layout, the points, the annotations and the options for publication
+figures are those of \code{\link[=adjusted_boxplot]{adjusted_boxplot()}}: see its details.
 }
 \examples{
 data(forageLIBS)

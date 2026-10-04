@@ -6,9 +6,11 @@
 # `v` of one variable (and group), a list: `stats`, a one-row data frame
 # with lower, q1, median, q3, upper, lower_fence, upper_fence, notch_lower,
 # notch_upper and the statistics of the method; and `tail`, "lower" or
-# "upper" for the values outside the fences, NA for the others. Returns
-# `stats`, `outliers`, and `data` (all values, with their tail).
-robust_boxplot_data <- function(x, vars, id_name, group_name, stats_fun) {
+# "upper" for the values outside the fences, NA for the others. `rate` is
+# the expected proportion of outlying values in clean data. Returns `stats`,
+# `outliers`, `data` (all values, with their tail) and, with groups,
+# `tests` (Kruskal-Wallis tests between the groups of each variable).
+robust_boxplot_data <- function(x, vars, id_name, group_name, stats_fun, rate) {
   group <- if (is.null(group_name)) {
     NULL
   } else {
@@ -20,15 +22,17 @@ robust_boxplot_data <- function(x, vars, id_name, group_name, stats_fun) {
   data <- list()
   for (variable in vars) {
     for (level in levels) {
-      rows <- which(!is.na(x[[variable]]) & (if (is.null(level)) TRUE else group %in% level))
+      in_group <- if (is.null(level)) rep(TRUE, nrow(x)) else group %in% level
+      rows <- which(!is.na(x[[variable]]) & in_group)
       if (length(rows) == 0) next
       v <- x[[variable]][rows]
       res <- stats_fun(v)
       key <- data.frame(variable = variable, stringsAsFactors = FALSE)
       if (!is.null(level)) key$group <- level
       stats[[length(stats) + 1]] <- cbind(
-        key, n = length(v), res$stats, mean = mean(v),
-        n_outliers = sum(!is.na(res$tail))
+        key, n = length(v), n_missing = sum(is.na(x[[variable]]) & in_group), res$stats,
+        boxplot_summaries(v, res$stats), mean = mean(v), n_outliers = sum(!is.na(res$tail)),
+        expected_outliers = rate * length(v)
       )
       values <- data.frame(variable = rep(variable, length(v)), stringsAsFactors = FALSE)
       if (!is.null(level)) values$group <- level
@@ -51,8 +55,43 @@ robust_boxplot_data <- function(x, vars, id_name, group_name, stats_fun) {
     data$group <- factor(data$group, levels = levels(group))
   }
   outliers <- data[!is.na(data$out), ]
-  list(stats = stats, outliers = outliers, data = data)
+  tests <- NULL
+  if (!is.null(group)) {
+    tests <- lapply(vars, function(variable) {
+      d <- data[data$variable == variable, ]
+      if (length(unique(d$group)) < 2) return(NULL)
+      kw <- stats::kruskal.test(d$value, droplevels(d$group))
+      data.frame(variable = variable, statistic = unname(kw$statistic),
+                 df = unname(kw$parameter), p_value = kw$p.value)
+    })
+    tests <- tibble::as_tibble(do.call(rbind, tests))
+    if (nrow(tests) > 0) tests$variable <- factor(tests$variable, levels = vars)
+  }
+  list(stats = stats, outliers = outliers, data = data, tests = tests)
 }
+
+# Robust summaries of the values `v` of a box: the distribution-free 95%
+# confidence interval of the median (from the order statistics, unlike the
+# notch, which compares two medians), the interquartile range of the box,
+# the robust coefficient of variation (IQR / 1.349 over the median, in
+# percent) and the biweight location.
+boxplot_summaries <- function(v, stats) {
+  n <- length(v)
+  j <- stats::qbinom(0.025, n, 0.5)
+  ci <- if (j >= 1) sort(v)[c(j, n - j + 1)] else c(NA_real_, NA_real_)
+  iqr <- stats$q3 - stats$q1
+  rcv <- if (stats$median != 0) {
+    100 * iqr / diff(stats::qnorm(c(0.25, 0.75))) / abs(stats$median)
+  } else {
+    NA_real_
+  }
+  biweight <- tryCatch(biweight_location(v), error = function(e) NA_real_)
+  data.frame(median_lower = ci[1], median_upper = ci[2], iqr = iqr, rcv = rcv,
+             biweight = biweight)
+}
+
+boxplot_annotations <- c("shape", "outliers", "fences", "median", "spread", "location", "test",
+                         "missing")
 
 # The column name selected by a quosure (unquoted name or string), or NULL.
 boxplot_column <- function(quo, x, arg) {
@@ -86,7 +125,7 @@ boxplot_input <- function(x, id_quo, group_quo) {
 
 # The plot options, with the renamed arguments resolved and checked.
 boxplot_args <- function(fn, user_env, scales, points, label_outliers, show_n, show_mean,
-                         horizontal, log, fill, xlab, ylab, title, caption, base_size,
+                         annotate, horizontal, log, fill, xlab, ylab, title, caption, base_size,
                          x_labels_angle, box_width, notch, notch_width, staple_width,
                          xlabels.angle, xlabels.vjust, xlabels.hjust, box.width, notchwidth,
                          staplewidth) {
@@ -104,6 +143,8 @@ boxplot_args <- function(fn, user_env, scales, points, label_outliers, show_n, s
     scales = match.arg(scales, c("free_y", "fixed")),
     points = match.arg(points, c("outliers", "all", "none")),
     label_outliers = label_outliers, show_n = show_n, show_mean = show_mean,
+    annotate = if (identical(annotate, "all")) boxplot_annotations else annotate,
+    annotate_all = identical(annotate, "all"),
     horizontal = horizontal, log = log, fill = fill, xlab = xlab, ylab = ylab, title = title,
     caption = caption, base_size = base_size, notch = notch,
     x_labels_angle = renamed(xlabels.angle, x_labels_angle, "xlabels.angle", "x_labels_angle"),
@@ -126,7 +167,8 @@ check_boxplot_args <- function(args) {
   }
   angle <- args$x_labels_angle
   if (!is.numeric(angle) || length(angle) != 1 || is.na(angle) || angle < 0 || angle > 360) {
-    stop("Argument '", args$angle_arg, "' must be a numeric value between 0 and 360.", call. = FALSE)
+    stop("Argument '", args$angle_arg, "' must be a numeric value between 0 and 360.",
+         call. = FALSE)
   }
   for (just in c("hjust", "vjust")) {
     value <- args[[paste0("x_labels_", just)]]
@@ -155,6 +197,11 @@ check_boxplot_args <- function(args) {
   if (!fill_ok) {
     stop("'fill' must be one or several colors.", call. = FALSE)
   }
+  annotate <- args$annotate
+  if (!is.null(annotate) && (!is.character(annotate) || !all(annotate %in% boxplot_annotations))) {
+    stop("'annotate' must be \"all\" or some of ",
+         paste0("\"", boxplot_annotations, "\"", collapse = ", "), ".", call. = FALSE)
+  }
   caption <- args$caption
   if (!(isTRUE(caption) || isFALSE(caption) ||
         (is.character(caption) && length(caption) == 1 && !is.na(caption)))) {
@@ -164,10 +211,16 @@ check_boxplot_args <- function(args) {
 }
 
 # The boxplot of the statistics `res` (from robust_boxplot_data()), with the
-# options `args`; `caption` is the default caption of the method.
-robust_boxplot_plot <- function(res, args, caption) {
+# options `args`; `method` is "adjusted" or "generalized", and `alpha` the
+# expected proportion of outlying values in clean data.
+robust_boxplot_plot <- function(res, args, method, alpha) {
   st <- res$stats
   data <- res$data
+  ann <- args$annotate
+  tested <- "test" %in% ann && !is.null(res$tests) && nrow(res$tests) > 0
+  if ("test" %in% ann && is.null(res$tests) && !args$annotate_all) {
+    warning("annotate = \"test\" needs 'group': no test is shown.", call. = FALSE)
+  }
   grouped <- "group" %in% names(st)
   n_vars <- nlevels(st$variable)
   panels <- grouped || (args$scales == "free_y" && n_vars > 1)
@@ -179,8 +232,13 @@ robust_boxplot_plot <- function(res, args, caption) {
   # else the variables (one panel), else one box per panel; with the number
   # of values below each position
   base <- if (grouped) as.character(st$group) else if (panels) "" else as.character(st$variable)
+  missing <- if ("missing" %in% ann) {
+    ifelse(st$n_missing > 0, paste0(" (", st$n_missing, " missing)"), "")
+  } else {
+    ""
+  }
   label <- if (args$show_n) {
-    trimws(paste0(base, ifelse(nzchar(base), "\n", ""), "n = ", st$n))
+    trimws(paste0(base, ifelse(nzchar(base), "\n", ""), "n = ", st$n, missing))
   } else {
     base
   }
@@ -248,24 +306,90 @@ robust_boxplot_plot <- function(res, args, caption) {
     p <- p + ggplot2::geom_point(data = st, mean_aes, shape = 23, fill = "white",
                                  colour = "grey15", size = point_size)
   }
+  if ("location" %in% ann) {
+    location_aes <- if (args$horizontal) {
+      ggplot2::aes(x = .data$biweight, y = .x)
+    } else {
+      ggplot2::aes(x = .x, y = .data$biweight)
+    }
+    p <- p + ggplot2::geom_point(data = st, location_aes, shape = 4, stroke = 0.9,
+                                 colour = "grey10", size = point_size)
+  }
+  if ("fences" %in% ann) {
+    # the fences beyond which there are outlying values
+    cell <- function(d) paste(d$variable, if (grouped) d$group)
+    low <- st[cell(st) %in% cell(outliers[outliers$out == "lower", ]), ]
+    up <- st[cell(st) %in% cell(outliers[outliers$out == "upper", ]), ]
+    low$.fence <- low$lower_fence
+    up$.fence <- up$upper_fence
+    fences <- rbind(low, up)
+    if (nrow(fences) > 0) {
+      fence_aes <- if (args$horizontal) {
+        ggplot2::aes(y = .x, xmin = .data$.fence, xmax = .data$.fence)
+      } else {
+        ggplot2::aes(x = .x, ymin = .data$.fence, ymax = .data$.fence)
+      }
+      p <- p + ggplot2::geom_errorbar(data = fences, fence_aes,
+                                      orientation = if (args$horizontal) "y" else "x",
+                                      width = 0.8 * args$box_width, linetype = "22",
+                                      colour = "grey35", linewidth = args$base_size / 30)
+    }
+  }
+  # the statistics written above each box (at the right of horizontal ones)
+  several <- grouped || (!panels && n_vars > 1)
+  text <- boxplot_text(st, ann, method, compact = several)
+  room <- 0.05
+  if (!is.null(text)) {
+    st$.text <- text
+    n_lines <- length(strsplit(text[1], "\n", fixed = TRUE)[[1]])
+    text_size <- 0.62 * args$base_size / ggplot2::.pt
+    p <- p + if (args$horizontal) {
+      ggplot2::geom_text(data = st, ggplot2::aes(x = Inf, y = .x, label = .data$.text),
+                         hjust = 1.02, vjust = 0.5, size = text_size, lineheight = 0.95,
+                         colour = "grey25")
+    } else {
+      ggplot2::geom_text(data = st, ggplot2::aes(x = .x, y = Inf, label = .data$.text),
+                         vjust = 1.1, size = text_size, lineheight = 0.95, colour = "grey25")
+    }
+    widest <- max(nchar(unlist(strsplit(text, "\n", fixed = TRUE))))
+    room <- if (args$horizontal) 0.05 + 0.009 * widest else 0.05 + 0.065 * n_lines
+  }
   value_scale <- if (args$horizontal) {
     if (args$log) ggplot2::scale_x_log10 else ggplot2::scale_x_continuous
   } else {
     if (args$log) ggplot2::scale_y_log10 else ggplot2::scale_y_continuous
   }
-  p <- p + value_scale(labels = plain_numbers)
+  p <- p + value_scale(labels = plain_numbers, expand = ggplot2::expansion(mult = c(0.05, room)))
 
   if (panels) {
     # free value axes, or the same for all panels; the positions are always
     # free, each panel having its own boxes
-    facet_scales <- if (args$scales == "free_y") "free" else if (args$horizontal) "free_y" else "free_x"
+    facet_scales <- if (args$scales == "free_y") {
+      "free"
+    } else if (args$horizontal) {
+      "free_y"
+    } else {
+      "free_x"
+    }
+    # the Kruskal-Wallis test between the groups, below the variable name
+    strips <- stats::setNames(levels(st$variable), levels(st$variable))
+    if (tested) {
+      tested_vars <- as.character(res$tests$variable)
+      strips[tested_vars] <- paste0(strips[tested_vars], "\nKruskal-Wallis p ",
+                                    format_p(res$tests$p_value))
+    }
     p <- p + ggplot2::facet_wrap(
       ggplot2::vars(.data$variable), scales = facet_scales,
       nrow = if (!args$horizontal && n_vars <= 6) 1,
-      ncol = if (args$horizontal && n_vars <= 6) 1
+      ncol = if (args$horizontal && n_vars <= 6) 1,
+      labeller = ggplot2::as_labeller(strips)
     )
   }
-  caption_text <- if (isTRUE(args$caption)) caption else if (is.character(args$caption)) args$caption
+  caption_text <- if (isTRUE(args$caption)) {
+    boxplot_caption(method, alpha, setdiff(ann, if (!tested) "test"), args$show_mean)
+  } else if (is.character(args$caption)) {
+    args$caption
+  }
   p <- p +
     ggplot2::labs(x = if (args$horizontal) args$ylab else args$xlab,
                   y = if (args$horizontal) args$xlab else args$ylab,
@@ -289,16 +413,19 @@ robust_boxplot_plot <- function(res, args, caption) {
   if (panels && !grouped && !args$show_n) {
     # one box per panel, named by the strip: no position labels needed
     p <- p + if (args$horizontal) {
-      ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank())
+      ggplot2::theme(axis.text.y = ggplot2::element_blank(),
+                     axis.ticks.y = ggplot2::element_blank())
     } else {
-      ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.ticks.x = ggplot2::element_blank())
+      ggplot2::theme(axis.text.x = ggplot2::element_blank(),
+                     axis.ticks.x = ggplot2::element_blank())
     }
   }
   finish_title(p)
 }
 
-# The caption of a method: what the whiskers show.
-boxplot_caption <- function(method, alpha = NULL) {
+# The caption of a method: what the whiskers show, and the key of the
+# annotations and marks drawn.
+boxplot_caption <- function(method, alpha = NULL, annotate = NULL, show_mean = FALSE) {
   text <- if (method == "adjusted") {
     paste("Adjusted boxplot (Hubert and Vandervieren, 2008). Whiskers: the most extreme",
           "values within the medcouple-adjusted fences.")
@@ -307,8 +434,60 @@ boxplot_caption <- function(method, alpha = NULL) {
            "within the fences of a fitted Tukey g-and-h distribution (alpha = ",
            format(signif(100 * alpha, 2)), "%).")
   }
+  key <- c(
+    shape = if (method == "adjusted") "MC: medcouple." else
+      "g, h: skewness and tail heaviness of the g-and-h fit.",
+    outliers = paste0("Flagged (exp.): outlying values (expected in clean data, ",
+                      format(signif(100 * alpha, 2)), "%)."),
+    fences = "Dashed: fences.",
+    median = "Md: median [95% CI].",
+    spread = "rCV: IQR / (1.349 median).",
+    location = "x: biweight location.",
+    test = "Kruskal-Wallis test between the groups."
+  )
+  key <- c(if (show_mean) "Diamond: mean.", key[intersect(names(key), annotate)])
   # short lines, which fit a figure of a journal column
-  paste(strwrap(text, width = 60), collapse = "\n")
+  paste(strwrap(paste(c(text, key), collapse = " "), width = 60), collapse = "\n")
+}
+
+# The statistics written with each box: one line per annotation (two short
+# ones when `compact`, for boxes side by side), or NULL.
+boxplot_text <- function(st, annotate, method, compact = FALSE) {
+  sep <- if (compact) "\n" else " "
+  two <- function(v) sprintf("%.2f", round(v, 2) + 0) # no "-0.00"
+  number <- function(v) {
+    ifelse(is.na(v), "NA", trimws(formatC(signif(v, 3), digits = 3, format = "fg", big.mark = ",")))
+  }
+  lines <- list()
+  if ("shape" %in% annotate) {
+    lines$shape <- if (method == "adjusted") {
+      paste0("MC = ", two(st$medcouple), ifelse(abs(st$medcouple) > 0.6, " (> 0.6)", ""))
+    } else {
+      paste0("g = ", two(st$g), if (compact) "\n" else ", ", "h = ", two(st$h))
+    }
+  }
+  if ("outliers" %in% annotate) {
+    lines$outliers <- paste0(st$n_outliers, " flagged", sep,
+                             sprintf("(%.1f exp.)", st$expected_outliers))
+  }
+  if ("median" %in% annotate) {
+    lines$median <- paste0("Md ", number(st$median), sep, "[", number(st$median_lower), ", ",
+                           number(st$median_upper), "]")
+  }
+  if ("spread" %in% annotate) {
+    lines$spread <- paste0("IQR ", number(st$iqr), if (compact) "\n" else ", ", "rCV ",
+                           ifelse(is.na(st$rcv), "NA", sprintf("%.0f%%", st$rcv)))
+  }
+  if (length(lines) == 0) {
+    return(NULL)
+  }
+  do.call(paste, c(unname(lines), sep = "\n"))
+}
+
+format_p <- function(p) {
+  vapply(p, function(v) {
+    if (v < 0.001) "< 0.001" else paste("=", format(signif(v, 2), scientific = FALSE))
+  }, character(1))
 }
 
 # The identity stat, accepting the notch limits of precomputed statistics
