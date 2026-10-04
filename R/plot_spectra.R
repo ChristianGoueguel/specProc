@@ -313,12 +313,16 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
   }
   if (label_spectra) {
     ends <- spectra_ends(long, curves$meta, id_name, col_name, summary)
+    # right of the spectra, moved apart vertically by ggrepel
+    span <- diff(range(long$wavelength))
     p <- p +
-      ggplot2::geom_text(data = ends, ggplot2::aes(x = .data$wavelength, y = .data$intensity,
-                                                   label = .data$.label),
-                         hjust = 0, nudge_x = 0.01 * diff(range(long$wavelength)),
-                         size = 0.8 * base_size / ggplot2::.pt, colour = "grey20",
-                         inherit.aes = FALSE) +
+      ggrepel::geom_text_repel(data = ends, ggplot2::aes(x = .data$wavelength, y = .data$intensity,
+                                                         label = .data$.label),
+                               hjust = 0, direction = "y", nudge_x = 0.01 * span,
+                               xlim = c(max(long$wavelength) + 0.005 * span, Inf),
+                               size = 0.8 * base_size / ggplot2::.pt, colour = "grey20",
+                               segment.colour = "grey60", min.segment.length = 0.2,
+                               max.overlaps = Inf, seed = 1, inherit.aes = FALSE) +
       ggplot2::coord_cartesian(clip = "off")
   }
   # labels at the right end need room; the emission lines are labeled on a

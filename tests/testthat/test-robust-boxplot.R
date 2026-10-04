@@ -127,7 +127,7 @@ test_that("the boxplots show what is asked, with notches", {
   expect_equal(geoms(adjusted_boxplot(df)), c("GeomBoxplot", "GeomPoint"))
   expect_equal(geoms(adjusted_boxplot(df, points = "none")), "GeomBoxplot")
   expect_equal(geoms(adjusted_boxplot(df, points = "all", show_mean = TRUE, label_outliers = TRUE)),
-               c("GeomPoint", "GeomBoxplot", "GeomPoint", "GeomText", "GeomPoint"))
+               c("GeomPoint", "GeomBoxplot", "GeomPoint", "GeomTextRepel", "GeomPoint"))
   p <- adjusted_boxplot(df, notch = TRUE)
   expect_no_warning(built <- ggplot2::ggplot_build(p))
   expect_true(all(c("notchlower", "notchupper") %in% names(built$data[[1]])))

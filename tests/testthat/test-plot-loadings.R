@@ -79,7 +79,7 @@ test_that("plot_loadings works with prcomp and robust fits", {
   expect_match(levels(p$data$panel)[1], "^PC1 \\([0-9.]+%\\)$")
   expect_s3_class(plot_loadings(pca, type = "contribution", top = 0), "ggplot")
   # labels: bold when matched to a line
-  labels <- built$data[[which(vapply(p$layers, function(l) inherits(l$geom, "GeomText"), logical(1)))]]
+  labels <- built$data[[which(vapply(p$layers, function(l) inherits(l$geom, "GeomTextRepel"), logical(1)))]]
   expect_true(any(labels$fontface == "bold"))
 
   set.seed(3)
@@ -123,14 +123,6 @@ test_that("plot_loadings checks its arguments", {
   expect_error(plot_loadings(pca, spectra = x[, 1:5]), "variables")
   expect_error(plot_loadings(pca, spectra = "a"), "spectra")
   expect_error(plot_loadings(pca, type = "scores"), "arg")
-})
-
-test_that("spread_positions keeps labels apart and close to their peaks", {
-  pos <- spread_positions(c(10, 10.5, 11, 50), gap = 2)
-  expect_true(all(diff(sort(pos)) >= 2 - 1e-12))
-  expect_equal(pos[4], 50)
-  expect_equal(mean(pos[1:3]), 10.5)
-  expect_equal(spread_positions(c(5, 1), gap = 1), c(5, 1))
 })
 
 test_that("default variable names are not wavelengths", {

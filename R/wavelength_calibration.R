@@ -320,8 +320,10 @@ plot_wavelength_calibration <- function(object, title = NULL) {
                                                    colour = .data$segment), linewidth = 0.7) +
     ggplot2::geom_point(data = pts, ggplot2::aes(.data$measured, .data$offset, colour = .data$segment,
                                                  shape = .data$status), size = 2.5) +
-    ggplot2::geom_text(data = pts, ggplot2::aes(.data$measured, .data$offset, label = .data$label),
-                       size = 2.6, vjust = -0.9, colour = "grey25", check_overlap = TRUE) +
+    # all the lines labeled, moved apart by ggrepel
+    ggrepel::geom_text_repel(data = pts, ggplot2::aes(.data$measured, .data$offset, label = .data$label),
+                             size = 2.6, colour = "grey25", segment.colour = "grey60",
+                             min.segment.length = 0.2, max.overlaps = Inf, seed = 1) +
     ggplot2::scale_shape_manual(values = c(used = 16, `not used` = 1), name = NULL) +
     ggplot2::labs(x = "Measured wavelength (nm)", y = "Reference - measured (nm)",
                   colour = "Segment", title = title) +

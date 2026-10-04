@@ -282,10 +282,14 @@ fit_pair <- function(aug, curve, summary, label, style) {
     )
   }
   if (multi) {
+    # the peak numbers above their tops, moved apart along x by ggrepel
     tops <- data.frame(x = peaks$center, y = summary$y0 + peaks$height, label = peaks$peak)
-    top <- top + ggplot2::geom_text(data = tops, ggplot2::aes(x = x, y = y, label = .data$label),
-                                    vjust = -0.6, size = 0.7 * style$base_size / ggplot2::.pt,
-                                    colour = "grey25")
+    lift <- 0.04 * diff(range(c(aug$y, tops$y), na.rm = TRUE))
+    top <- top + ggrepel::geom_text_repel(data = tops, ggplot2::aes(x = x, y = y, label = .data$label),
+                                          nudge_y = lift, direction = "x", vjust = 0,
+                                          size = 0.7 * style$base_size / ggplot2::.pt,
+                                          colour = "grey25", segment.colour = "grey60",
+                                          min.segment.length = 0.2, max.overlaps = Inf, seed = 1)
   }
   # the parameters above the panel, where they cannot hide the data
   top <- top +

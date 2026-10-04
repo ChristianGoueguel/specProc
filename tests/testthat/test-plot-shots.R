@@ -3,10 +3,11 @@ test_that("plot_shots draws the criteria of the shots", {
   p <- plot_shots(res, type = "criteria")
   expect_s3_class(p, "ggplot")
   expect_match(p$labels$caption, "Rejected: 8 of 160 shots")
-  labels <- Filter(function(l) inherits(l$geom, "GeomText"), p$layers)[[1]]$data
-  expect_equal(nrow(labels), 8)
-  texts <- function(p) Filter(function(l) inherits(l$geom, "GeomText"), p$layers)
-  expect_equal(nrow(texts(plot_shots(res, type = "criteria", label = 3))[[1]]$data), 3)
+  # the labels are placed by ggrepel; the other shots have empty labels
+  texts <- function(p) Filter(function(l) inherits(l$geom, "GeomTextRepel"), p$layers)
+  n_shown <- function(p) sum(texts(p)[[1]]$data$.label != "")
+  expect_equal(n_shown(p), 8)
+  expect_equal(n_shown(plot_shots(res, type = "criteria", label = 3)), 3)
   expect_length(texts(plot_shots(res, type = "criteria", label = 0)), 0)
   tbl <- plot_shots(res, type = "criteria", plot = FALSE)
   expect_equal(nrow(tbl), 160)

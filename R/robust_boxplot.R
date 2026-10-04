@@ -291,15 +291,15 @@ robust_boxplot_plot <- function(res, args, method, alpha) {
                                  fill = "grey15", colour = "grey15", size = point_size,
                                  alpha = 0.75)
     if (args$label_outliers) {
-      # labels alternately on either side of the points, in the order of their
-      # values in each tail, so that close values keep apart
+      # moved apart by ggrepel, from the same jittered positions as the
+      # points (the same seed); in dense tails, the labels that would
+      # overlap many others are left out (the default max.overlaps of ggrepel)
       outliers$.label <- as.character(if ("id" %in% names(outliers)) outliers$id else outliers$row)
-      tails <- interaction(outliers$.x, outliers$variable, outliers$out, drop = TRUE)
-      rank <- stats::ave(outliers$value, tails, FUN = function(v) rank(v, ties.method = "first"))
-      hjust <- ifelse(rank %% 2 == 1, -0.25, 1.25)
-      p <- p + ggplot2::geom_text(data = outliers, point_aes,
-                                  label = outliers$.label, position = jitter, hjust = hjust,
-                                  colour = "grey25", size = 0.7 * args$base_size / ggplot2::.pt)
+      label_aes <- point_aes
+      label_aes$label <- quote(.data$.label)
+      p <- p + ggrepel::geom_text_repel(data = outliers, label_aes, position = jitter,
+                                        colour = "grey25", size = 0.7 * args$base_size / ggplot2::.pt,
+                                        segment.colour = "grey60", min.segment.length = 0.2, seed = 1)
     }
   }
   if (args$show_mean) {

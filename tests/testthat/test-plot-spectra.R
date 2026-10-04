@@ -174,7 +174,7 @@ test_that("plot_spectra labels each spectrum at its right end", {
   wl <- as.numeric(names(df))
   df$conc <- c(1.234, 2, 3)
   df$id <- c("x", "y", "z")
-  ends_of <- function(p) Filter(function(l) inherits(l$geom, "GeomText"), p$layers)[[1]]$data
+  ends_of <- function(p) Filter(function(l) inherits(l$geom, "GeomTextRepel"), p$layers)[[1]]$data
   ends <- ends_of(plot_spectra(df, id = id, colvar = conc, label_spectra = TRUE, offset = 10))
   expect_equal(ends$.label, c("x", "y", "z"))
   expect_equal(ends$wavelength, rep(max(wl), 3))

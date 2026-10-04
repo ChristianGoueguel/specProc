@@ -45,9 +45,10 @@ test_that("plot_embedding draws T-squared ellipses and labels outliers", {
   on95 <- as.matrix(paths[paths$limit == "T² 95%", c("x", "y")])
   expect_equal(range(stats::mahalanobis(on95, colMeans(s), stats::cov(s))),
                rep(2 * 39 / 38 * stats::qf(0.95, 2, 38), 2))
-  labels <- Filter(function(l) inherits(l$geom, "GeomText") && ".label" %in% names(l$data),
+  # the labels are placed by ggrepel; the unlabeled samples have empty labels
+  labels <- Filter(function(l) inherits(l$geom, "GeomTextRepel") && ".label" %in% names(l$data),
                    p$layers)[[1]]$data
-  expect_equal(labels$.label, "s3")
+  expect_equal(labels$.label[labels$.label != ""], "s3")
   # the T-squared levels are labeled on the ellipses, not in a legend
   levels_text <- Filter(function(l) inherits(l$geom, "GeomText") && "limit" %in% names(l$data),
                         p$layers)[[1]]$data

@@ -256,13 +256,13 @@ outlier_scores_plot <- function(tbl, vars, color_by, label_outliers, base_size) 
                         linetype = "dashed")
   p <- p + outlier_points(color_by, size)
   if (label_outliers) {
-    # in each panel, the outliers beyond the univariate limits, labeled on
-    # the inner side of the point (all of them are named in the distance plot)
-    labels <- long[long$outlier & abs(long$score) > 2.5, ]
-    labels$.label <- as.character(if ("id" %in% names(labels)) labels$id else labels$row)
-    p <- p + ggplot2::geom_text(data = labels, ggplot2::aes(label = .data$.label),
-                                hjust = ifelse(labels$.x > 0, 1.2, -0.2),
-                                colour = "grey25", size = 0.65 * base_size / ggplot2::.pt)
+    # in each panel, the outliers beyond the univariate limits (all of them
+    # are named in the distance plot), moved apart by ggrepel, away from all
+    # the points (unlabeled ones have an empty label)
+    shown <- long$outlier & abs(long$score) > 2.5
+    long$.label <- ""
+    long$.label[shown] <- as.character(if ("id" %in% names(long)) long$id[shown] else long$row[shown])
+    p <- p + outlier_labels(long, base_size)
   }
   n_vars <- length(vars)
   p +
@@ -271,6 +271,15 @@ outlier_scores_plot <- function(tbl, vars, color_by, label_outliers, base_size) 
     ggplot2::labs(x = NULL) +
     ggplot2::theme_classic(base_size = base_size) +
     ggplot2::theme(axis.line.x = ggplot2::element_blank())
+}
+
+# Labels of the outliers (column `.label`, empty for the other samples),
+# moved apart by ggrepel so that they overlap neither each other nor the
+# points, with a fixed seed for the same layout at each drawing.
+outlier_labels <- function(data, base_size) {
+  ggrepel::geom_text_repel(data = data, ggplot2::aes(label = .data$.label), colour = "grey25",
+                           size = 0.65 * base_size / ggplot2::.pt, segment.colour = "grey60",
+                           min.segment.length = 0.2, max.overlaps = Inf, seed = 1)
 }
 
 # The robust distance of each sample, in the order of the rows, with the
@@ -290,13 +299,10 @@ outlier_distance_plot <- function(tbl, res, color_by, label_outliers, base_size)
   p <- p + outlier_points(color_by, size)
   top <- 0.08
   if (label_outliers) {
-    # vertical labels above the points, which keep apart for nearby rows
-    labels <- tbl[tbl$outlier, ]
-    labels$.label <- as.character(if ("id" %in% names(labels)) labels$id else labels$row)
-    p <- p + ggplot2::geom_text(data = labels, ggplot2::aes(label = .data$.label), angle = 90,
-                                hjust = -0.25, vjust = 0.5, colour = "grey25",
-                                size = 0.65 * base_size / ggplot2::.pt)
-    top <- 0.06 + 0.035 * max(0, nchar(labels$.label))
+    tbl$.label <- ""
+    tbl$.label[tbl$outlier] <- as.character(if ("id" %in% names(tbl)) tbl$id[tbl$outlier] else
+      tbl$row[tbl$outlier])
+    p <- p + outlier_labels(tbl, base_size)
   }
   p +
     ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.03, top))) +

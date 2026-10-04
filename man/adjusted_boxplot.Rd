@@ -58,7 +58,9 @@ value axis, or \code{"fixed"}, a common value axis.}
 outlying ones; \code{"all"}; or \code{"none"}.}
 
 \item{label_outliers}{A logical: label the outlying observations with
-their \code{id}, else their row number (\code{FALSE}, default).}
+their \code{id}, else their row number (\code{FALSE}, default). The labels are
+moved apart so that they do not overlap; where many outliers crowd
+together, some are left unlabeled.}
 
 \item{show_n}{A logical: write the number of values below each box
 (\code{TRUE}, default).}

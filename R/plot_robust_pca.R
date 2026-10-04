@@ -839,24 +839,21 @@ cell_map_profile <- function(cells, spectrum, regions, threshold, labels, x_limi
     digits <- if (cells$has_wavelength) wavelength_digits(wavelength) else 0L
     shown$label <- ifelse(is.na(shown$species), format_wavelength(shown$peak, digits),
                           paste(shown$species, format_wavelength(shown$line_wavelength, 2)))
-    # horizontal labels, spread apart by their width (for plots about 10
-    # inches wide) and kept inside the panel
-    half <- 0.0033 * nchar(shown$label) * diff(x_limits)
-    shown$x <- spread_positions(shown$peak, 2 * max(half) + 0.005 * diff(x_limits))
-    shown$x <- pmin(pmax(shown$x, x_limits[1] + half), x_limits[2] - half)
+    # horizontal labels beyond the peaks, moved apart along the wavelength
+    # axis by ggrepel (inside the panel), with a leader line to their peak
     lower <- shown$direction == "lower"
     shown$y0 <- ifelse(lower, -down[match(shown$peak, wavelength)], up[match(shown$peak, wavelength)])
     shown$y <- ifelse(lower, -1, 1) * (pmax(abs(shown$y0), threshold) + 0.12 * top_share)
     shown$vjust <- ifelse(lower, 1, 0)
-    room <- data.frame(x = shown$x, y = shown$y + ifelse(lower, -1, 1) * 0.3 * top_share)
+    shown$fontface <- ifelse(is.na(shown$species), "plain", "bold")
+    room <- data.frame(x = shown$peak, y = shown$y + ifelse(lower, -1, 1) * 0.3 * top_share)
     p <- p +
-      ggplot2::geom_segment(data = shown, ggplot2::aes(x = .data$peak, xend = .data$x,
-                                                       y = .data$y0, yend = .data$y),
-                            colour = "grey55", linewidth = 0.25) +
-      ggplot2::geom_text(data = shown, ggplot2::aes(x = .data$x, y = .data$y, label = .data$label,
-                                                    vjust = .data$vjust),
-                         size = 2.6, colour = "grey15",
-                         fontface = ifelse(is.na(shown$species), "plain", "bold")) +
+      ggrepel::geom_text_repel(data = shown,
+                               ggplot2::aes(x = .data$peak, y = .data$y0, label = .data$label,
+                                            vjust = .data$vjust, fontface = .data$fontface),
+                               nudge_y = shown$y - shown$y0, direction = "x", size = 2.6,
+                               colour = "grey15", segment.colour = "grey55", min.segment.length = 0,
+                               max.overlaps = Inf, seed = 1) +
       ggplot2::geom_blank(data = room, ggplot2::aes(x = .data$x, y = .data$y))
   }
   p +

@@ -86,10 +86,17 @@
 
 ## Improvements
 
-* The labels of the most outlying samples in `plot_outlier_map()`,
-  `plot_influence()` and `plot_coomans()` no longer overlap: they are placed
-  by ggrepel (now imported), away from each other and from the points, with
-  a segment to their point when moved far.
+* The labels of the plots no longer overlap: they are placed by ggrepel
+  (now imported), away from each other and from the points, with a segment
+  to their point when moved far. This applies to the outlying samples of
+  `plot_outlier_map()`, `plot_influence()`, `plot_coomans()`,
+  `plot_outliers()` and `plot_embedding()` (and its biplot loadings), the
+  peaks of `plot_loadings()`, `plot_contributions()`, `plot_cell_map()` and
+  `plot_fit()`, the outliers of `adjusted_boxplot()` and
+  `generalized_boxplot()` (where many crowd together, some are left
+  unlabeled), the rejected shots of `plot_shots()`, the spectra of
+  `plot_spectra(label_spectra = TRUE)`, and the lines of
+  `plot_wavelength_calibration()`, which are now all labeled.
 * `robpca()` and `rospca()` are faster on wide data (up to about 4 times on
   full LIBS spectra): the reduction to the subspace spanned by the
   observations is now computed in C++ from the smaller cross-product matrix

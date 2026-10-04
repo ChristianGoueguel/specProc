@@ -440,12 +440,12 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
         ggplot2::geom_segment(data = top, ggplot2::aes(x = 0, y = 0, xend = .data$x, yend = .data$y),
                               colour = "#7f0000", linewidth = 0.4 * scale, inherit.aes = FALSE,
                               arrow = ggplot2::arrow(length = ggplot2::unit(0.15 * scale, "cm"))) +
-        ggplot2::geom_segment(data = top[top$moved & top$labeled, , drop = FALSE],
-                              ggplot2::aes(x = .data$x, y = .data$y, xend = .data$lx, yend = .data$ly),
-                              colour = "#7f000080", linewidth = 0.2, inherit.aes = FALSE) +
-        ggplot2::geom_text(data = top[top$labeled, , drop = FALSE],
-                           ggplot2::aes(.data$lx, .data$ly, label = .data$label),
-                           colour = "#7f0000", size = 2.6 * scale, inherit.aes = FALSE)
+        # labels at the arrow tips, moved apart by ggrepel
+        ggrepel::geom_text_repel(data = top[top$labeled, , drop = FALSE],
+                                 ggplot2::aes(.data$x, .data$y, label = .data$label),
+                                 colour = "#7f0000", size = 2.6 * scale, segment.colour = "#7f000080",
+                                 min.segment.length = 0.2, max.overlaps = Inf, seed = 1,
+                                 inherit.aes = FALSE)
     }
   }
   # the samples beyond the limit: circled (flag) and labeled (label), independently
@@ -460,12 +460,17 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
                             colour = "#c0392b", stroke = 0.8 * scale, inherit.aes = FALSE)
     }
     if (show_labels) {
-      # alternately above and below the points, in the order of x, so that
-      # neighbors keep apart
-      side <- rank(out$.x, ties.method = "first") %% 2 == 1
-      p <- p + ggplot2::geom_text(data = out, ggplot2::aes(.data$.x, .data$.y, label = .data$.label),
-                                  vjust = ifelse(side, -1.1, 2.1), size = 3 * scale,
-                                  colour = "#c0392b", inherit.aes = FALSE)
+      # moved apart by ggrepel, away from all the samples (unlabeled ones
+      # have an empty label)
+      labeled <- plot_df
+      labeled$.label <- ""
+      labeled$.label[t2$sample[t2$.flag]] <- as.character(out$.label)
+      p <- p + ggrepel::geom_text_repel(data = labeled,
+                                        ggplot2::aes(.data$.x, .data$.y, label = .data$.label),
+                                        size = 3 * scale, colour = "#c0392b", box.padding = 0.4,
+                                        segment.colour = "#c0392b80", min.segment.length = 0.2,
+                                        max.overlaps = Inf, seed = 1, na.rm = TRUE,
+                                        inherit.aes = FALSE)
     }
   }
   subtitle <- if (!is.null(t2)) {
@@ -751,36 +756,11 @@ embedding_loadings <- function(data, x, y, plot_df, top) {
     seq_along(norm)
   }
   chosen <- candidates[order(norm[candidates], decreasing = TRUE)][seq_len(min(top, length(candidates)))]
-  top_load <- biplot_label_positions(load[chosen, , drop = FALSE], plot_df)
+  top_load <- load[chosen, , drop = FALSE]
   # arrows shorter than a fifth of the longest are drawn without a label,
   # which would overlap the others near the origin
   top_load$labeled <- norm[chosen] >= 0.2 * max(norm[chosen])
   list(all = load, top = top_load, factor = factor)
-}
-
-# Label positions beyond the arrow tips, pushed outward along the arrow until
-# they do not overlap the labels already placed (in units of the panel).
-biplot_label_positions <- function(top, plot_df) {
-  span_x <- diff(range(c(plot_df$.x, top$x), na.rm = TRUE))
-  span_y <- diff(range(c(plot_df$.y, top$y), na.rm = TRUE))
-  top$lx <- top$x * 1.08
-  top$ly <- top$y * 1.08
-  top$moved <- FALSE
-  for (i in seq_len(nrow(top))[-1]) {
-    for (step in 0:10) {
-      m <- 1.08 + 0.12 * step
-      lx <- top$x[i] * m
-      ly <- top$y[i] * m
-      width <- 0.012 * (nchar(top$label[i]) + nchar(top$label[seq_len(i - 1)])) / 2
-      clash <- abs(lx - top$lx[seq_len(i - 1)]) / span_x < width &
-        abs(ly - top$ly[seq_len(i - 1)]) / span_y < 0.045
-      if (!any(clash)) break
-    }
-    top$lx[i] <- lx
-    top$ly[i] <- ly
-    top$moved[i] <- step > 0
-  }
-  top
 }
 
 # Coordinates of the confidence ellipses of the groups (or of all samples).

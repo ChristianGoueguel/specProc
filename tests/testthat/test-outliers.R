@@ -156,7 +156,9 @@ test_that("plot_outliers names the samples and leaves out missing values", {
   expect_equal(res$id, df$sample[res$row])
   expect_true(res$outlier[res$row == 5])
   p <- suppressMessages(plot_outliers(df, id = sample, label_outliers = TRUE, title = "Outliers"))
-  labels <- Filter(function(l) inherits(l$geom, "GeomText"), p$layers)[[1]]$data
+  # the labels are placed by ggrepel; the other samples have empty labels
+  labels <- Filter(function(l) inherits(l$geom, "GeomTextRepel"), p$layers)[[1]]$data
+  labels <- labels[labels$.label != "", ]
   expect_true("s5" %in% labels$.label)
   expect_true(all(abs(labels$score) > 2.5)) # only beyond the univariate limits
   expect_equal(p$labels$title, "Outliers")
@@ -165,7 +167,8 @@ test_that("plot_outliers names the samples and leaves out missing values", {
   expect_error(plot_outliers(df, id = zz), "'id' column does not exist")
   d <- suppressMessages(plot_outliers(df, id = sample, type = "distance", label_outliers = TRUE))
   expect_equal(d$labels$y, "Robust distance")
-  expect_setequal(Filter(function(l) inherits(l$geom, "GeomText"), d$layers)[[1]]$data$.label,
+  shown <- Filter(function(l) inherits(l$geom, "GeomTextRepel"), d$layers)[[1]]$data$.label
+  expect_setequal(shown[shown != ""],
                   res$id[res$outlier])
 })
 

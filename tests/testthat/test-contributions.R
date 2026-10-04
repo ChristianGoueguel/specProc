@@ -116,7 +116,7 @@ test_that("plot_contributions draws one panel per sample", {
   lines <- tibble::tibble(species = "Fe I", stage = 1L, wavelength = 410.02, relative_intensity = 1)
   p <- plot_contributions(q, samples = 1, lines = lines, spectra = x)
   built <- ggplot2::ggplot_build(p)
-  text_layer <- which(vapply(p$layers, function(l) inherits(l$geom, "GeomText"), logical(1)))
+  text_layer <- which(vapply(p$layers, function(l) inherits(l$geom, "GeomTextRepel"), logical(1)))
   expect_true(any(grepl("Fe I 410.02", built$data[[text_layer]]$label)))
   t2 <- contributions(stats::prcomp(x), k = 2, statistic = "t2")
   expect_match(plot_contributions(t2, samples = 2)$labels$title, "T² contributions")

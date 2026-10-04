@@ -346,12 +346,11 @@ wavelength_digits <- function(wl) {
   as.integer(min(4, max(0, ceiling(-log10(spacing)))))
 }
 
-# Peak labels, spread along the wavelength axis so that they do not overlap
-# (each keeps a leader line to its peak).
+# Peak labels: the line species and wavelength, or the peak wavelength.
 loading_labels <- function(peaks, parts) {
   empty <- data.frame(panel = peaks$panel[0], wavelength = numeric(), value = numeric(),
                       sign = character(), label = character(), matched = logical(),
-                      x = numeric(), stringsAsFactors = FALSE)
+                      stringsAsFactors = FALSE)
   if (nrow(peaks) == 0) return(empty)
   digits <- if (parts$has_wavelength) wavelength_digits(parts$wavelength) else 0L
   out <- data.frame(
@@ -360,42 +359,7 @@ loading_labels <- function(peaks, parts) {
                    paste(peaks$species, format_wavelength(peaks$line_wavelength, 2))),
     matched = !is.na(peaks$species), stringsAsFactors = FALSE
   )
-  gap <- 0.013 * diff(range(parts$wavelength))
-  out$x <- out$wavelength
-  for (g in split(seq_len(nrow(out)), list(out$panel, out$sign), drop = TRUE)) {
-    out$x[g] <- spread_positions(out$wavelength[g], gap)
-  }
   out
-}
-
-# Positions as close as possible to `x`, at least `gap` apart: overlapping
-# labels are merged into evenly spaced groups centered on their targets.
-spread_positions <- function(x, gap) {
-  o <- order(x)
-  target <- x[o]
-  groups <- as.list(seq_along(target))
-  layout <- function(members) {
-    mean(target[members]) + (seq_along(members) - (length(members) + 1) / 2) * gap
-  }
-  repeat {
-    merged <- FALSE
-    k <- 1
-    while (k < length(groups)) {
-      right_edge <- max(layout(groups[[k]]))
-      left_edge <- min(layout(groups[[k + 1]]))
-      if (left_edge - right_edge < gap) {
-        groups[[k]] <- c(groups[[k]], groups[[k + 1]])
-        groups[[k + 1]] <- NULL
-        merged <- TRUE
-      } else {
-        k <- k + 1
-      }
-    }
-    if (!merged) break
-  }
-  pos <- numeric(length(target))
-  for (members in groups) pos[members] <- layout(members)
-  pos[order(o)]
 }
 
 # The mean of `spectra` (a data frame or matrix with the variables `vars`,
@@ -457,11 +421,13 @@ plot_loadings_ggplot <- function(curves, peaks, background, parts, x_lab, y_lab,
     ggplot2::geom_hline(yintercept = 0, colour = "grey30", linewidth = 0.3) +
     ggplot2::scale_colour_manual(values = loading_colours, guide = "none")
   if (nrow(labels) > 0) {
-    # vertical labels above positive peaks and below negative ones, with a
-    # leader line when the label was moved aside
+    # vertical labels above positive peaks and below negative ones, moved
+    # apart along the wavelength axis by ggrepel, with a leader line to
+    # their peak
     extent <- tapply(abs(curves$value), curves$panel, max)[as.character(labels$panel)]
     up <- labels$sign == "positive"
-    labels$y <- labels$value + ifelse(up, 0.06, -0.06) * extent
+    nudge <- unname(ifelse(up, 0.06, -0.06) * extent)
+    labels$y <- labels$value + nudge
     labels$hjust <- ifelse(up, 0, 1)
     labels$fontface <- ifelse(labels$matched, "bold", "plain")
     # room for the labels, growing with their length and with the number of
@@ -470,14 +436,12 @@ plot_loadings_ggplot <- function(curves, peaks, background, parts, x_lab, y_lab,
     room <- data.frame(panel = labels$panel, wavelength = labels$wavelength,
                        value = labels$y + ifelse(up, 1, -1) * per_char * nchar(labels$label) * extent)
     p <- p +
-      ggplot2::geom_segment(data = labels,
-                            ggplot2::aes(x = .data$wavelength, xend = .data$x,
-                                         y = .data$value, yend = .data$y),
-                            colour = "grey55", linewidth = 0.25, inherit.aes = FALSE) +
-      ggplot2::geom_text(data = labels,
-                         ggplot2::aes(x = .data$x, y = .data$y, label = .data$label,
-                                      hjust = .data$hjust, fontface = .data$fontface),
-                         angle = 90, size = 2.6, colour = "grey15", inherit.aes = FALSE) +
+      ggrepel::geom_text_repel(data = labels,
+                               ggplot2::aes(x = .data$wavelength, y = .data$value, label = .data$label,
+                                            hjust = .data$hjust, fontface = .data$fontface),
+                               nudge_y = nudge, direction = "x", angle = 90, size = 2.6,
+                               colour = "grey15", segment.colour = "grey55", min.segment.length = 0,
+                               max.overlaps = Inf, seed = 1, inherit.aes = FALSE) +
       ggplot2::geom_blank(data = room, ggplot2::aes(x = .data$wavelength, y = .data$value),
                           inherit.aes = FALSE)
   }

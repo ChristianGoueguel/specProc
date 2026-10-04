@@ -237,8 +237,9 @@ test_that("plot_embedding draws the T-squared ellipses of a PCA model", {
   rp <- Filter(function(l) inherits(l$geom, "GeomPath"), r$layers)[[1]]$data
   expect_equal(rp$x^2 / fit$eigenvalues[1] + rp$y^2 / fit$eigenvalues[2],
                rep(stats::qchisq(0.975, 2), nrow(rp)))
-  flagged <- Filter(function(l) inherits(l$geom, "GeomText") && ".label" %in% names(l$data),
+  flagged <- Filter(function(l) inherits(l$geom, "GeomTextRepel") && ".label" %in% names(l$data),
                     r$layers)[[1]]$data$.label
+  flagged <- flagged[flagged != ""]  # the unlabeled samples have empty labels
   leverage <- which(fit$outlier_type %in% c("good leverage", "bad leverage"))
   expect_setequal(as.integer(flagged), leverage)
   # other embeddings: from the mean and covariance of the samples
@@ -254,8 +255,13 @@ test_that("the circles and labels of the flagged samples are optional", {
   x <- data.frame(PC1 = rnorm(30), PC2 = rnorm(30), id = paste0("s", 1:30))
   x[1, 1:2] <- c(8, 8)
   pca <- stats::prcomp(x[1:2])
-  texts <- function(p) Filter(function(l) inherits(l$geom, "GeomText") && ".label" %in% names(l$data),
+  texts <- function(p) Filter(function(l) inherits(l$geom, "GeomTextRepel") && ".label" %in% names(l$data),
                               p$layers)
+  # the labels shown (the unlabeled samples have empty labels)
+  shown <- function(p) {
+    labels <- texts(p)[[1]]$data$.label
+    labels[labels != ""]
+  }
   circles <- function(p) Filter(function(l) inherits(l$geom, "GeomPoint") && identical(l$aes_params$shape, 21),
                                 p$layers)
   # by default, neither circles nor labels, but the count in the subtitle
@@ -265,15 +271,15 @@ test_that("the circles and labels of the flagged samples are optional", {
   expect_match(p$labels$subtitle, "1 sample")
   # labels without circles, circles without labels, or both
   lab <- plot_embedding(pca, hotelling = "all", label = TRUE)
-  expect_equal(texts(lab)[[1]]$data$.label, 1)
+  expect_equal(shown(lab), "1")
   expect_length(circles(lab), 0)
-  expect_equal(texts(plot_embedding(pca, hotelling = "all", label = x$id))[[1]]$data$.label, "s1")
+  expect_equal(shown(plot_embedding(pca, hotelling = "all", label = x$id)), "s1")
   f <- plot_embedding(pca, hotelling = "all", flag = TRUE)
   expect_length(circles(f), 1)
   expect_length(texts(f), 0)
   expect_length(texts(plot_embedding(pca, hotelling = "all", flag = TRUE, label = FALSE)), 0)
-  expect_equal(texts(plot_embedding(pca, hotelling = "all", flag = TRUE, label = TRUE))[[1]]$data$.label, 1)
-  expect_equal(texts(plot_embedding(pca, hotelling = "all", flag = TRUE, label = x$id))[[1]]$data$.label, "s1")
+  expect_equal(shown(plot_embedding(pca, hotelling = "all", flag = TRUE, label = TRUE)), "1")
+  expect_equal(shown(plot_embedding(pca, hotelling = "all", flag = TRUE, label = x$id)), "s1")
   expect_error(plot_embedding(pca, hotelling = "all", flag = NA), "flag")
 })
 

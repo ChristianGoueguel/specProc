@@ -425,11 +425,16 @@ shots_criteria <- function(x, settings, label, base_size) {
     ggplot2::geom_point(ggplot2::aes(colour = status), size = 1.6 * base_size / 11, alpha = 0.85) +
     ggplot2::scale_colour_manual(values = colours, name = NULL)
   if (label > 0 && any(x$.rejected)) {
-    top <- df[df$status != "Kept", ]
-    top <- top[order(-top$.extreme), ][seq_len(min(label, nrow(top))), ]
-    top$.label <- shot_label(top)
-    p <- p + ggplot2::geom_text(data = top, ggplot2::aes(label = .data$.label), vjust = -0.8,
-                                size = 0.7 * base_size / ggplot2::.pt, colour = "grey20")
+    # the most extreme rejected shots, moved apart by ggrepel, away from all
+    # the shots (unlabeled ones have an empty label)
+    rejected <- which(df$status != "Kept")
+    shown <- rejected[order(-df$.extreme[rejected])][seq_len(min(label, length(rejected)))]
+    df$.label <- ""
+    df$.label[shown] <- shot_label(df[shown, , drop = FALSE])
+    p <- p + ggrepel::geom_text_repel(data = df, ggplot2::aes(label = .data$.label),
+                                      size = 0.7 * base_size / ggplot2::.pt, colour = "grey20",
+                                      segment.colour = "grey60", min.segment.length = 0.2,
+                                      max.overlaps = Inf, seed = 1)
   }
   p <- p +
     ggplot2::scale_x_continuous(labels = plain_numbers) +

@@ -108,7 +108,9 @@
 #' @param points The observations drawn: `"outliers"` (default), the
 #'   outlying ones; `"all"`; or `"none"`.
 #' @param label_outliers A logical: label the outlying observations with
-#'   their `id`, else their row number (`FALSE`, default).
+#'   their `id`, else their row number (`FALSE`, default). The labels are
+#'   moved apart so that they do not overlap; where many outliers crowd
+#'   together, some are left unlabeled.
 #' @param show_n A logical: write the number of values below each box
 #'   (`TRUE`, default).
 #' @param show_mean A logical: mark the mean of each box with a diamond
