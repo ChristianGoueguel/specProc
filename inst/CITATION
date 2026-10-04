@@ -1,0 +1,22 @@
+# The year of the version: its CRAN publication, else the date it was built
+# (installed from GitHub or a source tarball), else the current year.
+year <- if (!is.null(meta$`Date/Publication`)) {
+  substr(meta$`Date/Publication`, 1, 4)
+} else if (!is.null(meta$Packaged)) {
+  substr(meta$Packaged, 1, 4)
+} else {
+  format(Sys.Date(), "%Y")
+}
+
+bibentry(
+  bibtype = "Manual",
+  key = "specProc",
+  title = "{specProc}: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy",
+  author = person("Christian L.", "Goueguel", comment = c(ORCID = "0000-0003-0521-3446")),
+  year = year,
+  note = paste("R package version", meta$Version),
+  url = "https://github.com/ChristianGoueguel/specProc",
+  header = "To cite specProc in publications, please use:",
+  footer = paste("Please also cite the original papers of the methods you use, listed in",
+                 "the References section of their help pages.")
+)

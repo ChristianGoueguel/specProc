@@ -227,7 +227,7 @@ A BibTeX entry for LaTeX users:
 
 ``` bibtex
 @Manual{specProc,
-  title  = {specProc: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy},
+  title  = {{specProc}: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy},
   author = {Christian L. Goueguel},
   year   = {2026},
   note   = {R package version 0.8.3},
