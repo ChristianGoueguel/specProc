@@ -77,7 +77,10 @@
   from the scaled score and orthogonal distances, for whole spectra.
   [`predict()`](https://rdrr.io/r/stats/predict.html) gives the classes,
   or the distances to the classes and whether a spectrum is outlying for
-  all of them.
+  all of them, and
+  [`plot_coomans()`](https://christiangoueguel.com/specProc/reference/plot_coomans.md)
+  draws the distances to two classes against each other (Coomans plot),
+  with the class and classification boundaries.
   [`simca()`](https://christiangoueguel.com/specProc/reference/simca.md)
   is a new parsnip model of SIMCA classification, with
   [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md)

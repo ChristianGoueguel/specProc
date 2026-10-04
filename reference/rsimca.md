@@ -101,7 +101,8 @@ An object of class `specproc_rsimca`, a list with:
 - `distances`: a tibble with the combined distance \\D_j\\ of each
   training observation to each class.
 
-- `fitted`: the classes assigned to the training observations.
+- `group`: the classes of the training observations, and `fitted`, the
+  classes assigned to them.
 
 - `weights`: 1 for the observations regular in the model of their class,
   0 for the others.
@@ -137,6 +138,11 @@ distances.
 An observation whose two scaled distances exceed 1 for every class is an
 outlier for all of them (`outlying`): it is still assigned to the
 closest class, but probably belongs to none.
+
+[`plot_coomans()`](https://christiangoueguel.com/specProc/reference/plot_coomans.md)
+draws the distances to two classes against each other (Coomans plot),
+and `plot_outlier_map(fit$models[[j]])` the score and orthogonal
+distances to the robust PCA model of class `j`.
 
 The misclassification rates are estimated on the regular observations of
 the training data (those regular in the robust PCA of their class), and
@@ -175,6 +181,7 @@ results.
 ## See also
 
 [`predict.specproc_rsimca()`](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimca.md),
+[`plot_coomans()`](https://christiangoueguel.com/specProc/reference/plot_coomans.md),
 [`simca()`](https://christiangoueguel.com/specProc/reference/simca.md),
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
 [`robust_da()`](https://christiangoueguel.com/specProc/reference/robust_da.md)
@@ -213,4 +220,5 @@ table(predict(fit, spectra[301:368, ]), level[301:368])
 #>        low high
 #>   low   16   28
 #>   high   3   21
+plot_coomans(fit, newdata = spectra[301:368, ], group = level[301:368])
 ```

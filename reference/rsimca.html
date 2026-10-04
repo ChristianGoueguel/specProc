@@ -141,7 +141,8 @@ of random subsets of FAST-MCD in <code><a href="robpca.html">robpca()</a></code>
 <li><p><code>ncomp</code>: the number of components of each class model.</p></li>
 <li><p><code>distances</code>: a tibble with the combined distance \(D_j\) of each
 training observation to each class.</p></li>
-<li><p><code>fitted</code>: the classes assigned to the training observations.</p></li>
+<li><p><code>group</code>: the classes of the training observations, and <code>fitted</code>, the
+classes assigned to them.</p></li>
 <li><p><code>weights</code>: 1 for the observations regular in the model of their class,
 0 for the others.</p></li>
 <li><p><code>outlying</code>: <code>TRUE</code> for the observations outlying for every class.</p></li>
@@ -167,6 +168,9 @@ distances against the score distances.</p>
 <p>An observation whose two scaled distances exceed 1 for every class is an
 outlier for all of them (<code>outlying</code>): it is still assigned to the closest
 class, but probably belongs to none.</p>
+<p><code><a href="plot_coomans.html">plot_coomans()</a></code> draws the distances to two classes against each other
+(Coomans plot), and <code>plot_outlier_map(fit$models[[j]])</code> the score and
+orthogonal distances to the robust PCA model of class <code>j</code>.</p>
 <p>The misclassification rates are estimated on the regular observations of
 the training data (those regular in the robust PCA of their class), and
 the overall rate is weighted by the membership probabilities, by default
@@ -195,7 +199,8 @@ approach to robust principal component analysis. Technometrics,
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="predict.specproc_rsimca.html">predict.specproc_rsimca()</a></code>, <code><a href="simca.html">simca()</a></code>, <code><a href="robpca.html">robpca()</a></code>, <code><a href="robust_da.html">robust_da()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="predict.specproc_rsimca.html">predict.specproc_rsimca()</a></code>, <code><a href="plot_coomans.html">plot_coomans()</a></code>, <code><a href="simca.html">simca()</a></code>, <code><a href="robpca.html">robpca()</a></code>,
+<code><a href="robust_da.html">robust_da()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -231,6 +236,8 @@ approach to robust principal component analysis. Technometrics,
 <span class="r-out co"><span class="r-pr">#&gt;</span>        low high</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   low   16   28</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   high   3   21</span>
+<span class="r-in"><span><span class="fu"><a href="plot_coomans.html">plot_coomans</a></span><span class="op">(</span><span class="va">fit</span>, newdata <span class="op">=</span> <span class="va">spectra</span><span class="op">[</span><span class="fl">301</span><span class="op">:</span><span class="fl">368</span>, <span class="op">]</span>, group <span class="op">=</span> <span class="va">level</span><span class="op">[</span><span class="fl">301</span><span class="op">:</span><span class="fl">368</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="rsimca-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

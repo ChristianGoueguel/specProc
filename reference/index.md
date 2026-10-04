@@ -119,6 +119,8 @@ principal component scores).
   : Robust SIMCA Classification (RSIMCA)
 - [`predict(`*`<specproc_rsimca>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimca.md)
   : Predictions of a Robust SIMCA Model
+- [`plot_coomans()`](https://christiangoueguel.com/specProc/reference/plot_coomans.md)
+  : Coomans Plot of a Robust SIMCA Model
 - [`simca()`](https://christiangoueguel.com/specProc/reference/simca.md)
   [`update(`*`<simca>`*`)`](https://christiangoueguel.com/specProc/reference/simca.md)
   : SIMCA Classification Model (parsnip)
