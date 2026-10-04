@@ -123,6 +123,58 @@ test_that("plot_spectra offsets successive spectra", {
   expect_error(plot_spectra(df, offset = 1:3), "offset")
 })
 
+test_that("plot_spectra draws one panel per group, with the offsets restarting in each", {
+  spec <- make_spectra(n = 5, p = 50)
+  df <- as.data.frame(spec$x, check.names = FALSE)
+  df$site <- c("a", "b", "a", "b", "a")
+  p <- plot_spectra(df, panel = site, offset = 10)
+  built <- ggplot2::ggplot_build(p)
+  layout <- built$layout$layout
+  expect_equal(nrow(layout), 2)
+  expect_equal(max(layout$COL), 1) # vertical: one column
+  wide <- ggplot2::ggplot_build(plot_spectra(df, panel = "site", layout = "horizontal"))$layout$layout
+  expect_equal(max(wide$ROW), 1) # horizontal: one row
+  # the third spectrum is the second of panel "a": shifted once, not twice
+  base <- ggplot2::ggplot_build(plot_spectra(df[, 1:50]))$data[[1]]
+  shifted <- built$data[[1]]
+  expect_equal(shifted$y[shifted$group == 3], base$y[base$group == 3] + 10)
+  expect_equal(shifted$y[shifted$group == 2], base$y[base$group == 2])
+  expect_error(plot_spectra(df, panel = zz), "does not exist")
+  expect_error(plot_spectra(df, panel = site, layout = "diagonal"), "should be one of")
+})
+
+test_that("plot_spectra draws grid lines on request", {
+  spec <- make_spectra(n = 2, p = 50)
+  df <- as.data.frame(spec$x, check.names = FALSE)
+  grid_of <- function(p) ggplot2::calc_element("panel.grid.major", ggplot2::complete_theme(p$theme))
+  expect_match(class(grid_of(plot_spectra(df)))[1], "element_blank")
+  expect_match(class(grid_of(plot_spectra(df, grid = TRUE)))[1], "element_line")
+  expect_error(plot_spectra(df, grid = "yes"), "grid")
+})
+
+test_that("plot_spectra fills the area under the spectra with color_as = 'fill'", {
+  spec <- make_spectra(n = 3, p = 50)
+  df <- as.data.frame(spec$x, check.names = FALSE)
+  df$conc <- 1:3
+  p <- plot_spectra(df, colvar = conc, color_as = "fill", offset = 10)
+  expect_s3_class(p$layers[[1]]$geom, "GeomRibbon")
+  expect_equal(p$labels$fill, "conc")
+  built <- ggplot2::ggplot_build(p)$data[[1]]
+  base <- ggplot2::ggplot_build(plot_spectra(df[, 1:50]))$data[[1]]
+  # stacked upwards: the top spectrum is drawn first, each filled down to its baseline
+  top <- built$group == 1
+  expect_equal(built$ymax[top], base$y[base$group == 3] + 20)
+  expect_equal(unique(built$ymin[top]), 20)
+  expect_equal(unique(built$alpha), 1)
+  expect_equal(length(unique(built$fill)), 3)
+  # overlaid spectra are translucent; the colors of id fill the areas without colvar
+  overlaid <- ggplot2::ggplot_build(plot_spectra(df[, 1:50], color_as = "fill"))$data[[1]]
+  expect_true(all(overlaid$alpha < 1))
+  df$id <- c("x", "y", "z")
+  expect_s3_class(plot_spectra(df[, -51], id = id, color_as = "fill"), "ggplot")
+  expect_error(plot_spectra(df, colvar = conc, color_as = "area"), "should be one of")
+})
+
 test_that("tukey_gh distribution functions are consistent", {
   u <- c(0.05, 0.3, 0.5, 0.9)
   q <- tukey_gh(u, type = "q", g = 0.3, h = 0.1)

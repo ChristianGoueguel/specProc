@@ -10,7 +10,11 @@ plot_spectra(
   colvar = NULL,
   .interactive = FALSE,
   drop_na = FALSE,
-  offset = NULL
+  offset = NULL,
+  panel = NULL,
+  layout = c("vertical", "horizontal"),
+  grid = FALSE,
+  color_as = c("line", "fill")
 )
 }
 \arguments{
@@ -32,7 +36,24 @@ if drop_na is \code{TRUE}.}
 spectra, to separate them: a number (vertical offset, in intensity
 units), or two numbers \code{c(horizontal, vertical)} (in nm and intensity
 units). The spectrum of row \code{i} is shifted by \code{(i - 1)} times the
-offsets, so that the first one stays in place.}
+offsets, so that the first one stays in place. With \code{panel}, the rows
+are counted in each panel, so that the first spectrum of every panel
+stays in place.}
+
+\item{panel}{Optional (\code{NULL} by default). Column name of a grouping
+variable: the spectra of each group are drawn in a separate panel, with
+the same axes.}
+
+\item{layout}{The arrangement of the panels: \code{"vertical"} (default), one
+above the other, or \code{"horizontal"}, side by side. Ignored without
+\code{panel}.}
+
+\item{grid}{A logical: draw grid lines at the major breaks of the axes
+(\code{FALSE}, default).}
+
+\item{color_as}{How the colors of \code{colvar} (or of \code{id}, without \code{colvar})
+are shown: as the color of the lines (\code{"line"}, default), or as the fill
+of the area under each spectrum (\code{"fill"}).}
 }
 \value{
 Object of class ggplot or of class plotly if \code{.interactive = TRUE}.
@@ -43,12 +64,20 @@ wavelength and the y-axis represents intensity of a spectrum's signal.
 The function allows to plot a spectrum or several spectra in a single plot,
 identified either by an id (for example, the samples or spectra id) or by a
 target variable (for example, the concentration of a chemical element).
+The spectra can be split into panels by a grouping variable.
 }
 \details{
 This function is based on the ggplot2 package, thus allowing users to easily
 add or modify different components of the plot. Each row of \code{x} is drawn as
-a separate line. All columns other than \code{id} and \code{colvar} must be named by
-their wavelength.
+a separate line. All columns other than \code{id}, \code{colvar} and \code{panel} must be
+named by their wavelength.
+
+With \code{color_as = "fill"}, the area between each spectrum and its baseline
+(zero intensity, shifted by \code{offset}) is filled, with the spectrum drawn as
+a thin dark line. Overlaid spectra are filled with translucent colors.
+Stacked spectra (with a vertical \code{offset}) are filled with opaque colors and
+drawn from the back to the front (from the top to the bottom of the stack),
+so that the front spectra hide the back ones, as in a waterfall plot.
 }
 \examples{
 data(forageLIBS)
@@ -60,6 +89,13 @@ plot_spectra(forageLIBS[1:20, c("K", k_lines)], colvar = K)
 # five spectra stacked, each shifted up by 20000 counts and right by 0.5 nm
 plot_spectra(forageLIBS[1:5, c("Measurement", k_lines)], id = Measurement,
              offset = c(0.5, 20000))
+
+# one panel per potassium level, side by side, with the area under the
+# spectra filled by potassium content and grid lines
+spectra <- forageLIBS[1:30, c("K", k_lines)]
+spectra$level <- cut(spectra$K, 3, labels = c("Low K", "Medium K", "High K"))
+plot_spectra(spectra, colvar = K, panel = level, layout = "horizontal",
+             offset = c(0.2, 8000), color_as = "fill", grid = TRUE)
 }
 \author{
 Christian L. Goueguel

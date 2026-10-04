@@ -80,12 +80,12 @@ plot_fit <- function(data, title = NULL, pt.size = 3, pt.colour = "black", pt.sh
 
   plot1 <- plot1 +
     ggplot2::geom_line(data = curve, ggplot2::aes(x = x, y = .fitted), linewidth = line.size, colour = line.colour, linetype = linetype) +
-    ggplot2::labs(title = title, x = NULL, y = "Intensity [arb. units]") +
+    ggplot2::labs(title = title, x = NULL, y = "Intensity (arb. units)") +
     ggplot2::theme_bw(base_size = 10)
   plot2 <- ggplot2::ggplot(aug, ggplot2::aes(x = x, y = .resid)) +
     ggplot2::geom_hline(yintercept = 0) +
     ggplot2::geom_point(shape = resid.shape, size = resid.size, fill = resid.fill, colour = resid.colour) +
-    ggplot2::labs(x = "Wavelength [nm]", y = "Residual") +
+    ggplot2::labs(x = "Wavelength (nm)", y = "Residual") +
     ggplot2::theme_bw(base_size = 10)
 
   if (nlevels(aug$.id) > 1) {

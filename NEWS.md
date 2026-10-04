@@ -29,6 +29,18 @@
   full LIBS spectra): the reduction to the subspace spanned by the
   observations is now computed in C++ from the smaller cross-product matrix
   instead of an SVD. The results are unchanged up to numerical precision.
+* `plot_spectra()` has new arguments: `panel`, a grouping variable that
+  splits the spectra into panels, arranged one above the other or side by
+  side (`layout = "vertical"` or `"horizontal"`), with the `offset` restarting
+  in each panel; `grid`, to draw grid lines; and `color_as = "fill"`, to show
+  the colors of `colvar` (or `id`) as the fill of the area under each
+  spectrum instead of the line color. Spectra stacked with a vertical offset
+  are then filled with opaque colors, the front ones hiding the back ones, as
+  in a waterfall plot.
+* The axis titles of `plot_spectra()` and `plot_fit()` give the units in
+  parentheses, as in the other plots: "Wavelength (nm)" and
+  "Intensity (arb. units)".
+* specProc now requires ggplot2 3.5.0 or later.
 
 ## Breaking changes
 
