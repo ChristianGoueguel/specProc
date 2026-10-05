@@ -3,6 +3,8 @@
 A dials parameter for the `derivative` of
 [`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md):
 0 (smoothing), 1 or 2.
+[`step_gap_derivative()`](https://christiangoueguel.com/specProc/reference/step_gap_derivative.md)
+uses it with the range 1 to 2.
 
 ## Usage
 
@@ -26,7 +28,8 @@ A dials `quant_param` object.
 
 ## See also
 
-[`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md)
+[`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md),
+[`step_gap_derivative()`](https://christiangoueguel.com/specProc/reference/step_gap_derivative.md)
 
 ## Examples
 

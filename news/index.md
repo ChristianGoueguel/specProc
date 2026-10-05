@@ -136,6 +136,28 @@
   `num_terms`, `num_intervals` (new dials parameter
   [`num_intervals()`](https://christiangoueguel.com/specProc/reference/num_intervals.md))
   and `num_comp` can be tuned.
+- [`gap_derivative()`](https://christiangoueguel.com/specProc/reference/gap_derivative.md):
+  the gap-segment derivative of Norris and Williams (1984), the first or
+  second derivative computed from the means of segments of `segment`
+  channels separated by `gap` channels, so that the smoothing and the
+  distance of the difference are set separately (the window of
+  [`savitzky_golay()`](https://christiangoueguel.com/specProc/reference/savitzky_golay.md)
+  sets both). As in
+  [`savitzky_golay()`](https://christiangoueguel.com/specProc/reference/savitzky_golay.md),
+  every channel is kept and the detectors of a multi-spectrometer system
+  are filtered separately.
+  [`step_gap_derivative()`](https://christiangoueguel.com/specProc/reference/step_gap_derivative.md)
+  is its recipe step; `derivative`, `gap` and `segment` can be tuned.
+- [`bin_spectra()`](https://christiangoueguel.com/specProc/reference/bin_spectra.md):
+  the means of groups of `width` adjacent channels, within each
+  detector, which reduce the number of channels and the noise at the
+  cost of resolution.
+  [`step_bin_spectra()`](https://christiangoueguel.com/specProc/reference/step_bin_spectra.md)
+  is its recipe step; `width` can be tuned. With
+  `step_spectral_norm(method = "area")` and
+  [`step_gap_derivative()`](https://christiangoueguel.com/specProc/reference/step_gap_derivative.md),
+  it gives the preprocessing of the winning team of the EMSLIBS 2019
+  classification contest (Vrábel et al., 2020).
 
 ### Improvements
 

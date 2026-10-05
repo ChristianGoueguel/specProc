@@ -164,6 +164,10 @@ and can be tuned within a tidymodels workflow.
   : Baseline Correction Recipe Step
 - [`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md)
   : Savitzky-Golay Recipe Step
+- [`step_gap_derivative()`](https://christiangoueguel.com/specProc/reference/step_gap_derivative.md)
+  : Gap-Segment Derivative Recipe Step
+- [`step_bin_spectra()`](https://christiangoueguel.com/specProc/reference/step_bin_spectra.md)
+  : Binning Recipe Step
 - [`step_wavelet()`](https://christiangoueguel.com/specProc/reference/step_wavelet.md)
   : Wavelet Features Recipe Step
 - [`step_snv()`](https://christiangoueguel.com/specProc/reference/step_snv.md)
@@ -366,12 +370,17 @@ Functions that help assess data visually.
 - [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
   : Generalized Boxplot
 
-## Smoothing
+## Smoothing and derivatives
 
-Functions used to increase the signal-to-noise ratio.
+Functions used to increase the signal-to-noise ratio, or to compute
+derivatives of the spectra.
 
 - [`savitzky_golay()`](https://christiangoueguel.com/specProc/reference/savitzky_golay.md)
   : Savitzky-Golay Smoothing and Derivatives
+- [`gap_derivative()`](https://christiangoueguel.com/specProc/reference/gap_derivative.md)
+  : Gap-Segment Derivatives
+- [`bin_spectra()`](https://christiangoueguel.com/specProc/reference/bin_spectra.md)
+  : Binning of Adjacent Channels
 - [`wavelet_features()`](https://christiangoueguel.com/specProc/reference/wavelet_features.md)
   : Wavelet Coefficients of Spectra
 - [`average()`](https://christiangoueguel.com/specProc/reference/average.md)

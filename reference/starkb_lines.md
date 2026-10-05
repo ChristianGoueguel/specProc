@@ -101,7 +101,7 @@ Christian L. Goueguel
 # \donttest{
 # needs an internet connection
 ca <- try(starkb_lines("Ca II", wavelength = c(390, 400), perturber = "electron"))
-#> Error : Could not download STARK-B data for Ca II (URL 'http://stark-b.obspm.fr/12.07/vamdc/tap/sync?LANG=VSS2&REQUEST=doQuery&FORMAT=XSAMS&QUERY=select%20%2A%20where%20%28atomsymbol%20%3D%20%27Ca%27%20and%20ioncharge%20%3D%201%29': Timeout of 120 seconds was reached). Check the internet connection, or try again later.
+#> Error : Could not download STARK-B data for Ca II (downloaded length 0 != reported length 160). Check the internet connection, or try again later.
 if (!inherits(ca, "try-error")) head(ca)
 # }
 ```

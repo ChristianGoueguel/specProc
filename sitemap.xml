@@ -16,6 +16,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/baseline_arpls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/baseline_lambda.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/baseline_lsp.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/bin_spectra.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/biweight_location.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/biweight_midcorrelation.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/biweight_midcovariance.html</loc></url>
@@ -39,6 +40,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/flagged_regions.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/forageLIBS.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/forageShots.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/gap_derivative.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/gaussian_profile.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/generalized_boxplot.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/glsw.html</loc></url>
@@ -135,11 +137,13 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/stark_width.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/starkb_lines.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_baseline.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/step_bin_spectra.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_cellpca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_direct_orthogonal.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_direct_osc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_emsc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_epo.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/step_gap_derivative.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_glsw.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_line_intensities.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_line_ratio.html</loc></url>
