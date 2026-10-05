@@ -117,6 +117,18 @@ names_to_wavelength <- function(nms) {
   if (anyNA(wl)) NULL else wl
 }
 
+# Column indices of the detector segments of a spectral axis (see
+# wavelength_segments()): one segment of all `n` columns when `segments` is
+# FALSE or the names `nms` are not all wavelengths.
+segment_columns <- function(nms, segments, n = length(nms)) {
+  idx <- seq_len(n)
+  if (segments && !is.null(nms) && n > 2) {
+    wl <- parse_wavelength(nms)
+    if (!anyNA(wl)) return(unname(split(idx, wavelength_segments(wl))))
+  }
+  list(idx)
+}
+
 # Column medians, in C++ (as apply(x, 2, stats::median, na.rm = na.rm), with
 # the column names).
 col_medians <- function(x, na.rm = FALSE) {

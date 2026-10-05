@@ -120,13 +120,13 @@ step_savgol <- function(recipe, ..., window = 11, order = 2, derivative = 0, seg
 #'
 #' @description
 #' A dials parameter for the `derivative` of [step_savgol()]: 0 (smoothing),
-#' 1 or 2.
+#' 1 or 2. [step_gap_derivative()] uses it with the range 1 to 2.
 #'
 #' @param range The range of derivative orders. Default is 0 to 2.
 #' @param trans Not used.
 #'
 #' @return A dials `quant_param` object.
-#' @seealso [step_savgol()]
+#' @seealso [step_savgol()], [step_gap_derivative()]
 #' @export
 #'
 #' @examplesIf rlang::is_installed("dials")
@@ -168,13 +168,7 @@ savgol_weights <- function(window, order, derivative) {
 # Filters the rows of a matrix, segment by segment.
 savgol_matrix <- function(x, window, order, derivative, segments) {
   out <- matrix(NA_real_, nrow(x), ncol(x), dimnames = dimnames(x))
-  bounds <- list(seq_len(ncol(x)))
-  if (segments && !is.null(colnames(x))) {
-    wl <- parse_wavelength(colnames(x))
-    if (!anyNA(wl) && ncol(x) > 2) {
-      bounds <- split(seq_len(ncol(x)), wavelength_segments(wl))
-    }
-  }
+  bounds <- segment_columns(colnames(x), segments, ncol(x))
   weights <- savgol_weights(window, order, derivative)
   h <- (window - 1) / 2
   short <- 0

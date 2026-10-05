@@ -112,6 +112,8 @@ reference:
   contents:
   - step_baseline
   - step_savgol
+  - step_gap_derivative
+  - step_bin_spectra
   - step_wavelet
   - step_snv
   - step_spectral_norm
@@ -236,11 +238,14 @@ reference:
   - adjusted_boxplot
   - generalized_boxplot
 
-- title: Smoothing
+- title: Smoothing and derivatives
   desc: >
-    Functions used to increase the signal-to-noise ratio.
+    Functions used to increase the signal-to-noise ratio, or to compute
+    derivatives of the spectra.
   contents:
   - savitzky_golay
+  - gap_derivative
+  - bin_spectra
   - wavelet_features
   - average
   - reject_shots

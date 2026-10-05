@@ -16,7 +16,7 @@ A dials \code{quant_param} object.
 }
 \description{
 A dials parameter for the \code{derivative} of \code{\link[=step_savgol]{step_savgol()}}: 0 (smoothing),
-1 or 2.
+1 or 2. \code{\link[=step_gap_derivative]{step_gap_derivative()}} uses it with the range 1 to 2.
 }
 \examples{
 \dontshow{if (rlang::is_installed("dials")) withAutoprint(\{ # examplesIf}
@@ -25,5 +25,5 @@ dials::value_seq(savgol_derivative(), 3)
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link[=step_savgol]{step_savgol()}}
+\code{\link[=step_savgol]{step_savgol()}}, \code{\link[=step_gap_derivative]{step_gap_derivative()}}
 }

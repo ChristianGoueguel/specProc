@@ -83,6 +83,20 @@
 * `step_select_wavelengths()`: the selection as a recipe step, repeated on
   every resample; `num_terms`, `num_intervals` (new dials parameter
   `num_intervals()`) and `num_comp` can be tuned.
+* `gap_derivative()`: the gap-segment derivative of Norris and Williams
+  (1984), the first or second derivative computed from the means of
+  segments of `segment` channels separated by `gap` channels, so that the
+  smoothing and the distance of the difference are set separately (the
+  window of `savitzky_golay()` sets both). As in `savitzky_golay()`, every
+  channel is kept and the detectors of a multi-spectrometer system are
+  filtered separately. `step_gap_derivative()` is its recipe step;
+  `derivative`, `gap` and `segment` can be tuned.
+* `bin_spectra()`: the means of groups of `width` adjacent channels, within
+  each detector, which reduce the number of channels and the noise at the
+  cost of resolution. `step_bin_spectra()` is its recipe step; `width` can
+  be tuned. With `step_spectral_norm(method = "area")` and
+  `step_gap_derivative()`, it gives the preprocessing of the winning team of
+  the EMSLIBS 2019 classification contest (Vrábel et al., 2020).
 
 ## Improvements
 
