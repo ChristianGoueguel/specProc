@@ -42,7 +42,18 @@ test_that("nist functions validate their inputs", {
   expect_error(nist_lines("Ca II"), "wavelength")
   expect_error(nist_lines("Ca II", c(300, NA)), "wavelength")
   expect_error(nist_lines("Ca+", c(300, 400)), "Roman")
+  expect_error(nist_lines(c("Ca I", "Ca+"), c(300, 400)), "Roman")
+  expect_error(nist_lines(character(), c(300, 400)), "character")
   expect_error(nist_ionization_energy(1), "character")
+})
+
+test_that("nist_lines binds the lines of several species", {
+  local_mocked_bindings(
+    nist_download = function(url, query, label, timeout) nist_csv
+  )
+  lines <- nist_lines(c("Xx I", "Xx II", "Xx I"), c(399, 421), with_aki = FALSE)
+  expect_equal(lines$species, rep(c("Xx I", "Xx II"), each = 3))
+  expect_equal(nrow(nist_lines(c("Xx I", "Xx II"), c(399, 421))), 4)
 })
 
 test_that("nist_lines and nist_ionization_energy query the NIST database", {

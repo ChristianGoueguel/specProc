@@ -24,8 +24,9 @@
 #'    Atomic Spectra Database, \url{https://physics.nist.gov/asd}. National
 #'    Institute of Standards and Technology, Gaithersburg, MD.
 #'
-#' @param species A character string naming the emitter in spectroscopic
-#'   notation, such as `"Ca I"` or `"Ca II"`.
+#' @param species A character vector of emitters in spectroscopic notation,
+#'   such as `"Ca II"` or `c("Ca I", "Ca II")`. The lines of several species
+#'   are returned in one table, species by species.
 #' @param wavelength A numeric vector of length 2: the wavelength range, in
 #'   nm.
 #' @param with_aki A logical: keep only the lines with a transition
@@ -46,11 +47,15 @@
 #' @examples
 #' \donttest{
 #' # needs an internet connection
-#' ca <- try(nist_lines("Ca II", wavelength = c(310, 400)))
+#' ca <- try(nist_lines(c("Ca I", "Ca II"), wavelength = c(390, 400)))
 #' if (!inherits(ca, "try-error")) ca
 #' }
 nist_lines <- function(species, wavelength, with_aki = TRUE, timeout = 120) {
-  sp <- parse_species(species)
+  if (!is.character(species) || length(species) == 0) {
+    stop("'species' must be a character vector, such as \"Ca II\".")
+  }
+  parsed <- lapply(species, parse_species)
+  parsed <- parsed[!duplicated(vapply(parsed, `[[`, character(1), "label"))]
   if (missing(wavelength) || !is.numeric(wavelength) || length(wavelength) != 2 ||
       anyNA(wavelength) || any(wavelength <= 0)) {
     stop("'wavelength' must be a numeric vector of length 2 (nm).")
@@ -58,22 +63,27 @@ nist_lines <- function(species, wavelength, with_aki = TRUE, timeout = 120) {
   check_flag(with_aki, "with_aki")
   check_number(timeout, "timeout", lower = 0, lower_open = TRUE)
   wavelength <- sort(wavelength)
-  key <- paste("lines", sp$label, wavelength[1], wavelength[2])
-  lines <- nist_cache[[key]]
-  if (is.null(lines)) {
-    query <- list(
-      spectra = sp$label, low_w = wavelength[1], upp_w = wavelength[2], unit = 1,
-      submit = "Retrieve Data", format = 2, line_out = 0, en_unit = 1, output_type = 0,
-      bibrefs = 1, show_obs_wl = 1, show_calc_wl = 1, order_out = 0, max_low_enrg = "",
-      show_av = 2, max_upp_enrg = "", tsb_value = 0, min_str = "", A_out = 0, f_out = "on",
-      intens_out = "on", max_str = "", allowed_out = 1, forbid_out = 1, min_accur = "",
-      min_intens = "", conf_out = "on", term_out = "on", enrg_out = "on", J_out = "on",
-      g_out = "on", page_size = 15, remove_js = "on", show_wn = 1
-    )
-    text <- nist_download("https://physics.nist.gov/cgi-bin/ASD/lines1.pl", query, sp$label, timeout)
-    lines <- parse_nist_lines(text, sp$label)
-    assign(key, lines, envir = nist_cache)
-  }
+  tables <- lapply(parsed, function(sp) {
+    key <- paste("lines", sp$label, wavelength[1], wavelength[2])
+    table <- nist_cache[[key]]
+    if (is.null(table)) {
+      query <- list(
+        spectra = sp$label, low_w = wavelength[1], upp_w = wavelength[2], unit = 1,
+        submit = "Retrieve Data", format = 2, line_out = 0, en_unit = 1, output_type = 0,
+        bibrefs = 1, show_obs_wl = 1, show_calc_wl = 1, order_out = 0, max_low_enrg = "",
+        show_av = 2, max_upp_enrg = "", tsb_value = 0, min_str = "", A_out = 0, f_out = "on",
+        intens_out = "on", max_str = "", allowed_out = 1, forbid_out = 1, min_accur = "",
+        min_intens = "", conf_out = "on", term_out = "on", enrg_out = "on", J_out = "on",
+        g_out = "on", page_size = 15, remove_js = "on", show_wn = 1
+      )
+      text <- nist_download("https://physics.nist.gov/cgi-bin/ASD/lines1.pl", query, sp$label,
+                            timeout)
+      table <- parse_nist_lines(text, sp$label)
+      assign(key, table, envir = nist_cache)
+    }
+    table
+  })
+  lines <- do.call(rbind, tables)
   if (with_aki) {
     lines <- lines[!is.na(lines$Aki), ]
   }

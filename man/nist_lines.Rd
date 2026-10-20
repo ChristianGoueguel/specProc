@@ -7,8 +7,9 @@
 nist_lines(species, wavelength, with_aki = TRUE, timeout = 120)
 }
 \arguments{
-\item{species}{A character string naming the emitter in spectroscopic
-notation, such as \code{"Ca I"} or \code{"Ca II"}.}
+\item{species}{A character vector of emitters in spectroscopic notation,
+such as \code{"Ca II"} or \code{c("Ca I", "Ca II")}. The lines of several species
+are returned in one table, species by species.}
 
 \item{wavelength}{A numeric vector of length 2: the wavelength range, in
 nm.}
@@ -53,7 +54,7 @@ Institute of Standards and Technology, Gaithersburg, MD.
 \examples{
 \donttest{
 # needs an internet connection
-ca <- try(nist_lines("Ca II", wavelength = c(310, 400)))
+ca <- try(nist_lines(c("Ca I", "Ca II"), wavelength = c(390, 400)))
 if (!inherits(ca, "try-error")) ca
 }
 }

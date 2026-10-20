@@ -271,6 +271,9 @@
 
 ## Bug fixes
 
+* `nist_lines()` accepts several species, such as `c("Ca I", "Ca II")`, as
+  in the plasma diagnostics vignette, and returns their lines in one table;
+  it accepted only one ("'species' must be a single character string").
 * `generalized_boxplot()` now follows Bruffaerts et al. (2014) and the
   authors' implementation: the transformed data are standardized by their
   interquartile range divided by `diff(qnorm(c(0.25, 0.75)))` = 1.349 (was
