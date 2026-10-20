@@ -392,6 +392,10 @@
 
 ### Bug fixes
 
+- [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md)
+  accepts several species, such as `c("Ca I", "Ca II")`, as in the
+  plasma diagnostics vignette, and returns their lines in one table; it
+  accepted only one (“‘species’ must be a single character string”).
 - [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
   now follows Bruffaerts et al. (2014) and the authors’ implementation:
   the transformed data are standardized by their interquartile range
@@ -455,6 +459,8 @@
   comparison that depends on the units, and keeps it in the usual case.
 
 ## specProc 0.8.3
+
+CRAN release: 2026-10-15
 
 ### New features
 

@@ -11,14 +11,24 @@ computations.
 
 ## Installation
 
+Install the released version from
+[CRAN](https://CRAN.R-project.org/package=specProc):
+
+``` r
+
+install.packages("specProc")
+```
+
+or the development version from GitHub:
+
 ``` r
 
 # install.packages("remotes")
 remotes::install_github("ChristianGoueguel/specProc", build_vignettes = TRUE)
 ```
 
-A C++ compiler is needed to build the package from source (Rtools on
-Windows, Xcode Command Line Tools on macOS).
+A C++ compiler is needed to build the development version from source
+(Rtools on Windows, Xcode Command Line Tools on macOS).
 
 ## A LIBS workflow
 

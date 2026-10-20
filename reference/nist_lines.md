@@ -19,8 +19,9 @@ nist_lines(species, wavelength, with_aki = TRUE, timeout = 120)
 
 - species:
 
-  A character string naming the emitter in spectroscopic notation, such
-  as `"Ca I"` or `"Ca II"`.
+  A character vector of emitters in spectroscopic notation, such as
+  `"Ca II"` or `c("Ca I", "Ca II")`. The lines of several species are
+  returned in one table, species by species.
 
 - wavelength:
 
@@ -76,18 +77,16 @@ Christian L. Goueguel
 ``` r
 # \donttest{
 # needs an internet connection
-ca <- try(nist_lines("Ca II", wavelength = c(310, 400)))
+ca <- try(nist_lines(c("Ca I", "Ca II"), wavelength = c(390, 400)))
 if (!inherits(ca, "try-error")) ca
-#> # A tibble: 7 × 12
-#>   species wavelength      Aki   fik accuracy    Ei    Ek    gi    gk lower upper
-#>   <chr>        <dbl>    <dbl> <dbl> <chr>    <dbl> <dbl> <dbl> <dbl> <chr> <chr>
-#> 1 Ca II         316.   3.10e8 0.93  C         3.12  7.05     2     4 3p6.… 3p6.…
-#> 2 Ca II         318.   3.60e8 0.82  C         3.15  7.05     4     6 3p6.… 3p6.…
-#> 3 Ca II         318.   5.80e7 0.088 C         3.15  7.05     4     4 3p6.… 3p6.…
-#> 4 Ca II         371.   8.80e7 0.18  C         3.12  6.47     2     2 3p6.… 3p6.…
-#> 5 Ca II         374.   1.7 e8 0.18  C         3.15  6.47     4     2 3p6.… 3p6.…
-#> 6 Ca II         393.   1.47e8 0.682 C         0     3.15     2     4 3p6.… 3p6.…
-#> 7 Ca II         397.   1.4 e8 0.33  C         0     3.12     2     2 3p6.… 3p6.…
+#> # A tibble: 5 × 12
+#>   species wavelength     Aki    fik accuracy    Ei    Ek    gi    gk lower upper
+#>   <chr>        <dbl>   <dbl>  <dbl> <chr>    <dbl> <dbl> <dbl> <dbl> <chr> <chr>
+#> 1 Ca I          395.  3.34e6 0.0234 C         1.88  5.02     1     3 3p6.… 3p6.…
+#> 2 Ca I          396.  9.8 e6 0.023  C         1.89  5.02     3     3 3p6.… 3p6.…
+#> 3 Ca I          397.  1.75e7 0.0249 C         1.90  5.02     5     3 3p6.… 3p6.…
+#> 4 Ca II         393.  1.47e8 0.682  C         0     3.15     2     4 3p6.… 3p6.…
+#> 5 Ca II         397.  1.4 e8 0.33   C         0     3.12     2     2 3p6.… 3p6.…
 #> # ℹ 1 more variable: intensity <chr>
 # }
 ```

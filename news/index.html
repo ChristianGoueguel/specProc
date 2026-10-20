@@ -142,6 +142,8 @@ The help page gives the sizes for journal figures. The colors of <code>colvar</c
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li>
+<code><a href="../reference/nist_lines.html">nist_lines()</a></code> accepts several species, such as <code>c("Ca I", "Ca II")</code>, as in the plasma diagnostics vignette, and returns their lines in one table; it accepted only one (“‘species’ must be a single character string”).</li>
+<li>
 <code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code> now follows Bruffaerts et al. (2014) and the authors’ implementation: the transformed data are standardized by their interquartile range divided by <code>diff(qnorm(c(0.25, 0.75)))</code> = 1.349 (was 1.3426); a negative tail parameter <code>h</code> (tails lighter than normal) is kept instead of being set to 0, which widened the fences of such variables (in <code>forageLIBS</code>, at alpha = 0.7%, the upper fence of Ca was 1.25 instead of 1.19); and the fences are never inside the box.</li>
 <li>
 <code>notch = TRUE</code> failed in <code><a href="../reference/adjusted_boxplot.html">adjusted_boxplot()</a></code> and <code><a href="../reference/generalized_boxplot.html">generalized_boxplot()</a></code> (“object ‘notchlower’ not found”); the notches span the median plus or minus 1.58 IQR / sqrt(n) (McGill et al., 1978).</li>
@@ -154,7 +156,7 @@ The help page gives the sizes for journal figures. The colors of <code>colvar</c
 </ul></div>
 </div>
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.8.3" id="specproc-083">specProc 0.8.3<a class="anchor" aria-label="anchor" href="#specproc-083"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.8.3" id="specproc-083">specProc 0.8.3<a class="anchor" aria-label="anchor" href="#specproc-083"></a></h2><p class="text-muted">CRAN release: 2026-10-15</p>
 <div class="section level3">
 <h3 id="new-features-0-8-3">New features<a class="anchor" aria-label="anchor" href="#new-features-0-8-3"></a></h3>
 <ul><li>
