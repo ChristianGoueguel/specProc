@@ -396,6 +396,15 @@
   accepts several species, such as `c("Ca I", "Ca II")`, as in the
   plasma diagnostics vignette, and returns their lines in one table; it
   accepted only one (“‘species’ must be a single character string”).
+- [`starkb_lines()`](https://christiangoueguel.com/specProc/reference/starkb_lines.md),
+  [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md),
+  [`nist_levels()`](https://christiangoueguel.com/specProc/reference/nist_levels.md)
+  and
+  [`nist_ionization_energy()`](https://christiangoueguel.com/specProc/reference/nist_ionization_energy.md)
+  try a download again, up to three times, when the server is busy (HTTP
+  5xx errors, such as 504 Gateway Timeout), and report the HTTP status
+  when the download fails, instead of a less telling message such as
+  “downloaded length 0 != reported length 160”.
 - [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
   now follows Bruffaerts et al. (2014) and the authors’ implementation:
   the transformed data are standardized by their interquartile range
