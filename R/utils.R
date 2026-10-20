@@ -136,3 +136,46 @@ col_medians <- function(x, na.rm = FALSE) {
   storage.mode(x) <- "double"
   stats::setNames(col_medians_cpp(x, na.rm), colnames(x))
 }
+
+# Downloads 'url' to 'file' from an online database (NIST ASD, STARK-B). A
+# busy server (HTTP 5xx, such as 504 Gateway Timeout) is tried again after
+# 'wait' seconds, up to 'attempts' times. The error gives the HTTP status,
+# which download.file() reports after a less telling warning ("downloaded
+# length 0 != reported length ...").
+download_data <- function(url, file, database, label, timeout, attempts = 3, wait = 5) {
+  old <- options(timeout = max(timeout, getOption("timeout")))
+  on.exit(options(old), add = TRUE)
+  for (i in seq_len(attempts)) {
+    problems <- character()
+    withCallingHandlers(
+      tryCatch(download_file(url, file), error = function(e) {
+        problems <<- c(problems, conditionMessage(e))
+      }),
+      warning = function(w) {
+        problems <<- c(problems, conditionMessage(w))
+        invokeRestart("muffleWarning")
+      }
+    )
+    if (length(problems) == 0 && file.exists(file) && file.size(file) > 0) {
+      return(invisible(file))
+    }
+    http <- regmatches(problems, regexpr("HTTP status was '[^']*'", problems))
+    reason <- if (length(http) > 0) {
+      sub("HTTP status was '([^']*)'", "HTTP status \\1", http[1])
+    } else if (length(problems) > 0) {
+      problems[1]
+    } else {
+      "empty response"
+    }
+    if (!startsWith(reason, "HTTP status 5") || i == attempts) {
+      break
+    }
+    Sys.sleep(wait)
+  }
+  stop("Could not download ", database, " data for ", label, " (", reason, "). ",
+       "Check the internet connection, or try again later.", call. = FALSE)
+}
+
+download_file <- function(url, file) {
+  utils::download.file(url, file, quiet = TRUE, mode = "wb")
+}

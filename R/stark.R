@@ -508,18 +508,7 @@ starkb_download <- function(sp, timeout) {
   url <- paste0(starkb_endpoint, "?LANG=VSS2&REQUEST=doQuery&FORMAT=XSAMS&QUERY=",
                 utils::URLencode(query, reserved = TRUE))
   file <- tempfile(fileext = ".xml")
-  old <- options(timeout = max(timeout, getOption("timeout")))
-  on.exit(options(old), add = TRUE)
-  status <- tryCatch(
-    utils::download.file(url, file, quiet = TRUE, mode = "wb"),
-    error = function(e) e, warning = function(w) w
-  )
-  if (inherits(status, "condition") || !file.exists(file) || file.size(file) == 0) {
-    msg <- if (inherits(status, "condition")) conditionMessage(status) else "empty response"
-    stop("Could not download STARK-B data for ", sp$label, " (", msg, "). ",
-         "Check the internet connection, or try again later.", call. = FALSE)
-  }
-  file
+  download_data(url, file, "STARK-B", sp$label, timeout)
 }
 
 # Reads a STARK-B XSAMS document into a tibble.

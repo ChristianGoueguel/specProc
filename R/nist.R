@@ -253,17 +253,7 @@ nist_download <- function(url, query, label, timeout) {
   ))
   file <- tempfile(fileext = ".csv")
   on.exit(unlink(file), add = TRUE)
-  old <- options(timeout = max(timeout, getOption("timeout")))
-  on.exit(options(old), add = TRUE)
-  status <- tryCatch(
-    utils::download.file(full, file, quiet = TRUE, mode = "wb"),
-    error = function(e) e, warning = function(w) w
-  )
-  if (inherits(status, "condition") || !file.exists(file) || file.size(file) == 0) {
-    msg <- if (inherits(status, "condition")) conditionMessage(status) else "empty response"
-    stop("Could not download NIST data for ", label, " (", msg, "). ",
-         "Check the internet connection, or try again later.", call. = FALSE)
-  }
+  download_data(full, file, "NIST", label, timeout)
   text <- readLines(file, warn = FALSE, encoding = "UTF-8")
   if (length(text) == 0 || grepl("<html|<!DOCTYPE", text[1], ignore.case = TRUE) ||
       any(grepl("<title>NIST ASD : Input Error", text, fixed = TRUE))) {
