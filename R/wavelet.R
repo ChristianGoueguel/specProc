@@ -34,8 +34,22 @@
 #' most informative coefficients, [step_wavelet()] can select those with the
 #' largest variance in the training data (Trygg and Wold, 1998).
 #'
+#' Each coefficient is a weighted sum of a window of channels, which widens
+#' with the level, and is placed at the center of that window: the centroid
+#' of the weights for the approximation, their center of energy for the
+#' details. The window of a coefficient is not centered on its block of
+#' \eqn{2^{level}} channels (about 37 channels later for `"la8"` at level
+#' 4). When the names of the channels are wavelengths, the wavelengths at
+#' these centers are returned as the attribute `"wavelength"`, so that the
+#' approximation can be plotted against the wavelength and the coefficients
+#' kept by [step_wavelet()] traced back to the spectrum. The approximation at
+#' `level` is \eqn{2^{level/2}} times the local mean of the spectrum. The last
+#' coefficients, whose window extends past the last channel (the padding,
+#' then the start of the spectrum), are placed past the end of the
+#' wavelength axis, extended with the spacing of its last channels.
+#'
 #' @param x A numeric matrix or data frame of spectra, one per row, or a
-#'   numeric vector (one spectrum).
+#'   numeric vector (one spectrum). Their names are the wavelengths.
 #' @param wavelet The wavelet: `"haar"`, `"d4"` (default), `"d6"`, `"d8"` or
 #'   `"la8"`.
 #' @param level The number of levels of the decomposition. Default is 3.
@@ -44,7 +58,9 @@
 #'
 #' @return A matrix with one row per spectrum and one column per coefficient,
 #'   named `A<level>_<i>` for the approximation and `D<j>_<i>` for the
-#'   details of level `j`.
+#'   details of level `j`. When the names of `x` are wavelengths, its
+#'   attribute `"wavelength"` gives the wavelength at the center of each
+#'   coefficient.
 #'
 #' @references
 #'  - Mallat, S.G. (1989). A theory for multiresolution signal
@@ -63,17 +79,29 @@
 #' spectra <- forageLIBS[1:4, -(1:14)]
 #' approx <- wavelet_features(spectra, wavelet = "la8", level = 4)
 #' dim(approx)   # 7152 channels -> 447 coefficients
+#' head(attr(approx, "wavelength"))   # the wavelength of each coefficient
 wavelet_features <- function(x, wavelet = "d4", level = 3, coefficients = "approximation") {
   wavelet <- match.arg(wavelet, names(wavelet_filters))
   coefficients <- match.arg(coefficients, c("approximation", "all"))
-  mat <- if (is.numeric(x) && is.null(dim(x))) matrix(x, nrow = 1) else as_numeric_matrix(x, "x")
+  mat <- if (is.numeric(x) && is.null(dim(x))) {
+    matrix(x, nrow = 1, dimnames = list(NULL, names(x)))
+  } else {
+    as_numeric_matrix(x, "x")
+  }
   if (anyNA(mat)) {
     stop("The spectra have missing values; impute or remove them first.", call. = FALSE)
   }
   check_wavelet_level(level, ncol(mat), wavelet)
   dwt <- dwt_matrix(mat, wavelet_filters[[wavelet]], level)
-  if (coefficients == "approximation") return(dwt$approximation)
-  do.call(cbind, c(list(dwt$approximation), rev(dwt$details)))
+  out <- if (coefficients == "approximation") dwt$approximation else
+    do.call(cbind, c(list(dwt$approximation), rev(dwt$details)))
+  wl <- names_to_wavelength(colnames(mat))
+  if (!is.null(wl)) {
+    centers <- wavelet_centers(wavelet_filters[[wavelet]], level,
+                               ncol(dwt$approximation) * 2^level, coefficients)
+    attr(out, "wavelength") <- channel_wavelength(centers, wl)
+  }
+  out
 }
 
 #' @title Wavelet Features Recipe Step
@@ -91,8 +119,10 @@ wavelet_features <- function(x, wavelet = "d4", level = 3, coefficients = "appro
 #' kept (Trygg and Wold, 1998); new data get the same coefficients. The
 #' `level` and `num_coef` can be tuned with `tune::tune()` (dials parameters
 #' `wavelet_level()` and `num_terms()`). [tidy()][recipes::tidy.recipe]
-#' returns the names of the kept coefficients (`terms`), their `variance` in
-#' the training data (`NA` before the step is trained) and `id`.
+#' returns the names of the kept coefficients (`terms`), the `wavelength` at
+#' their center (see [wavelet_features()]; `NA` when the column names are not
+#' wavelengths), their `variance` in the training data (`NA` before the step
+#' is trained) and `id`.
 #'
 #' @inheritParams step_baseline
 #' @inheritParams wavelet_features
@@ -217,6 +247,49 @@ dwt_matrix <- function(x, h, level) {
   list(approximation = a, details = details)
 }
 
+# Channels (from 1, fractional) at the center of the coefficients of
+# dwt_matrix() for spectra padded to m channels, in the order of
+# wavelet_features(). Coefficient i of level j weighs the channels from
+# 2^j (i - 1) + 1 on with an equivalent filter, the cascade of the filters of
+# the levels up to j: its center is the centroid of that filter for the
+# approximation, and its center of energy for the details (whose filter sums
+# to zero).
+wavelet_centers <- function(h, level, m, coefficients) {
+  g <- rev(h) * (-1)^(seq_along(h) - 1)
+  centroid <- function(w) sum((seq_along(w) - 1) * w) / sum(w)
+  at <- function(j, offset) 2^j * (seq_len(m / 2^j) - 1) + offset + 1
+  approx_filter <- 1
+  details <- vector("list", level)
+  for (j in seq_len(level)) {
+    details[[j]] <- at(j, centroid(cascade_filter(approx_filter, g, 2^(j - 1))^2))
+    approx_filter <- cascade_filter(approx_filter, h, 2^(j - 1))
+  }
+  approximation <- at(level, centroid(approx_filter))
+  if (coefficients == "approximation") return(approximation)
+  c(approximation, unlist(rev(details)))
+}
+
+# Equivalent filter of `f` followed by `h` applied to every `step`-th value.
+cascade_filter <- function(f, h, step) {
+  out <- numeric(length(f) + (length(h) - 1) * step)
+  for (k in seq_along(h)) {
+    idx <- (k - 1) * step + seq_along(f)
+    out[idx] <- out[idx] + h[k] * f
+  }
+  out
+}
+
+# Wavelengths at the fractional channels `pos` of the axis `wl`, extended past
+# its end with the spacing of its last two channels (the padding, and the
+# coefficients whose window wraps around to the start).
+channel_wavelength <- function(pos, wl) {
+  n <- length(wl)
+  out <- stats::approx(seq_len(n), wl, xout = pmin(pos, n))$y
+  past <- pos > n
+  out[past] <- wl[n] + (pos[past] - n) * (wl[n] - wl[n - 1])
+  out
+}
+
 # Inverse of dwt_matrix (used in the tests).
 idwt_matrix <- function(dwt, h) {
   g <- rev(h) * (-1)^(seq_along(h) - 1)
@@ -249,7 +322,8 @@ prep.step_wavelet <- function(x, training, info = NULL, ...) {
       check_count(x$num_coef, "num_coef")
       sort(order(variance, decreasing = TRUE)[seq_len(min(x$num_coef, length(variance)))])
     }
-    x$res <- list(keep = colnames(coefs)[keep], variance = unname(variance[keep]))
+    x$res <- list(keep = colnames(coefs)[keep], variance = unname(variance[keep]),
+                  wavelength = attr(coefs, "wavelength")[keep])
   }
   x$columns <- cols
   x$trained <- TRUE
@@ -283,9 +357,12 @@ print.step_wavelet <- function(x, width = max(20, options()$width - 30), ...) {
 #' @exportS3Method generics::tidy
 tidy.step_wavelet <- function(x, ...) {
   if (recipes::is_trained(x) && !is.null(x$res)) {
-    tibble::tibble(terms = paste0(x$prefix, x$res$keep), variance = x$res$variance, id = x$id)
+    tibble::tibble(terms = paste0(x$prefix, x$res$keep),
+                   wavelength = x$res$wavelength %||% NA_real_, variance = x$res$variance,
+                   id = x$id)
   } else {
-    tibble::tibble(terms = recipes::sel2char(x$terms), variance = NA_real_, id = x$id)
+    tibble::tibble(terms = recipes::sel2char(x$terms), wavelength = NA_real_,
+                   variance = NA_real_, id = x$id)
   }
 }
 

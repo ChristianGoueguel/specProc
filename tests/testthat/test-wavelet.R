@@ -37,6 +37,38 @@ test_that("wavelet_features returns approximation or all coefficients", {
   expect_error(wavelet_features(x), "missing values")
 })
 
+test_that("wavelet_features gives the wavelength at the center of each coefficient", {
+  set.seed(4)
+  x <- matrix(stats::rnorm(2 * 100), 2, dimnames = list(NULL, 400 + 1:100))
+  # Haar: the center of the block of 2^j channels of each coefficient
+  a <- wavelet_features(x, "haar", level = 2)
+  expect_equal(attr(a, "wavelength"), 400 + 4 * (0:24) + 2.5)
+  all_coef <- wavelet_features(x, "haar", level = 2, coefficients = "all")
+  expect_equal(attr(all_coef, "wavelength"),
+               c(400 + 4 * (0:24) + 2.5, 400 + 4 * (0:24) + 2.5, 400 + 2 * (0:49) + 1.5))
+  # past the end of the axis: the padding and the window wrapping around
+  expect_equal(tail(attr(wavelet_features(x[, 1:97], "haar", 2), "wavelength"), 1), 498.5)
+  expect_equal(attr(wavelet_features(x[1, ], "haar", 1), "wavelength")[1:2], c(401.5, 403.5))
+  expect_null(attr(wavelet_features(unname(x), "haar", 2), "wavelength"))
+  # a line is centered on its wavelength, whatever the wavelet
+  wl <- 300 + 0.1 * (1:512)
+  line <- matrix(stats::dnorm(1:512, 250, 6), 1, dimnames = list(NULL, wl))
+  for (w in names(wavelet_filters)) {
+    coef <- wavelet_features(line, w, level = 3)
+    expect_equal(sum(attr(coef, "wavelength") * coef) / sum(coef), wl[250], tolerance = 1e-6)
+  }
+  # the details are at the center of energy of their window
+  impulse <- matrix(0, 64, 256, dimnames = list(NULL, 1:256))
+  impulse[cbind(1:64, 100 + 1:64)] <- 1
+  d <- wavelet_features(impulse, "la8", level = 3, coefficients = "all")
+  for (j in 1:3) {
+    s <- startsWith(colnames(d), paste0("D", j, "_"))
+    energy <- d[, s]^2
+    center <- sum(sweep(energy, 2, attr(d, "wavelength")[s], "*")) / sum(energy)
+    expect_equal(center, sum((100 + 1:64) * rowSums(energy)) / sum(energy), tolerance = 1e-10)
+  }
+})
+
 test_that("step_wavelet replaces spectra by coefficients", {
   skip_if_not_installed("recipes")
   set.seed(3)
@@ -46,7 +78,8 @@ test_that("step_wavelet replaces spectra by coefficients", {
     step_wavelet(recipes::all_predictors(), wavelet = "haar", level = 3)
   out <- recipes::bake(recipes::prep(rec), new_data = NULL)
   expect_equal(names(out), c("y", paste0("wav_A3_", 1:8)))
-  expect_equal(unname(as.matrix(out[-1])), unname(wavelet_features(x, "haar", 3)))
+  expect_equal(unname(as.matrix(out[-1])), unname(wavelet_features(x, "haar", 3)),
+               ignore_attr = "wavelength")
   # the coefficients of largest variance in the training data
   top <- recipes::recipe(y ~ ., data = d) |>
     step_wavelet(recipes::all_predictors(), coefficients = "all", num_coef = 5, level = 2) |>
@@ -54,6 +87,8 @@ test_that("step_wavelet replaces spectra by coefficients", {
   all_coef <- wavelet_features(x, "d4", 2, "all")
   v <- apply(all_coef, 2, stats::var)
   expect_setequal(recipes::tidy(top, 1)$terms, paste0("wav_", names(sort(v, decreasing = TRUE))[1:5]))
+  kept_coef <- match(sub("^wav_", "", recipes::tidy(top, 1)$terms), colnames(all_coef))
+  expect_equal(recipes::tidy(top, 1)$wavelength, attr(all_coef, "wavelength")[kept_coef])
   new <- recipes::bake(top, new_data = d[1:2, ])
   expect_equal(ncol(new), 6)
   kept <- recipes::recipe(y ~ ., data = d) |>
@@ -62,6 +97,12 @@ test_that("step_wavelet replaces spectra by coefficients", {
   expect_equal(ncol(kept), 1 + 64 + 32)
   expect_equal(generics::tunable(rec$steps[[1]])$name, c("level", "num_coef"))
   expect_true(all(is.na(recipes::tidy(rec, 1)$variance)))
+  expect_true(all(is.na(recipes::tidy(rec, 1)$wavelength)))
+  # column names that are not wavelengths
+  unnamed <- recipes::recipe(y ~ ., data = data.frame(y = 1:6, as.data.frame(unname(x)))) |>
+    step_wavelet(recipes::all_predictors(), level = 2) |>
+    recipes::prep()
+  expect_true(all(is.na(recipes::tidy(unnamed, 1)$wavelength)))
   expect_match(paste(utils::capture.output(print(rec), type = "message"), collapse = " "), "haar")
   skip_if_not_installed("dials")
   expect_s3_class(wavelet_level(), "quant_param")

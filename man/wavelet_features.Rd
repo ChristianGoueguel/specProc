@@ -8,7 +8,7 @@ wavelet_features(x, wavelet = "d4", level = 3, coefficients = "approximation")
 }
 \arguments{
 \item{x}{A numeric matrix or data frame of spectra, one per row, or a
-numeric vector (one spectrum).}
+numeric vector (one spectrum). Their names are the wavelengths.}
 
 \item{wavelet}{The wavelet: \code{"haar"}, \code{"d4"} (default), \code{"d6"}, \code{"d8"} or
 \code{"la8"}.}
@@ -21,7 +21,9 @@ numeric vector (one spectrum).}
 \value{
 A matrix with one row per spectrum and one column per coefficient,
 named \verb{A<level>_<i>} for the approximation and \verb{D<j>_<i>} for the
-details of level \code{j}.
+details of level \code{j}. When the names of \code{x} are wavelengths, its
+attribute \code{"wavelength"} gives the wavelength at the center of each
+coefficient.
 }
 \description{
 Computes the discrete wavelet transform (DWT) of spectra and returns its
@@ -58,12 +60,27 @@ the (padded) spectrum. As features for a model, the approximation keeps
 the broad shape of the spectrum and drops the noise; to keep only the
 most informative coefficients, \code{\link[=step_wavelet]{step_wavelet()}} can select those with the
 largest variance in the training data (Trygg and Wold, 1998).
+
+Each coefficient is a weighted sum of a window of channels, which widens
+with the level, and is placed at the center of that window: the centroid
+of the weights for the approximation, their center of energy for the
+details. The window of a coefficient is not centered on its block of
+\eqn{2^{level}} channels (about 37 channels later for \code{"la8"} at level
+4). When the names of the channels are wavelengths, the wavelengths at
+these centers are returned as the attribute \code{"wavelength"}, so that the
+approximation can be plotted against the wavelength and the coefficients
+kept by \code{\link[=step_wavelet]{step_wavelet()}} traced back to the spectrum. The approximation at
+\code{level} is \eqn{2^{level/2}} times the local mean of the spectrum. The last
+coefficients, whose window extends past the last channel (the padding,
+then the start of the spectrum), are placed past the end of the
+wavelength axis, extended with the spacing of its last channels.
 }
 \examples{
 data(forageLIBS)
 spectra <- forageLIBS[1:4, -(1:14)]
 approx <- wavelet_features(spectra, wavelet = "la8", level = 4)
 dim(approx)   # 7152 channels -> 447 coefficients
+head(attr(approx, "wavelength"))   # the wavelength of each coefficient
 }
 \references{
 \itemize{

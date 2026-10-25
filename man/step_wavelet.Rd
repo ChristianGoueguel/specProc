@@ -77,8 +77,10 @@ recipe is prepped, and the \code{num_coef} coefficients of largest variance are
 kept (Trygg and Wold, 1998); new data get the same coefficients. The
 \code{level} and \code{num_coef} can be tuned with \code{tune::tune()} (dials parameters
 \code{wavelet_level()} and \code{num_terms()}). \link[recipes:tidy.recipe]{tidy()}
-returns the names of the kept coefficients (\code{terms}), their \code{variance} in
-the training data (\code{NA} before the step is trained) and \code{id}.
+returns the names of the kept coefficients (\code{terms}), the \code{wavelength} at
+their center (see \code{\link[=wavelet_features]{wavelet_features()}}; \code{NA} when the column names are not
+wavelengths), their \code{variance} in the training data (\code{NA} before the step
+is trained) and \code{id}.
 }
 \examples{
 if (rlang::is_installed("recipes")) {

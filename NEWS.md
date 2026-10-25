@@ -214,6 +214,14 @@
 * The axis titles of `plot_spectra()` and `plot_fit()` give the units in
   parentheses, as in the other plots: "Wavelength (nm)" and
   "Intensity (arb. units)".
+* `wavelet_features()` keeps the wavelengths: when the names of the spectra
+  are wavelengths, the attribute `"wavelength"` of the coefficients gives
+  the wavelength at the center of the window of channels of each one (the
+  centroid of its weights for the approximation, their center of energy for
+  the details, which are not centered on the block of `2^level` channels:
+  about 37 channels later for `"la8"` at level 4). `tidy()` of
+  `step_wavelet()` gains the `wavelength` of the kept coefficients, to trace
+  them back to the spectrum. A named vector now keeps its names.
 * specProc now requires ggplot2 3.5.0 or later.
 
 ## Breaking changes
