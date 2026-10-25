@@ -155,8 +155,10 @@ recipe is prepped, and the <code>num_coef</code> coefficients of largest varianc
 kept (Trygg and Wold, 1998); new data get the same coefficients. The
 <code>level</code> and <code>num_coef</code> can be tuned with <code><a href="https://hardhat.tidymodels.org/reference/tune.html" class="external-link">tune::tune()</a></code> (dials parameters
 <code><a href="wavelet_level.html">wavelet_level()</a></code> and <code>num_terms()</code>). <a href="https://recipes.tidymodels.org/reference/tidy.recipe.html" class="external-link">tidy()</a>
-returns the names of the kept coefficients (<code>terms</code>), their <code>variance</code> in
-the training data (<code>NA</code> before the step is trained) and <code>id</code>.</p>
+returns the names of the kept coefficients (<code>terms</code>), the <code>wavelength</code> at
+their center (see <code><a href="wavelet_features.html">wavelet_features()</a></code>; <code>NA</code> when the column names are not
+wavelengths), their <code>variance</code> in the training data (<code>NA</code> before the step
+is trained) and <code>id</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

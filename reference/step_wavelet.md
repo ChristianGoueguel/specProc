@@ -112,8 +112,11 @@ are kept (Trygg and Wold, 1998); new data get the same coefficients. The
 [`wavelet_level()`](https://christiangoueguel.com/specProc/reference/wavelet_level.md)
 and `num_terms()`).
 [tidy()](https://recipes.tidymodels.org/reference/tidy.recipe.html)
-returns the names of the kept coefficients (`terms`), their `variance`
-in the training data (`NA` before the step is trained) and `id`.
+returns the names of the kept coefficients (`terms`), the `wavelength`
+at their center (see
+[`wavelet_features()`](https://christiangoueguel.com/specProc/reference/wavelet_features.md);
+`NA` when the column names are not wavelengths), their `variance` in the
+training data (`NA` before the step is trained) and `id`.
 
 ## See also
 

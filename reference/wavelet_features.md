@@ -15,7 +15,7 @@ wavelet_features(x, wavelet = "d4", level = 3, coefficients = "approximation")
 - x:
 
   A numeric matrix or data frame of spectra, one per row, or a numeric
-  vector (one spectrum).
+  vector (one spectrum). Their names are the wavelengths.
 
 - wavelet:
 
@@ -33,7 +33,8 @@ wavelet_features(x, wavelet = "d4", level = 3, coefficients = "approximation")
 
 A matrix with one row per spectrum and one column per coefficient, named
 `A<level>_<i>` for the approximation and `D<j>_<i>` for the details of
-level `j`.
+level `j`. When the names of `x` are wavelengths, its attribute
+`"wavelength"` gives the wavelength at the center of each coefficient.
 
 ## Details
 
@@ -70,6 +71,22 @@ the most informative coefficients,
 can select those with the largest variance in the training data (Trygg
 and Wold, 1998).
 
+Each coefficient is a weighted sum of a window of channels, which widens
+with the level, and is placed at the center of that window: the centroid
+of the weights for the approximation, their center of energy for the
+details. The window of a coefficient is not centered on its block of
+\\2^{level}\\ channels (about 37 channels later for `"la8"` at level 4).
+When the names of the channels are wavelengths, the wavelengths at these
+centers are returned as the attribute `"wavelength"`, so that the
+approximation can be plotted against the wavelength and the coefficients
+kept by
+[`step_wavelet()`](https://christiangoueguel.com/specProc/reference/step_wavelet.md)
+traced back to the spectrum. The approximation at `level` is
+\\2^{level/2}\\ times the local mean of the spectrum. The last
+coefficients, whose window extends past the last channel (the padding,
+then the start of the spectrum), are placed past the end of the
+wavelength axis, extended with the spacing of its last channels.
+
 ## References
 
 - Mallat, S.G. (1989). A theory for multiresolution signal
@@ -99,4 +116,6 @@ spectra <- forageLIBS[1:4, -(1:14)]
 approx <- wavelet_features(spectra, wavelet = "la8", level = 4)
 dim(approx)   # 7152 channels -> 447 coefficients
 #> [1]   4 447
+head(attr(approx, "wavelength"))   # the wavelength of each coefficient
+#> [1] 203.1792 204.5673 205.8950 207.2589 208.6327 209.9410
 ```

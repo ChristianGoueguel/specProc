@@ -122,6 +122,8 @@ The help page gives the sizes for journal figures. The colors of <code>colvar</c
 <li>
 <code><a href="../reference/hotelling_t2.html">hotelling_t2()</a></code> and <code><a href="../reference/plot_embedding.html">plot_embedding()</a></code> give the limit of a new sample, <code>method = "new"</code> (the F limit times (n + 1) / n). The docs no longer call the F limit the limit of a new sample.</li>
 <li>The axis titles of <code><a href="../reference/plot_spectra.html">plot_spectra()</a></code> and <code><a href="../reference/plot_fit.html">plot_fit()</a></code> give the units in parentheses, as in the other plots: “Wavelength (nm)” and “Intensity (arb. units)”.</li>
+<li>
+<code><a href="../reference/wavelet_features.html">wavelet_features()</a></code> keeps the wavelengths: when the names of the spectra are wavelengths, the attribute <code>"wavelength"</code> of the coefficients gives the wavelength at the center of the window of channels of each one (the centroid of its weights for the approximation, their center of energy for the details, which are not centered on the block of <code>2^level</code> channels: about 37 channels later for <code>"la8"</code> at level 4). <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code> of <code><a href="../reference/step_wavelet.html">step_wavelet()</a></code> gains the <code>wavelength</code> of the kept coefficients, to trace them back to the spectrum. A named vector now keeps its names.</li>
 <li>specProc now requires ggplot2 3.5.0 or later.</li>
 </ul></div>
 <div class="section level3">
