@@ -1,4 +1,4 @@
-# 4. Plasma diagnostics
+# Plasma diagnostics
 
 Quantitative LIBS assumes that the plasma is in local thermodynamic
 equilibrium (LTE), optically thin, and recorded within the linear range

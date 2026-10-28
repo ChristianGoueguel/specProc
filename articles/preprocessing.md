@@ -1,4 +1,4 @@
-# 2. Preprocessing with recipe steps
+# Preprocessing with recipe steps
 
 Preprocessing turns raw spectra into variables ready for modeling. In
 specProc, each preprocessing method is also a

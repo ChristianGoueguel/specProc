@@ -1,4 +1,4 @@
-# 3. Calibration curves and figures of merit
+# Calibration curves and figures of merit
 
 A calibration relates a signal to the concentration of an element, from
 samples of known composition, and predicts the concentration of new

@@ -1,4 +1,4 @@
-# 1. Fitting emission lines
+# Fitting emission lines
 
 A typical LIBS analysis goes through four stages, each covered by a
 vignette:
