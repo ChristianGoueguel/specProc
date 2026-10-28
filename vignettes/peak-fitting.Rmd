@@ -1,8 +1,8 @@
 ---
-title: "1. Fitting emission lines"
+title: "Fitting emission lines"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{1. Fitting emission lines}
+  %\VignetteIndexEntry{Fitting emission lines}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

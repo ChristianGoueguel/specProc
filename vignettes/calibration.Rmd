@@ -1,8 +1,8 @@
 ---
-title: "3. Calibration curves and figures of merit"
+title: "Calibration curves and figures of merit"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{3. Calibration curves and figures of merit}
+  %\VignetteIndexEntry{Calibration curves and figures of merit}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

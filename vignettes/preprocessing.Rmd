@@ -1,8 +1,8 @@
 ---
-title: "2. Preprocessing with recipe steps"
+title: "Preprocessing with recipe steps"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{2. Preprocessing with recipe steps}
+  %\VignetteIndexEntry{Preprocessing with recipe steps}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
