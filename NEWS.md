@@ -192,9 +192,9 @@
   the reduced intensities against the optical depth.
 * Calibration transfer: `ds()` (direct standardization) and `sst()`
   (spectral space transformation, Du et al., 2011) transfer spectra of a
-  slave instrument to the master, from transfer samples measured on both,
+  secondary instrument to the primary, from transfer samples measured on both,
   with low-rank transfer matrices; `slope_bias()` corrects the predictions
-  of a model on the slave instrument instead, with tests of the bias and
+  of a model on the secondary instrument instead, with tests of the bias and
   slope. `pds()` now returns a `specproc_transfer` object (with the same
   `transfer_matrix` and `intercept`), and `predict()` transfers spectra with
   any of the three.

@@ -78,7 +78,7 @@ test_that("pds validates its inputs", {
 })
 
 # Transfer spectra in a low-dimensional space (as spectra are), with a
-# slave instrument of another response and offset
+# secondary instrument of another response and offset
 transfer_data <- function(n = 40, p = 60, seed = 5) {
   set.seed(seed)
   scores <- matrix(stats::rnorm(n * 3), n)
@@ -90,7 +90,7 @@ transfer_data <- function(n = 40, p = 60, seed = 5) {
   list(x1 = x1, x2 = x2)
 }
 
-test_that("ds transfers spectra of the slave instrument", {
+test_that("ds transfers spectra of the secondary instrument", {
   d <- transfer_data()
   transfer <- ds(d$x1[1:20, ], d$x2[1:20, ])
   expect_s3_class(transfer, "specproc_transfer")
@@ -115,7 +115,7 @@ test_that("ds transfers spectra of the slave instrument", {
   expect_s3_class(predict(transfer, as.data.frame(d$x2[21:22, ])), "tbl_df")
 })
 
-test_that("sst moves the slave spectra by the difference of the instruments", {
+test_that("sst moves the secondary spectra by the difference of the instruments", {
   d <- transfer_data()
   transfer <- sst(d$x1[1:20, ], d$x2[1:20, ], ncomp = 3)
   expect_s3_class(transfer, "specproc_transfer")

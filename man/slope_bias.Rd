@@ -7,11 +7,11 @@
 slope_bias(predicted, reference, slope = TRUE)
 }
 \arguments{
-\item{predicted}{The predictions of the model for the slave spectra of
+\item{predicted}{The predictions of the model for the secondary spectra of
 the transfer samples.}
 
 \item{reference}{Their reference values (or the predictions for their
-master spectra).}
+primary spectra).}
 
 \item{slope}{A logical: correct the slope and the bias (\code{TRUE}, default),
 or the bias only.}
@@ -30,10 +30,10 @@ instrument (or measured under other conditions) by a straight line,
 estimated on transfer samples whose reference values are known.
 }
 \details{
-The model of the master instrument, applied to the slave spectra of the
+The model of the primary instrument, applied to the secondary spectra of the
 transfer samples, gives predictions \eqn{\hat{y}}; the reference values
 \eqn{y} are regressed on them, \eqn{y = a + b\,\hat{y}}, and the
-predictions of new slave spectra are corrected likewise. With
+predictions of new secondary spectra are corrected likewise. With
 \code{slope = FALSE}, only the bias is corrected (\eqn{b = 1}). The correction
 leaves the spectra and the model unchanged, so it suits differences that
 affect all samples alike; it cannot correct differences of spectral shape

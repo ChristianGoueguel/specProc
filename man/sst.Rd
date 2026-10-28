@@ -7,11 +7,11 @@
 sst(x1, x2, ncomp = NULL, variance = 0.99)
 }
 \arguments{
-\item{x1}{The spectra of the transfer samples on the master instrument: a
+\item{x1}{The spectra of the transfer samples on the primary instrument: a
 numeric matrix or data frame, one spectrum per row.}
 
 \item{x2}{The spectra of the same samples, in the same order, on the
-slave instrument.}
+secondary instrument.}
 
 \item{ncomp}{The number of principal components. By default, chosen from
 \code{variance}.}
@@ -21,13 +21,14 @@ not given. Default is 0.99.}
 }
 \value{
 An object of class \code{specproc_transfer}. Use
-\link[=predict.specproc_transfer]{predict()} to transfer slave spectra.
+\link[=predict.specproc_transfer]{predict()} to transfer secondary spectra.
 }
 \description{
-Transfers spectra from one instrument (the slave) to another (the
-master) by spectral space transformation (SST; Du et al., 2011): the
-slave spectra are moved, in the space of the principal components shared
-by both instruments, by the difference between the instruments.
+Transfers spectra from a secondary instrument to the primary instrument,
+on which the calibration model was built, by spectral space
+transformation (SST; Du et al., 2011): the secondary spectra are moved, in
+the space of the principal components shared by both instruments, by the
+difference between the instruments.
 }
 \details{
 The transfer spectra of both instruments, centered by the mean of each
@@ -36,7 +37,7 @@ and decomposed by a principal component analysis,
 \eqn{[\textbf{X}_1\ \textbf{X}_2] \approx \textbf{T} [\textbf{P}_1^T\
 \textbf{P}_2^T]}: the same scores \eqn{\textbf{T}} describe a sample on
 both instruments, and the loadings \eqn{\textbf{P}_1} and
-\eqn{\textbf{P}_2} the spectra of each. A new slave spectrum gets the
+\eqn{\textbf{P}_2} the spectra of each. A new secondary spectrum gets the
 scores \eqn{t = (x_2 - \bar{x}_2) (\textbf{P}_2^T)^{+}} and is transferred
 by adding the difference of the instruments in that space:
 \deqn{x_{2 \to 1} = \bar{x}_1 + (x_2 - \bar{x}_2) + t\,(\textbf{P}_1^T - \textbf{P}_2^T)}
@@ -50,10 +51,10 @@ the fraction \code{variance} of the variance of the joined spectra.
 data(forageLIBS)
 wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 spectra <- as.matrix(forageLIBS[which(wl > 760 & wl < 780)])  # the K I lines
-slave <- 0.8 * cbind(spectra[, -1], spectra[, ncol(spectra)]) + 50
-transfer <- sst(spectra[1:30, ], slave[1:30, ])
+secondary <- 0.8 * cbind(spectra[, -1], spectra[, ncol(spectra)]) + 50
+transfer <- sst(spectra[1:30, ], secondary[1:30, ])
 transfer
-transferred <- predict(transfer, slave[31:368, ])
+transferred <- predict(transfer, secondary[31:368, ])
 mean(abs(transferred - spectra[31:368, ])) / mean(spectra)
 }
 \references{

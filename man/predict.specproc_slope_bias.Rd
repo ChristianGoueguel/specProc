@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{The result of \code{\link[=slope_bias]{slope_bias()}}.}
 
-\item{newdata}{Predictions of the model for new slave spectra.}
+\item{newdata}{Predictions of the model for new secondary spectra.}
 
 \item{...}{Not used.}
 }

@@ -9,26 +9,26 @@
 \arguments{
 \item{object}{A transfer returned by \code{\link[=ds]{ds()}}, \code{\link[=sst]{sst()}} or \code{\link[=pds]{pds()}}.}
 
-\item{newdata}{Spectra of the slave instrument: a numeric matrix or data
+\item{newdata}{Spectra of the secondary instrument: a numeric matrix or data
 frame with the wavelengths of the transfer spectra.}
 
 \item{...}{Not used.}
 }
 \value{
 The transferred spectra, a matrix (or a tibble for a data frame)
-with the wavelengths of the master spectra.
+with the wavelengths of the primary spectra.
 }
 \description{
-Transfers spectra measured on the slave instrument to the master
+Transfers spectra measured on the secondary instrument to the primary
 instrument, with a transfer fitted by \code{\link[=ds]{ds()}}, \code{\link[=sst]{sst()}} or \code{\link[=pds]{pds()}}.
 }
 \examples{
 data(forageLIBS)
 wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 spectra <- as.matrix(forageLIBS[which(wl > 760 & wl < 780)])
-slave <- 0.8 * cbind(spectra[, -1], spectra[, ncol(spectra)]) + 50
-transfer <- pds(spectra[1:30, ], slave[1:30, ], win = 3)
-transferred <- predict(transfer, slave[31:40, ])
+secondary <- 0.8 * cbind(spectra[, -1], spectra[, ncol(spectra)]) + 50
+transfer <- pds(spectra[1:30, ], secondary[1:30, ], win = 3)
+transferred <- predict(transfer, secondary[31:40, ])
 }
 \seealso{
 \code{\link[=ds]{ds()}}, \code{\link[=sst]{sst()}}, \code{\link[=pds]{pds()}}

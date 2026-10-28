@@ -10,22 +10,24 @@
 #' transfer performance when the instrumental differences are not purely local.
 #'
 #' @details
-#' For each wavelength \eqn{j} of the standard (master) instrument, a PLSR model
-#' is fitted between the response of the master instrument at \eqn{j} and the
-#' responses of the slave instrument in the window \eqn{[j - win, j + win]}
+#' For each wavelength \eqn{j} of the primary (reference) instrument, a PLSR model
+#' is fitted between the response of the primary instrument at \eqn{j} and the
+#' responses of the secondary instrument in the window \eqn{[j - win, j + win]}
 #' (truncated at the edges of the spectrum). The regression coefficients are
 #' stored in a banded transfer matrix \eqn{\textbf{F}}, and the intercepts in a
-#' vector \eqn{\textbf{b}_0}. Spectra measured on the slave instrument are then
+#' vector \eqn{\textbf{b}_0}. Spectra measured on the secondary instrument are then
 #' standardized as
 #' \deqn{\textbf{X}_{2,std} = \textbf{X}_2 \textbf{F} + \textbf{1}\textbf{b}_0^T}
 #'
-#' When `alpha > 0`, a global PLSR model mapping the whole slave spectrum to
-#' the whole master spectrum is also fitted, and the transfer matrix and
+#' When `alpha > 0`, a global PLSR model mapping the whole secondary spectrum to
+#' the whole primary spectrum is also fitted, and the transfer matrix and
 #' intercept are \eqn{(1 - \alpha)} times the local ones plus \eqn{\alpha}
 #' times the global ones.
 #'
-#' @param x1 A matrix or data frame containing spectra acquired with the standard (master) instrument.
-#' @param x2 A matrix or data frame containing spectra of the same samples acquired with the instrument to be standardized (slave).
+#' @param x1 A matrix or data frame containing spectra acquired with the
+#'   primary (reference) instrument.
+#' @param x2 A matrix or data frame containing spectra of the same samples
+#'   acquired with the secondary instrument, to be standardized.
 #' @param win An integer specifying the half size of the moving window used for PLSR. A larger value may improve the transfer but will increase computational time. Default is 5.
 #' @param ncomp An integer specifying the number of components to be used in PLSR. Typically, a small number (e.g., 2-5) is sufficient. Default is 2.
 #' @param alpha A numeric value between 0 and 1 specifying the weight for the global PLSR model. A value of 0 (default) corresponds to the original PDS method, while a value of 1 corresponds to using only the global PLSR model.
@@ -34,7 +36,7 @@
 #'   \item{`transfer_matrix`}{The \eqn{p \times p} transfer matrix \eqn{\textbf{F}}.}
 #'   \item{`intercept`}{A vector of length \eqn{p} containing the intercepts.}
 #'   and the settings of the transfer. Use
-#'   [predict()][predict.specproc_transfer] to transfer slave spectra.
+#'   [predict()][predict.specproc_transfer] to transfer secondary spectra.
 #'
 #' @references
 #'   - Wang, Y., Veltkamp, D.J., Kowalski, B.R., (1991).

@@ -3,38 +3,39 @@
 #' @author Christian L. Goueguel
 #'
 #' @description
-#' Transfers spectra from one instrument (the slave) to another (the
-#' master) by direct standardization (DS; Wang et al., 1991): a linear map
-#' of the whole slave spectrum onto the whole master spectrum, estimated on
-#' transfer samples measured on both instruments.
+#' Transfers spectra from a secondary instrument to the primary instrument,
+#' on which the calibration model was built, by direct standardization (DS;
+#' Wang et al., 1991): a linear map of the whole secondary spectrum onto the
+#' whole primary spectrum, estimated on transfer samples measured on both
+#' instruments.
 #'
 #' @details
 #' With the transfer spectra centered by the mean of each instrument,
 #' \eqn{\textbf{X}_1 \approx \textbf{X}_2 \textbf{F}}, and the transfer
 #' matrix is \eqn{\textbf{F} = \textbf{X}_2^{+} \textbf{X}_1}, where
-#' \eqn{\textbf{X}_2^{+}} is the pseudo-inverse of the slave spectra,
-#' truncated to their first `ncomp` singular vectors. A new slave spectrum
+#' \eqn{\textbf{X}_2^{+}} is the pseudo-inverse of the secondary spectra,
+#' truncated to their first `ncomp` singular vectors. A new secondary spectrum
 #' is transferred as \eqn{\bar{x}_1 + (x_2 - \bar{x}_2) \textbf{F}}.
 #'
 #' With as many components as the transfer samples allow (`ncomp = NULL`),
-#' the transfer spectra are reproduced exactly, and the noise of the slave
+#' the transfer spectra are reproduced exactly, and the noise of the secondary
 #' spectra is amplified: fewer components give a smoother, more robust
 #' transfer. Unlike [pds()], DS mixes all wavelengths, so it corrects global
 #' differences of the response but needs more transfer samples. The transfer
 #' matrix (\eqn{p \times p}) is kept in factored form, as `ncomp` columns of
 #' each factor.
 #'
-#' @param x1 The spectra of the transfer samples on the master instrument: a
+#' @param x1 The spectra of the transfer samples on the primary instrument: a
 #'   numeric matrix or data frame, one spectrum per row.
 #' @param x2 The spectra of the same samples, in the same order, on the
-#'   slave instrument.
-#' @param ncomp The number of singular vectors of the slave spectra kept. By
+#'   secondary instrument.
+#' @param ncomp The number of singular vectors of the secondary spectra kept. By
 #'   default, all those with a singular value above `tol` times the largest.
 #' @param tol The relative tolerance on the singular values. Default is
 #'   1e-8.
 #'
 #' @return An object of class `specproc_transfer`. Use
-#'   [predict()][predict.specproc_transfer] to transfer slave spectra.
+#'   [predict()][predict.specproc_transfer] to transfer secondary spectra.
 #'
 #' @references
 #'  - Wang, Y., Veltkamp, D.J., Kowalski, B.R. (1991). Multivariate
@@ -48,11 +49,11 @@
 #' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 #' spectra <- as.matrix(forageLIBS[which(wl > 760 & wl < 780)])  # the K I lines
 #' # a second instrument, with a shifted and less sensitive response
-#' slave <- 0.8 * cbind(spectra[, -1], spectra[, ncol(spectra)]) + 50
-#' transfer <- ds(spectra[1:30, ], slave[1:30, ], ncomp = 10)
+#' secondary <- 0.8 * cbind(spectra[, -1], spectra[, ncol(spectra)]) + 50
+#' transfer <- ds(spectra[1:30, ], secondary[1:30, ], ncomp = 10)
 #' transfer
-#' # the other samples, measured on the slave, transferred to the master
-#' transferred <- predict(transfer, slave[31:368, ])
+#' # the other samples, measured on the secondary, transferred to the primary
+#' transferred <- predict(transfer, secondary[31:368, ])
 #' mean(abs(transferred - spectra[31:368, ])) / mean(spectra)
 ds <- function(x1, x2, ncomp = NULL, tol = 1e-8) {
   pair <- transfer_pair(x1, x2)
@@ -60,7 +61,7 @@ ds <- function(x1, x2, ncomp = NULL, tol = 1e-8) {
   sv <- svd(pair$x2c)
   rank <- sum(sv$d > tol * sv$d[1])
   if (rank == 0) {
-    stop("The slave spectra have no variation.", call. = FALSE)
+    stop("The secondary spectra have no variation.", call. = FALSE)
   }
   k <- if (is.null(ncomp)) rank else min(check_count(ncomp, "ncomp"), rank)
   idx <- seq_len(k)
@@ -77,10 +78,11 @@ ds <- function(x1, x2, ncomp = NULL, tol = 1e-8) {
 #' @author Christian L. Goueguel
 #'
 #' @description
-#' Transfers spectra from one instrument (the slave) to another (the
-#' master) by spectral space transformation (SST; Du et al., 2011): the
-#' slave spectra are moved, in the space of the principal components shared
-#' by both instruments, by the difference between the instruments.
+#' Transfers spectra from a secondary instrument to the primary instrument,
+#' on which the calibration model was built, by spectral space
+#' transformation (SST; Du et al., 2011): the secondary spectra are moved, in
+#' the space of the principal components shared by both instruments, by the
+#' difference between the instruments.
 #'
 #' @details
 #' The transfer spectra of both instruments, centered by the mean of each
@@ -89,7 +91,7 @@ ds <- function(x1, x2, ncomp = NULL, tol = 1e-8) {
 #' \eqn{[\textbf{X}_1\ \textbf{X}_2] \approx \textbf{T} [\textbf{P}_1^T\
 #' \textbf{P}_2^T]}: the same scores \eqn{\textbf{T}} describe a sample on
 #' both instruments, and the loadings \eqn{\textbf{P}_1} and
-#' \eqn{\textbf{P}_2} the spectra of each. A new slave spectrum gets the
+#' \eqn{\textbf{P}_2} the spectra of each. A new secondary spectrum gets the
 #' scores \eqn{t = (x_2 - \bar{x}_2) (\textbf{P}_2^T)^{+}} and is transferred
 #' by adding the difference of the instruments in that space:
 #' \deqn{x_{2 \to 1} = \bar{x}_1 + (x_2 - \bar{x}_2) + t\,(\textbf{P}_1^T - \textbf{P}_2^T)}
@@ -106,7 +108,7 @@ ds <- function(x1, x2, ncomp = NULL, tol = 1e-8) {
 #'   not given. Default is 0.99.
 #'
 #' @return An object of class `specproc_transfer`. Use
-#'   [predict()][predict.specproc_transfer] to transfer slave spectra.
+#'   [predict()][predict.specproc_transfer] to transfer secondary spectra.
 #'
 #' @references
 #'  - Du, W., Chen, Z.-P., Zhong, L.-J., Wang, S.-X., Yu, R.-Q., Nordon, A.,
@@ -121,10 +123,10 @@ ds <- function(x1, x2, ncomp = NULL, tol = 1e-8) {
 #' data(forageLIBS)
 #' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 #' spectra <- as.matrix(forageLIBS[which(wl > 760 & wl < 780)])  # the K I lines
-#' slave <- 0.8 * cbind(spectra[, -1], spectra[, ncol(spectra)]) + 50
-#' transfer <- sst(spectra[1:30, ], slave[1:30, ])
+#' secondary <- 0.8 * cbind(spectra[, -1], spectra[, ncol(spectra)]) + 50
+#' transfer <- sst(spectra[1:30, ], secondary[1:30, ])
 #' transfer
-#' transferred <- predict(transfer, slave[31:368, ])
+#' transferred <- predict(transfer, secondary[31:368, ])
 #' mean(abs(transferred - spectra[31:368, ])) / mean(spectra)
 sst <- function(x1, x2, ncomp = NULL, variance = 0.99) {
   pair <- transfer_pair(x1, x2)
@@ -150,16 +152,16 @@ sst <- function(x1, x2, ncomp = NULL, variance = 0.99) {
 #' @title Transfer Spectra to Another Instrument
 #'
 #' @description
-#' Transfers spectra measured on the slave instrument to the master
+#' Transfers spectra measured on the secondary instrument to the primary
 #' instrument, with a transfer fitted by [ds()], [sst()] or [pds()].
 #'
 #' @param object A transfer returned by [ds()], [sst()] or [pds()].
-#' @param newdata Spectra of the slave instrument: a numeric matrix or data
+#' @param newdata Spectra of the secondary instrument: a numeric matrix or data
 #'   frame with the wavelengths of the transfer spectra.
 #' @param ... Not used.
 #'
 #' @return The transferred spectra, a matrix (or a tibble for a data frame)
-#'   with the wavelengths of the master spectra.
+#'   with the wavelengths of the primary spectra.
 #'
 #' @seealso [ds()], [sst()], [pds()]
 #' @export
@@ -168,22 +170,22 @@ sst <- function(x1, x2, ncomp = NULL, variance = 0.99) {
 #' data(forageLIBS)
 #' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 #' spectra <- as.matrix(forageLIBS[which(wl > 760 & wl < 780)])
-#' slave <- 0.8 * cbind(spectra[, -1], spectra[, ncol(spectra)]) + 50
-#' transfer <- pds(spectra[1:30, ], slave[1:30, ], win = 3)
-#' transferred <- predict(transfer, slave[31:40, ])
+#' secondary <- 0.8 * cbind(spectra[, -1], spectra[, ncol(spectra)]) + 50
+#' transfer <- pds(spectra[1:30, ], secondary[1:30, ], win = 3)
+#' transferred <- predict(transfer, secondary[31:40, ])
 predict.specproc_transfer <- function(object, newdata, ...) {
   x <- as_numeric_matrix(newdata, "newdata")
-  p <- length(object$master_mean %||% object$intercept)
+  p <- length(object$primary_mean %||% object$intercept)
   if (ncol(x) != p) {
     stop("'newdata' must have the ", p, " wavelengths of the transfer spectra.", call. = FALSE)
   }
   if (!is.null(object$transfer_matrix)) {
     out <- sweep(x %*% object$transfer_matrix, 2, object$intercept, "+")
   } else {
-    xc <- sweep(x, 2, object$slave_mean)
+    xc <- sweep(x, 2, object$secondary_mean)
     out <- (xc %*% object$factors$a) %*% object$factors$b
     if (object$factors$identity) out <- out + xc
-    out <- sweep(out, 2, object$master_mean, "+")
+    out <- sweep(out, 2, object$primary_mean, "+")
   }
   colnames(out) <- object$wavelengths %||% names(object$intercept)
   if (is.data.frame(newdata)) tibble::as_tibble(as.data.frame(out, check.names = FALSE)) else out
@@ -193,7 +195,7 @@ predict.specproc_transfer <- function(object, newdata, ...) {
 print.specproc_transfer <- function(x, ...) {
   label <- c(ds = "Direct standardization", sst = "Spectral space transformation",
              pds = "Piecewise direct standardization")[[x$method]]
-  cat(label, " (", x$n, " transfer samples, ", length(x$master_mean %||% x$intercept),
+  cat(label, " (", x$n, " transfer samples, ", length(x$primary_mean %||% x$intercept),
       " wavelengths)\n", sep = "")
   if (x$method == "pds") {
     cat("Window: +/-", x$win, " channels, ", x$ncomp, " PLS components", "\n", sep = "")
@@ -214,10 +216,10 @@ print.specproc_transfer <- function(x, ...) {
 #' estimated on transfer samples whose reference values are known.
 #'
 #' @details
-#' The model of the master instrument, applied to the slave spectra of the
+#' The model of the primary instrument, applied to the secondary spectra of the
 #' transfer samples, gives predictions \eqn{\hat{y}}; the reference values
 #' \eqn{y} are regressed on them, \eqn{y = a + b\,\hat{y}}, and the
-#' predictions of new slave spectra are corrected likewise. With
+#' predictions of new secondary spectra are corrected likewise. With
 #' `slope = FALSE`, only the bias is corrected (\eqn{b = 1}). The correction
 #' leaves the spectra and the model unchanged, so it suits differences that
 #' affect all samples alike; it cannot correct differences of spectral shape
@@ -225,10 +227,10 @@ print.specproc_transfer <- function(x, ...) {
 #' The tests of the bias against 0 and of the slope against 1 tell whether
 #' the correction is needed.
 #'
-#' @param predicted The predictions of the model for the slave spectra of
+#' @param predicted The predictions of the model for the secondary spectra of
 #'   the transfer samples.
 #' @param reference Their reference values (or the predictions for their
-#'   master spectra).
+#'   primary spectra).
 #' @param slope A logical: correct the slope and the bias (`TRUE`, default),
 #'   or the bias only.
 #'
@@ -299,7 +301,7 @@ slope_bias <- function(predicted, reference, slope = TRUE) {
 #' Applies the correction fitted by [slope_bias()] to new predictions.
 #'
 #' @param object The result of [slope_bias()].
-#' @param newdata Predictions of the model for new slave spectra.
+#' @param newdata Predictions of the model for new secondary spectra.
 #' @param ... Not used.
 #'
 #' @return The corrected predictions.
@@ -354,7 +356,7 @@ transfer_pair <- function(x1, x2) {
 transfer_object <- function(method, pair, a, b, identity, ncomp, explained = NULL) {
   structure(
     list(method = method, factors = list(a = a, b = b, identity = identity),
-         master_mean = unname(pair$m1), slave_mean = unname(pair$m2), wavelengths = pair$names,
+         primary_mean = unname(pair$m1), secondary_mean = unname(pair$m2), wavelengths = pair$names,
          ncomp = ncomp, explained = explained, n = pair$n),
     class = "specproc_transfer"
   )
