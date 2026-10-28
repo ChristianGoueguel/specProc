@@ -50,6 +50,11 @@ than the plasma evolution and diffusion (Cristoforetti et al., 2010).
   laser-induced breakdown spectroscopy: beyond the McWhirter criterion.
   Spectrochimica Acta Part B, 65(1):86-95.
 
+## See also
+
+[`lte_criteria()`](https://christiangoueguel.com/specProc/reference/lte_criteria.md)
+for the temporal and spatial criteria of Cristoforetti et al. (2010)
+
 ## Examples
 
 ``` r

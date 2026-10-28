@@ -17,7 +17,10 @@ multipeak_fit(
   wlgth.max = NULL,
   id = NULL,
   max.iter = 200,
-  fixed = NULL
+  fixed = NULL,
+  lock_centers = FALSE,
+  share_widths = FALSE,
+  area_ratios = NULL
 )
 ```
 
@@ -80,6 +83,22 @@ multipeak_fit(
   [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md)
   for holding the Gaussian width at the instrumental and Doppler width.
 
+- lock_centers:
+
+  Keep the separations of `peaks` (see details): `FALSE` (default),
+  `TRUE`, a logical vector or group labels, one per peak.
+
+- share_widths:
+
+  Share the widths of the lines (see details): `FALSE` (default),
+  `TRUE`, a logical vector or group labels, one per peak. The lines of a
+  group must have the same profile.
+
+- area_ratios:
+
+  The fixed relative areas of the lines, one per peak (`NA` for a free
+  area), or `NULL` (default) for free areas.
+
 ## Value
 
 A tibble with one row per spectrum and the columns `id` (or `spectrum`),
@@ -100,6 +119,37 @@ fitted simultaneously with a common baseline offset: \$\$y = y_0 +
 Initial values that are not supplied are estimated from the data around
 each peak center. Each peak center is constrained to lie within the
 fitted wavelength range.
+
+The lines of a multiplet, or of a fine-structure doublet, are related,
+and constraints make the fit of overlapping lines much more stable:
+
+- `lock_centers`: the lines keep the separations of their `peaks`
+  (accurate wavelengths, such as those of the NIST database) and move
+  together by one fitted shift, which also absorbs an offset of the
+  wavelength axis. The shift is listed in `tidied` as `shift` (or
+  `shift_1_2`, ..., named by its lines, when there are several groups).
+
+- `share_widths`: the lines share their Gaussian and Lorentzian widths,
+  as lines of the same multiplet have nearly the same Stark width.
+
+- `area_ratios`: the areas of the lines are in fixed ratios, with one
+  fitted area. In an optically thin plasma in LTE, the ratio of two
+  lines is \\g_k A\_{ki} \lambda^{-1} \exp(-E_k / k_B T)\\ (energy
+  units), independent of the temperature for lines from the same upper
+  level: the `relative_intensity` of
+  [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md).
+  Self-absorbed lines, such as resonance lines, break these ratios.
+
+`lock_centers` and `share_widths` take `TRUE` (all lines), a logical
+vector (the lines constrained together) or one group label per line
+(`NA` for a line left free), so that, for example, a multiplet can be
+constrained while an interfering line of another element is not.
+`area_ratios` gives a ratio per line, `NA` for a line with a free area.
+
+`tidied` lists the center, widths and area of every line (named with the
+suffix `_i`), with standard errors propagated from the fitted
+parameters: lines that share a parameter have the same width, or centers
+that differ by a constant.
 
 ## Author
 
@@ -125,4 +175,20 @@ res$tidied[[1]]
 #> 5 xc_2   405.      0.0126   32038.   5.70e-18
 #> 6 wG_2     0.170   0.0368       4.61 9.99e- 3
 #> 7 A_2    208.     47.2          4.41 1.16e- 2
+
+# the same doublet with the NIST separation of its lines and a common width
+res <- multipeak_fit(doublet, peaks = c(404.414, 404.721), profiles = "gaussian",
+                     lock_centers = TRUE, share_widths = TRUE)
+res$tidied[[1]]
+#> # A tibble: 8 × 5
+#>   term   estimate std.error statistic  p.value
+#>   <chr>     <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 y0    1667.      82.4         20.2  9.49e- 7
+#> 2 xc_1   404.       0.00637  63486.   1.03e-27
+#> 3 wG_1     0.111    0.0168       6.62 5.72e- 4
+#> 4 A_1    200.      36.4          5.50 1.51e- 3
+#> 5 xc_2   405.       0.00637  63534.   1.03e-27
+#> 6 wG_2     0.111    0.0168       6.62 5.72e- 4
+#> 7 A_2    159.      29.0          5.46 1.57e- 3
+#> 8 shift   -0.0593   0.00637     -9.31 8.72e- 5
 ```

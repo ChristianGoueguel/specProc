@@ -260,6 +260,45 @@ plot_fit(k_gauss, title = "K I 404.41 and 404.72 nm, Gaussian profiles")
 The areas are now determined, and the AIC is lower: prefer the simplest
 profile that describes the data.
 
+The two lines come from the fine-structure levels of the same 5p
+configuration of K I: their separation is known (0.307 nm, from the NIST
+database), and their instrumental and Stark widths are nearly the same.
+`lock_centers = TRUE` keeps the separation of `peaks`, with one shift of
+both lines, and `share_widths = TRUE` gives them one width:
+
+``` r
+
+k_locked <- multipeak_fit(doublet, peaks = c(404.414, 404.721), profiles = "gaussian",
+                          lock_centers = TRUE, share_widths = TRUE)
+k_locked$tidied[[1]]
+#> # A tibble: 8 × 5
+#>   term   estimate std.error statistic  p.value
+#>   <chr>     <dbl>     <dbl>     <dbl>    <dbl>
+#> 1 y0     91.7      96.6         0.949 3.86e- 1
+#> 2 xc_1  404.        0.00646 62591.    1.98e-23
+#> 3 wG_1    0.116     0.0174      6.65  1.16e- 3
+#> 4 A_1   212.       39.8         5.31  3.17e- 3
+#> 5 xc_2  405.        0.00646 62638.    1.97e-23
+#> 6 wG_2    0.116     0.0174      6.65  1.16e- 3
+#> 7 A_2   166.       32.5         5.11  3.73e- 3
+#> 8 shift   0.00204   0.00646     0.315 7.65e- 1
+```
+
+The free fit placed the lines 0.288 nm apart, with widths of 0.119 and
+0.183 nm; with two parameters fewer, the standard error of the area of
+the weaker line drops from 48 to 32. The common shift, 0.002 ± 0.006 nm,
+is zero within its standard error, since the wavelength axis was
+corrected above; on raw spectra, it absorbs the offset of the axis.
+
+`area_ratios` would also fix the ratio of the areas. In an optically
+thin plasma, the ratio of these lines is that of their g_k A\_{ki} /
+\lambda, 2.15 (their upper levels are 2 meV apart). The fitted ratio is
+1.28: the 404.41 nm line, which ends on the ground state, is
+self-absorbed (see
+[`vignette("plasma-diagnostics")`](https://christiangoueguel.com/specProc/articles/plasma-diagnostics.md)),
+so fixing the ratio would bias the areas. Fix ratios only for optically
+thin lines.
+
 ## Instrumental and Doppler widths
 
 The Gaussian width of a line is the instrumental width combined with the
@@ -295,8 +334,8 @@ bind_rows(free = free, fixed = fixed, .id = "fit") |>
 #>   <chr> <chr>    <dbl>     <dbl>
 #> 1 free  wG      0.0808  0.00160 
 #> 2 free  wL      0.0387  0.00200 
-#> 3 fixed wL      0.0395  0.000640
-#> 4 fixed wG      0.0802 NA
+#> 3 fixed wG      0.0802 NA       
+#> 4 fixed wL      0.0395  0.000640
 ```
 
 The Doppler width of Al at 9000 K is only 0.0052 nm, so the Gaussian

@@ -311,6 +311,30 @@ The measured density is 42 times the minimum. The criterion is necessary
 but not sufficient: in a transient, inhomogeneous plasma, LTE also
 requires the equilibration to be faster than the changes of the plasma
 (Cristoforetti et al., 2010).
+[`lte_criteria()`](https://christiangoueguel.com/specProc/reference/lte_criteria.md)
+computes the time the plasma takes to relax to equilibrium, through the
+resonance transition of Ca II (393.37 nm, oscillator strength 0.68), and
+the distance an atom diffuses meanwhile, here compared with 1 mm, the
+order of the size of the plasma:
+
+``` r
+
+criteria <- lte_criteria(temperature = saha$temperature, electron_density = ne,
+                         delta_e = 3.15, oscillator_strength = 0.68, mass = "Ca",
+                         length_scale = 1)
+criteria |>
+  select(mcwhirter, relaxation_time, diffusion_length, length_ratio, spatial)
+#> # A tibble: 1 × 5
+#>   mcwhirter relaxation_time diffusion_length length_ratio spatial
+#>   <lgl>               <dbl>            <dbl>        <dbl> <lgl>  
+#> 1 TRUE             5.44e-10         0.000399     0.000399 TRUE
+```
+
+The relaxation time, 0.54 ns, is far shorter than the microseconds over
+which a LIBS plasma cools, and the diffusion length, 0.4 µm, far shorter
+than the plasma: the spatial criterion is satisfied. The temporal
+criterion needs the temperature and density at several delays (`time`),
+which these spectra, recorded at one delay, do not have.
 
 ## Self-absorption
 

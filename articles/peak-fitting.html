@@ -317,6 +317,38 @@ few channels wide:</p>
 <p><img src="peak-fitting_files/figure-html/doublet-plot-1.png" class="r-plt" alt="" width="100%"></p>
 <p>The areas are now determined, and the AIC is lower: prefer the
 simplest profile that describes the data.</p>
+<p>The two lines come from the fine-structure levels of the same 5p
+configuration of K I: their separation is known (0.307 nm, from the NIST
+database), and their instrumental and Stark widths are nearly the same.
+<code>lock_centers = TRUE</code> keeps the separation of
+<code>peaks</code>, with one shift of both lines, and
+<code>share_widths = TRUE</code> gives them one width:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">k_locked</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/multipeak_fit.html">multipeak_fit</a></span><span class="op">(</span><span class="va">doublet</span>, peaks <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">404.414</span>, <span class="fl">404.721</span><span class="op">)</span>, profiles <span class="op">=</span> <span class="st">"gaussian"</span>,</span>
+<span>                          lock_centers <span class="op">=</span> <span class="cn">TRUE</span>, share_widths <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">k_locked</span><span class="op">$</span><span class="va">tidied</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 8 × 5</span></span></span>
+<span><span class="co">#&gt;   term   estimate std.error statistic  p.value</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> y0     91.7      96.6         0.949 3.86<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> xc_1  404.        0.006<span style="text-decoration: underline;">46</span> <span style="text-decoration: underline;">62</span>591.    1.98<span style="color: #949494;">e</span><span style="color: #BB0000;">-23</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> wG_1    0.116     0.017<span style="text-decoration: underline;">4</span>      6.65  1.16<span style="color: #949494;">e</span><span style="color: #BB0000;">- 3</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> A_1   212.       39.8         5.31  3.17<span style="color: #949494;">e</span><span style="color: #BB0000;">- 3</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> xc_2  405.        0.006<span style="text-decoration: underline;">46</span> <span style="text-decoration: underline;">62</span>638.    1.97<span style="color: #949494;">e</span><span style="color: #BB0000;">-23</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> wG_2    0.116     0.017<span style="text-decoration: underline;">4</span>      6.65  1.16<span style="color: #949494;">e</span><span style="color: #BB0000;">- 3</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> A_2   166.       32.5         5.11  3.73<span style="color: #949494;">e</span><span style="color: #BB0000;">- 3</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">8</span> shift   0.002<span style="text-decoration: underline;">04</span>   0.006<span style="text-decoration: underline;">46</span>     0.315 7.65<span style="color: #949494;">e</span><span style="color: #BB0000;">- 1</span></span></span></code></pre></div>
+<p>The free fit placed the lines 0.288 nm apart, with widths of 0.119
+and 0.183 nm; with two parameters fewer, the standard error of the area
+of the weaker line drops from 48 to 32. The common shift, 0.002 ± 0.006
+nm, is zero within its standard error, since the wavelength axis was
+corrected above; on raw spectra, it absorbs the offset of the axis.</p>
+<p><code>area_ratios</code> would also fix the ratio of the areas. In an
+optically thin plasma, the ratio of these lines is that of their <span class="math inline">g_k A_{ki} / \lambda</span>, 2.15 (their upper
+levels are 2 meV apart). The fitted ratio is 1.28: the 404.41 nm line,
+which ends on the ground state, is self-absorbed (see
+<code><a href="../articles/plasma-diagnostics.html">vignette("plasma-diagnostics")</a></code>), so fixing the ratio would
+bias the areas. Fix ratios only for optically thin lines.</p>
 </div>
 <div class="section level2">
 <h2 id="instrumental-and-doppler-widths">Instrumental and Doppler widths<a class="anchor" aria-label="anchor" href="#instrumental-and-doppler-widths"></a>
@@ -332,7 +364,7 @@ it in the fit, and only the Lorentzian (Stark) width is fitted. The
 instrumental width of the forage spectrometers is not known, so here is
 a simulated Al I line, with an instrumental width of 0.08 nm and a Stark
 width of 0.04 nm:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">395.5</span>, <span class="fl">396.5</span>, by <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/voigt_profile.html">voigt_profile</a></span><span class="op">(</span><span class="va">x</span>, y0 <span class="op">=</span> <span class="fl">50</span>, xc <span class="op">=</span> <span class="fl">396.15</span>, wG <span class="op">=</span> <span class="fl">0.08</span>, wL <span class="op">=</span> <span class="fl">0.04</span>, A <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op">+</span></span>
@@ -352,8 +384,8 @@ width of 0.04 nm:</p>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> free  wG      0.080<span style="text-decoration: underline;">8</span>  0.001<span style="text-decoration: underline;">60</span> </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> free  wL      0.038<span style="text-decoration: underline;">7</span>  0.002<span style="text-decoration: underline;">00</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> fixed wL      0.039<span style="text-decoration: underline;">5</span>  0.000<span style="text-decoration: underline;">640</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> fixed wG      0.080<span style="text-decoration: underline;">2</span> <span style="color: #BB0000;">NA</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> fixed wG      0.080<span style="text-decoration: underline;">2</span> <span style="color: #BB0000;">NA</span>       </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> fixed wL      0.039<span style="text-decoration: underline;">5</span>  0.000<span style="text-decoration: underline;">640</span></span></span></code></pre></div>
 <p>The Doppler width of Al at 9000 K is only 0.0052 nm, so the Gaussian
 width is the instrumental width. With both widths free, they trade off
 against each other: the standard error of the Lorentzian width is 3.1
@@ -368,7 +400,7 @@ listed without standard error.</p>
 in every spectrum. A fit that fails (here on a few spectra where the
 doublet is lost in the noise) gives <code>NULL</code> with a warning,
 and the others continue:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">doublets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html" class="external-link">bind_cols</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">forageLIBS</span>, <span class="va">Measurement</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/window.html" class="external-link">window</a></span><span class="op">(</span><span class="fl">404.1</span>, <span class="fl">405.0</span>, x <span class="op">=</span> <span class="va">corrected</span><span class="op">)</span></span>
@@ -382,7 +414,7 @@ and the others continue:</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">forageLIBS</span>, <span class="va">Measurement</span>, <span class="va">K</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"Measurement"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">k_areas</span><span class="op">$</span><span class="va">area</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 8</span></span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">k_areas</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">K</span>, <span class="va">area</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"K (%)"</span>, y <span class="op">=</span> <span class="st">"Area of K I 404.41 nm"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -401,7 +433,7 @@ the peak of each line near its tabulated wavelength
 (<code>half_width</code>), or fits a Voigt profile with
 <code>method = "voigt"</code>. It needs no starting values and is fast,
 but it does not separate overlapping lines:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>`K I 404.41` <span class="op">=</span> <span class="fl">404.414</span>, `Mg I 518.36` <span class="op">=</span> <span class="fl">518.360</span>, `Fe II 259.94` <span class="op">=</span> <span class="fl">259.940</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">corrected</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="op">]</span>, <span class="va">lines</span>, half_width <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 11</span></span></span>

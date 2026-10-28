@@ -320,6 +320,8 @@ checks of LTE, self-absorption and detector saturation.
   : Uncertainty of Transition Probabilities from NIST Accuracy Grades
 - [`mcwhirter_criterion()`](https://christiangoueguel.com/specProc/reference/mcwhirter_criterion.md)
   : McWhirter Criterion for Local Thermodynamic Equilibrium
+- [`lte_criteria()`](https://christiangoueguel.com/specProc/reference/lte_criteria.md)
+  : Criteria of Local Thermodynamic Equilibrium in Transient Plasmas
 - [`self_absorption()`](https://christiangoueguel.com/specProc/reference/self_absorption.md)
   : Self-Absorption Coefficient from Line Widths
 - [`correct_self_absorption()`](https://christiangoueguel.com/specProc/reference/correct_self_absorption.md)
