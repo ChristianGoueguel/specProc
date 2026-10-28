@@ -260,6 +260,51 @@ plot_fit(k_gauss, title = "K I 404.41 and 404.72 nm, Gaussian profiles")
 The areas are now determined, and the AIC is lower: prefer the simplest
 profile that describes the data.
 
+## Instrumental and Doppler widths
+
+The Gaussian width of a line is the instrumental width combined with the
+Doppler width, w_G = \sqrt{w\_{inst}^2 + w_D^2}. The instrumental width
+is the width of a line of a low-pressure lamp (mercury, argon), whose
+Stark and Doppler widths are negligible, fitted with a Gaussian profile;
+[`doppler_width()`](https://christiangoueguel.com/specProc/reference/doppler_width.md)
+gives the Doppler width from the temperature and the mass of the
+emitter. With the Gaussian width known, `fixed = "wG"` holds it in the
+fit, and only the Lorentzian (Stark) width is fitted. The instrumental
+width of the forage spectrometers is not known, so here is a simulated
+Al I line, with an instrumental width of 0.08 nm and a Stark width of
+0.04 nm:
+
+``` r
+
+x <- seq(395.5, 396.5, by = 0.02)
+set.seed(1)
+y <- voigt_profile(x, y0 = 50, xc = 396.15, wG = 0.08, wL = 0.04, A = 100) +
+  rnorm(length(x), sd = 5)
+al_line <- as_tibble(as.list(set_names(y, x)))
+w_gauss <- sqrt(0.08^2 + doppler_width(396.15, temperature = 9000, mass = "Al")^2)
+w_gauss
+#> [1] 0.08016766
+
+free <- peak_fit(al_line, profile = "voigt")$tidied[[1]]
+fixed <- peak_fit(al_line, profile = "voigt", wG = w_gauss, fixed = "wG")$tidied[[1]]
+bind_rows(free = free, fixed = fixed, .id = "fit") |>
+  filter(term %in% c("wG", "wL")) |>
+  select(fit, term, estimate, std.error)
+#> # A tibble: 4 × 4
+#>   fit   term  estimate std.error
+#>   <chr> <chr>    <dbl>     <dbl>
+#> 1 free  wG      0.0808  0.00160 
+#> 2 free  wL      0.0387  0.00200 
+#> 3 fixed wL      0.0395  0.000640
+#> 4 fixed wG      0.0802 NA
+```
+
+The Doppler width of Al at 9000 K is only 0.0052 nm, so the Gaussian
+width is the instrumental width. With both widths free, they trade off
+against each other: the standard error of the Lorentzian width is 3.1
+times larger than with the Gaussian width fixed. The fixed width is
+listed without standard error.
+
 ## Fitting every spectrum
 
 With an `id` column,

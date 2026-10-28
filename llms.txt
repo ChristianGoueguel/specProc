@@ -59,8 +59,8 @@ website](https://christiangoueguel.com/specProc/articles/).
 
 | Task | Functions |
 |----|----|
-| Line identification | [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md), [`plot_lines()`](https://christiangoueguel.com/specProc/reference/plot_lines.md), [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md) (Shiny app), [`wavelength_calibration()`](https://christiangoueguel.com/specProc/reference/wavelength_calibration.md), [`apply_calibration()`](https://christiangoueguel.com/specProc/reference/apply_calibration.md) |
-| Line fitting | [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md), [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md), [`plot_fit()`](https://christiangoueguel.com/specProc/reference/plot_fit.md), [`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md), [`voigt_profile()`](https://christiangoueguel.com/specProc/reference/voigt_profile.md), [`pseudo_voigt_profile()`](https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.md), [`gaussian_profile()`](https://christiangoueguel.com/specProc/reference/gaussian_profile.md), [`lorentzian_profile()`](https://christiangoueguel.com/specProc/reference/lorentzian_profile.md), [`voigt_fwhm()`](https://christiangoueguel.com/specProc/reference/voigt_fwhm.md) |
+| Line identification | [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md), [`plot_lines()`](https://christiangoueguel.com/specProc/reference/plot_lines.md), [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md) (Shiny app), [`wavelength_calibration()`](https://christiangoueguel.com/specProc/reference/wavelength_calibration.md), [`apply_calibration()`](https://christiangoueguel.com/specProc/reference/apply_calibration.md), [`response_calibration()`](https://christiangoueguel.com/specProc/reference/response_calibration.md), [`correct_response()`](https://christiangoueguel.com/specProc/reference/correct_response.md) |
+| Line fitting | [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md), [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md), [`plot_fit()`](https://christiangoueguel.com/specProc/reference/plot_fit.md), [`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md), [`voigt_profile()`](https://christiangoueguel.com/specProc/reference/voigt_profile.md), [`pseudo_voigt_profile()`](https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.md), [`gaussian_profile()`](https://christiangoueguel.com/specProc/reference/gaussian_profile.md), [`lorentzian_profile()`](https://christiangoueguel.com/specProc/reference/lorentzian_profile.md), [`voigt_fwhm()`](https://christiangoueguel.com/specProc/reference/voigt_fwhm.md), [`doppler_width()`](https://christiangoueguel.com/specProc/reference/doppler_width.md) |
 | Preprocessing | [`baseline_arpls()`](https://christiangoueguel.com/specProc/reference/baseline_arpls.md), [`baseline_als()`](https://christiangoueguel.com/specProc/reference/baseline_als.md), [`baseline_lsp()`](https://christiangoueguel.com/specProc/reference/baseline_lsp.md), [`snv()`](https://christiangoueguel.com/specProc/reference/snv.md), [`msc()`](https://christiangoueguel.com/specProc/reference/msc.md), [`emsc()`](https://christiangoueguel.com/specProc/reference/emsc.md), [`normalize()`](https://christiangoueguel.com/specProc/reference/normalize.md), [`savitzky_golay()`](https://christiangoueguel.com/specProc/reference/savitzky_golay.md), [`gap_derivative()`](https://christiangoueguel.com/specProc/reference/gap_derivative.md), [`bin_spectra()`](https://christiangoueguel.com/specProc/reference/bin_spectra.md), [`wavelet_features()`](https://christiangoueguel.com/specProc/reference/wavelet_features.md), [`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md), [`average()`](https://christiangoueguel.com/specProc/reference/average.md) |
 | Recipe steps | [`step_baseline()`](https://christiangoueguel.com/specProc/reference/step_baseline.md), [`step_snv()`](https://christiangoueguel.com/specProc/reference/step_snv.md), [`step_msc()`](https://christiangoueguel.com/specProc/reference/step_msc.md), [`step_emsc()`](https://christiangoueguel.com/specProc/reference/step_emsc.md), [`step_spectral_norm()`](https://christiangoueguel.com/specProc/reference/step_spectral_norm.md), [`step_line_ratio()`](https://christiangoueguel.com/specProc/reference/step_line_ratio.md), [`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md), [`step_gap_derivative()`](https://christiangoueguel.com/specProc/reference/step_gap_derivative.md), [`step_bin_spectra()`](https://christiangoueguel.com/specProc/reference/step_bin_spectra.md), [`step_wavelet()`](https://christiangoueguel.com/specProc/reference/step_wavelet.md), [`step_line_intensities()`](https://christiangoueguel.com/specProc/reference/step_line_intensities.md), [`step_reject_shots()`](https://christiangoueguel.com/specProc/reference/step_reject_shots.md), [`step_opls()`](https://christiangoueguel.com/specProc/reference/step_opls.md), [`step_o2pls()`](https://christiangoueguel.com/specProc/reference/step_o2pls.md), [`step_epo()`](https://christiangoueguel.com/specProc/reference/step_epo.md), [`step_glsw()`](https://christiangoueguel.com/specProc/reference/step_glsw.md), and more |
 | Orthogonalization | [`osc()`](https://christiangoueguel.com/specProc/reference/osc.md), [`direct_osc()`](https://christiangoueguel.com/specProc/reference/direct_osc.md), [`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md), [`opls()`](https://christiangoueguel.com/specProc/reference/opls.md), [`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md), [`epo()`](https://christiangoueguel.com/specProc/reference/epo.md), [`glsw()`](https://christiangoueguel.com/specProc/reference/glsw.md), [`y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/y_gradient_glsw.md) |
@@ -524,6 +524,19 @@ the wavelength axis on reference lines.
 - [`plot_wavelength_calibration()`](https://christiangoueguel.com/specProc/reference/plot_wavelength_calibration.md)
   : Plot a Wavelength Calibration
 
+## Spectral response
+
+The relative spectral response of the instrument, measured on a
+calibration lamp with its uncertainty, to correct spectra and line
+intensities.
+
+- [`response_calibration()`](https://christiangoueguel.com/specProc/reference/response_calibration.md)
+  : Spectral Response from a Calibration Lamp
+- [`correct_response()`](https://christiangoueguel.com/specProc/reference/correct_response.md)
+  : Correct Spectra or Line Intensities for the Spectral Response
+- [`plot_response()`](https://christiangoueguel.com/specProc/reference/plot_response.md)
+  : Plot a Spectral Response
+
 ## Plasma diagnostics
 
 Electron density from Stark broadening (with the STARK-B database),
@@ -597,6 +610,8 @@ conditions of the emitting environment.
   : Multiple Peaks Fitting
 - [`voigt_fwhm()`](https://christiangoueguel.com/specProc/reference/voigt_fwhm.md)
   : Full Width at Half Maximum of a Voigt Profile
+- [`doppler_width()`](https://christiangoueguel.com/specProc/reference/doppler_width.md)
+  : Doppler Width of an Emission Line
 
 ## Data visualization
 

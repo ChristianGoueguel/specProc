@@ -29,12 +29,14 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/center.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/cf_libs.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/contributions.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/correct_response.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/correct_self_absorption.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/correlation.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/direct_orthogonal.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/direct_osc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/directional_outlyingness.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/dmodx.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/doppler_width.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/electron_density.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/electron_density_uncertainty.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/emsc.html</loc></url>
@@ -88,6 +90,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_loadings.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_outlier_map.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_outliers.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/plot_response.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_shots.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_som.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_spectra.html</loc></url>
@@ -113,6 +116,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/quantile_weight.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/read_starkb.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/reject_shots.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/response_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/robpca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/robust_bcyj.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/robust_da.html</loc></url>

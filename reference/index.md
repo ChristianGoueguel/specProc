@@ -269,6 +269,19 @@ the wavelength axis on reference lines.
 - [`plot_wavelength_calibration()`](https://christiangoueguel.com/specProc/reference/plot_wavelength_calibration.md)
   : Plot a Wavelength Calibration
 
+## Spectral response
+
+The relative spectral response of the instrument, measured on a
+calibration lamp with its uncertainty, to correct spectra and line
+intensities.
+
+- [`response_calibration()`](https://christiangoueguel.com/specProc/reference/response_calibration.md)
+  : Spectral Response from a Calibration Lamp
+- [`correct_response()`](https://christiangoueguel.com/specProc/reference/correct_response.md)
+  : Correct Spectra or Line Intensities for the Spectral Response
+- [`plot_response()`](https://christiangoueguel.com/specProc/reference/plot_response.md)
+  : Plot a Spectral Response
+
 ## Plasma diagnostics
 
 Electron density from Stark broadening (with the STARK-B database),
@@ -342,6 +355,8 @@ conditions of the emitting environment.
   : Multiple Peaks Fitting
 - [`voigt_fwhm()`](https://christiangoueguel.com/specProc/reference/voigt_fwhm.md)
   : Full Width at Half Maximum of a Voigt Profile
+- [`doppler_width()`](https://christiangoueguel.com/specProc/reference/doppler_width.md)
+  : Doppler Width of an Emission Line
 
 ## Data visualization
 

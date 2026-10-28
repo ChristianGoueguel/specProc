@@ -59,7 +59,9 @@ gives the temperature from its slope, \\T = -1/(k_B\\\mathrm{slope})\\,
 and its standard error from that of the slope.
 
 The intensities must be corrected for the spectral response of the
-instrument, and the lines must be optically thin (see
+instrument (see
+[`response_calibration()`](https://christiangoueguel.com/specProc/reference/response_calibration.md)),
+and the lines must be optically thin (see
 [`self_absorption()`](https://christiangoueguel.com/specProc/reference/self_absorption.md)).
 A wide range of upper-level energies gives a more precise temperature.
 Atomic data (\\A\_{ki}\\, \\g_k\\, \\E_k\\) can be taken from the NIST

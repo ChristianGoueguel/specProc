@@ -6,8 +6,9 @@ of the detector. This vignette checks these conditions on the forage
 spectra, measures the electron density N_e and the temperature T of the
 plasma, and ends with a calibration-free estimate of the composition of
 the samples. The intensities are not corrected for the spectral response
-of the instrument, and the acquisition delay is not known, so the values
-are indicative.
+of the instrument, which needs spectra of a calibration lamp (see
+[`response_calibration()`](https://christiangoueguel.com/specProc/reference/response_calibration.md)),
+and the acquisition delay is not known, so the values are indicative.
 
 ``` r
 

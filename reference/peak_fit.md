@@ -15,7 +15,8 @@ peak_fit(
   wlgth.min = NULL,
   wlgth.max = NULL,
   id = NULL,
-  max.iter = 200
+  max.iter = 200,
+  fixed = NULL
 )
 ```
 
@@ -63,6 +64,11 @@ peak_fit(
 
   A numeric specifying the maximum number of iteration (200 by default)
 
+- fixed:
+
+  The widths held at their given values (`wG`, `wL`) instead of being
+  fitted: `"wG"`, `"wL"` or both. Default is `NULL` (all widths fitted).
+
 ## Value
 
 A tibble with one row per spectrum and the columns:
@@ -105,6 +111,18 @@ and the widths and area to positive values. If the fit of a spectrum
 fails, a warning is issued and the corresponding `fit`, `tidied` and
 `augmented` entries are `NULL`.
 
+The Gaussian and Lorentzian widths of a Voigt profile are strongly
+correlated, so a free fit determines the Lorentzian (Stark) width poorly
+when the line is narrow. In a LIBS plasma, the Gaussian width is the
+instrumental width, combined with the Doppler width in quadrature, \\w_G
+= \sqrt{w\_{inst}^2 + w_D^2}\\, and can be held fixed with
+`fixed = "wG"` and the value of `wG`. The instrumental width is the
+width of a line of a low-pressure lamp (mercury, argon), whose Stark and
+Doppler widths are negligible, fitted with a Gaussian profile at a
+nearby wavelength; the Doppler width is given by
+[`doppler_width()`](https://christiangoueguel.com/specProc/reference/doppler_width.md).
+A fixed width is listed in `tidied` without standard error.
+
 ## Author
 
 Christian L. Goueguel
@@ -126,4 +144,20 @@ res$tidied[[1]]
 #> 2 xc      656.     0.00935   70231.  2.78e-265
 #> 3 wL        1.70   0.0459       37.1 2.27e- 46
 #> 4 A     26000.   773.           33.6 1.12e- 43
+
+# a Voigt line whose Gaussian width (instrument and Doppler) is known
+x <- seq(395, 397, by = 0.01)
+set.seed(1)
+y <- voigt_profile(x, y0 = 10, xc = 396, wG = 0.08, wL = 0.05, A = 50) +
+  rnorm(length(x), sd = 2)
+line <- tibble::as_tibble(as.list(stats::setNames(y, x)))
+peak_fit(line, profile = "voigt", wG = 0.08, fixed = "wG")$tidied[[1]]
+#> # A tibble: 5 × 5
+#>   term  estimate std.error statistic    p.value
+#>   <chr>    <dbl>     <dbl>     <dbl>      <dbl>
+#> 1 y0      9.95    0.150         66.4  7.66e-137
+#> 2 xc    396.      0.000127 3123171.   0        
+#> 3 wL      0.0511  0.000425     120.   2.93e-186
+#> 4 A      50.3     0.159        315.   2.52e-268
+#> 5 wG      0.08   NA             NA   NA        
 ```

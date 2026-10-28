@@ -82,6 +82,10 @@ thin: self-absorption broadens lines and overestimates the density (see
   or
   [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md),
   whose Gaussian part absorbs the instrumental and Doppler broadening.
+  Holding the Gaussian width at the measured instrumental width combined
+  with the Doppler width
+  ([`doppler_width()`](https://christiangoueguel.com/specProc/reference/doppler_width.md)),
+  with `fixed = "wG"`, determines the Lorentzian width much better.
 
 - The Stark profile of H\\\alpha\\ (`method = "halpha"`) is not
   Lorentzian: use the FWHM of the whole line, for example

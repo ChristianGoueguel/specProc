@@ -196,6 +196,32 @@
   or the standard error of the fitted area for the Voigt method.
   [`correct_self_absorption()`](https://christiangoueguel.com/specProc/reference/correct_self_absorption.md)
   turns it into the standard error of the corrected intensity.
+- [`response_calibration()`](https://christiangoueguel.com/specProc/reference/response_calibration.md):
+  the relative spectral response of the instrument from spectra of a
+  calibration lamp (such as a deuterium-halogen lamp) and its certified
+  irradiance, with its uncertainty. The certified values are
+  interpolated by a monotone spline of their logarithm, the ratio is
+  smoothed by a local linear fit within each detector, ranges such as
+  the Balmer lines of deuterium can be left out, and the relative
+  standard uncertainty combines those of the certificate and of the
+  measurement (repeated lamp spectra, or the noise of one).
+  [`correct_response()`](https://christiangoueguel.com/specProc/reference/correct_response.md)
+  corrects spectra on the same axis, or the intensities of a table of
+  lines (with their standard errors, for
+  [`plasma_uncertainty()`](https://christiangoueguel.com/specProc/reference/plasma_uncertainty.md)),
+  and
+  [`plot_response()`](https://christiangoueguel.com/specProc/reference/plot_response.md)
+  draws the response.
+- [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md)
+  and
+  [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md)
+  gain `fixed`, to hold the Gaussian (or Lorentzian) width at a given
+  value, such as the instrumental width measured on a lamp line combined
+  with the Doppler width: the Lorentzian (Stark) width of a Voigt fit is
+  then much better determined.
+  [`doppler_width()`](https://christiangoueguel.com/specProc/reference/doppler_width.md)
+  gives the Doppler width of a line from the temperature and the mass of
+  the emitter.
 
 ### Improvements
 

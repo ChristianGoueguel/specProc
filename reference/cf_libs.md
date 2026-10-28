@@ -170,7 +170,9 @@ standard atomic weights. The result is only as good as its assumptions:
 all major elements must be measured (with closure), the lines must be
 optically thin (see
 [`self_absorption()`](https://christiangoueguel.com/specProc/reference/self_absorption.md)),
-the intensities corrected for the spectral response of the instrument,
+the intensities corrected for the spectral response of the instrument
+(see
+[`response_calibration()`](https://christiangoueguel.com/specProc/reference/response_calibration.md)),
 and the atomic data accurate (prefer lines of accuracy B or better in
 [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md)).
 

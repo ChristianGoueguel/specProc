@@ -16,7 +16,8 @@ multipeak_fit(
   wlgth.min = NULL,
   wlgth.max = NULL,
   id = NULL,
-  max.iter = 200
+  max.iter = 200,
+  fixed = NULL
 )
 ```
 
@@ -69,6 +70,15 @@ multipeak_fit(
 - max.iter:
 
   A numeric specifying the maximum number of iteration (200 by default)
+
+- fixed:
+
+  The widths held at their given values (`wG`, `wL`, one value or one
+  per peak) instead of being fitted: `"wG"`, `"wL"` or both, for the
+  peaks whose profile has that width. Default is `NULL` (all widths
+  fitted). See
+  [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md)
+  for holding the Gaussian width at the instrumental and Doppler width.
 
 ## Value
 
