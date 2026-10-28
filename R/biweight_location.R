@@ -19,7 +19,8 @@
 #' @param c A numeric value specifying the tuning constant for the biweight estimator (`c = 6` by default).
 #' @param tol Convergence tolerance for the iterative computation (default: 1e-6).
 #' @param max_iter Maximum number of iterations (default: 50).
-#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when `x` contains missing values.
+#' @param drop_na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when `x` contains missing values.
+#' @param drop.na `r lifecycle::badge("deprecated")` Use `drop_na`.
 #'
 #' @return The biweight location of `x`.
 #'
@@ -41,7 +42,9 @@
 #'
 #' @export biweight_location
 #'
-biweight_location <- function(x, loc = NULL, c = 6, tol = 1e-6, max_iter = 50, drop.na = FALSE) {
+biweight_location <- function(x, loc = NULL, c = 6, tol = 1e-6, max_iter = 50, drop_na = FALSE,
+                              drop.na = deprecated()) {
+  drop_na <- renamed_arg(drop.na, drop_na, "biweight_location", "drop.na", "drop_na")
 
   if (missing(x)) {
     stop("Input 'x' must be provided.")
@@ -50,9 +53,9 @@ biweight_location <- function(x, loc = NULL, c = 6, tol = 1e-6, max_iter = 50, d
     stop("'x' must be a numeric vector.")
   }
   check_number(c, "c", lower = 0, lower_open = TRUE)
-  check_flag(drop.na, "drop.na")
+  check_flag(drop_na, "drop_na")
 
-  if (drop.na) {
+  if (drop_na) {
     x <- x[!is.na(x)]
   } else if (anyNA(x)) {
     return(NA_real_)

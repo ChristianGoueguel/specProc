@@ -104,7 +104,7 @@ spectra for a clean example:
 
 ```{r corrected}
 calibrated <- apply_calibration(first_detector, wavecal)
-corrected <- baseline_arpls(calibrated, lambda = 1e5, max.iter = 20)$correction
+corrected <- baseline_arpls(calibrated, lambda = 1e5, max_iter = 20)$correction
 wl_corrected <- as.numeric(names(corrected))
 mean_spectrum <- colMeans(corrected)
 

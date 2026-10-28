@@ -38,10 +38,11 @@
 #' function. The default value is 4.
 #' @param tol A numeric value representing the tolerance for the difference
 #' between iterations. The default value is 1e-3.
-#' @param max.iter An integer specifying the maximum number of iterations for the
+#' @param max_iter An integer specifying the maximum number of iterations for the
 #' algorithm. The default value is 100.
 #' @param method The algorithm: `"imodpoly"` (default) or `"modpoly"`. See
 #' Details.
+#' @param max.iter `r lifecycle::badge("deprecated")` Use `max_iter`.
 #'
 #' @return A list with two elements:
 #' \itemize{
@@ -69,8 +70,10 @@
 #'      main = "Corrected spectrum")
 #' abline(h = 0, col = "red", lty = 2)
 #' par(oldpar)
-baseline_lsp <- function(x, degree = 4, tol = 1e-3, max.iter = 100,
-                         method = c("imodpoly", "modpoly")) {
+baseline_lsp <- function(x, degree = 4, tol = 1e-3, max_iter = 100,
+                         method = c("imodpoly", "modpoly"),
+                         max.iter = deprecated()) {
+  max_iter <- renamed_arg(max.iter, max_iter, "baseline_lsp", "max.iter", "max_iter")
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -80,11 +83,11 @@ baseline_lsp <- function(x, degree = 4, tol = 1e-3, max.iter = 100,
   if (!is.numeric(tol) || length(tol) != 1) {
     stop("'tol must be a single numeric value.")
   }
-  if (!is.numeric(max.iter) || length(max.iter) != 1) {
-    stop("'max.iter' must be a single numeric value.")
+  if (!is.numeric(max_iter) || length(max_iter) != 1) {
+    stop("'max_iter' must be a single numeric value.")
   }
   check_count(degree, "degree")
-  check_count(max.iter, "max.iter")
+  check_count(max_iter, "max_iter")
   method <- match.arg(method)
 
   x <- as_numeric_matrix(x, "x")
@@ -99,16 +102,16 @@ baseline_lsp <- function(x, degree = 4, tol = 1e-3, max.iter = 100,
   # Orthonormal polynomial basis, shared by all spectra.
   basis <- cbind(1 / sqrt(m), stats::poly(seq_len(m), degree = degree))
   fit <- if (method == "imodpoly") imodpoly else modpoly
-  background <- t(apply(x, 1, fit, basis = basis, tol = tol, max.iter = max.iter))
+  background <- t(apply(x, 1, fit, basis = basis, tol = tol, max_iter = max_iter))
   if (m == 1) background <- t(background)
 
   baseline_result(x, background)
 }
 
 # Modified polynomial fit (Lieber and Mahadevan-Jansen, 2003).
-modpoly <- function(x, basis, tol, max.iter) {
+modpoly <- function(x, basis, tol, max_iter) {
   z_d <- x
-  for (i in seq_len(max.iter)) {
+  for (i in seq_len(max_iter)) {
     z_p <- drop(basis %*% crossprod(basis, z_d))
     z_w <- pmin(x, z_p)
     crit <- sum(abs((z_w - z_d) / z_d), na.rm = TRUE)
@@ -120,7 +123,7 @@ modpoly <- function(x, basis, tol, max.iter) {
 
 # Improved modified polynomial fit (Zhao et al., 2007). The basis is
 # orthonormal, but not on a subset of its rows, hence the least-squares fit.
-imodpoly <- function(x, basis, tol, max.iter) {
+imodpoly <- function(x, basis, tol, max_iter) {
   fit <- function(y, keep) drop(basis %*% qr.coef(qr(basis[keep, , drop = FALSE]), y[keep]))
   keep <- rep(TRUE, length(x))
   p <- fit(x, keep)
@@ -129,7 +132,7 @@ imodpoly <- function(x, basis, tol, max.iter) {
   keep <- x <= p + dev
   if (sum(keep) <= ncol(basis)) return(p)
   y <- x
-  for (i in seq_len(max.iter)) {
+  for (i in seq_len(max_iter)) {
     p <- fit(y, keep)
     dev_new <- stats::sd(y[keep] - p[keep])
     y[keep] <- pmin(y[keep], p[keep] + dev_new)

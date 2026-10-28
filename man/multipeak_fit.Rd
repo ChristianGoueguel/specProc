@@ -11,14 +11,16 @@ multipeak_fit(
   wL = NULL,
   wG = NULL,
   A = NULL,
-  wlgth.min = NULL,
-  wlgth.max = NULL,
+  wavelength = NULL,
   id = NULL,
-  max.iter = 200,
+  max_iter = 200,
   fixed = NULL,
   lock_centers = FALSE,
   share_widths = FALSE,
-  area_ratios = NULL
+  area_ratios = NULL,
+  max.iter = deprecated(),
+  wlgth.min = deprecated(),
+  wlgth.max = deprecated()
 )
 }
 \arguments{
@@ -38,13 +40,12 @@ one per peak or a single one used for all peaks: "lorentzian", "gaussian",
 
 \item{A}{A numeric (single value or one per peak) of the peak area (initial guess)}
 
-\item{wlgth.min}{A numeric of the lower bound of the wavelength subset}
-
-\item{wlgth.max}{A numeric of the upper bound of the wavelength subset}
+\item{wavelength}{The wavelength range of the fit, \code{c(min, max)} in nm, or
+\code{NULL} (default) for all the channels.}
 
 \item{id}{A character specifying the name of the column holding the spectra id (optional)}
 
-\item{max.iter}{A numeric specifying the maximum number of iteration (200 by default)}
+\item{max_iter}{A numeric specifying the maximum number of iteration (200 by default)}
 
 \item{fixed}{The widths held at their given values (\code{wG}, \code{wL}, one
 value or one per peak) instead of being fitted: \code{"wG"}, \code{"wL"} or
@@ -62,6 +63,9 @@ lines of a group must have the same profile.}
 
 \item{area_ratios}{The fixed relative areas of the lines, one per peak
 (\code{NA} for a free area), or \code{NULL} (default) for free areas.}
+
+\item{max.iter, wlgth.min, wlgth.max}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
+\code{max_iter}, and \code{wavelength = c(wlgth.min, wlgth.max)}.}
 }
 \value{
 A tibble with one row per spectrum and the columns \code{id} (or

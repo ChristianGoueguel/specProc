@@ -65,7 +65,7 @@
 #'   `"fearn"`. See [osc()].
 #' @param num_comp The number of orthogonal components to remove.
 #' @param options A list of further arguments passed to the underlying
-#'   function, such as `scale`, `tol` or `max.iter` for [osc()].
+#'   function, such as `scale`, `tol` or `max_iter` for [osc()].
 #' @param res The fitted filter, stored once the step has been trained.
 #' @param columns The names of the selected predictors, stored once the step
 #'   has been trained.

@@ -4,12 +4,14 @@
 \alias{medcouple_weight}
 \title{Medcouple Tail Weight Measure}
 \usage{
-medcouple_weight(x, drop.na = FALSE)
+medcouple_weight(x, drop_na = FALSE, drop.na = deprecated())
 }
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{drop.na}{Logical value indicating whether to remove missing values (NA). If \code{FALSE} (default) and \code{x} contains missing values, \code{NA} is returned.}
+\item{drop_na}{Logical value indicating whether to remove missing values (NA). If \code{FALSE} (default) and \code{x} contains missing values, \code{NA} is returned.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 A tibble with two numeric columns:

@@ -4,7 +4,7 @@
 \name{specProc-package}
 \alias{specProc}
 \alias{specProc-package}
-\title{specProc: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy}
+\title{specProc: Analysis of Laser-Induced Breakdown Spectroscopy Data}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 

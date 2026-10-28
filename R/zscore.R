@@ -30,8 +30,9 @@
 #'
 #' @param x A numeric vector.
 #' @param robust A logical value indicating whether to calculate classical or robust z-score. If `FALSE` (the default), uses the classical approach. If `TRUE`, computes the robust method, i.e. the so-called Stahel-Donoho outlyingness.
-#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values are kept in the output (with a missing score) and ignored when computing the location and scale.
+#' @param drop_na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values are kept in the output (with a missing score) and ignored when computing the location and scale.
 #' @param cutoff A numeric value indicating the threshold above which data points are identified and flagged as potential outliers. By default, `cutoff = 3`.
+#' @param drop.na `r lifecycle::badge("deprecated")` Use `drop_na`.
 #'
 #' @return A tibble with two columns:
 #'   - `data`: The original numeric values.
@@ -47,7 +48,9 @@
 #'
 #' @export zscore
 #'
-zscore <- function(x, cutoff = 3, robust = FALSE, drop.na = FALSE) {
+zscore <- function(x, cutoff = 3, robust = FALSE, drop_na = FALSE,
+                   drop.na = deprecated()) {
+  drop_na <- renamed_arg(drop.na, drop_na, "zscore", "drop.na", "drop_na")
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -58,9 +61,9 @@ zscore <- function(x, cutoff = 3, robust = FALSE, drop.na = FALSE) {
     stop("The input 'robust' must be a logical value (TRUE or FALSE).")
   }
   check_number(cutoff, "cutoff", lower = 0, lower_open = TRUE)
-  check_flag(drop.na, "drop.na")
+  check_flag(drop_na, "drop_na")
 
-  if (drop.na) {
+  if (drop_na) {
     x <- x[!is.na(x)]
   }
 

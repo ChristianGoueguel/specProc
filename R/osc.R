@@ -52,8 +52,9 @@
 #' @param scale A logical value indicating whether to scale `x` and `y`. Default is `FALSE`.
 #' @param ncomp An integer representing the number of orthogonal components to remove. Default value is 10; it is reduced to `min(n - 1, p)` if larger.
 #' @param tol A numeric value representing the tolerance for convergence. The default value is 1e-3.
-#' @param max.iter An integer representing the maximum number of iterations. The default value is 10.
-#' @param pls.ncomp An integer giving the number of PLS components used to compute the weights in Wold's method. Default is 5.
+#' @param max_iter An integer representing the maximum number of iterations. The default value is 10.
+#' @param pls_ncomp An integer giving the number of PLS components used to compute the weights in Wold's method. Default is 5.
+#' @param max.iter,pls.ncomp `r lifecycle::badge("deprecated")` Use `max_iter` and `pls_ncomp`.
 #'
 #' @return An object of class `specproc_osc` (a list), which [predict()][predict.specproc_filter] applies to new spectra, with the following components:
 #'  - `correction`: The corrected matrix.
@@ -76,15 +77,18 @@
 #' x <- spectra[wl > 760 & wl < 780]  # the K I resonance lines
 #' res <- osc(x, forageLIBS$K, method = "fearn", ncomp = 2)
 #' res$angle
-osc <- function(x, y, method = "sjoblom", center = TRUE, scale = FALSE, ncomp = 10, tol = 1e-3, max.iter = 10, pls.ncomp = 5) {
+osc <- function(x, y, method = "sjoblom", center = TRUE, scale = FALSE, ncomp = 10, tol = 1e-3, max_iter = 10, pls_ncomp = 5,
+                max.iter = deprecated(), pls.ncomp = deprecated()) {
+  max_iter <- renamed_arg(max.iter, max_iter, "osc", "max.iter", "max_iter")
+  pls_ncomp <- renamed_arg(pls.ncomp, pls_ncomp, "osc", "pls.ncomp", "pls_ncomp")
 
   if (missing(x) || missing(y)) {
     stop("Both 'x' and 'y' must be provided.")
   }
   method <- match.arg(method, c("wold", "sjoblom", "fearn"))
   check_count(ncomp, "ncomp")
-  check_count(max.iter, "max.iter")
-  check_count(pls.ncomp, "pls.ncomp")
+  check_count(max_iter, "max_iter")
+  check_count(pls_ncomp, "pls_ncomp")
   check_number(tol, "tol", lower = 0, lower_open = TRUE)
 
   xy <- prepare_xy(x, y, center, scale)
@@ -101,11 +105,11 @@ osc <- function(x, y, method = "sjoblom", center = TRUE, scale = FALSE, ncomp = 
 
   out <- switch(
     method,
-    wold = osc_iterative(x, y, ncomp, tol, max.iter, weight_fun = function(x, t) {
-      k <- min(pls.ncomp, n - 1, p)
+    wold = osc_iterative(x, y, ncomp, tol, max_iter, weight_fun = function(x, t) {
+      k <- min(pls_ncomp, n - 1, p)
       drop(pls::simpls.fit(x, t, ncomp = k, center = FALSE)$coefficients[, , k])
     }),
-    sjoblom = osc_iterative(x, y, ncomp, tol, max.iter, weight_fun = function(x, t) {
+    sjoblom = osc_iterative(x, y, ncomp, tol, max_iter, weight_fun = function(x, t) {
       drop(crossprod(x, t))
     }),
     fearn = osc_fearn(x, y, ncomp)
@@ -132,12 +136,12 @@ orthogonalize <- function(t, y) {
 
 # Wold and Sjoblom OSC: iterate between orthogonalizing the score to y and
 # re-expressing it as a linear combination of X, then deflate X.
-osc_iterative <- function(x, y, ncomp, tol, max.iter, weight_fun) {
+osc_iterative <- function(x, y, ncomp, tol, max_iter, weight_fun) {
   ws <- ps <- ts <- vector("list", ncomp)
   for (i in seq_len(ncomp)) {
     sv <- svd(x, nu = 1, nv = 0)
     t <- sv$u * sv$d[1]
-    for (iter in seq_len(max.iter)) {
+    for (iter in seq_len(max_iter)) {
       t_orth <- orthogonalize(t, y)
       w <- weight_fun(x, t_orth)
       w <- w / sqrt(sum(w^2))

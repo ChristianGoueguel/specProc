@@ -41,7 +41,7 @@ minerals <- forageLIBS |> select(3:14) |> names()
 spectra <- forageLIBS |> select(-all_of(c(spectra_id, minerals)))
 wl <- as.numeric(names(spectra))
 
-corrected <- baseline_arpls(spectra, lambda = 1e5, max.iter = 20)$correction
+corrected <- baseline_arpls(spectra, lambda = 1e5, max_iter = 20)$correction
 mean_spectrum <- colMeans(corrected)
 ```
 

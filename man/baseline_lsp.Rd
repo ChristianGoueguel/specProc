@@ -8,8 +8,9 @@ baseline_lsp(
   x,
   degree = 4,
   tol = 0.001,
-  max.iter = 100,
-  method = c("imodpoly", "modpoly")
+  max_iter = 100,
+  method = c("imodpoly", "modpoly"),
+  max.iter = deprecated()
 )
 }
 \arguments{
@@ -21,11 +22,13 @@ function. The default value is 4.}
 \item{tol}{A numeric value representing the tolerance for the difference
 between iterations. The default value is 1e-3.}
 
-\item{max.iter}{An integer specifying the maximum number of iterations for the
+\item{max_iter}{An integer specifying the maximum number of iterations for the
 algorithm. The default value is 100.}
 
 \item{method}{The algorithm: \code{"imodpoly"} (default) or \code{"modpoly"}. See
 Details.}
+
+\item{max.iter}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{max_iter}.}
 }
 \value{
 A list with two elements:

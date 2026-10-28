@@ -4,12 +4,14 @@
 \alias{biweight_midvariance}
 \title{Biweight Midvariance}
 \usage{
-biweight_midvariance(x, drop.na = FALSE)
+biweight_midvariance(x, drop_na = FALSE, drop.na = deprecated())
 }
 \arguments{
 \item{x}{A numeric vector.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when \code{x} contains missing values.}
+\item{drop_na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when \code{x} contains missing values.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 The biweight midvariance of the input vector.

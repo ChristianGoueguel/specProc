@@ -4,7 +4,13 @@
 \alias{baseline_als}
 \title{Asymmetric Least Squares}
 \usage{
-baseline_als(x, lambda = 1000, p = 0.001, max.iter = 10)
+baseline_als(
+  x,
+  lambda = 1000,
+  p = 0.001,
+  max_iter = 10,
+  max.iter = deprecated()
+)
 }
 \arguments{
 \item{x}{A numeric matrix or data frame, with one spectrum per row.}
@@ -17,7 +23,9 @@ lambda, the more curvature in the baseline fitting. Default is 1000.}
 fit. Larger values allow more negative-going regions. Smaller values disallow
 negative-going regions. \code{p} must be between 0 and 1. Default is 0.001.}
 
-\item{max.iter}{Maximum number of iterations for the algorithm. Default is 10.}
+\item{max_iter}{Maximum number of iterations for the algorithm. Default is 10.}
+
+\item{max.iter}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{max_iter}.}
 }
 \value{
 A list containing two tibbles:

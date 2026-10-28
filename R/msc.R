@@ -20,15 +20,16 @@
 #' Each row represents a sample, and each column represents a spectral variable.
 #' @param xref An optional numeric vector representing the reference spectrum.
 #' If `NULL` (default), the mean or median of `x` is used as the reference.
-#' @param drop.offset A logical value indicating whether the additive offset
+#' @param drop_offset A logical value indicating whether the additive offset
 #' \eqn{a_i} should be removed from the spectra (default is `TRUE`). If `FALSE`,
 #' only the multiplicative effect is corrected: \eqn{\textbf{x}_i / b_i}.
 #' @param robust A logical value indicating whether the median (`TRUE`, default)
 #' or the mean (`FALSE`) of `x` is used as `xref`.
 #' @param window An optional list of numeric vectors specifying the column indices of
 #' spectral windows. If provided, MSC is performed separately for each window.
-#' @param drop.na A logical value indicating whether to remove spectra (rows)
+#' @param drop_na A logical value indicating whether to remove spectra (rows)
 #' containing missing values. If `TRUE` (the default), such rows are removed.
+#' @param drop.offset,drop.na `r lifecycle::badge("deprecated")` Use `drop_offset` and `drop_na`.
 #'
 #' @return A list with the following components:
 #'   \item{`correction`}{The corrected spectra.}
@@ -46,10 +47,13 @@
 msc <- function(
     x,
     xref = NULL,
-    drop.offset = TRUE,
+    drop_offset = TRUE,
     robust = TRUE,
     window = NULL,
-    drop.na = TRUE) {
+    drop_na = TRUE,
+    drop.offset = deprecated(), drop.na = deprecated()) {
+  drop_offset <- renamed_arg(drop.offset, drop_offset, "msc", "drop.offset", "drop_offset")
+  drop_na <- renamed_arg(drop.na, drop_na, "msc", "drop.na", "drop_na")
 
   if (missing(x)) {
     stop("Missing 'x' argument.")
@@ -58,20 +62,20 @@ msc <- function(
   if (!is.null(xref) && (!is.numeric(xref) || length(xref) != ncol(x))) {
     stop("'xref' must be a numeric vector of the same length as the number of columns in 'x'.")
   }
-  if (!is.logical(drop.offset)) {
-    stop("'drop.offset' must be a logical value (TRUE or FALSE).")
+  if (!is.logical(drop_offset)) {
+    stop("'drop_offset' must be a logical value (TRUE or FALSE).")
   }
   if (!is.logical(robust)) {
     stop("'robust' must be a logical value (TRUE or FALSE).")
   }
-  if (!is.logical(drop.na)) {
-    stop("'drop.na' must be a logical value (TRUE or FALSE).")
+  if (!is.logical(drop_na)) {
+    stop("'drop_na' must be a logical value (TRUE or FALSE).")
   }
 
-  if (drop.na) {
+  if (drop_na) {
     x <- x[stats::complete.cases(x), , drop = FALSE]
   } else if (anyNA(x)) {
-    stop("'x' contains missing values; set 'drop.na = TRUE' to remove them.")
+    stop("'x' contains missing values; set 'drop_na = TRUE' to remove them.")
   }
   if (nrow(x) < 1) {
     stop("'x' has no complete spectra.")
@@ -107,7 +111,7 @@ msc <- function(
     xw <- x[, w, drop = FALSE]
     b <- drop(sweep(xw, 1, rowMeans(xw)) %*% rc) / sum(rc^2)
     a <- rowMeans(xw) - b * mean(r)
-    sx[, w] <- if (drop.offset) (xw - a) / b else xw / b
+    sx[, w] <- if (drop_offset) (xw - a) / b else xw / b
     offset[, k] <- a
     slope[, k] <- b
   }

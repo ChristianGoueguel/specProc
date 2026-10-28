@@ -4,7 +4,7 @@
 \alias{iqr_outliers}
 \title{Interquartile Range Method}
 \usage{
-iqr_outliers(x, k = 1.5, skew = FALSE, drop.na = FALSE)
+iqr_outliers(x, k = 1.5, skew = FALSE, drop_na = FALSE, drop.na = deprecated())
 }
 \arguments{
 \item{x}{A numeric vector.}
@@ -20,7 +20,9 @@ These formulas are explicitly derived and optimized for the scenario where \code
 Consequently, if the user attempts to use a value of \code{k} other than 1.5, the code will issue a warning message indicating that the formula is only defined for \code{k = 1.5}.
 In such cases, the code will automatically reset \code{k} to 1.5 and proceed with the calculations using the appropriate formulas and constants.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values are kept in the output (with a missing flag) and ignored when computing the fences.}
+\item{drop_na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values are kept in the output (with a missing flag) and ignored when computing the fences.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 A tibble with two columns:

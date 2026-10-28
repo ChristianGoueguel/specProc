@@ -11,9 +11,10 @@
 #' @param x A numeric vector.
 #' @param a The minimum value of the new range (default: 0).
 #' @param b The maximum value of the new range (default: 1).
-#' @param drop.na A logical value indicating whether to remove missing values
+#' @param drop_na A logical value indicating whether to remove missing values
 #' (NA). If `TRUE` (the default), missing values are removed from the output.
 #' If `FALSE`, they are kept (as `NA`) and ignored when computing the range.
+#' @param drop.na `r lifecycle::badge("deprecated")` Use `drop_na`.
 #'
 #' @return A numeric vector with values rescaled to the new range `[a, b]`.
 #'
@@ -22,8 +23,10 @@
 #' @examples
 #' data(forageLIBS)
 #' head(minmax(forageLIBS$K))
-#' head(minmax(forageLIBS$S, a = -1, b = 1, drop.na = FALSE))
-minmax <- function(x, a = 0, b = 1, drop.na = TRUE) {
+#' head(minmax(forageLIBS$S, a = -1, b = 1, drop_na = FALSE))
+minmax <- function(x, a = 0, b = 1, drop_na = TRUE,
+                   drop.na = deprecated()) {
+  drop_na <- renamed_arg(drop.na, drop_na, "minmax", "drop.na", "drop_na")
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -36,11 +39,11 @@ minmax <- function(x, a = 0, b = 1, drop.na = TRUE) {
   if (b <= a) {
     stop("'b' must be greater than 'a'.")
   }
-  if (!is.logical(drop.na)) {
-    stop("'drop.na' must be a logical value (TRUE or FALSE).")
+  if (!is.logical(drop_na)) {
+    stop("'drop_na' must be a logical value (TRUE or FALSE).")
   }
 
-  if (drop.na) {
+  if (drop_na) {
     x <- x[!is.na(x)]
   }
   if (all(is.na(x))) {

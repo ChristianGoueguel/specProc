@@ -53,10 +53,10 @@
 #' @param wL A numeric (single value or one per peak) of the Lorentzian full width at half maximum (initial guess)
 #' @param wG A numeric (single value or one per peak) of the Gaussian full width at half maximum (initial guess)
 #' @param A A numeric (single value or one per peak) of the peak area (initial guess)
-#' @param wlgth.min A numeric of the lower bound of the wavelength subset
-#' @param wlgth.max A numeric of the upper bound of the wavelength subset
+#' @param wavelength The wavelength range of the fit, `c(min, max)` in nm, or
+#'   `NULL` (default) for all the channels.
 #' @param id A character specifying the name of the column holding the spectra id (optional)
-#' @param max.iter A numeric specifying the maximum number of iteration (200 by default)
+#' @param max_iter A numeric specifying the maximum number of iteration (200 by default)
 #' @param fixed The widths held at their given values (`wG`, `wL`, one
 #'   value or one per peak) instead of being fitted: `"wG"`, `"wL"` or
 #'   both, for the peaks whose profile has that width. Default is `NULL`
@@ -70,6 +70,8 @@
 #'   lines of a group must have the same profile.
 #' @param area_ratios The fixed relative areas of the lines, one per peak
 #'   (`NA` for a free area), or `NULL` (default) for free areas.
+#' @param max.iter,wlgth.min,wlgth.max `r lifecycle::badge("deprecated")` Use
+#'   `max_iter`, and `wavelength = c(wlgth.min, wlgth.max)`.
 #'
 #' @return A tibble with one row per spectrum and the columns `id` (or
 #'   `spectrum`), `data`, `fit`, `tidied` and `augmented` (see [peak_fit()]).
@@ -98,14 +100,18 @@ multipeak_fit <- function(
     wL = NULL,
     wG = NULL,
     A = NULL,
-    wlgth.min = NULL,
-    wlgth.max = NULL,
+    wavelength = NULL,
     id = NULL,
-    max.iter = 200,
+    max_iter = 200,
     fixed = NULL,
     lock_centers = FALSE,
     share_widths = FALSE,
-    area_ratios = NULL) {
+    area_ratios = NULL,
+    max.iter = deprecated(),
+    wlgth.min = deprecated(),
+    wlgth.max = deprecated()) {
+  max_iter <- renamed_arg(max.iter, max_iter, "multipeak_fit", "max.iter", "max_iter")
+  wavelength <- fit_range(wavelength, wlgth.min, wlgth.max, "multipeak_fit")
 
   if (missing(x) || is.null(x)) {
     stop("Apparently you forgot to provide the spectra.")
@@ -129,7 +135,7 @@ multipeak_fit <- function(
   if (length(peaks) != length(profiles)) {
     stop("Peaks and profiles must have the same length")
   }
-  if (!is.numeric(max.iter)) {
+  if (!is.numeric(max_iter)) {
     stop("Maximum number of iteration must be numeric")
   }
 
@@ -148,9 +154,9 @@ multipeak_fit <- function(
     }
   }
 
-  spectra <- long_spectra(x, id, wlgth.min, wlgth.max)
+  spectra <- long_spectra(x, id, wavelength)
   fit_spectra(spectra, peaks = peaks, profiles = profiles,
-              wL = wL, wG = wG, A = A, max.iter = max.iter, single = FALSE, fixed = fixed,
+              wL = wL, wG = wG, A = A, max_iter = max_iter, single = FALSE, fixed = fixed,
               centers = centers, widths = widths, area_ratios = area_ratios)
 }
 

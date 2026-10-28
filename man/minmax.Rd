@@ -4,7 +4,7 @@
 \alias{minmax}
 \title{Min-Max Normalization}
 \usage{
-minmax(x, a = 0, b = 1, drop.na = TRUE)
+minmax(x, a = 0, b = 1, drop_na = TRUE, drop.na = deprecated())
 }
 \arguments{
 \item{x}{A numeric vector.}
@@ -13,9 +13,11 @@ minmax(x, a = 0, b = 1, drop.na = TRUE)
 
 \item{b}{The maximum value of the new range (default: 1).}
 
-\item{drop.na}{A logical value indicating whether to remove missing values
+\item{drop_na}{A logical value indicating whether to remove missing values
 (NA). If \code{TRUE} (the default), missing values are removed from the output.
 If \code{FALSE}, they are kept (as \code{NA}) and ignored when computing the range.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 A numeric vector with values rescaled to the new range \verb{[a, b]}.
@@ -29,7 +31,7 @@ the maximum value is mapped to \code{b}.
 \examples{
 data(forageLIBS)
 head(minmax(forageLIBS$K))
-head(minmax(forageLIBS$S, a = -1, b = 1, drop.na = FALSE))
+head(minmax(forageLIBS$S, a = -1, b = 1, drop_na = FALSE))
 }
 \author{
 Christian L. Goueguel

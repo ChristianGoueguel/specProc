@@ -4,7 +4,14 @@
 \alias{normalize}
 \title{Spectra Normalization}
 \usage{
-normalize(x, method = "area", bkg = NULL, wlength = NULL, drop.na = TRUE)
+normalize(
+  x,
+  method = "area",
+  bkg = NULL,
+  wlength = NULL,
+  drop_na = TRUE,
+  drop.na = deprecated()
+)
 }
 \arguments{
 \item{x}{A numeric matrix or data frame containing the spectra.}
@@ -15,7 +22,9 @@ normalize(x, method = "area", bkg = NULL, wlength = NULL, drop.na = TRUE)
 
 \item{wlength}{A character vector of the selected wavelength(s) (column names). Required for the "internal" method, where the intensities at these wavelengths are summed to give the internal standard. Optional for the "background" method, where only these wavelengths are normalized and returned.}
 
-\item{drop.na}{A logical value indicating whether to remove spectra (rows) containing missing values before normalizing. Default is \code{TRUE}.}
+\item{drop_na}{A logical value indicating whether to remove spectra (rows) containing missing values before normalizing. Default is \code{TRUE}.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 A tibble of normalized spectra.

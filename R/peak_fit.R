@@ -43,13 +43,15 @@
 #' @param wL A numeric specifying the Lorentzian full width at half maximum (initial guess)
 #' @param wG A numeric specifying the Gaussian full width at half maximum (initial guess)
 #' @param A A numeric specifying the peak area (initial guess)
-#' @param wlgth.min A numeric specifying the lower bound of the wavelength subset
-#' @param wlgth.max A numeric specifying the upper bound of the wavelength subset
+#' @param wavelength The wavelength range of the fit, `c(min, max)` in nm, or
+#'   `NULL` (default) for all the channels.
 #' @param id A character specifying the name of the column holding the spectra id (optional)
-#' @param max.iter A numeric specifying the maximum number of iteration (200 by default)
+#' @param max_iter A numeric specifying the maximum number of iteration (200 by default)
 #' @param fixed The widths held at their given values (`wG`, `wL`) instead
 #'   of being fitted: `"wG"`, `"wL"` or both. Default is `NULL` (all
 #'   widths fitted).
+#' @param max.iter,wlgth.min,wlgth.max `r lifecycle::badge("deprecated")` Use
+#'   `max_iter`, and `wavelength = c(wlgth.min, wlgth.max)`.
 #'
 #' @return A tibble with one row per spectrum and the columns:
 #'  - `id` column (or `spectrum`, the row number, when `id = NULL`),
@@ -82,11 +84,15 @@ peak_fit <- function(
     wL = NULL,
     wG = NULL,
     A = NULL,
-    wlgth.min = NULL,
-    wlgth.max = NULL,
+    wavelength = NULL,
     id = NULL,
-    max.iter = 200,
-    fixed = NULL) {
+    max_iter = 200,
+    fixed = NULL,
+    max.iter = deprecated(),
+    wlgth.min = deprecated(),
+    wlgth.max = deprecated()) {
+  max_iter <- renamed_arg(max.iter, max_iter, "peak_fit", "max.iter", "max_iter")
+  wavelength <- fit_range(wavelength, wlgth.min, wlgth.max, "peak_fit")
 
   if (missing(x)) {
     stop("Missing 'data' argument.")
@@ -98,21 +104,33 @@ peak_fit <- function(
       !tolower(profile) %in% lineshapes) {
     stop("The profile function must be: 'lorentzian', 'gaussian', 'voigt' or 'pseudo_voigt'")
   }
-  if (!is.numeric(max.iter)) {
+  if (!is.numeric(max_iter)) {
     stop("Maximum number of iteration must be numeric")
   }
 
-  spectra <- long_spectra(x, id, wlgth.min, wlgth.max)
+  spectra <- long_spectra(x, id, wavelength)
   fit_spectra(spectra, peaks = NA_real_, profiles = tolower(profile),
-              wL = wL, wG = wG, A = A, max.iter = max.iter, single = TRUE, fixed = fixed)
+              wL = wL, wG = wG, A = A, max_iter = max_iter, single = TRUE, fixed = fixed)
 }
 
 
 lineshapes <- c("gaussian", "lorentzian", "voigt", "pseudo_voigt")
 
+# The wavelength range of a fit, from `wavelength` or from the former
+# arguments `wlgth.min` and `wlgth.max`.
+fit_range <- function(wavelength, wlgth.min, wlgth.max, fn, user_env = rlang::caller_env(2)) {
+  details <- "Give the range as `wavelength = c(min, max)`."
+  lo <- renamed_arg(wlgth.min, NULL, fn, "wlgth.min", "wavelength", details, user_env)
+  hi <- renamed_arg(wlgth.max, NULL, fn, "wlgth.max", "wavelength", details, user_env)
+  if (is.null(lo) && is.null(hi)) {
+    return(wavelength)
+  }
+  c(if (is.null(lo)) -Inf else lo, if (is.null(hi)) Inf else hi)
+}
+
 # Splits a wide data frame of spectra into a list of (x, y) tibbles, one per
-# spectrum, restricted to [wlgth.min, wlgth.max].
-long_spectra <- function(x, id, wlgth.min, wlgth.max) {
+# spectrum, restricted to the wavelength range `wavelength`.
+long_spectra <- function(x, id, wavelength) {
   if (!is.null(id)) {
     if (!is.character(id) || length(id) != 1 || !id %in% names(x)) {
       stop("'id' must be the name of a column of 'x'.", call. = FALSE)
@@ -132,11 +150,13 @@ long_spectra <- function(x, id, wlgth.min, wlgth.max) {
     stop("Column names of 'x' must be wavelengths (numeric values).", call. = FALSE)
   }
 
-  lo <- if (is.null(wlgth.min)) -Inf else as.numeric(wlgth.min)
-  hi <- if (is.null(wlgth.max)) Inf else as.numeric(wlgth.max)
-  if (lo >= hi) {
-    stop("wlgth.min must be strictly smaller than wlgth.max", call. = FALSE)
+  if (is.null(wavelength)) wavelength <- c(-Inf, Inf)
+  if (!is.numeric(wavelength) || length(wavelength) != 2 || anyNA(wavelength) ||
+      wavelength[1] >= wavelength[2]) {
+    stop("'wavelength' must be a range c(min, max), with min < max.", call. = FALSE)
   }
+  lo <- wavelength[1]
+  hi <- wavelength[2]
   keep <- wl >= lo & wl <= hi
   if (sum(keep) < 5) {
     stop("Fewer than 5 data points in the selected wavelength range.", call. = FALSE)
@@ -274,7 +294,7 @@ peak_parameters <- function(data, peaks, profiles, wL, wG, A, single, fixed = ch
        definitions = definitions)
 }
 
-fit_one <- function(data, peaks, profiles, wL, wG, A, max.iter, single, fixed = character(),
+fit_one <- function(data, peaks, profiles, wL, wG, A, max_iter, single, fixed = character(),
                     centers = NULL, widths = NULL, area_ratios = NULL) {
   spec <- peak_parameters(data, peaks, profiles, wL, wG, A, single, fixed, centers, widths,
                           area_ratios)
@@ -288,7 +308,7 @@ fit_one <- function(data, peaks, profiles, wL, wG, A, max.iter, single, fixed = 
     start = spec$start,
     lower = spec$lower,
     upper = spec$upper,
-    control = minpack.lm::nls.lm.control(maxiter = max.iter)
+    control = minpack.lm::nls.lm.control(maxiter = max_iter)
   )
   attr(fit, "peak_terms") <- spec$terms
   attr(fit, "definitions") <- spec$definitions
@@ -357,7 +377,7 @@ fit_parameters <- function(fit) {
                  p.value = unname(2 * stats::pt(-abs(statistic), stats::df.residual(fit))))
 }
 
-fit_spectra <- function(spectra, peaks, profiles, wL, wG, A, max.iter, single,
+fit_spectra <- function(spectra, peaks, profiles, wL, wG, A, max_iter, single,
                         fixed = character(), centers = NULL, widths = NULL,
                         area_ratios = NULL) {
   for (v in list(wL, wG, A)) {
@@ -369,7 +389,7 @@ fit_spectra <- function(spectra, peaks, profiles, wL, wG, A, max.iter, single,
   fixed <- check_fixed(fixed, profiles, wL, wG)
   results <- lapply(seq_along(spectra$data), function(i) {
     tryCatch(
-      fit_one(spectra$data[[i]], peaks, profiles, wL, wG, A, max.iter, single, fixed, centers,
+      fit_one(spectra$data[[i]], peaks, profiles, wL, wG, A, max_iter, single, fixed, centers,
               widths, area_ratios),
       error = function(e) {
         warning("Fitting failed for ", spectra$id_name, " '", spectra$ids[i], "': ",

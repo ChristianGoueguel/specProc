@@ -10,12 +10,13 @@ step_msc(
   role = NA,
   trained = FALSE,
   robust = TRUE,
-  drop.offset = TRUE,
+  drop_offset = TRUE,
   window = NULL,
   reference = NULL,
   columns = NULL,
   skip = FALSE,
-  id = recipes::rand_id("msc")
+  id = recipes::rand_id("msc"),
+  drop.offset = deprecated()
 )
 }
 \arguments{
@@ -32,7 +33,7 @@ example, the spectral channels). See \code{\link[recipes:selections]{recipes::se
 \item{robust}{A logical: use the median (\code{TRUE}, default) or the mean of
 the training spectra as the reference.}
 
-\item{drop.offset}{A logical: remove the additive offset (\code{TRUE},
+\item{drop_offset}{A logical: remove the additive offset (\code{TRUE},
 default) or only the multiplicative effect.}
 
 \item{window}{An optional list of column index vectors (within the
@@ -49,6 +50,8 @@ by \code{\link[recipes:bake]{recipes::bake()}}? Keep the default \code{FALSE}, s
 corrected with the same filter as the training data.}
 
 \item{id}{A character string that is unique to this step.}
+
+\item{drop.offset}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_offset}.}
 }
 \value{
 An updated version of \code{recipe} with the new step added to the

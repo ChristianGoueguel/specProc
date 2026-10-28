@@ -30,7 +30,8 @@
 #' @param p A numeric value specifying the extent of asymmetry required of the
 #' fit. Larger values allow more negative-going regions. Smaller values disallow
 #' negative-going regions. `p` must be between 0 and 1. Default is 0.001.
-#' @param max.iter Maximum number of iterations for the algorithm. Default is 10.
+#' @param max_iter Maximum number of iterations for the algorithm. Default is 10.
+#' @param max.iter `r lifecycle::badge("deprecated")` Use `max_iter`.
 #'
 #' @return A list containing two tibbles:
 #' \itemize{
@@ -58,7 +59,9 @@
 #'      main = "Corrected spectrum")
 #' abline(h = 0, col = "red", lty = 2)
 #' par(oldpar)
-baseline_als <- function(x, lambda = 1e3, p = 0.001, max.iter = 10) {
+baseline_als <- function(x, lambda = 1e3, p = 0.001, max_iter = 10,
+                         max.iter = deprecated()) {
+  max_iter <- renamed_arg(max.iter, max_iter, "baseline_als", "max.iter", "max_iter")
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -71,18 +74,18 @@ baseline_als <- function(x, lambda = 1e3, p = 0.001, max.iter = 10) {
   if (p <= 0 || p >= 1) {
     stop("'p' must be between 0 and 1")
   }
-  if (!is.numeric(max.iter) || length(max.iter) != 1) {
-    stop("'max.iter' must be a single numeric value.")
+  if (!is.numeric(max_iter) || length(max_iter) != 1) {
+    stop("'max_iter' must be a single numeric value.")
   }
-  baseline_fit(x, lambda, p, max.iter, method = 0L)
+  baseline_fit(x, lambda, p, max_iter, method = 0L)
 }
 
 # Shared driver for the penalized least-squares baselines (ALS and arPLS).
-baseline_fit <- function(x, lambda, param, max.iter, method) {
+baseline_fit <- function(x, lambda, param, max_iter, method) {
   if (lambda <= 0) {
     stop("'lambda' must be positive.")
   }
-  check_count(max.iter, "max.iter")
+  check_count(max_iter, "max_iter")
   x <- as_numeric_matrix(x, "x")
   if (anyNA(x)) {
     stop("'x' contains missing values; remove or impute them before baseline correction.")
@@ -90,7 +93,7 @@ baseline_fit <- function(x, lambda, param, max.iter, method) {
   if (ncol(x) < 3) {
     stop("Spectra must have at least 3 points.")
   }
-  background <- whittaker_baseline_cpp(x, lambda, param, as.integer(max.iter), method)
+  background <- whittaker_baseline_cpp(x, lambda, param, as.integer(max_iter), method)
   baseline_result(x, background)
 }
 

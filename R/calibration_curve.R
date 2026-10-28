@@ -309,7 +309,7 @@ predict.specproc_calibration <- function(object, newdata, replicates = 1, level 
 #' spectra_id <- names(forageLIBS)[1:2]
 #' minerals <- names(forageLIBS)[3:14]
 #' spectra <- forageLIBS[setdiff(names(forageLIBS), c(spectra_id, minerals))]
-#' corrected <- baseline_arpls(spectra, lambda = 1e5, max.iter = 20)$correction
+#' corrected <- baseline_arpls(spectra, lambda = 1e5, max_iter = 20)$correction
 #'
 #' # the K I 769.90 nm line, normalized to the C I 247.86 nm line of the matrix
 #' lines <- line_intensities(corrected, c(C = 247.856, K = 769.896))

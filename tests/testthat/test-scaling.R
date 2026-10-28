@@ -11,7 +11,7 @@ test_that("msc removes additive and multiplicative effects", {
   expect_equal(as.matrix(res$correction), matrix(ref, 10, 50, byrow = TRUE), ignore_attr = TRUE)
   expect_equal(res$offset, a)
   expect_equal(res$slope, b)
-  expect_equal(as.matrix(msc(x, xref = ref, drop.offset = FALSE)$correction), x / b, ignore_attr = TRUE)
+  expect_equal(as.matrix(msc(x, xref = ref, drop_offset = FALSE)$correction), x / b, ignore_attr = TRUE)
   # default reference: corrected spectra all become proportional to the median spectrum
   res2 <- msc(x)
   expect_lt(max(apply(as.matrix(res2$correction), 2, stats::sd)), 1e-10)
@@ -41,14 +41,14 @@ test_that("pareto divides by the square root of the standard deviation", {
   expect_warning(pareto_scale(cbind(m, 1)), "zero standard deviation")
   m_na <- m
   m_na[1, 1] <- NA
-  expect_false(anyNA(pareto_scale(m_na, drop.na = TRUE)[-1, ]))
+  expect_false(anyNA(pareto_scale(m_na, drop_na = TRUE)[-1, ]))
 })
 
 test_that("minmax rescales to [a, b]", {
   expect_equal(minmax(c(2, 4, 6, 10)), c(0, 0.25, 0.5, 1))
   expect_equal(range(minmax(stats::rnorm(20), a = -1, b = 1)), c(-1, 1))
   expect_equal(minmax(c(1, NA, 3)), c(0, 1))
-  expect_equal(minmax(c(1, NA, 3), drop.na = FALSE), c(0, NA, 1))
+  expect_equal(minmax(c(1, NA, 3), drop_na = FALSE), c(0, NA, 1))
   expect_equal(minmax(c(5, 5)), c(0, 0))
   expect_error(minmax(1:3, a = 1, b = 0), "greater")
 })
@@ -59,7 +59,7 @@ test_that("center subtracts column means or medians", {
   expect_equal(attr(center(m), "center"), colMeans(m))
   m_na <- m
   m_na[1, 1] <- NA
-  expect_equal(sum(is.na(center(m_na, drop.na = TRUE))), 1)
+  expect_equal(sum(is.na(center(m_na, drop_na = TRUE))), 1)
   expect_error(center(m, "mode"), "Invalid method")
   expect_error(center("a"), "numeric")
 })

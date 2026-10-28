@@ -4,7 +4,13 @@
 \alias{baseline_arpls}
 \title{Asymmetrically Reweighted Penalized Least Squares}
 \usage{
-baseline_arpls(x, lambda = 1000, ratio = 0.05, max.iter = 10)
+baseline_arpls(
+  x,
+  lambda = 1000,
+  ratio = 0.05,
+  max_iter = 10,
+  max.iter = deprecated()
+)
 }
 \arguments{
 \item{x}{A numeric matrix or data frame, with one spectrum per row.}
@@ -13,7 +19,9 @@ baseline_arpls(x, lambda = 1000, ratio = 0.05, max.iter = 10)
 
 \item{ratio}{A numeric value specifying the convergence ratio for the iterative algorithm. The algorithm stops when the relative change in the weights is less than this ratio. Typical values are between 0.01 and 0.1. Default is 0.05.}
 
-\item{max.iter}{Maximum number of iterations for the algorithm. Default is 10.}
+\item{max_iter}{Maximum number of iterations for the algorithm. Default is 10.}
+
+\item{max.iter}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{max_iter}.}
 }
 \value{
 A list containing two tibbles:

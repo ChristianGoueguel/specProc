@@ -13,7 +13,7 @@ test_that("summary_stats computes the classical statistics", {
   expect_equal(res$sd, round(c(stats::sd(1:5), stats::sd(seq(2, 10, 2)), stats::sd(c(3, 6, 12, 15))), 2))
   expect_equal(res$count, c(5, 5, 4))
   expect_equal(res$range, c(4, 8, 12))
-  res_na <- summary_stats(test_data, drop.na = FALSE)
+  res_na <- summary_stats(test_data, drop_na = FALSE)
   expect_true(is.na(res_na$mean[3]))
   expect_equal(res_na$count[3], 5)
 })

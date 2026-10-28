@@ -41,7 +41,8 @@
 #' These formulas are explicitly derived and optimized for the scenario where `k = 1.5` (Hubert and Vandervieren, 2008).
 #' Consequently, if the user attempts to use a value of `k` other than 1.5, the code will issue a warning message indicating that the formula is only defined for `k = 1.5`.
 #' In such cases, the code will automatically reset `k` to 1.5 and proceed with the calculations using the appropriate formulas and constants.
-#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values are kept in the output (with a missing flag) and ignored when computing the fences.
+#' @param drop_na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), missing values are kept in the output (with a missing flag) and ignored when computing the fences.
+#' @param drop.na `r lifecycle::badge("deprecated")` Use `drop_na`.
 #'
 #' @return A tibble with two columns:
 #'   - `data`: The original numeric values.
@@ -55,7 +56,9 @@
 #'
 #' @export iqr_outliers
 #'
-iqr_outliers <- function(x, k = 1.5, skew = FALSE, drop.na = FALSE) {
+iqr_outliers <- function(x, k = 1.5, skew = FALSE, drop_na = FALSE,
+                         drop.na = deprecated()) {
+  drop_na <- renamed_arg(drop.na, drop_na, "iqr_outliers", "drop.na", "drop_na")
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -69,7 +72,7 @@ iqr_outliers <- function(x, k = 1.5, skew = FALSE, drop.na = FALSE) {
     stop("'skew' must be of type boolean (TRUE or FALSE)")
   }
 
-  if (drop.na) {
+  if (drop_na) {
     x <- x[!is.na(x)]
   }
 

@@ -39,7 +39,7 @@ example, the spectral channels). See \code{\link[recipes:selections]{recipes::se
 \item{num_comp}{The number of orthogonal components to remove.}
 
 \item{options}{A list of further arguments passed to the underlying
-function, such as \code{scale}, \code{tol} or \code{max.iter} for \code{\link[=osc]{osc()}}.}
+function, such as \code{scale}, \code{tol} or \code{max_iter} for \code{\link[=osc]{osc()}}.}
 
 \item{res}{The fitted filter, stored once the step has been trained.}
 

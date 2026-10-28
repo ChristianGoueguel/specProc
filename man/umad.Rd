@@ -4,14 +4,16 @@
 \alias{umad}
 \title{Unbiased Median Absolute Deviation}
 \usage{
-umad(x, method = "hayes", drop.na = TRUE)
+umad(x, method = "hayes", drop_na = TRUE, drop.na = deprecated())
 }
 \arguments{
 \item{x}{A numeric vector.}
 
 \item{method}{A character string specifying the method to use for calculating the correction factor when the number of sample is more than 100. The available options are "hayes" (default) and "williams".}
 
-\item{drop.na}{A logical value indicating whether to remove missing values (NA) from the calculations. If \code{TRUE} (the default), missing values will be removed. If \code{FALSE}, missing values will be included.}
+\item{drop_na}{A logical value indicating whether to remove missing values (NA) from the calculations. If \code{TRUE} (the default), missing values will be removed. If \code{FALSE}, missing values will be included.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 The MAD scale estimate for the input vector \code{x}.

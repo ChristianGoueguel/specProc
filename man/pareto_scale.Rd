@@ -4,13 +4,15 @@
 \alias{pareto_scale}
 \title{Pareto Scaling}
 \usage{
-pareto_scale(x, drop.na = FALSE)
+pareto_scale(x, drop_na = FALSE, drop.na = deprecated())
 }
 \arguments{
 \item{x}{A numeric matrix or data frame to be scaled.}
 
-\item{drop.na}{A logical value indicating whether to ignore missing values
+\item{drop_na}{A logical value indicating whether to ignore missing values
 (NA) when computing the standard deviations. Default is \code{FALSE}.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 A numeric matrix (or a tibble if \code{x} is a data frame) with the same

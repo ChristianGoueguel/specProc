@@ -21,7 +21,8 @@
 #' @author Christian L. Goueguel
 #'
 #' @param x A numeric vector.
-#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when `x` contains missing values.
+#' @param drop_na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when `x` contains missing values.
+#' @param drop.na `r lifecycle::badge("deprecated")` Use `drop_na`.
 #'
 #' @return The biweight midvariance of the input vector.
 #'
@@ -33,7 +34,9 @@
 #'
 #' @export biweight_midvariance
 #'
-biweight_midvariance <- function(x, drop.na = FALSE) {
+biweight_midvariance <- function(x, drop_na = FALSE,
+                                 drop.na = deprecated()) {
+  drop_na <- renamed_arg(drop.na, drop_na, "biweight_midvariance", "drop.na", "drop_na")
 
   if (missing(x)) {
     stop("Input 'x' must be provided.")
@@ -41,9 +44,9 @@ biweight_midvariance <- function(x, drop.na = FALSE) {
   if (!is.numeric(x)) {
     stop("Input 'x' must be a numeric vector.")
   }
-  check_flag(drop.na, "drop.na")
+  check_flag(drop_na, "drop_na")
 
-  if (drop.na) {
+  if (drop_na) {
     x <- x[!is.na(x)]
   } else if (anyNA(x)) {
     return(NA_real_)

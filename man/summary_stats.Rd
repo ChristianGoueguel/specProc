@@ -4,7 +4,14 @@
 \alias{summary_stats}
 \title{Classical or Robust Descriptive Statistics}
 \usage{
-summary_stats(x, var = NULL, digits = 2, robust = FALSE, drop.na = TRUE)
+summary_stats(
+  x,
+  var = NULL,
+  digits = 2,
+  robust = FALSE,
+  drop_na = TRUE,
+  drop.na = deprecated()
+)
 }
 \arguments{
 \item{x}{A data frame or tibble.}
@@ -15,7 +22,9 @@ summary_stats(x, var = NULL, digits = 2, robust = FALSE, drop.na = TRUE)
 
 \item{robust}{A logical value indicating whether to compute robust descriptive statistics. If \code{FALSE} (the default), computes the classical descriptive statistics for describing the distribution of a univariate variable.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE} (the default), missing values will be removed. If \code{FALSE}, the statistics of variables containing missing values are \code{NA}.}
+\item{drop_na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE} (the default), missing values will be removed. If \code{FALSE}, the statistics of variables containing missing values are \code{NA}.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 A tibble with one row per variable. The classical statistics are the mean,

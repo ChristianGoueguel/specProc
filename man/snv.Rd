@@ -4,13 +4,15 @@
 \alias{snv}
 \title{Standard Normal Variate}
 \usage{
-snv(x, drop.na = TRUE)
+snv(x, drop_na = TRUE, drop.na = deprecated())
 }
 \arguments{
 \item{x}{A numeric matrix or data frame.}
 
-\item{drop.na}{A logical value indicating whether to remove spectra (rows)
+\item{drop_na}{A logical value indicating whether to remove spectra (rows)
 containing missing values. If \code{TRUE} (the default), such rows are removed.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 A list with the following components:

@@ -12,8 +12,10 @@ osc(
   scale = FALSE,
   ncomp = 10,
   tol = 0.001,
-  max.iter = 10,
-  pls.ncomp = 5
+  max_iter = 10,
+  pls_ncomp = 5,
+  max.iter = deprecated(),
+  pls.ncomp = deprecated()
 )
 }
 \arguments{
@@ -31,9 +33,11 @@ osc(
 
 \item{tol}{A numeric value representing the tolerance for convergence. The default value is 1e-3.}
 
-\item{max.iter}{An integer representing the maximum number of iterations. The default value is 10.}
+\item{max_iter}{An integer representing the maximum number of iterations. The default value is 10.}
 
-\item{pls.ncomp}{An integer giving the number of PLS components used to compute the weights in Wold's method. Default is 5.}
+\item{pls_ncomp}{An integer giving the number of PLS components used to compute the weights in Wold's method. Default is 5.}
+
+\item{max.iter, pls.ncomp}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{max_iter} and \code{pls_ncomp}.}
 }
 \value{
 An object of class \code{specproc_osc} (a list), which \link[=predict.specproc_filter]{predict()} applies to new spectra, with the following components:

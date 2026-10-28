@@ -1,7 +1,7 @@
 spec <- make_spectra(n = 4, p = 150)
 
 test_that("baseline_als (ALS) matches a dense reference implementation", {
-  res <- baseline_als(spec$x, lambda = 1e4, p = 0.01, max.iter = 20)
+  res <- baseline_als(spec$x, lambda = 1e4, p = 0.01, max_iter = 20)
   expect_named(res, c("correction", "background"))
   expect_s3_class(res$correction, "tbl_df")
   expect_equal(dim(res$background), dim(spec$x))
@@ -15,7 +15,7 @@ test_that("baseline_als (ALS) matches a dense reference implementation", {
 })
 
 test_that("baseline_arpls matches a dense reference implementation", {
-  res <- baseline_arpls(spec$x, lambda = 1e4, ratio = 0.05, max.iter = 20)
+  res <- baseline_arpls(spec$x, lambda = 1e4, ratio = 0.05, max_iter = 20)
   for (i in 1:2) {
     ref <- dense_arpls(spec$x[i, ], 1e4, 0.05, 20)
     expect_equal(unlist(res$background[i, ], use.names = FALSE), ref, tolerance = 1e-7)
@@ -24,10 +24,10 @@ test_that("baseline_arpls matches a dense reference implementation", {
 
 test_that("penalized baselines recover a smooth continuum under emission lines", {
   # noise sd = 0.5; ALS sits slightly below the noise, arPLS in its middle
-  res <- baseline_als(spec$x, lambda = 1e3, p = 0.01, max.iter = 30)
+  res <- baseline_als(spec$x, lambda = 1e3, p = 0.01, max_iter = 30)
   err <- abs(as.matrix(res$background) - spec$background)
   expect_lt(stats::median(err), 1)
-  res2 <- baseline_arpls(spec$x, lambda = 1e3, max.iter = 30)
+  res2 <- baseline_arpls(spec$x, lambda = 1e3, max_iter = 30)
   err2 <- abs(as.matrix(res2$background) - spec$background)
   expect_lt(stats::median(err2), 0.2)
 })

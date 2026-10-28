@@ -7,7 +7,7 @@ test_that("biweight location is robust and exact for symmetric data", {
   expect_lt(abs(biweight_location(x) - 50), 1.5)
   expect_lt(abs(biweight_location(z)), 0.03)
   expect_equal(biweight_location(c(1, 2, NA, 4, 5)), NA_real_)
-  expect_equal(biweight_location(c(1, 2, NA, 4, 5), drop.na = TRUE), 3)
+  expect_equal(biweight_location(c(1, 2, NA, 4, 5), drop_na = TRUE), 3)
   expect_error(biweight_location(c(1, 1, 1)), "constant")
   expect_error(biweight_location("a"), "numeric")
 })
@@ -45,7 +45,7 @@ test_that("Rousseeuw-Croux estimators are consistent at the normal", {
   expect_equal(rousseeuw_croux(z, "Sn"), 1, tolerance = 0.02)
   expect_equal(rousseeuw_croux(z, "Qn"), 1, tolerance = 0.02)
   expect_equal(rousseeuw_croux(c(1, 2, NA, 5)), NA_real_)
-  expect_type(rousseeuw_croux(c(1, 2, NA, 5, 9), drop.na = TRUE), "double")
+  expect_type(rousseeuw_croux(c(1, 2, NA, 5, 9), drop_na = TRUE), "double")
   expect_error(rousseeuw_croux(c(3, 3, 3)), "constant")
 })
 

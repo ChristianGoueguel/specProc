@@ -9,8 +9,9 @@
 #' transpose of the input data.
 #'
 #' @param x A numeric matrix or data frame.
-#' @param drop.na A logical value indicating whether to remove spectra (rows)
+#' @param drop_na A logical value indicating whether to remove spectra (rows)
 #' containing missing values. If `TRUE` (the default), such rows are removed.
+#' @param drop.na `r lifecycle::badge("deprecated")` Use `drop_na`.
 #'
 #' @return A list with the following components:
 #'   \item{`correction`}{The SNV-scaled data.}
@@ -24,23 +25,25 @@
 #' spectra <- forageLIBS[-(1:14)]  # the spectral channels
 #' corrected <- snv(spectra)$correction
 #' corrected[1:3, 1:4]
-snv <- function(x, drop.na = TRUE) {
+snv <- function(x, drop_na = TRUE,
+                drop.na = deprecated()) {
+  drop_na <- renamed_arg(drop.na, drop_na, "snv", "drop.na", "drop_na")
 
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!is.logical(drop.na)) {
-    stop("'drop.na' must be a logical value (TRUE or FALSE).")
+  if (!is.logical(drop_na)) {
+    stop("'drop_na' must be a logical value (TRUE or FALSE).")
   }
   x <- tryCatch(as_numeric_matrix(x, "x"), error = function(e) {
     stop("Input 'x' must be a numeric matrix or data frame.", call. = FALSE)
   })
-  if (drop.na) {
+  if (drop_na) {
     x <- x[stats::complete.cases(x), , drop = FALSE]
   }
 
-  mns <- rowMeans(x, na.rm = drop.na)
-  sds <- apply(x, 1, stats::sd, na.rm = drop.na)
+  mns <- rowMeans(x, na.rm = drop_na)
+  sds <- apply(x, 1, stats::sd, na.rm = drop_na)
   if (any(sds == 0, na.rm = TRUE)) {
     warning("Some spectra are constant (zero standard deviation); they are only centered.")
     sds[sds == 0] <- 1

@@ -4,14 +4,21 @@
 \alias{rousseeuw_croux}
 \title{Rousseeuw-Croux Scale Estimators}
 \usage{
-rousseeuw_croux(x, estimator = c("Sn", "Qn"), drop.na = FALSE)
+rousseeuw_croux(
+  x,
+  estimator = c("Sn", "Qn"),
+  drop_na = FALSE,
+  drop.na = deprecated()
+)
 }
 \arguments{
 \item{x}{A numeric vector of data values.}
 
 \item{estimator}{A character string indicating whether to calculate the "Sn" or "Qn" estimator.}
 
-\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the input vector. If \code{FALSE} (default) and \code{x} contains missing values, \code{NA} is returned.}
+\item{drop_na}{A logical value indicating whether to remove missing values (\code{NA}) from the input vector. If \code{FALSE} (default) and \code{x} contains missing values, \code{NA} is returned.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 A numeric value representing the calculated Sn or Qn scale estimator.

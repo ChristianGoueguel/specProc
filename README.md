@@ -118,7 +118,7 @@ per_spectrum <- \(data, step, ...) {
 ```
 
 ``` r
-corrected <- per_spectrum(forageLIBS, step_baseline, lambda = 1e5, options = list(max.iter = 20))
+corrected <- per_spectrum(forageLIBS, step_baseline, lambda = 1e5, options = list(max_iter = 20))
 area <- per_spectrum(corrected, step_spectral_norm, method = "area")
 carbon <- per_spectrum(corrected, step_line_ratio, reference = 247.856, window = 0.15)
 compressed <- per_spectrum(carbon, step_wavelet, level = 3)

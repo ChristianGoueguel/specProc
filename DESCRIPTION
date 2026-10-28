@@ -1,6 +1,6 @@
 Package: specProc
 Type: Package
-Title: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy
+Title: Analysis of Laser-Induced Breakdown Spectroscopy Data
 Version: 0.8.3.9000
 Authors@R:
     person("Christian L.", "Goueguel", , "christian.goueguel@gmail.com",

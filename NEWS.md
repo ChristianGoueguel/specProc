@@ -161,6 +161,9 @@
 
 ## Improvements
 
+* The title of the package is now "Analysis of Laser-Induced Breakdown
+  Spectroscopy Data": it covers plasma diagnostics, calibration and robust
+  chemometrics, not only preprocessing.
 * The labels of the plots no longer overlap: they are placed by ggrepel
   (now imported), away from each other and from the points, with a segment
   to their point when moved far. This applies to the outlying samples of
@@ -287,6 +290,27 @@
 
 ## Breaking changes
 
+* The functions renamed in specProc 0.2.0 and 0.8.0 (`peakfit()`,
+  `multipeakfit()`, `plotfit()`, `plotSpec()`, `summaryStats()`,
+  `tukeyGH()`, `boltzmann_plot()` and the others listed in
+  `?"specProc-defunct"`), deprecated until 0.8.3, are now defunct: they stop
+  with an error that names the new function, and will be removed in a later
+  release.
+* Arguments with dotted names are renamed in snake_case, as in the rest of
+  the package. The former names still work, with a deprecation warning:
+  - `max.iter` becomes `max_iter` in `baseline_als()`, `baseline_arpls()`,
+    `baseline_lsp()`, `osc()`, `peak_fit()` and `multipeak_fit()`;
+  - `drop.na` becomes `drop_na` (as in `plot_spectra()`) in
+    `biweight_location()`, `biweight_midvariance()`, `biweight_scale()`,
+    `center()`, `iqr_outliers()`, `medcouple_weight()`, `minmax()`, `msc()`,
+    `normalize()`, `pareto_scale()`, `poisson_scale()`, `quantile_weight()`,
+    `rousseeuw_croux()`, `snv()`, `summary_stats()`, `umad()` and `zscore()`;
+  - `drop.offset` becomes `drop_offset` in `msc()` and `step_msc()`, and
+    `pls.ncomp` becomes `pls_ncomp` in `osc()`;
+  - in `peak_fit()` and `multipeak_fit()`, `wavelength = c(min, max)`
+    replaces `wlgth.min` and `wlgth.max`, as the wavelength range of
+    `nist_lines()` and `libs_lines()`. Calls that gave the arguments after
+    `A` by position must name them.
 * `generalized_boxplot()` flags fewer observations: its default detection
   rate `alpha` is now about 0.7% (`2 * pnorm(-4 * qnorm(0.75))`), that of
   Tukey's boxplot for normal data, as in the authors' implementation (the

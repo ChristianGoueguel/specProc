@@ -10,11 +10,13 @@ peak_fit(
   wL = NULL,
   wG = NULL,
   A = NULL,
-  wlgth.min = NULL,
-  wlgth.max = NULL,
+  wavelength = NULL,
   id = NULL,
-  max.iter = 200,
-  fixed = NULL
+  max_iter = 200,
+  fixed = NULL,
+  max.iter = deprecated(),
+  wlgth.min = deprecated(),
+  wlgth.max = deprecated()
 )
 }
 \arguments{
@@ -31,17 +33,19 @@ can be given with \code{id}.}
 
 \item{A}{A numeric specifying the peak area (initial guess)}
 
-\item{wlgth.min}{A numeric specifying the lower bound of the wavelength subset}
-
-\item{wlgth.max}{A numeric specifying the upper bound of the wavelength subset}
+\item{wavelength}{The wavelength range of the fit, \code{c(min, max)} in nm, or
+\code{NULL} (default) for all the channels.}
 
 \item{id}{A character specifying the name of the column holding the spectra id (optional)}
 
-\item{max.iter}{A numeric specifying the maximum number of iteration (200 by default)}
+\item{max_iter}{A numeric specifying the maximum number of iteration (200 by default)}
 
 \item{fixed}{The widths held at their given values (\code{wG}, \code{wL}) instead
 of being fitted: \code{"wG"}, \code{"wL"} or both. Default is \code{NULL} (all
 widths fitted).}
+
+\item{max.iter, wlgth.min, wlgth.max}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
+\code{max_iter}, and \code{wavelength = c(wlgth.min, wlgth.max)}.}
 }
 \value{
 A tibble with one row per spectrum and the columns:

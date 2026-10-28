@@ -16,7 +16,8 @@
 #'
 #' @param x A numeric vector of data values.
 #' @param estimator A character string indicating whether to calculate the "Sn" or "Qn" estimator.
-#' @param drop.na A logical value indicating whether to remove missing values (`NA`) from the input vector. If `FALSE` (default) and `x` contains missing values, `NA` is returned.
+#' @param drop_na A logical value indicating whether to remove missing values (`NA`) from the input vector. If `FALSE` (default) and `x` contains missing values, `NA` is returned.
+#' @param drop.na `r lifecycle::badge("deprecated")` Use `drop_na`.
 #' @return A numeric value representing the calculated Sn or Qn scale estimator.
 #'
 #' @author Christian L. Goueguel
@@ -35,7 +36,9 @@
 #'   Sn = rousseeuw_croux(fe, estimator = "Sn"), Qn = rousseeuw_croux(fe, estimator = "Qn"))
 #'
 #' @export rousseeuw_croux
-rousseeuw_croux <- function(x, estimator = c("Sn", "Qn"), drop.na = FALSE) {
+rousseeuw_croux <- function(x, estimator = c("Sn", "Qn"), drop_na = FALSE,
+                            drop.na = deprecated()) {
+  drop_na <- renamed_arg(drop.na, drop_na, "rousseeuw_croux", "drop.na", "drop_na")
   if (missing(x)) {
     stop("Input 'x' must be provided.")
   }
@@ -43,9 +46,9 @@ rousseeuw_croux <- function(x, estimator = c("Sn", "Qn"), drop.na = FALSE) {
     stop("'x' must be a numeric vector.")
   }
   estimator <- match.arg(estimator)
-  check_flag(drop.na, "drop.na")
+  check_flag(drop_na, "drop_na")
 
-  if (drop.na) {
+  if (drop_na) {
     x <- x[!is.na(x)]
   } else if (anyNA(x)) {
     return(NA_real_)

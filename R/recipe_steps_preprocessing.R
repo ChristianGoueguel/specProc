@@ -42,8 +42,8 @@
 #'   methods. Default is 1000.
 #' @param degree The polynomial degree of the `"lsp"` method. Default is 4.
 #' @param options A list of further arguments passed to the baseline
-#'   function: `ratio` and `max.iter` for [baseline_arpls()], `p` and
-#'   `max.iter` for [baseline_als()], `tol` and `max.iter` for
+#'   function: `ratio` and `max_iter` for [baseline_arpls()], `p` and
+#'   `max_iter` for [baseline_als()], `tol` and `max_iter` for
 #'   [baseline_lsp()].
 #' @param columns The names of the selected columns, stored once the step has
 #'   been trained.
@@ -147,12 +147,13 @@ step_snv <- function(recipe, ..., role = NA, trained = FALSE, columns = NULL,
 #' @inheritParams step_baseline
 #' @param robust A logical: use the median (`TRUE`, default) or the mean of
 #'   the training spectra as the reference.
-#' @param drop.offset A logical: remove the additive offset (`TRUE`,
+#' @param drop_offset A logical: remove the additive offset (`TRUE`,
 #'   default) or only the multiplicative effect.
 #' @param window An optional list of column index vectors (within the
 #'   selected columns) for piecewise MSC. See [msc()].
 #' @param reference The reference spectrum, stored once the step has been
 #'   trained.
+#' @param drop.offset `r lifecycle::badge("deprecated")` Use `drop_offset`.
 #'
 #' @seealso [msc()], [step_emsc()]
 #' @export
@@ -167,12 +168,14 @@ step_snv <- function(recipe, ..., role = NA, trained = FALSE, columns = NULL,
 #' prepped <- recipes::prep(rec)
 #' recipes::bake(prepped, new_data = dat[301:368, ])
 step_msc <- function(recipe, ..., role = NA, trained = FALSE, robust = TRUE,
-                     drop.offset = TRUE, window = NULL, reference = NULL,
-                     columns = NULL, skip = FALSE, id = recipes::rand_id("msc")) {
+                     drop_offset = TRUE, window = NULL, reference = NULL,
+                     columns = NULL, skip = FALSE, id = recipes::rand_id("msc"),
+                     drop.offset = deprecated()) {
+  drop_offset <- renamed_arg(drop.offset, drop_offset, "step_msc", "drop.offset", "drop_offset")
   rlang::check_installed("recipes")
   recipes::add_step(recipe, specproc_step_new(
     "msc", terms = rlang::enquos(...), role = role, trained = trained,
-    robust = robust, drop.offset = drop.offset, window = window,
+    robust = robust, drop_offset = drop_offset, window = window,
     reference = reference, columns = columns, skip = skip, id = id
   ))
 }
@@ -372,7 +375,7 @@ prep_preprocessing_step <- function(x, training, info = NULL, ...) {
   switch(
     class(x)[1],
     step_msc = {
-      x$reference <- msc(xmat, robust = x$robust, window = x$window, drop.na = FALSE)$reference
+      x$reference <- msc(xmat, robust = x$robust, window = x$window, drop_na = FALSE)$reference
     },
     step_emsc = {
       check_count(x$degree, "degree", lower = 0)
@@ -389,7 +392,7 @@ prep_preprocessing_step <- function(x, training, info = NULL, ...) {
     },
     step_poisson_scale = {
       check_number(x$offset, "offset", lower = 0)
-      sc <- poisson_scale(xmat, drop.na = FALSE, options = list(offset = x$offset, mode = 1))$sc
+      sc <- poisson_scale(xmat, drop_na = FALSE, options = list(offset = x$offset, mode = 1))$sc
       x$scales <- stats::setNames(sc, cols)
     },
     step_baseline = {
@@ -417,9 +420,9 @@ bake_preprocessing_step <- function(object, new_data, ...) {
       als = do.call(baseline_als, c(list(xmat, lambda = object$lambda), opts))$correction,
       lsp = do.call(baseline_lsp, c(list(xmat, degree = object$degree), opts))$correction
     ),
-    step_snv = snv(xmat, drop.na = FALSE)$correction,
-    step_msc = msc(xmat, xref = object$reference, drop.offset = object$drop.offset,
-                   window = object$window, drop.na = FALSE)$correction,
+    step_snv = snv(xmat, drop_na = FALSE)$correction,
+    step_msc = msc(xmat, xref = object$reference, drop_offset = object$drop_offset,
+                   window = object$window, drop_na = FALSE)$correction,
     step_emsc = stats::predict(object$res, xmat),
     step_pareto_scale = ,
     step_poisson_scale = sweep(xmat, 2, object$scales, "/")

@@ -24,7 +24,8 @@
 #' @param x A numeric matrix or data frame, with one spectrum per row.
 #' @param lambda A numeric value specifying the smoothing parameter, which controls the amount of curvature allowed for the baseline. The smaller the lambda, the more curvature in the baseline fitting. Default is 1000.
 #' @param ratio A numeric value specifying the convergence ratio for the iterative algorithm. The algorithm stops when the relative change in the weights is less than this ratio. Typical values are between 0.01 and 0.1. Default is 0.05.
-#' @param max.iter Maximum number of iterations for the algorithm. Default is 10.
+#' @param max_iter Maximum number of iterations for the algorithm. Default is 10.
+#' @param max.iter `r lifecycle::badge("deprecated")` Use `max_iter`.
 #'
 #' @return A list containing two tibbles:
 #' \itemize{
@@ -52,7 +53,9 @@
 #'      main = "Corrected spectrum")
 #' abline(h = 0, col = "red", lty = 2)
 #' par(oldpar)
-baseline_arpls <- function(x, lambda = 1e3, ratio = 0.05, max.iter = 10) {
+baseline_arpls <- function(x, lambda = 1e3, ratio = 0.05, max_iter = 10,
+                           max.iter = deprecated()) {
+  max_iter <- renamed_arg(max.iter, max_iter, "baseline_arpls", "max.iter", "max_iter")
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -65,8 +68,8 @@ baseline_arpls <- function(x, lambda = 1e3, ratio = 0.05, max.iter = 10) {
   if (ratio <= 0) {
     stop("'ratio' must be positive.")
   }
-  if (!is.numeric(max.iter) || length(max.iter) != 1) {
-    stop("'max.iter' must be a single numeric value.")
+  if (!is.numeric(max_iter) || length(max_iter) != 1) {
+    stop("'max_iter' must be a single numeric value.")
   }
-  baseline_fit(x, lambda, ratio, max.iter, method = 1L)
+  baseline_fit(x, lambda, ratio, max_iter, method = 1L)
 }

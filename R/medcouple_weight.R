@@ -31,7 +31,8 @@
 #'
 #' @author Christian L. Goueguel
 #' @param x A numeric vector.
-#' @param drop.na Logical value indicating whether to remove missing values (NA). If `FALSE` (default) and `x` contains missing values, `NA` is returned.
+#' @param drop_na Logical value indicating whether to remove missing values (NA). If `FALSE` (default) and `x` contains missing values, `NA` is returned.
+#' @param drop.na `r lifecycle::badge("deprecated")` Use `drop_na`.
 #'
 #' @return A tibble with two numeric columns:
 #'  - `LMC`: Left medcouple.
@@ -46,18 +47,20 @@
 #'
 #' @export medcouple_weight
 #'
-medcouple_weight <- function(x, drop.na = FALSE) {
+medcouple_weight <- function(x, drop_na = FALSE,
+                             drop.na = deprecated()) {
+  drop_na <- renamed_arg(drop.na, drop_na, "medcouple_weight", "drop.na", "drop_na")
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
   if (!is.numeric(x)) {
     stop("The input 'x' must be a numeric vector.")
   }
-  if (!is.logical(drop.na)) {
-    stop("The input 'drop.na' must be a logical value (TRUE or FALSE).")
+  if (!is.logical(drop_na)) {
+    stop("The input 'drop_na' must be a logical value (TRUE or FALSE).")
   }
 
-  if (drop.na) {
+  if (drop_na) {
     x <- x[!is.na(x)]
   } else if (anyNA(x)) {
     return(tibble::tibble(LMC = NA_real_, RMC = NA_real_))

@@ -4,7 +4,13 @@
 \alias{quantile_weight}
 \title{Quantile Tail Weight Measure}
 \usage{
-quantile_weight(x, p = 0.125, q = 0.875, drop.na = FALSE)
+quantile_weight(
+  x,
+  p = 0.125,
+  q = 0.875,
+  drop_na = FALSE,
+  drop.na = deprecated()
+)
 }
 \arguments{
 \item{x}{A numeric vector.}
@@ -13,7 +19,9 @@ quantile_weight(x, p = 0.125, q = 0.875, drop.na = FALSE)
 
 \item{q}{A numeric value between 0.5 and 1 (\code{q = 0.875} by default).}
 
-\item{drop.na}{Logical value indicating whether to remove missing values (NA). If \code{FALSE} (default) and \code{x} contains missing values, \code{NA} is returned.}
+\item{drop_na}{Logical value indicating whether to remove missing values (NA). If \code{FALSE} (default) and \code{x} contains missing values, \code{NA} is returned.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 A tibble with two numeric columns:

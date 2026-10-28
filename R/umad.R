@@ -29,7 +29,8 @@
 #'
 #' @param x A numeric vector.
 #' @param method A character string specifying the method to use for calculating the correction factor when the number of sample is more than 100. The available options are "hayes" (default) and "williams".
-#' @param drop.na A logical value indicating whether to remove missing values (NA) from the calculations. If `TRUE` (the default), missing values will be removed. If `FALSE`, missing values will be included.
+#' @param drop_na A logical value indicating whether to remove missing values (NA) from the calculations. If `TRUE` (the default), missing values will be removed. If `FALSE`, missing values will be included.
+#' @param drop.na `r lifecycle::badge("deprecated")` Use `drop_na`.
 #'
 #' @return The MAD scale estimate for the input vector `x`.
 #'
@@ -40,21 +41,23 @@
 #' x <- c(stats::rnorm(50), 10, 12)  # two outliers
 #' umad(x)
 #' stats::mad(x)
-umad <- function(x, method = "hayes", drop.na = TRUE) {
+umad <- function(x, method = "hayes", drop_na = TRUE,
+                 drop.na = deprecated()) {
+  drop_na <- renamed_arg(drop.na, drop_na, "umad", "drop.na", "drop_na")
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
   if (!is.numeric(x)) {
     stop("'x' must be a numeric vector.")
   }
-  if (!is.logical(drop.na) || length(drop.na) != 1) {
-    stop("'drop.na' must be a single logical value (TRUE or FALSE).")
+  if (!is.logical(drop_na) || length(drop_na) != 1) {
+    stop("'drop_na' must be a single logical value (TRUE or FALSE).")
   }
   if (!is.character(method) || !(method %in% c("hayes", "williams"))) {
     stop("'method' must be either 'hayes' or 'williams'.")
   }
 
-  if (drop.na) {
+  if (drop_na) {
     x <- x[!is.na(x)]
   }
 

@@ -60,13 +60,23 @@ test_that("peak_fit fits several spectra, with ids and wavelength windows", {
   df <- as.data.frame(spectra)
   names(df) <- wl
   df <- cbind(sample = c("s1", "s2"), df)
-  res <- peak_fit(df, profile = "gaussian", id = "sample", wlgth.min = 395.5, wlgth.max = 396.8)
+  res <- peak_fit(df, profile = "gaussian", id = "sample", wavelength = c(395.5, 396.8))
   expect_equal(res$sample, c("s1", "s2"))
   xc <- sapply(res$tidied, function(t) t$estimate[t$term == "xc"])
   expect_equal(unname(xc), c(396, 396.3), tolerance = 1e-3)
   expect_true(all(sapply(res$data, function(d) all(d$x >= 395.5 & d$x <= 396.8))))
   expect_error(peak_fit(df, id = "nope"), "'id'")
-  expect_error(peak_fit(df, id = "sample", wlgth.min = 397, wlgth.max = 396), "strictly smaller")
+  expect_error(peak_fit(df, id = "sample", wavelength = c(397, 396)), "min < max")
+  rlang::local_options(lifecycle_verbosity = "warning")
+  # the former bounds, each with a deprecation warning
+  expect_warning(lo <- peak_fit(df, profile = "gaussian", id = "sample", wlgth.min = 395.5),
+                 "wlgth.min")
+  expect_equal(lo$data, peak_fit(df, profile = "gaussian", id = "sample",
+                                 wavelength = c(395.5, Inf))$data)
+  expect_warning(hi <- peak_fit(df, profile = "gaussian", id = "sample", wlgth.max = 396.8),
+                 "wlgth.max")
+  expect_equal(hi$data, peak_fit(df, profile = "gaussian", id = "sample",
+                                 wavelength = c(-Inf, 396.8))$data)
 })
 
 test_that("peak_fit validates its inputs", {
@@ -74,7 +84,7 @@ test_that("peak_fit validates its inputs", {
   expect_error(peak_fit(), "Missing 'data' argument.")
   expect_error(peak_fit(as.matrix(df)), "data frame")
   expect_error(peak_fit(df, profile = "foo"), "must be")
-  expect_error(peak_fit(df, max.iter = "a"), "numeric")
+  expect_error(peak_fit(df, max_iter = "a"), "numeric")
   expect_error(peak_fit(df, profile = "gaussian", A = -1), "positive")
 })
 
@@ -102,7 +112,7 @@ test_that("multipeak_fit resolves overlapping lines", {
 
 test_that("a failing fit gives a warning, not an error", {
   flat <- wide_spectrum(wl, rep(1, length(wl)))
-  expect_warning(res <- peak_fit(flat, profile = "gaussian", max.iter = 5), "Fitting failed")
+  expect_warning(res <- peak_fit(flat, profile = "gaussian", max_iter = 5), "Fitting failed")
   expect_null(res$fit[[1]])
 })
 
@@ -309,10 +319,10 @@ test_that("multipeak_fit locks centers, shares widths and fixes area ratios", {
 
   # TRUE constrains every line: one shift, one width
   all_locked <- multipeak_fit(spec, peaks[1:2], profiles = "gaussian", lock_centers = TRUE,
-                              share_widths = TRUE, wlgth.max = 396.25)
+                              share_widths = TRUE, wavelength = c(395, 396.25))
   expect_true(all(c("shift", "wG") %in% names(stats::coef(all_locked$fit[[1]]))))
   # unconstrained fits keep their parameters
-  free <- multipeak_fit(spec, peaks[1:2], profiles = "gaussian", wlgth.max = 396.25)
+  free <- multipeak_fit(spec, peaks[1:2], profiles = "gaussian", wavelength = c(395, 396.25))
   expect_named(stats::coef(free$fit[[1]]), c("y0", "xc_1", "wG_1", "A_1", "xc_2", "wG_2", "A_2"))
   expect_equal(free$tidied[[1]]$std.error, unname(sqrt(diag(stats::vcov(free$fit[[1]])))))
 

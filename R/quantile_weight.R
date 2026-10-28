@@ -41,7 +41,8 @@
 #' @param x A numeric vector.
 #' @param p A numeric value between 0 and 0.5 (`p = 0.125` by default).
 #' @param q A numeric value between 0.5 and 1 (`q = 0.875` by default).
-#' @param drop.na Logical value indicating whether to remove missing values (NA). If `FALSE` (default) and `x` contains missing values, `NA` is returned.
+#' @param drop_na Logical value indicating whether to remove missing values (NA). If `FALSE` (default) and `x` contains missing values, `NA` is returned.
+#' @param drop.na `r lifecycle::badge("deprecated")` Use `drop_na`.
 #'
 #' @return A tibble with two numeric columns:
 #'  - `LQW`: Left quantile weight.
@@ -56,20 +57,22 @@
 #'
 #' @export quantile_weight
 #'
-quantile_weight <- function(x, p = 0.125, q = 0.875, drop.na = FALSE) {
+quantile_weight <- function(x, p = 0.125, q = 0.875, drop_na = FALSE,
+                            drop.na = deprecated()) {
+  drop_na <- renamed_arg(drop.na, drop_na, "quantile_weight", "drop.na", "drop_na")
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
   if (!is.numeric(x)) {
     stop("The input 'x' must be a numeric vector.")
   }
-  if (!is.logical(drop.na)) {
-    stop("The input 'drop.na' must be a logical value (TRUE or FALSE).")
+  if (!is.logical(drop_na)) {
+    stop("The input 'drop_na' must be a logical value (TRUE or FALSE).")
   }
   check_number(p, "p", lower = 0, upper = 0.5, lower_open = TRUE, upper_open = TRUE)
   check_number(q, "q", lower = 0.5, upper = 1, lower_open = TRUE, upper_open = TRUE)
 
-  if (drop.na) {
+  if (drop_na) {
     x <- x[!is.na(x)]
   } else if (anyNA(x)) {
     return(tibble::tibble(LQW = NA_real_, RQW = NA_real_))

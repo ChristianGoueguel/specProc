@@ -38,8 +38,8 @@ methods. Default is 1000.}
 \item{degree}{The polynomial degree of the \code{"lsp"} method. Default is 4.}
 
 \item{options}{A list of further arguments passed to the baseline
-function: \code{ratio} and \code{max.iter} for \code{\link[=baseline_arpls]{baseline_arpls()}}, \code{p} and
-\code{max.iter} for \code{\link[=baseline_als]{baseline_als()}}, \code{tol} and \code{max.iter} for
+function: \code{ratio} and \code{max_iter} for \code{\link[=baseline_arpls]{baseline_arpls()}}, \code{p} and
+\code{max_iter} for \code{\link[=baseline_als]{baseline_als()}}, \code{tol} and \code{max_iter} for
 \code{\link[=baseline_lsp]{baseline_lsp()}}.}
 
 \item{columns}{The names of the selected columns, stored once the step has

@@ -7,10 +7,12 @@
 msc(
   x,
   xref = NULL,
-  drop.offset = TRUE,
+  drop_offset = TRUE,
   robust = TRUE,
   window = NULL,
-  drop.na = TRUE
+  drop_na = TRUE,
+  drop.offset = deprecated(),
+  drop.na = deprecated()
 )
 }
 \arguments{
@@ -20,7 +22,7 @@ Each row represents a sample, and each column represents a spectral variable.}
 \item{xref}{An optional numeric vector representing the reference spectrum.
 If \code{NULL} (default), the mean or median of \code{x} is used as the reference.}
 
-\item{drop.offset}{A logical value indicating whether the additive offset
+\item{drop_offset}{A logical value indicating whether the additive offset
 \eqn{a_i} should be removed from the spectra (default is \code{TRUE}). If \code{FALSE},
 only the multiplicative effect is corrected: \eqn{\textbf{x}_i / b_i}.}
 
@@ -30,8 +32,10 @@ or the mean (\code{FALSE}) of \code{x} is used as \code{xref}.}
 \item{window}{An optional list of numeric vectors specifying the column indices of
 spectral windows. If provided, MSC is performed separately for each window.}
 
-\item{drop.na}{A logical value indicating whether to remove spectra (rows)
+\item{drop_na}{A logical value indicating whether to remove spectra (rows)
 containing missing values. If \code{TRUE} (the default), such rows are removed.}
+
+\item{drop.offset, drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_offset} and \code{drop_na}.}
 }
 \value{
 A list with the following components:

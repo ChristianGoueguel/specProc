@@ -1,8 +1,9 @@
-#' Deprecated functions in specProc
+#' Defunct functions in specProc
 #'
 #' These functions were renamed, most of them in specProc 0.2.0 to follow a
-#' consistent snake_case naming scheme. The old names still work but issue a
-#' deprecation warning and will be removed in a future release.
+#' consistent snake_case naming scheme. They were deprecated until specProc
+#' 0.8.3 and are defunct since 0.9.0: they stop with an error that names the
+#' new function, and will be removed in a future release.
 #'
 #' `gaussian()` was renamed to [gaussian_profile()] without an alias, because
 #' an exported `gaussian()` masks `stats::gaussian()`, the family used by
@@ -33,89 +34,100 @@
 #' 0.8.0, so that they are not confused with [plot_boltzmann()], which
 #' draws their result.
 #'
-#' @param ... Arguments passed to the new function.
-#' @return The result of the new function.
-#' @name specProc-deprecated
+#' @param ... Not used.
+#' @return None: they stop with an error.
+#' @name specProc-defunct
 #' @keywords internal
 NULL
 
-deprecate <- function(old, new) {
+defunct <- function(old, new) {
   force(new)
   function(...) {
-    .Deprecated(new, package = "specProc",
-                msg = sprintf("'%s()' is deprecated; use '%s()' instead.", old, new))
-    get(new, envir = asNamespace("specProc"))(...)
+    .Defunct(new, package = "specProc",
+             msg = sprintf("'%s()' is defunct; use '%s()' instead.", old, new))
   }
 }
 
-#' @rdname specProc-deprecated
-#' @export
-whittaker <- deprecate("whittaker", "baseline_als")
+# The value of a renamed argument: the former one, with a deprecation
+# warning, when the caller used it, and otherwise the new one.
+renamed_arg <- function(old_value, new_value, fn, old, new, details = NULL,
+                        user_env = rlang::caller_env(2)) {
+  if (!lifecycle::is_present(old_value)) {
+    return(new_value)
+  }
+  lifecycle::deprecate_warn("0.9.0", sprintf("%s(%s)", fn, old), sprintf("%s(%s)", fn, new),
+                            details = details, user_env = user_env)
+  old_value
+}
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-lorentzian <- deprecate("lorentzian", "lorentzian_profile")
+whittaker <- defunct("whittaker", "baseline_als")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-pseudo_voigt <- deprecate("pseudo_voigt", "pseudo_voigt_profile")
+lorentzian <- defunct("lorentzian", "lorentzian_profile")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-peakfit <- deprecate("peakfit", "peak_fit")
+pseudo_voigt <- defunct("pseudo_voigt", "pseudo_voigt_profile")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-multipeakfit <- deprecate("multipeakfit", "multipeak_fit")
+peakfit <- defunct("peakfit", "peak_fit")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-plotfit <- deprecate("plotfit", "plot_fit")
+multipeakfit <- defunct("multipeakfit", "multipeak_fit")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-plotSpec <- deprecate("plotSpec", "plot_spectra")
+plotfit <- defunct("plotfit", "plot_fit")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-outlierplot <- deprecate("outlierplot", "plot_outliers")
+plotSpec <- defunct("plotSpec", "plot_spectra")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-directOutlyingness <- deprecate("directOutlyingness", "directional_outlyingness")
+outlierplot <- defunct("outlierplot", "plot_outliers")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-iqrMethod <- deprecate("iqrMethod", "iqr_outliers")
+directOutlyingness <- defunct("directOutlyingness", "directional_outlyingness")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-robustBCYJ <- deprecate("robustBCYJ", "robust_bcyj")
+iqrMethod <- defunct("iqrMethod", "iqr_outliers")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-rousseeuwCroux <- deprecate("rousseeuwCroux", "rousseeuw_croux")
+robustBCYJ <- defunct("robustBCYJ", "robust_bcyj")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-summaryStats <- deprecate("summaryStats", "summary_stats")
+rousseeuwCroux <- defunct("rousseeuwCroux", "rousseeuw_croux")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-tukeyGH <- deprecate("tukeyGH", "tukey_gh")
+summaryStats <- defunct("summaryStats", "summary_stats")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-yGradientglsw <- deprecate("yGradientglsw", "y_gradient_glsw")
+tukeyGH <- defunct("tukeyGH", "tukey_gh")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-pareto <- deprecate("pareto", "pareto_scale")
+yGradientglsw <- defunct("yGradientglsw", "y_gradient_glsw")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-boltzmann_plot <- deprecate("boltzmann_plot", "boltzmann")
+pareto <- defunct("pareto", "pareto_scale")
 
-#' @rdname specProc-deprecated
+#' @rdname specProc-defunct
 #' @export
-saha_boltzmann_plot <- deprecate("saha_boltzmann_plot", "saha_boltzmann")
+boltzmann_plot <- defunct("boltzmann_plot", "boltzmann")
+
+#' @rdname specProc-defunct
+#' @export
+saha_boltzmann_plot <- defunct("saha_boltzmann_plot", "saha_boltzmann")

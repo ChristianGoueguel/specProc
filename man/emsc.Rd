@@ -62,7 +62,7 @@ The coefficients are estimated by least squares, and the corrected spectrum
 is
 \deqn{\textbf{x}_i^{corr} = (\textbf{x}_i - a_i - d_{i1}\lambda - \dots - \sum_j h_{ij}\textbf{k}_j) / b_i}
 With \code{degree = 0} and no interferents, EMSC is identical to \code{\link[=msc]{msc()}} with
-\code{drop.offset = TRUE}.
+\code{drop_offset = TRUE}.
 
 The wavelengths are rescaled to \eqn{[-1, 1]} before the polynomials are
 formed, for numerical stability. Interferent spectra describe variation

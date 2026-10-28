@@ -10,7 +10,8 @@ biweight_location(
   c = 6,
   tol = 1e-06,
   max_iter = 50,
-  drop.na = FALSE
+  drop_na = FALSE,
+  drop.na = deprecated()
 )
 }
 \arguments{
@@ -24,7 +25,9 @@ biweight_location(
 
 \item{max_iter}{Maximum number of iterations (default: 50).}
 
-\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when \code{x} contains missing values.}
+\item{drop_na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when \code{x} contains missing values.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 The biweight location of \code{x}.

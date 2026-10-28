@@ -4,7 +4,13 @@
 \alias{poisson_scale}
 \title{Poisson Scaling}
 \usage{
-poisson_scale(x, sc = NULL, drop.na = TRUE, options = list())
+poisson_scale(
+  x,
+  sc = NULL,
+  drop_na = TRUE,
+  options = list(),
+  drop.na = deprecated()
+)
 }
 \arguments{
 \item{x}{A numeric matrix or data frame.}
@@ -12,11 +18,13 @@ poisson_scale(x, sc = NULL, drop.na = TRUE, options = list())
 \item{sc}{A vector of previously calculated scales. If provided, these scales
 will be applied to the data.}
 
-\item{drop.na}{A logical value indicating whether to remove rows containing
+\item{drop_na}{A logical value indicating whether to remove rows containing
 missing values. If \code{TRUE} (the default), such rows are removed. If \code{FALSE},
 missing values are kept and ignored when computing the means.}
 
 \item{options}{A list of options for Poisson scaling. See the 'Options' section below.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 If \code{sc} is not provided, the function returns a list with the following components:

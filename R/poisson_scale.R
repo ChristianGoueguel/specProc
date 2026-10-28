@@ -11,10 +11,11 @@
 #' @param x A numeric matrix or data frame.
 #' @param sc A vector of previously calculated scales. If provided, these scales
 #' will be applied to the data.
-#' @param drop.na A logical value indicating whether to remove rows containing
+#' @param drop_na A logical value indicating whether to remove rows containing
 #' missing values. If `TRUE` (the default), such rows are removed. If `FALSE`,
 #' missing values are kept and ignored when computing the means.
 #' @param options A list of options for Poisson scaling. See the 'Options' section below.
+#' @param drop.na `r lifecycle::badge("deprecated")` Use `drop_na`.
 #'
 #' @return If `sc` is not provided, the function returns a list with the following components:
 #'   \item{`xs`}{The Poisson-scaled data.}
@@ -38,7 +39,9 @@
 #' head(res$sc)
 #' # the same scales for new spectra
 #' poisson_scale(spectra[301:368, ], sc = res$sc)[1:3, 1:4]
-poisson_scale <- function(x, sc = NULL, drop.na = TRUE, options = list()) {
+poisson_scale <- function(x, sc = NULL, drop_na = TRUE, options = list(),
+                          drop.na = deprecated()) {
+  drop_na <- renamed_arg(drop.na, drop_na, "poisson_scale", "drop.na", "drop_na")
 
   if (missing(x)) {
     stop("Missing 'x' argument.")
@@ -47,8 +50,8 @@ poisson_scale <- function(x, sc = NULL, drop.na = TRUE, options = list()) {
     stop("'x' must be a numeric matrix or data frame.")
   }
 
-  if (!is.logical(drop.na)) {
-    stop("'drop.na' must be a logical value (TRUE or FALSE).")
+  if (!is.logical(drop_na)) {
+    stop("'drop_na' must be a logical value (TRUE or FALSE).")
   }
   x <- as_numeric_matrix(x, "x")
 
@@ -69,7 +72,7 @@ poisson_scale <- function(x, sc = NULL, drop.na = TRUE, options = list()) {
     return(sweep(x, if (options$mode == 1) 2 else 1, sc, "/"))
   }
 
-  if (drop.na) {
+  if (drop_na) {
     x <- x[stats::complete.cases(x), , drop = FALSE]
   }
 

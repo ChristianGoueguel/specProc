@@ -49,7 +49,8 @@
 #' @param method A character vector specifying the normalization method to apply. Available methods are: "area", "l1", "l2", "max", "background", and "internal". Spectra whose L1, L2 or maximum norm is zero are set to `NA`, with a warning.
 #' @param bkg A numeric matrix or data frame of the same dimension as `x`, specifying the intensity of the continuum radiation (background emission) used for normalizing `x`. Required for "background" method.
 #' @param wlength A character vector of the selected wavelength(s) (column names). Required for the "internal" method, where the intensities at these wavelengths are summed to give the internal standard. Optional for the "background" method, where only these wavelengths are normalized and returned.
-#' @param drop.na A logical value indicating whether to remove spectra (rows) containing missing values before normalizing. Default is `TRUE`.
+#' @param drop_na A logical value indicating whether to remove spectra (rows) containing missing values before normalizing. Default is `TRUE`.
+#' @param drop.na `r lifecycle::badge("deprecated")` Use `drop_na`.
 #'
 #' @return A tibble of normalized spectra.
 #'
@@ -63,14 +64,16 @@
 #' # internal standard: the C I 247.86 nm line of the organic matrix
 #' carbon <- names(spectra)[which.min(abs(as.numeric(names(spectra)) - 247.856))]
 #' normalize(spectra[1:3, ], method = "internal", wlength = carbon)[, 1:4]
-normalize <- function(x, method = "area", bkg = NULL, wlength = NULL, drop.na = TRUE) {
+normalize <- function(x, method = "area", bkg = NULL, wlength = NULL, drop_na = TRUE,
+                      drop.na = deprecated()) {
+  drop_na <- renamed_arg(drop.na, drop_na, "normalize", "drop.na", "drop_na")
 
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
   method <- match.arg(method, c("area", "l1", "l2", "max", "background", "internal"))
   x <- as.data.frame(as_numeric_matrix(x, "x"), check.names = FALSE)
-  keep <- if (drop.na) stats::complete.cases(x) else rep(TRUE, nrow(x))
+  keep <- if (drop_na) stats::complete.cases(x) else rep(TRUE, nrow(x))
 
   norm_spectra <- switch(
     method,
@@ -96,7 +99,7 @@ normalize <- function(x, method = "area", bkg = NULL, wlength = NULL, drop.na = 
         stop("Dimensions of 'x' and 'bkg' must be the same for the 'background' method.")
       }
       names(bkg) <- names(x)
-      if (drop.na) {
+      if (drop_na) {
         keep <- keep & stats::complete.cases(bkg)
       }
       x <- x[keep, , drop = FALSE]

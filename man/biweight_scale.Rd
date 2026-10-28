@@ -4,7 +4,14 @@
 \alias{biweight_scale}
 \title{Biweight Scale}
 \usage{
-biweight_scale(x, loc = NULL, c = 9, reduced = FALSE, drop.na = FALSE)
+biweight_scale(
+  x,
+  loc = NULL,
+  c = 9,
+  reduced = FALSE,
+  drop_na = FALSE,
+  drop.na = deprecated()
+)
 }
 \arguments{
 \item{x}{A numeric vector.}
@@ -15,7 +22,9 @@ biweight_scale(x, loc = NULL, c = 9, reduced = FALSE, drop.na = FALSE)
 
 \item{reduced}{A logical value specifying whether the sample size, \emph{n}, should be reduced to the number of non-rejected values. If \code{TRUE}, \emph{n} is reduced to the number of observations that pass a rejection criteria (\eqn{|u_i| < 1}). If \code{FALSE} (default), \emph{n} is equal to the length of \code{x} (the input data).}
 
-\item{drop.na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when \code{x} contains missing values.}
+\item{drop_na}{A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when \code{x} contains missing values.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 The biweight scale of \code{x}.

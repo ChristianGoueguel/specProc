@@ -4,7 +4,7 @@
 \alias{center}
 \title{Data Centering}
 \usage{
-center(x, method = "mean", drop.na = FALSE)
+center(x, method = "mean", drop_na = FALSE, drop.na = deprecated())
 }
 \arguments{
 \item{x}{A numeric matrix or data frame.}
@@ -12,9 +12,11 @@ center(x, method = "mean", drop.na = FALSE)
 \item{method}{A character string specifying the centering method, either
 "mean" or "median".}
 
-\item{drop.na}{A logical value indicating whether to ignore missing values
+\item{drop_na}{A logical value indicating whether to ignore missing values
 (NA) when computing the column means or medians. Missing values are kept
 in the output.}
+
+\item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
 A numeric matrix with the same dimensions as the input, with

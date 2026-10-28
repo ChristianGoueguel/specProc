@@ -18,7 +18,8 @@
 #' @param loc The location about which the scale is computed (default: median of `x`).
 #' @param c A numeric value specifying the tuning constant for the biweight estimator (`c = 9` by default).
 #' @param reduced A logical value specifying whether the sample size, *n*, should be reduced to the number of non-rejected values. If `TRUE`, *n* is reduced to the number of observations that pass a rejection criteria (\eqn{|u_i| < 1}). If `FALSE` (default), *n* is equal to the length of `x` (the input data).
-#' @param drop.na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when `x` contains missing values.
+#' @param drop_na A logical value indicating whether to remove missing values (\code{NA}) from the calculations. If \code{TRUE}, missing values will be removed. If \code{FALSE} (the default), the result is \code{NA} when `x` contains missing values.
+#' @param drop.na `r lifecycle::badge("deprecated")` Use `drop_na`.
 #'
 #' @return The biweight scale of `x`.
 #'
@@ -40,7 +41,9 @@
 #'
 #' @export biweight_scale
 #'
-biweight_scale <- function(x, loc = NULL, c = 9, reduced = FALSE, drop.na = FALSE) {
+biweight_scale <- function(x, loc = NULL, c = 9, reduced = FALSE, drop_na = FALSE,
+                           drop.na = deprecated()) {
+  drop_na <- renamed_arg(drop.na, drop_na, "biweight_scale", "drop.na", "drop_na")
 
   if (missing(x)) {
     stop("Input 'x' must be provided.")
@@ -54,9 +57,9 @@ biweight_scale <- function(x, loc = NULL, c = 9, reduced = FALSE, drop.na = FALS
   if (!is.logical(reduced)) {
     stop("'reduced' must be a logical value (TRUE or FALSE).")
   }
-  check_flag(drop.na, "drop.na")
+  check_flag(drop_na, "drop_na")
 
-  if (drop.na) {
+  if (drop_na) {
     x <- x[!is.na(x)]
   } else if (anyNA(x)) {
     return(NA_real_)
