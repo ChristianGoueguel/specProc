@@ -432,7 +432,8 @@ stark_width <- function(stark, wavelength, temperature, density = 1e17,
 #'   difference between `wavelength` and the tabulated wavelength, in nm
 #'   (see [stark_width()]). Default is 0.5.
 #'
-#' @return A numeric vector of electron densities, in cm\eqn{^{-3}}.
+#' @return A numeric vector of electron densities, in cm\eqn{^{-3}}. See
+#'   [electron_density_uncertainty()] for their uncertainty.
 #'
 #' @references
 #'  - Gigosos, M.A., González, M.Á., Cardeñoso, V. (2003). Computer
@@ -460,7 +461,7 @@ electron_density <- function(width, method = "stark", stark = NULL, wavelength =
     stop("'width' must contain positive values (nm).")
   }
   if (method == "halpha") {
-    return(1e17 * (width / 1.098)^(1 / 0.67823))
+    return(1e17 * (width / 1.098)^(1 / halpha_exponent))
   }
   if (is.null(reference_width)) {
     if (is.null(stark) || is.null(wavelength) || is.null(temperature)) {
@@ -479,6 +480,9 @@ electron_density <- function(width, method = "stark", stark = NULL, wavelength =
 # ---- internals ---------------------------------------------------------------
 
 starkb_cache <- new.env(parent = emptyenv())
+
+# Exponent of the H-alpha width law of Gigosos, Gonzalez and Cardenoso (2003)
+halpha_exponent <- 0.67823
 
 starkb_endpoint <- "http://stark-b.obspm.fr/12.07/vamdc/tap/sync"
 

@@ -101,9 +101,13 @@
 #'    abscissa of ions includes the ionization energy and the ordinate the
 #'    Saha correction), `intercept`, the intercept of each plot, and `fit`,
 #'    the `lm` fit;
-#'  - `method` and the number of `iterations` of the Saha-Boltzmann fit.
+#'  - `method` and the number of `iterations` of the Saha-Boltzmann fit;
+#'  - `lines`, the lines of the fit, and `settings`, its other arguments.
 #'
-#' Use [plot_boltzmann()] to draw the Boltzmann plots.
+#' Use [plot_boltzmann()] to draw the Boltzmann plots, and
+#' [plasma_uncertainty()] to propagate the uncertainties of the
+#' intensities, of the atomic data and of the electron density to the
+#' temperature and the composition.
 #'
 #' @references
 #'  - Ciucci, A., Corsi, M., Palleschi, V., Rastelli, S., Salvetti, A.,
@@ -200,12 +204,11 @@ cf_libs <- function(lines, electron_density = NULL, temperature = NULL, method =
            "to estimate the temperature; otherwise give `temperature`.", call. = FALSE)
     }
     formula <- if (nlevels(points$group) > 1) y ~ 0 + group + x else y ~ x
+    design <- stats::model.matrix(formula, points)
     temperature <- 1e4
     repeat {
       iterations <- iterations + 1L
-      points$y <- y0 - saha_shift(temperature)
-      fit <- stats::lm(formula, data = points)
-      slope <- stats::coef(fit)[["x"]]
+      slope <- stats::lm.fit(design, y0 - saha_shift(temperature))$coefficients[["x"]]
       if (!is.finite(slope) || slope >= 0) {
         stop("The Boltzmann plots have a non-negative common slope; check the line data.",
              call. = FALSE)
@@ -314,7 +317,10 @@ cf_libs <- function(lines, electron_density = NULL, temperature = NULL, method =
     list(composition = composition, species = species_tbl, temperature = temperature,
          temperature_se = temperature_se, electron_density = electron_density,
          points = points, fit = fit, intercept = intercept, units = units,
-         reference = reference, method = method, iterations = iterations),
+         reference = reference, method = method, iterations = iterations,
+         lines = tibble::as_tibble(lines),
+         settings = list(partition = partition, ionization_energy = ionization_energy,
+                         timeout = timeout)),
     class = "specproc_cflibs"
   )
 }

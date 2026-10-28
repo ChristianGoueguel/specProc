@@ -50,9 +50,9 @@ Default is 3.}
 A tibble with one row per spectrum and line: the other columns
 of \code{spectra} (or \code{spectrum}, the row number), the columns of \code{lines}
 (or \code{line} and \code{wavelength}), and \code{peak_wavelength}, \code{shift} (nm),
-\code{height}, \code{intensity}, \code{snr}, \code{detected} and \code{saturated} (which
-replace the columns of \code{lines} of the same name, such as the relative
-intensity listed by \code{\link[=nist_lines]{nist_lines()}}). For a single
+\code{height}, \code{intensity}, \code{intensity_se}, \code{snr}, \code{detected} and
+\code{saturated} (which replace the columns of \code{lines} of the same name,
+such as the relative intensity listed by \code{\link[=nist_lines]{nist_lines()}}). For a single
 spectrum, it has one row per line, like \code{lines}, with the measured
 \code{intensity}.
 }
@@ -90,6 +90,17 @@ spectrum, estimated robustly from its channel-to-channel differences;
 \item \code{saturated}: with \code{limit}, whether a channel of the window reaches
 the saturation limit of the detector (see \code{\link[=saturation_summary]{saturation_summary()}}).
 }
+
+\code{intensity_se} is the standard error of the intensity due to the noise
+of the spectrum: the noise (as for \code{snr}) propagated through the
+integration and the baseline subtraction, or, for the Voigt method, the
+standard error of the fitted area. The noise is taken as white and the
+same in every channel, so this is a lower bound: it leaves out the
+shot-to-shot fluctuations of the plasma, which usually dominate in LIBS.
+These are better estimated from replicate spectra, as the standard
+deviation of the intensities of the replicates divided by the square
+root of their number. \code{\link[=plasma_uncertainty]{plasma_uncertainty()}} propagates \code{intensity_se}
+to the temperature and the composition.
 }
 \examples{
 data(forageLIBS)

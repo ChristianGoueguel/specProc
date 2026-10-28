@@ -33,6 +33,17 @@
 #'  - `saturated`: with `limit`, whether a channel of the window reaches
 #'    the saturation limit of the detector (see [saturation_summary()]).
 #'
+#' `intensity_se` is the standard error of the intensity due to the noise
+#' of the spectrum: the noise (as for `snr`) propagated through the
+#' integration and the baseline subtraction, or, for the Voigt method, the
+#' standard error of the fitted area. The noise is taken as white and the
+#' same in every channel, so this is a lower bound: it leaves out the
+#' shot-to-shot fluctuations of the plasma, which usually dominate in LIBS.
+#' These are better estimated from replicate spectra, as the standard
+#' deviation of the intensities of the replicates divided by the square
+#' root of their number. [plasma_uncertainty()] propagates `intensity_se`
+#' to the temperature and the composition.
+#'
 #' @param spectra The spectra: a numeric vector named by wavelength (one
 #'   spectrum), or a matrix or data frame with one spectrum per row and the
 #'   wavelengths as column names. Other columns of a data frame (such as
@@ -57,9 +68,9 @@
 #' @return A tibble with one row per spectrum and line: the other columns
 #'   of `spectra` (or `spectrum`, the row number), the columns of `lines`
 #'   (or `line` and `wavelength`), and `peak_wavelength`, `shift` (nm),
-#'   `height`, `intensity`, `snr`, `detected` and `saturated` (which
-#'   replace the columns of `lines` of the same name, such as the relative
-#'   intensity listed by [nist_lines()]). For a single
+#'   `height`, `intensity`, `intensity_se`, `snr`, `detected` and
+#'   `saturated` (which replace the columns of `lines` of the same name,
+#'   such as the relative intensity listed by [nist_lines()]). For a single
 #'   spectrum, it has one row per line, like `lines`, with the measured
 #'   `intensity`.
 #'
@@ -97,7 +108,7 @@ line_intensities <- function(spectra, lines, half_width = 0.15, search = 0.2, me
   noise <- apply(x, 1, spectrum_noise)
   results <- lapply(seq_len(nrow(lines)), function(j) {
     m <- measure_line(x, wl, lines$wavelength[j], half_width, search, method, baseline,
-                      fit_width, limit)
+                      fit_width, limit, noise)
     m$snr <- m$height / noise
     m$line_row <- j
     m$spectrum_row <- seq_len(nrow(x))
@@ -105,7 +116,8 @@ line_intensities <- function(spectra, lines, half_width = 0.15, search = 0.2, me
   })
   res <- do.call(rbind, results)
   res$detected <- !is.na(res$snr) & res$snr >= min_snr
-  measured <- c("peak_wavelength", "shift", "height", "intensity", "snr", "detected", "saturated")
+  measured <- c("peak_wavelength", "shift", "height", "intensity", "intensity_se", "snr",
+                "detected", "saturated")
   # measured columns replace those of the same name (such as the relative
   # intensity of nist_lines())
   lines <- lines[setdiff(names(lines), measured)]
@@ -238,11 +250,14 @@ spectrum_noise <- function(v) {
 
 # Measures one line in every spectrum (rows of x). The spectra are grouped by
 # the channel of their peak, which sets their integration window, and each
-# group is measured with matrix operations.
-measure_line <- function(x, wl, center, half_width, search, method, baseline, fit_width, limit) {
+# group is measured with matrix operations. With the noise of each spectrum,
+# the standard error of the intensity is the noise propagated through the
+# linear combination of channels that gives the area or the height.
+measure_line <- function(x, wl, center, half_width, search, method, baseline, fit_width, limit,
+                         noise = NULL) {
   n <- nrow(x)
   out <- data.frame(peak_wavelength = rep(NA_real_, n), shift = NA_real_, height = NA_real_,
-                    intensity = NA_real_, saturated = NA)
+                    intensity = NA_real_, intensity_se = NA_real_, saturated = NA)
   if (min(abs(wl - center)) > search + half_width) {
     return(out)   # outside the spectral range
   }
@@ -273,15 +288,52 @@ measure_line <- function(x, wl, center, half_width, search, method, baseline, fi
       area = if (m > 1) as.vector((v[, -1, drop = FALSE] + v[, -m, drop = FALSE]) %*% diff(w)) / 2 else height,
       voigt = NA_real_
     )
+    if (!is.null(noise) && method != "voigt") {
+      top <- if (method == "height" || m == 1) {
+        apply(v, 1, function(r) if (all(is.na(r))) NA_integer_ else which.max(r))
+      }
+      out$intensity_se[rows] <- noise[rows] * noise_gain(w, method, baseline, top)
+    }
   }
   out$shift <- out$peak_wavelength - center
   if (method == "voigt") {
-    out$intensity <- voigt_areas(x, wl, out$peak_wavelength, fit_width)
+    areas <- voigt_areas(x, wl, out$peak_wavelength, fit_width)
+    out$intensity <- areas[1, ]
+    out$intensity_se <- areas[2, ]
   }
   out
 }
 
-# Areas of Voigt profiles fitted around the peak of each spectrum.
+# Norm of the weights of the channels of a window (wavelengths w) in the
+# area (trapezoidal rule) or in the height at channel `top`, after the
+# subtraction of the linear baseline through the end channels: the standard
+# error of the intensity per unit of white noise.
+noise_gain <- function(w, method, baseline, top = NULL) {
+  m <- length(w)
+  f <- if (m > 1) (w - w[1]) / (w[m] - w[1]) else 0
+  weights <- function(k) {
+    cf <- numeric(m)
+    cf[k] <- 1
+    if (baseline && m > 1) {
+      cf[1] <- cf[1] - (1 - f[k])
+      cf[m] <- cf[m] - f[k]
+    }
+    sqrt(sum(cf^2))
+  }
+  if (method == "area" && m > 1) {
+    d <- diff(w)
+    cf <- c(d, 0) / 2 + c(0, d) / 2
+    if (baseline) {
+      cf[1] <- cf[1] - sum(cf * (1 - f))
+      cf[m] <- cf[m] - sum(cf * f)
+    }
+    return(rep(sqrt(sum(cf^2)), max(length(top), 1)))
+  }
+  vapply(top, function(k) if (is.na(k)) NA_real_ else weights(k), numeric(1))
+}
+
+# Areas of Voigt profiles fitted around the peak of each spectrum, and their
+# standard errors (a 2-row matrix).
 voigt_areas <- function(x, wl, peaks, fit_width) {
   too_few <- vapply(peaks, function(p) !is.na(p) && sum(abs(wl - p) <= fit_width) < 6, logical(1))
   if (any(too_few)) {
@@ -289,14 +341,14 @@ voigt_areas <- function(x, wl, peaks, fit_width) {
             " nm: widen `fit_width`.", call. = FALSE)
   }
   vapply(seq_len(nrow(x)), function(i) {
-    if (is.na(peaks[i]) || too_few[i]) return(NA_real_)
+    if (is.na(peaks[i]) || too_few[i]) return(c(NA_real_, NA_real_))
     keep <- abs(wl - peaks[i]) <= fit_width
     window <- tibble::as_tibble(as.list(stats::setNames(x[i, keep], wl[keep])))
     fit <- suppressWarnings(peak_fit(window, profile = "voigt"))
     tidied <- fit$tidied[[1]]
-    if (is.null(tidied)) return(NA_real_)
-    tidied$estimate[tidied$term == "A"]
-  }, numeric(1))
+    if (is.null(tidied)) return(c(NA_real_, NA_real_))
+    unlist(tidied[tidied$term == "A", c("estimate", "std.error")], use.names = FALSE)
+  }, numeric(2))
 }
 
 line_column_names <- function(lines, prefix) {

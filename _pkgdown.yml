@@ -190,9 +190,12 @@ reference:
   - stark_table
   - stark_width
   - electron_density
+  - electron_density_uncertainty
   - boltzmann
   - saha_boltzmann
   - plot_boltzmann
+  - plasma_uncertainty
+  - aki_uncertainty
   - mcwhirter_criterion
   - self_absorption
   - correct_self_absorption

@@ -41,7 +41,8 @@ difference between \code{wavelength} and the tabulated wavelength, in nm
 (see \code{\link[=stark_width]{stark_width()}}). Default is 0.5.}
 }
 \value{
-A numeric vector of electron densities, in cm\eqn{^{-3}}.
+A numeric vector of electron densities, in cm\eqn{^{-3}}. See
+\code{\link[=electron_density_uncertainty]{electron_density_uncertainty()}} for their uncertainty.
 }
 \description{
 Estimates the electron density of a plasma from the Stark width of an

@@ -46,7 +46,11 @@ Default is 1e-8.}
 \code{lines}, as a tibble, with the corrected \code{intensity}, the
 \code{measured_intensity}, the self-absorption coefficient \code{SA} and a
 logical \code{reference}, ready for \code{\link[=boltzmann]{boltzmann()}} or \code{\link[=cf_libs]{cf_libs()}}. The
-temperature used is in the attribute \code{temperature}.
+temperature used is in the attribute \code{temperature}. A column
+\code{intensity_se} (as returned by \code{\link[=line_intensities]{line_intensities()}}) becomes the
+standard error of the corrected intensity, which is computed from the
+reference line alone: its relative standard error is that of the
+reference line.
 }
 \description{
 Corrects the intensities of emission lines for self-absorption by the

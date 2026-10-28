@@ -65,7 +65,11 @@
 #' @return `lines`, as a tibble, with the corrected `intensity`, the
 #'   `measured_intensity`, the self-absorption coefficient `SA` and a
 #'   logical `reference`, ready for [boltzmann()] or [cf_libs()]. The
-#'   temperature used is in the attribute `temperature`.
+#'   temperature used is in the attribute `temperature`. A column
+#'   `intensity_se` (as returned by [line_intensities()]) becomes the
+#'   standard error of the corrected intensity, which is computed from the
+#'   reference line alone: its relative standard error is that of the
+#'   reference line.
 #'
 #' @references
 #'  - Sun, L., Yu, H. (2009). Correction of self-absorption effect in
@@ -183,6 +187,11 @@ correct_self_absorption <- function(lines, temperature = NULL, electron_density 
   out$measured_intensity <- measured
   out$SA <- sa
   out$intensity <- measured / sa
+  if ("intensity_se" %in% names(lines)) {
+    # the corrected intensity is computed from the reference line alone
+    r <- ref[species]
+    out$intensity_se <- out$intensity * lines$intensity_se[r] / measured[r]
+  }
   out$reference <- seq_len(nrow(lines)) %in% ref
   attr(out, "temperature") <- temperature
   out

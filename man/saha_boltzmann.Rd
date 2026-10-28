@@ -32,7 +32,8 @@ example from \code{\link[=electron_density]{electron_density()}}.}
 }
 \value{
 An object of class \code{specproc_boltzmann}, as for
-\code{\link[=boltzmann]{boltzmann()}}, with the number of iterations in \code{iterations}.
+\code{\link[=boltzmann]{boltzmann()}}, with the number of iterations in \code{iterations}, the
+\code{electron_density}, and the other arguments of the fit in \code{settings}.
 }
 \description{
 Estimates the temperature of a plasma in LTE from lines of the neutral

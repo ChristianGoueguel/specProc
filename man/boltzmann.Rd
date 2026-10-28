@@ -23,10 +23,13 @@ error, in K;
 \item \code{r_squared}: the coefficient of determination of the fit;
 \item \code{points}: a tibble with the abscissa \code{x} (eV) and ordinate \code{y} of each
 line;
-\item \code{fit}: the \code{lm} fit of \code{y} on \code{x}.
+\item \code{fit}: the \code{lm} fit of \code{y} on \code{x};
+\item \code{lines}: the lines of the plot.
 }
 
-Use \code{\link[=plot_boltzmann]{plot_boltzmann()}} to draw the plot.
+Use \code{\link[=plot_boltzmann]{plot_boltzmann()}} to draw the plot, and \code{\link[=plasma_uncertainty]{plasma_uncertainty()}} to
+propagate the uncertainties of the intensities and of the atomic data to
+the temperature.
 }
 \description{
 Estimates the excitation temperature of a plasma in local thermodynamic

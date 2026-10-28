@@ -97,6 +97,32 @@
   be tuned. With `step_spectral_norm(method = "area")` and
   `step_gap_derivative()`, it gives the preprocessing of the winning team of
   the EMSLIBS 2019 classification contest (Vrábel et al., 2020).
+* `plasma_uncertainty()`: the uncertainty of the temperature of
+  `boltzmann()` and `saha_boltzmann()`, and of the temperature and
+  composition of `cf_libs()`, by Monte Carlo simulation (JCGM 101:2008).
+  Each draw repeats the fit with the intensities, transition probabilities,
+  electron density and, for a given temperature, the temperature perturbed
+  within their uncertainties; the result gives the standard uncertainty and
+  the interval of each quantity, and the draws. The uncertainties of the
+  intensities are the column `intensity_se` of the lines and those of the
+  transition probabilities their NIST accuracy grades (or `aki_rsd`). The
+  reduced chi-squared of the fit tells whether these uncertainties explain
+  the scatter of the points, or whether other errors (spectral response,
+  self-absorption) dominate. The fits now keep their `lines` (and, for
+  `saha_boltzmann()` and `cf_libs()`, their other arguments in `settings`)
+  for this purpose.
+* `electron_density_uncertainty()`: the electron density of
+  `electron_density()` with its standard uncertainty and interval, from the
+  standard error of the width and the uncertainty of the Stark parameter or
+  of the H-alpha width law.
+* `aki_uncertainty()`: the relative standard uncertainties of transition
+  probabilities from the accuracy grades of the NIST Atomic Spectra
+  Database (one standard deviation; upper bounds).
+* `line_intensities()` gives the standard error of each intensity
+  (`intensity_se`): the noise of the spectrum propagated through the
+  integration and the baseline, or the standard error of the fitted area
+  for the Voigt method. `correct_self_absorption()` turns it into the
+  standard error of the corrected intensity.
 
 ## Improvements
 

@@ -38,9 +38,12 @@
 #'  - `r_squared`: the coefficient of determination of the fit;
 #'  - `points`: a tibble with the abscissa `x` (eV) and ordinate `y` of each
 #'    line;
-#'  - `fit`: the `lm` fit of `y` on `x`.
+#'  - `fit`: the `lm` fit of `y` on `x`;
+#'  - `lines`: the lines of the plot.
 #'
-#' Use [plot_boltzmann()] to draw the plot.
+#' Use [plot_boltzmann()] to draw the plot, and [plasma_uncertainty()] to
+#' propagate the uncertainties of the intensities and of the atomic data to
+#' the temperature.
 #'
 #' @references
 #'  - Cristoforetti, G., De Giacomo, A., Dell'Aglio, M., Legnaioli, S.,
@@ -81,7 +84,9 @@ boltzmann <- function(lines, units = "energy") {
     y = boltzmann_ordinate(lines, units),
     stage = if ("stage" %in% names(lines)) as.integer(lines$stage) else rep(1L, nrow(lines))
   )
-  boltzmann_result(points, method = "Boltzmann", units = units)
+  res <- boltzmann_result(points, method = "Boltzmann", units = units)
+  res$lines <- tibble::as_tibble(lines)
+  res
 }
 
 #' @title Plasma Temperature from a Saha-Boltzmann Plot
@@ -115,7 +120,8 @@ boltzmann <- function(lines, units = "energy") {
 #' @param tol The relative tolerance on the temperature. Default is 1e-8.
 #'
 #' @return An object of class `specproc_boltzmann`, as for
-#'   [boltzmann()], with the number of iterations in `iterations`.
+#'   [boltzmann()], with the number of iterations in `iterations`, the
+#'   `electron_density`, and the other arguments of the fit in `settings`.
 #'
 #' @references
 #'  - Aguilera, J.A., Aragón, C. (2004). Characterization of a laser-induced
@@ -161,26 +167,21 @@ saha_boltzmann <- function(lines, ionization_energy, electron_density, units = "
   y0 <- boltzmann_ordinate(lines, units)
   ion <- lines$stage == 2
   x <- lines$Ek + ion * ionization_energy
-  temperature <- 1e4
-  for (iter in seq_len(max_iter)) {
-    y <- y0 - ion * log(saha_factor(temperature, electron_density))
-    slope <- stats::coef(stats::lm(y ~ x))[[2]]
-    if (!is.finite(slope) || slope >= 0) {
-      stop("The Saha-Boltzmann plot has a non-negative slope; check the line data.")
-    }
-    new_temperature <- -1 / (k_boltzmann_ev * slope)
-    converged <- abs(new_temperature - temperature) <= tol * new_temperature
-    temperature <- new_temperature
-    if (converged) break
+  iter <- saha_temperatures(x, y0, ion, electron_density, max_iter, tol)
+  temperature <- iter$temperature
+  if (is.na(temperature)) {
+    stop("The Saha-Boltzmann plot has a non-negative slope; check the line data.")
   }
-  if (!converged) {
+  if (!iter$converged) {
     warning("The temperature did not converge in ", max_iter, " iterations.", call. = FALSE)
   }
   points <- tibble::tibble(x = x, y = y0 - ion * log(saha_factor(temperature, electron_density)),
                           stage = as.integer(lines$stage))
   res <- boltzmann_result(points, method = "Saha-Boltzmann", units = units)
-  res$iterations <- iter
+  res$iterations <- iter$iterations
   res$electron_density <- electron_density
+  res$lines <- tibble::as_tibble(lines)
+  res$settings <- list(ionization_energy = ionization_energy, max_iter = max_iter, tol = tol)
   res
 }
 
@@ -469,6 +470,44 @@ saha_factor <- function(temperature, electron_density) {
   k_b <- 1.380649e-23
   h <- 6.62607015e-34
   2 * (2 * pi * m_e * k_b * temperature / h^2)^1.5 * 1e-6 / electron_density
+}
+
+# Temperatures of Saha-Boltzmann plots, by fixed-point iteration from
+# 10000 K: one plot per column of y0 (the ordinates before the Saha
+# correction of the ions) with its electron density. A plot whose slope is
+# not negative at some iteration gives NA.
+saha_temperatures <- function(x, y0, ion, electron_density, max_iter, tol) {
+  y0 <- as.matrix(y0)
+  n <- ncol(y0)
+  electron_density <- rep_len(electron_density, n)
+  xc <- x - mean(x)
+  sxx <- sum(xc^2)
+  temperature <- rep(1e4, n)
+  iterations <- integer(n)
+  active <- seq_len(n)
+  for (iter in seq_len(max_iter)) {
+    y <- y0[, active, drop = FALSE] -
+      outer(ion, log(saha_factor(temperature[active], electron_density[active])))
+    slope <- colSums(xc * y) / sxx
+    new_temperature <- ifelse(is.finite(slope) & slope < 0, -1 / (k_boltzmann_ev * slope), NA_real_)
+    done <- is.na(new_temperature) |
+      abs(new_temperature - temperature[active]) <= tol * new_temperature
+    temperature[active] <- new_temperature
+    iterations[active] <- iter
+    active <- active[!done]
+    if (length(active) == 0) break
+  }
+  converged <- rep(TRUE, n)
+  converged[active] <- FALSE
+  list(temperature = temperature, converged = converged, iterations = iterations)
+}
+
+# Temperatures of Boltzmann plots, one per column of y; Inf for a plot whose
+# slope is not negative.
+boltzmann_temperatures <- function(x, y) {
+  xc <- x - mean(x)
+  slope <- colSums(xc * as.matrix(y)) / sum(xc^2)
+  ifelse(is.finite(slope) & slope < 0, -1 / (k_boltzmann_ev * slope), Inf)
 }
 
 boltzmann_ordinate <- function(lines, units) {

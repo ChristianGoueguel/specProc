@@ -71,10 +71,14 @@ relative number \code{density} and whether it was \code{observed};
 abscissa of ions includes the ionization energy and the ordinate the
 Saha correction), \code{intercept}, the intercept of each plot, and \code{fit},
 the \code{lm} fit;
-\item \code{method} and the number of \code{iterations} of the Saha-Boltzmann fit.
+\item \code{method} and the number of \code{iterations} of the Saha-Boltzmann fit;
+\item \code{lines}, the lines of the fit, and \code{settings}, its other arguments.
 }
 
-Use \code{\link[=plot_boltzmann]{plot_boltzmann()}} to draw the Boltzmann plots.
+Use \code{\link[=plot_boltzmann]{plot_boltzmann()}} to draw the Boltzmann plots, and
+\code{\link[=plasma_uncertainty]{plasma_uncertainty()}} to propagate the uncertainties of the
+intensities, of the atomic data and of the electron density to the
+temperature and the composition.
 }
 \description{
 Estimates the elemental composition of a sample from the intensities of
