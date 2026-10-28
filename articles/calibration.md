@@ -5,9 +5,10 @@ samples of known composition, and predicts the concentration of new
 samples. This vignette builds univariate calibration curves from line
 intensities, with their limits of detection and quantification, and
 compares them with a multivariate model of the whole spectrum, whose
-figures of merit come from the net analyte signal. It ends with two
-checks of routine analysis: whether new spectra lie within the
-calibration space, and whether the instrument drifts.
+figures of merit come from the net analyte signal. It ends with routine
+analysis: whether new spectra lie within the calibration space, how to
+transfer the calibration to another instrument, and whether the
+instrument drifts.
 
 ``` r
 
@@ -394,6 +395,67 @@ calibration curve, [`predict()`](https://rdrr.io/r/stats/predict.html)
 flags the concentrations outside the range of the standards
 (`outside_range`).
 
+## Transferring the calibration to another instrument
+
+A calibration is tied to the instrument that recorded its spectra. On
+another instrument, or on the same one after a change of its optics, the
+spectra differ, and so do the predictions. With no second instrument for
+these samples, we simulate one: its response tilts by ±15% across the
+spectral range, its wavelength axis is shifted by one channel, and it
+adds an offset:
+
+``` r
+
+wl_x <- as.numeric(colnames(x))
+response <- 1 + 0.3 * (wl_x - mean(wl_x)) / diff(range(wl_x))
+slave <- sweep(cbind(x[, -1], x[, ncol(x)]), 2, response, "*") + 0.002
+```
+
+The PLS model of potassium predicts the test samples measured on this
+instrument badly. Twenty calibration samples, measured on both
+instruments, are enough to transfer their spectra: by direct
+standardization
+([`ds()`](https://christiangoueguel.com/specProc/reference/ds.md)), a
+linear map of the whole spectrum, or by spectral space transformation
+([`sst()`](https://christiangoueguel.com/specProc/reference/sst.md)),
+which moves the slave spectra by the difference between the instruments
+in the principal components they share. Instead of the spectra,
+[`slope_bias()`](https://christiangoueguel.com/specProc/reference/slope_bias.md)
+corrects the predictions by a straight line:
+
+``` r
+
+predict_k <- \(spectra) drop(predict(cv, newdata = data.frame(x = I(spectra)), ncomp = ncomp))
+set.seed(2)
+transfer_samples <- sample(which(is_calibration), 20)
+slave_test <- slave[!is_calibration, ]
+
+by_ds <- ds(x[transfer_samples, ], slave[transfer_samples, ])
+by_sst <- sst(x[transfer_samples, ], slave[transfer_samples, ])
+by_slope_bias <- slope_bias(predict_k(slave[transfer_samples, ]), data$K[transfer_samples])
+
+prediction_error <- \(predicted) sqrt(mean((predicted - test$K)^2))
+transfer_errors <- c(
+  master = prediction_error(predict_k(x[!is_calibration, ])),
+  slave = prediction_error(predict_k(slave_test)),
+  ds = prediction_error(predict_k(predict(by_ds, slave_test))),
+  sst = prediction_error(predict_k(predict(by_sst, slave_test))),
+  slope_bias = prediction_error(predict(by_slope_bias, predict_k(slave_test)))
+)
+round(transfer_errors, 2)   # RMSEP, % K
+#>     master      slave         ds        sst slope_bias 
+#>       0.30       1.69       0.29       0.29       0.47
+```
+
+Direct standardization and SST bring the error of the test samples back
+to that of the master instrument, 0.30% K, from 1.69% K. The slope and
+bias correction removes most of the bias, but not the distortion of the
+spectra, which changes the ranking of the samples.
+[`pds()`](https://christiangoueguel.com/specProc/reference/pds.md),
+piecewise direct standardization, suits local differences such as shifts
+of the axis, but its transfer matrix has one row and one column per
+channel (7152 here), heavy for whole spectra.
+
 ## Monitoring drift
 
 The measurements are numbered in the order in which they were acquired.
@@ -443,6 +505,12 @@ change of the samples.
   regression.
 - **Flag the samples outside the applicability domain**, and chart an
   internal standard or a check sample to detect drifts.
+- **Transfer the calibration** to another instrument with
+  [`ds()`](https://christiangoueguel.com/specProc/reference/ds.md),
+  [`sst()`](https://christiangoueguel.com/specProc/reference/sst.md) or
+  [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md), or
+  correct its predictions with
+  [`slope_bias()`](https://christiangoueguel.com/specProc/reference/slope_bias.md).
 - **Validate on samples left out** of the calibration: the prediction
   error on test samples is the most honest figure of merit.
 

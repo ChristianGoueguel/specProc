@@ -45,7 +45,7 @@ pds(x1, x2, win = 5, ncomp = 2, alpha = 0)
 
 ## Value
 
-A list with two components:
+An object of class `specproc_transfer`, a list with
 
 - `transfer_matrix`:
 
@@ -54,6 +54,10 @@ A list with two components:
 - `intercept`:
 
   A vector of length \\p\\ containing the intercepts.
+
+and the settings of the transfer. Use
+[predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_transfer.md)
+to transfer slave spectra.
 
 ## Details
 
@@ -81,6 +85,13 @@ times the global ones.
   multivariate calibration. Chemometrics and Intelligent Laboratory
   Systems, (32)2:201-213.
 
+## See also
+
+[`ds()`](https://christiangoueguel.com/specProc/reference/ds.md),
+[`sst()`](https://christiangoueguel.com/specProc/reference/sst.md),
+[`slope_bias()`](https://christiangoueguel.com/specProc/reference/slope_bias.md),
+[`predict.specproc_transfer()`](https://christiangoueguel.com/specProc/reference/predict.specproc_transfer.md)
+
 ## Author
 
 Christian L. Goueguel
@@ -96,7 +107,7 @@ x1 <- as.matrix(spectra[1:30, ])
 x2 <- 0.8 * cbind(x1[, -1], x1[, ncol(x1)]) + 50
 res <- pds(x1, x2, win = 3, ncomp = 2)
 # spectra of the second instrument transferred to the first one
-transferred <- sweep(x2 %*% res$transfer_matrix, 2, res$intercept, "+")
+transferred <- predict(res, x2)
 max(abs(transferred - x1)) / max(x1)
 #> [1] 0.0313053
 ```

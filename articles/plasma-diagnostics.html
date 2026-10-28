@@ -401,6 +401,18 @@ unsuitable for the calibration-free analysis below. The coefficients of
 the weaker lines, between about 0.6 and 1.07 (hence the warning), show
 the precision of the method: it inherits the noise of the reference line
 and the errors of the transition probabilities.</p>
+<p><code><a href="../reference/curve_of_growth.html">curve_of_growth()</a></code> needs no reference line. It fits the
+curve of growth of a homogeneous plasma in LTE to the lines of one or
+several species at once, the model of the C-sigma graphs of Aragón and
+Aguilera (2014): the intensity of a line grows as its optical depth
+while the plasma is thin, then more slowly as its center saturates. With
+one column density per species, the fit gives the optical depth of every
+line, its self-absorption coefficient and its optically thin intensity,
+ready for <code><a href="../reference/boltzmann.html">boltzmann()</a></code> or <code><a href="../reference/cf_libs.html">cf_libs()</a></code>. It needs
+the Stark widths of the lines, which set how fast they saturate:
+<code><a href="../reference/stark_width.html">stark_width()</a></code> gives them from the STARK-B database
+(<code><a href="../reference/starkb_lines.html">starkb_lines()</a></code>) at the electron density measured above,
+and <code><a href="../reference/plot_curve_of_growth.html">plot_curve_of_growth()</a></code> draws the fit.</p>
 </div>
 <div class="section level2">
 <h2 id="calibration-free-composition">Calibration-free composition<a class="anchor" aria-label="anchor" href="#calibration-free-composition"></a>
@@ -586,6 +598,10 @@ a correction of the spectral response.</li>
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <ul>
+<li>Aragón, C., Aguilera, J.A. (2014). CSigma graphs: a new approach for
+plasma characterization in laser-induced breakdown spectroscopy.
+<em>Journal of Quantitative Spectroscopy and Radiative Transfer</em>,
+149:90–102.</li>
 <li>Ciucci, A., Corsi, M., Palleschi, V., Rastelli, S., Salvetti, A.,
 Tognoni, E. (1999). New procedure for quantitative elemental analysis by
 laser-induced plasma spectroscopy. <em>Applied Spectroscopy</em>,

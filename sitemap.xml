@@ -34,11 +34,14 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/correct_response.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/correct_self_absorption.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/correlation.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/curve_of_growth.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/curve_of_growth_model.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/direct_orthogonal.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/direct_osc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/directional_outlyingness.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/dmodx.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/doppler_width.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/ds.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/electron_density.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/electron_density_uncertainty.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/emsc.html</loc></url>
@@ -87,6 +90,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_contributions.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_control_chart.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_coomans.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/plot_curve_of_growth.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_embedding.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_fit.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_influence.html</loc></url>
@@ -113,7 +117,9 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_rpcr.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_rsimca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_rsimpls.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_slope_bias.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_som.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_transfer.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_wavelength_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/projected_osc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.html</loc></url>
@@ -139,12 +145,14 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/self_absorption.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/simca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/simca_gamma.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/slope_bias.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/snv.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/som.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/som_stability.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/specProc-defunct.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/specProc-package.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/spectral_norm_method.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/sst.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/stark_table.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/stark_width.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/starkb_lines.html</loc></url>

@@ -383,6 +383,26 @@ coefficients of the weaker lines, between about 0.6 and 1.07 (hence the
 warning), show the precision of the method: it inherits the noise of the
 reference line and the errors of the transition probabilities.
 
+[`curve_of_growth()`](https://christiangoueguel.com/specProc/reference/curve_of_growth.md)
+needs no reference line. It fits the curve of growth of a homogeneous
+plasma in LTE to the lines of one or several species at once, the model
+of the C-sigma graphs of Aragón and Aguilera (2014): the intensity of a
+line grows as its optical depth while the plasma is thin, then more
+slowly as its center saturates. With one column density per species, the
+fit gives the optical depth of every line, its self-absorption
+coefficient and its optically thin intensity, ready for
+[`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
+or
+[`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md).
+It needs the Stark widths of the lines, which set how fast they
+saturate:
+[`stark_width()`](https://christiangoueguel.com/specProc/reference/stark_width.md)
+gives them from the STARK-B database
+([`starkb_lines()`](https://christiangoueguel.com/specProc/reference/starkb_lines.md))
+at the electron density measured above, and
+[`plot_curve_of_growth()`](https://christiangoueguel.com/specProc/reference/plot_curve_of_growth.md)
+draws the fit.
+
 ## Calibration-free composition
 
 Calibration-free LIBS (CF-LIBS; Ciucci et al., 1999) derives the
@@ -585,6 +605,10 @@ laboratory values shows.
 
 ## References
 
+- Aragón, C., Aguilera, J.A. (2014). CSigma graphs: a new approach for
+  plasma characterization in laser-induced breakdown spectroscopy.
+  *Journal of Quantitative Spectroscopy and Radiative Transfer*,
+  149:90–102.
 - Ciucci, A., Corsi, M., Palleschi, V., Rastelli, S., Salvetti, A.,
   Tognoni, E. (1999). New procedure for quantitative elemental analysis
   by laser-induced plasma spectroscopy. *Applied Spectroscopy*,

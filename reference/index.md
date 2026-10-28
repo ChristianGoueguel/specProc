@@ -149,6 +149,16 @@ instrument to another instrument.
 
 - [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md) :
   Piecewise Direct Standardization
+- [`ds()`](https://christiangoueguel.com/specProc/reference/ds.md) :
+  Direct Standardization
+- [`sst()`](https://christiangoueguel.com/specProc/reference/sst.md) :
+  Spectral Space Transformation
+- [`predict(`*`<specproc_transfer>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_transfer.md)
+  : Transfer Spectra to Another Instrument
+- [`slope_bias()`](https://christiangoueguel.com/specProc/reference/slope_bias.md)
+  : Slope and Bias Correction of Predictions
+- [`predict(`*`<specproc_slope_bias>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_slope_bias.md)
+  : Correct Predictions for Slope and Bias
 - [`glsw()`](https://christiangoueguel.com/specProc/reference/glsw.md) :
   Generalized Least Squares Weighting
 
@@ -326,6 +336,12 @@ checks of LTE, self-absorption and detector saturation.
   : Self-Absorption Coefficient from Line Widths
 - [`correct_self_absorption()`](https://christiangoueguel.com/specProc/reference/correct_self_absorption.md)
   : Self-Absorption Correction with an Internal Reference Line
+- [`curve_of_growth()`](https://christiangoueguel.com/specProc/reference/curve_of_growth.md)
+  : Self-Absorption by the Curve of Growth
+- [`curve_of_growth_model()`](https://christiangoueguel.com/specProc/reference/curve_of_growth_model.md)
+  : Intensities of Emission Lines on a Curve of Growth
+- [`plot_curve_of_growth()`](https://christiangoueguel.com/specProc/reference/plot_curve_of_growth.md)
+  : Plot a Curve of Growth
 - [`saturation_summary()`](https://christiangoueguel.com/specProc/reference/saturation_summary.md)
   : Detect Saturated Channels in Spectra
 

@@ -271,6 +271,37 @@
   outside the domain, by their Hotelling T-squared or Q residual (see
   [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md)),
   so that extrapolated predictions of any model can be checked.
+- [`curve_of_growth()`](https://christiangoueguel.com/specProc/reference/curve_of_growth.md):
+  self-absorption by the curve of growth of a homogeneous plasma in LTE
+  (Gornushkin et al., 1999), the model of the C-sigma graphs of Aragón
+  and Aguilera (2014): from the intensities of the lines of one or
+  several species, their Stark widths and the temperature, it fits a
+  common instrument factor and one column density per species, and
+  returns the optical depth at the center, the self-absorption
+  coefficient and the optically thin intensity of each line, ready for
+  [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
+  and
+  [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md).
+  The line profiles are Voigt profiles of the Stark and Doppler widths.
+  [`curve_of_growth_model()`](https://christiangoueguel.com/specProc/reference/curve_of_growth_model.md)
+  computes the intensities for given optical depths, and
+  [`plot_curve_of_growth()`](https://christiangoueguel.com/specProc/reference/plot_curve_of_growth.md)
+  draws the reduced intensities against the optical depth.
+- Calibration transfer:
+  [`ds()`](https://christiangoueguel.com/specProc/reference/ds.md)
+  (direct standardization) and
+  [`sst()`](https://christiangoueguel.com/specProc/reference/sst.md)
+  (spectral space transformation, Du et al., 2011) transfer spectra of a
+  slave instrument to the master, from transfer samples measured on
+  both, with low-rank transfer matrices;
+  [`slope_bias()`](https://christiangoueguel.com/specProc/reference/slope_bias.md)
+  corrects the predictions of a model on the slave instrument instead,
+  with tests of the bias and slope.
+  [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md) now
+  returns a `specproc_transfer` object (with the same `transfer_matrix`
+  and `intercept`), and
+  [`predict()`](https://rdrr.io/r/stats/predict.html) transfers spectra
+  with any of the three.
 - [`control_chart()`](https://christiangoueguel.com/specProc/reference/control_chart.md)
   and
   [`plot_control_chart()`](https://christiangoueguel.com/specProc/reference/plot_control_chart.md):
