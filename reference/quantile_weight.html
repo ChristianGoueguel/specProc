@@ -54,7 +54,13 @@ behavior in the left and right tails, respectively.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">quantile_weight</span><span class="op">(</span><span class="va">x</span>, p <span class="op">=</span> <span class="fl">0.125</span>, q <span class="op">=</span> <span class="fl">0.875</span>, drop.na <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">quantile_weight</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  p <span class="op">=</span> <span class="fl">0.125</span>,</span>
+<span>  q <span class="op">=</span> <span class="fl">0.875</span>,</span>
+<span>  drop_na <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  drop.na <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -73,8 +79,12 @@ behavior in the left and right tails, respectively.</p>
 <dd><p>A numeric value between 0.5 and 1 (<code>q = 0.875</code> by default).</p></dd>
 
 
-<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dt id="arg-drop-na">drop_na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
 <dd><p>Logical value indicating whether to remove missing values (NA). If <code>FALSE</code> (default) and <code>x</code> contains missing values, <code>NA</code> is returned.</p></dd>
+
+
+<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>drop_na</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -246,6 +246,9 @@
 
 ### Improvements
 
+- The title of the package is now “Analysis of Laser-Induced Breakdown
+  Spectroscopy Data”: it covers plasma diagnostics, calibration and
+  robust chemometrics, not only preprocessing.
 - The labels of the plots no longer overlap: they are placed by ggrepel
   (now imported), away from each other and from the points, with a
   segment to their point when moved far. This applies to the outlying
@@ -414,6 +417,66 @@
 
 ### Breaking changes
 
+- The functions renamed in specProc 0.2.0 and 0.8.0
+  ([`peakfit()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md),
+  [`multipeakfit()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md),
+  [`plotfit()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md),
+  [`plotSpec()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md),
+  [`summaryStats()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md),
+  [`tukeyGH()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md),
+  [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
+  and the others listed in
+  [`?"specProc-defunct"`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)),
+  deprecated until 0.8.3, are now defunct: they stop with an error that
+  names the new function, and will be removed in a later release.
+- Arguments with dotted names are renamed in snake_case, as in the rest
+  of the package. The former names still work, with a deprecation
+  warning:
+  - `max.iter` becomes `max_iter` in
+    [`baseline_als()`](https://christiangoueguel.com/specProc/reference/baseline_als.md),
+    [`baseline_arpls()`](https://christiangoueguel.com/specProc/reference/baseline_arpls.md),
+    [`baseline_lsp()`](https://christiangoueguel.com/specProc/reference/baseline_lsp.md),
+    [`osc()`](https://christiangoueguel.com/specProc/reference/osc.md),
+    [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md)
+    and
+    [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md);
+  - `drop.na` becomes `drop_na` (as in
+    [`plot_spectra()`](https://christiangoueguel.com/specProc/reference/plot_spectra.md))
+    in
+    [`biweight_location()`](https://christiangoueguel.com/specProc/reference/biweight_location.md),
+    [`biweight_midvariance()`](https://christiangoueguel.com/specProc/reference/biweight_midvariance.md),
+    [`biweight_scale()`](https://christiangoueguel.com/specProc/reference/biweight_scale.md),
+    [`center()`](https://christiangoueguel.com/specProc/reference/center.md),
+    [`iqr_outliers()`](https://christiangoueguel.com/specProc/reference/iqr_outliers.md),
+    [`medcouple_weight()`](https://christiangoueguel.com/specProc/reference/medcouple_weight.md),
+    [`minmax()`](https://christiangoueguel.com/specProc/reference/minmax.md),
+    [`msc()`](https://christiangoueguel.com/specProc/reference/msc.md),
+    [`normalize()`](https://christiangoueguel.com/specProc/reference/normalize.md),
+    [`pareto_scale()`](https://christiangoueguel.com/specProc/reference/pareto_scale.md),
+    [`poisson_scale()`](https://christiangoueguel.com/specProc/reference/poisson_scale.md),
+    [`quantile_weight()`](https://christiangoueguel.com/specProc/reference/quantile_weight.md),
+    [`rousseeuw_croux()`](https://christiangoueguel.com/specProc/reference/rousseeuw_croux.md),
+    [`snv()`](https://christiangoueguel.com/specProc/reference/snv.md),
+    [`summary_stats()`](https://christiangoueguel.com/specProc/reference/summary_stats.md),
+    [`umad()`](https://christiangoueguel.com/specProc/reference/umad.md)
+    and
+    [`zscore()`](https://christiangoueguel.com/specProc/reference/zscore.md);
+  - `drop.offset` becomes `drop_offset` in
+    [`msc()`](https://christiangoueguel.com/specProc/reference/msc.md)
+    and
+    [`step_msc()`](https://christiangoueguel.com/specProc/reference/step_msc.md),
+    and `pls.ncomp` becomes `pls_ncomp` in
+    [`osc()`](https://christiangoueguel.com/specProc/reference/osc.md);
+  - in
+    [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md)
+    and
+    [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md),
+    `wavelength = c(min, max)` replaces `wlgth.min` and `wlgth.max`, as
+    the wavelength range of
+    [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md)
+    and
+    [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md).
+    Calls that gave the arguments after `A` by position must name them.
 - [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
   flags fewer observations: its default detection rate `alpha` is now
   about 0.7% (`2 * pnorm(-4 * qnorm(0.75))`), that of Tukey’s boxplot
@@ -742,9 +805,9 @@ CRAN release: 2026-10-15
     [`cellWise::transfo()`](https://rdrr.io/pkg/cellWise/man/transfo.html),
     and leaves the variables that cannot be transformed unchanged
     (method `"none"`).
-- [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+- [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   and
-  [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   are renamed
   [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
   and
@@ -1202,7 +1265,7 @@ CRAN release: 2026-10-15
   in spectra, searching each peak near its tabulated wavelength, with a
   signal-to-noise ratio and saturation check. It keeps the columns of a
   table of lines, so its result feeds
-  [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md),
+  [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md),
   [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md)
   and
   [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md).
@@ -1269,9 +1332,9 @@ Stark parameters from STARK-B.
     estimates the electron density from the Stark (Lorentzian) width of
     a line, with STARK-B data or a reference width, or from the H-alpha
     line (Gigosos et al., 2003).
-  - [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  - [`boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
     and
-    [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+    [`saha_boltzmann_plot()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
     estimate the excitation temperature from line intensities and atomic
     data, and
     [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md)
@@ -1446,53 +1509,53 @@ independent reference implementations.
 
 - Functions were renamed to a consistent snake_case scheme. The old
   names still work but give a deprecation warning (see
-  [`?"specProc-deprecated"`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)):
-  [`whittaker()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  `?"specProc-deprecated"`):
+  [`whittaker()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`baseline_als()`](https://christiangoueguel.com/specProc/reference/baseline_als.md),
-  [`lorentzian()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`lorentzian()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`lorentzian_profile()`](https://christiangoueguel.com/specProc/reference/lorentzian_profile.md),
-  [`pseudo_voigt()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`pseudo_voigt()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`pseudo_voigt_profile()`](https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.md),
-  [`peakfit()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`peakfit()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md),
-  [`multipeakfit()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`multipeakfit()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md),
-  [`plotfit()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`plotfit()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`plot_fit()`](https://christiangoueguel.com/specProc/reference/plot_fit.md),
-  [`plotSpec()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`plotSpec()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`plot_spectra()`](https://christiangoueguel.com/specProc/reference/plot_spectra.md),
-  [`outlierplot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`outlierplot()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`plot_outliers()`](https://christiangoueguel.com/specProc/reference/plot_outliers.md),
-  [`directOutlyingness()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`directOutlyingness()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`directional_outlyingness()`](https://christiangoueguel.com/specProc/reference/directional_outlyingness.md),
-  [`iqrMethod()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`iqrMethod()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`iqr_outliers()`](https://christiangoueguel.com/specProc/reference/iqr_outliers.md),
-  [`robustBCYJ()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`robustBCYJ()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`robust_bcyj()`](https://christiangoueguel.com/specProc/reference/robust_bcyj.md),
-  [`rousseeuwCroux()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`rousseeuwCroux()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`rousseeuw_croux()`](https://christiangoueguel.com/specProc/reference/rousseeuw_croux.md),
-  [`summaryStats()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`summaryStats()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`summary_stats()`](https://christiangoueguel.com/specProc/reference/summary_stats.md),
-  [`tukeyGH()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`tukeyGH()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`tukey_gh()`](https://christiangoueguel.com/specProc/reference/tukey_gh.md),
-  [`yGradientglsw()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`yGradientglsw()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/y_gradient_glsw.md),
-  [`pareto()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`pareto()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   -\>
   [`pareto_scale()`](https://christiangoueguel.com/specProc/reference/pareto_scale.md).
 
@@ -1506,7 +1569,7 @@ independent reference implementations.
 - [`baseline_arpls()`](https://christiangoueguel.com/specProc/reference/baseline_arpls.md),
   [`baseline_lsp()`](https://christiangoueguel.com/specProc/reference/baseline_lsp.md)
   and
-  [`whittaker()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`whittaker()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   return tibbles (they previously returned plain lists of columns). They
   no longer replace negative corrected values with 1.
 
@@ -1563,25 +1626,25 @@ independent reference implementations.
 
 - Fixed crashes in
   [`baseline_arpls()`](https://christiangoueguel.com/specProc/reference/baseline_arpls.md),
-  [`whittaker()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md),
+  [`whittaker()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md),
   [`baseline_lsp()`](https://christiangoueguel.com/specProc/reference/baseline_lsp.md)
   (data frames), `correlation(method = "bicor")`,
   `directOutlyingness(maxRatio = )`,
   [`direct_osc()`](https://christiangoueguel.com/specProc/reference/direct_osc.md),
   [`msc()`](https://christiangoueguel.com/specProc/reference/msc.md),
-  [`multipeakfit()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md),
+  [`multipeakfit()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md),
   [`nas()`](https://christiangoueguel.com/specProc/reference/nas.md),
   [`o2pls()`](https://christiangoueguel.com/specProc/reference/o2pls.md),
   [`osc()`](https://christiangoueguel.com/specProc/reference/osc.md)
   (`"wold"`, `"fearn"`),
   [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md),
-  [`peakfit()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md),
+  [`peakfit()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md),
   [`projected_osc()`](https://christiangoueguel.com/specProc/reference/projected_osc.md)
   and
-  [`yGradientglsw()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md).
+  [`yGradientglsw()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md).
 - [`glsw()`](https://christiangoueguel.com/specProc/reference/glsw.md)
   and
-  [`yGradientglsw()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`yGradientglsw()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   squared the eigenvalues of the covariance matrix when building the
   filter.
 - [`msc()`](https://christiangoueguel.com/specProc/reference/msc.md)
@@ -1590,7 +1653,7 @@ independent reference implementations.
   transformed the ranks instead of the data. This made the g-and-h
   estimates meaningless. It also failed when the two tails had different
   numbers of outliers.
-- [`pseudo_voigt()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+- [`pseudo_voigt()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   counted the area and the offset twice.
 - [`biweight_scale()`](https://christiangoueguel.com/specProc/reference/biweight_scale.md)
   used a wrong exponent in the denominator. It also ignored
@@ -1601,11 +1664,11 @@ independent reference implementations.
   did not ignore missing values. It also read out of bounds for factors
   with unused levels or missing group values.
 - `normalize(method = "background")` rejected data frames for `bkg`.
-- [`plotSpec()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+- [`plotSpec()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   connected all spectra into a single line when `id` was not given.
-- [`outlierplot()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+- [`outlierplot()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   no longer changes the user’s random number generator state.
-- [`iqrMethod()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+- [`iqrMethod()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   no longer changes global options. Missing values no longer cause
   errors.
 
@@ -1655,12 +1718,12 @@ independent reference implementations.
   scale to spectra with tens of thousands of channels.
 - EPO and GLSW use Eigen’s divide-and-conquer SVD and never form the p x
   p covariance or projection matrices.
-- [`peakfit()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+- [`peakfit()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   and
-  [`multipeakfit()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`multipeakfit()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   estimate starting values from the data when `wL`, `wG` or `A` are not
   given.
-  [`multipeakfit()`](https://christiangoueguel.com/specProc/reference/specProc-deprecated.md)
+  [`multipeakfit()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   fits all lines simultaneously and returns each line’s contribution. A
   spectrum that fails to fit produces a warning instead of stopping the
   whole batch.

@@ -6,7 +6,7 @@ the interquartile range (IQR) method.
 ## Usage
 
 ``` r
-iqr_outliers(x, k = 1.5, skew = FALSE, drop.na = FALSE)
+iqr_outliers(x, k = 1.5, skew = FALSE, drop_na = FALSE, drop.na = deprecated())
 ```
 
 ## Arguments
@@ -38,12 +38,16 @@ iqr_outliers(x, k = 1.5, skew = FALSE, drop.na = FALSE)
   and proceed with the calculations using the appropriate formulas and
   constants.
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to remove missing values (`NA`)
   from the calculations. If `TRUE`, missing values will be removed. If
   `FALSE` (the default), missing values are kept in the output (with a
   missing flag) and ignored when computing the fences.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

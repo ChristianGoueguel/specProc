@@ -12,11 +12,13 @@ peak_fit(
   wL = NULL,
   wG = NULL,
   A = NULL,
-  wlgth.min = NULL,
-  wlgth.max = NULL,
+  wavelength = NULL,
   id = NULL,
-  max.iter = 200,
-  fixed = NULL
+  max_iter = 200,
+  fixed = NULL,
+  max.iter = deprecated(),
+  wlgth.min = deprecated(),
+  wlgth.max = deprecated()
 )
 ```
 
@@ -47,20 +49,17 @@ peak_fit(
 
   A numeric specifying the peak area (initial guess)
 
-- wlgth.min:
+- wavelength:
 
-  A numeric specifying the lower bound of the wavelength subset
-
-- wlgth.max:
-
-  A numeric specifying the upper bound of the wavelength subset
+  The wavelength range of the fit, `c(min, max)` in nm, or `NULL`
+  (default) for all the channels.
 
 - id:
 
   A character specifying the name of the column holding the spectra id
   (optional)
 
-- max.iter:
+- max_iter:
 
   A numeric specifying the maximum number of iteration (200 by default)
 
@@ -68,6 +67,11 @@ peak_fit(
 
   The widths held at their given values (`wG`, `wL`) instead of being
   fitted: `"wG"`, `"wL"` or both. Default is `NULL` (all widths fitted).
+
+- max.iter, wlgth.min, wlgth.max:
+
+  **\[deprecated\]** Use `max_iter`, and
+  `wavelength = c(wlgth.min, wlgth.max)`.
 
 ## Value
 

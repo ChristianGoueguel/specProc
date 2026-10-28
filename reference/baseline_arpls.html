@@ -48,7 +48,13 @@ squares smoothing algorithm as proposed by Baek <em>et al.</em> (2015).</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">baseline_arpls</span><span class="op">(</span><span class="va">x</span>, lambda <span class="op">=</span> <span class="fl">1000</span>, ratio <span class="op">=</span> <span class="fl">0.05</span>, max.iter <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">baseline_arpls</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  lambda <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  ratio <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  max_iter <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  max.iter <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -67,8 +73,12 @@ squares smoothing algorithm as proposed by Baek <em>et al.</em> (2015).</p>
 <dd><p>A numeric value specifying the convergence ratio for the iterative algorithm. The algorithm stops when the relative change in the weights is less than this ratio. Typical values are between 0.01 and 0.1. Default is 0.05.</p></dd>
 
 
-<dt id="arg-max-iter">max.iter<a class="anchor" aria-label="anchor" href="#arg-max-iter"></a></dt>
+<dt id="arg-max-iter">max_iter<a class="anchor" aria-label="anchor" href="#arg-max-iter"></a></dt>
 <dd><p>Maximum number of iterations for the algorithm. Default is 10.</p></dd>
+
+
+<dt id="arg-max-iter">max.iter<a class="anchor" aria-label="anchor" href="#arg-max-iter"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>max_iter</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

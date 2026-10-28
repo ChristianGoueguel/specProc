@@ -10,10 +10,12 @@ effects in the spectral data by regressing against a reference spectrum.
 msc(
   x,
   xref = NULL,
-  drop.offset = TRUE,
+  drop_offset = TRUE,
   robust = TRUE,
   window = NULL,
-  drop.na = TRUE
+  drop_na = TRUE,
+  drop.offset = deprecated(),
+  drop.na = deprecated()
 )
 ```
 
@@ -29,7 +31,7 @@ msc(
   An optional numeric vector representing the reference spectrum. If
   `NULL` (default), the mean or median of `x` is used as the reference.
 
-- drop.offset:
+- drop_offset:
 
   A logical value indicating whether the additive offset \\a_i\\ should
   be removed from the spectra (default is `TRUE`). If `FALSE`, only the
@@ -46,10 +48,14 @@ msc(
   spectral windows. If provided, MSC is performed separately for each
   window.
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to remove spectra (rows) containing
   missing values. If `TRUE` (the default), such rows are removed.
+
+- drop.offset, drop.na:
+
+  **\[deprecated\]** Use `drop_offset` and `drop_na`.
 
 ## Value
 

@@ -7,7 +7,14 @@ spectrum.
 ## Usage
 
 ``` r
-normalize(x, method = "area", bkg = NULL, wlength = NULL, drop.na = TRUE)
+normalize(
+  x,
+  method = "area",
+  bkg = NULL,
+  wlength = NULL,
+  drop_na = TRUE,
+  drop.na = deprecated()
+)
 ```
 
 ## Arguments
@@ -37,10 +44,14 @@ normalize(x, method = "area", bkg = NULL, wlength = NULL, drop.na = TRUE)
   "background" method, where only these wavelengths are normalized and
   returned.
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to remove spectra (rows) containing
   missing values before normalizing. Default is `TRUE`.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

@@ -8,7 +8,13 @@ distribution's behavior in the left and right tails, respectively.
 ## Usage
 
 ``` r
-quantile_weight(x, p = 0.125, q = 0.875, drop.na = FALSE)
+quantile_weight(
+  x,
+  p = 0.125,
+  q = 0.875,
+  drop_na = FALSE,
+  drop.na = deprecated()
+)
 ```
 
 ## Arguments
@@ -25,10 +31,14 @@ quantile_weight(x, p = 0.125, q = 0.875, drop.na = FALSE)
 
   A numeric value between 0.5 and 1 (`q = 0.875` by default).
 
-- drop.na:
+- drop_na:
 
   Logical value indicating whether to remove missing values (NA). If
   `FALSE` (default) and `x` contains missing values, `NA` is returned.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

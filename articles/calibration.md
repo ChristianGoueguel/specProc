@@ -31,7 +31,7 @@ spectrum to spectrum (the internal standard of
 
 ``` r
 
-corrected <- baseline_arpls(spectra, lambda = 1e5, max.iter = 20)$correction
+corrected <- baseline_arpls(spectra, lambda = 1e5, max_iter = 20)$correction
 
 lines <- c(C = 247.856, K = 769.896, Fe = 259.940)
 intensities <- line_intensities(corrected, lines) |>

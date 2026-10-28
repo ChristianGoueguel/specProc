@@ -8,7 +8,7 @@ in the presence of outliers or contaminated data.
 ## Usage
 
 ``` r
-medcouple_weight(x, drop.na = FALSE)
+medcouple_weight(x, drop_na = FALSE, drop.na = deprecated())
 ```
 
 ## Arguments
@@ -17,10 +17,14 @@ medcouple_weight(x, drop.na = FALSE)
 
   A numeric vector.
 
-- drop.na:
+- drop_na:
 
   Logical value indicating whether to remove missing values (NA). If
   `FALSE` (default) and `x` contains missing values, `NA` is returned.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

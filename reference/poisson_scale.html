@@ -54,7 +54,13 @@ near-zero mean.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">poisson_scale</span><span class="op">(</span><span class="va">x</span>, sc <span class="op">=</span> <span class="cn">NULL</span>, drop.na <span class="op">=</span> <span class="cn">TRUE</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">poisson_scale</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  sc <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  drop_na <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  drop.na <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -70,7 +76,7 @@ near-zero mean.</p>
 will be applied to the data.</p></dd>
 
 
-<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dt id="arg-drop-na">drop_na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
 <dd><p>A logical value indicating whether to remove rows containing
 missing values. If <code>TRUE</code> (the default), such rows are removed. If <code>FALSE</code>,
 missing values are kept and ignored when computing the means.</p></dd>
@@ -78,6 +84,10 @@ missing values are kept and ignored when computing the means.</p></dd>
 
 <dt id="arg-options">options<a class="anchor" aria-label="anchor" href="#arg-options"></a></dt>
 <dd><p>A list of options for Poisson scaling. See the 'Options' section below.</p></dd>
+
+
+<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>drop_na</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -6,7 +6,13 @@ squares smoothing algorithm as proposed by Baek *et al.* (2015).
 ## Usage
 
 ``` r
-baseline_arpls(x, lambda = 1000, ratio = 0.05, max.iter = 10)
+baseline_arpls(
+  x,
+  lambda = 1000,
+  ratio = 0.05,
+  max_iter = 10,
+  max.iter = deprecated()
+)
 ```
 
 ## Arguments
@@ -28,9 +34,13 @@ baseline_arpls(x, lambda = 1000, ratio = 0.05, max.iter = 10)
   is less than this ratio. Typical values are between 0.01 and 0.1.
   Default is 0.05.
 
-- max.iter:
+- max_iter:
 
   Maximum number of iterations for the algorithm. Default is 10.
+
+- max.iter:
+
+  **\[deprecated\]** Use `max_iter`.
 
 ## Value
 

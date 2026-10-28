@@ -57,7 +57,8 @@ than the sample mean.</p>
 <span>  c <span class="op">=</span> <span class="fl">6</span>,</span>
 <span>  tol <span class="op">=</span> <span class="fl">1e-06</span>,</span>
 <span>  max_iter <span class="op">=</span> <span class="fl">50</span>,</span>
-<span>  drop.na <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  drop_na <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  drop.na <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -85,8 +86,12 @@ than the sample mean.</p>
 <dd><p>Maximum number of iterations (default: 50).</p></dd>
 
 
-<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dt id="arg-drop-na">drop_na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
 <dd><p>A logical value indicating whether to remove missing values (<code>NA</code>) from the calculations. If <code>TRUE</code>, missing values will be removed. If <code>FALSE</code> (the default), the result is <code>NA</code> when <code>x</code> contains missing values.</p></dd>
+
+
+<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>drop_na</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

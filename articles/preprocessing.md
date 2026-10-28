@@ -66,7 +66,7 @@ shows the baseline itself:
 
 region <- wl > 276 & wl < 290
 fitted_baselines <- map(c(`1e3` = 1e3, `1e5` = 1e5, `1e7` = 1e7), \(lambda) {
-  unlist(baseline_arpls(spectra[1, ], lambda = lambda, max.iter = 20)$background)[region]
+  unlist(baseline_arpls(spectra[1, ], lambda = lambda, max_iter = 20)$background)[region]
 })
 first_spectrum <- tibble(wavelength = wl[region], counts = unlist(spectra[1, region]))
 
@@ -93,7 +93,7 @@ the range of
 ``` r
 
 corrected <- base |>
-  step_baseline(all_predictors(), lambda = 1e5, options = list(max.iter = 20))
+  step_baseline(all_predictors(), lambda = 1e5, options = list(max_iter = 20))
 ```
 
 [`step_baseline()`](https://christiangoueguel.com/specProc/reference/step_baseline.md)

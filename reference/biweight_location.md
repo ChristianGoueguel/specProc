@@ -13,7 +13,8 @@ biweight_location(
   c = 6,
   tol = 1e-06,
   max_iter = 50,
-  drop.na = FALSE
+  drop_na = FALSE,
+  drop.na = deprecated()
 )
 ```
 
@@ -40,12 +41,16 @@ biweight_location(
 
   Maximum number of iterations (default: 50).
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to remove missing values (`NA`)
   from the calculations. If `TRUE`, missing values will be removed. If
   `FALSE` (the default), the result is `NA` when `x` contains missing
   values.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

@@ -55,14 +55,16 @@ functions with variable parameters.</p>
 <span>  wL <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  wG <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  A <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  wlgth.min <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  wlgth.max <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  wavelength <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  id <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  max.iter <span class="op">=</span> <span class="fl">200</span>,</span>
+<span>  max_iter <span class="op">=</span> <span class="fl">200</span>,</span>
 <span>  fixed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lock_centers <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  share_widths <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  area_ratios <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  area_ratios <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  max.iter <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  wlgth.min <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  wlgth.max <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -98,19 +100,16 @@ one per peak or a single one used for all peaks: "lorentzian", "gaussian",
 <dd><p>A numeric (single value or one per peak) of the peak area (initial guess)</p></dd>
 
 
-<dt id="arg-wlgth-min">wlgth.min<a class="anchor" aria-label="anchor" href="#arg-wlgth-min"></a></dt>
-<dd><p>A numeric of the lower bound of the wavelength subset</p></dd>
-
-
-<dt id="arg-wlgth-max">wlgth.max<a class="anchor" aria-label="anchor" href="#arg-wlgth-max"></a></dt>
-<dd><p>A numeric of the upper bound of the wavelength subset</p></dd>
+<dt id="arg-wavelength">wavelength<a class="anchor" aria-label="anchor" href="#arg-wavelength"></a></dt>
+<dd><p>The wavelength range of the fit, <code>c(min, max)</code> in nm, or
+<code>NULL</code> (default) for all the channels.</p></dd>
 
 
 <dt id="arg-id">id<a class="anchor" aria-label="anchor" href="#arg-id"></a></dt>
 <dd><p>A character specifying the name of the column holding the spectra id (optional)</p></dd>
 
 
-<dt id="arg-max-iter">max.iter<a class="anchor" aria-label="anchor" href="#arg-max-iter"></a></dt>
+<dt id="arg-max-iter">max_iter<a class="anchor" aria-label="anchor" href="#arg-max-iter"></a></dt>
 <dd><p>A numeric specifying the maximum number of iteration (200 by default)</p></dd>
 
 
@@ -137,6 +136,11 @@ lines of a group must have the same profile.</p></dd>
 <dt id="arg-area-ratios">area_ratios<a class="anchor" aria-label="anchor" href="#arg-area-ratios"></a></dt>
 <dd><p>The fixed relative areas of the lines, one per peak
 (<code>NA</code> for a free area), or <code>NULL</code> (default) for free areas.</p></dd>
+
+
+<dt id="arg-max-iter-wlgth-min-wlgth-max">max.iter, wlgth.min, wlgth.max<a class="anchor" aria-label="anchor" href="#arg-max-iter-wlgth-min-wlgth-max"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use
+<code>max_iter</code>, and <code>wavelength = c(wlgth.min, wlgth.max)</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

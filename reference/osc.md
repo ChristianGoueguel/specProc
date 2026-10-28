@@ -17,8 +17,10 @@ osc(
   scale = FALSE,
   ncomp = 10,
   tol = 0.001,
-  max.iter = 10,
-  pls.ncomp = 5
+  max_iter = 10,
+  pls_ncomp = 5,
+  max.iter = deprecated(),
+  pls.ncomp = deprecated()
 )
 ```
 
@@ -57,15 +59,19 @@ osc(
   A numeric value representing the tolerance for convergence. The
   default value is 1e-3.
 
-- max.iter:
+- max_iter:
 
   An integer representing the maximum number of iterations. The default
   value is 10.
 
-- pls.ncomp:
+- pls_ncomp:
 
   An integer giving the number of PLS components used to compute the
   weights in Wold's method. Default is 5.
+
+- max.iter, pls.ncomp:
+
+  **\[deprecated\]** Use `max_iter` and `pls_ncomp`.
 
 ## Value
 

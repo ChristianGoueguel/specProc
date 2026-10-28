@@ -13,14 +13,16 @@ multipeak_fit(
   wL = NULL,
   wG = NULL,
   A = NULL,
-  wlgth.min = NULL,
-  wlgth.max = NULL,
+  wavelength = NULL,
   id = NULL,
-  max.iter = 200,
+  max_iter = 200,
   fixed = NULL,
   lock_centers = FALSE,
   share_widths = FALSE,
-  area_ratios = NULL
+  area_ratios = NULL,
+  max.iter = deprecated(),
+  wlgth.min = deprecated(),
+  wlgth.max = deprecated()
 )
 ```
 
@@ -57,20 +59,17 @@ multipeak_fit(
   A numeric (single value or one per peak) of the peak area (initial
   guess)
 
-- wlgth.min:
+- wavelength:
 
-  A numeric of the lower bound of the wavelength subset
-
-- wlgth.max:
-
-  A numeric of the upper bound of the wavelength subset
+  The wavelength range of the fit, `c(min, max)` in nm, or `NULL`
+  (default) for all the channels.
 
 - id:
 
   A character specifying the name of the column holding the spectra id
   (optional)
 
-- max.iter:
+- max_iter:
 
   A numeric specifying the maximum number of iteration (200 by default)
 
@@ -98,6 +97,11 @@ multipeak_fit(
 
   The fixed relative areas of the lines, one per peak (`NA` for a free
   area), or `NULL` (default) for free areas.
+
+- max.iter, wlgth.min, wlgth.max:
+
+  **\[deprecated\]** Use `max_iter`, and
+  `wavelength = c(wlgth.min, wlgth.max)`.
 
 ## Value
 

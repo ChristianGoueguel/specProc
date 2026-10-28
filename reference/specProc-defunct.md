@@ -1,0 +1,92 @@
+# Defunct functions in specProc
+
+These functions were renamed, most of them in specProc 0.2.0 to follow a
+consistent snake_case naming scheme. They were deprecated until specProc
+0.8.3 and are defunct since 0.9.0: they stop with an error that names
+the new function, and will be removed in a future release.
+
+## Usage
+
+``` r
+whittaker(...)
+
+lorentzian(...)
+
+pseudo_voigt(...)
+
+peakfit(...)
+
+multipeakfit(...)
+
+plotfit(...)
+
+plotSpec(...)
+
+outlierplot(...)
+
+directOutlyingness(...)
+
+iqrMethod(...)
+
+robustBCYJ(...)
+
+rousseeuwCroux(...)
+
+summaryStats(...)
+
+tukeyGH(...)
+
+yGradientglsw(...)
+
+pareto(...)
+
+boltzmann_plot(...)
+
+saha_boltzmann_plot(...)
+```
+
+## Arguments
+
+- ...:
+
+  Not used.
+
+## Value
+
+None: they stop with an error.
+
+## Details
+
+[`gaussian()`](https://rdrr.io/r/stats/family.html) was renamed to
+[`gaussian_profile()`](https://christiangoueguel.com/specProc/reference/gaussian_profile.md)
+without an alias, because an exported
+[`gaussian()`](https://rdrr.io/r/stats/family.html) masks
+[`stats::gaussian()`](https://rdrr.io/r/stats/family.html), the family
+used by [`glm()`](https://rdrr.io/r/stats/glm.html).
+
+|  |  |
+|----|----|
+| Old name | New name |
+| `whittaker()` | [`baseline_als()`](https://christiangoueguel.com/specProc/reference/baseline_als.md) |
+| `lorentzian()` | [`lorentzian_profile()`](https://christiangoueguel.com/specProc/reference/lorentzian_profile.md) |
+| `pseudo_voigt()` | [`pseudo_voigt_profile()`](https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.md) |
+| `peakfit()` | [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md) |
+| `multipeakfit()` | [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md) |
+| `plotfit()` | [`plot_fit()`](https://christiangoueguel.com/specProc/reference/plot_fit.md) |
+| `plotSpec()` | [`plot_spectra()`](https://christiangoueguel.com/specProc/reference/plot_spectra.md) |
+| `outlierplot()` | [`plot_outliers()`](https://christiangoueguel.com/specProc/reference/plot_outliers.md) |
+| `directOutlyingness()` | [`directional_outlyingness()`](https://christiangoueguel.com/specProc/reference/directional_outlyingness.md) |
+| `iqrMethod()` | [`iqr_outliers()`](https://christiangoueguel.com/specProc/reference/iqr_outliers.md) |
+| `robustBCYJ()` | [`robust_bcyj()`](https://christiangoueguel.com/specProc/reference/robust_bcyj.md) |
+| `rousseeuwCroux()` | [`rousseeuw_croux()`](https://christiangoueguel.com/specProc/reference/rousseeuw_croux.md) |
+| `summaryStats()` | [`summary_stats()`](https://christiangoueguel.com/specProc/reference/summary_stats.md) |
+| `tukeyGH()` | [`tukey_gh()`](https://christiangoueguel.com/specProc/reference/tukey_gh.md) |
+| `yGradientglsw()` | [`y_gradient_glsw()`](https://christiangoueguel.com/specProc/reference/y_gradient_glsw.md) |
+| `pareto()` | [`pareto_scale()`](https://christiangoueguel.com/specProc/reference/pareto_scale.md) |
+| `boltzmann_plot()` | [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md) |
+| `saha_boltzmann_plot()` | [`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md) |
+
+`boltzmann_plot()` and `saha_boltzmann_plot()` were renamed in specProc
+0.8.0, so that they are not confused with
+[`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md),
+which draws their result.

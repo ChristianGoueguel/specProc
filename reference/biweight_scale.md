@@ -7,7 +7,14 @@ outliers than the sample standard deviation.
 ## Usage
 
 ``` r
-biweight_scale(x, loc = NULL, c = 9, reduced = FALSE, drop.na = FALSE)
+biweight_scale(
+  x,
+  loc = NULL,
+  c = 9,
+  reduced = FALSE,
+  drop_na = FALSE,
+  drop.na = deprecated()
+)
 ```
 
 ## Arguments
@@ -34,12 +41,16 @@ biweight_scale(x, loc = NULL, c = 9, reduced = FALSE, drop.na = FALSE)
   (\\\|u_i\| \< 1\\). If `FALSE` (default), *n* is equal to the length
   of `x` (the input data).
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to remove missing values (`NA`)
   from the calculations. If `TRUE`, missing values will be removed. If
   `FALSE` (the default), the result is `NA` when `x` contains missing
   values.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

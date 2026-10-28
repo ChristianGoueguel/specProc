@@ -8,7 +8,7 @@ autoscaling the transpose of the input data.
 ## Usage
 
 ``` r
-snv(x, drop.na = TRUE)
+snv(x, drop_na = TRUE, drop.na = deprecated())
 ```
 
 ## Arguments
@@ -17,10 +17,14 @@ snv(x, drop.na = TRUE)
 
   A numeric matrix or data frame.
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to remove spectra (rows) containing
   missing values. If `TRUE` (the default), such rows are removed.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

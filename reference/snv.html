@@ -54,7 +54,7 @@ transpose of the input data.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">snv</span><span class="op">(</span><span class="va">x</span>, drop.na <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">snv</span><span class="op">(</span><span class="va">x</span>, drop_na <span class="op">=</span> <span class="cn">TRUE</span>, drop.na <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -65,9 +65,13 @@ transpose of the input data.</p>
 <dd><p>A numeric matrix or data frame.</p></dd>
 
 
-<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dt id="arg-drop-na">drop_na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
 <dd><p>A logical value indicating whether to remove spectra (rows)
 containing missing values. If <code>TRUE</code> (the default), such rows are removed.</p></dd>
+
+
+<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>drop_na</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

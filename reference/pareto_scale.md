@@ -7,7 +7,7 @@ square root of its standard deviation.
 ## Usage
 
 ``` r
-pareto_scale(x, drop.na = FALSE)
+pareto_scale(x, drop_na = FALSE, drop.na = deprecated())
 ```
 
 ## Arguments
@@ -16,10 +16,14 @@ pareto_scale(x, drop.na = FALSE)
 
   A numeric matrix or data frame to be scaled.
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to ignore missing values (NA) when
   computing the standard deviations. Default is `FALSE`.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

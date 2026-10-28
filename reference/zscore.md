@@ -6,7 +6,7 @@ for a numeric vector.
 ## Usage
 
 ``` r
-zscore(x, cutoff = 3, robust = FALSE, drop.na = FALSE)
+zscore(x, cutoff = 3, robust = FALSE, drop_na = FALSE, drop.na = deprecated())
 ```
 
 ## Arguments
@@ -28,12 +28,16 @@ zscore(x, cutoff = 3, robust = FALSE, drop.na = FALSE)
   `TRUE`, computes the robust method, i.e. the so-called Stahel-Donoho
   outlyingness.
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to remove missing values (`NA`)
   from the calculations. If `TRUE`, missing values will be removed. If
   `FALSE` (the default), missing values are kept in the output (with a
   missing score) and ignored when computing the location and scale.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

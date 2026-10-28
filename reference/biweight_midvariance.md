@@ -8,7 +8,7 @@ outliers.
 ## Usage
 
 ``` r
-biweight_midvariance(x, drop.na = FALSE)
+biweight_midvariance(x, drop_na = FALSE, drop.na = deprecated())
 ```
 
 ## Arguments
@@ -17,12 +17,16 @@ biweight_midvariance(x, drop.na = FALSE)
 
   A numeric vector.
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to remove missing values (`NA`)
   from the calculations. If `TRUE`, missing values will be removed. If
   `FALSE` (the default), the result is `NA` when `x` contains missing
   values.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

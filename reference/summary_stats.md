@@ -7,7 +7,14 @@ frame or tibble.
 ## Usage
 
 ``` r
-summary_stats(x, var = NULL, digits = 2, robust = FALSE, drop.na = TRUE)
+summary_stats(
+  x,
+  var = NULL,
+  digits = 2,
+  robust = FALSE,
+  drop_na = TRUE,
+  drop.na = deprecated()
+)
 ```
 
 ## Arguments
@@ -35,12 +42,16 @@ summary_stats(x, var = NULL, digits = 2, robust = FALSE, drop.na = TRUE)
   descriptive statistics for describing the distribution of a univariate
   variable.
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to remove missing values (`NA`)
   from the calculations. If `TRUE` (the default), missing values will be
   removed. If `FALSE`, the statistics of variables containing missing
   values are `NA`.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

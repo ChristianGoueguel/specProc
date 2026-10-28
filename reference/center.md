@@ -6,7 +6,7 @@ matrix or data frame.
 ## Usage
 
 ``` r
-center(x, method = "mean", drop.na = FALSE)
+center(x, method = "mean", drop_na = FALSE, drop.na = deprecated())
 ```
 
 ## Arguments
@@ -20,11 +20,15 @@ center(x, method = "mean", drop.na = FALSE)
   A character string specifying the centering method, either "mean" or
   "median".
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to ignore missing values (NA) when
   computing the column means or medians. Missing values are kept in the
   output.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

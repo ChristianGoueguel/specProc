@@ -48,7 +48,7 @@ a numeric vector.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">zscore</span><span class="op">(</span><span class="va">x</span>, cutoff <span class="op">=</span> <span class="fl">3</span>, robust <span class="op">=</span> <span class="cn">FALSE</span>, drop.na <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">zscore</span><span class="op">(</span><span class="va">x</span>, cutoff <span class="op">=</span> <span class="fl">3</span>, robust <span class="op">=</span> <span class="cn">FALSE</span>, drop_na <span class="op">=</span> <span class="cn">FALSE</span>, drop.na <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -67,8 +67,12 @@ a numeric vector.</p>
 <dd><p>A logical value indicating whether to calculate classical or robust z-score. If <code>FALSE</code> (the default), uses the classical approach. If <code>TRUE</code>, computes the robust method, i.e. the so-called Stahel-Donoho outlyingness.</p></dd>
 
 
-<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dt id="arg-drop-na">drop_na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
 <dd><p>A logical value indicating whether to remove missing values (<code>NA</code>) from the calculations. If <code>TRUE</code>, missing values will be removed. If <code>FALSE</code> (the default), missing values are kept in the output (with a missing score) and ignored when computing the location and scale.</p></dd>
+
+
+<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>drop_na</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

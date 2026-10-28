@@ -8,7 +8,13 @@ variable has a near-zero mean.
 ## Usage
 
 ``` r
-poisson_scale(x, sc = NULL, drop.na = TRUE, options = list())
+poisson_scale(
+  x,
+  sc = NULL,
+  drop_na = TRUE,
+  options = list(),
+  drop.na = deprecated()
+)
 ```
 
 ## Arguments
@@ -22,7 +28,7 @@ poisson_scale(x, sc = NULL, drop.na = TRUE, options = list())
   A vector of previously calculated scales. If provided, these scales
   will be applied to the data.
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to remove rows containing missing
   values. If `TRUE` (the default), such rows are removed. If `FALSE`,
@@ -32,6 +38,10 @@ poisson_scale(x, sc = NULL, drop.na = TRUE, options = list())
 
   A list of options for Poisson scaling. See the 'Options' section
   below.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

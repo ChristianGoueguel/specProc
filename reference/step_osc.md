@@ -63,7 +63,7 @@ step_osc(
 - options:
 
   A list of further arguments passed to the underlying function, such as
-  `scale`, `tol` or `max.iter` for
+  `scale`, `tol` or `max_iter` for
   [`osc()`](https://christiangoueguel.com/specProc/reference/osc.md).
 
 - res:

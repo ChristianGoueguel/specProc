@@ -48,7 +48,7 @@ interquartile range (IQR) method.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">iqr_outliers</span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">1.5</span>, skew <span class="op">=</span> <span class="cn">FALSE</span>, drop.na <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">iqr_outliers</span><span class="op">(</span><span class="va">x</span>, k <span class="op">=</span> <span class="fl">1.5</span>, skew <span class="op">=</span> <span class="cn">FALSE</span>, drop_na <span class="op">=</span> <span class="cn">FALSE</span>, drop.na <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -74,8 +74,12 @@ Consequently, if the user attempts to use a value of <code>k</code> other than 1
 In such cases, the code will automatically reset <code>k</code> to 1.5 and proceed with the calculations using the appropriate formulas and constants.</p></dd>
 
 
-<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dt id="arg-drop-na">drop_na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
 <dd><p>A logical value indicating whether to remove missing values (<code>NA</code>) from the calculations. If <code>TRUE</code>, missing values will be removed. If <code>FALSE</code> (the default), missing values are kept in the output (with a missing flag) and ignored when computing the fences.</p></dd>
+
+
+<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>drop_na</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -14,12 +14,13 @@ step_msc(
   role = NA,
   trained = FALSE,
   robust = TRUE,
-  drop.offset = TRUE,
+  drop_offset = TRUE,
   window = NULL,
   reference = NULL,
   columns = NULL,
   skip = FALSE,
-  id = recipes::rand_id("msc")
+  id = recipes::rand_id("msc"),
+  drop.offset = deprecated()
 )
 ```
 
@@ -49,7 +50,7 @@ step_msc(
   A logical: use the median (`TRUE`, default) or the mean of the
   training spectra as the reference.
 
-- drop.offset:
+- drop_offset:
 
   A logical: remove the additive offset (`TRUE`, default) or only the
   multiplicative effect.
@@ -79,6 +80,10 @@ step_msc(
 - id:
 
   A character string that is unique to this step.
+
+- drop.offset:
+
+  **\[deprecated\]** Use `drop_offset`.
 
 ## Value
 

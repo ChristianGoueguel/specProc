@@ -11,8 +11,9 @@ baseline_lsp(
   x,
   degree = 4,
   tol = 0.001,
-  max.iter = 100,
-  method = c("imodpoly", "modpoly")
+  max_iter = 100,
+  method = c("imodpoly", "modpoly"),
+  max.iter = deprecated()
 )
 ```
 
@@ -32,7 +33,7 @@ baseline_lsp(
   A numeric value representing the tolerance for the difference between
   iterations. The default value is 1e-3.
 
-- max.iter:
+- max_iter:
 
   An integer specifying the maximum number of iterations for the
   algorithm. The default value is 100.
@@ -40,6 +41,10 @@ baseline_lsp(
 - method:
 
   The algorithm: `"imodpoly"` (default) or `"modpoly"`. See Details.
+
+- max.iter:
+
+  **\[deprecated\]** Use `max_iter`.
 
 ## Value
 

@@ -54,10 +54,12 @@ in the spectral data by regressing against a reference spectrum.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">msc</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  xref <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  drop.offset <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  drop_offset <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  robust <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  window <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  drop.na <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  drop_na <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  drop.offset <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  drop.na <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -75,7 +77,7 @@ Each row represents a sample, and each column represents a spectral variable.</p
 If <code>NULL</code> (default), the mean or median of <code>x</code> is used as the reference.</p></dd>
 
 
-<dt id="arg-drop-offset">drop.offset<a class="anchor" aria-label="anchor" href="#arg-drop-offset"></a></dt>
+<dt id="arg-drop-offset">drop_offset<a class="anchor" aria-label="anchor" href="#arg-drop-offset"></a></dt>
 <dd><p>A logical value indicating whether the additive offset
 \(a_i\) should be removed from the spectra (default is <code>TRUE</code>). If <code>FALSE</code>,
 only the multiplicative effect is corrected: \(\textbf{x}_i / b_i\).</p></dd>
@@ -91,9 +93,13 @@ or the mean (<code>FALSE</code>) of <code>x</code> is used as <code>xref</code>.
 spectral windows. If provided, MSC is performed separately for each window.</p></dd>
 
 
-<dt id="arg-drop-na">drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
+<dt id="arg-drop-na">drop_na<a class="anchor" aria-label="anchor" href="#arg-drop-na"></a></dt>
 <dd><p>A logical value indicating whether to remove spectra (rows)
 containing missing values. If <code>TRUE</code> (the default), such rows are removed.</p></dd>
+
+
+<dt id="arg-drop-offset-drop-na">drop.offset, drop.na<a class="anchor" aria-label="anchor" href="#arg-drop-offset-drop-na"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>drop_offset</code> and <code>drop_na</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

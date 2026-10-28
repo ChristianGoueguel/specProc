@@ -6,7 +6,12 @@ estimator.
 ## Usage
 
 ``` r
-rousseeuw_croux(x, estimator = c("Sn", "Qn"), drop.na = FALSE)
+rousseeuw_croux(
+  x,
+  estimator = c("Sn", "Qn"),
+  drop_na = FALSE,
+  drop.na = deprecated()
+)
 ```
 
 ## Arguments
@@ -20,11 +25,15 @@ rousseeuw_croux(x, estimator = c("Sn", "Qn"), drop.na = FALSE)
   A character string indicating whether to calculate the "Sn" or "Qn"
   estimator.
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to remove missing values (`NA`)
   from the input vector. If `FALSE` (default) and `x` contains missing
   values, `NA` is returned.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

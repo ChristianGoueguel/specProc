@@ -1,4 +1,4 @@
-# specProc: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy
+# specProc: Analysis of Laser-Induced Breakdown Spectroscopy Data
 
 Tools for exploring, preprocessing and modeling spectroscopic data,
 developed for laser-induced breakdown spectroscopy (LIBS) and also

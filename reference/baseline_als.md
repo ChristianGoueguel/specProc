@@ -6,7 +6,13 @@ proposed by Eilers *et al.* (2005).
 ## Usage
 
 ``` r
-baseline_als(x, lambda = 1000, p = 0.001, max.iter = 10)
+baseline_als(
+  x,
+  lambda = 1000,
+  p = 0.001,
+  max_iter = 10,
+  max.iter = deprecated()
+)
 ```
 
 ## Arguments
@@ -28,9 +34,13 @@ baseline_als(x, lambda = 1000, p = 0.001, max.iter = 10)
   disallow negative-going regions. `p` must be between 0 and 1. Default
   is 0.001.
 
-- max.iter:
+- max_iter:
 
   Maximum number of iterations for the algorithm. Default is 10.
+
+- max.iter:
+
+  **\[deprecated\]** Use `max_iter`.
 
 ## Value
 

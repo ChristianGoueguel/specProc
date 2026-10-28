@@ -81,7 +81,7 @@ estimated by least squares, and the corrected spectrum is
 \dots - \sum_j h\_{ij}\textbf{k}\_j) / b_i\$\$ With `degree = 0` and no
 interferents, EMSC is identical to
 [`msc()`](https://christiangoueguel.com/specProc/reference/msc.md) with
-`drop.offset = TRUE`.
+`drop_offset = TRUE`.
 
 The wavelengths are rescaled to \\\[-1, 1\]\\ before the polynomials are
 formed, for numerical stability. Interferent spectra describe variation

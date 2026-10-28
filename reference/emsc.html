@@ -121,7 +121,7 @@ The coefficients are estimated by least squares, and the corrected spectrum
 is
 $$\textbf{x}_i^{corr} = (\textbf{x}_i - a_i - d_{i1}\lambda - \dots - \sum_j h_{ij}\textbf{k}_j) / b_i$$
 With <code>degree = 0</code> and no interferents, EMSC is identical to <code><a href="msc.html">msc()</a></code> with
-<code>drop.offset = TRUE</code>.</p>
+<code>drop_offset = TRUE</code>.</p>
 <p>The wavelengths are rescaled to \([-1, 1]\) before the polynomials are
 formed, for numerical stability. Interferent spectra describe variation
 that should be removed, for example the spectrum of a contaminant or the

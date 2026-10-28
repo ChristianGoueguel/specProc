@@ -62,11 +62,11 @@ step_baseline(
 - options:
 
   A list of further arguments passed to the baseline function: `ratio`
-  and `max.iter` for
+  and `max_iter` for
   [`baseline_arpls()`](https://christiangoueguel.com/specProc/reference/baseline_arpls.md),
-  `p` and `max.iter` for
+  `p` and `max_iter` for
   [`baseline_als()`](https://christiangoueguel.com/specProc/reference/baseline_als.md),
-  `tol` and `max.iter` for
+  `tol` and `max_iter` for
   [`baseline_lsp()`](https://christiangoueguel.com/specProc/reference/baseline_lsp.md).
 
 - columns:

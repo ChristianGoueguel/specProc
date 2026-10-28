@@ -8,7 +8,7 @@ normal distribution.
 ## Usage
 
 ``` r
-umad(x, method = "hayes", drop.na = TRUE)
+umad(x, method = "hayes", drop_na = TRUE, drop.na = deprecated())
 ```
 
 ## Arguments
@@ -23,11 +23,15 @@ umad(x, method = "hayes", drop.na = TRUE)
   correction factor when the number of sample is more than 100. The
   available options are "hayes" (default) and "williams".
 
-- drop.na:
+- drop_na:
 
   A logical value indicating whether to remove missing values (NA) from
   the calculations. If `TRUE` (the default), missing values will be
   removed. If `FALSE`, missing values will be included.
+
+- drop.na:
+
+  **\[deprecated\]** Use `drop_na`.
 
 ## Value
 

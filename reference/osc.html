@@ -62,8 +62,10 @@ with the response vector or property of interest.</p>
 <span>  scale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ncomp <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  tol <span class="op">=</span> <span class="fl">0.001</span>,</span>
-<span>  max.iter <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  pls.ncomp <span class="op">=</span> <span class="fl">5</span></span>
+<span>  max_iter <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  pls_ncomp <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  max.iter <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  pls.ncomp <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -99,12 +101,16 @@ with the response vector or property of interest.</p>
 <dd><p>A numeric value representing the tolerance for convergence. The default value is 1e-3.</p></dd>
 
 
-<dt id="arg-max-iter">max.iter<a class="anchor" aria-label="anchor" href="#arg-max-iter"></a></dt>
+<dt id="arg-max-iter">max_iter<a class="anchor" aria-label="anchor" href="#arg-max-iter"></a></dt>
 <dd><p>An integer representing the maximum number of iterations. The default value is 10.</p></dd>
 
 
-<dt id="arg-pls-ncomp">pls.ncomp<a class="anchor" aria-label="anchor" href="#arg-pls-ncomp"></a></dt>
+<dt id="arg-pls-ncomp">pls_ncomp<a class="anchor" aria-label="anchor" href="#arg-pls-ncomp"></a></dt>
 <dd><p>An integer giving the number of PLS components used to compute the weights in Wold's method. Default is 5.</p></dd>
+
+
+<dt id="arg-max-iter-pls-ncomp">max.iter, pls.ncomp<a class="anchor" aria-label="anchor" href="#arg-max-iter-pls-ncomp"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>max_iter</code> and <code>pls_ncomp</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
