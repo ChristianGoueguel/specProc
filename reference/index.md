@@ -345,6 +345,20 @@ of detection, and calibration-free composition (CF-LIBS).
 - [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md)
   : Calibration-Free LIBS Quantification
 
+## Applicability domain and drift
+
+Flags for the spectra outside the calibration space, and control charts
+(Shewhart, EWMA, CUSUM) to detect drifts of the instrument.
+
+- [`applicability_domain()`](https://christiangoueguel.com/specProc/reference/applicability_domain.md)
+  : Applicability Domain of a Calibration
+- [`predict(`*`<specproc_domain>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_domain.md)
+  : Flag Spectra Outside the Applicability Domain
+- [`control_chart()`](https://christiangoueguel.com/specProc/reference/control_chart.md)
+  : Control Chart for Instrument Drift
+- [`plot_control_chart()`](https://christiangoueguel.com/specProc/reference/plot_control_chart.md)
+  : Plot a Control Chart
+
 ## Peak fitting
 
 Functions used to characterize spectral lines. The choice of the fitting

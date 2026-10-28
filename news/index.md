@@ -243,6 +243,42 @@
   an interfering line can be left free. `tidied` lists the center,
   widths and area of every line, with standard errors propagated from
   the fitted parameters, and the common shifts.
+- [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md)
+  fits straight lines with errors in the concentrations, such as the
+  certified values of reference materials: `regression = "york"` (York
+  et al., 2004) with the standard uncertainties of the concentration and
+  signal of each standard (`concentration_se`, `signal_se`), and
+  `regression = "deming"` with a constant ratio of their variances
+  (`variance_ratio`). Least squares, which assume exact concentrations,
+  bias the slope toward zero. The York fit reproduces the Pearson-York
+  benchmark; its standard errors are scaled by the square root of the
+  reduced chi-squared when it exceeds 1.
+  [`predict()`](https://rdrr.io/r/stats/predict.html) and
+  [`plot_calibration()`](https://christiangoueguel.com/specProc/reference/plot_calibration.md)
+  use the fitted line.
+- [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md)
+  gains the limits of ISO 11843-2 and IUPAC
+  (`lod_convention = "iso11843"`): the critical value and the limit of
+  detection for the risks `alpha` and `beta` (noncentral t), with the
+  uncertainty of the intercept and the number of `replicates` of a
+  sample, and the limit of quantification at 10 standard deviations.
+  [`predict()`](https://rdrr.io/r/stats/predict.html) marks the samples
+  above the critical value as `detected`, and flags the concentrations
+  outside the range of the standards (`outside_range`).
+- [`applicability_domain()`](https://christiangoueguel.com/specProc/reference/applicability_domain.md)
+  describes the calibration spectra by a PCA, and its
+  [`predict()`](https://rdrr.io/r/stats/predict.html) flags new spectra
+  outside the domain, by their Hotelling T-squared or Q residual (see
+  [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md)),
+  so that extrapolated predictions of any model can be checked.
+- [`control_chart()`](https://christiangoueguel.com/specProc/reference/control_chart.md)
+  and
+  [`plot_control_chart()`](https://christiangoueguel.com/specProc/reference/plot_control_chart.md):
+  control charts of a quantity that should stay constant, such as an
+  internal standard line or a check sample, to detect drifts of the
+  instrument: Shewhart chart with the Western Electric rules, EWMA and
+  CUSUM, with the center and standard deviation (mean moving range) from
+  a baseline.
 
 ### Improvements
 

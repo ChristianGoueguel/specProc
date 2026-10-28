@@ -107,8 +107,11 @@ signal. Default is 1.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>For <code>type = "concentration"</code>, a tibble with the <code>signal</code>, the
 predicted <code>concentration</code>, its standard error <code>se</code>, the interval
-(<code>lower</code>, <code>upper</code>) and whether it is below the limit of detection
-(<code>below_lod</code>) or of quantification (<code>below_loq</code>). For <code>type = "signal"</code>, a tibble with the <code>concentration</code>, the predicted <code>signal</code>,
+(<code>lower</code>, <code>upper</code>), whether it is below the limit of detection
+(<code>below_lod</code>) or of quantification (<code>below_loq</code>), whether it lies
+outside the range of the standards (<code>outside_range</code>, an
+extrapolation), and, with the ISO 11843 limits, whether the element is
+<code>detected</code> (above the critical value). For <code>type = "signal"</code>, a tibble with the <code>concentration</code>, the predicted <code>signal</code>,
 its standard error <code>se</code> and the interval (<code>lower</code>, <code>upper</code>).</p>
     </div>
     <div class="section level2">
@@ -139,14 +142,14 @@ concentration (numeric weights give new samples a weight of 1).</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">cal</span> <span class="op">&lt;-</span> <span class="fu"><a href="calibration_curve.html">calibration_curve</a></span><span class="op">(</span><span class="va">standards</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">300</span>, <span class="op">]</span>, <span class="va">signal</span>, <span class="va">K</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cal</span>, <span class="va">standards</span><span class="op">$</span><span class="va">signal</span><span class="op">[</span><span class="fl">301</span><span class="op">:</span><span class="fl">305</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   signal concentration    se   lower upper below_lod below_loq</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  0.459          1.36  1.03 -<span style="color: #BB0000;">0.665</span>   3.38 TRUE      TRUE     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>  0.543          1.97  1.03 -<span style="color: #BB0000;">0.053</span><span style="color: #BB0000; text-decoration: underline;">8</span>  3.99 TRUE      TRUE     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  0.580          2.23  1.03  0.212   4.25 TRUE      TRUE     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>  0.492          1.59  1.03 -<span style="color: #BB0000;">0.427</span>   3.62 TRUE      TRUE     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>  0.481          1.52  1.03 -<span style="color: #BB0000;">0.507</span>   3.54 TRUE      TRUE     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 5 × 8</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   signal concentration    se   lower upper below_lod below_loq outside_range</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  0.459          1.36  1.03 -<span style="color: #BB0000;">0.665</span>   3.38 TRUE      TRUE      FALSE        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>  0.543          1.97  1.03 -<span style="color: #BB0000;">0.053</span><span style="color: #BB0000; text-decoration: underline;">8</span>  3.99 TRUE      TRUE      FALSE        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  0.580          2.23  1.03  0.212   4.25 TRUE      TRUE      FALSE        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>  0.492          1.59  1.03 -<span style="color: #BB0000;">0.427</span>   3.62 TRUE      TRUE      FALSE        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>  0.481          1.52  1.03 -<span style="color: #BB0000;">0.507</span>   3.54 TRUE      TRUE      FALSE        </span>
 <span class="r-in"><span><span class="co"># the signal expected at given contents (% K)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cal</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>, type <span class="op">=</span> <span class="st">"signal"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 5</span></span>

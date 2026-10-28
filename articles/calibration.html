@@ -78,7 +78,9 @@ from samples of known composition, and predicts the concentration of new
 samples. This vignette builds univariate calibration curves from line
 intensities, with their limits of detection and quantification, and
 compares them with a multivariate model of the whole spectrum, whose
-figures of merit come from the net analyte signal.</p>
+figures of merit come from the net analyte signal. It ends with two
+checks of routine analysis: whether new spectra lie within the
+calibration space, and whether the instrument drifts.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ChristianGoueguel/specProc" class="external-link">specProc</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
@@ -169,21 +171,88 @@ the values below the limits of detection and quantification:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">k_predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">k_curve</span>, <span class="va">test</span><span class="op">$</span><span class="va">K_signal</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">k_predicted</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 7</span></span></span>
-<span><span class="co">#&gt;   signal concentration    se lower upper below_lod below_loq</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>   2.23          3.17 0.443 2.29   4.04 FALSE     TRUE     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>   1.89          2.05 0.439 1.18   2.91 FALSE     TRUE     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>   2.06          2.61 0.440 1.74   3.48 FALSE     TRUE     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>   2.16          2.93 0.442 2.06   3.80 FALSE     TRUE     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>   1.83          1.86 0.439 0.996  2.73 FALSE     TRUE     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>   1.85          1.92 0.439 1.06   2.79 FALSE     TRUE</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 8</span></span></span>
+<span><span class="co">#&gt;   signal concentration    se lower upper below_lod below_loq outside_range</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>   2.23          3.17 0.443 2.29   4.04 FALSE     TRUE      FALSE        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>   1.89          2.05 0.439 1.18   2.91 FALSE     TRUE      FALSE        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>   2.06          2.61 0.440 1.74   3.48 FALSE     TRUE      FALSE        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>   2.16          2.93 0.442 2.06   3.80 FALSE     TRUE      FALSE        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>   1.83          1.86 0.439 0.996  2.73 FALSE     TRUE      FALSE        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>   1.85          1.92 0.439 1.06   2.79 FALSE     TRUE      FALSE</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">k_predicted</span><span class="op">$</span><span class="va">concentration</span> <span class="op">-</span> <span class="va">test</span><span class="op">$</span><span class="va">K</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>   <span class="co"># RMSEP, % K</span></span>
 <span><span class="co">#&gt; [1] 0.4828623</span></span></code></pre></div>
 <p>The limit of quantification of this curve, 4.4% K, is above the
 potassium content of almost every sample, so 100% of the predictions are
 flagged <code>below_loq</code>: a single line ranks the samples, but
 does not quantify them individually with the usual <span class="math inline">10\,\sigma</span> margin.</p>
+<p>The limits above follow the ICH convention. ISO 11843-2 and IUPAC
+define them by the risks of a false positive (<span class="math inline">\alpha</span>) and of a false negative (<span class="math inline">\beta</span>), and include the uncertainty of the
+curve itself: the critical value is the content above which potassium is
+declared present, and the limit of detection, the content detected with
+probability <span class="math inline">1 - \beta</span>:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">k_iso</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibration_curve.html">calibration_curve</a></span><span class="op">(</span><span class="va">calibration</span>, <span class="va">K_signal</span>, <span class="va">K</span>, lod_convention <span class="op">=</span> <span class="st">"iso11843"</span><span class="op">)</span></span>
+<span><span class="va">k_iso</span><span class="op">$</span><span class="va">figures_of_merit</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">critical_value</span>, <span class="va">lod</span>, <span class="va">loq</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 3</span></span></span>
+<span><span class="co">#&gt;   critical_value   lod   loq</span></span>
+<span><span class="co">#&gt;            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>          0.744  1.49  4.51</span></span></code></pre></div>
+<p>With risks of 5%, the limit of detection, 1.5% K, is close to that of
+the ICH convention: with 275 standards, the uncertainty of the curve is
+small next to the scatter of the samples. <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> then
+marks the samples above the critical value as <code>detected</code>.</p>
+</div>
+<div class="section level2">
+<h2 id="uncertain-reference-values">Uncertain reference values<a class="anchor" aria-label="anchor" href="#uncertain-reference-values"></a>
+</h2>
+<p>Least squares treat the laboratory values as exact. Their errors bias
+the slope toward zero (regression dilution) and narrow the intervals.
+York’s regression weights each standard by the uncertainties of both its
+concentration and its signal. The uncertainty of the laboratory values
+is not given with these data, so we take, for illustration, a relative
+standard uncertainty of 5%; that of the signal follows from the noise of
+the spectra (<code>intensity_se</code> of
+<code><a href="../reference/line_intensities.html">line_intensities()</a></code>):</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">noise</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">corrected</span>, <span class="va">lines</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C"</span>, <span class="st">"K"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>relative_se <span class="op">=</span> <span class="va">intensity_se</span> <span class="op">/</span> <span class="va">intensity</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">spectrum</span>, <span class="va">line</span>, <span class="va">relative_se</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">line</span>, values_from <span class="op">=</span> <span class="va">relative_se</span><span class="op">)</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="va">data</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>K_se <span class="op">=</span> <span class="fl">0.05</span> <span class="op">*</span> <span class="va">K</span>, K_signal_se <span class="op">=</span> <span class="va">K_signal</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">noise</span><span class="op">$</span><span class="va">K</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="va">noise</span><span class="op">$</span><span class="va">C</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">calibration</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">data</span>, <span class="op">!</span><span class="va">Sample</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">test_samples</span><span class="op">)</span></span>
+<span><span class="va">test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">data</span>, <span class="va">Sample</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">test_samples</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">k_york</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibration_curve.html">calibration_curve</a></span><span class="op">(</span><span class="va">calibration</span>, <span class="va">K_signal</span>, <span class="va">K</span>, regression <span class="op">=</span> <span class="st">"york"</span>,</span>
+<span>                            concentration_se <span class="op">=</span> <span class="va">K_se</span>, signal_se <span class="op">=</span> <span class="va">K_signal_se</span><span class="op">)</span></span>
+<span><span class="va">k_york</span></span>
+<span><span class="co">#&gt; Linear calibration curve (275 standards, York regression)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;       term estimate std_error  lower  upper</span></span>
+<span><span class="co">#&gt;  intercept   0.8789   0.05284 0.7749 0.9830</span></span>
+<span><span class="co">#&gt;      slope   0.5314   0.02996 0.4724 0.5904</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; R-squared:    0.60055</span></span>
+<span><span class="co">#&gt; Chi-squared:  18.4 (reduced)</span></span>
+<span><span class="co">#&gt; Sensitivity:  0.5314</span></span>
+<span><span class="co">#&gt; LOD:          1.23  (residual)</span></span>
+<span><span class="co">#&gt; LOQ:          3.71</span></span>
+<span><span class="co">#&gt; Mandel:        F = 4.52, p = 0.0345</span></span>
+<span><span class="co">#&gt; Lack of fit:   F = 1.12, p = 0.258</span></span></code></pre></div>
+<p>The slope rises from 0.309 to 0.531, and the prediction error on the
+test samples falls from 0.48 to 0.39% K. But the reduced chi-squared,
+18, shows that the standards scatter far more than these uncertainties
+explain: matrix effects, not the noise of the spectra or the assumed
+errors of the laboratory values, dominate. York’s weights then mostly
+lower the weight of the richest standards, whose 5% uncertainty is the
+largest, much like weights <code>"1/x2"</code>, rather than correct the
+dilution of the slope; its standard errors are scaled up accordingly.
+York’s regression is at its best with reference materials whose
+certified uncertainties, and the replicate measurements of their
+signals, describe the scatter (a reduced chi-squared near 1). When every
+standard has the same uncertainties, <code>regression = "deming"</code>,
+with the ratio of their variances, is the simpler alternative.</p>
 </div>
 <div class="section level2">
 <h2 id="trace-elements-weights-and-limits-of-detection">Trace elements: weights and limits of detection<a class="anchor" aria-label="anchor" href="#trace-elements-weights-and-limits-of-detection"></a>
@@ -196,7 +265,7 @@ inversely proportional to its concentration. With weights, the residual
 standard deviation depends on their scale, so the blank standard
 deviation is taken from the standard error of the intercept
 (<code>lod_method = "intercept"</code>):</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fe_calibration</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">calibration</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Fe</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">fe_unweighted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibration_curve.html">calibration_curve</a></span><span class="op">(</span><span class="va">fe_calibration</span>, <span class="va">Fe_signal</span>, <span class="va">Fe</span><span class="op">)</span></span>
 <span><span class="va">fe_weighted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibration_curve.html">calibration_curve</a></span><span class="op">(</span><span class="va">fe_calibration</span>, <span class="va">Fe_signal</span>, <span class="va">Fe</span>, weights <span class="op">=</span> <span class="st">"1/x"</span>,</span>
@@ -210,13 +279,13 @@ deviation is taken from the standard error of the intercept
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> unweighted   272     0.852 295.  895. </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> weighted     272     0.788  17.4  52.8</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_calibration.html">plot_calibration</a></span><span class="op">(</span><span class="va">fe_weighted</span>, interval <span class="op">=</span> <span class="st">"prediction"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="calibration_files/figure-html/fe-plot-1.png" class="r-plt" alt="" width="100%"></p>
 <p>The weighted fit gives a limit of detection of 17 ppm, instead of 295
 ppm. Its R² is lower, because it no longer favors the rich samples,
 which dominate R².</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fe_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">test</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Fe</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">fe_predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fe_weighted</span>, <span class="va">fe_test</span><span class="op">$</span><span class="va">Fe_signal</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">fe_predicted</span>, <span class="va">below_loq</span><span class="op">)</span></span>
@@ -236,7 +305,7 @@ squares (PLS) regression uses all of it: we divide the
 baseline-corrected spectra by the carbon line, and choose the number of
 components by cross-validation on the calibration samples, with the pls
 package:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">corrected</span><span class="op">)</span> <span class="op">/</span> <span class="va">intensities</span><span class="op">$</span><span class="va">C</span></span>
 <span><span class="va">is_calibration</span> <span class="op">&lt;-</span> <span class="op">!</span><span class="va">data</span><span class="op">$</span><span class="va">Sample</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">test_samples</span></span>
 <span><span class="va">x_calibration</span> <span class="op">&lt;-</span> <span class="va">x</span><span class="op">[</span><span class="va">is_calibration</span>, <span class="op">]</span></span>
@@ -262,7 +331,7 @@ prediction.</li>
 </ul>
 <p>We estimate the noise from the three samples measured twice, as the
 standard deviation of their difference spectra divided by <span class="math inline">\sqrt{2}</span>:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">repeated</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">$</span><span class="va">Sample</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">duplicated</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Sample</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="va">differences</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">repeated</span>, \<span class="op">(</span><span class="va">s</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">rows</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">Sample</span> <span class="op">==</span> <span class="va">s</span><span class="op">)</span></span>
@@ -276,14 +345,14 @@ standard deviation of their difference spectra divided by <span class="math inli
 <span><span class="co">#&gt;              4.0183608              0.1183193             29.9163896 </span></span>
 <span><span class="co">#&gt;                    lod                    loq </span></span>
 <span><span class="co">#&gt;              0.1103074              0.3342649</span></span></code></pre></div>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nas_predicted</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">k_nas</span>, <span class="va">x</span><span class="op">[</span><span class="op">!</span><span class="va">is_calibration</span>, <span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">(</span><span class="va">nas_predicted</span><span class="op">$</span><span class="va">predicted</span> <span class="op">-</span> <span class="va">test</span><span class="op">$</span><span class="va">K</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>   <span class="co"># RMSEP, % K</span></span>
 <span><span class="co">#&gt; [1] 0.2964224</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">nas_predicted</span><span class="op">$</span><span class="va">selectivity</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. </span></span>
 <span><span class="co">#&gt; 0.0009985 0.0479909 0.0875087 0.1082689 0.1542453 0.3520663</span></span></code></pre></div>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span></span>
 <span>  `K I 769.90 nm curve` <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>laboratory <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">K</span>, predicted <span class="op">=</span> <span class="va">k_predicted</span><span class="op">$</span><span class="va">concentration</span><span class="op">)</span>,</span>
 <span>  `PLS (NAS)` <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>laboratory <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">K</span>, predicted <span class="op">=</span> <span class="va">nas_predicted</span><span class="op">$</span><span class="va">predicted</span><span class="op">)</span>,</span>
@@ -304,6 +373,68 @@ far below the limit of the calibration curve, which includes all the
 scatter of the samples. Its mean selectivity, 0.12, means that only
 about a tenth of each spectrum is specific to potassium: the rest is
 shared with the other constituents and the plasma.</p>
+<div class="section level3">
+<h3 id="spectra-outside-the-calibration-space">Spectra outside the calibration space<a class="anchor" aria-label="anchor" href="#spectra-outside-the-calibration-space"></a>
+</h3>
+<p>A model is reliable only for spectra like those it was calibrated on.
+<code><a href="../reference/applicability_domain.html">applicability_domain()</a></code> describes the calibration spectra by
+a principal component analysis, here with as many components as the PLS
+model, and <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> flags the test spectra whose Hotelling
+<span class="math inline">T^2</span> (more extreme than the calibration
+samples) or Q residual (unlike them) exceeds its 99% limit:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">domain</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/applicability_domain.html">applicability_domain</a></span><span class="op">(</span><span class="va">x_calibration</span>, k <span class="op">=</span> <span class="va">ncomp</span><span class="op">)</span></span>
+<span><span class="va">domain</span></span>
+<span><span class="co">#&gt; Applicability domain: PCA of 275 calibration spectra</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Components:  7 (91.78% of the variance)</span></span>
+<span><span class="co">#&gt; Limits:       T2 = 19.44, Q = 43.54 (99%)</span></span>
+<span><span class="va">outside</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">domain</span>, <span class="va">x</span><span class="op">[</span><span class="op">!</span><span class="va">is_calibration</span>, <span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">outside</span>, <span class="va">outlier</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 2</span></span></span>
+<span><span class="co">#&gt;   outlier      n</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> regular     86</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> extreme      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> residual     3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> both         3</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_influence.html">plot_influence</a></span><span class="op">(</span><span class="va">outside</span><span class="op">)</span></span></code></pre></div>
+<p><img src="calibration_files/figure-html/domain-plot-1.png" class="r-plt" alt="" width="100%"></p>
+<p>7 of the 93 test spectra lie outside the domain. Their predictions
+are about as accurate as the others (mean absolute error 0.22 against
+0.22% K): the flag says that the model extrapolates, not that the
+prediction is wrong, but such samples deserve a check in routine
+analysis. For a calibration curve, <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> flags the
+concentrations outside the range of the standards
+(<code>outside_range</code>).</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="monitoring-drift">Monitoring drift<a class="anchor" aria-label="anchor" href="#monitoring-drift"></a>
+</h2>
+<p>The measurements are numbered in the order in which they were
+acquired. The carbon line, the internal standard of these calibrations,
+follows the ablated mass and the plasma, so a control chart of its
+intensity shows the stability of the instrument over the acquisition.
+The first 100 measurements set the center and the standard deviation,
+and an exponentially weighted moving average (EWMA), sensitive to slow
+drifts, follows the others:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">carbon</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/control_chart.html">control_chart</a></span><span class="op">(</span><span class="va">intensities</span><span class="op">$</span><span class="va">C</span>, order <span class="op">=</span> <span class="va">data</span><span class="op">$</span><span class="va">Measurement</span>, method <span class="op">=</span> <span class="st">"ewma"</span>,</span>
+<span>                        baseline <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot_control_chart.html">plot_control_chart</a></span><span class="op">(</span><span class="va">carbon</span>, xlab <span class="op">=</span> <span class="st">"Measurement (acquisition order)"</span>,</span>
+<span>                   ylab <span class="op">=</span> <span class="st">"EWMA of the C I 247.86 nm intensity"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="calibration_files/figure-html/drift-1.png" class="r-plt" alt="" width="100%"></p>
+<p>The intensity changes by blocks between the sessions of the
+acquisition (the gaps in the numbering), and the chart signals 26
+measurements; the longest run of signals, from measurement 121411 to
+121418, is a drop of the intensity. Dividing by the carbon line
+compensates for such changes in the calibrations above. In routine
+analysis, a check sample measured at regular intervals, charted the same
+way (<code>method = "shewhart"</code>, <code>"ewma"</code> or
+<code>"cusum"</code>), separates a drift of the instrument from a change
+of the samples.</p>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
@@ -324,6 +455,14 @@ from blanks.</li>
 <strong>Report how the limits were estimated</strong>: from the
 residuals of a curve, they include the scatter of the samples; from the
 noise of the spectra (<code><a href="../reference/nas.html">nas()</a></code>), they are lower bounds.</li>
+<li>
+<strong>State the convention of the limits</strong>: ICH (<span class="math inline">3.3\,\sigma/S</span>) or ISO 11843 (risks <span class="math inline">\alpha</span> and <span class="math inline">\beta</span>, uncertainty of the curve).</li>
+<li>
+<strong>Account for uncertain reference values</strong> with York’s
+or Deming’s regression.</li>
+<li>
+<strong>Flag the samples outside the applicability domain</strong>,
+and chart an internal standard or a check sample to detect drifts.</li>
 <li>
 <strong>Validate on samples left out</strong> of the calibration:
 the prediction error on test samples is the most honest figure of

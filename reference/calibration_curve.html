@@ -62,7 +62,15 @@ their signal, with confidence intervals.</p>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  blank <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lod_method <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  level <span class="op">=</span> <span class="fl">0.95</span></span>
+<span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  regression <span class="op">=</span> <span class="st">"ols"</span>,</span>
+<span>  concentration_se <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  signal_se <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  variance_ratio <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  lod_convention <span class="op">=</span> <span class="st">"ich"</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  beta <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  replicates <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -103,6 +111,41 @@ sample.</p></dd>
 <dd><p>The confidence level of the intervals of the coefficients.
 Default is 0.95.</p></dd>
 
+
+<dt id="arg-regression">regression<a class="anchor" aria-label="anchor" href="#arg-regression"></a></dt>
+<dd><p><code>"ols"</code> (default, least squares), <code>"deming"</code> or
+<code>"york"</code> (see details).</p></dd>
+
+
+<dt id="arg-concentration-se-signal-se">concentration_se, signal_se<a class="anchor" aria-label="anchor" href="#arg-concentration-se-signal-se"></a></dt>
+<dd><p>For <code>regression = "york"</code> or
+<code>"deming"</code>: the columns of <code>data</code> with the standard uncertainties of the
+concentration and of the signal of each standard, unquoted or as
+strings.</p></dd>
+
+
+<dt id="arg-variance-ratio">variance_ratio<a class="anchor" aria-label="anchor" href="#arg-variance-ratio"></a></dt>
+<dd><p>For <code>regression = "deming"</code>: the ratio of the error
+variance of the signal to that of the concentration. By default, it is
+computed from <code>signal_se</code> and <code>concentration_se</code>.</p></dd>
+
+
+<dt id="arg-lod-convention">lod_convention<a class="anchor" aria-label="anchor" href="#arg-lod-convention"></a></dt>
+<dd><p>The convention of the limits of detection and
+quantification: <code>"ich"</code> (default, \(3.3\,\sigma/S\) and
+\(10\,\sigma/S\)) or <code>"iso11843"</code> (ISO 11843-2 and IUPAC; see
+details).</p></dd>
+
+
+<dt id="arg-alpha-beta">alpha, beta<a class="anchor" aria-label="anchor" href="#arg-alpha-beta"></a></dt>
+<dd><p>For <code>lod_convention = "iso11843"</code>: the probabilities of
+false positives and of false negatives. Default is 0.05.</p></dd>
+
+
+<dt id="arg-replicates">replicates<a class="anchor" aria-label="anchor" href="#arg-replicates"></a></dt>
+<dd><p>For <code>lod_convention = "iso11843"</code>: the number of
+replicate measurements averaged for a sample. Default is 1.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -110,11 +153,14 @@ Default is 0.95.</p></dd>
 confidence intervals (<code>lower</code>, <code>upper</code>) at <code>level</code>;</p></li>
 <li><p><code>figures_of_merit</code>: a tibble with the number of standards <code>n</code>, the
 <code>sensitivity</code>, <code>r_squared</code>, the residual standard deviation <code>sigma</code>,
-the blank standard deviation used (<code>sigma_blank</code>), <code>lod</code> and <code>loq</code>
-(in concentration units);</p></li>
+the blank standard deviation used (<code>sigma_blank</code>), the
+<code>critical_value</code> (ISO 11843 only, <code>NA</code> otherwise), <code>lod</code> and <code>loq</code> (in
+concentration units);</p></li>
 <li><p><code>linearity</code>: a tibble with the statistic, degrees of freedom and
 p-value of Mandel's test and of the lack-of-fit test (when they apply);</p></li>
-<li><p><code>fit</code>: the <code>lm</code> fit, and <code>data</code>, the calibration data.</p></li>
+<li><p><code>fit</code>: the least-squares <code>lm</code> fit, <code>eiv</code>, the Deming or York fit
+(<code>NULL</code> for least squares), with its <code>chi_squared</code>, and <code>data</code>, the
+calibration data.</p></li>
 </ul><p>Use <a href="predict.specproc_calibration.html">predict()</a> for new samples and
 <code><a href="plot_calibration.html">plot_calibration()</a></code> to draw the curve.</p>
     </div>
@@ -136,6 +182,37 @@ without <code>blank</code>);</p></li>
 (default when given).</p></li>
 </ul><p>With weights, the residual standard deviation depends on the scale of the
 weights, so prefer <code>"blank"</code> or <code>"intercept"</code>.</p>
+<p>With <code>lod_convention = "iso11843"</code>, the limits follow ISO 11843-2 and
+IUPAC (Currie, 1999), and account for the uncertainty of the curve and
+for the false positive and false negative risks \(\alpha\) and
+\(\beta\). The standard deviation of a net signal near zero is
+\(\sigma_0 = \sqrt{\sigma^2 / K + s_a^2}\), where \(\sigma\) is the
+standard deviation of the signal (<code>"residual"</code> or <code>"blank"</code>), \(K\) the
+number of <code>replicates</code> averaged for a sample and \(s_a\) the standard
+error of the intercept. The critical value (decision limit), above which
+an element is detected, is \(x_C = t_{1-\alpha,\nu}\,\sigma_0 / S\); the
+limit of detection, the content detected with probability \(1 -
+\beta\), is \(x_D = \delta_{\nu,\alpha,\beta}\,\sigma_0 / S\), where
+\(\delta\) is the noncentrality parameter of the noncentral t
+distribution (about \(2 t_{1-\alpha,\nu}\) for \(\alpha = \beta\)) and
+\(\nu\) the degrees of freedom of \(\sigma\); and the limit of
+quantification (IUPAC) is \(x_Q = 10\,\sigma_0 / S\). For a weighted
+curve, the standard deviation must come from <code>blank</code> signals.</p>
+<p><strong>Errors in the concentrations.</strong> Least squares assume exact
+concentrations. When those of the standards are uncertain, such as the
+certified values of reference materials, the slope is biased toward zero
+and the intervals too narrow. <code>regression = "york"</code> fits the line by the
+method of York et al. (2004), with the standard uncertainties of the
+concentration (<code>concentration_se</code>) and of the signal (<code>signal_se</code>) of
+each standard; its standard errors are multiplied by the square root of
+the reduced chi-squared when it exceeds 1 (the points scatter more than
+their uncertainties explain). <code>regression = "deming"</code> (Deming
+regression) assumes constant uncertainties, whose ratio
+<code>variance_ratio</code> (variance of the signal over variance of the
+concentration, in their units) is given, or computed from the mean
+squared <code>signal_se</code> and <code>concentration_se</code>; its standard errors come from
+the scatter of the points. Both fit straight lines without weights; the
+tests of linearity are those of the least-squares fit.</p>
 <p><strong>Linearity.</strong> For a straight line, Mandel's test compares its residual
 variance with that of a quadratic fit; a small p-value means that the
 curvature is significant (as with self-absorption or detector
@@ -156,12 +233,20 @@ signal, the mean of <code>replicates</code> measurements.</p>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
 
-<ul><li><p>ICH (2005). Validation of analytical procedures: text and methodology
+<ul><li><p>Currie, L.A. (1999). Detection and quantification limits: origins and
+historical overview. Analytica Chimica Acta, 391(2):127-134.</p></li>
+<li><p>ICH (2005). Validation of analytical procedures: text and methodology
 Q2(R1). International Conference on Harmonisation.</p></li>
+<li><p>ISO 11843-2 (2000). Capability of detection, Part 2: Methodology in
+the linear calibration case. International Organization for
+Standardization, Geneva.</p></li>
 <li><p>Mandel, J. (1964). The Statistical Analysis of Experimental Data.
 Interscience, New York.</p></li>
 <li><p>Miller, J.N., Miller, J.C. (2018). Statistics and Chemometrics for
 Analytical Chemistry, 7th ed. Pearson, Harlow.</p></li>
+<li><p>York, D., Evensen, N.M., López Martínez, M., De Basabe Delgado, J.
+(2004). Unified equations for the slope, intercept, and standard errors
+of the best straight line. American Journal of Physics, 72(3):367-375.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
@@ -198,15 +283,54 @@ Analytical Chemistry, 7th ed. Pearson, Harlow.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Lack of fit:   F = 1.13, p = 0.239</span>
 <span class="r-in"><span><span class="co"># the concentrations of new samples, from their signals</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cal</span>, <span class="va">standards</span><span class="op">$</span><span class="va">signal</span><span class="op">[</span><span class="fl">301</span><span class="op">:</span><span class="fl">368</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   signal concentration    se   lower upper below_lod below_loq</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  0.459          1.36  1.03 -<span style="color: #BB0000;">0.665</span>   3.38 TRUE      TRUE     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>  0.543          1.97  1.03 -<span style="color: #BB0000;">0.053</span><span style="color: #BB0000; text-decoration: underline;">8</span>  3.99 TRUE      TRUE     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  0.580          2.23  1.03  0.212   4.25 TRUE      TRUE     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>  0.492          1.59  1.03 -<span style="color: #BB0000;">0.427</span>   3.62 TRUE      TRUE     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>  0.481          1.52  1.03 -<span style="color: #BB0000;">0.507</span>   3.54 TRUE      TRUE     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>  0.501          1.67  1.03 -<span style="color: #BB0000;">0.355</span>   3.69 TRUE      TRUE     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 8</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   signal concentration    se   lower upper below_lod below_loq outside_range</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  0.459          1.36  1.03 -<span style="color: #BB0000;">0.665</span>   3.38 TRUE      TRUE      FALSE        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>  0.543          1.97  1.03 -<span style="color: #BB0000;">0.053</span><span style="color: #BB0000; text-decoration: underline;">8</span>  3.99 TRUE      TRUE      FALSE        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  0.580          2.23  1.03  0.212   4.25 TRUE      TRUE      FALSE        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>  0.492          1.59  1.03 -<span style="color: #BB0000;">0.427</span>   3.62 TRUE      TRUE      FALSE        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>  0.481          1.52  1.03 -<span style="color: #BB0000;">0.507</span>   3.54 TRUE      TRUE      FALSE        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>  0.501          1.67  1.03 -<span style="color: #BB0000;">0.355</span>   3.69 TRUE      TRUE      FALSE        </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># limits of detection by ISO 11843-2</span></span></span>
+<span class="r-in"><span><span class="fu">calibration_curve</span><span class="op">(</span><span class="va">standards</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">300</span>, <span class="op">]</span>, <span class="va">signal</span>, <span class="va">K</span>, lod_convention <span class="op">=</span> <span class="st">"iso11843"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Linear calibration curve (300 standards)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       term estimate std_error  lower  upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  intercept   0.2708   0.03240 0.2070 0.3345</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      slope   0.1384   0.01556 0.1078 0.1690</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> R-squared:    0.20976</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Sensitivity:  0.1384</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Critical:     1.73  (ISO 11843, alpha = 0.05)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> LOD:          3.47  (beta = 0.05; residual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> LOQ:          10.5  (IUPAC, 10 sigma)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mandel:        F = 4.03, p = 0.0457</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Lack of fit:   F = 1.13, p = 0.239</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># reference materials with certified values known within 3%, and</span></span></span>
+<span class="r-in"><span><span class="co"># signals within 2% (simulated)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">crm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>certified <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">6</span>, <span class="fl">8</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">crm</span><span class="op">$</span><span class="va">signal</span> <span class="op">&lt;-</span> <span class="fl">0.05</span> <span class="op">+</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="va">crm</span><span class="op">$</span><span class="va">certified</span> <span class="op">*</span> <span class="op">(</span><span class="fl">1</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">6</span>, sd <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fl">0.2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">6</span>, sd <span class="op">=</span> <span class="fl">0.03</span> <span class="op">*</span> <span class="va">crm</span><span class="op">$</span><span class="va">certified</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">crm</span><span class="op">$</span><span class="va">certified_se</span> <span class="op">&lt;-</span> <span class="fl">0.03</span> <span class="op">*</span> <span class="va">crm</span><span class="op">$</span><span class="va">certified</span></span></span>
+<span class="r-in"><span><span class="va">crm</span><span class="op">$</span><span class="va">signal_se</span> <span class="op">&lt;-</span> <span class="fl">0.02</span> <span class="op">*</span> <span class="va">crm</span><span class="op">$</span><span class="va">signal</span></span></span>
+<span class="r-in"><span><span class="fu">calibration_curve</span><span class="op">(</span><span class="va">crm</span>, <span class="va">signal</span>, <span class="va">certified</span>, regression <span class="op">=</span> <span class="st">"york"</span>,</span></span>
+<span class="r-in"><span>                  concentration_se <span class="op">=</span> <span class="va">certified_se</span>, signal_se <span class="op">=</span> <span class="va">signal_se</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Linear calibration curve (6 standards, York regression)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       term estimate std_error   lower  upper</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  intercept  0.04832  0.005072 0.03424 0.0624</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      slope  0.20442  0.004422 0.19214 0.2167</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> R-squared:    0.99835</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Chi-squared:  0.372 (reduced)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Sensitivity:  0.2044</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> LOD:          0.454  (residual)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> LOQ:          1.38</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Mandel:        F = 1.86, p = 0.266</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

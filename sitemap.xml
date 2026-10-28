@@ -11,6 +11,7 @@
 <url><loc>https://christiangoueguel.com/specProc/news/index.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/adjusted_boxplot.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/aki_uncertainty.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/applicability_domain.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/apply_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/average.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/baseline_als.html</loc></url>
@@ -29,6 +30,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/center.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/cf_libs.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/contributions.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/control_chart.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/correct_response.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/correct_self_absorption.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/correlation.html</loc></url>
@@ -83,6 +85,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_cell_map.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_contributions.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/plot_control_chart.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_coomans.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_embedding.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_fit.html</loc></url>
@@ -100,6 +103,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/pls_rsimpls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/poisson_scale.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_calibration.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_domain.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_emsc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_filter.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_nas.html</loc></url>

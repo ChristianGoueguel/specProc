@@ -60,10 +60,12 @@ predict(
 
 For `type = "concentration"`, a tibble with the `signal`, the predicted
 `concentration`, its standard error `se`, the interval (`lower`,
-`upper`) and whether it is below the limit of detection (`below_lod`) or
-of quantification (`below_loq`). For `type = "signal"`, a tibble with
-the `concentration`, the predicted `signal`, its standard error `se` and
-the interval (`lower`, `upper`).
+`upper`), whether it is below the limit of detection (`below_lod`) or of
+quantification (`below_loq`), whether it lies outside the range of the
+standards (`outside_range`, an extrapolation), and, with the ISO 11843
+limits, whether the element is `detected` (above the critical value).
+For `type = "signal"`, a tibble with the `concentration`, the predicted
+`signal`, its standard error `se` and the interval (`lower`, `upper`).
 
 ## Details
 
@@ -97,14 +99,14 @@ standards <- data.frame(
 )
 cal <- calibration_curve(standards[1:300, ], signal, K)
 predict(cal, standards$signal[301:305])
-#> # A tibble: 5 × 7
-#>   signal concentration    se   lower upper below_lod below_loq
-#>    <dbl>         <dbl> <dbl>   <dbl> <dbl> <lgl>     <lgl>    
-#> 1  0.459          1.36  1.03 -0.665   3.38 TRUE      TRUE     
-#> 2  0.543          1.97  1.03 -0.0538  3.99 TRUE      TRUE     
-#> 3  0.580          2.23  1.03  0.212   4.25 TRUE      TRUE     
-#> 4  0.492          1.59  1.03 -0.427   3.62 TRUE      TRUE     
-#> 5  0.481          1.52  1.03 -0.507   3.54 TRUE      TRUE     
+#> # A tibble: 5 × 8
+#>   signal concentration    se   lower upper below_lod below_loq outside_range
+#>    <dbl>         <dbl> <dbl>   <dbl> <dbl> <lgl>     <lgl>     <lgl>        
+#> 1  0.459          1.36  1.03 -0.665   3.38 TRUE      TRUE      FALSE        
+#> 2  0.543          1.97  1.03 -0.0538  3.99 TRUE      TRUE      FALSE        
+#> 3  0.580          2.23  1.03  0.212   4.25 TRUE      TRUE      FALSE        
+#> 4  0.492          1.59  1.03 -0.427   3.62 TRUE      TRUE      FALSE        
+#> 5  0.481          1.52  1.03 -0.507   3.54 TRUE      TRUE      FALSE        
 # the signal expected at given contents (% K)
 predict(cal, c(1, 2, 3), type = "signal")
 #> # A tibble: 3 × 5
