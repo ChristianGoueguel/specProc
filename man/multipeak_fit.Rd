@@ -14,7 +14,8 @@ multipeak_fit(
   wlgth.min = NULL,
   wlgth.max = NULL,
   id = NULL,
-  max.iter = 200
+  max.iter = 200,
+  fixed = NULL
 )
 }
 \arguments{
@@ -41,6 +42,12 @@ one per peak or a single one used for all peaks: "lorentzian", "gaussian",
 \item{id}{A character specifying the name of the column holding the spectra id (optional)}
 
 \item{max.iter}{A numeric specifying the maximum number of iteration (200 by default)}
+
+\item{fixed}{The widths held at their given values (\code{wG}, \code{wL}, one
+value or one per peak) instead of being fitted: \code{"wG"}, \code{"wL"} or
+both, for the peaks whose profile has that width. Default is \code{NULL}
+(all widths fitted). See \code{\link[=peak_fit]{peak_fit()}} for holding the Gaussian width at
+the instrumental and Doppler width.}
 }
 \value{
 A tibble with one row per spectrum and the columns \code{id} (or

@@ -30,6 +30,11 @@
 #' @param wlgth.max A numeric of the upper bound of the wavelength subset
 #' @param id A character specifying the name of the column holding the spectra id (optional)
 #' @param max.iter A numeric specifying the maximum number of iteration (200 by default)
+#' @param fixed The widths held at their given values (`wG`, `wL`, one
+#'   value or one per peak) instead of being fitted: `"wG"`, `"wL"` or
+#'   both, for the peaks whose profile has that width. Default is `NULL`
+#'   (all widths fitted). See [peak_fit()] for holding the Gaussian width at
+#'   the instrumental and Doppler width.
 #'
 #' @return A tibble with one row per spectrum and the columns `id` (or
 #'   `spectrum`), `data`, `fit`, `tidied` and `augmented` (see [peak_fit()]).
@@ -56,7 +61,8 @@ multipeak_fit <- function(
     wlgth.min = NULL,
     wlgth.max = NULL,
     id = NULL,
-    max.iter = 200) {
+    max.iter = 200,
+    fixed = NULL) {
 
   if (missing(x) || is.null(x)) {
     stop("Apparently you forgot to provide the spectra.")
@@ -86,5 +92,5 @@ multipeak_fit <- function(
 
   spectra <- long_spectra(x, id, wlgth.min, wlgth.max)
   fit_spectra(spectra, peaks = peaks, profiles = profiles,
-              wL = wL, wG = wG, A = A, max.iter = max.iter, single = FALSE)
+              wL = wL, wG = wG, A = A, max.iter = max.iter, single = FALSE, fixed = fixed)
 }

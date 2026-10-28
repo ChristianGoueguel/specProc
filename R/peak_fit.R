@@ -24,6 +24,17 @@
 #' area to positive values. If the fit of a spectrum fails, a warning is issued
 #' and the corresponding `fit`, `tidied` and `augmented` entries are `NULL`.
 #'
+#' The Gaussian and Lorentzian widths of a Voigt profile are strongly
+#' correlated, so a free fit determines the Lorentzian (Stark) width poorly
+#' when the line is narrow. In a LIBS plasma, the Gaussian width is the
+#' instrumental width, combined with the Doppler width in quadrature,
+#' \eqn{w_G = \sqrt{w_{inst}^2 + w_D^2}}, and can be held fixed with
+#' `fixed = "wG"` and the value of `wG`. The instrumental width is the width
+#' of a line of a low-pressure lamp (mercury, argon), whose Stark and
+#' Doppler widths are negligible, fitted with a Gaussian profile at a nearby
+#' wavelength; the Doppler width is given by [doppler_width()]. A fixed width
+#' is listed in `tidied` without standard error.
+#'
 #' @param x A data frame or tibble of spectra, one spectrum per row. Column
 #'   names are the wavelengths (e.g. `"396.15"`); an optional identifier column
 #'   can be given with `id`.
@@ -36,6 +47,9 @@
 #' @param wlgth.max A numeric specifying the upper bound of the wavelength subset
 #' @param id A character specifying the name of the column holding the spectra id (optional)
 #' @param max.iter A numeric specifying the maximum number of iteration (200 by default)
+#' @param fixed The widths held at their given values (`wG`, `wL`) instead
+#'   of being fitted: `"wG"`, `"wL"` or both. Default is `NULL` (all
+#'   widths fitted).
 #'
 #' @return A tibble with one row per spectrum and the columns:
 #'  - `id` column (or `spectrum`, the row number, when `id = NULL`),
@@ -54,6 +68,14 @@
 #' halpha <- tibble::as_tibble(as.list(mean_spectrum[wl > 653.5 & wl < 659.5]))
 #' res <- peak_fit(halpha, profile = "lorentzian")
 #' res$tidied[[1]]
+#'
+#' # a Voigt line whose Gaussian width (instrument and Doppler) is known
+#' x <- seq(395, 397, by = 0.01)
+#' set.seed(1)
+#' y <- voigt_profile(x, y0 = 10, xc = 396, wG = 0.08, wL = 0.05, A = 50) +
+#'   rnorm(length(x), sd = 2)
+#' line <- tibble::as_tibble(as.list(stats::setNames(y, x)))
+#' peak_fit(line, profile = "voigt", wG = 0.08, fixed = "wG")$tidied[[1]]
 peak_fit <- function(
     x,
     profile = "voigt",
@@ -63,7 +85,8 @@ peak_fit <- function(
     wlgth.min = NULL,
     wlgth.max = NULL,
     id = NULL,
-    max.iter = 200) {
+    max.iter = 200,
+    fixed = NULL) {
 
   if (missing(x)) {
     stop("Missing 'data' argument.")
@@ -81,7 +104,7 @@ peak_fit <- function(
 
   spectra <- long_spectra(x, id, wlgth.min, wlgth.max)
   fit_spectra(spectra, peaks = NA_real_, profiles = tolower(profile),
-              wL = wL, wG = wG, A = A, max.iter = max.iter, single = TRUE)
+              wL = wL, wG = wG, A = A, max.iter = max.iter, single = TRUE, fixed = fixed)
 }
 
 
@@ -145,8 +168,30 @@ guess_peak <- function(x, y, xc = NA_real_) {
   list(xc = xc, fwhm = fwhm, A = max(h, .Machine$double.eps) * fwhm * 1.064, step = step)
 }
 
-# Builds the parameter specification of the multi-peak model.
-peak_parameters <- function(data, peaks, profiles, wL, wG, A, single) {
+# Checks the widths held fixed (`fixed`) against the profiles and the given
+# widths.
+check_fixed <- function(fixed, profiles, wL, wG) {
+  if (is.null(fixed) || length(fixed) == 0) return(character())
+  if (!is.character(fixed) || !all(fixed %in% c("wG", "wL")) || anyDuplicated(fixed)) {
+    stop("'fixed' must be \"wG\", \"wL\" or both.", call. = FALSE)
+  }
+  has_width <- list(wG = c("gaussian", "voigt", "pseudo_voigt"),
+                    wL = c("lorentzian", "voigt", "pseudo_voigt"))
+  for (w in fixed) {
+    if (is.null(if (w == "wG") wG else wL)) {
+      stop("A fixed width needs its value: give '", w, "'.", call. = FALSE)
+    }
+    if (!any(profiles %in% has_width[[w]])) {
+      stop("'fixed = \"", w, "\"' needs a profile with a ",
+           if (w == "wG") "Gaussian" else "Lorentzian", " width.", call. = FALSE)
+    }
+  }
+  fixed
+}
+
+# Builds the parameter specification of the multi-peak model. The widths
+# named in `fixed` enter the model as constants (in `held`).
+peak_parameters <- function(data, peaks, profiles, wL, wG, A, single, fixed = character()) {
   k <- length(profiles)
   pick <- function(v, i) if (is.null(v)) NA_real_ else if (length(v) == 1) v else v[i]
   x <- data$x
@@ -156,7 +201,21 @@ peak_parameters <- function(data, peaks, profiles, wL, wG, A, single) {
   start <- list(y0 = min(y))
   lower <- c(y0 = -Inf)
   upper <- c(y0 = Inf)
+  held <- numeric()
   terms <- character(k)
+  # a width parameter of peak i: a constant when fixed, otherwise fitted
+  width <- function(type, i, guess) {
+    nm <- sfx(type, i)
+    value <- pick(if (type == "wG") wG else wL, i)
+    if (type %in% fixed) {
+      held[[nm]] <<- value
+      return(sprintf("%.17g", value))
+    }
+    start[[nm]] <<- ifelse(is.na(value), guess, value)
+    lower[nm] <<- stats::median(diff(x)) / 100
+    upper[nm] <<- Inf
+    nm
+  }
   for (i in seq_len(k)) {
     g <- guess_peak(x, y, if (single) NA_real_ else peaks[i])
     nm_xc <- sfx("xc", i)
@@ -164,44 +223,25 @@ peak_parameters <- function(data, peaks, profiles, wL, wG, A, single) {
     start[[nm_xc]] <- if (single) g$xc else peaks[i]
     lower[nm_xc] <- min(x)
     upper[nm_xc] <- max(x)
-    wmin <- g$step / 100
     width_term <- switch(
       profiles[i],
-      gaussian = {
-        nm <- sfx("wG", i)
-        start[[nm]] <- ifelse(is.na(pick(wG, i)), g$fwhm, pick(wG, i))
-        lower[nm] <- wmin
-        upper[nm] <- Inf
-        sprintf("profile_gaussian(x, %s, %s)", nm_xc, nm)
-      },
-      lorentzian = {
-        nm <- sfx("wL", i)
-        start[[nm]] <- ifelse(is.na(pick(wL, i)), g$fwhm, pick(wL, i))
-        lower[nm] <- wmin
-        upper[nm] <- Inf
-        sprintf("profile_lorentzian(x, %s, %s)", nm_xc, nm)
-      },
+      gaussian = sprintf("profile_gaussian(x, %s, %s)", nm_xc, width("wG", i, g$fwhm)),
+      lorentzian = sprintf("profile_lorentzian(x, %s, %s)", nm_xc, width("wL", i, g$fwhm)),
       voigt = ,
-      pseudo_voigt = {
-        nmG <- sfx("wG", i)
-        nmL <- sfx("wL", i)
-        start[[nmG]] <- ifelse(is.na(pick(wG, i)), g$fwhm / 2, pick(wG, i))
-        start[[nmL]] <- ifelse(is.na(pick(wL, i)), g$fwhm / 2, pick(wL, i))
-        lower[c(nmG, nmL)] <- wmin
-        upper[c(nmG, nmL)] <- Inf
-        sprintf("profile_%s(x, %s, %s, %s)", profiles[i], nm_xc, nmG, nmL)
-      }
+      pseudo_voigt = sprintf("profile_%s(x, %s, %s, %s)", profiles[i], nm_xc,
+                             width("wG", i, g$fwhm / 2), width("wL", i, g$fwhm / 2))
     )
     start[[nm_A]] <- ifelse(is.na(pick(A, i)), g$A, pick(A, i))
     lower[nm_A] <- 0
     upper[nm_A] <- Inf
     terms[i] <- sprintf("%s * %s", nm_A, width_term)
   }
-  list(start = start, lower = lower[names(start)], upper = upper[names(start)], terms = terms)
+  list(start = start, lower = lower[names(start)], upper = upper[names(start)], terms = terms,
+       held = held)
 }
 
-fit_one <- function(data, peaks, profiles, wL, wG, A, max.iter, single) {
-  spec <- peak_parameters(data, peaks, profiles, wL, wG, A, single)
+fit_one <- function(data, peaks, profiles, wL, wG, A, max.iter, single, fixed = character()) {
+  spec <- peak_parameters(data, peaks, profiles, wL, wG, A, single, fixed)
   form <- stats::as.formula(
     paste("y ~ y0 +", paste(spec$terms, collapse = " + ")),
     env = environment(profile_gaussian)
@@ -223,6 +263,12 @@ fit_one <- function(data, peaks, profiles, wL, wG, A, max.iter, single) {
     statistic = coefs[, 3],
     p.value = coefs[, 4]
   )
+  if (length(spec$held) > 0) {
+    # the fixed widths, without standard error
+    tidied <- rbind(tidied, tibble::tibble(term = names(spec$held), estimate = spec$held,
+                                           std.error = NA_real_, statistic = NA_real_,
+                                           p.value = NA_real_))
+  }
   fitted <- stats::fitted(fit)
   augmented <- tibble::tibble(
     x = data$x, y = data$y,
@@ -237,19 +283,22 @@ fit_one <- function(data, peaks, profiles, wL, wG, A, max.iter, single) {
     }
   }
   attr(fit, "peak_terms") <- spec$terms
+  attr(fit, "held") <- spec$held
   list(fit = fit, tidied = tidied, augmented = augmented)
 }
 
-fit_spectra <- function(spectra, peaks, profiles, wL, wG, A, max.iter, single) {
+fit_spectra <- function(spectra, peaks, profiles, wL, wG, A, max.iter, single,
+                        fixed = character()) {
   for (v in list(wL, wG, A)) {
     if (!is.null(v) && (!is.numeric(v) || !length(v) %in% c(1, length(profiles)) || any(v <= 0))) {
       stop("'wL', 'wG' and 'A' must be positive numbers, either one value or one per peak.",
            call. = FALSE)
     }
   }
+  fixed <- check_fixed(fixed, profiles, wL, wG)
   results <- lapply(seq_along(spectra$data), function(i) {
     tryCatch(
-      fit_one(spectra$data[[i]], peaks, profiles, wL, wG, A, max.iter, single),
+      fit_one(spectra$data[[i]], peaks, profiles, wL, wG, A, max.iter, single, fixed),
       error = function(e) {
         warning("Fitting failed for ", spectra$id_name, " '", spectra$ids[i], "': ",
                 conditionMessage(e), call. = FALSE)

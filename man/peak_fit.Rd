@@ -13,7 +13,8 @@ peak_fit(
   wlgth.min = NULL,
   wlgth.max = NULL,
   id = NULL,
-  max.iter = 200
+  max.iter = 200,
+  fixed = NULL
 )
 }
 \arguments{
@@ -37,6 +38,10 @@ can be given with \code{id}.}
 \item{id}{A character specifying the name of the column holding the spectra id (optional)}
 
 \item{max.iter}{A numeric specifying the maximum number of iteration (200 by default)}
+
+\item{fixed}{The widths held at their given values (\code{wG}, \code{wL}) instead
+of being fitted: \code{"wG"}, \code{"wL"} or both. Default is \code{NULL} (all
+widths fitted).}
 }
 \value{
 A tibble with one row per spectrum and the columns:
@@ -69,6 +74,17 @@ half maximum, and the area from the integrated intensity above the minimum.
 The center is constrained to the fitted wavelength range and the widths and
 area to positive values. If the fit of a spectrum fails, a warning is issued
 and the corresponding \code{fit}, \code{tidied} and \code{augmented} entries are \code{NULL}.
+
+The Gaussian and Lorentzian widths of a Voigt profile are strongly
+correlated, so a free fit determines the Lorentzian (Stark) width poorly
+when the line is narrow. In a LIBS plasma, the Gaussian width is the
+instrumental width, combined with the Doppler width in quadrature,
+\eqn{w_G = \sqrt{w_{inst}^2 + w_D^2}}, and can be held fixed with
+\code{fixed = "wG"} and the value of \code{wG}. The instrumental width is the width
+of a line of a low-pressure lamp (mercury, argon), whose Stark and
+Doppler widths are negligible, fitted with a Gaussian profile at a nearby
+wavelength; the Doppler width is given by \code{\link[=doppler_width]{doppler_width()}}. A fixed width
+is listed in \code{tidied} without standard error.
 }
 \examples{
 data(forageLIBS)
@@ -78,6 +94,14 @@ wl <- as.numeric(names(mean_spectrum))
 halpha <- tibble::as_tibble(as.list(mean_spectrum[wl > 653.5 & wl < 659.5]))
 res <- peak_fit(halpha, profile = "lorentzian")
 res$tidied[[1]]
+
+# a Voigt line whose Gaussian width (instrument and Doppler) is known
+x <- seq(395, 397, by = 0.01)
+set.seed(1)
+y <- voigt_profile(x, y0 = 10, xc = 396, wG = 0.08, wL = 0.05, A = 50) +
+  rnorm(length(x), sd = 2)
+line <- tibble::as_tibble(as.list(stats::setNames(y, x)))
+peak_fit(line, profile = "voigt", wG = 0.08, fixed = "wG")$tidied[[1]]
 }
 \author{
 Christian L. Goueguel

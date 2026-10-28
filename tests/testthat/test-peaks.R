@@ -205,3 +205,63 @@ test_that("plot_fit annotates, marks the FWHM and keeps the former arguments", {
   lifecycle::expect_deprecated(plot_fit(res, resid.fill = "blue"))
   expect_error(plot_fit(res, fit_color = "nocolor"), "colors")
 })
+
+test_that("peak_fit and multipeak_fit hold widths fixed", {
+  set.seed(8)
+  y <- voigt_profile(wl, 2, 396, 0.15, 0.05, 30) + stats::rnorm(length(wl), sd = 0.2)
+  free <- peak_fit(wide_spectrum(wl, y), profile = "voigt")
+  held <- peak_fit(wide_spectrum(wl, y), profile = "voigt", wG = 0.15, fixed = "wG")
+  t <- held$tidied[[1]]
+  expect_equal(t$term, c("y0", "xc", "wL", "A", "wG"))
+  expect_equal(unname(t$estimate[t$term == "wG"]), 0.15)
+  expect_true(is.na(t$std.error[t$term == "wG"]))
+  expect_false("wG" %in% names(stats::coef(held$fit[[1]])))
+  expect_equal(attr(held$fit[[1]], "held"), c(wG = 0.15))
+  # the Lorentzian width is better determined than with both widths free
+  tf <- free$tidied[[1]]
+  expect_lt(t$std.error[t$term == "wL"], tf$std.error[tf$term == "wL"])
+  expect_equal(unname(t$estimate[t$term == "wL"]), 0.05, tolerance = 0.2)
+  # plot_fit uses the fixed width
+  s <- fit_summary(held$fit[[1]], held$augmented[[1]], fit_curve(held$fit[[1]], wl))
+  expect_equal(s$peaks$fwhm, voigt_fwhm(0.15, unname(t$estimate[t$term == "wL"])))
+  expect_gt(s$peaks$fwhm_se, 0)
+  expect_equal(s$rmse, summary(held$fit[[1]])$sigma)
+  expect_s3_class(plot_fit(held), "patchwork")
+  # both widths fixed: only the baseline, center and area are fitted
+  both <- peak_fit(wide_spectrum(wl, y), profile = "voigt", wG = 0.15, wL = 0.05,
+                   fixed = c("wG", "wL"))
+  expect_named(stats::coef(both$fit[[1]]), c("y0", "xc", "A"))
+  expect_equal(unname(both$tidied[[1]]$estimate[both$tidied[[1]]$term == "A"]), 30,
+               tolerance = 0.05)
+
+  # one fixed width per peak, for the peaks whose profile has it
+  y2 <- voigt_profile(wl, 1, 395.7, 0.10, 0.05, 10) + voigt_profile(wl, 0, 396.2, 0.12, 0.08, 20) +
+    stats::rnorm(length(wl), sd = 0.05)
+  mp <- multipeak_fit(wide_spectrum(wl, y2), peaks = c(395.7, 396.2), profiles = "voigt",
+                      wG = c(0.10, 0.12), fixed = "wG")
+  tm <- mp$tidied[[1]]
+  expect_equal(unname(tm$estimate[match(c("wG_1", "wG_2"), tm$term)]), c(0.10, 0.12))
+  expect_equal(unname(tm$estimate[match(c("wL_1", "wL_2"), tm$term)]), c(0.05, 0.08),
+               tolerance = 0.15)
+  mixed <- multipeak_fit(wide_spectrum(wl, y2), peaks = c(395.7, 396.2),
+                         profiles = c("lorentzian", "voigt"), wG = 0.12, fixed = "wG")
+  expect_equal(attr(mixed$fit[[1]], "held"), c(wG_2 = 0.12))
+
+  expect_error(peak_fit(wide_spectrum(wl, y), profile = "voigt", fixed = "wG"), "give 'wG'")
+  expect_error(peak_fit(wide_spectrum(wl, y), profile = "lorentzian", wG = 0.1, fixed = "wG"),
+               "Gaussian width")
+  expect_error(peak_fit(wide_spectrum(wl, y), profile = "voigt", wG = 0.1, fixed = "xc"), "'fixed'")
+})
+
+test_that("doppler_width follows the thermal broadening", {
+  expect_equal(doppler_width(400, 1e4, 40), 0.0045297, tolerance = 1e-4)
+  expect_equal(doppler_width(656.28, 1e4, "H"), 0.0469, tolerance = 0.01)
+  # proportional to the wavelength and to sqrt(T / m)
+  expect_equal(doppler_width(800, 4e4, 10) / doppler_width(400, 1e4, 40), 2 * 2 * 2)
+  expect_equal(doppler_width(c(393.37, 656.28), 1e4, c("Ca", "H")),
+               c(doppler_width(393.37, 1e4, "Ca"), doppler_width(656.28, 1e4, "H")))
+  expect_error(doppler_width(400, 1e4, "Xx"), "Unknown element")
+  expect_error(doppler_width(-1, 1e4, "Ca"), "wavelength")
+  expect_error(doppler_width(400, 0, "Ca"), "temperature")
+  expect_error(doppler_width(400, 1e4, -2), "mass")
+})

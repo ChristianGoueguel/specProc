@@ -54,7 +54,8 @@
 #' standard atomic weights. The result is only as good as its assumptions:
 #' all major elements must be measured (with closure), the lines must be
 #' optically thin (see [self_absorption()]), the intensities corrected for
-#' the spectral response of the instrument, and the atomic data accurate
+#' the spectral response of the instrument (see [response_calibration()]),
+#' and the atomic data accurate
 #' (prefer lines of accuracy B or better in [nist_lines()]).
 #'
 #' @param lines A data frame with one row per line and columns `species`

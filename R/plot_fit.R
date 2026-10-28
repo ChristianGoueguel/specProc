@@ -180,7 +180,7 @@ profile_names <- c(gaussian = "Gaussian", lorentzian = "Lorentzian", voigt = "Vo
 # The parameters of each peak of a fit (center, FWHM and area with their
 # standard errors, height above the baseline), the baseline, R2 and RMSE.
 fit_summary <- function(fit, aug, curve) {
-  est <- stats::coef(fit)
+  est <- c(stats::coef(fit), attr(fit, "held"))   # with the fixed widths
   cov <- tryCatch(stats::vcov(fit), error = function(e) NULL)
   se <- function(term) {
     if (is.null(cov) || !term %in% rownames(cov)) NA_real_ else sqrt(max(cov[term, term], 0))
@@ -200,7 +200,10 @@ fit_summary <- function(fit, aug, curve) {
       root <- sqrt(0.2166 * wL^2 + wG^2)
       grad <- c(if (root > 0) wG / root else 0, 0.5346 + if (root > 0) 0.2166 * wL / root else 0)
       fwhm_se <- if (is.null(cov)) NA_real_ else {
-        v <- cov[c(name("wG"), name("wL")), c(name("wG"), name("wL"))]
+        widths <- c(name("wG"), name("wL"))
+        v <- matrix(0, 2, 2, dimnames = list(widths, widths))   # a fixed width has no variance
+        free <- intersect(widths, rownames(cov))
+        v[free, free] <- cov[free, free]
         sqrt(max(drop(t(grad) %*% v %*% grad), 0))
       }
     } else {
@@ -218,7 +221,7 @@ fit_summary <- function(fit, aug, curve) {
   rss <- sum(resid^2)
   list(peaks = do.call(rbind, peaks), y0 = est[["y0"]],
        r2 = 1 - rss / sum((aug$y - mean(aug$y))^2),
-       rmse = sqrt(rss / max(length(resid) - length(est), 1)))
+       rmse = sqrt(rss / max(length(resid) - length(stats::coef(fit)), 1)))
 }
 
 # An estimate and its standard error, rounded to two significant digits of

@@ -59,7 +59,10 @@ thin: self-absorption broadens lines and overestimates the density (see
 \item For isolated lines (\code{method = "stark"}), the Stark profile is
 Lorentzian: use the Lorentzian width \code{wL} of a Voigt fit with
 \code{\link[=peak_fit]{peak_fit()}} or \code{\link[=multipeak_fit]{multipeak_fit()}}, whose Gaussian part absorbs the
-instrumental and Doppler broadening.
+instrumental and Doppler broadening. Holding the Gaussian width at the
+measured instrumental width combined with the Doppler width
+(\code{\link[=doppler_width]{doppler_width()}}), with \code{fixed = "wG"}, determines the Lorentzian
+width much better.
 \item The Stark profile of H\eqn{\alpha} (\code{method = "halpha"}) is not
 Lorentzian: use the FWHM of the whole line, for example \code{\link[=voigt_fwhm]{voigt_fwhm()}}
 of the fitted widths, corrected for the instrumental width when it is

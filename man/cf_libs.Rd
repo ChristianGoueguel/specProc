@@ -136,7 +136,8 @@ The mass fractions are computed from the atomic fractions with the
 standard atomic weights. The result is only as good as its assumptions:
 all major elements must be measured (with closure), the lines must be
 optically thin (see \code{\link[=self_absorption]{self_absorption()}}), the intensities corrected for
-the spectral response of the instrument, and the atomic data accurate
+the spectral response of the instrument (see \code{\link[=response_calibration]{response_calibration()}}),
+and the atomic data accurate
 (prefer lines of accuracy B or better in \code{\link[=nist_lines]{nist_lines()}}).
 }
 \examples{

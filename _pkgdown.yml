@@ -176,6 +176,16 @@ reference:
   - predict.specproc_wavelength_calibration
   - plot_wavelength_calibration
 
+- title: Spectral response
+  desc: >
+    The relative spectral response of the instrument, measured on a
+    calibration lamp with its uncertainty, to correct spectra and line
+    intensities.
+  contents:
+  - response_calibration
+  - correct_response
+  - plot_response
+
 - title: Plasma diagnostics
   desc: >
     Electron density from Stark broadening (with the STARK-B database),
@@ -221,6 +231,7 @@ reference:
   - peak_fit
   - multipeak_fit
   - voigt_fwhm
+  - doppler_width
 
 - title: Data visualization
   desc: >

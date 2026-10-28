@@ -19,8 +19,8 @@
 #' that of the slope.
 #'
 #' The intensities must be corrected for the spectral response of the
-#' instrument, and the lines must be optically thin (see
-#' [self_absorption()]). A wide range of upper-level energies gives a more
+#' instrument (see [response_calibration()]), and the lines must be
+#' optically thin (see [self_absorption()]). A wide range of upper-level energies gives a more
 #' precise temperature. Atomic data (\eqn{A_{ki}}, \eqn{g_k}, \eqn{E_k}) can
 #' be taken from the NIST Atomic Spectra Database
 #' (\url{https://physics.nist.gov/PhysRefData/ASD/lines_form.html}).

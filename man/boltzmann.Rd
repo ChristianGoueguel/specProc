@@ -48,8 +48,8 @@ slope, \eqn{T = -1/(k_B\,\mathrm{slope})}, and its standard error from
 that of the slope.
 
 The intensities must be corrected for the spectral response of the
-instrument, and the lines must be optically thin (see
-\code{\link[=self_absorption]{self_absorption()}}). A wide range of upper-level energies gives a more
+instrument (see \code{\link[=response_calibration]{response_calibration()}}), and the lines must be
+optically thin (see \code{\link[=self_absorption]{self_absorption()}}). A wide range of upper-level energies gives a more
 precise temperature. Atomic data (\eqn{A_{ki}}, \eqn{g_k}, \eqn{E_k}) can
 be taken from the NIST Atomic Spectra Database
 (\url{https://physics.nist.gov/PhysRefData/ASD/lines_form.html}).

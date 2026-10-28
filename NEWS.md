@@ -123,6 +123,23 @@
   integration and the baseline, or the standard error of the fitted area
   for the Voigt method. `correct_self_absorption()` turns it into the
   standard error of the corrected intensity.
+* `response_calibration()`: the relative spectral response of the
+  instrument from spectra of a calibration lamp (such as a
+  deuterium-halogen lamp) and its certified irradiance, with its
+  uncertainty. The certified values are interpolated by a monotone spline of
+  their logarithm, the ratio is smoothed by a local linear fit within each
+  detector, ranges such as the Balmer lines of deuterium can be left out,
+  and the relative standard uncertainty combines those of the certificate
+  and of the measurement (repeated lamp spectra, or the noise of one).
+  `correct_response()` corrects spectra on the same axis, or the
+  intensities of a table of lines (with their standard errors, for
+  `plasma_uncertainty()`), and `plot_response()` draws the response.
+* `peak_fit()` and `multipeak_fit()` gain `fixed`, to hold the Gaussian
+  (or Lorentzian) width at a given value, such as the instrumental width
+  measured on a lamp line combined with the Doppler width: the Lorentzian
+  (Stark) width of a Voigt fit is then much better determined.
+  `doppler_width()` gives the Doppler width of a line from the
+  temperature and the mass of the emitter.
 
 ## Improvements
 

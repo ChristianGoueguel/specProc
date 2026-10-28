@@ -392,7 +392,10 @@ stark_width <- function(stark, wavelength, temperature, density = 1e17,
 #' - For isolated lines (`method = "stark"`), the Stark profile is
 #'   Lorentzian: use the Lorentzian width `wL` of a Voigt fit with
 #'   [peak_fit()] or [multipeak_fit()], whose Gaussian part absorbs the
-#'   instrumental and Doppler broadening.
+#'   instrumental and Doppler broadening. Holding the Gaussian width at the
+#'   measured instrumental width combined with the Doppler width
+#'   ([doppler_width()]), with `fixed = "wG"`, determines the Lorentzian
+#'   width much better.
 #' - The Stark profile of H\eqn{\alpha} (`method = "halpha"`) is not
 #'   Lorentzian: use the FWHM of the whole line, for example [voigt_fwhm()]
 #'   of the fitted widths, corrected for the instrumental width when it is
