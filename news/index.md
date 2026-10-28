@@ -158,6 +158,44 @@
   [`step_gap_derivative()`](https://christiangoueguel.com/specProc/reference/step_gap_derivative.md),
   it gives the preprocessing of the winning team of the EMSLIBS 2019
   classification contest (Vrábel et al., 2020).
+- [`plasma_uncertainty()`](https://christiangoueguel.com/specProc/reference/plasma_uncertainty.md):
+  the uncertainty of the temperature of
+  [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
+  and
+  [`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md),
+  and of the temperature and composition of
+  [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md),
+  by Monte Carlo simulation (JCGM 101:2008). Each draw repeats the fit
+  with the intensities, transition probabilities, electron density and,
+  for a given temperature, the temperature perturbed within their
+  uncertainties; the result gives the standard uncertainty and the
+  interval of each quantity, and the draws. The uncertainties of the
+  intensities are the column `intensity_se` of the lines and those of
+  the transition probabilities their NIST accuracy grades (or
+  `aki_rsd`). The reduced chi-squared of the fit tells whether these
+  uncertainties explain the scatter of the points, or whether other
+  errors (spectral response, self-absorption) dominate. The fits now
+  keep their `lines` (and, for
+  [`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md)
+  and
+  [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md),
+  their other arguments in `settings`) for this purpose.
+- [`electron_density_uncertainty()`](https://christiangoueguel.com/specProc/reference/electron_density_uncertainty.md):
+  the electron density of
+  [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md)
+  with its standard uncertainty and interval, from the standard error of
+  the width and the uncertainty of the Stark parameter or of the H-alpha
+  width law.
+- [`aki_uncertainty()`](https://christiangoueguel.com/specProc/reference/aki_uncertainty.md):
+  the relative standard uncertainties of transition probabilities from
+  the accuracy grades of the NIST Atomic Spectra Database (one standard
+  deviation; upper bounds).
+- [`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md)
+  gives the standard error of each intensity (`intensity_se`): the noise
+  of the spectrum propagated through the integration and the baseline,
+  or the standard error of the fitted area for the Voigt method.
+  [`correct_self_absorption()`](https://christiangoueguel.com/specProc/reference/correct_self_absorption.md)
+  turns it into the standard error of the corrected intensity.
 
 ### Improvements
 

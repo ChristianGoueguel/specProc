@@ -293,12 +293,18 @@ checks of LTE, self-absorption and detector saturation.
   : Stark Width of a Line at Given Plasma Conditions
 - [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md)
   : Electron Density from Stark Broadening
+- [`electron_density_uncertainty()`](https://christiangoueguel.com/specProc/reference/electron_density_uncertainty.md)
+  : Uncertainty of the Electron Density from Stark Broadening
 - [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
   : Plasma Temperature from a Boltzmann Plot
 - [`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md)
   : Plasma Temperature from a Saha-Boltzmann Plot
 - [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md)
   : Draw a Boltzmann or Saha-Boltzmann Plot
+- [`plasma_uncertainty()`](https://christiangoueguel.com/specProc/reference/plasma_uncertainty.md)
+  : Monte Carlo Uncertainty of Plasma Diagnostics
+- [`aki_uncertainty()`](https://christiangoueguel.com/specProc/reference/aki_uncertainty.md)
+  : Uncertainty of Transition Probabilities from NIST Accuracy Grades
 - [`mcwhirter_criterion()`](https://christiangoueguel.com/specProc/reference/mcwhirter_criterion.md)
   : McWhirter Criterion for Local Thermodynamic Equilibrium
 - [`self_absorption()`](https://christiangoueguel.com/specProc/reference/self_absorption.md)

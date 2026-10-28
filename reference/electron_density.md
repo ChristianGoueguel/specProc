@@ -65,7 +65,9 @@ electron_density(
 
 ## Value
 
-A numeric vector of electron densities, in cm\\^{-3}\\.
+A numeric vector of electron densities, in cm\\^{-3}\\. See
+[`electron_density_uncertainty()`](https://christiangoueguel.com/specProc/reference/electron_density_uncertainty.md)
+for their uncertainty.
 
 ## Details
 

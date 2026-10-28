@@ -100,11 +100,16 @@ An object of class `specproc_cflibs`, a list with
   Saha correction), `intercept`, the intercept of each plot, and `fit`,
   the `lm` fit;
 
-- `method` and the number of `iterations` of the Saha-Boltzmann fit.
+- `method` and the number of `iterations` of the Saha-Boltzmann fit;
+
+- `lines`, the lines of the fit, and `settings`, its other arguments.
 
 Use
 [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md)
-to draw the Boltzmann plots.
+to draw the Boltzmann plots, and
+[`plasma_uncertainty()`](https://christiangoueguel.com/specProc/reference/plasma_uncertainty.md)
+to propagate the uncertainties of the intensities, of the atomic data
+and of the electron density to the temperature and the composition.
 
 ## Details
 

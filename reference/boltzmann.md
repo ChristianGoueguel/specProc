@@ -36,11 +36,16 @@ An object of class `specproc_boltzmann`, a list with
 - `points`: a tibble with the abscissa `x` (eV) and ordinate `y` of each
   line;
 
-- `fit`: the `lm` fit of `y` on `x`.
+- `fit`: the `lm` fit of `y` on `x`;
+
+- `lines`: the lines of the plot.
 
 Use
 [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md)
-to draw the plot.
+to draw the plot, and
+[`plasma_uncertainty()`](https://christiangoueguel.com/specProc/reference/plasma_uncertainty.md)
+to propagate the uncertainties of the intensities and of the atomic data
+to the temperature.
 
 ## Details
 

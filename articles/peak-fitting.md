@@ -314,16 +314,17 @@ overlapping lines:
 
 lines <- c(`K I 404.41` = 404.414, `Mg I 518.36` = 518.360, `Fe II 259.94` = 259.940)
 line_intensities(corrected[1:2, ], lines, half_width = 0.1)
-#> # A tibble: 6 × 10
-#>   spectrum line       wavelength peak_wavelength    shift height intensity   snr
-#>      <int> <chr>           <dbl>           <dbl>    <dbl>  <dbl>     <dbl> <dbl>
-#> 1        1 K I 404.41       404.            404.  0.00970  2908.     321.   66.9
-#> 2        1 Mg I 518.…       518.            518.  0.0247   8692.    1006.  200. 
-#> 3        1 Fe II 259…       260.            260. -0.00470   614.      65.3  14.1
-#> 4        2 K I 404.41       404.            404.  0.00970  2092.     209.   47.0
-#> 5        2 Mg I 518.…       518.            518.  0.0247   5547.     639.  125. 
-#> 6        2 Fe II 259…       260.            260. -0.00470   596.      64.4  13.4
-#> # ℹ 2 more variables: detected <lgl>, saturated <lgl>
+#> # A tibble: 6 × 11
+#>   spectrum line         wavelength peak_wavelength    shift height intensity
+#>      <int> <chr>             <dbl>           <dbl>    <dbl>  <dbl>     <dbl>
+#> 1        1 K I 404.41         404.            404.  0.00970  2908.     321. 
+#> 2        1 Mg I 518.36        518.            518.  0.0247   8692.    1006. 
+#> 3        1 Fe II 259.94       260.            260. -0.00470   614.      65.3
+#> 4        2 K I 404.41         404.            404.  0.00970  2092.     209. 
+#> 5        2 Mg I 518.36        518.            518.  0.0247   5547.     639. 
+#> 6        2 Fe II 259.94       260.            260. -0.00470   596.      64.4
+#> # ℹ 4 more variables: intensity_se <dbl>, snr <dbl>, detected <lgl>,
+#> #   saturated <lgl>
 ```
 
 The recipe step

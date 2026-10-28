@@ -117,7 +117,11 @@ Default is 1e-8.</p></dd>
     <p><code>lines</code>, as a tibble, with the corrected <code>intensity</code>, the
 <code>measured_intensity</code>, the self-absorption coefficient <code>SA</code> and a
 logical <code>reference</code>, ready for <code><a href="boltzmann.html">boltzmann()</a></code> or <code><a href="cf_libs.html">cf_libs()</a></code>. The
-temperature used is in the attribute <code>temperature</code>.</p>
+temperature used is in the attribute <code>temperature</code>. A column
+<code>intensity_se</code> (as returned by <code><a href="line_intensities.html">line_intensities()</a></code>) becomes the
+standard error of the corrected intensity, which is computed from the
+reference line alone: its relative standard error is that of the
+reference line.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

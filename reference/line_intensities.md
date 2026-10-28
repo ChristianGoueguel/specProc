@@ -81,9 +81,9 @@ line_intensities(
 A tibble with one row per spectrum and line: the other columns of
 `spectra` (or `spectrum`, the row number), the columns of `lines` (or
 `line` and `wavelength`), and `peak_wavelength`, `shift` (nm), `height`,
-`intensity`, `snr`, `detected` and `saturated` (which replace the
-columns of `lines` of the same name, such as the relative intensity
-listed by
+`intensity`, `intensity_se`, `snr`, `detected` and `saturated` (which
+replace the columns of `lines` of the same name, such as the relative
+intensity listed by
 [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md)).
 For a single spectrum, it has one row per line, like `lines`, with the
 measured `intensity`.
@@ -120,6 +120,18 @@ Each line is also checked:
   saturation limit of the detector (see
   [`saturation_summary()`](https://christiangoueguel.com/specProc/reference/saturation_summary.md)).
 
+`intensity_se` is the standard error of the intensity due to the noise
+of the spectrum: the noise (as for `snr`) propagated through the
+integration and the baseline subtraction, or, for the Voigt method, the
+standard error of the fitted area. The noise is taken as white and the
+same in every channel, so this is a lower bound: it leaves out the
+shot-to-shot fluctuations of the plasma, which usually dominate in LIBS.
+These are better estimated from replicate spectra, as the standard
+deviation of the intensities of the replicates divided by the square
+root of their number.
+[`plasma_uncertainty()`](https://christiangoueguel.com/specProc/reference/plasma_uncertainty.md)
+propagates `intensity_se` to the temperature and the composition.
+
 ## See also
 
 [`step_line_intensities()`](https://christiangoueguel.com/specProc/reference/step_line_intensities.md),
@@ -139,21 +151,22 @@ data(forageLIBS)
 spectra <- forageLIBS[1:8, -(1:14)]
 k <- c(`K I 404.41` = 404.414, `K I 404.72` = 404.721, `Mg I 518.36` = 518.360)
 line_intensities(spectra, k, baseline = TRUE)
-#> # A tibble: 24 × 10
-#>    spectrum line       wavelength peak_wavelength   shift height intensity   snr
-#>       <int> <chr>           <dbl>           <dbl>   <dbl>  <dbl>     <dbl> <dbl>
-#>  1        1 K I 404.41       404.            404. -0.0512  1979.     166.   42.9
-#>  2        1 K I 404.72       405.            405. -0.0233   898.      75.2  19.5
-#>  3        1 Mg I 518.…       518.            518. -0.0560  5399      453.  117. 
-#>  4        2 K I 404.41       404.            404. -0.0512  1688.     141.   36.6
-#>  5        2 K I 404.72       405.            405. -0.0233   550.      46.0  11.9
-#>  6        2 Mg I 518.…       518.            518. -0.0560  3484      293.   75.5
-#>  7        3 K I 404.41       404.            404. -0.0512  2238.     187.   46.4
-#>  8        3 K I 404.72       405.            405. -0.0233  1003.      84.0  20.8
-#>  9        3 Mg I 518.…       518.            518. -0.0560  4444.     373.   92.1
-#> 10        4 K I 404.41       404.            404. -0.0512  2071.     173.   43.0
+#> # A tibble: 24 × 11
+#>    spectrum line        wavelength peak_wavelength   shift height intensity
+#>       <int> <chr>            <dbl>           <dbl>   <dbl>  <dbl>     <dbl>
+#>  1        1 K I 404.41        404.            404. -0.0512  1979.     166. 
+#>  2        1 K I 404.72        405.            405. -0.0233   898.      75.2
+#>  3        1 Mg I 518.36       518.            518. -0.0560  5399      453. 
+#>  4        2 K I 404.41        404.            404. -0.0512  1688.     141. 
+#>  5        2 K I 404.72        405.            405. -0.0233   550.      46.0
+#>  6        2 Mg I 518.36       518.            518. -0.0560  3484      293. 
+#>  7        3 K I 404.41        404.            404. -0.0512  2238.     187. 
+#>  8        3 K I 404.72        405.            405. -0.0233  1003.      84.0
+#>  9        3 Mg I 518.36       518.            518. -0.0560  4444.     373. 
+#> 10        4 K I 404.41        404.            404. -0.0512  2071.     173. 
 #> # ℹ 14 more rows
-#> # ℹ 2 more variables: detected <lgl>, saturated <lgl>
+#> # ℹ 4 more variables: intensity_se <dbl>, snr <dbl>, detected <lgl>,
+#> #   saturated <lgl>
 
 # one spectrum and a table of lines, ready for a Boltzmann plot
 lines <- data.frame(wavelength = c(428.30, 430.25, 443.50, 445.48),
@@ -161,12 +174,13 @@ lines <- data.frame(wavelength = c(428.30, 430.25, 443.50, 445.48),
                     Ek = c(4.78, 4.78, 4.68, 4.68))
 mean_spectrum <- colMeans(forageLIBS[-(1:14)])
 line_intensities(mean_spectrum, lines, baseline = TRUE)
-#> # A tibble: 4 × 11
-#>   wavelength      Aki    gk    Ek peak_wavelength   shift height intensity   snr
-#>        <dbl>    <dbl> <dbl> <dbl>           <dbl>   <dbl>  <dbl>     <dbl> <dbl>
-#> 1       428.   4.34e7     5  4.78            428. -0.0487  4471.      376.  155.
-#> 2       430.   1.36e8     5  4.78            430. -0.0429  9200.      781.  318.
-#> 3       444.   6.70e7     5  4.68            443. -0.0721  4175.      349.  144.
-#> 4       445.   8.70e7     7  4.68            445. -0.0898  7780.      656.  269.
-#> # ℹ 2 more variables: detected <lgl>, saturated <lgl>
+#> # A tibble: 4 × 12
+#>   wavelength       Aki    gk    Ek peak_wavelength   shift height intensity
+#>        <dbl>     <dbl> <dbl> <dbl>           <dbl>   <dbl>  <dbl>     <dbl>
+#> 1       428.  43400000     5  4.78            428. -0.0487  4471.      376.
+#> 2       430. 136000000     5  4.78            430. -0.0429  9200.      781.
+#> 3       444.  67000000     5  4.68            443. -0.0721  4175.      349.
+#> 4       445.  87000000     7  4.68            445. -0.0898  7780.      656.
+#> # ℹ 4 more variables: intensity_se <dbl>, snr <dbl>, detected <lgl>,
+#> #   saturated <lgl>
 ```

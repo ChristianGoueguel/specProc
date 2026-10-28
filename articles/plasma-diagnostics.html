@@ -156,6 +156,22 @@ maximum into <span class="math inline">N_e</span>:</p>
 <span><span class="va">ne</span></span>
 <span><span class="co">#&gt;           wL </span></span>
 <span><span class="co">#&gt; 1.887979e+17</span></span></code></pre></div>
+<p>The fit also gives the standard error of the width.
+<code><a href="../reference/electron_density_uncertainty.html">electron_density_uncertainty()</a></code> propagates it to the
+density, together with the uncertainty of the width law of H<span class="math inline">\alpha</span> itself, taken here as 10% for
+illustration:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ne_u</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/electron_density_uncertainty.html">electron_density_uncertainty</a></span><span class="op">(</span><span class="va">width</span><span class="op">$</span><span class="va">estimate</span>, <span class="va">width</span><span class="op">$</span><span class="va">std.error</span>, method <span class="op">=</span> <span class="st">"halpha"</span>,</span>
+<span>                                     reference_rsd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
+<span><span class="va">ne_u</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 7</span></span></span>
+<span><span class="co">#&gt;   width width_se electron_density      se   rsd   lower   upper</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>  1.69   0.040<span style="text-decoration: underline;">3</span>          1.89<span style="color: #949494;">e</span>17 2.87<span style="color: #949494;">e</span>16 0.152 1.40<span style="color: #949494;">e</span>17 2.54<span style="color: #949494;">e</span>17</span></span></code></pre></div>
+<p>The width of H<span class="math inline">\alpha</span> grows as <span class="math inline">N_e^{0.68}</span>, so a relative error of the width
+is amplified about 1.5 times in the density. The relative standard
+uncertainty of the density, 15%, comes mostly from the width law: the
+fit error alone is 2.4% of the width.</p>
 <p>For other lines, <code><a href="../reference/stark_width.html">stark_width()</a></code> gives the width expected
 at a density from the Stark parameters of the STARK-B database
 (<code><a href="../reference/starkb_lines.html">starkb_lines()</a></code>), and <code><a href="../reference/self_absorption.html">self_absorption()</a></code>
@@ -172,14 +188,14 @@ compares it with the measured width.</p>
 <code><a href="../reference/nist_lines.html">nist_lines()</a></code> retrieves them from the NIST Atomic Spectra
 Database, and <code><a href="../reference/nist_ionization_energy.html">nist_ionization_energy()</a></code> the ionization
 energies:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ca_lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nist_lines.html">nist_lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ca I"</span>, <span class="st">"Ca II"</span><span class="op">)</span>, wavelength <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">310</span>, <span class="fl">660</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/nist_ionization_energy.html">nist_ionization_energy</a></span><span class="op">(</span><span class="st">"Ca I"</span><span class="op">)</span></span></code></pre></div>
 <p>So that this vignette runs offline, the calcium lines used below are
 included (NIST ASD, Kramida et al.). The accuracy grades of the
 transition probabilities (C: ≤ 25%, D: ≤ 50%) limit the precision of the
 temperature:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">atomic</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
 <span>  <span class="op">~</span><span class="va">species</span>, <span class="op">~</span><span class="va">stage</span>, <span class="op">~</span><span class="va">wavelength</span>, <span class="op">~</span><span class="va">Aki</span>,    <span class="op">~</span><span class="va">accuracy</span>, <span class="op">~</span><span class="va">Ek</span>,       <span class="op">~</span><span class="va">gk</span>,</span>
 <span>  <span class="st">"Ca I"</span>,   <span class="fl">1</span>,      <span class="fl">428.301</span>,     <span class="fl">4.34e7</span>,  <span class="st">"C+"</span>,      <span class="fl">4.779784</span>,  <span class="fl">5</span>,</span>
@@ -209,7 +225,7 @@ tabulated wavelength (<code>search</code>), which absorbs the offset of
 the wavelength axis, and integrates it over ±0.15 nm
 (<code>half_width</code>). It keeps the columns of the table of lines,
 so the result goes directly into a Boltzmann plot:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">mean_spectrum</span>, <span class="va">atomic</span><span class="op">)</span></span>
 <span><span class="va">lines</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">species</span>, <span class="va">wavelength</span>, <span class="va">peak_wavelength</span>, <span class="va">intensity</span>, <span class="va">snr</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 16 × 5</span></span></span>
@@ -235,7 +251,7 @@ so the result goes directly into a Boltzmann plot:</p>
 <div class="section level3">
 <h3 id="boltzmann-and-saha-boltzmann-plots">Boltzmann and Saha-Boltzmann plots<a class="anchor" aria-label="anchor" href="#boltzmann-and-saha-boltzmann-plots"></a>
 </h3>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">neutral</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/boltzmann.html">boltzmann</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">lines</span>, <span class="va">stage</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">neutral</span></span>
 <span><span class="co">#&gt; Boltzmann plot (12 lines)</span></span>
@@ -247,7 +263,7 @@ such a narrow range, the slope is sensitive to the errors of a few
 intensities or transition probabilities. The Saha equation places the
 lines of the ion on the same plot, using the electron density, and
 extends the range of energies to about 13 eV:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">saha</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/saha_boltzmann.html">saha_boltzmann</a></span><span class="op">(</span><span class="va">lines</span>, ionization_energy <span class="op">=</span> <span class="va">ionization_energy</span>, electron_density <span class="op">=</span> <span class="va">ne</span><span class="op">)</span></span>
 <span><span class="va">saha</span></span>
 <span><span class="co">#&gt; Saha-Boltzmann plot (16 lines)</span></span>
@@ -255,13 +271,51 @@ extends the range of energies to about 13 eV:</p>
 <span><span class="co">#&gt; Temperature:  8263 +/- 188 K</span></span>
 <span><span class="co">#&gt; R-squared:    0.9928</span></span>
 <span><span class="co">#&gt; Ne:           1.89e+17 cm-3</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boltzmann.html">plot_boltzmann</a></span><span class="op">(</span><span class="va">saha</span><span class="op">)</span></span></code></pre></div>
 <p><img src="plasma-diagnostics_files/figure-html/saha-plot-1.png" class="r-plt" alt="" width="100%"></p>
 <p>The Saha-Boltzmann temperature, 8300 K, is far better determined than
 the Boltzmann temperature of the neutral lines alone (4500 ± 500 K). Its
-standard error, 190 K, reflects the scatter of the points, not the
-systematic errors of the atomic data or of the spectral response.</p>
+standard error, 190 K, reflects the scatter of the points.</p>
+</div>
+<div class="section level3">
+<h3 id="uncertainty-of-the-temperature">Uncertainty of the temperature<a class="anchor" aria-label="anchor" href="#uncertainty-of-the-temperature"></a>
+</h3>
+<p>The points scatter because of the errors of the intensities and of
+the transition probabilities. The accuracy grades of the NIST database
+(column <code>accuracy</code>) bound the standard uncertainties of the
+transition probabilities: 18% for grade C+, 25% for C and 50% for D (see
+<code><a href="../reference/aki_uncertainty.html">aki_uncertainty()</a></code>). <code><a href="../reference/line_intensities.html">line_intensities()</a></code> gives
+the standard error of each intensity due to the noise of the spectrum
+(<code>intensity_se</code>). <code><a href="../reference/plasma_uncertainty.html">plasma_uncertainty()</a></code>
+propagates these uncertainties, and that of the electron density, to the
+temperature: it repeats the fit with inputs perturbed within their
+uncertainties (Monte Carlo simulation):</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">saha_u</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plasma_uncertainty.html">plasma_uncertainty</a></span><span class="op">(</span><span class="va">saha</span>, electron_density_se <span class="op">=</span> <span class="va">ne_u</span><span class="op">$</span><span class="va">se</span><span class="op">)</span></span>
+<span><span class="va">saha_u</span></span>
+<span><span class="co">#&gt; Monte Carlo uncertainty of a Saha-Boltzmann plot</span></span>
+<span><span class="co">#&gt; 1000 draws, 95% intervals</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Intensities:              0.12% to 1.3%</span></span>
+<span><span class="co">#&gt; Transition probabilities: 18% to 50%</span></span>
+<span><span class="co">#&gt; Electron density:         15%</span></span>
+<span><span class="co">#&gt; Reduced chi-squared:      3.81</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  quantity    estimate se  lower upper</span></span>
+<span><span class="co">#&gt;  temperature 8263     137 8006  8561 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Standard error of the fit (scatter of the points): 188 K</span></span></code></pre></div>
+<p>The intensities of the mean spectrum are measured to about 1%, so the
+transition probabilities and the electron density, which contribute
+about equally, make up the interval, 8010 to 8560 K. The reduced
+chi-squared compares the scatter of the points with their stated
+uncertainties. At 3.8, the scatter of the points is about 2.0 times what
+these uncertainties explain: other errors are at work, such as the
+spectral response of the instrument, which is not corrected here, or
+self-absorption. The interval does not include them, so it is a lower
+bound of the uncertainty.</p>
 </div>
 <div class="section level3">
 <h3 id="is-the-plasma-in-lte">Is the plasma in LTE?<a class="anchor" aria-label="anchor" href="#is-the-plasma-in-lte"></a>
@@ -270,7 +324,7 @@ systematic errors of the atomic data or of the spectral response.</p>
 collisions to dominate the population of the levels. The largest energy
 gap here is the first excited level of Ca II, 3.15 eV above the ground
 state:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lte</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/mcwhirter_criterion.html">mcwhirter_criterion</a></span><span class="op">(</span>temperature <span class="op">=</span> <span class="va">saha</span><span class="op">$</span><span class="va">temperature</span>, delta_e <span class="op">=</span> <span class="fl">3.15</span>, electron_density <span class="op">=</span> <span class="va">ne</span><span class="op">)</span></span>
 <span><span class="va">lte</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span></span>
@@ -292,7 +346,7 @@ so the plasma reabsorbs part of their light.
 reference line of the same species that is little absorbed, by default
 the one of smallest optical depth (Sun and Yu, 2009). The potassium
 lines:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">k_lines</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
 <span>  <span class="op">~</span><span class="va">species</span>, <span class="op">~</span><span class="va">wavelength</span>, <span class="op">~</span><span class="va">Aki</span>,      <span class="op">~</span><span class="va">Ei</span>,      <span class="op">~</span><span class="va">Ek</span>,      <span class="op">~</span><span class="va">gk</span>,</span>
 <span>  <span class="st">"K I"</span>,    <span class="fl">404.414</span>,     <span class="fl">1.150e+06</span>, <span class="fl">0</span>,        <span class="fl">3.064907</span>, <span class="fl">4</span>,</span>
@@ -341,14 +395,14 @@ sum to one.</p>
 resonance lines. <code><a href="../reference/cf_libs.html">cf_libs()</a></code> also needs the partition
 functions of the species, which it computes from the energy levels of
 <code><a href="../reference/nist_levels.html">nist_levels()</a></code>, and the ionization energies:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">species</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ca I"</span>, <span class="st">"Ca II"</span>, <span class="st">"Mg I"</span>, <span class="st">"Mg II"</span>, <span class="st">"K I"</span>, <span class="st">"K II"</span>, <span class="st">"Na I"</span>, <span class="st">"Na II"</span><span class="op">)</span></span>
 <span><span class="va">levels</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nist_levels.html">nist_levels</a></span><span class="op">(</span><span class="va">species</span><span class="op">)</span></span>
 <span><span class="va">ionization</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/nist_ionization_energy.html">nist_ionization_energy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Ca I"</span>, <span class="st">"Mg I"</span>, <span class="st">"K I"</span>, <span class="st">"Na I"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>To run offline, the atomic data and the partition functions (from
 <code><a href="../reference/nist_levels.html">partition_function()</a></code>, tabulated from 6000 to 12000 K) are
 included here:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cf_atomic</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
 <span>  <span class="op">~</span><span class="va">species</span>, <span class="op">~</span><span class="va">wavelength</span>, <span class="op">~</span><span class="va">Aki</span>,      <span class="op">~</span><span class="va">accuracy</span>, <span class="op">~</span><span class="va">Ek</span>,      <span class="op">~</span><span class="va">gk</span>,</span>
 <span>  <span class="st">"Ca I"</span>,   <span class="fl">428.301</span>,     <span class="fl">4.340e+07</span>, <span class="st">"C+"</span>,      <span class="fl">4.779784</span>, <span class="fl">5</span>,</span>
@@ -400,7 +454,7 @@ included here:</p>
 <p>With <code>partition = NULL</code> (the default),
 <code><a href="../reference/cf_libs.html">cf_libs()</a></code> downloads the levels and computes the partition
 functions itself. On the mean spectrum:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cf_mean</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/line_intensities.html">line_intensities</a></span><span class="op">(</span><span class="va">mean_spectrum</span>, <span class="va">cf_atomic</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/cf_libs.html">cf_libs</a></span><span class="op">(</span>electron_density <span class="op">=</span> <span class="va">ne</span>, partition <span class="op">=</span> <span class="va">partition</span>, ionization_energy <span class="op">=</span> <span class="va">cf_ionization</span><span class="op">)</span></span>
 <span><span class="va">cf_mean</span></span>
@@ -415,7 +469,7 @@ functions itself. On the mean spectrum:</p>
 <span><span class="co">#&gt;  Mg      0.0871          0.0571        I, II       </span></span>
 <span><span class="co">#&gt;  K       0.7587          0.8005        I, II (Saha)</span></span>
 <span><span class="co">#&gt;  Na      0.0531          0.0329        I, II (Saha)</span></span></code></pre></div>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_boltzmann.html">plot_boltzmann</a></span><span class="op">(</span><span class="va">cf_mean</span><span class="op">)</span></span></code></pre></div>
 <p><img src="plasma-diagnostics_files/figure-html/cf-plot-1.png" class="r-plt" alt="" width="100%"></p>
 <p>The four Saha-Boltzmann plots are parallel within the scatter of
@@ -423,7 +477,7 @@ their points. The forage is mostly C, H, O and N, whose lines are not
 used here, so the fractions describe the relative composition of Ca, Mg,
 K and Na, which we compare with the laboratory values on the same
 basis:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">laboratory</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">Ca</span>, <span class="va">Mg</span>, <span class="va">K</span>, <span class="va">Na</span><span class="op">)</span>, \<span class="op">(</span><span class="va">v</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">v</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/unlist.html" class="external-link">unlist</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -445,6 +499,40 @@ the instrument, which weights the lines of each element differently, the
 uncertain transition probabilities of the Ca lines, and the weak Na
 lines. With one standard of known composition, the remaining bias can be
 measured and removed for each element.</p>
+<p><code><a href="../reference/plasma_uncertainty.html">plasma_uncertainty()</a></code> also repeats the calibration-free
+analysis with perturbed inputs:</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">cf_u</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plasma_uncertainty.html">plasma_uncertainty</a></span><span class="op">(</span><span class="va">cf_mean</span>, n <span class="op">=</span> <span class="fl">500</span>, electron_density_se <span class="op">=</span> <span class="va">ne_u</span><span class="op">$</span><span class="va">se</span><span class="op">)</span></span>
+<span><span class="va">cf_u</span></span>
+<span><span class="co">#&gt; Monte Carlo uncertainty of a CF-LIBS fit (Saha-Boltzmann plots)</span></span>
+<span><span class="co">#&gt; 500 draws, 95% intervals</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Intensities:              0.12% to 6.6%</span></span>
+<span><span class="co">#&gt; Transition probabilities: 1% to 25%</span></span>
+<span><span class="co">#&gt; Electron density:         15%</span></span>
+<span><span class="co">#&gt; Reduced chi-squared:      296</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  quantity        element estimate se     lower  upper </span></span>
+<span><span class="co">#&gt;  temperature             9016     104    8835   9233  </span></span>
+<span><span class="co">#&gt;  atomic_fraction Ca      0.1012   0.0070 0.0882 0.1148</span></span>
+<span><span class="co">#&gt;  atomic_fraction Mg      0.0871   0.0049 0.0780 0.0973</span></span>
+<span><span class="co">#&gt;  atomic_fraction K       0.7587   0.0091 0.7396 0.7763</span></span>
+<span><span class="co">#&gt;  atomic_fraction Na      0.0531   0.0014 0.0503 0.0557</span></span>
+<span><span class="co">#&gt;  mass_fraction   Ca      0.1095   0.0076 0.0954 0.1243</span></span>
+<span><span class="co">#&gt;  mass_fraction   Mg      0.0571   0.0034 0.0510 0.0641</span></span>
+<span><span class="co">#&gt;  mass_fraction   K       0.8005   0.0088 0.7830 0.8171</span></span>
+<span><span class="co">#&gt;  mass_fraction   Na      0.0329   0.0009 0.0312 0.0346</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Standard error of the fit (scatter of the points): 218 K</span></span></code></pre></div>
+<p>The intervals are narrow, a few percent of each fraction. The reduced
+chi-squared, 296, shows why they are misleading: the K, Mg and Na lines
+have accurate transition probabilities (grades AA to B+) and intensities
+measured to a few percent, so their scatter about the parallel plots
+comes from other errors, such as the spectral response, self-absorption
+or departures from LTE. These systematic errors, not the random ones,
+limit the accuracy of the composition, as the comparison with the
+laboratory values shows.</p>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
@@ -463,6 +551,11 @@ ionization stages span a much wider range of energies.</li>
 <strong>Check LTE and self-absorption</strong> before trusting
 intensities: the McWhirter criterion is a minimum requirement, and
 resonance lines are often strongly self-absorbed.</li>
+<li>
+<strong>Propagate the uncertainties</strong> of the intensities, the
+transition probabilities and the electron density with
+<code><a href="../reference/plasma_uncertainty.html">plasma_uncertainty()</a></code>. A reduced chi-squared well above 1
+means that other errors dominate, and the interval is too narrow.</li>
 <li>
 <strong>Calibration-free LIBS is semi-quantitative</strong> without
 a correction of the spectral response.</li>

@@ -71,7 +71,12 @@ correct_self_absorption(
 [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
 or
 [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md).
-The temperature used is in the attribute `temperature`.
+The temperature used is in the attribute `temperature`. A column
+`intensity_se` (as returned by
+[`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md))
+becomes the standard error of the corrected intensity, which is computed
+from the reference line alone: its relative standard error is that of
+the reference line.
 
 ## Details
 

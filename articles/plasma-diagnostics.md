@@ -95,6 +95,27 @@ ne
 #> 1.887979e+17
 ```
 
+The fit also gives the standard error of the width.
+[`electron_density_uncertainty()`](https://christiangoueguel.com/specProc/reference/electron_density_uncertainty.md)
+propagates it to the density, together with the uncertainty of the width
+law of H\alpha itself, taken here as 10% for illustration:
+
+``` r
+
+ne_u <- electron_density_uncertainty(width$estimate, width$std.error, method = "halpha",
+                                     reference_rsd = 0.1)
+ne_u
+#> # A tibble: 1 × 7
+#>   width width_se electron_density      se   rsd   lower   upper
+#>   <dbl>    <dbl>            <dbl>   <dbl> <dbl>   <dbl>   <dbl>
+#> 1  1.69   0.0403          1.89e17 2.87e16 0.152 1.40e17 2.54e17
+```
+
+The width of H\alpha grows as N_e^{0.68}, so a relative error of the
+width is amplified about 1.5 times in the density. The relative standard
+uncertainty of the density, 15%, comes mostly from the width law: the
+fit error alone is 2.4% of the width.
+
 For other lines,
 [`stark_width()`](https://christiangoueguel.com/specProc/reference/stark_width.md)
 gives the width expected at a density from the Stark parameters of the
@@ -222,8 +243,51 @@ plot_boltzmann(saha)
 
 The Saha-Boltzmann temperature, 8300 K, is far better determined than
 the Boltzmann temperature of the neutral lines alone (4500 ± 500 K). Its
-standard error, 190 K, reflects the scatter of the points, not the
-systematic errors of the atomic data or of the spectral response.
+standard error, 190 K, reflects the scatter of the points.
+
+### Uncertainty of the temperature
+
+The points scatter because of the errors of the intensities and of the
+transition probabilities. The accuracy grades of the NIST database
+(column `accuracy`) bound the standard uncertainties of the transition
+probabilities: 18% for grade C+, 25% for C and 50% for D (see
+[`aki_uncertainty()`](https://christiangoueguel.com/specProc/reference/aki_uncertainty.md)).
+[`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md)
+gives the standard error of each intensity due to the noise of the
+spectrum (`intensity_se`).
+[`plasma_uncertainty()`](https://christiangoueguel.com/specProc/reference/plasma_uncertainty.md)
+propagates these uncertainties, and that of the electron density, to the
+temperature: it repeats the fit with inputs perturbed within their
+uncertainties (Monte Carlo simulation):
+
+``` r
+
+set.seed(1)
+saha_u <- plasma_uncertainty(saha, electron_density_se = ne_u$se)
+saha_u
+#> Monte Carlo uncertainty of a Saha-Boltzmann plot
+#> 1000 draws, 95% intervals
+#> 
+#> Intensities:              0.12% to 1.3%
+#> Transition probabilities: 18% to 50%
+#> Electron density:         15%
+#> Reduced chi-squared:      3.81
+#> 
+#>  quantity    estimate se  lower upper
+#>  temperature 8263     137 8006  8561 
+#> 
+#> Standard error of the fit (scatter of the points): 188 K
+```
+
+The intensities of the mean spectrum are measured to about 1%, so the
+transition probabilities and the electron density, which contribute
+about equally, make up the interval, 8010 to 8560 K. The reduced
+chi-squared compares the scatter of the points with their stated
+uncertainties. At 3.8, the scatter of the points is about 2.0 times what
+these uncertainties explain: other errors are at work, such as the
+spectral response of the instrument, which is not corrected here, or
+self-absorption. The interval does not include them, so it is a lower
+bound of the uncertainty.
 
 ### Is the plasma in LTE?
 
@@ -437,6 +501,45 @@ uncertain transition probabilities of the Ca lines, and the weak Na
 lines. With one standard of known composition, the remaining bias can be
 measured and removed for each element.
 
+[`plasma_uncertainty()`](https://christiangoueguel.com/specProc/reference/plasma_uncertainty.md)
+also repeats the calibration-free analysis with perturbed inputs:
+
+``` r
+
+set.seed(1)
+cf_u <- plasma_uncertainty(cf_mean, n = 500, electron_density_se = ne_u$se)
+cf_u
+#> Monte Carlo uncertainty of a CF-LIBS fit (Saha-Boltzmann plots)
+#> 500 draws, 95% intervals
+#> 
+#> Intensities:              0.12% to 6.6%
+#> Transition probabilities: 1% to 25%
+#> Electron density:         15%
+#> Reduced chi-squared:      296
+#> 
+#>  quantity        element estimate se     lower  upper 
+#>  temperature             9016     104    8835   9233  
+#>  atomic_fraction Ca      0.1012   0.0070 0.0882 0.1148
+#>  atomic_fraction Mg      0.0871   0.0049 0.0780 0.0973
+#>  atomic_fraction K       0.7587   0.0091 0.7396 0.7763
+#>  atomic_fraction Na      0.0531   0.0014 0.0503 0.0557
+#>  mass_fraction   Ca      0.1095   0.0076 0.0954 0.1243
+#>  mass_fraction   Mg      0.0571   0.0034 0.0510 0.0641
+#>  mass_fraction   K       0.8005   0.0088 0.7830 0.8171
+#>  mass_fraction   Na      0.0329   0.0009 0.0312 0.0346
+#> 
+#> Standard error of the fit (scatter of the points): 218 K
+```
+
+The intervals are narrow, a few percent of each fraction. The reduced
+chi-squared, 296, shows why they are misleading: the K, Mg and Na lines
+have accurate transition probabilities (grades AA to B+) and intensities
+measured to a few percent, so their scatter about the parallel plots
+comes from other errors, such as the spectral response, self-absorption
+or departures from LTE. These systematic errors, not the random ones,
+limit the accuracy of the composition, as the comparison with the
+laboratory values shows.
+
 ## Summary
 
 - **Screen for saturation first**: saturated lines are useless for
@@ -447,6 +550,11 @@ measured and removed for each element.
 - **Check LTE and self-absorption** before trusting intensities: the
   McWhirter criterion is a minimum requirement, and resonance lines are
   often strongly self-absorbed.
+- **Propagate the uncertainties** of the intensities, the transition
+  probabilities and the electron density with
+  [`plasma_uncertainty()`](https://christiangoueguel.com/specProc/reference/plasma_uncertainty.md).
+  A reduced chi-squared well above 1 means that other errors dominate,
+  and the interval is too narrow.
 - **Calibration-free LIBS is semi-quantitative** without a correction of
   the spectral response.
 

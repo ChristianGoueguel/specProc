@@ -10,6 +10,7 @@
 <url><loc>https://christiangoueguel.com/specProc/index.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/news/index.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/adjusted_boxplot.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/aki_uncertainty.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/apply_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/average.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/baseline_als.html</loc></url>
@@ -35,6 +36,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/directional_outlyingness.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/dmodx.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/electron_density.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/electron_density_uncertainty.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/emsc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/epo.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/flagged_regions.html</loc></url>
@@ -73,6 +75,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/pds.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/peak_fit.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/pipe.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/plasma_uncertainty.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_boltzmann.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/plot_cell_map.html</loc></url>

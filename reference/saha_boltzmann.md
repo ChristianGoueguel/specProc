@@ -51,7 +51,8 @@ saha_boltzmann(
 
 An object of class `specproc_boltzmann`, as for
 [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md),
-with the number of iterations in `iterations`.
+with the number of iterations in `iterations`, the `electron_density`,
+and the other arguments of the fit in `settings`.
 
 ## Details
 
