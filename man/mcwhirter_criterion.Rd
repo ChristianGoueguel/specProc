@@ -46,3 +46,7 @@ laser-induced breakdown spectroscopy: beyond the McWhirter criterion.
 Spectrochimica Acta Part B, 65(1):86-95.
 }
 }
+\seealso{
+\code{\link[=lte_criteria]{lte_criteria()}} for the temporal and spatial criteria of
+Cristoforetti et al. (2010)
+}

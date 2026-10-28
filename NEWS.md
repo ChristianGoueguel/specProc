@@ -140,6 +140,24 @@
   (Stark) width of a Voigt fit is then much better determined.
   `doppler_width()` gives the Doppler width of a line from the
   temperature and the mass of the emitter.
+* `lte_criteria()`: the criteria of local thermodynamic equilibrium of
+  Cristoforetti et al. (2010) for transient and inhomogeneous plasmas, with
+  the McWhirter criterion: the relaxation time to equilibrium and the
+  diffusion length of the atoms meanwhile, from the temperature, the
+  electron density and the gap and oscillator strength of the slowest
+  (resonance) transition. With measurements at several delays, the relative
+  changes of the temperature and density during the relaxation time give
+  the temporal criterion; with the length over which they change (such as
+  the size of the plasma), the diffusion length gives the spatial one.
+* `multipeak_fit()` gains constraints for multiplets: `lock_centers` keeps
+  the separations of the given wavelengths (such as those of the NIST
+  database) with one fitted shift, `share_widths` gives the lines common
+  widths, and `area_ratios` fixes the ratios of their areas (for optically
+  thin lines, the relative intensities of `libs_lines()`). Each constraint
+  applies to all lines, or to groups of lines, so that an interfering line
+  can be left free. `tidied` lists the center, widths and area of every
+  line, with standard errors propagated from the fitted parameters, and the
+  common shifts.
 
 ## Improvements
 

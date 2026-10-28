@@ -207,6 +207,7 @@ reference:
   - plasma_uncertainty
   - aki_uncertainty
   - mcwhirter_criterion
+  - lte_criteria
   - self_absorption
   - correct_self_absorption
   - saturation_summary

@@ -180,8 +180,10 @@ profile_names <- c(gaussian = "Gaussian", lorentzian = "Lorentzian", voigt = "Vo
 # The parameters of each peak of a fit (center, FWHM and area with their
 # standard errors, height above the baseline), the baseline, R2 and RMSE.
 fit_summary <- function(fit, aug, curve) {
-  est <- c(stats::coef(fit), attr(fit, "held"))   # with the fixed widths
-  cov <- tryCatch(stats::vcov(fit), error = function(e) NULL)
+  # the parameters of each line, fixed or constrained ones included
+  lines <- line_estimates(fit)
+  est <- lines$estimate
+  cov <- lines$vcov
   se <- function(term) {
     if (is.null(cov) || !term %in% rownames(cov)) NA_real_ else sqrt(max(cov[term, term], 0))
   }
@@ -200,10 +202,7 @@ fit_summary <- function(fit, aug, curve) {
       root <- sqrt(0.2166 * wL^2 + wG^2)
       grad <- c(if (root > 0) wG / root else 0, 0.5346 + if (root > 0) 0.2166 * wL / root else 0)
       fwhm_se <- if (is.null(cov)) NA_real_ else {
-        widths <- c(name("wG"), name("wL"))
-        v <- matrix(0, 2, 2, dimnames = list(widths, widths))   # a fixed width has no variance
-        free <- intersect(widths, rownames(cov))
-        v[free, free] <- cov[free, free]
+        v <- cov[c(name("wG"), name("wL")), c(name("wG"), name("wL"))]
         sqrt(max(drop(t(grad) %*% v %*% grad), 0))
       }
     } else {

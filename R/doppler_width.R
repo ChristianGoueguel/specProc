@@ -41,6 +41,15 @@ doppler_width <- function(wavelength, temperature, mass) {
   if (!is.numeric(temperature) || anyNA(temperature) || any(temperature <= 0)) {
     stop("'temperature' must contain positive values (K).", call. = FALSE)
   }
+  mass <- atomic_mass(mass)
+  k_b <- 1.380649e-23        # J / K
+  u <- 1.66053906660e-27     # kg
+  c_light <- 299792458       # m / s
+  wavelength * sqrt(8 * k_b * temperature * log(2) / (mass * u * c_light^2))
+}
+
+# Atomic masses (u) from masses or element symbols (standard atomic weights).
+atomic_mass <- function(mass) {
   if (is.character(mass)) {
     pt <- periodic_table()
     unknown <- setdiff(mass, pt$symbol)
@@ -52,8 +61,5 @@ doppler_width <- function(wavelength, temperature, mass) {
   if (!is.numeric(mass) || anyNA(mass) || any(mass <= 0)) {
     stop("'mass' must contain positive atomic masses (u) or element symbols.", call. = FALSE)
   }
-  k_b <- 1.380649e-23        # J / K
-  u <- 1.66053906660e-27     # kg
-  c_light <- 299792458       # m / s
-  wavelength * sqrt(8 * k_b * temperature * log(2) / (mass * u * c_light^2))
+  mass
 }

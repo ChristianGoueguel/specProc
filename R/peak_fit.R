@@ -189,59 +189,95 @@ check_fixed <- function(fixed, profiles, wL, wG) {
   fixed
 }
 
-# Builds the parameter specification of the multi-peak model. The widths
-# named in `fixed` enter the model as constants (in `held`).
-peak_parameters <- function(data, peaks, profiles, wL, wG, A, single, fixed = character()) {
+# Builds the parameter specification of the multi-peak model: the fitted
+# parameters (start values and bounds), the model terms, and the definition
+# of each parameter of each line (y0, xc, wG, wL, A) as an expression of the
+# fitted parameters: a parameter of its own, a fixed value (`fixed`), or a
+# function of a parameter shared by a group of lines (`centers`: the lines
+# keep the separations of `peaks` and move by a common shift; `widths`: the
+# lines share their widths; `area_ratios`: the areas are in fixed ratios).
+# `centers` and `widths` give a group number per line (NA for a free line).
+peak_parameters <- function(data, peaks, profiles, wL, wG, A, single, fixed = character(),
+                            centers = NULL, widths = NULL, area_ratios = NULL) {
   k <- length(profiles)
   pick <- function(v, i) if (is.null(v)) NA_real_ else if (length(v) == 1) v else v[i]
   x <- data$x
   y <- data$y
   sfx <- function(nm, i) if (single) nm else paste0(nm, "_", i)
+  num <- function(v) sprintf("%.17g", v)
+  # the name of a parameter shared by the lines `members`
+  shared <- function(base, members) {
+    if (length(members) == k) base else paste(c(base, members), collapse = "_")
+  }
+  guesses <- lapply(seq_len(k), function(i) guess_peak(x, y, if (single) NA_real_ else peaks[i]))
 
   start <- list(y0 = min(y))
   lower <- c(y0 = -Inf)
   upper <- c(y0 = Inf)
-  held <- numeric()
-  terms <- character(k)
-  # a width parameter of peak i: a constant when fixed, otherwise fitted
-  width <- function(type, i, guess) {
-    nm <- sfx(type, i)
-    value <- pick(if (type == "wG") wG else wL, i)
-    if (type %in% fixed) {
-      held[[nm]] <<- value
-      return(sprintf("%.17g", value))
+  add <- function(nm, value, lo, hi) {
+    if (is.null(start[[nm]])) {
+      start[[nm]] <<- value
+      lower[nm] <<- lo
+      upper[nm] <<- hi
     }
-    start[[nm]] <<- ifelse(is.na(value), guess, value)
-    lower[nm] <<- stats::median(diff(x)) / 100
-    upper[nm] <<- Inf
     nm
   }
+  center <- function(i) {
+    g <- if (is.null(centers)) NA else centers[i]
+    if (is.na(g)) {
+      return(add(sfx("xc", i), if (single) guesses[[i]]$xc else peaks[i], min(x), max(x)))
+    }
+    members <- which(centers == g)
+    if (min(peaks[members]) < min(x) || max(peaks[members]) > max(x)) {
+      stop("The lines locked together must lie within the fitted wavelength range.",
+           call. = FALSE)
+    }
+    shift <- add(shared("shift", members), 0, min(x) - min(peaks[members]),
+                 max(x) - max(peaks[members]))
+    paste(num(peaks[i]), "+", shift)
+  }
+  width <- function(type, i, guess) {
+    value <- pick(if (type == "wG") wG else wL, i)
+    if (type %in% fixed) return(num(value))
+    g <- if (is.null(widths)) NA else widths[i]
+    members <- if (is.na(g)) i else which(widths == g)
+    nm <- if (length(members) > 1) shared(type, members) else sfx(type, i)
+    add(nm, ifelse(is.na(value), guess, value), stats::median(diff(x)) / 100, Inf)
+  }
+  area <- function(i) {
+    r <- if (is.null(area_ratios)) NA_real_ else area_ratios[i]
+    if (is.na(r)) {
+      return(add(sfx("A", i), ifelse(is.na(pick(A, i)), guesses[[i]]$A, pick(A, i)), 0, Inf))
+    }
+    members <- which(!is.na(area_ratios))
+    first <- stats::median(vapply(members, function(j) guesses[[j]]$A / area_ratios[j], numeric(1)))
+    paste(num(r), "*", add(shared("A", members), first, 0, Inf))
+  }
+  wrap <- function(e) if (grepl(" ", e, fixed = TRUE)) paste0("(", e, ")") else e
+
+  definitions <- c(y0 = "y0")
+  terms <- character(k)
   for (i in seq_len(k)) {
-    g <- guess_peak(x, y, if (single) NA_real_ else peaks[i])
-    nm_xc <- sfx("xc", i)
-    nm_A <- sfx("A", i)
-    start[[nm_xc]] <- if (single) g$xc else peaks[i]
-    lower[nm_xc] <- min(x)
-    upper[nm_xc] <- max(x)
-    width_term <- switch(
+    xc <- center(i)
+    w <- switch(
       profiles[i],
-      gaussian = sprintf("profile_gaussian(x, %s, %s)", nm_xc, width("wG", i, g$fwhm)),
-      lorentzian = sprintf("profile_lorentzian(x, %s, %s)", nm_xc, width("wL", i, g$fwhm)),
-      voigt = ,
-      pseudo_voigt = sprintf("profile_%s(x, %s, %s, %s)", profiles[i], nm_xc,
-                             width("wG", i, g$fwhm / 2), width("wL", i, g$fwhm / 2))
+      gaussian = c(wG = width("wG", i, guesses[[i]]$fwhm)),
+      lorentzian = c(wL = width("wL", i, guesses[[i]]$fwhm)),
+      c(wG = width("wG", i, guesses[[i]]$fwhm / 2), wL = width("wL", i, guesses[[i]]$fwhm / 2))
     )
-    start[[nm_A]] <- ifelse(is.na(pick(A, i)), g$A, pick(A, i))
-    lower[nm_A] <- 0
-    upper[nm_A] <- Inf
-    terms[i] <- sprintf("%s * %s", nm_A, width_term)
+    a <- area(i)
+    definitions[sfx(c("xc", names(w), "A"), i)] <- c(xc, w, a)
+    terms[i] <- sprintf("%s * profile_%s(x, %s)", wrap(a), profiles[i],
+                        paste(c(xc, w), collapse = ", "))
   }
   list(start = start, lower = lower[names(start)], upper = upper[names(start)], terms = terms,
-       held = held)
+       definitions = definitions)
 }
 
-fit_one <- function(data, peaks, profiles, wL, wG, A, max.iter, single, fixed = character()) {
-  spec <- peak_parameters(data, peaks, profiles, wL, wG, A, single, fixed)
+fit_one <- function(data, peaks, profiles, wL, wG, A, max.iter, single, fixed = character(),
+                    centers = NULL, widths = NULL, area_ratios = NULL) {
+  spec <- peak_parameters(data, peaks, profiles, wL, wG, A, single, fixed, centers, widths,
+                          area_ratios)
   form <- stats::as.formula(
     paste("y ~ y0 +", paste(spec$terms, collapse = " + ")),
     env = environment(profile_gaussian)
@@ -254,21 +290,9 @@ fit_one <- function(data, peaks, profiles, wL, wG, A, max.iter, single, fixed = 
     upper = spec$upper,
     control = minpack.lm::nls.lm.control(maxiter = max.iter)
   )
+  attr(fit, "peak_terms") <- spec$terms
+  attr(fit, "definitions") <- spec$definitions
 
-  coefs <- summary(fit)$coefficients
-  tidied <- tibble::tibble(
-    term = rownames(coefs),
-    estimate = coefs[, 1],
-    std.error = coefs[, 2],
-    statistic = coefs[, 3],
-    p.value = coefs[, 4]
-  )
-  if (length(spec$held) > 0) {
-    # the fixed widths, without standard error
-    tidied <- rbind(tidied, tibble::tibble(term = names(spec$held), estimate = spec$held,
-                                           std.error = NA_real_, statistic = NA_real_,
-                                           p.value = NA_real_))
-  }
   fitted <- stats::fitted(fit)
   augmented <- tibble::tibble(
     x = data$x, y = data$y,
@@ -282,13 +306,60 @@ fit_one <- function(data, peaks, profiles, wL, wG, A, max.iter, single, fixed = 
       augmented[[paste0(".peak_", i)]] <- eval(str2lang(spec$terms[i]), env)
     }
   }
-  attr(fit, "peak_terms") <- spec$terms
-  attr(fit, "held") <- spec$held
-  list(fit = fit, tidied = tidied, augmented = augmented)
+  list(fit = fit, tidied = fit_parameters(fit), augmented = augmented)
+}
+
+# Values of the parameters of the lines (the definitions of the fit) and
+# their covariance matrix, propagated from the fitted parameters (the
+# definitions are linear in them). `constant` marks the fixed values.
+line_estimates <- function(fit) {
+  coefs <- stats::coef(fit)
+  cov <- tryCatch(stats::vcov(fit), error = function(e) NULL)
+  defs <- attr(fit, "definitions")
+  if (is.null(defs)) {   # fits made before the definitions were kept
+    return(list(estimate = coefs, vcov = cov, constant = rep(FALSE, length(coefs))))
+  }
+  exprs <- lapply(defs, str2lang)
+  value <- function(b) {
+    env <- as.list(b)
+    vapply(exprs, function(e) eval(e, env, baseenv()), numeric(1))
+  }
+  estimate <- value(coefs)
+  jacobian <- matrix(vapply(seq_along(coefs), function(j) {
+    h <- 1e-6 * max(1, abs(coefs[[j]]))
+    up <- dn <- coefs
+    up[j] <- up[j] + h
+    dn[j] <- dn[j] - h
+    (value(up) - value(dn)) / (2 * h)
+  }, numeric(length(defs))), nrow = length(defs), dimnames = list(names(defs), names(coefs)))
+  list(estimate = estimate,
+       vcov = if (is.null(cov)) NULL else jacobian %*% cov %*% t(jacobian),
+       constant = rowSums(jacobian != 0) == 0)
+}
+
+# The tidied parameters of a fit: those of each line, with their standard
+# errors (none for a fixed value), and the common shifts of locked centers.
+fit_parameters <- function(fit) {
+  le <- line_estimates(fit)
+  estimate <- le$estimate
+  se <- if (is.null(le$vcov)) rep(NA_real_, length(estimate)) else sqrt(pmax(diag(le$vcov), 0))
+  se[le$constant] <- NA_real_
+  shifts <- grep("^shift", names(stats::coef(fit)), value = TRUE)
+  if (length(shifts) > 0) {
+    cov <- tryCatch(stats::vcov(fit), error = function(e) NULL)
+    estimate <- c(estimate, stats::coef(fit)[shifts])
+    se <- c(se, if (is.null(cov)) rep(NA_real_, length(shifts)) else
+      sqrt(pmax(diag(cov)[shifts], 0)))
+  }
+  statistic <- estimate / se
+  tibble::tibble(term = names(estimate), estimate = estimate, std.error = unname(se),
+                 statistic = unname(statistic),
+                 p.value = unname(2 * stats::pt(-abs(statistic), stats::df.residual(fit))))
 }
 
 fit_spectra <- function(spectra, peaks, profiles, wL, wG, A, max.iter, single,
-                        fixed = character()) {
+                        fixed = character(), centers = NULL, widths = NULL,
+                        area_ratios = NULL) {
   for (v in list(wL, wG, A)) {
     if (!is.null(v) && (!is.numeric(v) || !length(v) %in% c(1, length(profiles)) || any(v <= 0))) {
       stop("'wL', 'wG' and 'A' must be positive numbers, either one value or one per peak.",
@@ -298,7 +369,8 @@ fit_spectra <- function(spectra, peaks, profiles, wL, wG, A, max.iter, single,
   fixed <- check_fixed(fixed, profiles, wL, wG)
   results <- lapply(seq_along(spectra$data), function(i) {
     tryCatch(
-      fit_one(spectra$data[[i]], peaks, profiles, wL, wG, A, max.iter, single, fixed),
+      fit_one(spectra$data[[i]], peaks, profiles, wL, wG, A, max.iter, single, fixed, centers,
+              widths, area_ratios),
       error = function(e) {
         warning("Fitting failed for ", spectra$id_name, " '", spectra$ids[i], "': ",
                 conditionMessage(e), call. = FALSE)

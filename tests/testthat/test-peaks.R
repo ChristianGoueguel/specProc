@@ -212,11 +212,11 @@ test_that("peak_fit and multipeak_fit hold widths fixed", {
   free <- peak_fit(wide_spectrum(wl, y), profile = "voigt")
   held <- peak_fit(wide_spectrum(wl, y), profile = "voigt", wG = 0.15, fixed = "wG")
   t <- held$tidied[[1]]
-  expect_equal(t$term, c("y0", "xc", "wL", "A", "wG"))
+  expect_equal(t$term, c("y0", "xc", "wG", "wL", "A"))
   expect_equal(unname(t$estimate[t$term == "wG"]), 0.15)
   expect_true(is.na(t$std.error[t$term == "wG"]))
   expect_false("wG" %in% names(stats::coef(held$fit[[1]])))
-  expect_equal(attr(held$fit[[1]], "held"), c(wG = 0.15))
+  expect_true(line_estimates(held$fit[[1]])$constant[["wG"]])
   # the Lorentzian width is better determined than with both widths free
   tf <- free$tidied[[1]]
   expect_lt(t$std.error[t$term == "wL"], tf$std.error[tf$term == "wL"])
@@ -245,7 +245,8 @@ test_that("peak_fit and multipeak_fit hold widths fixed", {
                tolerance = 0.15)
   mixed <- multipeak_fit(wide_spectrum(wl, y2), peaks = c(395.7, 396.2),
                          profiles = c("lorentzian", "voigt"), wG = 0.12, fixed = "wG")
-  expect_equal(attr(mixed$fit[[1]], "held"), c(wG_2 = 0.12))
+  expect_equal(line_estimates(mixed$fit[[1]])$estimate[["wG_2"]], 0.12)
+  expect_true(line_estimates(mixed$fit[[1]])$constant[["wG_2"]])
 
   expect_error(peak_fit(wide_spectrum(wl, y), profile = "voigt", fixed = "wG"), "give 'wG'")
   expect_error(peak_fit(wide_spectrum(wl, y), profile = "lorentzian", wG = 0.1, fixed = "wG"),
@@ -264,4 +265,104 @@ test_that("doppler_width follows the thermal broadening", {
   expect_error(doppler_width(-1, 1e4, "Ca"), "wavelength")
   expect_error(doppler_width(400, 0, "Ca"), "temperature")
   expect_error(doppler_width(400, 1e4, -2), "mass")
+})
+
+test_that("multipeak_fit locks centers, shares widths and fixes area ratios", {
+  peaks <- c(395.80, 396.05, 396.40)
+  set.seed(9)
+  truth_shift <- 0.012
+  y <- 2 + gaussian_profile(wl, 0, peaks[1] + truth_shift, 0.06, 6) +
+    gaussian_profile(wl, 0, peaks[2] + truth_shift, 0.06, 3) +
+    lorentzian_profile(wl, 0, 396.40, 0.10, 4) + stats::rnorm(length(wl), sd = 0.02)
+  spec <- wide_spectrum(wl, y)
+  # the first two lines form a multiplet; the third interferes
+  res <- multipeak_fit(spec, peaks, profiles = c("gaussian", "gaussian", "lorentzian"),
+                       lock_centers = c(TRUE, TRUE, FALSE), share_widths = c(1, 1, NA),
+                       area_ratios = c(2, 1, NA))
+  fit <- res$fit[[1]]
+  expect_named(stats::coef(fit), c("y0", "shift_1_2", "wG_1_2", "A_1_2", "xc_3", "wL_3", "A_3"))
+  t <- res$tidied[[1]]
+  est <- stats::setNames(t$estimate, t$term)
+  expect_equal(t$term, c("y0", "xc_1", "wG_1", "A_1", "xc_2", "wG_2", "A_2", "xc_3", "wL_3", "A_3",
+                         "shift_1_2"))
+  expect_equal(unname(est["shift_1_2"]), truth_shift, tolerance = 0.05)
+  expect_equal(unname(est["xc_2"] - est["xc_1"]), diff(peaks[1:2]))
+  expect_equal(unname(est["wG_1"]), unname(est["wG_2"]))
+  expect_equal(unname(est["A_1"] / est["A_2"]), 2)
+  expect_equal(unname(est[c("wG_1", "A_1", "A_2", "xc_3", "A_3")]),
+               c(0.06, 6, 3, 396.40, 4), tolerance = 0.03)
+  # propagated standard errors: equal for shared parameters, scaled for ratios
+  se <- stats::setNames(t$std.error, t$term)
+  cov <- stats::vcov(fit)
+  expect_equal(unname(se["xc_1"]), sqrt(cov["shift_1_2", "shift_1_2"]), tolerance = 1e-6)
+  expect_equal(unname(se["xc_2"]), unname(se["xc_1"]), tolerance = 1e-6)
+  expect_equal(unname(se["A_1"]), 2 * unname(se["A_2"]), tolerance = 1e-6)
+  expect_equal(unname(se["shift_1_2"]), unname(se["xc_1"]), tolerance = 1e-6)
+  # the augmented columns and plot_fit use the constrained lines
+  expect_equal(res$augmented[[1]]$.fitted,
+               est[["y0"]] + res$augmented[[1]]$.peak_1 + res$augmented[[1]]$.peak_2 +
+                 res$augmented[[1]]$.peak_3, tolerance = 1e-8)
+  s <- fit_summary(fit, res$augmented[[1]], fit_curve(fit, wl))
+  expect_equal(s$peaks$center, unname(est[c("xc_1", "xc_2", "xc_3")]))
+  expect_equal(s$peaks$area_se, unname(se[c("A_1", "A_2", "A_3")]), tolerance = 1e-6)
+  expect_s3_class(plot_fit(res), "patchwork")
+
+  # TRUE constrains every line: one shift, one width
+  all_locked <- multipeak_fit(spec, peaks[1:2], profiles = "gaussian", lock_centers = TRUE,
+                              share_widths = TRUE, wlgth.max = 396.25)
+  expect_true(all(c("shift", "wG") %in% names(stats::coef(all_locked$fit[[1]]))))
+  # unconstrained fits keep their parameters
+  free <- multipeak_fit(spec, peaks[1:2], profiles = "gaussian", wlgth.max = 396.25)
+  expect_named(stats::coef(free$fit[[1]]), c("y0", "xc_1", "wG_1", "A_1", "xc_2", "wG_2", "A_2"))
+  expect_equal(free$tidied[[1]]$std.error, unname(sqrt(diag(stats::vcov(free$fit[[1]])))))
+
+  expect_error(multipeak_fit(spec, peaks, "gaussian", lock_centers = c(TRUE, FALSE)), "lock_centers")
+  expect_error(multipeak_fit(spec, peaks, c("gaussian", "lorentzian", "gaussian"),
+                             share_widths = TRUE), "same profile")
+  expect_error(multipeak_fit(spec, peaks, "gaussian", area_ratios = c(1, -1, NA)), "area_ratios")
+  expect_warning(multipeak_fit(spec, c(395.8, 398), "gaussian", lock_centers = TRUE),
+                 "within the fitted wavelength range")
+})
+
+test_that("lte_criteria computes the relaxation time and the diffusion length", {
+  kt <- 8.617333262e-5 * 9000
+  out <- lte_criteria(9000, 1e17, delta_e = 3.15, oscillator_strength = 0.68, mass = "Ca",
+                      length_scale = 1)
+  expect_s3_class(out, "tbl_df")
+  expect_equal(out$minimum_density, 1.6e12 * sqrt(9000) * 3.15^3)
+  expect_true(out$mcwhirter)
+  expect_equal(out$relaxation_time, 6.3e4 / (1e17 * 0.68 * 0.2) * 3.15 * sqrt(kt) * exp(3.15 / kt))
+  ca <- 40.078
+  expect_equal(out$diffusion_length,
+               10 * 1.4e12 / 1e17 * kt^0.75 * sqrt(3.15 / (ca * 0.68 * 0.2)) * exp(3.15 / (2 * kt)),
+               tolerance = 1e-4)
+  expect_equal(out$length_ratio, out$diffusion_length / 1)
+  expect_true(out$spatial)
+  # lower densities relax more slowly
+  slow <- lte_criteria(9000, c(1e15, 1e17), 3.15, 0.68, "Ca")
+  expect_gt(slow$relaxation_time[1], slow$relaxation_time[2])
+  expect_false(slow$mcwhirter[1])
+})
+
+test_that("lte_criteria checks the temporal criterion on a time series", {
+  time <- c(1, 2, 3, 5) * 1e-6
+  t <- 12000 * (time / 1e-6)^-0.3
+  ne <- 3e17 * (time / 1e-6)^-1
+  out <- lte_criteria(t, ne, 3.15, 0.68, "Ca", time = time, tolerance = 0.01)
+  expect_equal(out$time, time)
+  # relative change over the relaxation time: |d log T / dt| tau
+  rate <- c((log(t[2]) - log(t[1])) / 1e-6, (log(t[3]) - log(t[1])) / 2e-6,
+            (log(t[4]) - log(t[2])) / 3e-6, (log(t[4]) - log(t[3])) / 2e-6)
+  expect_equal(out$temperature_change, abs(expm1(rate * out$relaxation_time)))
+  expect_true(all(out$temporal))
+  # a plasma that changes within nanoseconds
+  fast <- lte_criteria(t, ne / 100, 3.15, 0.68, "Ca", time = time * 1e-3)
+  expect_false(any(fast$temporal))
+  # order of the times does not matter
+  shuffled <- lte_criteria(t[4:1], ne[4:1], 3.15, 0.68, "Ca", time = time[4:1])
+  expect_equal(shuffled$temperature_change, rev(out$temperature_change))
+  expect_error(lte_criteria(t, ne, 3.15, 0.68, "Ca", time = 1e-6), "'time'")
+  expect_error(lte_criteria(9000, 1e17, 3.15, 0.68, "Xx"), "Unknown element")
+  expect_error(lte_criteria(9000, -1, 3.15, 0.68, "Ca"), "electron_density")
+  expect_error(lte_criteria(9000, 1e17, 3.15, 0.68, "Ca", length_scale = 0), "length_scale")
 })

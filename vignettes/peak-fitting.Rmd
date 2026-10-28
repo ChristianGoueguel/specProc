@@ -204,6 +204,47 @@ plot_fit(k_gauss, title = "K I 404.41 and 404.72 nm, Gaussian profiles")
 The areas are now determined, and the AIC is lower: prefer the simplest
 profile that describes the data.
 
+The two lines come from the fine-structure levels of the same 5p
+configuration of K I: their separation is known (0.307 nm, from the NIST
+database), and their instrumental and Stark widths are nearly the same.
+`lock_centers = TRUE` keeps the separation of `peaks`, with one shift of
+both lines, and `share_widths = TRUE` gives them one width:
+
+```{r doublet-locked}
+k_locked <- multipeak_fit(doublet, peaks = c(404.414, 404.721), profiles = "gaussian",
+                          lock_centers = TRUE, share_widths = TRUE)
+k_locked$tidied[[1]]
+```
+
+```{r doublet-numbers, include = FALSE}
+term_of <- \(fit, term, column = "estimate") {
+  t <- fit$tidied[[1]]
+  t[[column]][t$term == term]
+}
+free_separation <- term_of(k_gauss, "xc_2") - term_of(k_gauss, "xc_1")
+locked_ratio <- term_of(k_locked, "A_1") / term_of(k_locked, "A_2")
+thin_ratio <- (4 * 1.15e6 / 404.414) / (2 * 1.07e6 / 404.721)
+```
+
+The free fit placed the lines `r round(free_separation, 3)` nm apart, with
+widths of `r round(term_of(k_gauss, "wG_1"), 3)` and
+`r round(term_of(k_gauss, "wG_2"), 3)` nm; with two parameters fewer, the
+standard error of the area of the weaker line drops from
+`r round(term_of(k_gauss, "A_2", "std.error"))` to
+`r round(term_of(k_locked, "A_2", "std.error"))`. The common shift,
+`r round(term_of(k_locked, "shift"), 3)` ±
+`r round(term_of(k_locked, "shift", "std.error"), 3)` nm, is zero within its
+standard error, since the wavelength axis was corrected above; on raw
+spectra, it absorbs the offset of the axis.
+
+`area_ratios` would also fix the ratio of the areas. In an optically thin
+plasma, the ratio of these lines is that of their \(g_k A_{ki} / \lambda\),
+`r round(thin_ratio, 2)` (their upper levels are 2 meV apart). The fitted
+ratio is `r round(locked_ratio, 2)`: the 404.41 nm line, which ends on the
+ground state, is self-absorbed (see `vignette("plasma-diagnostics")`), so
+fixing the ratio would bias the areas. Fix ratios only for optically thin
+lines.
+
 ## Instrumental and Doppler widths
 
 The Gaussian width of a line is the instrumental width combined with the

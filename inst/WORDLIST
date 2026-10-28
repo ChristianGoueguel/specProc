@@ -256,6 +256,7 @@ Rastelli
 Raymaekers
 Rcpp
 RcppEigen
+Regemorter
 Reimann
 Reweighting
 Reynkens
@@ -369,6 +370,7 @@ chatterjee
 chemolab
 chemometric
 codebook
+collisional
 compositional
 corrr
 covarying
@@ -381,6 +383,7 @@ downweights
 dplyr
 eV
 embeddings
+equilibrate
 equilibration
 equivariant
 et
@@ -411,6 +414,7 @@ lineshape
 lorentzian
 magrittr
 mathrm
+meV
 medcouple
 medcouples
 metabolome
@@ -433,6 +437,7 @@ nm
 nonlinearly
 normalizations
 notchlower
+ns
 orthogonalization
 orthogonalize
 orthonormalized
@@ -472,6 +477,7 @@ voigt
 von
 williams
 workflowsets
+µm
 Á
 Å
 Ångström

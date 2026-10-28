@@ -15,7 +15,10 @@ multipeak_fit(
   wlgth.max = NULL,
   id = NULL,
   max.iter = 200,
-  fixed = NULL
+  fixed = NULL,
+  lock_centers = FALSE,
+  share_widths = FALSE,
+  area_ratios = NULL
 )
 }
 \arguments{
@@ -48,6 +51,17 @@ value or one per peak) instead of being fitted: \code{"wG"}, \code{"wL"} or
 both, for the peaks whose profile has that width. Default is \code{NULL}
 (all widths fitted). See \code{\link[=peak_fit]{peak_fit()}} for holding the Gaussian width at
 the instrumental and Doppler width.}
+
+\item{lock_centers}{Keep the separations of \code{peaks} (see details):
+\code{FALSE} (default), \code{TRUE}, a logical vector or group labels, one per
+peak.}
+
+\item{share_widths}{Share the widths of the lines (see details): \code{FALSE}
+(default), \code{TRUE}, a logical vector or group labels, one per peak. The
+lines of a group must have the same profile.}
+
+\item{area_ratios}{The fixed relative areas of the lines, one per peak
+(\code{NA} for a free area), or \code{NULL} (default) for free areas.}
 }
 \value{
 A tibble with one row per spectrum and the columns \code{id} (or
@@ -68,6 +82,35 @@ The parameters of peak \eqn{i} are named with the suffix \verb{_i}
 (e.g. \code{xc_1}, \code{wG_1}, \code{A_1}). Initial values that are not supplied are
 estimated from the data around each peak center. Each peak center is
 constrained to lie within the fitted wavelength range.
+
+The lines of a multiplet, or of a fine-structure doublet, are related,
+and constraints make the fit of overlapping lines much more stable:
+\itemize{
+\item \code{lock_centers}: the lines keep the separations of their \code{peaks}
+(accurate wavelengths, such as those of the NIST database) and move
+together by one fitted shift, which also absorbs an offset of the
+wavelength axis. The shift is listed in \code{tidied} as \code{shift} (or
+\code{shift_1_2}, ..., named by its lines, when there are several groups).
+\item \code{share_widths}: the lines share their Gaussian and Lorentzian widths,
+as lines of the same multiplet have nearly the same Stark width.
+\item \code{area_ratios}: the areas of the lines are in fixed ratios, with one
+fitted area. In an optically thin plasma in LTE, the ratio of two
+lines is \eqn{g_k A_{ki} \lambda^{-1} \exp(-E_k / k_B T)} (energy
+units), independent of the temperature for lines from the same upper
+level: the \code{relative_intensity} of \code{\link[=libs_lines]{libs_lines()}}. Self-absorbed lines,
+such as resonance lines, break these ratios.
+}
+
+\code{lock_centers} and \code{share_widths} take \code{TRUE} (all lines), a logical
+vector (the lines constrained together) or one group label per line
+(\code{NA} for a line left free), so that, for example, a multiplet can be
+constrained while an interfering line of another element is not.
+\code{area_ratios} gives a ratio per line, \code{NA} for a line with a free area.
+
+\code{tidied} lists the center, widths and area of every line (named with the
+suffix \verb{_i}), with standard errors propagated from the fitted parameters:
+lines that share a parameter have the same width, or centers that differ
+by a constant.
 }
 \examples{
 data(forageLIBS)
@@ -76,6 +119,11 @@ wl <- as.numeric(names(mean_spectrum))
 # the overlapping lines of the K I doublet
 doublet <- tibble::as_tibble(as.list(mean_spectrum[wl > 404.1 & wl < 405.0]))
 res <- multipeak_fit(doublet, peaks = c(404.414, 404.721), profiles = "gaussian")
+res$tidied[[1]]
+
+# the same doublet with the NIST separation of its lines and a common width
+res <- multipeak_fit(doublet, peaks = c(404.414, 404.721), profiles = "gaussian",
+                     lock_centers = TRUE, share_widths = TRUE)
 res$tidied[[1]]
 }
 \author{
