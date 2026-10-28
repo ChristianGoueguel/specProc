@@ -292,11 +292,11 @@
   (direct standardization) and
   [`sst()`](https://christiangoueguel.com/specProc/reference/sst.md)
   (spectral space transformation, Du et al., 2011) transfer spectra of a
-  slave instrument to the master, from transfer samples measured on
+  secondary instrument to the primary, from transfer samples measured on
   both, with low-rank transfer matrices;
   [`slope_bias()`](https://christiangoueguel.com/specProc/reference/slope_bias.md)
-  corrects the predictions of a model on the slave instrument instead,
-  with tests of the bias and slope.
+  corrects the predictions of a model on the secondary instrument
+  instead, with tests of the bias and slope.
   [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md) now
   returns a `specproc_transfer` object (with the same `transfer_matrix`
   and `intercept`), and

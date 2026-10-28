@@ -1,9 +1,10 @@
 # Direct Standardization
 
-Transfers spectra from one instrument (the slave) to another (the
-master) by direct standardization (DS; Wang et al., 1991): a linear map
-of the whole slave spectrum onto the whole master spectrum, estimated on
-transfer samples measured on both instruments.
+Transfers spectra from a secondary instrument to the primary instrument,
+on which the calibration model was built, by direct standardization (DS;
+Wang et al., 1991): a linear map of the whole secondary spectrum onto
+the whole primary spectrum, estimated on transfer samples measured on
+both instruments.
 
 ## Usage
 
@@ -15,18 +16,19 @@ ds(x1, x2, ncomp = NULL, tol = 1e-08)
 
 - x1:
 
-  The spectra of the transfer samples on the master instrument: a
+  The spectra of the transfer samples on the primary instrument: a
   numeric matrix or data frame, one spectrum per row.
 
 - x2:
 
-  The spectra of the same samples, in the same order, on the slave
+  The spectra of the same samples, in the same order, on the secondary
   instrument.
 
 - ncomp:
 
-  The number of singular vectors of the slave spectra kept. By default,
-  all those with a singular value above `tol` times the largest.
+  The number of singular vectors of the secondary spectra kept. By
+  default, all those with a singular value above `tol` times the
+  largest.
 
 - tol:
 
@@ -36,21 +38,22 @@ ds(x1, x2, ncomp = NULL, tol = 1e-08)
 
 An object of class `specproc_transfer`. Use
 [predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_transfer.md)
-to transfer slave spectra.
+to transfer secondary spectra.
 
 ## Details
 
 With the transfer spectra centered by the mean of each instrument,
 \\\textbf{X}\_1 \approx \textbf{X}\_2 \textbf{F}\\, and the transfer
 matrix is \\\textbf{F} = \textbf{X}\_2^{+} \textbf{X}\_1\\, where
-\\\textbf{X}\_2^{+}\\ is the pseudo-inverse of the slave spectra,
-truncated to their first `ncomp` singular vectors. A new slave spectrum
-is transferred as \\\bar{x}\_1 + (x_2 - \bar{x}\_2) \textbf{F}\\.
+\\\textbf{X}\_2^{+}\\ is the pseudo-inverse of the secondary spectra,
+truncated to their first `ncomp` singular vectors. A new secondary
+spectrum is transferred as \\\bar{x}\_1 + (x_2 - \bar{x}\_2)
+\textbf{F}\\.
 
 With as many components as the transfer samples allow (`ncomp = NULL`),
-the transfer spectra are reproduced exactly, and the noise of the slave
-spectra is amplified: fewer components give a smoother, more robust
-transfer. Unlike
+the transfer spectra are reproduced exactly, and the noise of the
+secondary spectra is amplified: fewer components give a smoother, more
+robust transfer. Unlike
 [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md), DS
 mixes all wavelengths, so it corrects global differences of the response
 but needs more transfer samples. The transfer matrix (\\p \times p\\) is
@@ -79,13 +82,13 @@ data(forageLIBS)
 wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 spectra <- as.matrix(forageLIBS[which(wl > 760 & wl < 780)])  # the K I lines
 # a second instrument, with a shifted and less sensitive response
-slave <- 0.8 * cbind(spectra[, -1], spectra[, ncol(spectra)]) + 50
-transfer <- ds(spectra[1:30, ], slave[1:30, ], ncomp = 10)
+secondary <- 0.8 * cbind(spectra[, -1], spectra[, ncol(spectra)]) + 50
+transfer <- ds(spectra[1:30, ], secondary[1:30, ], ncomp = 10)
 transfer
 #> Direct standardization (30 transfer samples, 245 wavelengths)
 #> Components: 10
-# the other samples, measured on the slave, transferred to the master
-transferred <- predict(transfer, slave[31:368, ])
+# the other samples, measured on the secondary, transferred to the primary
+transferred <- predict(transfer, secondary[31:368, ])
 mean(abs(transferred - spectra[31:368, ])) / mean(spectra)
 #> [1] 0.02327181
 ```

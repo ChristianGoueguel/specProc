@@ -20,7 +20,7 @@ predict(object, newdata, ...)
 
 - newdata:
 
-  Predictions of the model for new slave spectra.
+  Predictions of the model for new secondary spectra.
 
 - ...:
 

@@ -397,18 +397,18 @@ flags the concentrations outside the range of the standards
 
 ## Transferring the calibration to another instrument
 
-A calibration is tied to the instrument that recorded its spectra. On
-another instrument, or on the same one after a change of its optics, the
-spectra differ, and so do the predictions. With no second instrument for
-these samples, we simulate one: its response tilts by ±15% across the
-spectral range, its wavelength axis is shifted by one channel, and it
-adds an offset:
+A calibration is tied to the instrument that recorded its spectra, the
+primary instrument. On a secondary instrument, or on the same one after
+a change of its optics, the spectra differ, and so do the predictions.
+With no second instrument for these samples, we simulate one: its
+response tilts by ±15% across the spectral range, its wavelength axis is
+shifted by one channel, and it adds an offset:
 
 ``` r
 
 wl_x <- as.numeric(colnames(x))
 response <- 1 + 0.3 * (wl_x - mean(wl_x)) / diff(range(wl_x))
-slave <- sweep(cbind(x[, -1], x[, ncol(x)]), 2, response, "*") + 0.002
+secondary <- sweep(cbind(x[, -1], x[, ncol(x)]), 2, response, "*") + 0.002
 ```
 
 The PLS model of potassium predicts the test samples measured on this
@@ -418,8 +418,9 @@ standardization
 ([`ds()`](https://christiangoueguel.com/specProc/reference/ds.md)), a
 linear map of the whole spectrum, or by spectral space transformation
 ([`sst()`](https://christiangoueguel.com/specProc/reference/sst.md)),
-which moves the slave spectra by the difference between the instruments
-in the principal components they share. Instead of the spectra,
+which moves the secondary spectra by the difference between the
+instruments in the principal components they share. Instead of the
+spectra,
 [`slope_bias()`](https://christiangoueguel.com/specProc/reference/slope_bias.md)
 corrects the predictions by a straight line:
 
@@ -428,27 +429,27 @@ corrects the predictions by a straight line:
 predict_k <- \(spectra) drop(predict(cv, newdata = data.frame(x = I(spectra)), ncomp = ncomp))
 set.seed(2)
 transfer_samples <- sample(which(is_calibration), 20)
-slave_test <- slave[!is_calibration, ]
+secondary_test <- secondary[!is_calibration, ]
 
-by_ds <- ds(x[transfer_samples, ], slave[transfer_samples, ])
-by_sst <- sst(x[transfer_samples, ], slave[transfer_samples, ])
-by_slope_bias <- slope_bias(predict_k(slave[transfer_samples, ]), data$K[transfer_samples])
+by_ds <- ds(x[transfer_samples, ], secondary[transfer_samples, ])
+by_sst <- sst(x[transfer_samples, ], secondary[transfer_samples, ])
+by_slope_bias <- slope_bias(predict_k(secondary[transfer_samples, ]), data$K[transfer_samples])
 
 prediction_error <- \(predicted) sqrt(mean((predicted - test$K)^2))
 transfer_errors <- c(
-  master = prediction_error(predict_k(x[!is_calibration, ])),
-  slave = prediction_error(predict_k(slave_test)),
-  ds = prediction_error(predict_k(predict(by_ds, slave_test))),
-  sst = prediction_error(predict_k(predict(by_sst, slave_test))),
-  slope_bias = prediction_error(predict(by_slope_bias, predict_k(slave_test)))
+  primary = prediction_error(predict_k(x[!is_calibration, ])),
+  secondary = prediction_error(predict_k(secondary_test)),
+  ds = prediction_error(predict_k(predict(by_ds, secondary_test))),
+  sst = prediction_error(predict_k(predict(by_sst, secondary_test))),
+  slope_bias = prediction_error(predict(by_slope_bias, predict_k(secondary_test)))
 )
 round(transfer_errors, 2)   # RMSEP, % K
-#>     master      slave         ds        sst slope_bias 
+#>    primary  secondary         ds        sst slope_bias 
 #>       0.30       1.69       0.29       0.29       0.47
 ```
 
 Direct standardization and SST bring the error of the test samples back
-to that of the master instrument, 0.30% K, from 1.69% K. The slope and
+to that of the primary instrument, 0.30% K, from 1.69% K. The slope and
 bias correction removes most of the bias, but not the distortion of the
 spectra, which changes the ranking of the samples.
 [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md),

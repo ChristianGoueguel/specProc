@@ -14,12 +14,12 @@ slope_bias(predicted, reference, slope = TRUE)
 
 - predicted:
 
-  The predictions of the model for the slave spectra of the transfer
+  The predictions of the model for the secondary spectra of the transfer
   samples.
 
 - reference:
 
-  Their reference values (or the predictions for their master spectra).
+  Their reference values (or the predictions for their primary spectra).
 
 - slope:
 
@@ -38,14 +38,14 @@ to correct new predictions.
 
 ## Details
 
-The model of the master instrument, applied to the slave spectra of the
-transfer samples, gives predictions \\\hat{y}\\; the reference values
-\\y\\ are regressed on them, \\y = a + b\\\hat{y}\\, and the predictions
-of new slave spectra are corrected likewise. With `slope = FALSE`, only
-the bias is corrected (\\b = 1\\). The correction leaves the spectra and
-the model unchanged, so it suits differences that affect all samples
-alike; it cannot correct differences of spectral shape that change the
-ranking of the samples (see
+The model of the primary instrument, applied to the secondary spectra of
+the transfer samples, gives predictions \\\hat{y}\\; the reference
+values \\y\\ are regressed on them, \\y = a + b\\\hat{y}\\, and the
+predictions of new secondary spectra are corrected likewise. With
+`slope = FALSE`, only the bias is corrected (\\b = 1\\). The correction
+leaves the spectra and the model unchanged, so it suits differences that
+affect all samples alike; it cannot correct differences of spectral
+shape that change the ranking of the samples (see
 [`ds()`](https://christiangoueguel.com/specProc/reference/ds.md),
 [`sst()`](https://christiangoueguel.com/specProc/reference/sst.md) or
 [`pds()`](https://christiangoueguel.com/specProc/reference/pds.md)). The

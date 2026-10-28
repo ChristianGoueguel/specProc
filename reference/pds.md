@@ -17,13 +17,13 @@ pds(x1, x2, win = 5, ncomp = 2, alpha = 0)
 
 - x1:
 
-  A matrix or data frame containing spectra acquired with the standard
-  (master) instrument.
+  A matrix or data frame containing spectra acquired with the primary
+  (reference) instrument.
 
 - x2:
 
   A matrix or data frame containing spectra of the same samples acquired
-  with the instrument to be standardized (slave).
+  with the secondary instrument, to be standardized.
 
 - win:
 
@@ -57,23 +57,23 @@ An object of class `specproc_transfer`, a list with
 
 and the settings of the transfer. Use
 [predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_transfer.md)
-to transfer slave spectra.
+to transfer secondary spectra.
 
 ## Details
 
-For each wavelength \\j\\ of the standard (master) instrument, a PLSR
-model is fitted between the response of the master instrument at \\j\\
-and the responses of the slave instrument in the window \\\[j - win, j +
-win\]\\ (truncated at the edges of the spectrum). The regression
+For each wavelength \\j\\ of the primary (reference) instrument, a PLSR
+model is fitted between the response of the primary instrument at \\j\\
+and the responses of the secondary instrument in the window \\\[j - win,
+j + win\]\\ (truncated at the edges of the spectrum). The regression
 coefficients are stored in a banded transfer matrix \\\textbf{F}\\, and
 the intercepts in a vector \\\textbf{b}\_0\\. Spectra measured on the
-slave instrument are then standardized as \$\$\textbf{X}\_{2,std} =
+secondary instrument are then standardized as \$\$\textbf{X}\_{2,std} =
 \textbf{X}\_2 \textbf{F} + \textbf{1}\textbf{b}\_0^T\$\$
 
-When `alpha > 0`, a global PLSR model mapping the whole slave spectrum
-to the whole master spectrum is also fitted, and the transfer matrix and
-intercept are \\(1 - \alpha)\\ times the local ones plus \\\alpha\\
-times the global ones.
+When `alpha > 0`, a global PLSR model mapping the whole secondary
+spectrum to the whole primary spectrum is also fitted, and the transfer
+matrix and intercept are \\(1 - \alpha)\\ times the local ones plus
+\\\alpha\\ times the global ones.
 
 ## References
 

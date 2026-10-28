@@ -65,11 +65,13 @@ transfer performance when the instrumental differences are not purely local.</p>
 
 
 <dl><dt id="arg-x-">x1<a class="anchor" aria-label="anchor" href="#arg-x-"></a></dt>
-<dd><p>A matrix or data frame containing spectra acquired with the standard (master) instrument.</p></dd>
+<dd><p>A matrix or data frame containing spectra acquired with the
+primary (reference) instrument.</p></dd>
 
 
 <dt id="arg-x-">x2<a class="anchor" aria-label="anchor" href="#arg-x-"></a></dt>
-<dd><p>A matrix or data frame containing spectra of the same samples acquired with the instrument to be standardized (slave).</p></dd>
+<dd><p>A matrix or data frame containing spectra of the same samples
+acquired with the secondary instrument, to be standardized.</p></dd>
 
 
 <dt id="arg-win">win<a class="anchor" aria-label="anchor" href="#arg-win"></a></dt>
@@ -94,20 +96,20 @@ transfer performance when the instrumental differences are not purely local.</p>
 <dd><p>A vector of length \(p\) containing the intercepts.</p></dd>
 
 </dl><p>and the settings of the transfer. Use
-<a href="predict.specproc_transfer.html">predict()</a> to transfer slave spectra.</p>
+<a href="predict.specproc_transfer.html">predict()</a> to transfer secondary spectra.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>For each wavelength \(j\) of the standard (master) instrument, a PLSR model
-is fitted between the response of the master instrument at \(j\) and the
-responses of the slave instrument in the window \([j - win, j + win]\)
+    <p>For each wavelength \(j\) of the primary (reference) instrument, a PLSR model
+is fitted between the response of the primary instrument at \(j\) and the
+responses of the secondary instrument in the window \([j - win, j + win]\)
 (truncated at the edges of the spectrum). The regression coefficients are
 stored in a banded transfer matrix \(\textbf{F}\), and the intercepts in a
-vector \(\textbf{b}_0\). Spectra measured on the slave instrument are then
+vector \(\textbf{b}_0\). Spectra measured on the secondary instrument are then
 standardized as
 $$\textbf{X}_{2,std} = \textbf{X}_2 \textbf{F} + \textbf{1}\textbf{b}_0^T$$</p>
-<p>When <code>alpha &gt; 0</code>, a global PLSR model mapping the whole slave spectrum to
-the whole master spectrum is also fitted, and the transfer matrix and
+<p>When <code>alpha &gt; 0</code>, a global PLSR model mapping the whole secondary spectrum to
+the whole primary spectrum is also fitted, and the transfer matrix and
 intercept are \((1 - \alpha)\) times the local ones plus \(\alpha\)
 times the global ones.</p>
     </div>

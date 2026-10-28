@@ -59,13 +59,13 @@ estimated on transfer samples whose reference values are known.</p>
 
 
 <dl><dt id="arg-predicted">predicted<a class="anchor" aria-label="anchor" href="#arg-predicted"></a></dt>
-<dd><p>The predictions of the model for the slave spectra of
+<dd><p>The predictions of the model for the secondary spectra of
 the transfer samples.</p></dd>
 
 
 <dt id="arg-reference">reference<a class="anchor" aria-label="anchor" href="#arg-reference"></a></dt>
 <dd><p>Their reference values (or the predictions for their
-master spectra).</p></dd>
+primary spectra).</p></dd>
 
 
 <dt id="arg-slope">slope<a class="anchor" aria-label="anchor" href="#arg-slope"></a></dt>
@@ -84,10 +84,10 @@ to correct new predictions.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The model of the master instrument, applied to the slave spectra of the
+    <p>The model of the primary instrument, applied to the secondary spectra of the
 transfer samples, gives predictions \(\hat{y}\); the reference values
 \(y\) are regressed on them, \(y = a + b\,\hat{y}\), and the
-predictions of new slave spectra are corrected likewise. With
+predictions of new secondary spectra are corrected likewise. With
 <code>slope = FALSE</code>, only the bias is corrected (\(b = 1\)). The correction
 leaves the spectra and the model unchanged, so it suits differences that
 affect all samples alike; it cannot correct differences of spectral shape
