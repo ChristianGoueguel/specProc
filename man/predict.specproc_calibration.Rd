@@ -37,8 +37,11 @@ signal. Default is 1.}
 \value{
 For \code{type = "concentration"}, a tibble with the \code{signal}, the
 predicted \code{concentration}, its standard error \code{se}, the interval
-(\code{lower}, \code{upper}) and whether it is below the limit of detection
-(\code{below_lod}) or of quantification (\code{below_loq}). For \code{type = "signal"}, a tibble with the \code{concentration}, the predicted \code{signal},
+(\code{lower}, \code{upper}), whether it is below the limit of detection
+(\code{below_lod}) or of quantification (\code{below_loq}), whether it lies
+outside the range of the standards (\code{outside_range}, an
+extrapolation), and, with the ISO 11843 limits, whether the element is
+\code{detected} (above the critical value). For \code{type = "signal"}, a tibble with the \code{concentration}, the predicted \code{signal},
 its standard error \code{se} and the interval (\code{lower}, \code{upper}).
 }
 \description{

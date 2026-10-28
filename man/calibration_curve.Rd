@@ -12,7 +12,15 @@ calibration_curve(
   weights = NULL,
   blank = NULL,
   lod_method = NULL,
-  level = 0.95
+  level = 0.95,
+  regression = "ols",
+  concentration_se = NULL,
+  signal_se = NULL,
+  variance_ratio = NULL,
+  lod_convention = "ich",
+  alpha = 0.05,
+  beta = 0.05,
+  replicates = 1
 )
 }
 \arguments{
@@ -35,6 +43,29 @@ sample.}
 
 \item{level}{The confidence level of the intervals of the coefficients.
 Default is 0.95.}
+
+\item{regression}{\code{"ols"} (default, least squares), \code{"deming"} or
+\code{"york"} (see details).}
+
+\item{concentration_se, signal_se}{For \code{regression = "york"} or
+\code{"deming"}: the columns of \code{data} with the standard uncertainties of the
+concentration and of the signal of each standard, unquoted or as
+strings.}
+
+\item{variance_ratio}{For \code{regression = "deming"}: the ratio of the error
+variance of the signal to that of the concentration. By default, it is
+computed from \code{signal_se} and \code{concentration_se}.}
+
+\item{lod_convention}{The convention of the limits of detection and
+quantification: \code{"ich"} (default, \eqn{3.3\,\sigma/S} and
+\eqn{10\,\sigma/S}) or \code{"iso11843"} (ISO 11843-2 and IUPAC; see
+details).}
+
+\item{alpha, beta}{For \code{lod_convention = "iso11843"}: the probabilities of
+false positives and of false negatives. Default is 0.05.}
+
+\item{replicates}{For \code{lod_convention = "iso11843"}: the number of
+replicate measurements averaged for a sample. Default is 1.}
 }
 \value{
 An object of class \code{specproc_calibration}, a list with
@@ -43,11 +74,14 @@ An object of class \code{specproc_calibration}, a list with
 confidence intervals (\code{lower}, \code{upper}) at \code{level};
 \item \code{figures_of_merit}: a tibble with the number of standards \code{n}, the
 \code{sensitivity}, \code{r_squared}, the residual standard deviation \code{sigma},
-the blank standard deviation used (\code{sigma_blank}), \code{lod} and \code{loq}
-(in concentration units);
+the blank standard deviation used (\code{sigma_blank}), the
+\code{critical_value} (ISO 11843 only, \code{NA} otherwise), \code{lod} and \code{loq} (in
+concentration units);
 \item \code{linearity}: a tibble with the statistic, degrees of freedom and
 p-value of Mandel's test and of the lack-of-fit test (when they apply);
-\item \code{fit}: the \code{lm} fit, and \code{data}, the calibration data.
+\item \code{fit}: the least-squares \code{lm} fit, \code{eiv}, the Deming or York fit
+(\code{NULL} for least squares), with its \code{chi_squared}, and \code{data}, the
+calibration data.
 }
 
 Use \link[=predict.specproc_calibration]{predict()} for new samples and
@@ -82,6 +116,39 @@ without \code{blank});
 With weights, the residual standard deviation depends on the scale of the
 weights, so prefer \code{"blank"} or \code{"intercept"}.
 
+With \code{lod_convention = "iso11843"}, the limits follow ISO 11843-2 and
+IUPAC (Currie, 1999), and account for the uncertainty of the curve and
+for the false positive and false negative risks \eqn{\alpha} and
+\eqn{\beta}. The standard deviation of a net signal near zero is
+\eqn{\sigma_0 = \sqrt{\sigma^2 / K + s_a^2}}, where \eqn{\sigma} is the
+standard deviation of the signal (\code{"residual"} or \code{"blank"}), \eqn{K} the
+number of \code{replicates} averaged for a sample and \eqn{s_a} the standard
+error of the intercept. The critical value (decision limit), above which
+an element is detected, is \eqn{x_C = t_{1-\alpha,\nu}\,\sigma_0 / S}; the
+limit of detection, the content detected with probability \eqn{1 -
+\beta}, is \eqn{x_D = \delta_{\nu,\alpha,\beta}\,\sigma_0 / S}, where
+\eqn{\delta} is the noncentrality parameter of the noncentral t
+distribution (about \eqn{2 t_{1-\alpha,\nu}} for \eqn{\alpha = \beta}) and
+\eqn{\nu} the degrees of freedom of \eqn{\sigma}; and the limit of
+quantification (IUPAC) is \eqn{x_Q = 10\,\sigma_0 / S}. For a weighted
+curve, the standard deviation must come from \code{blank} signals.
+
+\strong{Errors in the concentrations.} Least squares assume exact
+concentrations. When those of the standards are uncertain, such as the
+certified values of reference materials, the slope is biased toward zero
+and the intervals too narrow. \code{regression = "york"} fits the line by the
+method of York et al. (2004), with the standard uncertainties of the
+concentration (\code{concentration_se}) and of the signal (\code{signal_se}) of
+each standard; its standard errors are multiplied by the square root of
+the reduced chi-squared when it exceeds 1 (the points scatter more than
+their uncertainties explain). \code{regression = "deming"} (Deming
+regression) assumes constant uncertainties, whose ratio
+\code{variance_ratio} (variance of the signal over variance of the
+concentration, in their units) is given, or computed from the mean
+squared \code{signal_se} and \code{concentration_se}; its standard errors come from
+the scatter of the points. Both fit straight lines without weights; the
+tests of linearity are those of the least-squares fit.
+
 \strong{Linearity.} For a straight line, Mandel's test compares its residual
 variance with that of a quadratic fit; a small p-value means that the
 curvature is significant (as with self-absorption or detector
@@ -114,15 +181,37 @@ cal
 # the concentrations of new samples, from their signals
 head(predict(cal, standards$signal[301:368]))
 
+# limits of detection by ISO 11843-2
+calibration_curve(standards[1:300, ], signal, K, lod_convention = "iso11843")
+
+# reference materials with certified values known within 3\%, and
+# signals within 2\% (simulated)
+set.seed(1)
+crm <- data.frame(certified = c(0.5, 1, 2, 4, 6, 8))
+crm$signal <- 0.05 + 0.2 * crm$certified * (1 + rnorm(6, sd = 0.02)) +
+  0.2 * rnorm(6, sd = 0.03 * crm$certified)
+crm$certified_se <- 0.03 * crm$certified
+crm$signal_se <- 0.02 * crm$signal
+calibration_curve(crm, signal, certified, regression = "york",
+                  concentration_se = certified_se, signal_se = signal_se)
+
 }
 \references{
 \itemize{
+\item Currie, L.A. (1999). Detection and quantification limits: origins and
+historical overview. Analytica Chimica Acta, 391(2):127-134.
 \item ICH (2005). Validation of analytical procedures: text and methodology
 Q2(R1). International Conference on Harmonisation.
+\item ISO 11843-2 (2000). Capability of detection, Part 2: Methodology in
+the linear calibration case. International Organization for
+Standardization, Geneva.
 \item Mandel, J. (1964). The Statistical Analysis of Experimental Data.
 Interscience, New York.
 \item Miller, J.N., Miller, J.C. (2018). Statistics and Chemometrics for
 Analytical Chemistry, 7th ed. Pearson, Harlow.
+\item York, D., Evensen, N.M., López Martínez, M., De Basabe Delgado, J.
+(2004). Unified equations for the slope, intercept, and standard errors
+of the best straight line. American Journal of Physics, 72(3):367-375.
 }
 }
 \seealso{

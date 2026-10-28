@@ -223,6 +223,16 @@ reference:
   - plot_calibration
   - cf_libs
 
+- title: Applicability domain and drift
+  desc: >
+    Flags for the spectra outside the calibration space, and control charts
+    (Shewhart, EWMA, CUSUM) to detect drifts of the instrument.
+  contents:
+  - applicability_domain
+  - predict.specproc_domain
+  - control_chart
+  - plot_control_chart
+
 - title: Peak fitting
   desc: >
     Functions used to characterize spectral lines.

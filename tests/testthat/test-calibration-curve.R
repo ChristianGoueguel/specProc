@@ -123,3 +123,125 @@ test_that("plot_calibration draws the bands and the new samples", {
   expect_match(p$labels$subtitle, "90%")
   expect_error(plot_calibration(cal, interval = "foo"))
 })
+
+test_that("York regression reproduces the Pearson-York benchmark", {
+  # Pearson (1901) data with the weights of York (1966); reference values of
+  # the bfsl package (York et al., 2004)
+  d <- data.frame(x = c(0.0, 0.9, 1.8, 2.6, 3.3, 4.4, 5.2, 6.1, 6.5, 7.4),
+                  y = c(5.9, 5.4, 4.4, 4.6, 3.5, 3.7, 2.8, 2.8, 2.4, 1.5),
+                  wx = c(1000, 1000, 500, 800, 200, 80, 60, 20, 1.8, 1.0),
+                  wy = c(1, 1.8, 4, 8, 20, 20, 70, 70, 100, 500))
+  d$sx <- 1 / sqrt(d$wx)
+  d$sy <- 1 / sqrt(d$wy)
+  fit <- york_fit(d$x, d$y, d$sx, d$sy)
+  expect_equal(fit$coefficients, c(5.47991, -0.48053), tolerance = 1e-5)
+  expect_equal(sqrt(diag(fit$vcov)), c(0.29497, 0.05799), tolerance = 1e-4)
+  expect_equal(fit$chi_squared, 1.483, tolerance = 1e-3)
+  # calibration_curve() scales the standard errors by sqrt(chi-squared) > 1
+  cal <- calibration_curve(d, y, x, regression = "york", concentration_se = sx, signal_se = sy)
+  expect_equal(cal$coefficients$estimate, fit$coefficients)
+  expect_equal(cal$coefficients$std_error, sqrt(diag(fit$vcov) * fit$chi_squared))
+  expect_equal(cal$eiv$chi_squared, fit$chi_squared)
+  expect_output(print(cal), "York regression")
+  # exact concentrations: weighted least squares
+  d$sx0 <- 0
+  wls <- calibration_curve(d, y, x, regression = "york", concentration_se = sx0, signal_se = sy)
+  expect_equal(wls$coefficients$estimate,
+               unname(stats::coef(stats::lm(y ~ x, data = d, weights = wy))), tolerance = 1e-8)
+})
+
+test_that("Deming regression matches its closed form", {
+  set.seed(2)
+  x_true <- seq(1, 10, length.out = 15)
+  d <- data.frame(x = x_true + stats::rnorm(15, sd = 0.3),
+                  y = 2 + 0.5 * x_true + stats::rnorm(15, sd = 0.2))
+  delta <- (0.2 / 0.3)^2
+  cal <- calibration_curve(d, y, x, regression = "deming", variance_ratio = delta)
+  sxx <- stats::var(d$x)
+  syy <- stats::var(d$y)
+  sxy <- stats::cov(d$x, d$y)
+  b <- (syy - delta * sxx + sqrt((syy - delta * sxx)^2 + 4 * delta * sxy^2)) / (2 * sxy)
+  expect_equal(cal$coefficients$estimate, c(mean(d$y) - b * mean(d$x), b), tolerance = 1e-8)
+  expect_true(all(cal$coefficients$std_error > 0))
+  # exact concentrations (a huge ratio): least squares
+  ls <- calibration_curve(d, y, x, regression = "deming", variance_ratio = 1e12)
+  expect_equal(ls$coefficients$estimate, unname(stats::coef(stats::lm(y ~ x, d))), tolerance = 1e-6)
+  # the ratio from the uncertainties
+  d$sx <- 0.3
+  d$sy <- 0.2
+  from_se <- calibration_curve(d, y, x, regression = "deming", concentration_se = sx, signal_se = sy)
+  expect_equal(from_se$coefficients$estimate, cal$coefficients$estimate)
+  expect_equal(from_se$eiv$variance_ratio, delta)
+  expect_output(print(cal), "Deming regression")
+  # inverse prediction and bands use the Deming line
+  p <- predict(cal, c(3, 5))
+  expect_equal(p$concentration, (c(3, 5) - cal$coefficients$estimate[1]) / b)
+  s <- predict(cal, 4, type = "signal", interval = "confidence")
+  v <- cal$eiv$vcov
+  expect_equal(s$se, sqrt(v[1, 1] + 16 * v[2, 2] + 8 * v[1, 2]))
+  expect_s3_class(plot_calibration(cal), "ggplot")
+})
+
+test_that("errors-in-variables fits validate their inputs", {
+  d <- cal_data()
+  d$se <- 0.01
+  expect_error(calibration_curve(d, intensity, concentration, regression = "york"),
+               "concentration_se")
+  expect_error(calibration_curve(d, intensity, concentration, regression = "deming"),
+               "variance_ratio")
+  expect_error(calibration_curve(d, intensity, concentration, regression = "york", model = "quadratic",
+                                 concentration_se = se, signal_se = se), "straight lines")
+  expect_error(calibration_curve(d, intensity, concentration, regression = "deming",
+                                 variance_ratio = 1, weights = rep(1, 18)), "weights")
+  d$bad <- -1
+  expect_error(calibration_curve(d, intensity, concentration, regression = "york",
+                                 concentration_se = bad, signal_se = se), "non-negative")
+  d$zero <- 0
+  expect_error(calibration_curve(d, intensity, concentration, regression = "york",
+                                 concentration_se = zero, signal_se = zero), "positive uncertainty")
+})
+
+test_that("ISO 11843 limits follow the noncentral t distribution", {
+  d <- cal_data()
+  cal <- calibration_curve(d, intensity, concentration, lod_convention = "iso11843")
+  fit <- stats::lm(intensity ~ concentration, d)
+  s <- summary(fit)$sigma
+  sa <- sqrt(stats::vcov(fit)[1, 1])
+  b <- stats::coef(fit)[[2]]
+  sd_net <- sqrt(s^2 + sa^2)
+  t_c <- stats::qt(0.95, 16)
+  fom <- cal$figures_of_merit
+  expect_equal(fom$critical_value, t_c * sd_net / b)
+  delta <- fom$lod * b / sd_net
+  expect_equal(stats::pt(t_c, 16, ncp = delta), 0.05, tolerance = 1e-6)
+  expect_equal(delta, 2 * t_c, tolerance = 0.05)   # about twice t for alpha = beta
+  expect_equal(fom$loq, 10 * sd_net / b)
+  # the ICH limits have no critical value
+  expect_true(is.na(calibration_curve(d, intensity, concentration)$figures_of_merit$critical_value))
+  # replicates of the sample lower the limits
+  four <- calibration_curve(d, intensity, concentration, lod_convention = "iso11843", replicates = 4)
+  expect_equal(four$figures_of_merit$critical_value, t_c * sqrt(s^2 / 4 + sa^2) / b)
+  # blanks give the standard deviation and its degrees of freedom
+  blank <- c(48, 52, 47, 55, 50, 49)
+  with_blank <- calibration_curve(d, intensity, concentration, blank = blank,
+                                  lod_convention = "iso11843")
+  expect_equal(with_blank$figures_of_merit$critical_value,
+               stats::qt(0.95, 5) * sqrt(stats::sd(blank)^2 + sa^2) / b)
+  # predictions above the critical value are detected
+  p <- predict(cal, stats::coef(fit)[[1]] + b * c(0.5, 2) * fom$critical_value)
+  expect_equal(p$detected, c(FALSE, TRUE))
+  expect_output(print(cal), "ISO 11843")
+  expect_s3_class(plot_calibration(cal), "ggplot")
+  expect_error(calibration_curve(d, intensity, concentration, lod_convention = "iso11843",
+                                 lod_method = "intercept"), "residual")
+  positive <- d[d$concentration > 0, ]
+  expect_error(calibration_curve(positive, intensity, concentration, weights = "1/x",
+                                 lod_convention = "iso11843"), "blank")
+})
+
+test_that("predict flags extrapolations", {
+  cal <- calibration_curve(cal_data(), intensity, concentration)
+  p <- predict(cal, c(2000, 1e5, -500))
+  expect_equal(p$outside_range, c(FALSE, TRUE, TRUE))
+  expect_false("detected" %in% names(p))
+})

@@ -23,7 +23,9 @@ samples of known composition, and predicts the concentration of new
 samples. This vignette builds univariate calibration curves from line
 intensities, with their limits of detection and quantification, and
 compares them with a multivariate model of the whole spectrum, whose
-figures of merit come from the net analyte signal.
+figures of merit come from the net analyte signal. It ends with two checks
+of routine analysis: whether new spectra lie within the calibration space,
+and whether the instrument drifts.
 
 ```{r setup, message = FALSE}
 library(specProc)
@@ -119,6 +121,71 @@ is above the potassium content of almost every sample, so
 `r round(100 * mean(k_predicted$below_loq))`% of the predictions are
 flagged `below_loq`: a single line ranks the samples, but does not
 quantify them individually with the usual \(10\,\sigma\) margin.
+
+The limits above follow the ICH convention. ISO 11843-2 and IUPAC define
+them by the risks of a false positive (\(\alpha\)) and of a false negative
+(\(\beta\)), and include the uncertainty of the curve itself: the critical
+value is the content above which potassium is declared present, and the
+limit of detection, the content detected with probability \(1 - \beta\):
+
+```{r k-iso}
+k_iso <- calibration_curve(calibration, K_signal, K, lod_convention = "iso11843")
+k_iso$figures_of_merit |> select(critical_value, lod, loq)
+```
+
+With risks of 5%, the limit of detection,
+`r signif(k_iso$figures_of_merit$lod, 2)`% K, is close to that of the ICH
+convention: with `r nrow(calibration)` standards, the uncertainty of the
+curve is small next to the scatter of the samples. `predict()` then marks
+the samples above the critical value as `detected`.
+
+## Uncertain reference values
+
+Least squares treat the laboratory values as exact. Their errors bias the
+slope toward zero (regression dilution) and narrow the intervals. York's
+regression weights each standard by the uncertainties of both its
+concentration and its signal. The uncertainty of the laboratory values is
+not given with these data, so we take, for illustration, a relative
+standard uncertainty of 5%; that of the signal follows from the noise of
+the spectra (`intensity_se` of `line_intensities()`):
+
+```{r k-york}
+noise <- line_intensities(corrected, lines[c("C", "K")]) |>
+  mutate(relative_se = intensity_se / intensity) |>
+  select(spectrum, line, relative_se) |>
+  pivot_wider(names_from = line, values_from = relative_se)
+data <- data |>
+  mutate(K_se = 0.05 * K, K_signal_se = K_signal * sqrt(noise$K^2 + noise$C^2))
+calibration <- filter(data, !Sample %in% test_samples)
+test <- filter(data, Sample %in% test_samples)
+
+k_york <- calibration_curve(calibration, K_signal, K, regression = "york",
+                            concentration_se = K_se, signal_se = K_signal_se)
+k_york
+```
+
+```{r york-numbers, include = FALSE}
+york_predicted <- predict(k_york, test$K_signal)
+rmsep <- \(p) sqrt(mean((p$concentration - test$K)^2))
+slope <- \(curve) signif(curve$coefficients$estimate[2], 3)
+```
+
+The slope rises from `r slope(k_curve)` to `r slope(k_york)`, and the
+prediction error on the test samples falls from
+`r sprintf("%.2f", rmsep(k_predicted))` to
+`r sprintf("%.2f", rmsep(york_predicted))`% K. But the reduced
+chi-squared, `r round(k_york$eiv$chi_squared)`, shows that the standards
+scatter far more than these uncertainties explain: matrix effects, not the
+noise of the spectra or the assumed errors of the laboratory values,
+dominate. York's weights then mostly lower the weight of the richest
+standards, whose 5% uncertainty is the largest, much like weights
+`"1/x2"`, rather than correct the dilution of the slope; its standard
+errors are scaled up accordingly. York's regression is at its best with
+reference materials whose certified uncertainties, and the replicate
+measurements of their signals, describe the scatter (a reduced
+chi-squared near 1). When every standard has the same uncertainties,
+`regression = "deming"`, with the ratio of their variances, is the simpler
+alternative.
 
 ## Trace elements: weights and limits of detection
 
@@ -238,6 +305,73 @@ the samples. Its mean selectivity, `r round(fom[["selectivity"]], 2)`,
 means that only about a tenth of each spectrum is specific to potassium:
 the rest is shared with the other constituents and the plasma.
 
+### Spectra outside the calibration space
+
+A model is reliable only for spectra like those it was calibrated on.
+`applicability_domain()` describes the calibration spectra by a principal
+component analysis, here with as many components as the PLS model, and
+`predict()` flags the test spectra whose Hotelling \(T^2\) (more extreme
+than the calibration samples) or Q residual (unlike them) exceeds its 99%
+limit:
+
+```{r domain}
+domain <- applicability_domain(x_calibration, k = ncomp)
+domain
+outside <- predict(domain, x[!is_calibration, ])
+count(outside, outlier)
+```
+
+```{r domain-plot, fig.height = 4.5}
+plot_influence(outside)
+```
+
+```{r domain-numbers, include = FALSE}
+errors <- abs(nas_predicted$predicted - test$K)
+```
+
+`r sum(!outside$inside)` of the `r nrow(outside)` test spectra lie outside
+the domain. Their predictions are about as accurate as the others (mean
+absolute error `r sprintf("%.2f", mean(errors[!outside$inside]))` against
+`r sprintf("%.2f", mean(errors[outside$inside]))`% K): the flag says that the
+model extrapolates, not that the prediction is wrong, but such samples
+deserve a check in routine analysis. For a calibration curve, `predict()`
+flags the concentrations outside the range of the standards
+(`outside_range`).
+
+## Monitoring drift
+
+The measurements are numbered in the order in which they were acquired.
+The carbon line, the internal standard of these calibrations, follows the
+ablated mass and the plasma, so a control chart of its intensity shows the
+stability of the instrument over the acquisition. The first 100
+measurements set the center and the standard deviation, and an
+exponentially weighted moving average (EWMA), sensitive to slow drifts,
+follows the others:
+
+```{r drift, fig.height = 4}
+carbon <- control_chart(intensities$C, order = data$Measurement, method = "ewma",
+                        baseline = 100)
+plot_control_chart(carbon, xlab = "Measurement (acquisition order)",
+                   ylab = "EWMA of the C I 247.86 nm intensity")
+```
+
+```{r drift-numbers, include = FALSE}
+runs <- rle(carbon$signal)
+longest <- which.max(ifelse(runs$values, runs$lengths, 0))
+run_end <- cumsum(runs$lengths)[longest]
+run_start <- run_end - runs$lengths[longest] + 1
+```
+
+The intensity changes by blocks between the sessions of the acquisition
+(the gaps in the numbering), and the chart signals `r sum(carbon$signal)`
+measurements; the longest run of signals, from measurement
+`r carbon$order[run_start]` to `r carbon$order[run_end]`, is a drop of the
+intensity. Dividing by the carbon line compensates for such changes in the
+calibrations above. In routine analysis, a check sample measured at regular
+intervals, charted the same way (`method = "shewhart"`, `"ewma"` or
+`"cusum"`), separates a drift of the instrument from a change of the
+samples.
+
 ## Summary
 
 -   **Normalize line intensities** to an internal standard, such as the
@@ -250,6 +384,12 @@ the rest is shared with the other constituents and the plasma.
 -   **Report how the limits were estimated**: from the residuals of a curve,
     they include the scatter of the samples; from the noise of the spectra
     (`nas()`), they are lower bounds.
+-   **State the convention of the limits**: ICH (\(3.3\,\sigma/S\)) or ISO
+    11843 (risks \(\alpha\) and \(\beta\), uncertainty of the curve).
+-   **Account for uncertain reference values** with York's or Deming's
+    regression.
+-   **Flag the samples outside the applicability domain**, and chart an
+    internal standard or a check sample to detect drifts.
 -   **Validate on samples left out** of the calibration: the prediction
     error on test samples is the most honest figure of merit.
 

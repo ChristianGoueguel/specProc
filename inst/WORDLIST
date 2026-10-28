@@ -19,6 +19,7 @@ Arneberg
 BMU
 Baek
 Balmer
+Basabe
 Belafhal
 Bellon
 Bengio
@@ -38,6 +39,7 @@ Bréchot
 CIARP
 CMD
 CN
+CUSUM
 Cardeñoso
 Caruana
 Casewise
@@ -61,6 +63,7 @@ Coomans
 Corsi
 Cristoforetti
 Croux
+Currie
 DDC
 DModX
 DOSC
@@ -80,6 +83,7 @@ EMSLIBS
 EPO
 ESCOM
 ETH
+EWMA
 Eigen
 Eigen's
 Eilers
@@ -87,6 +91,7 @@ El
 Engelen
 Engelsen
 Eriksson
+Evensen
 Everitt
 Ezan
 FWHM
@@ -118,6 +123,7 @@ Hilferty
 Himberg
 Hinkley
 Hoaglin
+Hoboken
 Hotelling
 Hotelling's
 HotellingEllipse
@@ -171,6 +177,7 @@ Lindgren
 Longbothum
 Lorber
 Lui
+López
 MADs
 MSC
 MacGregor
@@ -182,6 +189,7 @@ Mallat
 Mandel
 Mandel's
 Marquardt
+Martínez
 Massart
 Maurel
 McGill
@@ -287,6 +295,7 @@ Schätzungen
 Scripta
 Searle
 Sherbini
+Shewhart
 Shupack
 Sjöblom
 Skrondal
@@ -434,6 +443,8 @@ nanometers
 natively
 nd
 nm
+noncentral
+noncentrality
 nonlinearly
 normalizations
 notchlower
