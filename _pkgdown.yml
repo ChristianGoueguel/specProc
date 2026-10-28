@@ -100,6 +100,11 @@ reference:
     instrument to another instrument.
   contents:
   - pds
+  - ds
+  - sst
+  - predict.specproc_transfer
+  - slope_bias
+  - predict.specproc_slope_bias
   - glsw
 
 - title: Recipe steps (tidymodels)
@@ -210,6 +215,9 @@ reference:
   - lte_criteria
   - self_absorption
   - correct_self_absorption
+  - curve_of_growth
+  - curve_of_growth_model
+  - plot_curve_of_growth
   - saturation_summary
 
 - title: Line intensities and quantification

@@ -179,6 +179,25 @@
   its `predict()` flags new spectra outside the domain, by their Hotelling
   T-squared or Q residual (see `q_residuals()`), so that extrapolated
   predictions of any model can be checked.
+* `curve_of_growth()`: self-absorption by the curve of growth of a
+  homogeneous plasma in LTE (Gornushkin et al., 1999), the model of the
+  C-sigma graphs of Aragón and Aguilera (2014): from the intensities of the
+  lines of one or several species, their Stark widths and the temperature,
+  it fits a common instrument factor and one column density per species,
+  and returns the optical depth at the center, the self-absorption
+  coefficient and the optically thin intensity of each line, ready for
+  `boltzmann()` and `cf_libs()`. The line profiles are Voigt profiles of the
+  Stark and Doppler widths. `curve_of_growth_model()` computes the
+  intensities for given optical depths, and `plot_curve_of_growth()` draws
+  the reduced intensities against the optical depth.
+* Calibration transfer: `ds()` (direct standardization) and `sst()`
+  (spectral space transformation, Du et al., 2011) transfer spectra of a
+  slave instrument to the master, from transfer samples measured on both,
+  with low-rank transfer matrices; `slope_bias()` corrects the predictions
+  of a model on the slave instrument instead, with tests of the bias and
+  slope. `pds()` now returns a `specproc_transfer` object (with the same
+  `transfer_matrix` and `intercept`), and `predict()` transfers spectra with
+  any of the three.
 * `control_chart()` and `plot_control_chart()`: control charts of a quantity
   that should stay constant, such as an internal standard line or a check
   sample, to detect drifts of the instrument: Shewhart chart with the

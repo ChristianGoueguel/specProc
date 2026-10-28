@@ -60,7 +60,7 @@ test_that("pds recovers a linear instrument response", {
   x2 <- 1.1 * x1 + 0.05
   for (alpha in c(0, 0.5, 1)) {
     model <- pds(x1, x2, win = 3, ncomp = 2, alpha = alpha)
-    expect_named(model, c("transfer_matrix", "intercept"))
+    expect_true(all(c("transfer_matrix", "intercept") %in% names(model)))
     expect_equal(dim(model$transfer_matrix), c(40L, 40L))
     x2_std <- x2 %*% model$transfer_matrix + matrix(model$intercept, 15, 40, byrow = TRUE)
     expect_lt(max(abs(x2_std - x1)) / max(abs(x1)), 1e-4)
@@ -75,4 +75,107 @@ test_that("pds validates its inputs", {
   expect_error(pds(m, m[, 1:3]), "same number of columns")
   expect_error(pds(m, m[1:4, ]), "same number of rows")
   expect_error(pds(m, m, alpha = 2), "'alpha'")
+})
+
+# Transfer spectra in a low-dimensional space (as spectra are), with a
+# slave instrument of another response and offset
+transfer_data <- function(n = 40, p = 60, seed = 5) {
+  set.seed(seed)
+  scores <- matrix(stats::rnorm(n * 3), n)
+  loadings <- matrix(stats::rnorm(3 * p), 3)
+  x1 <- 100 + scores %*% loadings + matrix(stats::rnorm(n * p, sd = 0.01), n)
+  response <- matrix(seq(0.8, 1.2, length.out = p), n, p, byrow = TRUE)
+  x2 <- 5 + x1 * response
+  colnames(x1) <- colnames(x2) <- paste0("w", seq_len(p))
+  list(x1 = x1, x2 = x2)
+}
+
+test_that("ds transfers spectra of the slave instrument", {
+  d <- transfer_data()
+  transfer <- ds(d$x1[1:20, ], d$x2[1:20, ])
+  expect_s3_class(transfer, "specproc_transfer")
+  # the transfer samples are reproduced exactly with all components
+  expect_equal(predict(transfer, d$x2[1:20, ]), d$x1[1:20, ], tolerance = 1e-8)
+  # new samples of the same space
+  new <- predict(transfer, d$x2[21:40, ])
+  expect_equal(colnames(new), colnames(d$x1))
+  expect_lt(max(abs(new - d$x1[21:40, ])), 0.1)
+  # the definition: m1 + (x - m2) X2c^+ X1c
+  x1c <- sweep(d$x1[1:20, ], 2, colMeans(d$x1[1:20, ]))
+  x2c <- sweep(d$x2[1:20, ], 2, colMeans(d$x2[1:20, ]))
+  s <- svd(x2c)
+  k <- sum(s$d > 1e-8 * s$d[1])
+  f <- s$v[, 1:k] %*% diag(1 / s$d[1:k]) %*% t(s$u[, 1:k]) %*% x1c
+  ref <- sweep(sweep(d$x2[21:40, ], 2, colMeans(d$x2[1:20, ])) %*% f, 2, colMeans(d$x1[1:20, ]), "+")
+  expect_equal(unname(new), unname(ref), tolerance = 1e-8)
+  # fewer components
+  expect_equal(ds(d$x1[1:20, ], d$x2[1:20, ], ncomp = 3)$ncomp, 3)
+  expect_output(print(transfer), "Direct standardization")
+  # a data frame gives a tibble
+  expect_s3_class(predict(transfer, as.data.frame(d$x2[21:22, ])), "tbl_df")
+})
+
+test_that("sst moves the slave spectra by the difference of the instruments", {
+  d <- transfer_data()
+  transfer <- sst(d$x1[1:20, ], d$x2[1:20, ], ncomp = 3)
+  expect_s3_class(transfer, "specproc_transfer")
+  new <- predict(transfer, d$x2[21:40, ])
+  untransferred <- mean(abs(d$x2[21:40, ] - d$x1[21:40, ]))
+  expect_lt(mean(abs(new - d$x1[21:40, ])), untransferred / 50)
+  # the definition: x + t (P1' - P2'), with t = x (P2')^+
+  x1c <- sweep(d$x1[1:20, ], 2, colMeans(d$x1[1:20, ]))
+  x2c <- sweep(d$x2[1:20, ], 2, colMeans(d$x2[1:20, ]))
+  v <- svd(cbind(x1c, x2c))$v[, 1:3]
+  p1 <- v[1:60, ]
+  p2 <- v[61:120, ]
+  xc <- sweep(d$x2[21:40, ], 2, colMeans(d$x2[1:20, ]))
+  ref <- sweep(xc + xc %*% MASS::ginv(t(p2)) %*% (t(p1) - t(p2)), 2, colMeans(d$x1[1:20, ]), "+")
+  expect_equal(unname(new), unname(ref), tolerance = 1e-8)
+  # identical instruments: no change
+  same <- sst(d$x1[1:20, ], d$x1[1:20, ], ncomp = 3)
+  expect_equal(predict(same, d$x1[21:40, ]), d$x1[21:40, ], tolerance = 1e-8)
+  # by explained variance
+  expect_gte(sst(d$x1[1:20, ], d$x2[1:20, ])$explained, 0.99)
+  expect_error(sst(d$x1[1:20, ], d$x2[1:20, ], ncomp = 30), "rank")
+  expect_output(print(transfer), "Spectral space transformation")
+})
+
+test_that("pds results are transfers too", {
+  d <- transfer_data()
+  transfer <- pds(d$x1[1:20, ], d$x2[1:20, ], win = 2, ncomp = 2)
+  expect_s3_class(transfer, "specproc_transfer")
+  expect_equal(predict(transfer, d$x2[21:22, ]),
+               sweep(d$x2[21:22, ] %*% transfer$transfer_matrix, 2, transfer$intercept, "+"))
+  expect_output(print(transfer), "Piecewise")
+  expect_error(predict(transfer, d$x2[, 1:5]), "wavelengths")
+})
+
+test_that("transfers validate their inputs", {
+  d <- transfer_data()
+  expect_error(ds(d$x1, d$x2[, -1]), "same samples")
+  expect_error(sst(d$x1[1:2, ], d$x2[1:2, ]), "At least 3")
+  bad <- d$x2
+  bad[1, 1] <- NA
+  expect_error(ds(d$x1, bad), "missing")
+})
+
+test_that("slope_bias corrects predictions", {
+  set.seed(1)
+  reference <- stats::runif(20, 0.5, 4)
+  predicted <- 0.2 + 1.1 * reference + stats::rnorm(20, sd = 0.05)
+  correction <- slope_bias(predicted, reference)
+  expect_s3_class(correction, "specproc_slope_bias")
+  fit <- stats::lm(reference ~ predicted)
+  expect_equal(correction$coefficients$estimate, unname(stats::coef(fit)))
+  expect_equal(predict(correction, c(1, 2)), unname(stats::coef(fit)[1] + stats::coef(fit)[2] * c(1, 2)))
+  # the slope differs from 1 and the bias from 0
+  expect_true(all(correction$coefficients$p_value < 0.01))
+  expect_lt(correction$rmse[["after"]], correction$rmse[["before"]] / 5)
+  # bias only
+  bias <- slope_bias(reference + 0.3, reference, slope = FALSE)
+  expect_equal(bias$coefficients$estimate, c(-0.3, 1))
+  expect_equal(predict(bias, 2), 1.7)
+  expect_output(print(correction), "Slope and bias")
+  expect_error(slope_bias(1:3, 1:2), "same length")
+  expect_error(slope_bias(1:2, 1:2), "at least 3")
 })

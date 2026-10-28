@@ -30,9 +30,11 @@
 #' @param ncomp An integer specifying the number of components to be used in PLSR. Typically, a small number (e.g., 2-5) is sufficient. Default is 2.
 #' @param alpha A numeric value between 0 and 1 specifying the weight for the global PLSR model. A value of 0 (default) corresponds to the original PDS method, while a value of 1 corresponds to using only the global PLSR model.
 #'
-#' @return A list with two components:
+#' @return An object of class `specproc_transfer`, a list with
 #'   \item{`transfer_matrix`}{The \eqn{p \times p} transfer matrix \eqn{\textbf{F}}.}
 #'   \item{`intercept`}{A vector of length \eqn{p} containing the intercepts.}
+#'   and the settings of the transfer. Use
+#'   [predict()][predict.specproc_transfer] to transfer slave spectra.
 #'
 #' @references
 #'   - Wang, Y., Veltkamp, D.J., Kowalski, B.R., (1991).
@@ -43,6 +45,7 @@
 #'     transfer of NIR spectra for multivariate calibration.
 #'     Chemometrics and Intelligent Laboratory Systems, (32)2:201-213.
 #'
+#' @seealso [ds()], [sst()], [slope_bias()], [predict.specproc_transfer()]
 #' @export pds
 #'
 #' @examples
@@ -54,7 +57,7 @@
 #' x2 <- 0.8 * cbind(x1[, -1], x1[, ncol(x1)]) + 50
 #' res <- pds(x1, x2, win = 3, ncomp = 2)
 #' # spectra of the second instrument transferred to the first one
-#' transferred <- sweep(x2 %*% res$transfer_matrix, 2, res$intercept, "+")
+#' transferred <- predict(res, x2)
 #' max(abs(transferred - x1)) / max(x1)
 pds <- function(x1, x2, win = 5, ncomp = 2, alpha = 0) {
   x1 <- as_numeric_matrix(x1, "x1")
@@ -98,7 +101,9 @@ pds <- function(x1, x2, win = 5, ncomp = 2, alpha = 0) {
 
   dimnames(transfer) <- list(colnames(x2), colnames(x1))
   names(intercept) <- colnames(x1)
-  list(transfer_matrix = transfer, intercept = intercept)
+  structure(list(transfer_matrix = transfer, intercept = intercept, method = "pds", win = win,
+                 ncomp = ncomp, alpha = alpha, n = n),
+            class = "specproc_transfer")
 }
 
 # Regression coefficients of a PLS model fitted on centered data.

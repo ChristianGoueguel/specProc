@@ -18,9 +18,11 @@ pds(x1, x2, win = 5, ncomp = 2, alpha = 0)
 \item{alpha}{A numeric value between 0 and 1 specifying the weight for the global PLSR model. A value of 0 (default) corresponds to the original PDS method, while a value of 1 corresponds to using only the global PLSR model.}
 }
 \value{
-A list with two components:
+An object of class \code{specproc_transfer}, a list with
 \item{\code{transfer_matrix}}{The \eqn{p \times p} transfer matrix \eqn{\textbf{F}}.}
 \item{\code{intercept}}{A vector of length \eqn{p} containing the intercepts.}
+and the settings of the transfer. Use
+\link[=predict.specproc_transfer]{predict()} to transfer slave spectra.
 }
 \description{
 The \code{pds} function performs Piecewise Direct Standardization (PDS), a method
@@ -53,7 +55,7 @@ x1 <- as.matrix(spectra[1:30, ])
 x2 <- 0.8 * cbind(x1[, -1], x1[, ncol(x1)]) + 50
 res <- pds(x1, x2, win = 3, ncomp = 2)
 # spectra of the second instrument transferred to the first one
-transferred <- sweep(x2 \%*\% res$transfer_matrix, 2, res$intercept, "+")
+transferred <- predict(res, x2)
 max(abs(transferred - x1)) / max(x1)
 }
 \references{
@@ -66,6 +68,9 @@ Improvement of the piecewise direct standardization procedure for the
 transfer of NIR spectra for multivariate calibration.
 Chemometrics and Intelligent Laboratory Systems, (32)2:201-213.
 }
+}
+\seealso{
+\code{\link[=ds]{ds()}}, \code{\link[=sst]{sst()}}, \code{\link[=slope_bias]{slope_bias()}}, \code{\link[=predict.specproc_transfer]{predict.specproc_transfer()}}
 }
 \author{
 Christian L. Goueguel
