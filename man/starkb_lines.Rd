@@ -52,7 +52,8 @@ given at the mean wavelength of the multiplet; the \code{upper} and \code{lower}
 configurations and terms identify them.
 
 The results of a query are cached for the R session, so repeated calls
-with the same \code{species} do not download the data again.
+with the same \code{species} do not download the data again, and between
+sessions with the persistent cache (see \code{\link[=download_cache]{download_cache()}}).
 
 When you use these data, cite the STARK-B database and the original
 publications, listed in the \code{source} column:

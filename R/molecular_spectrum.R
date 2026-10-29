@@ -28,8 +28,10 @@
 #' MgO or CaO. [exomol_datasets()] lists the line lists of a molecule and
 #' their sizes.
 #'
-#' The files are kept for the R session, or in the directory `cache` to be
-#' reused in later sessions: a molecule whose files are in `cache` needs no
+#' The files are kept for the R session, or on disk to be reused in later
+#' sessions: in the directory `cache`, or in the persistent cache of specProc
+#' when it is enabled (see [download_cache()]), where line lists are kept
+#' until the cache is cleared. A molecule whose files are on disk needs no
 #' internet connection when `isotopologue` and `dataset` are given. Partition
 #' functions are not needed, as the spectrum is normalized. Wavelengths are
 #' in air between 200 and 2000 nm.
@@ -54,8 +56,9 @@
 #'   `"photons"`.
 #' @param lines A logical: return the lines instead of the convolved
 #'   spectrum (`FALSE`, default).
-#' @param cache A directory where the files are kept between sessions, or
-#'   `NULL` (default) to keep them for the session only.
+#' @param cache A directory where the files are kept between sessions. By
+#'   default (`NULL`), the persistent cache of specProc when it is enabled
+#'   (see [download_cache()]), or a temporary directory for the session.
 #' @param timeout The download timeout, in seconds. Default is 300.
 #'
 #' @return A tibble with the `wavelength` (nm) and the relative `intensity`
@@ -182,8 +185,7 @@ exomol_cache <- new.env(parent = emptyenv())
 # files; kept for the R session.
 exomol_api <- function(molecule, timeout) {
   rlang::check_installed("jsonlite", reason = "to read the ExoMol API.")
-  key <- paste0("api:", molecule)
-  if (is.null(exomol_cache[[key]])) {
+  cached_query("exomol", paste("api", molecule), molecule, function() {
     file <- tempfile(fileext = ".json")
     on.exit(unlink(file), add = TRUE)
     download_data(paste0("https://exomol.com/api/?molecule=", utils::URLencode(molecule, reserved = TRUE),
@@ -192,10 +194,8 @@ exomol_api <- function(molecule, timeout) {
     if (!startsWith(trimws(text), "{")) {
       stop("ExoMol has no line list for ", molecule, ".", call. = FALSE)
     }
-    assign(key, exomol_parse_api(jsonlite::fromJSON(text, simplifyVector = FALSE), molecule),
-           envir = exomol_cache)
-  }
-  exomol_cache[[key]]
+    exomol_parse_api(jsonlite::fromJSON(text, simplifyVector = FALSE), molecule)
+  })
 }
 
 # The small empirical line lists of the most abundant isotopologues.
@@ -261,7 +261,9 @@ exomol_source <- function(molecule, isotopologue, dataset, timeout) {
 
 # Local paths of the files, downloaded when missing.
 exomol_files <- function(source, cache, timeout) {
-  dir <- cache %||% file.path(tempdir(), "specProc-exomol")
+  persistent <- cache_dir()
+  dir <- cache %||% (if (is.null(persistent)) file.path(tempdir(), "specProc-exomol") else
+    file.path(persistent, "exomol"))
   if (!dir.exists(dir)) dir.create(dir, recursive = TRUE)
   paths <- file.path(dir, basename(source$urls))
   for (i in seq_along(paths)) {

@@ -42,8 +42,9 @@ default.}
 \item{lines}{A logical: return the lines instead of the convolved
 spectrum (\code{FALSE}, default).}
 
-\item{cache}{A directory where the files are kept between sessions, or
-\code{NULL} (default) to keep them for the session only.}
+\item{cache}{A directory where the files are kept between sessions. By
+default (\code{NULL}), the persistent cache of specProc when it is enabled
+(see \code{\link[=download_cache]{download_cache()}}), or a temporary directory for the session.}
 
 \item{timeout}{The download timeout, in seconds. Default is 300.}
 }
@@ -82,8 +83,10 @@ positions accurate, and the recommended line list otherwise (\code{AlO}:
 MgO or CaO. \code{\link[=exomol_datasets]{exomol_datasets()}} lists the line lists of a molecule and
 their sizes.
 
-The files are kept for the R session, or in the directory \code{cache} to be
-reused in later sessions: a molecule whose files are in \code{cache} needs no
+The files are kept for the R session, or on disk to be reused in later
+sessions: in the directory \code{cache}, or in the persistent cache of specProc
+when it is enabled (see \code{\link[=download_cache]{download_cache()}}), where line lists are kept
+until the cache is cleared. A molecule whose files are on disk needs no
 internet connection when \code{isotopologue} and \code{dataset} are given. Partition
 functions are not needed, as the spectrum is normalized. Wavelengths are
 in air between 200 and 2000 nm.

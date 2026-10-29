@@ -58,7 +58,8 @@ the lines fetched so far, so that a session can continue offline.
 }
 
 Each species is downloaded from NIST once per R session (see
-\code{\link[=nist_lines]{nist_lines()}}); later changes of the settings are computed locally. The
+\code{\link[=nist_lines]{nist_lines()}}), or once for all sessions with the persistent cache (see
+\code{\link[=download_cache]{download_cache()}}); later changes of the settings are computed locally. The
 zoom of the plot is kept when the lines change.
 
 \strong{Boltzmann plot.} Clicking the dot at the top of a line marker adds the

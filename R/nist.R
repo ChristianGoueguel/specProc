@@ -18,7 +18,8 @@
 #' (`accuracy`: AAA, AA, A+, A, B+, B, C+, C, D+, D, E) matters for plasma
 #' diagnostics: prefer lines of grade B or better.
 #'
-#' The results of a query are cached for the R session. Cite the database
+#' The results of a query are cached for the R session, and between sessions
+#' with the persistent cache (see [download_cache()]). Cite the database
 #' when you use these data:
 #'  - Kramida, A., Ralchenko, Yu., Reader, J., and NIST ASD Team. NIST
 #'    Atomic Spectra Database, \url{https://physics.nist.gov/asd}. National
@@ -65,8 +66,7 @@ nist_lines <- function(species, wavelength, with_aki = TRUE, timeout = 120) {
   wavelength <- sort(wavelength)
   tables <- lapply(parsed, function(sp) {
     key <- paste("lines", sp$label, wavelength[1], wavelength[2])
-    table <- nist_cache[[key]]
-    if (is.null(table)) {
+    cached_query("nist", key, sp$label, function() {
       query <- list(
         spectra = sp$label, low_w = wavelength[1], upp_w = wavelength[2], unit = 1,
         submit = "Retrieve Data", format = 2, line_out = 0, en_unit = 1, output_type = 0,
@@ -78,10 +78,8 @@ nist_lines <- function(species, wavelength, with_aki = TRUE, timeout = 120) {
       )
       text <- nist_download("https://physics.nist.gov/cgi-bin/ASD/lines1.pl", query, sp$label,
                             timeout)
-      table <- parse_nist_lines(text, sp$label)
-      assign(key, table, envir = nist_cache)
-    }
-    table
+      parse_nist_lines(text, sp$label)
+    })
   })
   lines <- do.call(rbind, tables)
   if (with_aki) {
@@ -119,16 +117,13 @@ nist_ionization_energy <- function(species, timeout = 120) {
   check_number(timeout, "timeout", lower = 0, lower_open = TRUE)
   parsed <- lapply(species, parse_species)
   out <- vapply(parsed, function(sp) {
-    key <- paste("ie", sp$element)
-    table <- nist_cache[[key]]
-    if (is.null(table)) {
+    table <- cached_query("nist", paste("ie", sp$element), sp$element, function() {
       query <- list(spectra = sp$element, units = 1, format = 2, order = 0,
                     sp_name_out = "on", ion_charge_out = "on", e_out = 0,
                     submit = "Retrieve Data")
       text <- nist_download("https://physics.nist.gov/cgi-bin/ASD/ie.pl", query, sp$element, timeout)
-      table <- parse_nist_ie(text)
-      assign(key, table, envir = nist_cache)
-    }
+      parse_nist_ie(text)
+    })
     value <- table$energy[table$species == sp$label]
     if (length(value) != 1 || is.na(value)) {
       stop("No ionization energy for ", sp$label, " in the NIST database.", call. = FALSE)
@@ -161,7 +156,8 @@ nist_ionization_energy <- function(species, timeout = 120) {
 #' alkali metals (see [cf_libs()], which does it). Without truncation, the
 #' result equals the partition function computed by the ASD.
 #'
-#' The results of a query are cached for the R session. Cite the database
+#' The results of a query are cached for the R session, and between sessions
+#' with the persistent cache (see [download_cache()]). Cite the database
 #' when you use these data (see [nist_lines()]).
 #'
 #' @param species A character vector of species in spectroscopic notation,
@@ -188,19 +184,15 @@ nist_levels <- function(species, timeout = 120) {
   check_number(timeout, "timeout", lower = 0, lower_open = TRUE)
   tables <- lapply(species, function(s) {
     sp <- parse_species(s)
-    key <- paste("levels", sp$label)
-    table <- nist_cache[[key]]
-    if (is.null(table)) {
+    cached_query("nist", paste("levels", sp$label), sp$label, function() {
       query <- list(de = 0, spectrum = sp$label, submit = "Retrieve Data", units = 1, format = 2,
                     output = 0, page_size = 15, multiplet_ordered = 0, conf_out = "on",
                     term_out = "on", level_out = "on", unc_out = 1, j_out = "on", g_out = "on",
                     lande_out = "on", perc_out = "on", biblio = "on", splitting = 1, temp = "")
       text <- nist_download("https://physics.nist.gov/cgi-bin/ASD/energy1.pl", query, sp$label,
                             timeout)
-      table <- parse_nist_levels(text, sp$label)
-      assign(key, table, envir = nist_cache)
-    }
-    table
+      parse_nist_levels(text, sp$label)
+    })
   })
   do.call(rbind, tables)
 }

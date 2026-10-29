@@ -43,7 +43,8 @@ for such levels. The accuracy grade of the transition probability
 (\code{accuracy}: AAA, AA, A+, A, B+, B, C+, C, D+, D, E) matters for plasma
 diagnostics: prefer lines of grade B or better.
 
-The results of a query are cached for the R session. Cite the database
+The results of a query are cached for the R session, and between sessions
+with the persistent cache (see \code{\link[=download_cache]{download_cache()}}). Cite the database
 when you use these data:
 \itemize{
 \item Kramida, A., Ralchenko, Yu., Reader, J., and NIST ASD Team. NIST

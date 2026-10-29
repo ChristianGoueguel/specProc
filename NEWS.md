@@ -226,6 +226,16 @@
   molecule in LTE from a line list of the ExoMol database (the MoLLIST line
   lists by default), downloaded on demand and convolved with the instrument
   profile, and `exomol_datasets()` lists the line lists of a molecule.
+* Persistent cache of downloaded data: with `options(specProc.cache = TRUE)`
+  (the user cache directory of `tools::R_user_dir()`) or a directory, the
+  data of `nist_lines()`, `nist_ionization_energy()`, `nist_levels()` (and so
+  `libs_lines()` and `line_finder()`), `starkb_lines()` and the ExoMol line
+  lists of `molecular_spectrum()` are kept on disk and reused in later
+  sessions, without an internet connection. Entries older than
+  `specProc.cache_max_age` days (default 180) are downloaded again, and an
+  older copy is used, with a warning, when the database cannot be reached.
+  `download_cache()` lists the cached files and `clear_download_cache()`
+  removes them. The cache is off by default.
 * `tidy()` and `glance()` methods for peak fits, `calibration_curve()`,
   `wavelength_calibration()`, `slope_bias()`, `boltzmann()`,
   `saha_boltzmann()`, `cf_libs()`, `plasma_uncertainty()` and

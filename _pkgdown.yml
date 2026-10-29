@@ -361,6 +361,7 @@ reference:
 
 - title: Miscellaneous
   contents:
+  - download_cache
   - specproc-tidy
   - specproc-tidy-models
   - correlation

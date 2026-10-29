@@ -21,7 +21,8 @@
 #' configurations and terms identify them.
 #'
 #' The results of a query are cached for the R session, so repeated calls
-#' with the same `species` do not download the data again.
+#' with the same `species` do not download the data again, and between
+#' sessions with the persistent cache (see [download_cache()]).
 #'
 #' When you use these data, cite the STARK-B database and the original
 #' publications, listed in the `source` column:
@@ -71,15 +72,12 @@ starkb_lines <- function(species, wavelength = NULL, perturber = NULL, timeout =
   sp <- parse_species(species)
   check_wavelength_range(wavelength)
   check_number(timeout, "timeout", lower = 0, lower_open = TRUE)
-  key <- paste(sp$element, sp$charge)
-  lines <- starkb_cache[[key]]
-  if (is.null(lines)) {
+  lines <- cached_query("starkb", sp$label, sp$label, function() {
     rlang::check_installed("xml2", reason = "to read STARK-B data.")
     file <- starkb_download(sp, timeout)
     on.exit(unlink(file), add = TRUE)
-    lines <- parse_xsams(file)
-    assign(key, lines, envir = starkb_cache)
-  }
+    parse_xsams(file)
+  })
   filter_stark(lines, wavelength, perturber)
 }
 
