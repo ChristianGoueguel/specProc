@@ -29,9 +29,9 @@ an internet connection.
 }
 \examples{
 \donttest{
-# needs an internet connection
+# needs an internet connection; gives up after 20 s if ExoMol does not answer
 if (rlang::is_installed("jsonlite")) {
-  try(exomol_datasets("CN"))
+  try(exomol_datasets("CN", timeout = 20))
 }
 }
 }

@@ -410,18 +410,18 @@ bind_rows(
 If you use specProc in a publication, please cite it. In R,
 `citation("specProc")` gives the reference of the installed version:
 
-> Goueguel, C. L. (2026). *specProc: Preprocessing Tools for Laser-Induced
-> Breakdown Spectroscopy*. R package version 0.8.3.
+> Goueguel, C. L. (2026). *specProc: Analysis of Laser-Induced Breakdown
+> Spectroscopy Data*. R package version 0.9.0.
 > <https://github.com/ChristianGoueguel/specProc>
 
 A BibTeX entry for LaTeX users:
 
 ``` bibtex
 @Manual{specProc,
-  title  = {{specProc}: Preprocessing Tools for Laser-Induced Breakdown Spectroscopy},
+  title  = {{specProc}: Analysis of Laser-Induced Breakdown Spectroscopy Data},
   author = {Christian L. Goueguel},
   year   = {2026},
-  note   = {R package version 0.8.3},
+  note   = {R package version 0.9.0},
   url    = {https://github.com/ChristianGoueguel/specProc},
 }
 ```

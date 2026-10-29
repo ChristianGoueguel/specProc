@@ -47,8 +47,8 @@
 #'
 #' @examples
 #' \donttest{
-#' # needs an internet connection
-#' ca <- try(nist_lines(c("Ca I", "Ca II"), wavelength = c(390, 400)))
+#' # needs an internet connection; gives up after 20 s if NIST does not answer
+#' ca <- try(nist_lines(c("Ca I", "Ca II"), wavelength = c(390, 400), timeout = 20))
 #' if (!inherits(ca, "try-error")) ca
 #' }
 nist_lines <- function(species, wavelength, with_aki = TRUE, timeout = 120) {
@@ -107,8 +107,8 @@ nist_lines <- function(species, wavelength, with_aki = TRUE, timeout = 120) {
 #'
 #' @examples
 #' \donttest{
-#' # needs an internet connection
-#' try(nist_ionization_energy(c("Ca I", "Mg I")))
+#' # needs an internet connection; gives up after 20 s if NIST does not answer
+#' try(nist_ionization_energy(c("Ca I", "Mg I"), timeout = 20))
 #' }
 nist_ionization_energy <- function(species, timeout = 120) {
   if (!is.character(species) || length(species) == 0) {
@@ -173,8 +173,8 @@ nist_ionization_energy <- function(species, timeout = 120) {
 #'
 #' @examples
 #' \donttest{
-#' # needs an internet connection
-#' ca <- try(nist_levels("Ca I"))
+#' # needs an internet connection; gives up after 20 s if NIST does not answer
+#' ca <- try(nist_levels("Ca I", timeout = 20))
 #' if (!inherits(ca, "try-error")) partition_function(ca, temperature = c(8000, 10000))
 #' }
 nist_levels <- function(species, timeout = 120) {

@@ -97,8 +97,10 @@ ExoMol page of the data set) when you use them.
 }
 \examples{
 \donttest{
-# needs an internet connection (about 1 MB)
-cn <- try(molecular_spectrum("CN", temperature = 6000, wavelength = c(383, 389)))
+# needs an internet connection (about 1 MB); gives up after 20 s if ExoMol
+# does not answer
+cn <- try(molecular_spectrum("CN", temperature = 6000, wavelength = c(383, 389),
+                              timeout = 20))
 if (!inherits(cn, "try-error")) {
   plot(cn$wavelength, cn$intensity, type = "l", xlab = "Wavelength (nm)",
        ylab = "Relative intensity")

@@ -23,8 +23,8 @@ example the ionization energy of the neutral atom needed by
 }
 \examples{
 \donttest{
-# needs an internet connection
-try(nist_ionization_energy(c("Ca I", "Mg I")))
+# needs an internet connection; gives up after 20 s if NIST does not answer
+try(nist_ionization_energy(c("Ca I", "Mg I"), timeout = 20))
 }
 }
 \seealso{

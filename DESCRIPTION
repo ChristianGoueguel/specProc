@@ -1,7 +1,7 @@
 Package: specProc
 Type: Package
 Title: Analysis of Laser-Induced Breakdown Spectroscopy Data
-Version: 0.8.3.9000
+Version: 0.9.0
 Authors@R:
     person("Christian L.", "Goueguel", , "christian.goueguel@gmail.com",
            role = c("aut", "cre"),
@@ -58,6 +58,7 @@ Imports:
     Rcpp,
     rlang,
     robustbase,
+    scales (>= 1.3.0),
     tibble,
     tidyr
 Suggests:
@@ -85,7 +86,6 @@ Suggests:
     ropls,
     rospca,
     rsample,
-    scales (>= 1.3.0),
     shiny,
     spelling,
     testthat (>= 3.0.0),

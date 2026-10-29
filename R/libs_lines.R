@@ -43,8 +43,9 @@
 #'
 #' @examples
 #' \donttest{
-#' # needs an internet connection
-#' lines <- try(libs_lines(c("Ca I", "Ca II"), wavelength = c(390, 450), top = 5))
+#' # needs an internet connection; gives up after 20 s if NIST does not answer
+#' lines <- try(libs_lines(c("Ca I", "Ca II"), wavelength = c(390, 450), top = 5,
+#'                         timeout = 20))
 #' if (!inherits(lines, "try-error")) lines
 #' }
 libs_lines <- function(species, wavelength = c(200, 900), temperature = 10000, top = 20,

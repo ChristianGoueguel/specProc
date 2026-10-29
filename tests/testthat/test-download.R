@@ -42,6 +42,20 @@ test_that("download_data reports the HTTP status", {
   expect_equal(calls, 1)
 })
 
+test_that("download_data uses its timeout, even below the option", {
+  used <- NULL
+  local_mocked_bindings(download_file = function(url, file) {
+    used <<- getOption("timeout")
+    writeLines("data", file)
+    0L
+  })
+  old <- options(timeout = 600)
+  on.exit(options(old), add = TRUE)
+  download_data("http://x", tempfile(), "STARK-B", "Ca II", 20, wait = 0)
+  expect_equal(used, 20)
+  expect_equal(getOption("timeout"), 600)
+})
+
 test_that("download_data reports other failures", {
   local_mocked_bindings(download_file = function(url, file) {
     warning("URL '", url, "': status was 'Could not resolve host'")

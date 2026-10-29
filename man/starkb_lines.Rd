@@ -65,8 +65,9 @@ of Belgrade (see the References).
 }
 \examples{
 \donttest{
-# needs an internet connection
-ca <- try(starkb_lines("Ca II", wavelength = c(390, 400), perturber = "electron"))
+# needs an internet connection; gives up after 20 s if STARK-B does not answer
+ca <- try(starkb_lines("Ca II", wavelength = c(390, 400), perturber = "electron",
+                      timeout = 20))
 if (!inherits(ca, "try-error")) head(ca)
 }
 }

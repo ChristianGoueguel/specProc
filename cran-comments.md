@@ -1,30 +1,17 @@
-## Resubmission
+## Update
 
-This is a resubmission. In this version I have:
-
-* Reduced the check time, which exceeded 10 minutes on Windows
-  (r-devel-windows-x86_64, "Overall checktime 13 min > 10 min"):
-  * The preprocessing vignette applies the baseline correction once,
-    instead of in every recipe and every resample (the results are
-    identical, since this correction estimates nothing from the data).
-  * Three small functions of compiled code, each instantiating a large
-    template of the Eigen library, now use `svd()` in R, which shortens the
-    installation.
-  * The tests that compare the results with those of other packages
-    (ropls, rospca, cellWise) are skipped on CRAN.
-  * The examples of several functions run on a window of the spectra
-    instead of all 7152 channels.
-* Kept the possibly misspelled words in DESCRIPTION, which are explained
-  below.
-
-## Submission
-
-This is a new submission (the package is not yet on CRAN).
+This is an update of specProc 0.8.3 to 0.9.0. The main changes (see
+NEWS.md) are robust PLS and principal component regression with robust
+cross-validation, robust SIMCA and discriminant analysis, and their
+'parsnip' engines; wavelength selection; calibration transfer; uncertainty
+propagation in the plasma diagnostics; and molecular band heads. The
+functions deprecated since 0.2.0 and 0.8.0 are now defunct.
 
 ## Test environments
 
 * local macOS (aarch64-apple-darwin), R 4.6.1
-* win-builder, R-devel (Windows Server 2022, x86_64-w64-mingw32)
+* GitHub Actions: macOS (R release), Windows (R release), Ubuntu (R devel,
+  release and oldrel-1)
 
 ## R CMD check results
 
@@ -32,14 +19,16 @@ This is a new submission (the package is not yet on CRAN).
 
 * checking CRAN incoming feasibility ... NOTE
 
-  New submission.
+  Possibly misspelled words in DESCRIPTION: Bossche, Driessen, Engelen,
+  Kohonen, LIBS, MacroPCA, OPLS, Raman, Raymaekers, Rousseeuw, Saha, SIMCA,
+  Trygg, Vanden, Verboven, cellwise. These are author names, method names
+  (MacroPCA, OPLS, Saha-Boltzmann, SIMCA), the acronym of laser-induced
+  breakdown spectroscopy (LIBS), Raman spectroscopy, and the statistical
+  term "cellwise" (cellwise outliers).
 
-  Possibly misspelled words in DESCRIPTION: Bossche, Kohonen, LIBS,
-  MacroPCA, OPLS, Raman, Raymaekers, Rousseeuw, Saha, Trygg, Vanden,
-  cellwise. These are author names, method names (MacroPCA, OPLS,
-  Saha-Boltzmann), the acronym of laser-induced breakdown spectroscopy
-  (LIBS), Raman spectroscopy, and the statistical term "cellwise"
-  (cellwise outliers).
+## Reverse dependencies
+
+There are no reverse dependencies.
 
 ## Suggested packages
 
@@ -52,6 +41,10 @@ This is a new submission (the package is not yet on CRAN).
 
 ## Examples
 
-Examples that need an internet connection (queries of the NIST and STARK-B
-databases) are wrapped in `\donttest{}` and fail gracefully with `try()`.
-Examples that take more than a few seconds are wrapped in `\donttest{}`.
+Examples that need an internet connection (queries of the NIST Atomic
+Spectra Database, STARK-B and ExoMol) are wrapped in `\donttest{}`, fail
+gracefully with `try()`, and give up after 20 seconds when a server does not
+answer. Examples that take more than a few seconds are wrapped in
+`\donttest{}`. Downloaded data are kept on disk only when the user sets the
+option `specProc.cache` (in `tools::R_user_dir()` or a directory of their
+choice); by default nothing is written outside the temporary directory.

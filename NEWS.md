@@ -1,4 +1,4 @@
-# specProc (development version)
+# specProc 0.9.0
 
 ## New features
 
@@ -386,6 +386,8 @@
   `step_wavelet()` gains the `wavelength` of the kept coefficients, to trace
   them back to the spectrum. A named vector now keeps its names.
 * specProc now requires ggplot2 3.5.0 or later.
+* scales moves from Suggests to Imports, since the plots use it; it was
+  already installed with ggplot2.
 
 ## Breaking changes
 
@@ -471,6 +473,11 @@
   the server is busy (HTTP 5xx errors, such as 504 Gateway Timeout), and
   report the HTTP status when the download fails, instead of a less telling
   message such as "downloaded length 0 != reported length 160".
+* The `timeout` of the functions that download data (`nist_lines()`,
+  `nist_levels()`, `nist_ionization_energy()`, `libs_lines()`,
+  `starkb_lines()`, `molecular_spectrum()`, `exomol_datasets()`) is the time
+  after which a download is given up, even when the option `timeout` is
+  larger: a server that did not answer was waited for as long as the option.
 * `generalized_boxplot()` now follows Bruffaerts et al. (2014) and the
   authors' implementation: the transformed data are standardized by their
   interquartile range divided by `diff(qnorm(c(0.25, 0.75)))` = 1.349 (was

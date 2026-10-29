@@ -141,9 +141,11 @@ col_medians <- function(x, na.rm = FALSE) {
 # busy server (HTTP 5xx, such as 504 Gateway Timeout) is tried again after
 # 'wait' seconds, up to 'attempts' times. The error gives the HTTP status,
 # which download.file() reports after a less telling warning ("downloaded
-# length 0 != reported length ...").
+# length 0 != reported length ..."). 'timeout' replaces the option `timeout`
+# for the download, so that a server that does not answer is given up on
+# after that time.
 download_data <- function(url, file, database, label, timeout, attempts = 3, wait = 5) {
-  old <- options(timeout = max(timeout, getOption("timeout")))
+  old <- options(timeout = timeout)
   on.exit(options(old), add = TRUE)
   for (i in seq_len(attempts)) {
     problems <- character()
