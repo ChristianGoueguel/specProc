@@ -3,15 +3,15 @@
 Elements are selected on a periodic table, and the strongest lines of
 their selected ionization stages, from the NIST Atomic Spectra Database,
 are overlaid on a spectrum in an interactive plotly graph, with one color
-per ionization stage. Lines of a species picked on the spectrum build a
-Boltzmann plot, whose temperature is fitted again as lines are added or
-left out."><meta property="og:description" content="Launches a Shiny app to identify the emission lines of LIBS spectra.
+per ionization stage. The heads of molecular bands can be overlaid too.
+Lines of a species picked on the spectrum build a Boltzmann plot, whose
+temperature is fitted again as lines are added or left out."><meta property="og:description" content="Launches a Shiny app to identify the emission lines of LIBS spectra.
 Elements are selected on a periodic table, and the strongest lines of
 their selected ionization stages, from the NIST Atomic Spectra Database,
 are overlaid on a spectrum in an interactive plotly graph, with one color
-per ionization stage. Lines of a species picked on the spectrum build a
-Boltzmann plot, whose temperature is fitted again as lines are added or
-left out."><meta property="og:image" content="https://christiangoueguel.com/specProc/logo.png"></head><body>
+per ionization stage. The heads of molecular bands can be overlaid too.
+Lines of a species picked on the spectrum build a Boltzmann plot, whose
+temperature is fitted again as lines are added or left out."><meta property="og:image" content="https://christiangoueguel.com/specProc/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -56,9 +56,9 @@ left out."><meta property="og:image" content="https://christiangoueguel.com/spec
 Elements are selected on a periodic table, and the strongest lines of
 their selected ionization stages, from the NIST Atomic Spectra Database,
 are overlaid on a spectrum in an interactive plotly graph, with one color
-per ionization stage. Lines of a species picked on the spectrum build a
-Boltzmann plot, whose temperature is fitted again as lines are added or
-left out.</p>
+per ionization stage. The heads of molecular bands can be overlaid too.
+Lines of a species picked on the spectrum build a Boltzmann plot, whose
+temperature is fitted again as lines are added or left out.</p>
     </div>
 
     <div class="section level2">
@@ -106,6 +106,9 @@ stay listed in the panel header;</p></li>
 <li><p>the plasma temperature and the number of lines per species, which set
 the lines kept and the height of their markers (relative intensities in
 local thermodynamic equilibrium, see <code><a href="libs_lines.html">libs_lines()</a></code>);</p></li>
+<li><p>molecules whose band heads are marked with dashed lines, at a
+vibrational temperature (see <code><a href="molecular_bands.html">molecular_bands()</a></code>; no download
+needed);</p></li>
 <li><p>the wavelength range, a wavelength shift to correct the calibration of
 the spectrometer, and the spectrum to show: the mean of all spectra, the
 mean of a group (from the first character or factor column of

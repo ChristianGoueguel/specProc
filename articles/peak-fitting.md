@@ -63,6 +63,47 @@ plot_lines(colMeans(spectra), candidates)
 fit <- line_finder(spectra)
 ```
 
+Molecules formed in the plasma emit bands.
+[`molecular_bands()`](https://christiangoueguel.com/specProc/reference/molecular_bands.md)
+lists the heads of the bands of diatomic molecules common in LIBS (CN,
+C2, CH, OH, N2, AlO, CaF, TiO, …), computed from spectroscopic constants
+without a download. The organic matrix of the forage samples, ablated in
+air, emits the violet system of CN, whose bands are degraded to the
+violet: each rises sharply at its head and fades toward shorter
+wavelengths. Its strongest sequence, the bands with v' = v'', has heads
+from 388.3 to 385.0 nm:
+
+``` r
+
+cn <- molecular_bands("CN", wavelength = c(383, 390))
+cn |>
+  select(v_upper, v_lower, wavelength, degraded, fcf, relative_intensity) |>
+  mutate(across(where(is.double), \(x) round(x, 3))) |>
+  as.data.frame()
+#>   v_upper v_lower wavelength degraded   fcf relative_intensity
+#> 1       5       5    384.747   violet 0.533              0.032
+#> 2       4       4    385.001   violet 0.559              0.059
+#> 3       3       3    385.488   violet 0.604              0.113
+#> 4       2       2    386.202   violet 0.674              0.224
+#> 5       1       1    387.143   violet 0.774              0.465
+#> 6       0       0    388.312   violet 0.915              1.000
+plot_lines(colMeans(spectra)[wl > 383 & wl < 390], bands = cn, interactive = FALSE)
+```
+
+![](peak-fitting_files/figure-html/cn-bands-1.png)
+
+The measured heads lie about 0.07 nm short of the markers: the
+wavelength axis needs a correction (next section).
+[`molecular_spectrum()`](https://christiangoueguel.com/specProc/reference/molecular_spectrum.md)
+simulates the full rotational structure of the bands from a line list of
+the ExoMol database, downloaded on demand:
+
+``` r
+
+cn_model <- molecular_spectrum("CN", temperature = 6000, wavelength = c(383, 390),
+                               resolution = 0.1)
+```
+
 ## Correcting the wavelength axis
 
 The measured lines are shifted from their tabulated wavelengths.

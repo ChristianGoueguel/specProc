@@ -1,19 +1,20 @@
 # Overlay Emission Lines on a Spectrum
 
 Plots a spectrum with vertical markers at the wavelengths of candidate
-emission lines, colored by ionization stage, to identify the lines of
-the spectrum.
+emission lines, colored by ionization stage, and at the heads of
+molecular bands, to identify the lines and bands of the spectrum.
 
 ## Usage
 
 ``` r
 plot_lines(
   spectrum,
-  lines,
+  lines = NULL,
   shift = 0,
   scale_markers = TRUE,
   interactive = TRUE,
-  title = NULL
+  title = NULL,
+  bands = NULL
 )
 ```
 
@@ -28,12 +29,13 @@ plot_lines(
 - lines:
 
   A tibble returned by
-  [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md).
+  [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md),
+  or `NULL` to draw only molecular bands.
 
 - shift:
 
-  A wavelength shift, in nm, added to the line wavelengths to correct
-  the wavelength calibration of the spectrometer. Default is 0.
+  A wavelength shift, in nm, added to the line and band wavelengths to
+  correct the wavelength calibration of the spectrometer. Default is 0.
 
 - scale_markers:
 
@@ -47,6 +49,11 @@ plot_lines(
 - title:
 
   An optional plot title.
+
+- bands:
+
+  An optional tibble of molecular band heads returned by
+  [`molecular_bands()`](https://christiangoueguel.com/specProc/reference/molecular_bands.md).
 
 ## Value
 
@@ -66,9 +73,15 @@ intensity (see
 times the maximum of the spectrum; otherwise all markers span the full
 height.
 
+The heads of molecular bands (`bands`, see
+[`molecular_bands()`](https://christiangoueguel.com/specProc/reference/molecular_bands.md))
+are drawn as dashed markers, one color per molecule, scaled by their
+relative intensity within their system.
+
 ## See also
 
 [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md),
+[`molecular_bands()`](https://christiangoueguel.com/specProc/reference/molecular_bands.md),
 [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md)
 
 ## Examples

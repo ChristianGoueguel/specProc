@@ -266,6 +266,12 @@ the wavelength axis on reference lines.
 
 - [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md)
   : Interactive Identification of Emission Lines
+- [`molecular_bands()`](https://christiangoueguel.com/specProc/reference/molecular_bands.md)
+  : Band Heads of Diatomic Molecules
+- [`molecular_spectrum()`](https://christiangoueguel.com/specProc/reference/molecular_spectrum.md)
+  : Simulated Emission Spectra of Diatomic Molecules
+- [`exomol_datasets()`](https://christiangoueguel.com/specProc/reference/exomol_datasets.md)
+  : Line Lists of a Molecule in the ExoMol Database
 - [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md)
   : Candidate Emission Lines for LIBS Spectra
 - [`plot_lines()`](https://christiangoueguel.com/specProc/reference/plot_lines.md)

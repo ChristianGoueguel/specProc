@@ -324,6 +324,27 @@
   fitted temperature, and **Done** closes the app and returns the
   [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
   fit to R.
+- Molecular bands:
+  [`molecular_bands()`](https://christiangoueguel.com/specProc/reference/molecular_bands.md)
+  lists the band heads of the electronic systems of diatomic molecules
+  that emit in laser-induced plasmas (CN, C2, CH, OH, NH, N2, N2+, NO,
+  CO, AlO, CaF, CaCl, SrF, SrCl, MgO, TiO, BO, SiO), with their origins,
+  the direction in which they are degraded, Franck-Condon factors (Morse
+  wavefunctions) and relative intensities at a vibrational temperature.
+  They are computed from the constants of Huber and Herzberg (1979),
+  included in the package, and agree with measured heads to about 0.05
+  nm for the well-studied systems.
+  [`plot_lines()`](https://christiangoueguel.com/specProc/reference/plot_lines.md)
+  gains `bands` to mark them on a spectrum (and `lines` may be `NULL`),
+  and
+  [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md)
+  overlays the bands of the selected molecules.
+  [`molecular_spectrum()`](https://christiangoueguel.com/specProc/reference/molecular_spectrum.md)
+  simulates the emission spectrum of a molecule in LTE from a line list
+  of the ExoMol database (the MoLLIST line lists by default), downloaded
+  on demand and convolved with the instrument profile, and
+  [`exomol_datasets()`](https://christiangoueguel.com/specProc/reference/exomol_datasets.md)
+  lists the line lists of a molecule.
 - [`tidy()`](https://generics.r-lib.org/reference/tidy.html) and
   [`glance()`](https://generics.r-lib.org/reference/glance.html) methods
   for peak fits,

@@ -4,9 +4,9 @@ Launches a Shiny app to identify the emission lines of LIBS spectra.
 Elements are selected on a periodic table, and the strongest lines of
 their selected ionization stages, from the NIST Atomic Spectra Database,
 are overlaid on a spectrum in an interactive plotly graph, with one
-color per ionization stage. Lines of a species picked on the spectrum
-build a Boltzmann plot, whose temperature is fitted again as lines are
-added or left out.
+color per ionization stage. The heads of molecular bands can be overlaid
+too. Lines of a species picked on the spectrum build a Boltzmann plot,
+whose temperature is fitted again as lines are added or left out.
 
 ## Usage
 
@@ -63,6 +63,11 @@ The app offers:
   the lines kept and the height of their markers (relative intensities
   in local thermodynamic equilibrium, see
   [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md));
+
+- molecules whose band heads are marked with dashed lines, at a
+  vibrational temperature (see
+  [`molecular_bands()`](https://christiangoueguel.com/specProc/reference/molecular_bands.md);
+  no download needed);
 
 - the wavelength range, a wavelength shift to correct the calibration of
   the spectrometer, and the spectrum to show: the mean of all spectra,
