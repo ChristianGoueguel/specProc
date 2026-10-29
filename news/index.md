@@ -1,6 +1,6 @@
 # Changelog
 
-## specProc (development version)
+## specProc 0.9.0
 
 ### New features
 
@@ -589,6 +589,8 @@
   gains the `wavelength` of the kept coefficients, to trace them back to
   the spectrum. A named vector now keeps its names.
 - specProc now requires ggplot2 3.5.0 or later.
+- scales moves from Suggests to Imports, since the plots use it; it was
+  already installed with ggplot2.
 
 ### Breaking changes
 
@@ -739,6 +741,17 @@
   5xx errors, such as 504 Gateway Timeout), and report the HTTP status
   when the download fails, instead of a less telling message such as
   “downloaded length 0 != reported length 160”.
+- The `timeout` of the functions that download data
+  ([`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md),
+  [`nist_levels()`](https://christiangoueguel.com/specProc/reference/nist_levels.md),
+  [`nist_ionization_energy()`](https://christiangoueguel.com/specProc/reference/nist_ionization_energy.md),
+  [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md),
+  [`starkb_lines()`](https://christiangoueguel.com/specProc/reference/starkb_lines.md),
+  [`molecular_spectrum()`](https://christiangoueguel.com/specProc/reference/molecular_spectrum.md),
+  [`exomol_datasets()`](https://christiangoueguel.com/specProc/reference/exomol_datasets.md))
+  is the time after which a download is given up, even when the option
+  `timeout` is larger: a server that did not answer was waited for as
+  long as the option.
 - [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
   now follows Bruffaerts et al. (2014) and the authors’ implementation:
   the transformed data are standardized by their interquartile range

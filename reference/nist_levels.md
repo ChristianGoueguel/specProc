@@ -82,8 +82,8 @@ Christian L. Goueguel
 
 ``` r
 # \donttest{
-# needs an internet connection
-ca <- try(nist_levels("Ca I"))
+# needs an internet connection; gives up after 20 s if NIST does not answer
+ca <- try(nist_levels("Ca I", timeout = 20))
 if (!inherits(ca, "try-error")) partition_function(ca, temperature = c(8000, 10000))
 #> # A tibble: 2 × 3
 #>   species temperature partition

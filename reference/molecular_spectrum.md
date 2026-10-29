@@ -141,8 +141,10 @@ Christian L. Goueguel
 
 ``` r
 # \donttest{
-# needs an internet connection (about 1 MB)
-cn <- try(molecular_spectrum("CN", temperature = 6000, wavelength = c(383, 389)))
+# needs an internet connection (about 1 MB); gives up after 20 s if ExoMol
+# does not answer
+cn <- try(molecular_spectrum("CN", temperature = 6000, wavelength = c(383, 389),
+                              timeout = 20))
 #> Downloading 12C-14N__MoLLIST-CN.states.bz2 from ExoMol.
 #> Downloading 12C-14N__MoLLIST-CN.trans.bz2 from ExoMol (this may take a while for a large line list).
 if (!inherits(cn, "try-error")) {

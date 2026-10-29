@@ -35,8 +35,8 @@ A named numeric vector of ionization energies, in eV.
 
 ``` r
 # \donttest{
-# needs an internet connection
-try(nist_ionization_energy(c("Ca I", "Mg I")))
+# needs an internet connection; gives up after 20 s if NIST does not answer
+try(nist_ionization_energy(c("Ca I", "Mg I"), timeout = 20))
 #>     Ca I     Mg I 
 #> 6.113155 7.646236 
 # }

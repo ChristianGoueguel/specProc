@@ -78,8 +78,8 @@ Christian L. Goueguel
 
 ``` r
 # \donttest{
-# needs an internet connection
-ca <- try(nist_lines(c("Ca I", "Ca II"), wavelength = c(390, 400)))
+# needs an internet connection; gives up after 20 s if NIST does not answer
+ca <- try(nist_lines(c("Ca I", "Ca II"), wavelength = c(390, 400), timeout = 20))
 if (!inherits(ca, "try-error")) ca
 #> # A tibble: 5 × 12
 #>   species wavelength     Aki    fik accuracy    Ei    Ek    gi    gk lower upper
