@@ -222,6 +222,17 @@
   (already a dependency of dplyr) moves from Suggests to Imports. The `fit`
   column of `peak_fit()` and `multipeak_fit()` holds `nls` fits of the new
   class `specproc_peak_fit`.
+* `tidy()` and `glance()` methods for the chemometric models (see
+  `?"specproc-tidy-models"`): robust PCA (`robpca()`, `rospca()`,
+  `macropca()`, `cellpca()`; eigenvalues, loadings or scores, as for
+  `prcomp` in broom), `rsimpls()` and `rpcr()` (coefficients, components,
+  loadings or scores), `lts_fit()`, `rsimca()`, `robust_da()`, `opls()`,
+  `som()`, `select_wavelengths()`, `nas()` and `applicability_domain()`,
+  with the outlier counts and the figures of merit of each model in
+  `glance()`. Through parsnip, they also summarize the fits and workflows
+  of the `"rsimpls"`, `"lts"`, `"rsimca"` and `"mcd"` engines. `lts_fit()`
+  now keeps the standard errors (`std_error`), residual degrees of freedom
+  and robust R² of the reweighted fit.
 
 ## Improvements
 

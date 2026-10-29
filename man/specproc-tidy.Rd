@@ -163,8 +163,8 @@ tidy(cal)
 glance(cal)
 }
 \seealso{
-\code{\link[=peak_fit]{peak_fit()}}, \code{\link[=calibration_curve]{calibration_curve()}}, \code{\link[=boltzmann]{boltzmann()}}, \code{\link[=cf_libs]{cf_libs()}},
-\code{\link[=plasma_uncertainty]{plasma_uncertainty()}}
+\link{specproc-tidy-models} for the chemometric models, \code{\link[=peak_fit]{peak_fit()}},
+\code{\link[=calibration_curve]{calibration_curve()}}, \code{\link[=boltzmann]{boltzmann()}}, \code{\link[=cf_libs]{cf_libs()}}, \code{\link[=plasma_uncertainty]{plasma_uncertainty()}}
 }
 \author{
 Christian L. Goueguel

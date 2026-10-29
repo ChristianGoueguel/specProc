@@ -78,8 +78,8 @@
 #'
 #' @return A tibble.
 #'
-#' @seealso [peak_fit()], [calibration_curve()], [boltzmann()], [cf_libs()],
-#'   [plasma_uncertainty()]
+#' @seealso [specproc-tidy-models] for the chemometric models, [peak_fit()],
+#'   [calibration_curve()], [boltzmann()], [cf_libs()], [plasma_uncertainty()]
 #' @name specproc-tidy
 #'
 #' @examples

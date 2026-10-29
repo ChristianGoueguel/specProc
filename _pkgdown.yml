@@ -359,6 +359,7 @@ reference:
 - title: Miscellaneous
   contents:
   - specproc-tidy
+  - specproc-tidy-models
   - correlation
   - summary_stats
 

@@ -85,7 +85,7 @@ website](https://christiangoueguel.com/specProc/articles/).
 | Plasma diagnostics | `saturation_summary()`, `electron_density()`, `boltzmann()`, `saha_boltzmann()`, `plot_boltzmann()`, `plasma_uncertainty()`, `electron_density_uncertainty()`, `mcwhirter_criterion()`, `lte_criteria()`, `self_absorption()`, `correct_self_absorption()`, `curve_of_growth()`, `cf_libs()`, `nist_lines()`, `starkb_lines()` |
 | Outliers and robust PCA | `robpca()`, `rospca()`, `macropca()`, `cellpca()`, `plot_outlier_map()`, `plot_cell_map()`, `q_residuals()`, `dmodx()`, `plot_influence()`, `hotelling_t2()` |
 | Robust statistics | `summary_stats()`, `biweight_location()`, `biweight_scale()`, `rousseeuw_croux()`, `umad()`, `adjusted_boxplot()`, `robust_bcyj()` |
-| Tidy results | `tidy()` and `glance()` of peak fits, calibrations and plasma diagnostics |
+| Tidy results | `tidy()` and `glance()` of peak fits, calibrations, plasma diagnostics and chemometric models |
 | Visualization | `plot_spectra()`, `plot_embedding()`, `plot_loadings()`, `plot_contributions()` |
 
 See the [reference](https://christiangoueguel.com/specProc/reference/)

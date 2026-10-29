@@ -19,11 +19,14 @@ minimized, between 0.5 and 1. Default is 0.75.}
 }
 \value{
 \code{lts_fit()} returns an object of class \code{specproc_lts}, a list with
-the \code{coefficients} (intercept first), the robust \code{scale} of the
-residuals, the \code{fitted} values, \code{residuals}, standardized residuals
-\code{std_resid} and the \code{weights} of the reweighted fit (1 for the
-observations whose standardized residual is within the cut-off). Its
-\code{\link[=predict]{predict()}} method takes \code{newdata}.
+the \code{coefficients} (intercept first), their standard errors
+\code{std_error} and the residual degrees of freedom \code{df_residual} of the
+reweighted least-squares fit, the robust \code{r_squared}, the robust
+\code{scale} of the residuals, the \code{fitted} values, \code{residuals},
+standardized residuals \code{std_resid} and the \code{weights} of the reweighted
+fit (1 for the observations whose standardized residual is within the
+cut-off). Its \code{\link[=predict]{predict()}} method takes \code{newdata}, and \code{\link[=tidy]{tidy()}} and
+\code{\link[=glance]{glance()}} summarize it (see \link{specproc-tidy-models}).
 }
 \description{
 specProc adds the \code{"lts"} engine to \code{\link[parsnip:linear_reg]{parsnip::linear_reg()}}: the

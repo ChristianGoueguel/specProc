@@ -35,11 +35,14 @@
 #' @param nsamp The number of random subsets. Default is 500.
 #'
 #' @return `lts_fit()` returns an object of class `specproc_lts`, a list with
-#'   the `coefficients` (intercept first), the robust `scale` of the
-#'   residuals, the `fitted` values, `residuals`, standardized residuals
-#'   `std_resid` and the `weights` of the reweighted fit (1 for the
-#'   observations whose standardized residual is within the cut-off). Its
-#'   [predict()] method takes `newdata`.
+#'   the `coefficients` (intercept first), their standard errors
+#'   `std_error` and the residual degrees of freedom `df_residual` of the
+#'   reweighted least-squares fit, the robust `r_squared`, the robust
+#'   `scale` of the residuals, the `fitted` values, `residuals`,
+#'   standardized residuals `std_resid` and the `weights` of the reweighted
+#'   fit (1 for the observations whose standardized residual is within the
+#'   cut-off). Its [predict()] method takes `newdata`, and [tidy()] and
+#'   [glance()] summarize it (see [specproc-tidy-models]).
 #'
 #' @references
 #'  - Rousseeuw, P.J., Van Driessen, K. (2006). Computing LTS regression for
@@ -80,9 +83,12 @@ lts_fit <- function(x, y, alpha = 0.75, nsamp = 500) {
   fit <- robustbase::ltsReg(x, drop(y), alpha = alpha, nsamp = nsamp)
   coef <- stats::setNames(unname(fit$coefficients), c("(Intercept)", colnames(x)))
   fitted <- drop(x %*% coef[-1]) + coef[1]
-  res <- list(coefficients = coef, scale = fit$scale, fitted = fitted,
-              residuals = drop(y) - fitted, std_resid = (drop(y) - fitted) / fit$scale,
-              weights = fit$lts.wt, alpha = alpha)
+  # standard errors of the reweighted least-squares fit
+  s <- summary(fit)
+  res <- list(coefficients = coef, std_error = stats::setNames(unname(s$coefficients[, 2]), names(coef)),
+              df_residual = unname(s$df[2]), r_squared = fit$rsquared, scale = fit$scale,
+              fitted = fitted, residuals = drop(y) - fitted,
+              std_resid = (drop(y) - fitted) / fit$scale, weights = fit$lts.wt, alpha = alpha)
   structure(res, variables = colnames(x), nvar = ncol(x), class = "specproc_lts")
 }
 
