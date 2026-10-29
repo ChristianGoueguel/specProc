@@ -346,6 +346,35 @@
   and
   [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md)
   holds `nls` fits of the new class `specproc_peak_fit`.
+- [`tidy()`](https://generics.r-lib.org/reference/tidy.html) and
+  [`glance()`](https://generics.r-lib.org/reference/glance.html) methods
+  for the chemometric models (see
+  [`?"specproc-tidy-models"`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)):
+  robust PCA
+  ([`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
+  [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md),
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
+  [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md);
+  eigenvalues, loadings or scores, as for `prcomp` in broom),
+  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
+  and
+  [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md)
+  (coefficients, components, loadings or scores),
+  [`lts_fit()`](https://christiangoueguel.com/specProc/reference/linear_reg_lts.md),
+  [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md),
+  [`robust_da()`](https://christiangoueguel.com/specProc/reference/robust_da.md),
+  [`opls()`](https://christiangoueguel.com/specProc/reference/opls.md),
+  [`som()`](https://christiangoueguel.com/specProc/reference/som.md),
+  [`select_wavelengths()`](https://christiangoueguel.com/specProc/reference/select_wavelengths.md),
+  [`nas()`](https://christiangoueguel.com/specProc/reference/nas.md) and
+  [`applicability_domain()`](https://christiangoueguel.com/specProc/reference/applicability_domain.md),
+  with the outlier counts and the figures of merit of each model in
+  [`glance()`](https://generics.r-lib.org/reference/glance.html).
+  Through parsnip, they also summarize the fits and workflows of the
+  `"rsimpls"`, `"lts"`, `"rsimca"` and `"mcd"` engines.
+  [`lts_fit()`](https://christiangoueguel.com/specProc/reference/linear_reg_lts.md)
+  now keeps the standard errors (`std_error`), residual degrees of
+  freedom and robust R² of the reweighted fit.
 
 ### Improvements
 

@@ -563,6 +563,29 @@ Functions used for charcaterizing plasma emission in laser spectroscopy.
   [`glance(`*`<specproc_curve_of_growth>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
   : Tidy and Glance Methods for Fits, Calibrations and Plasma
   Diagnostics
+- [`tidy(`*`<specproc_robpca>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_robpca>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_rsimpls>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_rsimpls>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_rpcr>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_rpcr>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_lts>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_lts>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_rsimca>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_rsimca>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_robust_da>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_robust_da>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_opls>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_opls>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_som>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_som>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_wavelength_selection>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_wavelength_selection>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_nas>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_nas>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_domain>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_domain>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  : Tidy and Glance Methods for Chemometric Models
 - [`correlation()`](https://christiangoueguel.com/specProc/reference/correlation.md)
   : Correlation Coefficients: Pearson, Spearman, Kendall, Chatterjee,
   and Biweight Midcorrelation

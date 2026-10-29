@@ -187,6 +187,8 @@ the bounds `conf.low` and `conf.high` of the confidence interval at
 
 ## See also
 
+[specproc-tidy-models](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+for the chemometric models,
 [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md),
 [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md),
 [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md),

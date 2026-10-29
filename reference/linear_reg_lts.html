@@ -81,11 +81,14 @@ minimized, between 0.5 and 1. Default is 0.75.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p><code>lts_fit()</code> returns an object of class <code>specproc_lts</code>, a list with
-the <code>coefficients</code> (intercept first), the robust <code>scale</code> of the
-residuals, the <code>fitted</code> values, <code>residuals</code>, standardized residuals
-<code>std_resid</code> and the <code>weights</code> of the reweighted fit (1 for the
-observations whose standardized residual is within the cut-off). Its
-<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method takes <code>newdata</code>.</p>
+the <code>coefficients</code> (intercept first), their standard errors
+<code>std_error</code> and the residual degrees of freedom <code>df_residual</code> of the
+reweighted least-squares fit, the robust <code>r_squared</code>, the robust
+<code>scale</code> of the residuals, the <code>fitted</code> values, <code>residuals</code>,
+standardized residuals <code>std_resid</code> and the <code>weights</code> of the reweighted
+fit (1 for the observations whose standardized residual is within the
+cut-off). Its <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> method takes <code>newdata</code>, and <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code> and
+<code><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance()</a></code> summarize it (see <a href="specproc-tidy-models.html">specproc-tidy-models</a>).</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>

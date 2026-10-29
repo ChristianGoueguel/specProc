@@ -70,7 +70,7 @@ website](https://christiangoueguel.com/specProc/articles/).
 | Plasma diagnostics | [`saturation_summary()`](https://christiangoueguel.com/specProc/reference/saturation_summary.md), [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md), [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md), [`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md), [`plot_boltzmann()`](https://christiangoueguel.com/specProc/reference/plot_boltzmann.md), [`plasma_uncertainty()`](https://christiangoueguel.com/specProc/reference/plasma_uncertainty.md), [`electron_density_uncertainty()`](https://christiangoueguel.com/specProc/reference/electron_density_uncertainty.md), [`mcwhirter_criterion()`](https://christiangoueguel.com/specProc/reference/mcwhirter_criterion.md), [`lte_criteria()`](https://christiangoueguel.com/specProc/reference/lte_criteria.md), [`self_absorption()`](https://christiangoueguel.com/specProc/reference/self_absorption.md), [`correct_self_absorption()`](https://christiangoueguel.com/specProc/reference/correct_self_absorption.md), [`curve_of_growth()`](https://christiangoueguel.com/specProc/reference/curve_of_growth.md), [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md), [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md), [`starkb_lines()`](https://christiangoueguel.com/specProc/reference/starkb_lines.md) |
 | Outliers and robust PCA | [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md), [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md), [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md), [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md), [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md), [`plot_cell_map()`](https://christiangoueguel.com/specProc/reference/plot_cell_map.md), [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md), [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md), [`plot_influence()`](https://christiangoueguel.com/specProc/reference/plot_influence.md), [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md) |
 | Robust statistics | [`summary_stats()`](https://christiangoueguel.com/specProc/reference/summary_stats.md), [`biweight_location()`](https://christiangoueguel.com/specProc/reference/biweight_location.md), [`biweight_scale()`](https://christiangoueguel.com/specProc/reference/biweight_scale.md), [`rousseeuw_croux()`](https://christiangoueguel.com/specProc/reference/rousseeuw_croux.md), [`umad()`](https://christiangoueguel.com/specProc/reference/umad.md), [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md), [`robust_bcyj()`](https://christiangoueguel.com/specProc/reference/robust_bcyj.md) |
-| Tidy results | [`tidy()`](https://generics.r-lib.org/reference/tidy.html) and [`glance()`](https://generics.r-lib.org/reference/glance.html) of peak fits, calibrations and plasma diagnostics |
+| Tidy results | [`tidy()`](https://generics.r-lib.org/reference/tidy.html) and [`glance()`](https://generics.r-lib.org/reference/glance.html) of peak fits, calibrations, plasma diagnostics and chemometric models |
 | Visualization | [`plot_spectra()`](https://christiangoueguel.com/specProc/reference/plot_spectra.md), [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md), [`plot_loadings()`](https://christiangoueguel.com/specProc/reference/plot_loadings.md), [`plot_contributions()`](https://christiangoueguel.com/specProc/reference/plot_contributions.md) |
 
 See the [reference](https://christiangoueguel.com/specProc/reference/)
@@ -819,6 +819,29 @@ Functions used for charcaterizing plasma emission in laser spectroscopy.
   [`glance(`*`<specproc_curve_of_growth>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
   : Tidy and Glance Methods for Fits, Calibrations and Plasma
   Diagnostics
+- [`tidy(`*`<specproc_robpca>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_robpca>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_rsimpls>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_rsimpls>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_rpcr>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_rpcr>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_lts>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_lts>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_rsimca>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_rsimca>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_robust_da>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_robust_da>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_opls>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_opls>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_som>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_som>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_wavelength_selection>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_wavelength_selection>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_nas>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_nas>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`tidy(`*`<specproc_domain>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  [`glance(`*`<specproc_domain>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)
+  : Tidy and Glance Methods for Chemometric Models
 - [`correlation()`](https://christiangoueguel.com/specProc/reference/correlation.md)
   : Correlation Coefficients: Pearson, Spearman, Kendall, Chatterjee,
   and Biweight Midcorrelation

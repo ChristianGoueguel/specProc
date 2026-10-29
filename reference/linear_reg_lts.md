@@ -35,12 +35,18 @@ lts_fit(x, y, alpha = 0.75, nsamp = 500)
 ## Value
 
 `lts_fit()` returns an object of class `specproc_lts`, a list with the
-`coefficients` (intercept first), the robust `scale` of the residuals,
-the `fitted` values, `residuals`, standardized residuals `std_resid` and
-the `weights` of the reweighted fit (1 for the observations whose
-standardized residual is within the cut-off). Its
+`coefficients` (intercept first), their standard errors `std_error` and
+the residual degrees of freedom `df_residual` of the reweighted
+least-squares fit, the robust `r_squared`, the robust `scale` of the
+residuals, the `fitted` values, `residuals`, standardized residuals
+`std_resid` and the `weights` of the reweighted fit (1 for the
+observations whose standardized residual is within the cut-off). Its
 [`predict()`](https://rdrr.io/r/stats/predict.html) method takes
-`newdata`.
+`newdata`, and
+[`tidy()`](https://generics.r-lib.org/reference/tidy.html) and
+[`glance()`](https://generics.r-lib.org/reference/glance.html) summarize
+it (see
+[specproc-tidy-models](https://christiangoueguel.com/specProc/reference/specproc-tidy-models.md)).
 
 ## Details
 
