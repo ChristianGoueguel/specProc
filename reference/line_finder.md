@@ -4,7 +4,9 @@ Launches a Shiny app to identify the emission lines of LIBS spectra.
 Elements are selected on a periodic table, and the strongest lines of
 their selected ionization stages, from the NIST Atomic Spectra Database,
 are overlaid on a spectrum in an interactive plotly graph, with one
-color per ionization stage.
+color per ionization stage. Lines of a species picked on the spectrum
+build a Boltzmann plot, whose temperature is fitted again as lines are
+added or left out.
 
 ## Usage
 
@@ -35,10 +37,15 @@ line_finder(spectra, launch.browser = interactive(), show_table = TRUE)
 
 ## Value
 
-Called for its side effect: runs the app. Use
-[`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md)
+Invisibly, when the app is closed with **Done**, the
+[`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
+fit of the Boltzmann plot, whose `lines` element holds the measured
+lines; `NULL` if the plot has fewer than 3 usable lines. Use
+[`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md),
+[`plot_lines()`](https://christiangoueguel.com/specProc/reference/plot_lines.md),
+[`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md)
 and
-[`plot_lines()`](https://christiangoueguel.com/specProc/reference/plot_lines.md)
+[`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
 for the same results in scripts.
 
 ## Details
@@ -71,6 +78,26 @@ Each species is downloaded from NIST once per R session (see
 later changes of the settings are computed locally. The zoom of the plot
 is kept when the lines change.
 
+**Boltzmann plot.** Clicking the dot at the top of a line marker adds
+the line to the Boltzmann plot of its species, and clicking it again
+removes it; **Add shown lines** adds all the lines shown for the species
+chosen in the Boltzmann plot panel. The intensities are measured on the
+displayed spectrum with
+[`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md),
+around the tabulated wavelengths plus the wavelength shift, with the
+settings of the panel, and the temperature is fitted with
+[`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md).
+Clicking a point of the plot leaves its line out of the fit or puts it
+back; lines without a positive intensity are left out. The table under
+the plot lists the upper-level energy, the signal-to-noise ratio and the
+residual of each line, **Use T** sets the temperature of the candidate
+lines to the fitted one, and **Done** closes the app and returns the fit
+to R. The spectra should be corrected for the spectral response of the
+instrument first (see
+[`correct_response()`](https://christiangoueguel.com/specProc/reference/correct_response.md)),
+and the lines should be optically thin (see
+[`self_absorption()`](https://christiangoueguel.com/specProc/reference/self_absorption.md)).
+
 The app needs the shiny, plotly and bslib packages, and an internet
 connection for the species not yet fetched.
 
@@ -78,7 +105,8 @@ connection for the species not yet fetched.
 
 [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md),
 [`plot_lines()`](https://christiangoueguel.com/specProc/reference/plot_lines.md),
-[`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md)
+[`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md),
+[`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
 
 ## Author
 
@@ -89,6 +117,8 @@ Christian L. Goueguel
 ``` r
 if (interactive() && rlang::is_installed(c("shiny", "plotly", "bslib"))) {
   data(forageLIBS)
-  line_finder(forageLIBS[-(1:14)])
+  fit <- line_finder(forageLIBS[-(1:14)])
+  # after a Boltzmann plot closed with Done
+  if (!is.null(fit)) plot_boltzmann(fit)
 }
 ```

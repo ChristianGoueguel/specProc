@@ -310,6 +310,42 @@
   instrument: Shewhart chart with the Western Electric rules, EWMA and
   CUSUM, with the center and standard deviation (mean moving range) from
   a baseline.
+- [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md)
+  builds a Boltzmann plot interactively: clicking the dot of a line
+  marker adds the line to the plot of its species (or removes it), **Add
+  shown lines** adds the lines shown, and clicking a point of the plot
+  leaves it out of the fit. The intensities are measured on the
+  displayed spectrum with
+  [`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md)
+  and the temperature is fitted with
+  [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md);
+  a table lists the upper-level energy, signal-to-noise ratio and
+  residual of each line. **Use T** ranks the candidate lines at the
+  fitted temperature, and **Done** closes the app and returns the
+  [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
+  fit to R.
+- [`tidy()`](https://generics.r-lib.org/reference/tidy.html) and
+  [`glance()`](https://generics.r-lib.org/reference/glance.html) methods
+  for peak fits,
+  [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md),
+  [`wavelength_calibration()`](https://christiangoueguel.com/specProc/reference/wavelength_calibration.md),
+  [`slope_bias()`](https://christiangoueguel.com/specProc/reference/slope_bias.md),
+  [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md),
+  [`saha_boltzmann()`](https://christiangoueguel.com/specProc/reference/saha_boltzmann.md),
+  [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md),
+  [`plasma_uncertainty()`](https://christiangoueguel.com/specProc/reference/plasma_uncertainty.md)
+  and
+  [`curve_of_growth()`](https://christiangoueguel.com/specProc/reference/curve_of_growth.md):
+  the estimates with their standard errors and confidence intervals, and
+  a one-row summary of the fit, in the conventions of broom (see
+  [`?"specproc-tidy"`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)),
+  to bind the results of several spectra or samples. The generics are
+  re-exported, and generics (already a dependency of dplyr) moves from
+  Suggests to Imports. The `fit` column of
+  [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md)
+  and
+  [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md)
+  holds `nls` fits of the new class `specproc_peak_fit`.
 
 ### Improvements
 

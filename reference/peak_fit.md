@@ -81,7 +81,10 @@ A tibble with one row per spectrum and the columns:
 
 - `data`: the fitted data (`x`, `y`),
 
-- `fit`: the `nls` model object,
+- `fit`: the `nls` model object, of class `specproc_peak_fit` (see
+  [tidy()](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  and
+  [glance()](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)),
 
 - `tidied`: the estimated parameters with their standard errors,
 

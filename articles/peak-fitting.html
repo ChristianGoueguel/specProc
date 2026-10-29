@@ -116,12 +116,16 @@ shots, and the column names are the wavelengths (nm):</p>
 <p><code><a href="../reference/libs_lines.html">libs_lines()</a></code> lists the strongest lines of given species
 in a wavelength range, from the NIST Atomic Spectra Database, and
 <code><a href="../reference/plot_lines.html">plot_lines()</a></code> marks them on a spectrum.
-<code><a href="../reference/line_finder.html">line_finder()</a></code> opens an interactive app that does both.
-These functions need an internet connection:</p>
+<code><a href="../reference/line_finder.html">line_finder()</a></code> opens an interactive app that does both. In
+the app, the lines of a species picked on the spectrum also build a
+Boltzmann plot, from which outlying lines can be left out, and
+<strong>Done</strong> returns its fit to R (see
+<code><a href="../articles/plasma-diagnostics.html">vignette("plasma-diagnostics")</a></code>). These functions need an
+internet connection:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">candidates</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/libs_lines.html">libs_lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"K I"</span>, <span class="st">"Ca I"</span>, <span class="st">"Fe I"</span>, <span class="st">"Mn I"</span><span class="op">)</span>, wavelength <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">400</span>, <span class="fl">410</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot_lines.html">plot_lines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colMeans</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">)</span>, <span class="va">candidates</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/line_finder.html">line_finder</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/line_finder.html">line_finder</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="correcting-the-wavelength-axis">Correcting the wavelength axis<a class="anchor" aria-label="anchor" href="#correcting-the-wavelength-axis"></a>

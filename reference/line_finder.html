@@ -3,11 +3,15 @@
 Elements are selected on a periodic table, and the strongest lines of
 their selected ionization stages, from the NIST Atomic Spectra Database,
 are overlaid on a spectrum in an interactive plotly graph, with one color
-per ionization stage."><meta property="og:description" content="Launches a Shiny app to identify the emission lines of LIBS spectra.
+per ionization stage. Lines of a species picked on the spectrum build a
+Boltzmann plot, whose temperature is fitted again as lines are added or
+left out."><meta property="og:description" content="Launches a Shiny app to identify the emission lines of LIBS spectra.
 Elements are selected on a periodic table, and the strongest lines of
 their selected ionization stages, from the NIST Atomic Spectra Database,
 are overlaid on a spectrum in an interactive plotly graph, with one color
-per ionization stage."><meta property="og:image" content="https://christiangoueguel.com/specProc/logo.png"></head><body>
+per ionization stage. Lines of a species picked on the spectrum build a
+Boltzmann plot, whose temperature is fitted again as lines are added or
+left out."><meta property="og:image" content="https://christiangoueguel.com/specProc/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -52,7 +56,9 @@ per ionization stage."><meta property="og:image" content="https://christiangoueg
 Elements are selected on a periodic table, and the strongest lines of
 their selected ionization stages, from the NIST Atomic Spectra Database,
 are overlaid on a spectrum in an interactive plotly graph, with one color
-per ionization stage.</p>
+per ionization stage. Lines of a species picked on the spectrum build a
+Boltzmann plot, whose temperature is fitted again as lines are added or
+left out.</p>
     </div>
 
     <div class="section level2">
@@ -84,8 +90,11 @@ the window.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Called for its side effect: runs the app. Use <code><a href="libs_lines.html">libs_lines()</a></code> and
-<code><a href="plot_lines.html">plot_lines()</a></code> for the same results in scripts.</p>
+    <p>Invisibly, when the app is closed with <strong>Done</strong>, the <code><a href="boltzmann.html">boltzmann()</a></code>
+fit of the Boltzmann plot, whose <code>lines</code> element holds the measured
+lines; <code>NULL</code> if the plot has fewer than 3 usable lines. Use
+<code><a href="libs_lines.html">libs_lines()</a></code>, <code><a href="plot_lines.html">plot_lines()</a></code>, <code><a href="line_intensities.html">line_intensities()</a></code> and <code><a href="boltzmann.html">boltzmann()</a></code>
+for the same results in scripts.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -106,12 +115,26 @@ the lines fetched so far, so that a session can continue offline.</p></li>
 </ul><p>Each species is downloaded from NIST once per R session (see
 <code><a href="nist_lines.html">nist_lines()</a></code>); later changes of the settings are computed locally. The
 zoom of the plot is kept when the lines change.</p>
+<p><strong>Boltzmann plot.</strong> Clicking the dot at the top of a line marker adds the
+line to the Boltzmann plot of its species, and clicking it again removes
+it; <strong>Add shown lines</strong> adds all the lines shown for the species chosen in
+the Boltzmann plot panel. The intensities are measured on the displayed
+spectrum with <code><a href="line_intensities.html">line_intensities()</a></code>, around the tabulated wavelengths plus
+the wavelength shift, with the settings of the panel, and the temperature
+is fitted with <code><a href="boltzmann.html">boltzmann()</a></code>. Clicking a point of the plot leaves its line
+out of the fit or puts it back; lines without a positive intensity are
+left out. The table under the plot lists the upper-level energy, the
+signal-to-noise ratio and the residual of each line, <strong>Use T</strong> sets the
+temperature of the candidate lines to the fitted one, and <strong>Done</strong> closes
+the app and returns the fit to R. The spectra should be corrected for the
+spectral response of the instrument first (see <code><a href="correct_response.html">correct_response()</a></code>), and
+the lines should be optically thin (see <code><a href="self_absorption.html">self_absorption()</a></code>).</p>
 <p>The app needs the shiny, plotly and bslib packages, and an internet
 connection for the species not yet fetched.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="libs_lines.html">libs_lines()</a></code>, <code><a href="plot_lines.html">plot_lines()</a></code>, <code><a href="nist_lines.html">nist_lines()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="libs_lines.html">libs_lines()</a></code>, <code><a href="plot_lines.html">plot_lines()</a></code>, <code><a href="nist_lines.html">nist_lines()</a></code>, <code><a href="boltzmann.html">boltzmann()</a></code></p></div>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
@@ -122,7 +145,9 @@ connection for the species not yet fetched.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/is_installed.html" class="external-link">is_installed</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shiny"</span>, <span class="st">"plotly"</span>, <span class="st">"bslib"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu">line_finder</span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">line_finder</span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># after a Boltzmann plot closed with Done</span></span></span>
+<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="plot_boltzmann.html">plot_boltzmann</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>

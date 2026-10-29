@@ -545,6 +545,24 @@ Functions used for charcaterizing plasma emission in laser spectroscopy.
 
 ## Miscellaneous
 
+- [`tidy(`*`<specproc_peak_fit>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`glance(`*`<specproc_peak_fit>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`tidy(`*`<specproc_calibration>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`glance(`*`<specproc_calibration>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`tidy(`*`<specproc_wavelength_calibration>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`glance(`*`<specproc_wavelength_calibration>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`tidy(`*`<specproc_slope_bias>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`glance(`*`<specproc_slope_bias>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`tidy(`*`<specproc_boltzmann>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`glance(`*`<specproc_boltzmann>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`tidy(`*`<specproc_cflibs>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`glance(`*`<specproc_cflibs>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`tidy(`*`<specproc_uncertainty>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`glance(`*`<specproc_uncertainty>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`tidy(`*`<specproc_curve_of_growth>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  [`glance(`*`<specproc_curve_of_growth>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
+  : Tidy and Glance Methods for Fits, Calibrations and Plasma
+  Diagnostics
 - [`correlation()`](https://christiangoueguel.com/specProc/reference/correlation.md)
   : Correlation Coefficients: Pearson, Spearman, Kendall, Chatterjee,
   and Biweight Midcorrelation

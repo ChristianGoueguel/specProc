@@ -246,6 +246,34 @@ The Saha-Boltzmann temperature, 8300 K, is far better determined than
 the Boltzmann temperature of the neutral lines alone (4500 ± 500 K). Its
 standard error, 190 K, reflects the scatter of the points.
 
+[`tidy()`](https://generics.r-lib.org/reference/tidy.html) lists the
+estimates of a fit, here with their 95% confidence intervals (that of
+the temperature is the interval of the slope, transformed), and
+[`glance()`](https://generics.r-lib.org/reference/glance.html)
+summarizes the fit in one row, to compare plots or bind the results of
+several spectra:
+
+``` r
+
+tidy(saha, conf.int = TRUE)
+#> # A tibble: 2 × 5
+#>   term        estimate std.error conf.low conf.high
+#>   <chr>          <dbl>     <dbl>    <dbl>     <dbl>
+#> 1 temperature 8263.      188.    7877.     8688.   
+#> 2 intercept      0.165     0.241   -0.350     0.681
+glance(saha)
+#> # A tibble: 1 × 9
+#>   r.squared sigma  nobs df.residual energy.range electron.density iterations
+#>       <dbl> <dbl> <int>       <int>        <dbl>            <dbl>      <int>
+#> 1     0.993 0.469    16          14         9.25          1.89e17         10
+#> # ℹ 2 more variables: method <chr>, units <chr>
+```
+
+The lines of a Boltzmann plot can also be chosen interactively:
+[`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md)
+measures the lines picked on a spectrum, fits their Boltzmann plot as
+they are added, and leaves out the points clicked on the plot.
+
 ### Uncertainty of the temperature
 
 The points scatter because of the errors of the intensities and of the

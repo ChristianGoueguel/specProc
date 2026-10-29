@@ -50,14 +50,17 @@ the NIST Atomic Spectra Database, and
 [`plot_lines()`](https://christiangoueguel.com/specProc/reference/plot_lines.md)
 marks them on a spectrum.
 [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md)
-opens an interactive app that does both. These functions need an
-internet connection:
+opens an interactive app that does both. In the app, the lines of a
+species picked on the spectrum also build a Boltzmann plot, from which
+outlying lines can be left out, and **Done** returns its fit to R (see
+[`vignette("plasma-diagnostics")`](https://christiangoueguel.com/specProc/articles/plasma-diagnostics.md)).
+These functions need an internet connection:
 
 ``` r
 
 candidates <- libs_lines(c("K I", "Ca I", "Fe I", "Mn I"), wavelength = c(400, 410))
 plot_lines(colMeans(spectra), candidates)
-line_finder(spectra)
+fit <- line_finder(spectra)
 ```
 
 ## Correcting the wavelength axis

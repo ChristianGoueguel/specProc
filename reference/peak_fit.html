@@ -116,7 +116,8 @@ widths fitted).</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble with one row per spectrum and the columns:</p><ul><li><p><code>id</code> column (or <code>spectrum</code>, the row number, when <code>id = NULL</code>),</p></li>
 <li><p><code>data</code>: the fitted data (<code>x</code>, <code>y</code>),</p></li>
-<li><p><code>fit</code>: the <code>nls</code> model object,</p></li>
+<li><p><code>fit</code>: the <code>nls</code> model object, of class <code>specproc_peak_fit</code> (see
+<a href="specproc-tidy.html">tidy()</a> and <a href="specproc-tidy.html">glance()</a>),</p></li>
 <li><p><code>tidied</code>: the estimated parameters with their standard errors,</p></li>
 <li><p><code>augmented</code>: the data with fitted values (<code>.fitted</code>) and residuals (<code>.resid</code>).</p></li>
 </ul></div>
