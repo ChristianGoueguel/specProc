@@ -6,11 +6,12 @@
 \usage{
 plot_lines(
   spectrum,
-  lines,
+  lines = NULL,
   shift = 0,
   scale_markers = TRUE,
   interactive = TRUE,
-  title = NULL
+  title = NULL,
+  bands = NULL
 )
 }
 \arguments{
@@ -18,10 +19,12 @@ plot_lines(
 one-row matrix or data frame whose column names are the wavelengths.
 Average several spectra first.}
 
-\item{lines}{A tibble returned by \code{\link[=libs_lines]{libs_lines()}}.}
+\item{lines}{A tibble returned by \code{\link[=libs_lines]{libs_lines()}}, or \code{NULL} to draw only
+molecular bands.}
 
-\item{shift}{A wavelength shift, in nm, added to the line wavelengths to
-correct the wavelength calibration of the spectrometer. Default is 0.}
+\item{shift}{A wavelength shift, in nm, added to the line and band
+wavelengths to correct the wavelength calibration of the spectrometer.
+Default is 0.}
 
 \item{scale_markers}{A logical: scale the markers by the relative
 intensity of the lines (\code{TRUE}, default) or draw them full height.}
@@ -29,14 +32,17 @@ intensity of the lines (\code{TRUE}, default) or draw them full height.}
 \item{interactive}{A logical: plotly (\code{TRUE}, default) or ggplot2.}
 
 \item{title}{An optional plot title.}
+
+\item{bands}{An optional tibble of molecular band heads returned by
+\code{\link[=molecular_bands]{molecular_bands()}}.}
 }
 \value{
 A plotly or ggplot object.
 }
 \description{
 Plots a spectrum with vertical markers at the wavelengths of candidate
-emission lines, colored by ionization stage, to identify the lines of the
-spectrum.
+emission lines, colored by ionization stage, and at the heads of
+molecular bands, to identify the lines and bands of the spectrum.
 }
 \details{
 With \code{interactive = TRUE}, the plot is made with plotly: the spectrum is
@@ -48,6 +54,10 @@ accuracy grade. Otherwise, a ggplot is returned.
 With \code{scale_markers = TRUE}, the height of each marker is its relative
 intensity (see \code{\link[=libs_lines]{libs_lines()}}) times the maximum of the spectrum;
 otherwise all markers span the full height.
+
+The heads of molecular bands (\code{bands}, see \code{\link[=molecular_bands]{molecular_bands()}}) are drawn
+as dashed markers, one color per molecule, scaled by their relative
+intensity within their system.
 }
 \examples{
 data(forageLIBS)
@@ -63,5 +73,5 @@ plot_lines(spectrum, lines, interactive = FALSE)
 
 }
 \seealso{
-\code{\link[=libs_lines]{libs_lines()}}, \code{\link[=line_finder]{line_finder()}}
+\code{\link[=libs_lines]{libs_lines()}}, \code{\link[=molecular_bands]{molecular_bands()}}, \code{\link[=line_finder]{line_finder()}}
 }

@@ -65,8 +65,8 @@ libs_lines <- function(species, wavelength = c(200, 900), temperature = 10000, t
 #'
 #' @description
 #' Plots a spectrum with vertical markers at the wavelengths of candidate
-#' emission lines, colored by ionization stage, to identify the lines of the
-#' spectrum.
+#' emission lines, colored by ionization stage, and at the heads of
+#' molecular bands, to identify the lines and bands of the spectrum.
 #'
 #' @details
 #' With `interactive = TRUE`, the plot is made with plotly: the spectrum is
@@ -79,20 +79,28 @@ libs_lines <- function(species, wavelength = c(200, 900), temperature = 10000, t
 #' intensity (see [libs_lines()]) times the maximum of the spectrum;
 #' otherwise all markers span the full height.
 #'
+#' The heads of molecular bands (`bands`, see [molecular_bands()]) are drawn
+#' as dashed markers, one color per molecule, scaled by their relative
+#' intensity within their system.
+#'
 #' @param spectrum A spectrum: a numeric vector named by wavelength, or a
 #'   one-row matrix or data frame whose column names are the wavelengths.
 #'   Average several spectra first.
-#' @param lines A tibble returned by [libs_lines()].
-#' @param shift A wavelength shift, in nm, added to the line wavelengths to
-#'   correct the wavelength calibration of the spectrometer. Default is 0.
+#' @param lines A tibble returned by [libs_lines()], or `NULL` to draw only
+#'   molecular bands.
+#' @param shift A wavelength shift, in nm, added to the line and band
+#'   wavelengths to correct the wavelength calibration of the spectrometer.
+#'   Default is 0.
 #' @param scale_markers A logical: scale the markers by the relative
 #'   intensity of the lines (`TRUE`, default) or draw them full height.
 #' @param interactive A logical: plotly (`TRUE`, default) or ggplot2.
 #' @param title An optional plot title.
+#' @param bands An optional tibble of molecular band heads returned by
+#'   [molecular_bands()].
 #'
 #' @return A plotly or ggplot object.
 #'
-#' @seealso [libs_lines()], [line_finder()]
+#' @seealso [libs_lines()], [molecular_bands()], [line_finder()]
 #' @export plot_lines
 #'
 #' @examples
@@ -107,22 +115,32 @@ libs_lines <- function(species, wavelength = c(200, 900), temperature = 10000, t
 #' )
 #' plot_lines(spectrum, lines, interactive = FALSE)
 #'
-plot_lines <- function(spectrum, lines, shift = 0, scale_markers = TRUE, interactive = TRUE,
-                       title = NULL) {
+plot_lines <- function(spectrum, lines = NULL, shift = 0, scale_markers = TRUE, interactive = TRUE,
+                       title = NULL, bands = NULL) {
   spec <- as_spectrum(spectrum)
-  check_lines_table(lines)
+  if (is.null(lines) && is.null(bands)) {
+    stop("Give 'lines' (from libs_lines()) or 'bands' (from molecular_bands()).", call. = FALSE)
+  }
+  if (is.null(lines)) lines <- empty_line_list() else check_lines_table(lines)
+  if (!is.null(bands)) check_bands_table(bands)
   check_number(shift, "shift")
   check_flag(scale_markers, "scale_markers")
   check_flag(interactive, "interactive")
   segments <- line_segments(lines, spec, shift, scale_markers)
+  band_segs <- band_segments(bands, spec, shift, scale_markers)
   if (interactive) {
     rlang::check_installed("plotly", reason = "for interactive plots.")
     p <- lines_plotly(spec, segments)
+    for (trace in band_traces(band_segs)) {
+      p <- do.call(plotly::add_trace, c(list(p), trace))
+    }
     plotly::layout(p, title = plotly_title(title),
                    xaxis = list(title = "Wavelength (nm)"), yaxis = list(title = "Intensity"),
                    legend = list(orientation = "h", y = -0.15), hovermode = "closest")
   } else {
-    # markers on top of the spectrum, semi-transparent
+    # markers on top of the spectrum, semi-transparent; one color scale for
+    # the ionization stages and the molecules
+    colours <- c(stage_colours, band_colours(band_segs$molecule))
     p <- ggplot2::ggplot() +
       ggplot2::geom_line(data = spec, ggplot2::aes(.data$wavelength, .data$intensity),
                          colour = "grey35", linewidth = 0.3) +
@@ -131,7 +149,12 @@ plot_lines <- function(spectrum, lines, shift = 0, scale_markers = TRUE, interac
         ggplot2::aes(x = .data$x, xend = .data$x, y = 0, yend = .data$height, colour = .data$stage_label),
         linewidth = 0.5, alpha = 0.7
       ) +
-      ggplot2::scale_colour_manual(values = stage_colours, name = NULL, drop = TRUE) +
+      ggplot2::geom_segment(
+        data = band_segs,
+        ggplot2::aes(x = .data$x, xend = .data$x, y = 0, yend = .data$height, colour = .data$molecule),
+        linewidth = 0.5, linetype = "dashed"
+      ) +
+      ggplot2::scale_colour_manual(values = colours, name = NULL, drop = TRUE) +
       ggplot2::labs(x = "Wavelength (nm)", y = "Intensity", title = title) +
       ggplot2::theme_bw() +
       ggplot2::theme(legend.position = "bottom")
@@ -285,6 +308,66 @@ line_segments <- function(lines, spec, shift, scale_markers) {
     ),
     stringsAsFactors = FALSE
   )
+}
+
+# Band markers: one row per band head, with its position, height, molecule
+# and hover text.
+band_segments <- function(bands, spec, shift, scale_markers) {
+  if (is.null(bands) || nrow(bands) == 0) {
+    return(data.frame(x = numeric(), height = numeric(), molecule = character(), text = character()))
+  }
+  top_value <- max(spec$intensity, na.rm = TRUE)
+  if (!is.finite(top_value) || top_value <= 0) top_value <- 1
+  inside <- bands$wavelength + shift >= min(spec$wavelength) &
+    bands$wavelength + shift <= max(spec$wavelength)
+  bands <- bands[inside, ]
+  data.frame(
+    x = bands$wavelength + shift,
+    height = if (scale_markers) top_value * bands$relative_intensity else rep(top_value, nrow(bands)),
+    molecule = bands$molecule,
+    text = sprintf(
+      "%s %s %s (%d,%d)<br>%s %.3f nm, origin %.3f nm<br>degraded to the %s, FCF %s<br>relative intensity %.2f",
+      bands$molecule, bands$system, bands$name, bands$v_upper, bands$v_lower,
+      ifelse(bands$head, "head", "band"), bands$wavelength, bands$origin,
+      ifelse(is.na(bands$degraded), "?", bands$degraded),
+      ifelse(is.na(bands$fcf), "unknown", sprintf("%.3f", bands$fcf)), bands$relative_intensity
+    ),
+    stringsAsFactors = FALSE
+  )
+}
+
+# One dashed plotly trace per molecule.
+band_traces <- function(segments) {
+  if (nrow(segments) == 0) return(list())
+  colours <- band_colours(segments$molecule)
+  lapply(unique(segments$molecule), function(m) {
+    s <- segments[segments$molecule == m, ]
+    list(
+      x = as.vector(rbind(s$x, s$x, NA)),
+      y = as.vector(rbind(0, s$height, NA)),
+      text = as.vector(rbind(s$text, s$text, NA)),
+      type = "scatter", mode = "lines", name = paste(m, "bands"),
+      line = list(color = unname(colours[m]), width = 1.5, dash = "dash"),
+      hoverinfo = "text", connectgaps = FALSE
+    )
+  })
+}
+
+band_palette <- c("#1f78b4", "#e31a1c", "#6a3d9a", "#b15928", "#33a02c", "#ff7f00", "#a6761d",
+                  "#666666", "#e6ab02", "#386cb0")
+
+band_colours <- function(molecules) {
+  molecules <- unique(molecules)
+  stats::setNames(rep(band_palette, length.out = length(molecules)), molecules)
+}
+
+check_bands_table <- function(bands) {
+  needed <- c("molecule", "system", "name", "v_upper", "v_lower", "wavelength", "origin", "degraded",
+              "head", "fcf", "relative_intensity")
+  if (!is.data.frame(bands) || !all(needed %in% names(bands))) {
+    stop("'bands' must be a table returned by molecular_bands().", call. = FALSE)
+  }
+  invisible(bands)
 }
 
 # One plotly trace per ionization stage: vertical segments separated by NA,

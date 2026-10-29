@@ -74,7 +74,7 @@ website](https://christiangoueguel.com/specProc/articles/).
 
 | Task | Functions |
 |----|----|
-| Line identification | `libs_lines()`, `plot_lines()`, `line_finder()` (Shiny app, with an interactive Boltzmann plot), `wavelength_calibration()`, `apply_calibration()`, `response_calibration()`, `correct_response()` |
+| Line identification | `libs_lines()`, `plot_lines()`, `line_finder()` (Shiny app, with an interactive Boltzmann plot), `molecular_bands()`, `molecular_spectrum()`, `wavelength_calibration()`, `apply_calibration()`, `response_calibration()`, `correct_response()` |
 | Line fitting | `peak_fit()`, `multipeak_fit()`, `plot_fit()`, `line_intensities()`, `voigt_profile()`, `pseudo_voigt_profile()`, `gaussian_profile()`, `lorentzian_profile()`, `voigt_fwhm()`, `doppler_width()` |
 | Preprocessing | `baseline_arpls()`, `baseline_als()`, `baseline_lsp()`, `snv()`, `msc()`, `emsc()`, `normalize()`, `savitzky_golay()`, `gap_derivative()`, `bin_spectra()`, `wavelet_features()`, `reject_shots()`, `average()` |
 | Recipe steps | `step_baseline()`, `step_snv()`, `step_msc()`, `step_emsc()`, `step_spectral_norm()`, `step_line_ratio()`, `step_savgol()`, `step_gap_derivative()`, `step_bin_spectra()`, `step_wavelet()`, `step_line_intensities()`, `step_reject_shots()`, `step_opls()`, `step_o2pls()`, `step_epo()`, `step_glsw()`, and more |

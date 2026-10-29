@@ -7,9 +7,9 @@
 #' Elements are selected on a periodic table, and the strongest lines of
 #' their selected ionization stages, from the NIST Atomic Spectra Database,
 #' are overlaid on a spectrum in an interactive plotly graph, with one color
-#' per ionization stage. Lines of a species picked on the spectrum build a
-#' Boltzmann plot, whose temperature is fitted again as lines are added or
-#' left out.
+#' per ionization stage. The heads of molecular bands can be overlaid too.
+#' Lines of a species picked on the spectrum build a Boltzmann plot, whose
+#' temperature is fitted again as lines are added or left out.
 #'
 #' @details
 #' The app offers:
@@ -21,6 +21,9 @@
 #'  - the plasma temperature and the number of lines per species, which set
 #'    the lines kept and the height of their markers (relative intensities in
 #'    local thermodynamic equilibrium, see [libs_lines()]);
+#'  - molecules whose band heads are marked with dashed lines, at a
+#'    vibrational temperature (see [molecular_bands()]; no download
+#'    needed);
 #'  - the wavelength range, a wavelength shift to correct the calibration of
 #'    the spectrometer, and the spectrum to show: the mean of all spectra, the
 #'    mean of a group (from the first character or factor column of
@@ -335,7 +338,12 @@ finder_ui <- function(data, show_table = TRUE) {
           shiny::numericInput("top", "Lines per species", value = 15, min = 1, max = 500, step = 1),
           shiny::sliderInput("min_relative", "Minimum relative intensity", min = 0, max = 1,
                              value = 0.01, step = 0.01),
-          shiny::checkboxInput("scale", "Scale markers by expected intensity", value = TRUE)
+          shiny::checkboxInput("scale", "Scale markers by expected intensity", value = TRUE),
+          shiny::selectizeInput("molecules", "Molecular bands", multiple = TRUE,
+                                choices = unique(molecular_constants()$molecule),
+                                options = list(placeholder = "None")),
+          shiny::numericInput("band_temperature", "Vibrational temperature of the bands (K)",
+                              value = 5000, min = 500, step = 500)
         ),
         bslib::accordion_panel(
           "Boltzmann plot",
@@ -485,11 +493,24 @@ finder_server <- function(data, fetch) {
       segments <- line_segments(l, spec, shift = finder_number(input$shift, 0),
                                 scale_markers = isTRUE(input$scale %||% TRUE))
       p <- lines_plotly(spec, segments, source = "spectrum", heads = TRUE)
+      band_segs <- band_segments(bands(), spec, shift = finder_number(input$shift, 0),
+                                 scale_markers = isTRUE(input$scale %||% TRUE))
+      for (trace in band_traces(band_segs)) {
+        p <- do.call(plotly::add_trace, c(list(p), trace))
+      }
       p <- add_selected_lines(p, bp()$lines, spec)
       p <- plotly::event_register(p, "plotly_click")
       # keep the zoom when the lines change, reset it when the spectrum changes
       finder_layout(p, uirevision = paste(input$spectrum, wl_range, collapse = " "),
-                    empty = nrow(l) == 0)
+                    empty = nrow(l) == 0 && nrow(band_segs) == 0)
+    })
+
+    bands <- shiny::reactive({
+      molecules <- unlist(input$molecules)
+      if (length(molecules) == 0) return(NULL)
+      molecular_bands(molecules, wavelength = fetch_range,
+                      temperature = finder_number(input$band_temperature, 5000, positive = TRUE),
+                      min_relative = input$min_relative %||% 0.01)
     })
 
     # ---- Boltzmann plot ----
@@ -581,7 +602,10 @@ finder_server <- function(data, fetch) {
 
     output$n_lines <- shiny::renderText({
       n <- nrow(lines())
-      paste(n, if (n == 1) "line" else "lines")
+      text <- paste(n, if (n == 1) "line" else "lines")
+      nb <- if (is.null(bands())) 0 else nrow(bands())
+      if (nb > 0) text <- paste0(text, ", ", nb, if (nb == 1) " band" else " bands")
+      text
     })
 
     shiny::observeEvent(input$clear, session$sendCustomMessage("pt-clear", TRUE))
@@ -606,7 +630,7 @@ finder_server <- function(data, fetch) {
       shiny::showNotification(paste("Loaded", length(loaded), "species."), type = "message")
     })
 
-    invisible(list(lines = lines, cache = cache, species = species, bp = bp))
+    invisible(list(lines = lines, cache = cache, species = species, bp = bp, bands = bands))
   }
 }
 

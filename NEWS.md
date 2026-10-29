@@ -212,6 +212,20 @@
   and residual of each line. **Use T** ranks the candidate lines at the
   fitted temperature, and **Done** closes the app and returns the
   `boltzmann()` fit to R.
+* Molecular bands: `molecular_bands()` lists the band heads of the
+  electronic systems of diatomic molecules that emit in laser-induced
+  plasmas (CN, C2, CH, OH, NH, N2, N2+, NO, CO, AlO, CaF, CaCl, SrF, SrCl,
+  MgO, TiO, BO, SiO), with their origins, the direction in which they are
+  degraded, Franck-Condon factors (Morse wavefunctions) and relative
+  intensities at a vibrational temperature. They are computed from the
+  constants of Huber and Herzberg (1979), included in the package, and agree
+  with measured heads to about 0.05 nm for the well-studied systems.
+  `plot_lines()` gains `bands` to mark them on a spectrum (and `lines` may
+  be `NULL`), and `line_finder()` overlays the bands of the selected
+  molecules. `molecular_spectrum()` simulates the emission spectrum of a
+  molecule in LTE from a line list of the ExoMol database (the MoLLIST line
+  lists by default), downloaded on demand and convolved with the instrument
+  profile, and `exomol_datasets()` lists the line lists of a molecule.
 * `tidy()` and `glance()` methods for peak fits, `calibration_curve()`,
   `wavelength_calibration()`, `slope_bias()`, `boltzmann()`,
   `saha_boltzmann()`, `cf_libs()`, `plasma_uncertainty()` and
