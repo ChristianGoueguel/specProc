@@ -37,10 +37,32 @@
 #' of `id`; the color of `colvar` is then the mean of `colvar` in each group.
 #' The band is not drawn with `color_as = "fill"`.
 #'
+#' **Transformations.** `transform` receives the spectral columns of `x` (a
+#' data frame of the columns named by their wavelength, without `id`,
+#' `colvar` and `panel`) and returns the transformed spectra, one row per
+#' spectrum: a data frame or a matrix with columns named by their wavelength,
+#' or a list holding them as `correction`, as returned by [snv()], [msc()],
+#' [baseline_als()] and the other baseline corrections. The number of
+#' channels may change, as with [bin_spectra()]. The whole spectra are
+#' transformed, before `wavelength` selects the channels to draw, so that a
+#' normalization or a baseline correction uses all the channels; the
+#' summaries, offsets and labels are those of the transformed spectra. Give
+#' `ylab` for the units of the transformed intensities.
+#'
+#' **Wavelength windows.** With a list of ranges in `wavelength`, each range
+#' is drawn in its own panel, side by side and of the same width, with its
+#' own wavelength axis: a zoom on several groups of lines at once. The ranges
+#' must not overlap; they are drawn in increasing wavelength order, under
+#' their names (if any). With `scales = "free_y"`, each range has its own
+#' intensity axis, so that weak lines stay readable next to strong ones. With
+#' `panel`, the groups are drawn in rows and the ranges in columns (`layout`
+#' is ignored), and `scales = "free_y"` fits the intensity axis to each row.
+#'
 #' **Emission lines.** Each line of `lines` within the wavelength range is
 #' marked by a dashed vertical line, labeled with its species and wavelength
-#' above the plot (above the top panels). Lines closer than 2% of the
-#' wavelength range share a label, such as "Ca II 393.37, 396.85". The
+#' above the plot (above the top panels, or above each row of panels with
+#' several wavelength ranges). Lines closer than 2% of the wavelength range
+#' (of their window) share a label, such as "Ca II 393.37, 396.85". The
 #' markers are at the tabulated wavelengths: with a horizontal `offset`, they
 #' match the first spectrum of each panel. Over a wide range, keep the
 #' strongest lines, for example with the `top` or `min_relative` arguments of
@@ -72,11 +94,20 @@
 #'   offsets, so that the first one stays in place. With `panel`, the rows
 #'   are counted in each panel, so that the first spectrum of every panel
 #'   stays in place. With `summary`, the summary spectra are offset.
+#' @param wavelength Optional (`NULL` by default). The wavelength range
+#'   `c(min, max)` to draw, in nm, or a list of ranges, drawn side by side,
+#'   such as `list("Ca II H and K" = c(392, 398), "K I" = c(765, 771))` (see
+#'   Details).
+#' @param transform Optional (`NULL` by default). A function applied to the
+#'   spectra before they are drawn, such as `snv` or
+#'   `\(s) baseline_als(s, lambda = 1e5)`, a formula such as
+#'   `~ savitzky_golay(.x, derivative = 1)`, or a list of them, applied in
+#'   order (see Details).
 #' @param panel Optional (`NULL` by default). Column name of a grouping
 #'   variable: the spectra of each group are drawn in a separate panel.
 #' @param layout The arrangement of the panels: `"vertical"` (default), one
 #'   above the other, or `"horizontal"`, side by side. Ignored without
-#'   `panel`.
+#'   `panel`, and with several wavelength ranges.
 #' @param grid A logical: draw grid lines at the major breaks of the axes
 #'   (`FALSE`, default).
 #' @param color_as How the colors of `colvar` (or of `id`, without `colvar`)
@@ -106,12 +137,11 @@
 #'   printed size. The axis lines and labels scale with it.
 #' @param linewidth The width of the spectra lines. Default is 0.5; about 0.3
 #'   suits small figures.
-#' @param xlim Optional wavelength range `c(from, to)`, in nm: only the
-#'   channels in this range are drawn.
 #' @param scales `"fixed"` (default), the same intensity axis for all panels,
 #'   or `"free_y"`, an intensity axis fitted to each panel.
 #' @param panel_tags A logical: tag the panels (a), (b), (c), ... before their
-#'   labels (`FALSE`, default).
+#'   labels (`FALSE`, default): the groups of `panel`, else the wavelength
+#'   ranges.
 #' @param label_spectra A logical: label each spectrum at its right end
 #'   (`FALSE`, default), with its `id`, else its value of `colvar`, else its
 #'   row number (or `"Mean"`/`"Median"` for summaries). Most useful for
@@ -156,16 +186,31 @@
 #' p <- plot_spectra(spectra, colvar = K, panel = level, summary = "mean",
 #'                   lines = lines, panel_tags = TRUE, legend = "right",
 #'                   legend_title = "K (%)", ylab = "Intensity (counts)",
-#'                   base_size = 8, linewidth = 0.3, xlim = c(765, 771))
+#'                   base_size = 8, linewidth = 0.3, wavelength = c(765, 771))
 #' p
 #' # ggplot2::ggsave("figure.pdf", p, width = 85, height = 90, units = "mm")
+#'
+#' # the spectra normalized by SNV over all the channels, then drawn in two
+#' # windows side by side, each with its own intensity axis
+#' channels <- names(forageLIBS)[-(1:14)]
+#' plot_spectra(forageLIBS[1:20, c("K", channels)], colvar = K, transform = snv,
+#'              wavelength = list("Ca II H and K" = c(392, 398), "K I" = c(765, 771)),
+#'              scales = "free_y", ylab = "SNV intensity")
+#'
+#' # several transformations, in order: a baseline correction, then the first
+#' # derivative
+#' plot_spectra(forageLIBS[1:20, c("K", k_lines)], colvar = K,
+#'              transform = list(\(s) baseline_als(s, lambda = 1e4),
+#'                               ~ savitzky_golay(.x, window = 7, derivative = 1)),
+#'              ylab = "First derivative")
 plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop_na = FALSE,
-                         offset = NULL, panel = NULL, layout = c("vertical", "horizontal"),
-                         grid = FALSE, color_as = c("line", "fill"),
+                         offset = NULL, wavelength = NULL, transform = NULL, panel = NULL,
+                         layout = c("vertical", "horizontal"), grid = FALSE,
+                         color_as = c("line", "fill"),
                          legend = c("none", "right", "top", "bottom", "inside"),
                          legend_title = NULL, xlab = "Wavelength (nm)",
                          ylab = "Intensity (arb. units)", title = NULL, lines = NULL,
-                         palette = "viridis", base_size = 11, linewidth = 0.5, xlim = NULL,
+                         palette = "viridis", base_size = 11, linewidth = 0.5,
                          scales = c("fixed", "free_y"), panel_tags = FALSE,
                          label_spectra = FALSE, summary = c("none", "mean", "median"),
                          rasterize = FALSE) {
@@ -218,28 +263,31 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
     }
     offset <- if (length(offset) == 1) c(0, offset) else offset
   }
-  if (!is.null(xlim) && (!is.numeric(xlim) || length(xlim) != 2 || anyNA(xlim) || xlim[1] >= xlim[2])) {
-    stop("'xlim' must be two increasing wavelengths c(from, to).", call. = FALSE)
-  }
+  windows <- spectra_windows(wavelength)
 
   spec_cols <- setdiff(names(x), c(id_name, col_name, panel_name))
   wl <- parse_wavelength(spec_cols)
   if (anyNA(wl)) {
     stop("Spectral column names must be wavelengths; use 'id', 'colvar' and 'panel' for the other columns.")
   }
-  if (!is.null(xlim)) {
-    keep <- wl >= xlim[1] & wl <= xlim[2]
-    if (!any(keep)) {
-      stop("No wavelength of the spectra is within 'xlim'.", call. = FALSE)
-    }
-    spec_cols <- spec_cols[keep]
-    wl <- wl[keep]
-  }
   spectra <- as.matrix(x[spec_cols])
   if (!is.numeric(spectra)) {
     stop("The spectral columns must be numeric.", call. = FALSE)
   }
-  marks <- if (is.null(lines)) NULL else line_marks(lines, wl)
+  if (!is.null(transform)) {
+    spectra <- transform_spectra(x[spec_cols], transform)
+    wl <- parse_wavelength(colnames(spectra))
+  }
+  # the window of each channel, after the transformation of the whole spectra
+  window <- rep(1L, length(wl))
+  if (!is.null(windows)) {
+    window <- window_of(wl, windows)
+    keep <- window > 0
+    spectra <- spectra[, keep, drop = FALSE]
+    wl <- wl[keep]
+    window <- window[keep]
+  }
+  marks <- if (is.null(lines)) NULL else line_marks(lines, wl, window)
 
   meta <- spectra_meta(x, id_name, col_name, panel_name, panel_tags)
   curves <- if (summary == "none") {
@@ -248,19 +296,20 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
     summarize_spectra(spectra, meta, id_name, col_name, summary)
   }
   fill <- color_as == "fill"
-  long <- spectra_long(curves, wl, offset, fill)
+  long <- spectra_long(curves, wl, window, offset, fill)
   if (drop_na) {
     long <- long[!is.na(long$intensity), ]
   }
+  split_windows <- length(windows) > 1 || any(nzchar(names(windows)))
 
-  intensity <- wavelength <- .group <- .base <- .lower <- .upper <- NULL
+  intensity <- .group <- .base <- .lower <- .upper <- NULL
 
   p <- ggplot2::ggplot(long) +
     ggplot2::aes(x = wavelength, y = intensity, group = .group)
 
   if (!is.null(marks)) {
-    p <- p + ggplot2::geom_vline(data = data.frame(wavelength = marks$at),
-                                 ggplot2::aes(xintercept = .data$wavelength),
+    # in the panels of their window (`.window`)
+    p <- p + ggplot2::geom_vline(data = marks$at, ggplot2::aes(xintercept = .data$wavelength),
                                  linetype = "dashed", colour = "grey60", linewidth = 0.3)
   }
   colour_by <- if (!is.null(col_name)) {
@@ -313,8 +362,9 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
   }
   if (label_spectra) {
     ends <- spectra_ends(long, curves$meta, id_name, col_name, summary)
-    # right of the spectra, moved apart vertically by ggrepel
-    span <- diff(range(long$wavelength))
+    # right of the spectra (in the last window), moved apart vertically by
+    # ggrepel
+    span <- diff(range(long$wavelength[long$.window == max(long$.window)]))
     p <- p +
       ggrepel::geom_text_repel(data = ends, ggplot2::aes(x = .data$wavelength, y = .data$intensity,
                                                          label = .data$.label),
@@ -329,7 +379,18 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
   # top axis, above the spectra
   x_scale <- list()
   if (label_spectra) {
-    x_scale$expand <- ggplot2::expansion(mult = c(0.05, 0.05 + 0.012 * max(0, nchar(ends$.label))))
+    room <- 0.012 * max(0, nchar(ends$.label))
+    if (split_windows) {
+      # in the last window only, a fraction of the width of the plot
+      nw <- length(windows)
+      p <- p + ggplot2::geom_blank(
+        data = data.frame(wavelength = max(long$wavelength) + (0.05 + room * nw) * span,
+                          intensity = ends$intensity[1], .window = nw),
+        ggplot2::aes(x = .data$wavelength, y = .data$intensity), inherit.aes = FALSE
+      )
+    } else {
+      x_scale$expand <- ggplot2::expansion(mult = c(0.05, 0.05 + room))
+    }
   }
   if (!is.null(marks)) {
     x_scale$sec.axis <- ggplot2::dup_axis(name = NULL, breaks = marks$labels$wavelength,
@@ -352,14 +413,32 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
     ) +
     legend_theme(legend)
 
-  if (!is.null(panel_name)) {
-    p <- p +
+  strips <- ggplot2::theme(strip.background = ggplot2::element_rect(fill = "grey95", colour = NA),
+                           strip.text = ggplot2::element_text(hjust = 0))
+  if (split_windows) {
+    # one column per window, with its own wavelength axis; the groups of
+    # `panel` in rows
+    labels <- window_labels(windows, tags = panel_tags && is.null(panel_name))
+    free <- if (scales == "free_y") "free" else "free_x"
+    p <- p + strips + if (is.null(panel_name)) {
+      ggplot2::facet_wrap(ggplot2::vars(.data$.window), nrow = 1, scales = free,
+                          labeller = ggplot2::as_labeller(labels), axes = "all",
+                          axis.labels = "margins")
+    } else {
+      ggplot2::facet_grid(rows = ggplot2::vars(.data$.panel), cols = ggplot2::vars(.data$.window),
+                          scales = free, labeller = ggplot2::labeller(.window = labels),
+                          axes = "all", axis.labels = "margins")
+    }
+    if (!any(nzchar(labels))) {
+      p <- p + ggplot2::theme(strip.background.x = ggplot2::element_blank(),
+                              strip.text.x = ggplot2::element_blank())
+    }
+  } else if (!is.null(panel_name)) {
+    p <- p + strips +
       ggplot2::facet_wrap(ggplot2::vars(.data$.panel),
                           ncol = if (layout == "vertical") 1 else NULL,
                           nrow = if (layout == "horizontal") 1 else NULL,
-                          scales = scales, axes = "all", axis.labels = "margins") +
-      ggplot2::theme(strip.background = ggplot2::element_rect(fill = "grey95", colour = NA),
-                     strip.text = ggplot2::element_text(hjust = 0))
+                          scales = scales, axes = "all", axis.labels = "margins")
   }
   if (grid) {
     p <- p + ggplot2::theme(panel.grid.major = ggplot2::element_line(colour = "grey90", linewidth = 0.3))
@@ -379,6 +458,81 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
 
 # ---- internals ---------------------------------------------------------------
 
+# The wavelength windows of `wavelength`: a list of ranges c(from, to), in
+# increasing order and named by their labels ("" when unnamed), or NULL.
+spectra_windows <- function(wavelength) {
+  if (is.null(wavelength)) {
+    return(NULL)
+  }
+  windows <- if (is.list(wavelength) && !is.data.frame(wavelength)) wavelength else list(wavelength)
+  is_range <- function(w) is.numeric(w) && length(w) == 2 && !anyNA(w) && w[1] < w[2]
+  if (length(windows) == 0 || !all(vapply(windows, is_range, logical(1)))) {
+    stop("'wavelength' must be two increasing wavelengths c(from, to), or a list of them.",
+         call. = FALSE)
+  }
+  labels <- names(windows) %||% rep("", length(windows))
+  labels[is.na(labels)] <- ""
+  from <- vapply(windows, `[[`, numeric(1), 1)
+  to <- vapply(windows, `[[`, numeric(1), 2)
+  o <- order(from)
+  if (any(from[o][-1] < to[o][-length(o)])) {
+    stop("The ranges of 'wavelength' must not overlap.", call. = FALSE)
+  }
+  stats::setNames(lapply(o, function(i) unname(windows[[i]])), labels[o])
+}
+
+# The window of each wavelength `wl` (0 outside them).
+window_of <- function(wl, windows) {
+  window <- integer(length(wl))
+  for (i in seq_along(windows)) {
+    inside <- wl >= windows[[i]][1] & wl <= windows[[i]][2]
+    if (!any(inside)) {
+      range <- if (length(windows) > 1) paste0(" (", windows[[i]][1], "-", windows[[i]][2], " nm)")
+      stop("No wavelength of the spectra is within 'wavelength'", range, ".", call. = FALSE)
+    }
+    window[inside] <- i
+  }
+  window
+}
+
+# Applies `transform` to the spectra (a data frame of the spectral columns):
+# a function, a formula (as a purrr lambda), or a list of them, in order. Each
+# step must return the spectra, one row per spectrum with columns named by
+# their wavelength, as a data frame or a matrix, or a list holding them as
+# `correction` (as snv(), msc() and the baseline corrections). Returns a
+# matrix.
+transform_spectra <- function(spectra, transform) {
+  steps <- if (is.list(transform)) transform else list(transform)
+  is_step <- function(f) is.function(f) || rlang::is_formula(f)
+  if (length(steps) == 0 || !all(vapply(steps, is_step, logical(1)))) {
+    stop("'transform' must be a function, a formula or a list of them.", call. = FALSE)
+  }
+  n <- nrow(spectra)
+  for (i in seq_along(steps)) {
+    step <- if (length(steps) > 1) paste0(" (step ", i, ")") else ""
+    out <- rlang::as_function(steps[[i]])(spectra)
+    if (is.list(out) && !is.data.frame(out)) {
+      out <- out$correction
+    }
+    if (!(is.data.frame(out) || is.matrix(out)) || nrow(out) != n) {
+      stop("'transform'", step, " must return the spectra, one row per spectrum: a data frame, ",
+           "a matrix, or a list holding them as 'correction'.", call. = FALSE)
+    }
+    if (is.matrix(out)) {
+      out <- tibble::as_tibble(out, .name_repair = "minimal")
+    }
+    if (ncol(out) == 0 || anyNA(parse_wavelength(names(out)))) {
+      stop("The spectra returned by 'transform'", step, " must have columns named by their ",
+           "wavelength.", call. = FALSE)
+    }
+    if (!all(vapply(out, is.numeric, logical(1)))) {
+      stop("The spectra returned by 'transform'", step, " must be numeric.", call. = FALSE)
+    }
+    spectra <- out
+  }
+  as.matrix(spectra)
+}
+
 # The variables of each spectrum: `id` and `colvar` under their names, and the
 # panel as the factor `.panel` (its levels tagged (a), (b), ... on request).
 spectra_meta <- function(x, id_name, col_name, panel_name, panel_tags) {
@@ -390,13 +544,25 @@ spectra_meta <- function(x, id_name, col_name, panel_name, panel_tags) {
     panel <- x[[panel_name]]
     panel <- if (is.factor(panel)) droplevels(panel) else factor(panel)
     if (panel_tags) {
-      k <- nlevels(panel)
-      tags <- if (k <= 26) letters[seq_len(k)] else seq_len(k)
-      levels(panel) <- paste0("(", tags, ") ", levels(panel))
+      levels(panel) <- paste(panel_tag(nlevels(panel)), levels(panel))
     }
     meta$.panel <- panel
   }
   meta
+}
+
+# The labels of the wavelength windows (their names), tagged (a), (b), ... on
+# request, named by the index of the window.
+window_labels <- function(windows, tags) {
+  labels <- names(windows)
+  if (tags) {
+    labels <- trimws(paste(panel_tag(length(labels)), labels))
+  }
+  stats::setNames(labels, seq_along(labels))
+}
+
+panel_tag <- function(k) {
+  paste0("(", if (k <= 26) letters[seq_len(k)] else seq_len(k), ")")
 }
 
 # The mean (with +/- one SD) or median (with the quartiles) spectrum of each
@@ -435,8 +601,9 @@ summary_band <- function(s, summary) {
 # One row per curve and wavelength, offset by the position of the curve in
 # its panel. `.draw` is the drawing order: filled curves are drawn from the
 # back (the top of a stack) to the front. `.group` draws each detector
-# segment of a curve as its own line, in the drawing order.
-spectra_long <- function(curves, wl, offset, fill) {
+# segment of a curve as its own line, in the drawing order. `.window` is the
+# wavelength window of each channel.
+spectra_long <- function(curves, wl, window, offset, fill) {
   meta <- curves$meta
   n <- nrow(meta)
   position <- if (is.null(meta$.panel)) {
@@ -452,6 +619,7 @@ spectra_long <- function(curves, wl, offset, fill) {
   segment <- spectra_segments(wl)
   long$.group <- (long$.draw - 1) * max(segment) + rep(segment, each = n)
   long$wavelength <- rep(wl, each = n)
+  long$.window <- rep(window, each = n)
   long$intensity <- as.vector(curves$center)
   if (!is.null(curves$lower)) {
     long$.lower <- as.vector(curves$lower)
@@ -504,33 +672,44 @@ spectra_ends <- function(long, meta, id_name, col_name, summary) {
   ends
 }
 
-# The emission lines within the wavelength range: their wavelengths (`at`),
-# and their labels. Lines closer than 2% of the range share one label, at
-# their mean wavelength, such as "Ca II 393.37, 396.85".
-line_marks <- function(lines, wl) {
+# The emission lines within the wavelength range of each window: their
+# wavelengths and windows (`at`), and their labels. Lines closer than 2% of
+# the range of their window share one label, at their mean wavelength, such
+# as "Ca II 393.37, 396.85".
+line_marks <- function(lines, wl, window = rep(1L, length(wl))) {
   if (!is.data.frame(lines) || !all(c("species", "wavelength") %in% names(lines)) ||
       !is.numeric(lines$wavelength)) {
     stop("'lines' must be a data frame with the columns 'species' and 'wavelength', ",
          "such as a table returned by libs_lines().", call. = FALSE)
   }
-  inside <- !is.na(lines$wavelength) & lines$wavelength >= min(wl) & lines$wavelength <= max(wl)
-  if (!any(inside)) {
+  marks <- lapply(sort(unique(window)), function(w) {
+    range <- range(wl[window == w])
+    inside <- !is.na(lines$wavelength) & lines$wavelength >= range[1] &
+      lines$wavelength <= range[2]
+    if (!any(inside)) {
+      return(NULL)
+    }
+    found <- unique(data.frame(species = as.character(lines$species[inside]),
+                               wavelength = lines$wavelength[inside]))
+    found <- found[order(found$wavelength), ]
+    group <- cumsum(c(TRUE, diff(found$wavelength) >= 0.02 * diff(range)))
+    labels <- lapply(split(found, group), function(g) {
+      species <- unique(g$species)
+      text <- vapply(species, function(s) {
+        paste(s, paste(format_wavelength(g$wavelength[g$species == s], 2), collapse = ", "))
+      }, character(1))
+      data.frame(wavelength = mean(g$wavelength), label = paste(text, collapse = ", "))
+    })
+    list(at = data.frame(wavelength = found$wavelength, .window = w),
+         labels = do.call(rbind, labels))
+  })
+  marks <- marks[!vapply(marks, is.null, logical(1))]
+  if (length(marks) == 0) {
     warning("None of 'lines' is within the wavelength range of the spectra.", call. = FALSE)
     return(NULL)
   }
-  lines <- unique(data.frame(species = as.character(lines$species[inside]),
-                             wavelength = lines$wavelength[inside]))
-  lines <- lines[order(lines$wavelength), ]
-  gap <- 0.02 * diff(range(wl))
-  group <- cumsum(c(TRUE, diff(lines$wavelength) >= gap))
-  labels <- lapply(split(lines, group), function(g) {
-    species <- unique(g$species)
-    text <- vapply(species, function(s) {
-      paste(s, paste(format_wavelength(g$wavelength[g$species == s], 2), collapse = ", "))
-    }, character(1))
-    data.frame(wavelength = mean(g$wavelength), label = paste(text, collapse = ", "))
-  })
-  list(at = lines$wavelength, labels = do.call(rbind, labels))
+  list(at = do.call(rbind, lapply(marks, `[[`, "at")),
+       labels = do.call(rbind, lapply(marks, `[[`, "labels")))
 }
 
 viridis_palettes <- c("viridis", "magma", "inferno", "plasma", "cividis", "rocket", "mako", "turbo")

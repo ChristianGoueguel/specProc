@@ -11,6 +11,8 @@ plot_spectra(
   .interactive = FALSE,
   drop_na = FALSE,
   offset = NULL,
+  wavelength = NULL,
+  transform = NULL,
   panel = NULL,
   layout = c("vertical", "horizontal"),
   grid = FALSE,
@@ -24,7 +26,6 @@ plot_spectra(
   palette = "viridis",
   base_size = 11,
   linewidth = 0.5,
-  xlim = NULL,
   scales = c("fixed", "free_y"),
   panel_tags = FALSE,
   label_spectra = FALSE,
@@ -55,12 +56,23 @@ offsets, so that the first one stays in place. With \code{panel}, the rows
 are counted in each panel, so that the first spectrum of every panel
 stays in place. With \code{summary}, the summary spectra are offset.}
 
+\item{wavelength}{Optional (\code{NULL} by default). The wavelength range
+\code{c(min, max)} to draw, in nm, or a list of ranges, drawn side by side,
+such as \code{list("Ca II H and K" = c(392, 398), "K I" = c(765, 771))} (see
+Details).}
+
+\item{transform}{Optional (\code{NULL} by default). A function applied to the
+spectra before they are drawn, such as \code{snv} or
+\verb{\\(s) baseline_als(s, lambda = 1e5)}, a formula such as
+\code{~ savitzky_golay(.x, derivative = 1)}, or a list of them, applied in
+order (see Details).}
+
 \item{panel}{Optional (\code{NULL} by default). Column name of a grouping
 variable: the spectra of each group are drawn in a separate panel.}
 
 \item{layout}{The arrangement of the panels: \code{"vertical"} (default), one
 above the other, or \code{"horizontal"}, side by side. Ignored without
-\code{panel}.}
+\code{panel}, and with several wavelength ranges.}
 
 \item{grid}{A logical: draw grid lines at the major breaks of the axes
 (\code{FALSE}, default).}
@@ -101,14 +113,12 @@ printed size. The axis lines and labels scale with it.}
 \item{linewidth}{The width of the spectra lines. Default is 0.5; about 0.3
 suits small figures.}
 
-\item{xlim}{Optional wavelength range \code{c(from, to)}, in nm: only the
-channels in this range are drawn.}
-
 \item{scales}{\code{"fixed"} (default), the same intensity axis for all panels,
 or \code{"free_y"}, an intensity axis fitted to each panel.}
 
 \item{panel_tags}{A logical: tag the panels (a), (b), (c), ... before their
-labels (\code{FALSE}, default).}
+labels (\code{FALSE}, default): the groups of \code{panel}, else the wavelength
+ranges.}
 
 \item{label_spectra}{A logical: label each spectrum at its right end
 (\code{FALSE}, default), with its \code{id}, else its value of \code{colvar}, else its
@@ -162,10 +172,32 @@ the third quartile. The groups are the panels and, within them, the values
 of \code{id}; the color of \code{colvar} is then the mean of \code{colvar} in each group.
 The band is not drawn with \code{color_as = "fill"}.
 
+\strong{Transformations.} \code{transform} receives the spectral columns of \code{x} (a
+data frame of the columns named by their wavelength, without \code{id},
+\code{colvar} and \code{panel}) and returns the transformed spectra, one row per
+spectrum: a data frame or a matrix with columns named by their wavelength,
+or a list holding them as \code{correction}, as returned by \code{\link[=snv]{snv()}}, \code{\link[=msc]{msc()}},
+\code{\link[=baseline_als]{baseline_als()}} and the other baseline corrections. The number of
+channels may change, as with \code{\link[=bin_spectra]{bin_spectra()}}. The whole spectra are
+transformed, before \code{wavelength} selects the channels to draw, so that a
+normalization or a baseline correction uses all the channels; the
+summaries, offsets and labels are those of the transformed spectra. Give
+\code{ylab} for the units of the transformed intensities.
+
+\strong{Wavelength windows.} With a list of ranges in \code{wavelength}, each range
+is drawn in its own panel, side by side and of the same width, with its
+own wavelength axis: a zoom on several groups of lines at once. The ranges
+must not overlap; they are drawn in increasing wavelength order, under
+their names (if any). With \code{scales = "free_y"}, each range has its own
+intensity axis, so that weak lines stay readable next to strong ones. With
+\code{panel}, the groups are drawn in rows and the ranges in columns (\code{layout}
+is ignored), and \code{scales = "free_y"} fits the intensity axis to each row.
+
 \strong{Emission lines.} Each line of \code{lines} within the wavelength range is
 marked by a dashed vertical line, labeled with its species and wavelength
-above the plot (above the top panels). Lines closer than 2\% of the
-wavelength range share a label, such as "Ca II 393.37, 396.85". The
+above the plot (above the top panels, or above each row of panels with
+several wavelength ranges). Lines closer than 2\% of the wavelength range
+(of their window) share a label, such as "Ca II 393.37, 396.85". The
 markers are at the tabulated wavelengths: with a horizontal \code{offset}, they
 match the first spectrum of each panel. Over a wide range, keep the
 strongest lines, for example with the \code{top} or \code{min_relative} arguments of
@@ -207,9 +239,23 @@ lines <- data.frame(species = "K I", wavelength = c(766.49, 769.90))
 p <- plot_spectra(spectra, colvar = K, panel = level, summary = "mean",
                   lines = lines, panel_tags = TRUE, legend = "right",
                   legend_title = "K (\%)", ylab = "Intensity (counts)",
-                  base_size = 8, linewidth = 0.3, xlim = c(765, 771))
+                  base_size = 8, linewidth = 0.3, wavelength = c(765, 771))
 p
 # ggplot2::ggsave("figure.pdf", p, width = 85, height = 90, units = "mm")
+
+# the spectra normalized by SNV over all the channels, then drawn in two
+# windows side by side, each with its own intensity axis
+channels <- names(forageLIBS)[-(1:14)]
+plot_spectra(forageLIBS[1:20, c("K", channels)], colvar = K, transform = snv,
+             wavelength = list("Ca II H and K" = c(392, 398), "K I" = c(765, 771)),
+             scales = "free_y", ylab = "SNV intensity")
+
+# several transformations, in order: a baseline correction, then the first
+# derivative
+plot_spectra(forageLIBS[1:20, c("K", k_lines)], colvar = K,
+             transform = list(\(s) baseline_als(s, lambda = 1e4),
+                              ~ savitzky_golay(.x, window = 7, derivative = 1)),
+             ylab = "First derivative")
 }
 \seealso{
 \code{\link[=libs_lines]{libs_lines()}} for the emission lines.

@@ -85,6 +85,18 @@ spectra_df <- function(n = 3, p = 50) {
   as.data.frame(make_spectra(n = n, p = p)$x, check.names = FALSE)
 }
 
+# The labels of the wavelength windows, in increasing wavelength.
+window_strips <- function(p) {
+  windows <- unique(ggplot2::ggplot_build(p)$layout$layout[".window"])
+  unname(unlist(p$facet$params$labeller(windows)))
+}
+
+# The intensities drawn, spectrum by spectrum, in increasing wavelength.
+drawn <- function(p) {
+  d <- ggplot2::ggplot_build(p)$data[[1]]
+  d$y[order(d$group, d$x)]
+}
+
 test_that("plot_spectra shows a legend on request, with its title", {
   df <- spectra_df()
   df$conc <- 1:3
@@ -153,10 +165,11 @@ test_that("plot_spectra sizes the text and lines, and limits the wavelength rang
   expect_equal(p$layers[[1]]$aes_params$linewidth, 0.3)
   expect_error(plot_spectra(df, base_size = 0), "base_size")
   expect_error(plot_spectra(df, linewidth = -1), "linewidth")
-  built <- ggplot2::ggplot_build(plot_spectra(df, xlim = c(392, 395)))$data[[1]]
+  built <- ggplot2::ggplot_build(plot_spectra(df, wavelength = c(392, 395)))$data[[1]]
   expect_true(all(built$x >= 392 & built$x <= 395))
-  expect_error(plot_spectra(df, xlim = c(395, 392)), "xlim")
-  expect_error(plot_spectra(df, xlim = c(500, 600)), "within 'xlim'")
+  expect_error(plot_spectra(df, wavelength = c(395, 392)), "increasing")
+  expect_error(plot_spectra(df, wavelength = "a"), "increasing")
+  expect_error(plot_spectra(df, wavelength = c(500, 600)), "within 'wavelength'.", fixed = TRUE)
 })
 
 test_that("plot_spectra frees the intensity axes and tags the panels on request", {
@@ -257,4 +270,100 @@ test_that("plot_spectra does not join detectors across gaps or overlaps", {
   reversed <- ggplot2::ggplot_build(plot_spectra(df[, rev(seq_along(wl))]))$data[[1]]
   expect_equal(length(unique(reversed$group)), 2 * 2)
   expect_equal(spectra_segments(rev(wl[wl < 395.05])), rep(1L, sum(wl < 395.05)))
+})
+
+test_that("plot_spectra draws several wavelength windows side by side", {
+  df <- spectra_df()
+  df$site <- c("a", "b", "a")
+  df$id <- c("x", "y", "z")
+  # in increasing wavelength order, under their names, each with its own wavelength axis
+  p <- plot_spectra(df[1:50], wavelength = list(K = c(396, 398), Ca = c(392, 395)))
+  built <- ggplot2::ggplot_build(p)
+  expect_equal(nrow(built$layout$layout), 2)
+  expect_equal(max(built$layout$layout$ROW), 1)
+  expect_equal(window_strips(p), c("Ca", "K"))
+  first <- built$data[[1]][built$data[[1]]$PANEL == 1, ]
+  expect_true(all(first$x >= 392 & first$x <= 395))
+  expect_true(p$facet$params$free$x)
+  expect_false(p$facet$params$free$y)
+  # unnamed windows have no strips; "free_y" gives each window its own intensity axis
+  q <- plot_spectra(df[1:50], wavelength = list(c(392, 395), c(396, 398)), scales = "free_y")
+  expect_true(q$facet$params$free$y)
+  strip <- ggplot2::calc_element("strip.text.x", ggplot2::complete_theme(q$theme))
+  expect_match(class(strip)[1], "element_blank")
+  # a single unnamed window is a single panel; the windows are tagged without panel
+  expect_s3_class(plot_spectra(df[1:50], wavelength = list(c(392, 395)))$facet, "FacetNull")
+  tagged <- plot_spectra(df[1:50], wavelength = list(c(392, 395), K = c(396, 398)),
+                         panel_tags = TRUE)
+  expect_equal(window_strips(tagged), c("(a)", "(b) K"))
+  # with panel: the groups in rows (tagged), the windows in columns
+  r <- plot_spectra(df[-52], panel = site, wavelength = list(Ca = c(392, 395), K = c(396, 398)),
+                    panel_tags = TRUE, layout = "horizontal", scales = "free_y")
+  expect_s3_class(r$facet, "FacetGrid")
+  layout <- ggplot2::ggplot_build(r)$layout$layout
+  expect_equal(c(max(layout$ROW), max(layout$COL)), c(2, 2))
+  expect_equal(levels(layout$.panel), c("(a) a", "(b) b"))
+  expect_equal(window_strips(r), c("Ca", "K"))
+  expect_true(r$facet$params$free$x && r$facet$params$free$y)
+  # the spectra are labeled at the right end of the last window
+  ends <- Filter(function(l) inherits(l$geom, "GeomTextRepel"),
+                 plot_spectra(df[-51], id = id, label_spectra = TRUE,
+                              wavelength = list(c(392, 395), c(396, 398)))$layers)[[1]]$data
+  expect_true(all(ends$wavelength > 396 & ends$wavelength <= 398))
+  expect_equal(ends$.window, c(2L, 2L, 2L))
+  expect_error(plot_spectra(df[1:50], wavelength = list(c(391, 394), c(393, 396))), "overlap")
+  expect_error(plot_spectra(df[1:50], wavelength = list(c(391, 392), c(500, 600))),
+               "within 'wavelength' (500-600 nm)", fixed = TRUE)
+  expect_error(plot_spectra(df[1:50], wavelength = list(c(391, 392), "a")), "increasing")
+  skip_if_not_installed("plotly")
+  expect_s3_class(plot_spectra(df[1:50], wavelength = list(c(392, 395), c(396, 398)),
+                               .interactive = TRUE), "plotly")
+})
+
+test_that("plot_spectra marks the emission lines in the panels of their window", {
+  df <- spectra_df()
+  lines <- data.frame(species = c("Ca II", "Ca II", "Ca II"), wavelength = c(393.37, 393.47, 396.85))
+  p <- plot_spectra(df, lines = lines, wavelength = list(c(393, 394), c(396, 398)))
+  marks <- p$layers[[1]]$data
+  expect_equal(marks$wavelength, c(393.37, 393.47, 396.85))
+  expect_equal(marks$.window, c(1L, 1L, 2L))
+  # lines closer than 2% of the range of their window share a label: 0.1 nm
+  # apart, separate in a window of 1 nm, shared over the 10 nm of the spectra
+  labels <- function(p) p$scales$get_scales("x")$secondary.axis$labels
+  expect_length(labels(p), 3)
+  expect_equal(labels(plot_spectra(df, lines = lines[1:2, ])), "Ca II 393.37, 393.47")
+  expect_warning(plot_spectra(df, lines = lines, wavelength = list(c(390, 392), c(398, 400))),
+                 "None of 'lines'")
+})
+
+test_that("plot_spectra transforms the whole spectra before selecting the wavelengths", {
+  df <- spectra_df()
+  wl <- as.numeric(names(df))
+  full <- as.matrix(snv(df)$correction)
+  expect_equal(drawn(plot_spectra(df, transform = snv)), as.vector(t(full)))
+  inside <- wl >= 392 & wl <= 395
+  expect_equal(drawn(plot_spectra(df, transform = snv, wavelength = c(392, 395))),
+               as.vector(t(full[, inside])))
+  # several steps, in order; formulas; a matrix; fewer channels
+  twice <- function(s) s * 2
+  expect_equal(drawn(plot_spectra(df, transform = list(snv, twice))), 2 * as.vector(t(full)))
+  expect_equal(drawn(plot_spectra(df, transform = ~ .x * 2)), 2 * drawn(plot_spectra(df)))
+  expect_equal(drawn(plot_spectra(df, transform = center)), as.vector(t(center(df))))
+  binned <- ggplot2::ggplot_build(plot_spectra(df, transform = \(s) bin_spectra(s, width = 5)))
+  expect_equal(length(unique(binned$data[[1]]$x)), 10)
+  # the other columns are kept
+  df$conc <- 1:3
+  colored <- ggplot2::ggplot_build(plot_spectra(df, colvar = conc, transform = snv))$data[[1]]
+  expect_equal(length(unique(colored$colour)), 3)
+  spectra <- df[1:50]
+  expect_error(plot_spectra(spectra, transform = "snv"), "must be a function")
+  expect_error(plot_spectra(spectra, transform = list()), "must be a function")
+  expect_error(plot_spectra(spectra, transform = \(s) s[1:2, ]), "one row per spectrum")
+  expect_error(plot_spectra(spectra, transform = \(s) list(a = 1)), "one row per spectrum")
+  expect_error(plot_spectra(spectra, transform = list(snv, \(s) s[1, ])), "(step 2)", fixed = TRUE)
+  expect_error(plot_spectra(spectra, transform = \(s) unname(as.matrix(s))), "named by their")
+  expect_error(plot_spectra(spectra, transform = \(s) {
+    s[[1]] <- "a"
+    s
+  }), "numeric")
 })
