@@ -345,6 +345,28 @@
   on demand and convolved with the instrument profile, and
   [`exomol_datasets()`](https://christiangoueguel.com/specProc/reference/exomol_datasets.md)
   lists the line lists of a molecule.
+- Persistent cache of downloaded data: with
+  `options(specProc.cache = TRUE)` (the user cache directory of
+  [`tools::R_user_dir()`](https://rdrr.io/r/tools/userdir.html)) or a
+  directory, the data of
+  [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md),
+  [`nist_ionization_energy()`](https://christiangoueguel.com/specProc/reference/nist_ionization_energy.md),
+  [`nist_levels()`](https://christiangoueguel.com/specProc/reference/nist_levels.md)
+  (and so
+  [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md)
+  and
+  [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md)),
+  [`starkb_lines()`](https://christiangoueguel.com/specProc/reference/starkb_lines.md)
+  and the ExoMol line lists of
+  [`molecular_spectrum()`](https://christiangoueguel.com/specProc/reference/molecular_spectrum.md)
+  are kept on disk and reused in later sessions, without an internet
+  connection. Entries older than `specProc.cache_max_age` days
+  (default 180) are downloaded again, and an older copy is used, with a
+  warning, when the database cannot be reached.
+  [`download_cache()`](https://christiangoueguel.com/specProc/reference/download_cache.md)
+  lists the cached files and
+  [`clear_download_cache()`](https://christiangoueguel.com/specProc/reference/download_cache.md)
+  removes them. The cache is off by default.
 - [`tidy()`](https://generics.r-lib.org/reference/tidy.html) and
   [`glance()`](https://generics.r-lib.org/reference/glance.html) methods
   for peak fits,

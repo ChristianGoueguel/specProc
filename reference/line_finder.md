@@ -79,7 +79,9 @@ The app offers:
   offline.
 
 Each species is downloaded from NIST once per R session (see
-[`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md));
+[`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md)),
+or once for all sessions with the persistent cache (see
+[`download_cache()`](https://christiangoueguel.com/specProc/reference/download_cache.md));
 later changes of the settings are computed locally. The zoom of the plot
 is kept when the lines change.
 

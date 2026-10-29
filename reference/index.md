@@ -551,6 +551,9 @@ Functions used for charcaterizing plasma emission in laser spectroscopy.
 
 ## Miscellaneous
 
+- [`download_cache()`](https://christiangoueguel.com/specProc/reference/download_cache.md)
+  [`clear_download_cache()`](https://christiangoueguel.com/specProc/reference/download_cache.md)
+  : Persistent Cache of Downloaded Data
 - [`tidy(`*`<specproc_peak_fit>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
   [`glance(`*`<specproc_peak_fit>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)
   [`tidy(`*`<specproc_calibration>`*`)`](https://christiangoueguel.com/specProc/reference/specproc-tidy.md)

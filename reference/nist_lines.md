@@ -54,8 +54,10 @@ for such levels. The accuracy grade of the transition probability
 (`accuracy`: AAA, AA, A+, A, B+, B, C+, C, D+, D, E) matters for plasma
 diagnostics: prefer lines of grade B or better.
 
-The results of a query are cached for the R session. Cite the database
-when you use these data:
+The results of a query are cached for the R session, and between
+sessions with the persistent cache (see
+[`download_cache()`](https://christiangoueguel.com/specProc/reference/download_cache.md)).
+Cite the database when you use these data:
 
 - Kramida, A., Ralchenko, Yu., Reader, J., and NIST ASD Team. NIST
   Atomic Spectra Database, <https://physics.nist.gov/asd>. National

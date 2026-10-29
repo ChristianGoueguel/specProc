@@ -63,8 +63,10 @@ molecular_spectrum(
 
 - cache:
 
-  A directory where the files are kept between sessions, or `NULL`
-  (default) to keep them for the session only.
+  A directory where the files are kept between sessions. By default
+  (`NULL`), the persistent cache of specProc when it is enabled (see
+  [`download_cache()`](https://christiangoueguel.com/specProc/reference/download_cache.md)),
+  or a temporary directory for the session.
 
 - timeout:
 
@@ -102,11 +104,14 @@ MgO or CaO.
 [`exomol_datasets()`](https://christiangoueguel.com/specProc/reference/exomol_datasets.md)
 lists the line lists of a molecule and their sizes.
 
-The files are kept for the R session, or in the directory `cache` to be
-reused in later sessions: a molecule whose files are in `cache` needs no
-internet connection when `isotopologue` and `dataset` are given.
-Partition functions are not needed, as the spectrum is normalized.
-Wavelengths are in air between 200 and 2000 nm.
+The files are kept for the R session, or on disk to be reused in later
+sessions: in the directory `cache`, or in the persistent cache of
+specProc when it is enabled (see
+[`download_cache()`](https://christiangoueguel.com/specProc/reference/download_cache.md)),
+where line lists are kept until the cache is cleared. A molecule whose
+files are on disk needs no internet connection when `isotopologue` and
+`dataset` are given. Partition functions are not needed, as the spectrum
+is normalized. Wavelengths are in air between 200 and 2000 nm.
 
 ExoMol data are released under the Creative Commons
 Attribution-ShareAlike 4.0 license; cite ExoMol and the article of the

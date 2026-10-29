@@ -62,8 +62,10 @@ levels close to the limit, such as the alkali metals (see
 which does it). Without truncation, the result equals the partition
 function computed by the ASD.
 
-The results of a query are cached for the R session. Cite the database
-when you use these data (see
+The results of a query are cached for the R session, and between
+sessions with the persistent cache (see
+[`download_cache()`](https://christiangoueguel.com/specProc/reference/download_cache.md)).
+Cite the database when you use these data (see
 [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md)).
 
 ## See also

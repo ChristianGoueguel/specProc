@@ -64,7 +64,9 @@ given at the mean wavelength of the multiplet; the `upper` and `lower`
 configurations and terms identify them.
 
 The results of a query are cached for the R session, so repeated calls
-with the same `species` do not download the data again.
+with the same `species` do not download the data again, and between
+sessions with the persistent cache (see
+[`download_cache()`](https://christiangoueguel.com/specProc/reference/download_cache.md)).
 
 When you use these data, cite the STARK-B database and the original
 publications, listed in the `source` column:
