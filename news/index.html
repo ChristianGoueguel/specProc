@@ -123,7 +123,9 @@
 <li>
 <code>base_size</code> and <code>linewidth</code> size the text and the lines for the printed figure (such as 8 points and 0.3 for a journal column);</li>
 <li>
-<code>xlim</code> limits the wavelength range, and <code>scales = "free_y"</code> fits the intensity axis to each panel;</li>
+<code>wavelength = c(min, max)</code> limits the wavelength range, as in <code><a href="../reference/peak_fit.html">peak_fit()</a></code> and <code><a href="../reference/nist_lines.html">nist_lines()</a></code>; a list of ranges draws them side by side, each with its own wavelength axis, such as <code>list("Ca II H and K" = c(392, 398), "K I" = c(765, 771))</code>, with the groups of <code>panel</code> in rows; <code>scales = "free_y"</code> fits the intensity axis to each panel;</li>
+<li>
+<code>transform</code> applies a preprocessing function of specProc (such as <code>snv</code>, <code><a href="../reference/baseline_als.html">baseline_als()</a></code> or <code><a href="../reference/savitzky_golay.html">savitzky_golay()</a></code>), a function of your own, or a list of them in order, to the whole spectra before they are drawn, keeping the <code>id</code>, <code>colvar</code> and <code>panel</code> columns;</li>
 <li>
 <code>panel_tags</code> tags the panels (a), (b), (c), …;</li>
 <li>

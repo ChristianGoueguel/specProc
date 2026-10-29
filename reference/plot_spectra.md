@@ -19,6 +19,8 @@ plot_spectra(
   .interactive = FALSE,
   drop_na = FALSE,
   offset = NULL,
+  wavelength = NULL,
+  transform = NULL,
   panel = NULL,
   layout = c("vertical", "horizontal"),
   grid = FALSE,
@@ -32,7 +34,6 @@ plot_spectra(
   palette = "viridis",
   base_size = 11,
   linewidth = 0.5,
-  xlim = NULL,
   scales = c("fixed", "free_y"),
   panel_tags = FALSE,
   label_spectra = FALSE,
@@ -77,6 +78,20 @@ plot_spectra(
   each panel, so that the first spectrum of every panel stays in place.
   With `summary`, the summary spectra are offset.
 
+- wavelength:
+
+  Optional (`NULL` by default). The wavelength range `c(min, max)` to
+  draw, in nm, or a list of ranges, drawn side by side, such as
+  `list("Ca II H and K" = c(392, 398), "K I" = c(765, 771))` (see
+  Details).
+
+- transform:
+
+  Optional (`NULL` by default). A function applied to the spectra before
+  they are drawn, such as `snv` or `\(s) baseline_als(s, lambda = 1e5)`,
+  a formula such as `~ savitzky_golay(.x, derivative = 1)`, or a list of
+  them, applied in order (see Details).
+
 - panel:
 
   Optional (`NULL` by default). Column name of a grouping variable: the
@@ -85,7 +100,8 @@ plot_spectra(
 - layout:
 
   The arrangement of the panels: `"vertical"` (default), one above the
-  other, or `"horizontal"`, side by side. Ignored without `panel`.
+  other, or `"horizontal"`, side by side. Ignored without `panel`, and
+  with several wavelength ranges.
 
 - grid:
 
@@ -146,11 +162,6 @@ plot_spectra(
   The width of the spectra lines. Default is 0.5; about 0.3 suits small
   figures.
 
-- xlim:
-
-  Optional wavelength range `c(from, to)`, in nm: only the channels in
-  this range are drawn.
-
 - scales:
 
   `"fixed"` (default), the same intensity axis for all panels, or
@@ -159,7 +170,7 @@ plot_spectra(
 - panel_tags:
 
   A logical: tag the panels (a), (b), (c), ... before their labels
-  (`FALSE`, default).
+  (`FALSE`, default): the groups of `panel`, else the wavelength ranges.
 
 - label_spectra:
 
@@ -213,11 +224,39 @@ first to the third quartile. The groups are the panels and, within them,
 the values of `id`; the color of `colvar` is then the mean of `colvar`
 in each group. The band is not drawn with `color_as = "fill"`.
 
+**Transformations.** `transform` receives the spectral columns of `x` (a
+data frame of the columns named by their wavelength, without `id`,
+`colvar` and `panel`) and returns the transformed spectra, one row per
+spectrum: a data frame or a matrix with columns named by their
+wavelength, or a list holding them as `correction`, as returned by
+[`snv()`](https://christiangoueguel.com/specProc/reference/snv.md),
+[`msc()`](https://christiangoueguel.com/specProc/reference/msc.md),
+[`baseline_als()`](https://christiangoueguel.com/specProc/reference/baseline_als.md)
+and the other baseline corrections. The number of channels may change,
+as with
+[`bin_spectra()`](https://christiangoueguel.com/specProc/reference/bin_spectra.md).
+The whole spectra are transformed, before `wavelength` selects the
+channels to draw, so that a normalization or a baseline correction uses
+all the channels; the summaries, offsets and labels are those of the
+transformed spectra. Give `ylab` for the units of the transformed
+intensities.
+
+**Wavelength windows.** With a list of ranges in `wavelength`, each
+range is drawn in its own panel, side by side and of the same width,
+with its own wavelength axis: a zoom on several groups of lines at once.
+The ranges must not overlap; they are drawn in increasing wavelength
+order, under their names (if any). With `scales = "free_y"`, each range
+has its own intensity axis, so that weak lines stay readable next to
+strong ones. With `panel`, the groups are drawn in rows and the ranges
+in columns (`layout` is ignored), and `scales = "free_y"` fits the
+intensity axis to each row.
+
 **Emission lines.** Each line of `lines` within the wavelength range is
 marked by a dashed vertical line, labeled with its species and
-wavelength above the plot (above the top panels). Lines closer than 2%
-of the wavelength range share a label, such as "Ca II 393.37, 396.85".
-The markers are at the tabulated wavelengths: with a horizontal
+wavelength above the plot (above the top panels, or above each row of
+panels with several wavelength ranges). Lines closer than 2% of the
+wavelength range (of their window) share a label, such as "Ca II 393.37,
+396.85". The markers are at the tabulated wavelengths: with a horizontal
 `offset`, they match the first spectrum of each panel. Over a wide
 range, keep the strongest lines, for example with the `top` or
 `min_relative` arguments of
@@ -275,8 +314,23 @@ lines <- data.frame(species = "K I", wavelength = c(766.49, 769.90))
 p <- plot_spectra(spectra, colvar = K, panel = level, summary = "mean",
                   lines = lines, panel_tags = TRUE, legend = "right",
                   legend_title = "K (%)", ylab = "Intensity (counts)",
-                  base_size = 8, linewidth = 0.3, xlim = c(765, 771))
+                  base_size = 8, linewidth = 0.3, wavelength = c(765, 771))
 p
 
 # ggplot2::ggsave("figure.pdf", p, width = 85, height = 90, units = "mm")
+
+# the spectra normalized by SNV over all the channels, then drawn in two
+# windows side by side, each with its own intensity axis
+channels <- names(forageLIBS)[-(1:14)]
+plot_spectra(forageLIBS[1:20, c("K", channels)], colvar = K, transform = snv,
+             wavelength = list("Ca II H and K" = c(392, 398), "K I" = c(765, 771)),
+             scales = "free_y", ylab = "SNV intensity")
+
+
+# several transformations, in order: a baseline correction, then the first
+# derivative
+plot_spectra(forageLIBS[1:20, c("K", k_lines)], colvar = K,
+             transform = list(\(s) baseline_als(s, lambda = 1e4),
+                              ~ savitzky_golay(.x, window = 7, derivative = 1)),
+             ylab = "First derivative")
 ```

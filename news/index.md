@@ -483,8 +483,23 @@
     default, `"magma"`, `"cividis"`, …) or any colors;
   - `base_size` and `linewidth` size the text and the lines for the
     printed figure (such as 8 points and 0.3 for a journal column);
-  - `xlim` limits the wavelength range, and `scales = "free_y"` fits the
-    intensity axis to each panel;
+  - `wavelength = c(min, max)` limits the wavelength range, as in
+    [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md)
+    and
+    [`nist_lines()`](https://christiangoueguel.com/specProc/reference/nist_lines.md);
+    a list of ranges draws them side by side, each with its own
+    wavelength axis, such as
+    `list("Ca II H and K" = c(392, 398), "K I" = c(765, 771))`, with the
+    groups of `panel` in rows; `scales = "free_y"` fits the intensity
+    axis to each panel;
+  - `transform` applies a preprocessing function of specProc (such as
+    `snv`,
+    [`baseline_als()`](https://christiangoueguel.com/specProc/reference/baseline_als.md)
+    or
+    [`savitzky_golay()`](https://christiangoueguel.com/specProc/reference/savitzky_golay.md)),
+    a function of your own, or a list of them in order, to the whole
+    spectra before they are drawn, keeping the `id`, `colvar` and
+    `panel` columns;
   - `panel_tags` tags the panels (a), (b), (c), …;
   - `label_spectra` labels each spectrum at its right end, with its `id`
     or value of `colvar`;
