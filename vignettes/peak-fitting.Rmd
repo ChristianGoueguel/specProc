@@ -63,13 +63,16 @@ forageLIBS |>
 
 `libs_lines()` lists the strongest lines of given species in a wavelength
 range, from the NIST Atomic Spectra Database, and `plot_lines()` marks them
-on a spectrum. `line_finder()` opens an interactive app that does both.
-These functions need an internet connection:
+on a spectrum. `line_finder()` opens an interactive app that does both. In
+the app, the lines of a species picked on the spectrum also build a
+Boltzmann plot, from which outlying lines can be left out, and **Done**
+returns its fit to R (see `vignette("plasma-diagnostics")`). These
+functions need an internet connection:
 
 ```{r identify, eval = FALSE}
 candidates <- libs_lines(c("K I", "Ca I", "Fe I", "Mn I"), wavelength = c(400, 410))
 plot_lines(colMeans(spectra), candidates)
-line_finder(spectra)
+fit <- line_finder(spectra)
 ```
 
 ## Correcting the wavelength axis

@@ -117,13 +117,7 @@ plot_lines <- function(spectrum, lines, shift = 0, scale_markers = TRUE, interac
   segments <- line_segments(lines, spec, shift, scale_markers)
   if (interactive) {
     rlang::check_installed("plotly", reason = "for interactive plots.")
-    p <- plotly::plot_ly()
-    p <- plotly::add_trace(p, x = spec$wavelength, y = spec$intensity, type = "scattergl",
-                           mode = "lines", name = "spectrum",
-                           line = list(color = "#595959", width = 1), hoverinfo = "x+y")
-    for (trace in stage_traces(segments)) {
-      p <- do.call(plotly::add_trace, c(list(p), trace))
-    }
+    p <- lines_plotly(spec, segments)
     plotly::layout(p, title = plotly_title(title),
                    xaxis = list(title = "Wavelength (nm)"), yaxis = list(title = "Intensity"),
                    legend = list(orientation = "h", y = -0.15), hovermode = "closest")
@@ -249,18 +243,40 @@ as_spectrum <- function(spectrum) {
   data.frame(wavelength = wavelength, intensity = unname(values))
 }
 
-# Marker segments: one row per line, with its position, height and hover text.
+# The spectrum and the line markers in plotly, from `source` (for the events
+# of the line finder). With `heads`, each marker ends in a dot, easier to
+# click than the end of a line.
+lines_plotly <- function(spec, segments, source = "A", heads = FALSE) {
+  p <- plotly::plot_ly(source = source)
+  p <- plotly::add_trace(p, x = spec$wavelength, y = spec$intensity, type = "scattergl",
+                         mode = "lines", name = "spectrum",
+                         line = list(color = "#595959", width = 1), hoverinfo = "x+y")
+  for (trace in stage_traces(segments, heads)) {
+    p <- do.call(plotly::add_trace, c(list(p), trace))
+  }
+  p
+}
+
+# Key of a line: stays the same when the candidate lines are ranked again.
+line_key <- function(lines) {
+  sprintf("%s|%.4f|%.4f", lines$species, lines$wavelength, lines$Ek)
+}
+
+# Marker segments: one row per line, with its position, height, key and hover
+# text.
 line_segments <- function(lines, spec, shift, scale_markers) {
   top_value <- max(spec$intensity, na.rm = TRUE)
   if (!is.finite(top_value) || top_value <= 0) top_value <- 1
   if (nrow(lines) == 0) {
-    return(data.frame(x = numeric(), height = numeric(), stage_label = character(), text = character()))
+    return(data.frame(x = numeric(), height = numeric(), stage_label = character(),
+                      key = character(), text = character()))
   }
   stage_label <- factor(roman_numerals[lines$stage], levels = roman_numerals)
   data.frame(
     x = lines$wavelength + shift,
     height = if (scale_markers) top_value * lines$relative_intensity else rep(top_value, nrow(lines)),
     stage_label = droplevels(stage_label),
+    key = if (is.null(lines$Ek)) NA_character_ else line_key(lines),
     text = sprintf(
       "%s %.3f nm<br>relative intensity %.2f<br>A = %.2e s-1, Ek = %.2f eV, gk = %s<br>accuracy %s<br>%s - %s",
       lines$species, lines$wavelength, lines$relative_intensity,
@@ -271,18 +287,26 @@ line_segments <- function(lines, spec, shift, scale_markers) {
   )
 }
 
-# One plotly trace per ionization stage: vertical segments separated by NA.
-stage_traces <- function(segments) {
+# One plotly trace per ionization stage: vertical segments separated by NA,
+# with the key of the line as custom data.
+stage_traces <- function(segments, heads = FALSE) {
   if (nrow(segments) == 0) return(list())
   lapply(levels(droplevels(segments$stage_label)), function(stage) {
     s <- segments[segments$stage_label == stage, ]
-    list(
+    colour <- unname(stage_colours[stage])
+    trace <- list(
       x = as.vector(rbind(s$x, s$x, NA)),
       y = as.vector(rbind(0, s$height, NA)),
       text = as.vector(rbind(s$text, s$text, NA)),
+      customdata = as.vector(rbind(s$key, s$key, NA)),
       type = "scatter", mode = "lines", name = paste("stage", stage),
-      line = list(color = unname(stage_colours[stage]), width = 1.5),
+      line = list(color = colour, width = 1.5),
       hoverinfo = "text", connectgaps = FALSE
     )
+    if (heads) {
+      trace$mode <- "lines+markers"
+      trace$marker <- list(color = colour, size = rep(c(0, 7, 0), nrow(s)))
+    }
+    trace
   })
 }

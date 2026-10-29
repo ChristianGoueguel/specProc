@@ -7,7 +7,9 @@
 #' Elements are selected on a periodic table, and the strongest lines of
 #' their selected ionization stages, from the NIST Atomic Spectra Database,
 #' are overlaid on a spectrum in an interactive plotly graph, with one color
-#' per ionization stage.
+#' per ionization stage. Lines of a species picked on the spectrum build a
+#' Boltzmann plot, whose temperature is fitted again as lines are added or
+#' left out.
 #'
 #' @details
 #' The app offers:
@@ -30,6 +32,21 @@
 #' [nist_lines()]); later changes of the settings are computed locally. The
 #' zoom of the plot is kept when the lines change.
 #'
+#' **Boltzmann plot.** Clicking the dot at the top of a line marker adds the
+#' line to the Boltzmann plot of its species, and clicking it again removes
+#' it; **Add shown lines** adds all the lines shown for the species chosen in
+#' the Boltzmann plot panel. The intensities are measured on the displayed
+#' spectrum with [line_intensities()], around the tabulated wavelengths plus
+#' the wavelength shift, with the settings of the panel, and the temperature
+#' is fitted with [boltzmann()]. Clicking a point of the plot leaves its line
+#' out of the fit or puts it back; lines without a positive intensity are
+#' left out. The table under the plot lists the upper-level energy, the
+#' signal-to-noise ratio and the residual of each line, **Use T** sets the
+#' temperature of the candidate lines to the fitted one, and **Done** closes
+#' the app and returns the fit to R. The spectra should be corrected for the
+#' spectral response of the instrument first (see [correct_response()]), and
+#' the lines should be optically thin (see [self_absorption()]).
+#'
 #' The app needs the shiny, plotly and bslib packages, and an internet
 #' connection for the species not yet fetched.
 #'
@@ -43,21 +60,27 @@
 #'   or shows it at any time; hiding it gives the spectrum the whole height of
 #'   the window.
 #'
-#' @return Called for its side effect: runs the app. Use [libs_lines()] and
-#'   [plot_lines()] for the same results in scripts.
+#' @return Invisibly, when the app is closed with **Done**, the [boltzmann()]
+#'   fit of the Boltzmann plot, whose `lines` element holds the measured
+#'   lines; `NULL` if the plot has fewer than 3 usable lines. Use
+#'   [libs_lines()], [plot_lines()], [line_intensities()] and [boltzmann()]
+#'   for the same results in scripts.
 #'
-#' @seealso [libs_lines()], [plot_lines()], [nist_lines()]
+#' @seealso [libs_lines()], [plot_lines()], [nist_lines()], [boltzmann()]
 #' @export line_finder
 #'
 #' @examples
 #' if (interactive() && rlang::is_installed(c("shiny", "plotly", "bslib"))) {
 #'   data(forageLIBS)
-#'   line_finder(forageLIBS[-(1:14)])
+#'   fit <- line_finder(forageLIBS[-(1:14)])
+#'   # after a Boltzmann plot closed with Done
+#'   if (!is.null(fit)) plot_boltzmann(fit)
 #' }
 line_finder <- function(spectra, launch.browser = interactive(), show_table = TRUE) {
   rlang::check_installed(c("shiny", "plotly", "bslib"), reason = "to run the line finder app.")
   check_flag(show_table, "show_table")
-  shiny::runApp(line_finder_app(spectra, show_table = show_table), launch.browser = launch.browser)
+  invisible(shiny::runApp(line_finder_app(spectra, show_table = show_table),
+                          launch.browser = launch.browser))
 }
 
 # The app object; `fetch(species, wavelength)` returns the NIST lines of a
@@ -204,6 +227,20 @@ finder_css <- "
 .bslib-sidebar-layout > .sidebar .accordion-button { font-weight: 600; font-size: .85rem; }
 .bslib-sidebar-layout > .sidebar .form-label { font-size: .8rem; color: #52606d; }
 .pt-card.pt-collapsed .pt-body { display: none; }
+.lf-main.html-fill-container { flex-direction: row; gap: 1rem; min-height: 380px; }
+.lf-main > .card { margin-bottom: 0; }
+.lf-main > .card.bp-card { flex: 0 0 410px; }
+.lf-main.bp-hidden > .card.bp-card { display: none; }
+@media (max-width: 991.98px) {
+  .lf-main.html-fill-container { flex-direction: column; }
+  .lf-main > .card.bp-card { flex: 0 0 auto; }
+}
+.bp-status { font-size: .8rem; color: #52606d; margin-bottom: .25rem; }
+.bp-status strong { color: #1f2933; font-size: .95rem; }
+.bp-table { font-size: .75rem; overflow-y: auto; }
+.bp-table table { margin-bottom: 0; }
+.bp-table td, .bp-table th { padding: .15rem .35rem !important; white-space: nowrap; }
+.lf-buttons { display: flex; gap: .4rem; margin-bottom: .75rem; }
 "
 
 finder_js <- "
@@ -227,6 +264,16 @@ $(document).on('click', '#pt-toggle', function() {
   $(this).text(hidden ? 'Show table' : 'Hide table').attr('aria-expanded', !hidden);
   setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 50);
 });
+// show or hide the Boltzmann plot beside the spectrum
+function lfBoltzmann(show) {
+  $('.lf-main').toggleClass('bp-hidden', !show);
+  $('#bp-toggle').toggleClass('active', show).attr('aria-pressed', show);
+  setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 50);
+}
+$(document).on('click', '#bp-toggle', function() {
+  lfBoltzmann($('.lf-main').hasClass('bp-hidden'));
+});
+Shiny.addCustomMessageHandler('bp-show', function(x) { lfBoltzmann(true); });
 "
 
 periodic_table_ui <- function() {
@@ -291,6 +338,25 @@ finder_ui <- function(data, show_table = TRUE) {
           shiny::checkboxInput("scale", "Scale markers by expected intensity", value = TRUE)
         ),
         bslib::accordion_panel(
+          "Boltzmann plot",
+          shiny::selectInput("bp_species", "Species", choices = character()),
+          shiny::tags$p(class = "small text-muted",
+                        "Click the dot of a line marker to add or remove the line. Click a point",
+                        "of the Boltzmann plot to leave it out of the fit."),
+          shiny::tags$div(class = "lf-buttons",
+                          shiny::actionButton("bp_add", "Add shown lines", class = small_button),
+                          shiny::actionButton("bp_clear", "Clear", class = small_button)),
+          shiny::selectInput("bp_method", "Intensity", choices = c(`Line area` = "area",
+                                                                    `Peak height` = "height")),
+          shiny::numericInput("bp_half_width", "Integration half-width (nm)", value = 0.15,
+                              min = 0.01, step = 0.01),
+          shiny::numericInput("bp_search", "Peak search half-width (nm)", value = 0.2, min = 0,
+                              step = 0.01),
+          shiny::checkboxInput("bp_baseline", "Subtract a linear baseline", value = TRUE),
+          shiny::radioButtons("bp_units", "Intensity units", inline = TRUE,
+                              choices = c(Energy = "energy", Photons = "photons"))
+        ),
+        bslib::accordion_panel(
           "Session",
           shiny::tags$p(class = "small text-muted",
                         "Save the lines fetched from NIST to continue offline later."),
@@ -309,23 +375,46 @@ finder_ui <- function(data, show_table = TRUE) {
                                        if (show_table) "Hide table" else "Show table")),
       bslib::card_body(class = "pt-body", periodic_table_ui())
     ),
-    bslib::card(
-      full_screen = TRUE, min_height = 380,
-      finder_header("Spectrum and candidate lines", shiny::textOutput("n_lines", inline = TRUE),
-                    shiny::downloadButton("download_lines", "CSV", class = small_button)),
-      bslib::card_body(padding = c(4, 8), plotly::plotlyOutput("plot", height = "100%"))
-    )
+    bslib::as_fill_carrier(shiny::tags$div(
+      class = "lf-main bp-hidden",
+      bslib::card(
+        full_screen = TRUE, min_height = 380,
+        finder_header("Spectrum and candidate lines", shiny::textOutput("n_lines", inline = TRUE),
+                      shiny::downloadButton("download_lines", "CSV", class = small_button),
+                      shiny::tags$button(id = "bp-toggle", type = "button", `aria-pressed` = "false",
+                                         class = paste("btn", small_button), "Boltzmann plot")),
+        bslib::card_body(padding = c(4, 8), plotly::plotlyOutput("plot", height = "100%"))
+      ),
+      bslib::card(
+        class = "bp-card", full_screen = TRUE,
+        finder_header("Boltzmann plot", NULL,
+                      shiny::actionButton("bp_use_t", "Use T", class = small_button,
+                                          title = "Rank the candidate lines at the fitted temperature"),
+                      shiny::downloadButton("bp_download", "CSV", class = small_button),
+                      shiny::actionButton("done", "Done", class = "btn-sm btn-primary",
+                                          title = "Close the app and return the fit to R")),
+        bslib::card_body(
+          padding = c(6, 10), gap = 4,
+          shiny::uiOutput("bp_status", class = "bp-status"),
+          plotly::plotlyOutput("bp_plot", height = "260px"),
+          shiny::tags$div(class = "bp-table", shiny::tableOutput("bp_table"))
+        )
+      )
+    ))
   )
 }
 
 # Plot styling of the app.
+finder_axis <- list(gridcolor = "#eef1f5", zeroline = FALSE, showline = TRUE, linecolor = "#c3cad4",
+                    ticks = "outside", tickcolor = "#c3cad4")
+finder_font <- list(family = "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", size = 12,
+                    color = "#1f2933")
+
 finder_layout <- function(p, uirevision, empty) {
-  axis <- list(gridcolor = "#eef1f5", zeroline = FALSE, showline = TRUE, linecolor = "#c3cad4",
-               ticks = "outside", tickcolor = "#c3cad4")
+  axis <- finder_axis
   p <- plotly::layout(
     p, uirevision = uirevision, paper_bgcolor = "rgba(0,0,0,0)", plot_bgcolor = "#fff",
-    font = list(family = "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", size = 12,
-                color = "#1f2933"),
+    font = finder_font,
     margin = list(l = 64, r = 16, t = 28, b = 48),
     legend = list(orientation = "h", x = 1, xanchor = "right", y = 1, yanchor = "bottom",
                   bgcolor = "rgba(0,0,0,0)"),
@@ -389,16 +478,96 @@ finder_server <- function(data, fetch) {
     spectrum <- shiny::reactive(finder_spectrum(data, input$spectrum))
 
     output$plot <- plotly::renderPlotly({
-      spec <- spectrum()
+      spec <- as_spectrum(spectrum())
       wl_range <- input$wl_range %||% fetch_range
-      keep <- as.numeric(names(spec)) >= wl_range[1] & as.numeric(names(spec)) <= wl_range[2]
+      spec <- spec[spec$wavelength >= wl_range[1] & spec$wavelength <= wl_range[2], ]
       l <- lines()
-      p <- plot_lines(spec[keep], l, shift = input$shift %||% 0,
-                      scale_markers = isTRUE(input$scale %||% TRUE), interactive = TRUE)
+      segments <- line_segments(l, spec, shift = finder_number(input$shift, 0),
+                                scale_markers = isTRUE(input$scale %||% TRUE))
+      p <- lines_plotly(spec, segments, source = "spectrum", heads = TRUE)
+      p <- add_selected_lines(p, bp()$lines, spec)
+      p <- plotly::event_register(p, "plotly_click")
       # keep the zoom when the lines change, reset it when the spectrum changes
       finder_layout(p, uirevision = paste(input$spectrum, wl_range, collapse = " "),
                     empty = nrow(l) == 0)
     })
+
+    # ---- Boltzmann plot ----
+    bp_keys <- shiny::reactiveVal(character())      # lines of the plot
+    bp_excluded <- shiny::reactiveVal(character())  # lines left out of the fit
+
+    shiny::observe({
+      available <- intersect(species(), names(cache())[vapply(cache(), nrow, integer(1)) > 0])
+      current <- shiny::isolate(input$bp_species)
+      shiny::updateSelectInput(session, "bp_species", choices = available,
+                               selected = if (isTRUE(current %in% available)) current else
+                                 utils::head(available, 1))
+    })
+
+    bp <- shiny::reactive({
+      # the chosen lines of the species, from the fetched lines: they stay when
+      # the settings of the candidate lines change
+      raw <- if (isTRUE(input$bp_species %in% names(cache()))) cache()[[input$bp_species]]
+      chosen <- if (is.null(raw)) empty_line_list() else
+        rank_lines(raw[line_key(raw) %in% bp_keys(), ], temperature = 10000, top = Inf,
+                   min_relative = 0)
+      chosen$key <- line_key(chosen)
+      boltzmann_selection(
+        spectrum(), chosen, shift = finder_number(input$shift, 0),
+        half_width = finder_number(input$bp_half_width, 0.15, positive = TRUE),
+        search = finder_number(input$bp_search, 0.2), method = input$bp_method %||% "area",
+        baseline = isTRUE(input$bp_baseline %||% TRUE), units = input$bp_units %||% "energy",
+        excluded = bp_excluded()
+      )
+    })
+
+    # a click on the dot of a line marker adds or removes the line
+    spectrum_click <- function() plotly::event_data("plotly_click", source = "spectrum", priority = "event")
+    boltzmann_click <- function() plotly::event_data("plotly_click", source = "boltzmann", priority = "event")
+    shiny::observeEvent(spectrum_click(), {
+      key <- clicked_key(spectrum_click())
+      if (is.null(key)) return()
+      sp <- sub("[|].*", "", key)
+      if (!identical(input$bp_species, sp)) shiny::updateSelectInput(session, "bp_species", selected = sp)
+      bp_keys(toggle_key(bp_keys(), key))
+      session$sendCustomMessage("bp-show", TRUE)
+    })
+    # a click on a point of the Boltzmann plot leaves it out of the fit
+    shiny::observeEvent(boltzmann_click(), {
+      key <- clicked_key(boltzmann_click())
+      if (!is.null(key)) bp_excluded(toggle_key(bp_excluded(), key))
+    })
+    shiny::observeEvent(input$bp_add, {
+      shown <- lines()
+      bp_keys(union(bp_keys(), line_key(shown[shown$species %in% input$bp_species, ])))
+      session$sendCustomMessage("bp-show", TRUE)
+    })
+    shiny::observeEvent(input$bp_clear, {
+      mine <- startsWith(bp_keys(), paste0(input$bp_species, "|"))
+      bp_excluded(setdiff(bp_excluded(), bp_keys()[mine]))
+      bp_keys(bp_keys()[!mine])
+    })
+    shiny::observeEvent(input$bp_use_t, {
+      fit <- bp()$fit
+      if (is.null(fit)) return()
+      shiny::updateSliderInput(session, "temperature",
+                               value = min(30000, max(3000, round(fit$temperature / 500) * 500)))
+    })
+    shiny::observeEvent(input$done, shiny::stopApp(bp()$fit))
+
+    output$bp_plot <- plotly::renderPlotly(boltzmann_plotly(bp()))
+    # rendered while hidden, so that its click events are registered
+    shiny::outputOptions(output, "bp_plot", suspendWhenHidden = FALSE)
+    output$bp_status <- shiny::renderUI(boltzmann_status(bp()))
+    output$bp_table <- shiny::renderTable(boltzmann_table(bp()$lines), align = "r",
+                                          striped = TRUE, hover = TRUE, spacing = "xs")
+    output$bp_download <- shiny::downloadHandler(
+      filename = function() "boltzmann_lines.csv",
+      content = function(file) {
+        out <- bp()$lines
+        utils::write.csv(out[setdiff(names(out), c("key", "x", "y", "y_se"))], file, row.names = FALSE)
+      }
+    )
 
     output$selection <- shiny::renderText({
       elements <- unlist(input$elements)
@@ -437,6 +606,170 @@ finder_server <- function(data, fetch) {
       shiny::showNotification(paste("Loaded", length(loaded), "species."), type = "message")
     })
 
-    invisible(list(lines = lines, cache = cache, species = species))
+    invisible(list(lines = lines, cache = cache, species = species, bp = bp))
   }
+}
+
+# ---- Boltzmann plot ----------------------------------------------------------
+
+# A numeric input, or its default when empty (or not positive).
+finder_number <- function(x, default, positive = FALSE) {
+  if (!is.numeric(x) || length(x) != 1 || !is.finite(x) || (positive && x <= 0)) default else x
+}
+
+toggle_key <- function(keys, key) {
+  if (key %in% keys) setdiff(keys, key) else c(keys, key)
+}
+
+# The key of the first clicked point that has one.
+clicked_key <- function(event) {
+  keys <- unlist(event$customdata)
+  keys <- keys[!is.na(keys) & nzchar(keys)]
+  if (length(keys) == 0) NULL else keys[[1]]
+}
+
+# Measures the lines in the spectrum and fits the Boltzmann plot of those
+# not excluded: the lines with their key, point (x, y and the standard error
+# of y), whether they are `included` and their residual, the fit (or NULL),
+# and a message when there is no fit.
+boltzmann_selection <- function(spectrum, lines, shift = 0, half_width = 0.15, search = 0.2,
+                                method = "area", baseline = TRUE, units = "energy",
+                                excluded = character()) {
+  if (nrow(lines) == 0) {
+    return(list(lines = NULL, fit = NULL, units = units,
+                message = "Click the dots of line markers, or use Add shown lines."))
+  }
+  centers <- data.frame(wavelength = lines$wavelength + shift)
+  measured <- line_intensities(spectrum, centers, half_width = half_width, search = search,
+                               method = method, baseline = baseline)
+  out <- lines[setdiff(names(lines), "relative_intensity")]
+  out$peak_wavelength <- measured$peak_wavelength
+  out$shift <- measured$peak_wavelength - lines$wavelength
+  for (col in c("height", "intensity", "intensity_se", "snr", "detected")) out[[col]] <- measured[[col]]
+  usable <- is.finite(out$intensity) & out$intensity > 0
+  out$x <- out$Ek
+  out$y <- NA_real_
+  out$y[usable] <- boltzmann_ordinate(out[usable, ], units)
+  out$y_se <- out$intensity_se / out$intensity
+  out$included <- usable & !out$key %in% excluded
+  out$residual <- NA_real_
+  out <- out[order(out$Ek, out$wavelength), ]
+  fit <- NULL
+  message <- NULL
+  if (sum(out$included) < 3) {
+    message <- sprintf("%d line%s in the fit; at least 3 are needed.", sum(out$included),
+                       if (sum(out$included) == 1) "" else "s")
+  } else {
+    used <- out[out$included, setdiff(names(out), c("key", "x", "y", "y_se", "included", "residual"))]
+    fit <- tryCatch(boltzmann(used, units = units), error = function(e) conditionMessage(e))
+    if (is.character(fit)) {
+      message <- if (length(unique(used$Ek)) < 2) "The lines share one upper level; add lines of other levels." else fit
+      fit <- NULL
+    } else {
+      cf <- stats::coef(fit$fit)
+      out$residual <- out$y - (cf[[1]] + cf[[2]] * out$x)
+    }
+  }
+  list(lines = out, fit = fit, units = units, message = message)
+}
+
+boltzmann_status <- function(sel) {
+  if (is.null(sel$fit)) {
+    return(shiny::tags$span(sel$message))
+  }
+  fit <- sel$fit
+  shiny::tagList(
+    shiny::tags$div(shiny::tags$strong(sprintf("T = %s \u00b1 %s K",
+                                               format(round(fit$temperature), big.mark = ","),
+                                               format(round(fit$temperature_se), big.mark = ",")))),
+    shiny::tags$div(sprintf("R\u00b2 = %.3f, %d of %d lines in the fit", fit$r_squared,
+                            nrow(fit$points), nrow(sel$lines)))
+  )
+}
+
+boltzmann_plotly <- function(sel) {
+  pts <- sel$lines
+  p <- plotly::plot_ly(source = "boltzmann")
+  ylab <- if (identical(sel$units, "photons")) "ln(I / g<sub>k</sub>A<sub>ki</sub>)" else
+    "ln(I\u03bb / g<sub>k</sub>A<sub>ki</sub>)"
+  if (!is.null(pts)) pts <- pts[is.finite(pts$y), ]
+  if (!is.null(sel$fit) && nrow(pts) > 0) {
+    cf <- stats::coef(sel$fit$fit)
+    xs <- range(pts$x)
+    p <- plotly::add_trace(p, x = xs, y = cf[[1]] + cf[[2]] * xs, type = "scatter", mode = "lines",
+                           line = list(color = "#8a96a3", width = 1.5), hoverinfo = "skip",
+                           name = "fit")
+  }
+  if (!is.null(pts) && nrow(pts) > 0) {
+    text <- sprintf(
+      "%s %.3f nm<br>E<sub>k</sub> = %.3f eV, g<sub>k</sub>A<sub>ki</sub> = %.2e s<sup>-1</sup><br>SNR %.0f%s<br>%s",
+      pts$species, pts$wavelength, pts$Ek, pts$gk * pts$Aki, pts$snr,
+      ifelse(is.finite(pts$residual), sprintf(", residual %+.2f", pts$residual), ""),
+      ifelse(pts$included, "click to leave out of the fit", "left out: click to use")
+    )
+    for (used in c(TRUE, FALSE)) {
+      k <- pts$included == used
+      if (!any(k)) next
+      p <- plotly::add_trace(
+        p, x = pts$x[k], y = pts$y[k], customdata = pts$key[k], text = text[k],
+        type = "scatter", mode = "markers", hoverinfo = "text",
+        name = if (used) "in the fit" else "left out",
+        error_y = list(type = "data", array = pts$y_se[k], color = "#c3cad4", thickness = 1, width = 0),
+        marker = if (used) list(color = finder_primary, size = 9) else
+          list(color = "#fff", size = 9, line = list(color = "#8a96a3", width = 1.5))
+      )
+    }
+  }
+  if (is.null(pts) || nrow(pts) == 0) {
+    p <- plotly::add_trace(p, x = numeric(0), y = numeric(0), type = "scatter", mode = "markers",
+                           hoverinfo = "skip")
+  }
+  p <- plotly::layout(
+    p, paper_bgcolor = "rgba(0,0,0,0)", plot_bgcolor = "#fff", font = finder_font,
+    margin = list(l = 56, r = 8, t = 8, b = 44), showlegend = FALSE,
+    uirevision = if (is.null(pts) || nrow(pts) == 0) "" else pts$species[1],
+    xaxis = c(list(title = "Upper-level energy (eV)"), finder_axis),
+    yaxis = c(list(title = ylab), finder_axis),
+    annotations = if (is.null(pts) || nrow(pts) == 0) list(list(
+      text = "Pick lines on the spectrum", showarrow = FALSE, xref = "paper", yref = "paper",
+      x = 0.5, y = 0.5, font = list(color = "#8a96a3")
+    ))
+  )
+  p <- plotly::event_register(p, "plotly_click")
+  plotly::config(p, displaylogo = FALSE, modeBarButtonsToRemove = c("lasso2d", "select2d"),
+                 toImageButtonOptions = list(format = "svg", filename = "boltzmann_plot"))
+}
+
+boltzmann_table <- function(lines) {
+  if (is.null(lines) || nrow(lines) == 0) return(NULL)
+  data.frame(
+    `Line (nm)` = sprintf("%.3f", lines$wavelength),
+    `Ek (eV)` = sprintf("%.3f", lines$Ek),
+    `gA (s-1)` = sprintf("%.2e", lines$gk * lines$Aki),
+    SNR = sprintf("%.0f", lines$snr),
+    Residual = ifelse(is.finite(lines$residual), sprintf("%+.2f", lines$residual), ""),
+    Fit = ifelse(lines$included, "yes", "no"),
+    check.names = FALSE
+  )
+}
+
+# Markers of the lines of the Boltzmann plot on the spectrum, at their peak.
+add_selected_lines <- function(p, lines, spec) {
+  if (is.null(lines) || nrow(lines) == 0) return(p)
+  x <- ifelse(is.na(lines$peak_wavelength), lines$wavelength, lines$peak_wavelength)
+  inside <- x >= min(spec$wavelength) & x <= max(spec$wavelength)
+  if (!any(inside)) return(p)
+  # the lines in the fit first: the legend shows the symbol of the first
+  keep <- which(inside)[order(!lines$included[inside])]
+  lines <- lines[keep, ]
+  x <- x[keep]
+  y <- stats::approx(spec$wavelength, spec$intensity, xout = x)$y
+  plotly::add_trace(
+    p, x = x, y = y, customdata = lines$key, type = "scatter", mode = "markers",
+    name = "Boltzmann plot", hoverinfo = "text",
+    text = sprintf("%s %.3f nm, in the Boltzmann plot<br>click to remove", lines$species,
+                   lines$wavelength),
+    marker = list(size = 10, symbol = ifelse(lines$included, "diamond", "diamond-open"),
+                  color = finder_primary, line = list(color = finder_primary, width = 1.5))
+  )
 }

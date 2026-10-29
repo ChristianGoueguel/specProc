@@ -52,7 +52,8 @@ A tibble with one row per spectrum and the columns:
 \itemize{
 \item \code{id} column (or \code{spectrum}, the row number, when \code{id = NULL}),
 \item \code{data}: the fitted data (\code{x}, \code{y}),
-\item \code{fit}: the \code{nls} model object,
+\item \code{fit}: the \code{nls} model object, of class \code{specproc_peak_fit} (see
+\link[=specproc-tidy]{tidy()} and \link[=specproc-tidy]{glance()}),
 \item \code{tidied}: the estimated parameters with their standard errors,
 \item \code{augmented}: the data with fitted values (\code{.fitted}) and residuals (\code{.resid}).
 }

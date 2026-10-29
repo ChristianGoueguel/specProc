@@ -190,6 +190,21 @@ alone (`r round(neutral$temperature, -2)` ±
 `r round(neutral$temperature_se, -1)` K). Its standard error,
 `r round(saha$temperature_se, -1)` K, reflects the scatter of the points.
 
+`tidy()` lists the estimates of a fit, here with their 95% confidence
+intervals (that of the temperature is the interval of the slope,
+transformed), and `glance()` summarizes the fit in one row, to compare
+plots or bind the results of several spectra:
+
+```{r tidy}
+tidy(saha, conf.int = TRUE)
+glance(saha)
+```
+
+The lines of a Boltzmann plot can also be chosen interactively:
+`line_finder()` measures the lines picked on a spectrum, fits their
+Boltzmann plot as they are added, and leaves out the points clicked on the
+plot.
+
 ### Uncertainty of the temperature
 
 The points scatter because of the errors of the intensities and of the

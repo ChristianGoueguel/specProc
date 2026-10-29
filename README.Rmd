@@ -92,7 +92,7 @@ website](https://christiangoueguel.com/specProc/articles/).
 
 | Task | Functions |
 |----|----|
-| Line identification | `libs_lines()`, `plot_lines()`, `line_finder()` (Shiny app), `wavelength_calibration()`, `apply_calibration()`, `response_calibration()`, `correct_response()` |
+| Line identification | `libs_lines()`, `plot_lines()`, `line_finder()` (Shiny app, with an interactive Boltzmann plot), `wavelength_calibration()`, `apply_calibration()`, `response_calibration()`, `correct_response()` |
 | Line fitting | `peak_fit()`, `multipeak_fit()`, `plot_fit()`, `line_intensities()`, `voigt_profile()`, `pseudo_voigt_profile()`, `gaussian_profile()`, `lorentzian_profile()`, `voigt_fwhm()`, `doppler_width()` |
 | Preprocessing | `baseline_arpls()`, `baseline_als()`, `baseline_lsp()`, `snv()`, `msc()`, `emsc()`, `normalize()`, `savitzky_golay()`, `gap_derivative()`, `bin_spectra()`, `wavelet_features()`, `reject_shots()`, `average()` |
 | Recipe steps | `step_baseline()`, `step_snv()`, `step_msc()`, `step_emsc()`, `step_spectral_norm()`, `step_line_ratio()`, `step_savgol()`, `step_gap_derivative()`, `step_bin_spectra()`, `step_wavelet()`, `step_line_intensities()`, `step_reject_shots()`, `step_opls()`, `step_o2pls()`, `step_epo()`, `step_glsw()`, and more |
@@ -103,6 +103,7 @@ website](https://christiangoueguel.com/specProc/articles/).
 | Plasma diagnostics | `saturation_summary()`, `electron_density()`, `boltzmann()`, `saha_boltzmann()`, `plot_boltzmann()`, `plasma_uncertainty()`, `electron_density_uncertainty()`, `mcwhirter_criterion()`, `lte_criteria()`, `self_absorption()`, `correct_self_absorption()`, `curve_of_growth()`, `cf_libs()`, `nist_lines()`, `starkb_lines()` |
 | Outliers and robust PCA | `robpca()`, `rospca()`, `macropca()`, `cellpca()`, `plot_outlier_map()`, `plot_cell_map()`, `q_residuals()`, `dmodx()`, `plot_influence()`, `hotelling_t2()` |
 | Robust statistics | `summary_stats()`, `biweight_location()`, `biweight_scale()`, `rousseeuw_croux()`, `umad()`, `adjusted_boxplot()`, `robust_bcyj()` |
+| Tidy results | `tidy()` and `glance()` of peak fits, calibrations and plasma diagnostics |
 | Visualization | `plot_spectra()`, `plot_embedding()`, `plot_loadings()`, `plot_contributions()` |
 
 See the [reference](https://christiangoueguel.com/specProc/reference/)

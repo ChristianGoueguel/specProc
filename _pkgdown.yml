@@ -358,6 +358,7 @@ reference:
 
 - title: Miscellaneous
   contents:
+  - specproc-tidy
   - correlation
   - summary_stats
 

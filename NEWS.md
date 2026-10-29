@@ -203,6 +203,25 @@
   sample, to detect drifts of the instrument: Shewhart chart with the
   Western Electric rules, EWMA and CUSUM, with the center and standard
   deviation (mean moving range) from a baseline.
+* `line_finder()` builds a Boltzmann plot interactively: clicking the dot of
+  a line marker adds the line to the plot of its species (or removes it),
+  **Add shown lines** adds the lines shown, and clicking a point of the plot
+  leaves it out of the fit. The intensities are measured on the displayed
+  spectrum with `line_intensities()` and the temperature is fitted with
+  `boltzmann()`; a table lists the upper-level energy, signal-to-noise ratio
+  and residual of each line. **Use T** ranks the candidate lines at the
+  fitted temperature, and **Done** closes the app and returns the
+  `boltzmann()` fit to R.
+* `tidy()` and `glance()` methods for peak fits, `calibration_curve()`,
+  `wavelength_calibration()`, `slope_bias()`, `boltzmann()`,
+  `saha_boltzmann()`, `cf_libs()`, `plasma_uncertainty()` and
+  `curve_of_growth()`: the estimates with their standard errors and
+  confidence intervals, and a one-row summary of the fit, in the
+  conventions of broom (see `?"specproc-tidy"`), to bind the results of
+  several spectra or samples. The generics are re-exported, and generics
+  (already a dependency of dplyr) moves from Suggests to Imports. The `fit`
+  column of `peak_fit()` and `multipeak_fit()` holds `nls` fits of the new
+  class `specproc_peak_fit`.
 
 ## Improvements
 

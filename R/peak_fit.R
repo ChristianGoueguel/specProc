@@ -56,7 +56,8 @@
 #' @return A tibble with one row per spectrum and the columns:
 #'  - `id` column (or `spectrum`, the row number, when `id = NULL`),
 #'  - `data`: the fitted data (`x`, `y`),
-#'  - `fit`: the `nls` model object,
+#'  - `fit`: the `nls` model object, of class `specproc_peak_fit` (see
+#'    [tidy()][specproc-tidy] and [glance()][specproc-tidy]),
 #'  - `tidied`: the estimated parameters with their standard errors,
 #'  - `augmented`: the data with fitted values (`.fitted`) and residuals (`.resid`).
 #'
@@ -310,6 +311,7 @@ fit_one <- function(data, peaks, profiles, wL, wG, A, max_iter, single, fixed = 
     upper = spec$upper,
     control = minpack.lm::nls.lm.control(maxiter = max_iter)
   )
+  class(fit) <- c("specproc_peak_fit", class(fit))
   attr(fit, "peak_terms") <- spec$terms
   attr(fit, "definitions") <- spec$definitions
 

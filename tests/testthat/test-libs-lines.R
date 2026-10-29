@@ -169,3 +169,118 @@ test_that("the selection lists the selected elements", {
     expect_match(output$selection, "^9 elements: .*, \\.\\.\\.$")
   })
 })
+
+# A spectrum of the four lines of fake "Xx I" in LTE at temperature `te`:
+# Gaussian lines whose areas follow the Boltzmann law, on a flat background.
+lte_spectrum <- function(te = 9000, noise = 0) {
+  set.seed(1)
+  lines <- rank_lines(fake_nist("Xx I"), temperature = te, top = 10, min_relative = 0)
+  wl <- seq(395, 435, by = 0.01)
+  area <- lines$gk * lines$Aki / lines$wavelength * exp(-lines$Ek / (kB * te))
+  sigma <- 0.03
+  y <- 50 + rowSums(vapply(seq_len(nrow(lines)), function(i) {
+    area[i] / (sigma * sqrt(2 * pi)) * exp(-(wl - lines$wavelength[i])^2 / (2 * sigma^2))
+  }, numeric(length(wl)))) + stats::rnorm(length(wl), sd = noise)
+  list(spectrum = stats::setNames(y, wl), lines = lines)
+}
+
+test_that("the Boltzmann selection measures the lines and fits the temperature", {
+  sim <- lte_spectrum(te = 9000, noise = 0.05)
+  lines <- sim$lines
+  lines$key <- line_key(lines)
+  sel <- boltzmann_selection(sim$spectrum, lines)
+  expect_s3_class(sel$fit, "specproc_boltzmann")
+  expect_equal(sel$fit$temperature, 9000, tolerance = 0.01)
+  expect_true(all(sel$lines$included))
+  expect_true(all(abs(sel$lines$residual) < 0.05))
+  expect_false(any(c("key", "x", "y", "residual", "relative_intensity") %in% names(sel$fit$lines)))
+  expect_equal(sel$fit$lines$wavelength, c(400, 410, 420, 430))
+
+  # an excluded line stays in the plot, with its residual, out of the fit
+  out <- boltzmann_selection(sim$spectrum, lines, excluded = lines$key[lines$wavelength == 430])
+  expect_equal(nrow(out$fit$points), 3)
+  expect_false(out$lines$included[out$lines$wavelength == 430])
+  expect_true(all(is.finite(out$lines$residual)))
+
+  # a calibration shift is found by the peak search, and the tabulated
+  # wavelengths are kept
+  shifted <- boltzmann_selection(stats::setNames(sim$spectrum, as.numeric(names(sim$spectrum)) + 0.05),
+                                 lines, shift = 0.05)
+  expect_equal(shifted$fit$temperature, sel$fit$temperature, tolerance = 1e-3)
+  expect_equal(shifted$lines$shift, rep(0.05, 4), tolerance = 1e-6)
+
+  expect_null(boltzmann_selection(sim$spectrum, lines[1:2, ])$fit)
+  expect_match(boltzmann_selection(sim$spectrum, lines[1:2, ])$message, "at least 3")
+  expect_match(boltzmann_selection(sim$spectrum, lines[0, ])$message, "Add shown lines")
+  same <- lines[1:3, ]
+  same$Ek <- 3
+  expect_match(boltzmann_selection(sim$spectrum, same)$message, "one upper level")
+})
+
+test_that("the Boltzmann helpers toggle keys and draw the plot and table", {
+  expect_equal(toggle_key(c("a", "b"), "a"), "b")
+  expect_equal(toggle_key("a", "b"), c("a", "b"))
+  expect_equal(clicked_key(data.frame(x = 1:2, customdata = c(NA, "k"))), "k")
+  expect_null(clicked_key(data.frame(x = 1)))
+  expect_null(clicked_key(NULL))
+  expect_equal(finder_number(NA, 2), 2)
+  expect_equal(finder_number(-1, 2, positive = TRUE), 2)
+  expect_equal(finder_number(0.3, 2), 0.3)
+  skip_if_not_installed("plotly")
+  skip_if_not_installed("shiny")
+  sim <- lte_spectrum()
+  lines <- sim$lines
+  lines$key <- line_key(lines)
+  sel <- boltzmann_selection(sim$spectrum, lines, excluded = lines$key[1])
+  built <- plotly::plotly_build(boltzmann_plotly(sel))
+  expect_equal(built$x$source, "boltzmann")
+  expect_equal(length(built$x$data), 3)   # fit, used and left-out points
+  expect_true(all(lines$key %in% unlist(lapply(built$x$data, `[[`, "customdata"))))
+  expect_equal(nrow(boltzmann_table(sel$lines)), 4)
+  expect_equal(boltzmann_table(sel$lines)$Fit, c("no", "yes", "yes", "yes"))
+  expect_null(boltzmann_table(NULL))
+  expect_match(as.character(boltzmann_status(sel)), "T = ")
+  empty <- plotly::plotly_build(boltzmann_plotly(boltzmann_selection(sim$spectrum, lines[0, ])))
+  expect_match(empty$x$layout$annotations[[1]]$text, "Pick lines")
+  # markers on the spectrum, those in the fit first (for the legend)
+  marked <- plotly::plotly_build(add_selected_lines(plotly::plot_ly(), sel$lines,
+                                                    as_spectrum(sim$spectrum)))
+  trace <- marked$x$data[[length(marked$x$data)]]
+  expect_equal(trace$marker$symbol, c(rep("diamond", 3), "diamond-open"), ignore_attr = TRUE)
+  expect_equal(trace$customdata[4], lines$key[1])
+})
+
+test_that("the line finder builds a Boltzmann plot from clicks", {
+  skip_if_not_installed("shiny")
+  skip_if_not_installed("plotly")
+  skip_if_not_installed("bslib")
+  sim <- lte_spectrum(te = 9000, noise = 0.05)
+  x <- rbind(sim$spectrum, sim$spectrum)
+  app <- line_finder_app(x, fetch = function(species, wavelength) fake_nist(species, wavelength))
+  click <- function(key) sprintf('[{"curveNumber":1,"pointNumber":1,"x":400,"y":1,"customdata":"%s"}]', key)
+  key <- function(wl) line_key(sim$lines[sim$lines$wavelength == wl, ])
+  shiny::testServer(app, {
+    session$userData$plotlyShinyEventIDs <- c("plotly_click-spectrum", "plotly_click-boltzmann")
+    session$setInputs(spectrum = "mean", stages = c("1", "2"), temperature = 10000, top = 10,
+                      min_relative = 0, wl_range = c(395, 435), shift = 0, scale = TRUE,
+                      elements = list("Xx"), bp_species = "Xx I", bp_method = "area",
+                      bp_half_width = 0.15, bp_search = 0.2, bp_baseline = TRUE, bp_units = "energy")
+    expect_null(bp()$lines)
+    session$setInputs(`plotly_click-spectrum` = click(key(400)))
+    expect_equal(nrow(bp()$lines), 1)
+    session$setInputs(`plotly_click-spectrum` = click(key(400)))   # again: removed
+    expect_null(bp()$lines)
+    session$setInputs(bp_add = 1)
+    expect_equal(nrow(bp()$lines), 4)
+    expect_equal(bp()$fit$temperature, 9000, tolerance = 0.01)
+    session$setInputs(top = 1)                                     # selection kept
+    expect_equal(nrow(bp()$lines), 4)
+    session$setInputs(`plotly_click-boltzmann` = click(key(430)))
+    expect_equal(nrow(bp()$fit$points), 3)
+    expect_match(output$bp_table, "> no <")
+    session$setInputs(`plotly_click-spectrum` = '[{"curveNumber":0,"pointNumber":5,"x":400,"y":1}]')
+    expect_equal(nrow(bp()$lines), 4)                              # the spectrum itself
+    session$setInputs(bp_clear = 1)
+    expect_null(bp()$lines)
+  })
+})
