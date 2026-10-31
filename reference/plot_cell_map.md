@@ -27,7 +27,11 @@ plot_cell_map(
   labels = 5,
   lines = NULL,
   tol = 0.1,
-  title = NULL
+  title = NULL,
+  wavelength = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11
 )
 ```
 
@@ -94,6 +98,21 @@ plot_cell_map(
 
   The plot title. Default is "MacroPCA cell map" or "cellPCA cell map".
 
+- wavelength:
+
+  Optional (`NULL` by default). The wavelength range `c(min, max)` to
+  show, in nm: the columns within it (of `columns`, if given). Needs
+  variables named by wavelength.
+
+- xlab, ylab:
+
+  The axis titles of the map. Default are `"Wavelength (nm)"` (or
+  `"Variable"`) and `"Observation"`, with the order of the rows.
+
+- base_size:
+
+  The size of the text, in points. Default is 11.
+
 ## Value
 
 A patchwork (ggplot2) object.
@@ -156,6 +175,8 @@ fit <- macropca(center(spectra), k = 3)
 
 if (requireNamespace("patchwork", quietly = TRUE)) {
   plot_cell_map(fit, order = "cluster")
+  # the Ca II H and K lines
+  plot_cell_map(fit, wavelength = c(390, 400), order = "od")
 }
 
 # }

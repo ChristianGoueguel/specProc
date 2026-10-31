@@ -19,7 +19,12 @@ plot_coomans(
   log = FALSE,
   shade = FALSE,
   title = NULL,
-  ...
+  ...,
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11,
+  point_size = 2.2,
+  point_alpha = 0.85
 )
 ```
 
@@ -68,11 +73,26 @@ plot_coomans(
 
   Further arguments passed to
   [`ggplot2::geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html)
-  to style the points, such as `alpha` (default 0.85), `size` (2.2),
-  `stroke` (0.4) or `colour` (the outline, `"black"`). `size` can also
-  be a numeric vector with one value per observation (the training
-  observations, then those of `newdata`), to vary the size of the
-  points, with a legend.
+  to style the points, such as `stroke` (default 0.4) or `colour` (the
+  outline, `"black"`).
+
+- xlab, ylab:
+
+  The axis titles. Default are the distances to the two classes.
+
+- base_size:
+
+  The size of the text, in points. Default is 11.
+
+- point_size:
+
+  The size of the points (default 2.2), or a numeric vector with one
+  value per observation (the training observations, then those of
+  `newdata`), to vary the size of the points, with a legend.
+
+- point_alpha:
+
+  The opacity of the points, between 0 and 1 (default 0.85).
 
 ## Value
 

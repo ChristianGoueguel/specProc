@@ -31,10 +31,16 @@ plot_outlier_map(
   relative = FALSE,
   shade = FALSE,
   log = FALSE,
-  colour_by = c("type", "distance"),
   title = NULL,
   map = c("regression", "score"),
-  ...
+  ...,
+  color_by = c("type", "distance"),
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11,
+  point_size = 2.2,
+  point_alpha = 0.85,
+  colour_by = deprecated()
 )
 ```
 
@@ -84,16 +90,6 @@ plot_outlier_map(
   observations when a few are far away. Zero distances are drawn at the
   smallest positive distance. Default is `FALSE`.
 
-- colour_by:
-
-  The colors of the points: `"type"` (default), by outlier type, or
-  `"distance"`, by their reduced distance from the origin,
-  \\\max(SD/c\_{SD}, OD/c\_{OD})\\, on a rainbow scale from dark red
-  (the closest) to blue (the farthest). With `relative = TRUE`, where
-  both cut-offs are at 1, yellow marks the cut-offs: dark red through
-  orange for the regular observations, then green and blue for the
-  outlying ones. Otherwise, the colors spread evenly over the distances.
-
 - title:
 
   The plot title.
@@ -112,11 +108,41 @@ plot_outlier_map(
 
   Further arguments passed to
   [`ggplot2::geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html)
-  to style the points, such as `alpha` (default 0.85), `size` (2.2),
-  `stroke` (0.4) or `colour` (the outline, `"black"`). `size` can also
-  be a numeric vector with one value per sample (the calibration
-  samples, then those of `newdata`), such as the concentration of an
-  element, to vary the size of the points, with a legend.
+  to style the points, such as `stroke` (default 0.4) or `colour` (the
+  outline, `"black"`).
+
+- color_by:
+
+  The colors of the points: `"type"` (default), by outlier type, or
+  `"distance"`, by their reduced distance from the origin,
+  \\\max(SD/c\_{SD}, OD/c\_{OD})\\, on a rainbow scale from dark red
+  (the closest) to blue (the farthest). With `relative = TRUE`, where
+  both cut-offs are at 1, yellow marks the cut-offs: dark red through
+  orange for the regular observations, then green and blue for the
+  outlying ones. Otherwise, the colors spread evenly over the distances.
+
+- xlab, ylab:
+
+  The axis titles. Default are the names of the distances.
+
+- base_size:
+
+  The size of the text, in points. Default is 11.
+
+- point_size:
+
+  The size of the points (default 2.2), or a numeric vector with one
+  value per sample (the calibration samples, then those of `newdata`),
+  such as the concentration of an element, to vary the size of the
+  points, with a legend.
+
+- point_alpha:
+
+  The opacity of the points, between 0 and 1 (default 0.85).
+
+- colour_by:
+
+  **\[deprecated\]** Use `color_by`.
 
 ## Value
 
@@ -192,6 +218,6 @@ fit <- forageLIBS |>
 plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE)
 
 plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE,
-labels = 10, colour_by = "distance")
+labels = 10, color_by = "distance", point_alpha = 0.6)
 
 ```

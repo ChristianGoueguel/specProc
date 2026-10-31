@@ -57,7 +57,12 @@ optionally the concentrations predicted for new samples.</p>
 <span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  replicates <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  title <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  base_size <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>  point_size <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  point_alpha <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -93,6 +98,24 @@ new signal. Default is 1.</p></dd>
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>The plot title. By default, the model and the figures of
 merit.</p></dd>
+
+
+<dt id="arg-xlab-ylab">xlab, ylab<a class="anchor" aria-label="anchor" href="#arg-xlab-ylab"></a></dt>
+<dd><p>The axis titles. Default are the names of the
+concentration and signal columns.</p></dd>
+
+
+<dt id="arg-base-size">base_size<a class="anchor" aria-label="anchor" href="#arg-base-size"></a></dt>
+<dd><p>The size of the text, in points. Default is 11.</p></dd>
+
+
+<dt id="arg-point-size">point_size<a class="anchor" aria-label="anchor" href="#arg-point-size"></a></dt>
+<dd><p>The size of the points of the standards. Default is 2.</p></dd>
+
+
+<dt id="arg-point-alpha">point_alpha<a class="anchor" aria-label="anchor" href="#arg-point-alpha"></a></dt>
+<dd><p>The opacity of the points of the standards, between 0
+and 1. Default is 1; lower it when replicates overlap.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -133,7 +156,8 @@ concentration from <a href="predict.specproc_calibration.html">predict()</a>.</p
 <span class="r-in"><span><span class="va">calibration</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">!</span><span class="va">data</span><span class="op">$</span><span class="va">Sample</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">test_samples</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">k_curve</span> <span class="op">&lt;-</span> <span class="fu"><a href="calibration_curve.html">calibration_curve</a></span><span class="op">(</span><span class="va">calibration</span>, <span class="va">K_signal</span>, <span class="va">K</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">plot_calibration</span><span class="op">(</span><span class="va">k_curve</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_calibration</span><span class="op">(</span><span class="va">k_curve</span>, point_alpha <span class="op">=</span> <span class="fl">0.4</span>, xlab <span class="op">=</span> <span class="st">"K (%)"</span>,</span></span>
+<span class="r-in"><span>                 ylab <span class="op">=</span> <span class="st">"K I 769.90 nm / C I 247.86 nm"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_calibration-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>

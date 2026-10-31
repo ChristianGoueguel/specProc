@@ -19,9 +19,15 @@ plot_influence(
   relative = FALSE,
   shade = FALSE,
   log = FALSE,
-  colour_by = c("type", "distance"),
   title = NULL,
-  ...
+  ...,
+  color_by = c("type", "distance"),
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11,
+  point_size = 2.2,
+  point_alpha = 0.85,
+  colour_by = deprecated()
 )
 ```
 
@@ -61,14 +67,6 @@ plot_influence(
   when a few are far away. Zero distances are drawn at the smallest
   positive distance. Default is `FALSE`.
 
-- colour_by:
-
-  The colors of the points: `"type"` (default), by type, or
-  `"distance"`, by their distance relative to the limits,
-  \\\max(T^2/T^2\_{lim}, Q/Q\_{lim})\\, on a rainbow scale from dark red
-  to blue, as in
-  [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md).
-
 - title:
 
   The plot title.
@@ -77,11 +75,38 @@ plot_influence(
 
   Further arguments passed to
   [`ggplot2::geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html)
-  to style the points, such as `alpha` (default 0.85), `size` (2.2),
-  `stroke` (0.4) or `colour` (the outline, `"black"`). `size` can also
-  be a numeric vector with one value per sample, such as the
-  concentration of an element, to vary the size of the points, with a
-  legend.
+  to style the points, such as `stroke` (default 0.4) or `colour` (the
+  outline, `"black"`).
+
+- color_by:
+
+  The colors of the points: `"type"` (default), by type, or
+  `"distance"`, by their distance relative to the limits,
+  \\\max(T^2/T^2\_{lim}, Q/Q\_{lim})\\, on a rainbow scale from dark red
+  to blue, as in
+  [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md).
+
+- xlab, ylab:
+
+  The axis titles. Default are the names of the distances.
+
+- base_size:
+
+  The size of the text, in points. Default is 11.
+
+- point_size:
+
+  The size of the points (default 2.2), or a numeric vector with one
+  value per sample, such as the concentration of an element, to vary the
+  size of the points, with a legend.
+
+- point_alpha:
+
+  The opacity of the points, between 0 and 1 (default 0.85).
+
+- colour_by:
+
+  **\[deprecated\]** Use `color_by`.
 
 ## Value
 
@@ -128,7 +153,7 @@ plot_influence(influence, label = forageLIBS$Measurement)
 
 # the same options as plot_outlier_map(): distances relative to the limits,
 # shaded outlying regions, logarithmic axes and colors by distance
-plot_influence(influence, relative = TRUE, shade = TRUE, log = TRUE, colour_by = "distance")
+plot_influence(influence, relative = TRUE, shade = TRUE, log = TRUE, color_by = "distance")
 
 
 # a single limit at 97.5%, with the outlying regions shaded

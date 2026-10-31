@@ -8,7 +8,15 @@ labeled with the reason.
 ## Usage
 
 ``` r
-plot_wavelength_calibration(object, title = NULL)
+plot_wavelength_calibration(
+  object,
+  title = NULL,
+  xlab = "Measured wavelength (nm)",
+  ylab = "Reference - measured (nm)",
+  base_size = 11,
+  point_size = 2.5,
+  point_alpha = 1
+)
 ```
 
 ## Arguments
@@ -21,6 +29,24 @@ plot_wavelength_calibration(object, title = NULL)
 - title:
 
   The plot title.
+
+- xlab, ylab:
+
+  The axis titles. Default are `"Measured wavelength (nm)"` and
+  `"Reference - measured (nm)"`.
+
+- base_size:
+
+  The size of the text, in points. Default is 11; the line labels scale
+  with it.
+
+- point_size:
+
+  The size of the points of the lines. Default is 2.5.
+
+- point_alpha:
+
+  The opacity of the points, between 0 and 1. Default is 1.
 
 ## Value
 

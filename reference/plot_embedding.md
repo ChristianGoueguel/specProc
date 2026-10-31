@@ -16,9 +16,9 @@ plot_embedding(
   data,
   x = NULL,
   y = NULL,
-  colour = NULL,
-  size = 2,
-  alpha = 0.8,
+  color_by = NULL,
+  point_size = NULL,
+  point_alpha = 0.8,
   ellipse = FALSE,
   conf_level = 0.975,
   robust = FALSE,
@@ -38,7 +38,12 @@ plot_embedding(
   legend = c("right", "bottom", "top", "inside", "none"),
   panel = c("shaded", "white"),
   caption = TRUE,
-  base_size = 11
+  base_size = 11,
+  xlab = NULL,
+  ylab = NULL,
+  colour = deprecated(),
+  size = deprecated(),
+  alpha = deprecated()
 )
 ```
 
@@ -59,19 +64,20 @@ plot_embedding(
   The columns of the axes, unquoted or as strings. By default, the first
   two embedding coordinates (see details).
 
-- colour:
+- color_by:
 
   The variable coloring the points: a column of `data` (unquoted or as a
   string), or a vector with one value per sample.
 
-- size:
+- point_size:
 
-  The size of the points: a number (default 2), or a numeric column of
-  `data` or vector with one value per sample to vary it.
+  The size of the points: a number, or a numeric column of `data` or
+  vector with one value per sample to vary it. Default is 2 at a
+  `base_size` of 11, scaled with `base_size`.
 
-- alpha:
+- point_alpha:
 
-  The opacity of the points.
+  The opacity of the points, between 0 and 1. Default is 0.8.
 
 - ellipse:
 
@@ -96,8 +102,8 @@ plot_embedding(
 - hotelling:
 
   Hotelling's \\T^2\\ ellipses and outliers: `"none"` (default), `"all"`
-  (all samples) or `"group"` (within the groups of a discrete `colour`).
-  Needs the HotellingEllipse package (1.3.0 or later).
+  (all samples) or `"group"` (within the groups of a discrete
+  `color_by`). Needs the HotellingEllipse package (1.3.0 or later).
 
 - k:
 
@@ -145,20 +151,20 @@ plot_embedding(
 
 - legend_title:
 
-  The title of the legend of `colour`. Default is its name; give it with
-  units, such as `"K (%)"`.
+  The title of the legend of `color_by`. Default is its name; give it
+  with units, such as `"K (%)"`.
 
 - palette:
 
-  The colors of `colour`: `NULL` (default: Dark2 for up to 8 groups,
+  The colors of `color_by`: `NULL` (default: Dark2 for up to 8 groups,
   viridis for a numeric variable), the name of a viridis palette
   (`"viridis"`, `"magma"`, `"cividis"`, ...) or a vector of colors.
 
 - shapes:
 
-  A logical: give each group of a discrete `colour` its own point shape
-  (up to 6 groups), so that the groups stay apart in grayscale (`TRUE`,
-  default).
+  A logical: give each group of a discrete `color_by` its own point
+  shape (up to 6 groups), so that the groups stay apart in grayscale
+  (`TRUE`, default).
 
 - legend:
 
@@ -179,7 +185,17 @@ plot_embedding(
 
   The size of the text, in points. Default is 11; use the text size of
   the journal (often 7 to 9 points) for a figure saved at its printed
-  size. The points, lines and labels scale with it.
+  size. The points (unless `point_size` is a number), lines and labels
+  scale with it.
+
+- xlab, ylab:
+
+  The axis titles. Default are the names of the axes, with the variance
+  they explain for a PCA.
+
+- colour, size, alpha:
+
+  **\[deprecated\]** Use `color_by`, `point_size` and `point_alpha`.
 
 ## Value
 
@@ -189,11 +205,11 @@ A ggplot object.
 
 By default, the axes are the first two columns named like embedding
 coordinates (`UMAP1`, `PC1`, `Comp1`, ...; the name followed by a
-number), or else the first two numeric columns. A numeric `colour` uses
-a continuous viridis scale, other types a discrete palette.
+number), or else the first two numeric columns. A numeric `color_by`
+uses a continuous viridis scale, other types a discrete palette.
 
 With `ellipse = TRUE`, a confidence ellipse is drawn for each group of a
-discrete `colour` (or for all the samples otherwise), with
+discrete `color_by` (or for all the samples otherwise), with
 [`ConfidenceEllipse::confidence_ellipse()`](https://christiangoueguel.github.io/ConfidenceEllipse/reference/confidence_ellipse.html),
 at each level of `conf_level` (0.975 by default). It covers the region
 expected to hold that share of the samples of the group if they follow a
@@ -235,7 +251,7 @@ the samples (with
 [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)
 and
 [`HotellingEllipse::ellipseCoord()`](https://pkgdown.r-lib.org,%20https://github.com/ChristianGoueguel/HotellingEllipse/reference/ellipseCoord.html)).
-With `hotelling = "group"`, each group of a discrete `colour` gets its
+With `hotelling = "group"`, each group of a discrete `color_by` gets its
 own ellipses and limits, from its mean and covariance, which flags the
 samples atypical of their own group. The ellipses are labeled with their
 level (instead of a legend), and drawn for the two components shown,
@@ -256,7 +272,7 @@ a fixed `aspect_ratio` (0.7 by default; `NULL` lets the plot fill the
 space, `"equal"` gives both axes the same scale), and thin light grey
 lines through the origin (when it lies in the range of the samples, as
 for centered scores). Without ellipses, the panel is white. The groups
-of a discrete `colour` also get their own point shapes (`shapes`), and
+of a discrete `color_by` also get their own point shapes (`shapes`), and
 the axes plain numbers. A caption says what the ellipses and limits are
 (their level, distribution and estimates), which readers cannot tell
 from the plot.
@@ -279,9 +295,10 @@ which estimate only these. With groups, the ellipses (confidence, or
 \\T^2\\ with `hotelling = "group"`) are filled with the color of their
 group.
 
-**Point size.** `size` is a number, or a numeric variable (a column of
-`data` or a vector with one value per sample), such as the concentration
-of an element, which sets the size of each point, with a legend.
+**Point size.** `point_size` is a number, or a numeric variable (a
+column of `data` or a vector with one value per sample), such as the
+concentration of an element, which sets the size of each point, with a
+legend.
 
 **Biplot.** With `biplot = TRUE` (for a
 [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html) fit or a robust
@@ -337,7 +354,7 @@ if (rlang::is_installed("ConfidenceEllipse")) {
   wl <- suppressWarnings(as.numeric(names(forageLIBS)))
   pca <- stats::prcomp(forageLIBS[which(wl > 760 & wl < 772)])
   level <- cut(forageLIBS$K, 3, labels = c("Low K", "Mid K", "High K"))
-  p <- plot_embedding(pca, colour = level, ellipse = TRUE, legend_title = "Potassium",
+  p <- plot_embedding(pca, color_by = level, ellipse = TRUE, legend_title = "Potassium",
                       legend = "bottom", base_size = 8)
   p
   # ggplot2::ggsave("scores.pdf", p, width = 85, height = 80, units = "mm")
@@ -357,7 +374,7 @@ if (rlang::is_installed(c("recipes", "embed"))) {
     embed::step_umap(recipes::all_predictors(), neighbors = 15) |>
     recipes::prep() |>
     recipes::bake(new_data = NULL)
-  plot_embedding(umap, colour = Species, title = "UMAP of the iris flowers")
+  plot_embedding(umap, color_by = Species, title = "UMAP of the iris flowers")
 }
 
 # }

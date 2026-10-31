@@ -229,7 +229,7 @@ fit
 #> 
 #>            regular      good leverage orthogonal outlier       bad leverage 
 #>                255                  1                 90                 22 
-plot_outlier_map(fit, shade = TRUE, relative = TRUE, log = TRUE, colour_by = "distance")
+plot_outlier_map(fit, shade = TRUE, relative = TRUE, log = TRUE, color_by = "distance")
 
 plot_cell_map(fit, order = "od")
 

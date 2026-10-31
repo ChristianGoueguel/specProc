@@ -22,6 +22,9 @@ plot_outliers(
   title = NULL,
   caption = TRUE,
   base_size = 11,
+  xlab = NULL,
+  point_size = NULL,
+  point_alpha = 1,
   show.outlier = deprecated(),
   show.mahal = deprecated()
 )
@@ -79,11 +82,6 @@ plot_outliers(
   outliers beyond the univariate limits of the panel are labeled; the
   distance plot names them all.
 
-- ylab:
-
-  The title of the value axis. Default is "Robust z-score", or "Robust
-  distance" with `type = "distance"`.
-
 - title:
 
   The plot title. A long title is split into a title and a subtitle.
@@ -98,6 +96,21 @@ plot_outliers(
   The size of the text, in points. Default is 11; use the text size of
   the journal (often 7 to 9 points) for a figure saved at its printed
   size.
+
+- xlab, ylab:
+
+  The axis titles. Default are none (the samples are spread along the
+  horizontal axis) and `"Robust z-score"`, or `"Sample (row)"` and
+  `"Robust distance"` with `type = "distance"`.
+
+- point_size:
+
+  The size of the points. Default is 1.4 at a `base_size` of 11, scaled
+  with `base_size`.
+
+- point_alpha:
+
+  The opacity of the points, between 0 and 1. Default is 1.
 
 - show.outlier, show.mahal:
 

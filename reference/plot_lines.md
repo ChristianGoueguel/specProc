@@ -14,7 +14,15 @@ plot_lines(
   scale_markers = TRUE,
   interactive = TRUE,
   title = NULL,
-  bands = NULL
+  bands = NULL,
+  wavelength = NULL,
+  xlab = "Wavelength (nm)",
+  ylab = "Intensity (arb. units)",
+  base_size = 11,
+  linewidth = 0.3,
+  spectrum_color = "grey35",
+  marker_linewidth = 0.5,
+  marker_alpha = 0.7
 )
 ```
 
@@ -55,6 +63,39 @@ plot_lines(
   An optional tibble of molecular band heads returned by
   [`molecular_bands()`](https://christiangoueguel.com/specProc/reference/molecular_bands.md).
 
+- wavelength:
+
+  Optional (`NULL` by default). The wavelength range `c(min, max)` to
+  draw, in nm. The markers are scaled to the maximum of the spectrum
+  within the range, and the lines and bands outside it are left out.
+
+- xlab, ylab:
+
+  The axis titles. Default are `"Wavelength (nm)"` and
+  `"Intensity (arb. units)"`.
+
+- base_size:
+
+  The size of the text, in points. Default is 11. Ignored for
+  interactive plots.
+
+- linewidth:
+
+  The width of the spectrum line. Default is 0.3.
+
+- spectrum_color:
+
+  The color of the spectrum. Default is `"grey35"`.
+
+- marker_linewidth:
+
+  The width of the line and band markers. Default is 0.5.
+
+- marker_alpha:
+
+  The opacity of the line and band markers, between 0 and 1. Default is
+  0.7.
+
 ## Value
 
 A plotly or ggplot object.
@@ -89,13 +130,12 @@ relative intensity within their system.
 ``` r
 data(forageLIBS)
 spectrum <- colMeans(forageLIBS[-(1:14)])
-spectrum <- spectrum[as.numeric(names(spectrum)) > 403 & as.numeric(names(spectrum)) < 406]
 # the K I doublet, with the atomic data of the NIST database
 lines <- tibble::tibble(
   species = "K I", element = "K", stage = 1L, wavelength = c(404.414, 404.721),
   relative_intensity = c(1, 0.5), Aki = c(1.15e6, 1.07e6), Ek = c(3.065, 3.063),
   gk = c(4, 2), accuracy = "A", lower = "4s 2S", upper = c("5p 2P* 3/2", "5p 2P* 1/2")
 )
-plot_lines(spectrum, lines, interactive = FALSE)
+plot_lines(spectrum, lines, wavelength = c(403, 406), interactive = FALSE)
 
 ```

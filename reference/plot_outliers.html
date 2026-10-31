@@ -65,6 +65,9 @@ outliers, and shows them on each variable, or by their robust distance.</p>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  caption <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  base_size <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  point_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  point_alpha <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  show.outlier <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  show.mahal <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -126,11 +129,6 @@ only the outliers beyond the univariate limits of the panel are labeled;
 the distance plot names them all.</p></dd>
 
 
-<dt id="arg-ylab">ylab<a class="anchor" aria-label="anchor" href="#arg-ylab"></a></dt>
-<dd><p>The title of the value axis. Default is "Robust z-score", or
-"Robust distance" with <code>type = "distance"</code>.</p></dd>
-
-
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>The plot title. A long title is split into a title and a
 subtitle.</p></dd>
@@ -146,6 +144,22 @@ your own.</p></dd>
 <dd><p>The size of the text, in points. Default is 11; use the
 text size of the journal (often 7 to 9 points) for a figure saved at its
 printed size.</p></dd>
+
+
+<dt id="arg-xlab-ylab">xlab, ylab<a class="anchor" aria-label="anchor" href="#arg-xlab-ylab"></a></dt>
+<dd><p>The axis titles. Default are none (the samples are
+spread along the horizontal axis) and <code>"Robust z-score"</code>, or
+<code>"Sample (row)"</code> and <code>"Robust distance"</code> with <code>type = "distance"</code>.</p></dd>
+
+
+<dt id="arg-point-size">point_size<a class="anchor" aria-label="anchor" href="#arg-point-size"></a></dt>
+<dd><p>The size of the points. Default is 1.4 at a <code>base_size</code>
+of 11, scaled with <code>base_size</code>.</p></dd>
+
+
+<dt id="arg-point-alpha">point_alpha<a class="anchor" aria-label="anchor" href="#arg-point-alpha"></a></dt>
+<dd><p>The opacity of the points, between 0 and 1. Default is
+1.</p></dd>
 
 
 <dt id="arg-show-outlier-show-mahal">show.outlier, show.mahal<a class="anchor" aria-label="anchor" href="#arg-show-outlier-show-mahal"></a></dt>

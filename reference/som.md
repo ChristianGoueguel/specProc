@@ -176,7 +176,7 @@ fit
 #> Topographic error:   0.00272
 #> Beyond the cut-off:  51
 # where the potassium-rich samples are, and how many samples per unit
-plot_som(fit, type = "mapping", colour = forageLIBS$K)
+plot_som(fit, type = "mapping", color_by = forageLIBS$K)
 
 plot_som(fit, type = "counts")
 ```

@@ -63,7 +63,12 @@ the emission lines they match when a line list is given.</p>
 <span>  spectra <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  span <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  interactive <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  title <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  wavelength <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  base_size <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>  linewidth <span class="op">=</span> <span class="fl">0.3</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -116,6 +121,28 @@ peaks and their candidate lines shown on hover. Default is <code>FALSE</code>.</
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>The plot title.</p></dd>
 
+
+<dt id="arg-wavelength">wavelength<a class="anchor" aria-label="anchor" href="#arg-wavelength"></a></dt>
+<dd><p>Optional (<code>NULL</code> by default). The wavelength range
+<code>c(min, max)</code> to draw, in nm; the <code>top</code> largest peaks within it are
+labeled. Needs variables named by wavelength.</p></dd>
+
+
+<dt id="arg-xlab-ylab">xlab, ylab<a class="anchor" aria-label="anchor" href="#arg-xlab-ylab"></a></dt>
+<dd><p>The axis titles. Default are <code>"Wavelength (nm)"</code> (or
+<code>"Variable"</code>) and the name of the values drawn. In interactive plots,
+each panel has its own vertical axis title and <code>ylab</code> is ignored.</p></dd>
+
+
+<dt id="arg-base-size">base_size<a class="anchor" aria-label="anchor" href="#arg-base-size"></a></dt>
+<dd><p>The size of the text, in points. Default is 11; the
+peak labels scale with it. Ignored for interactive plots.</p></dd>
+
+
+<dt id="arg-linewidth">linewidth<a class="anchor" aria-label="anchor" href="#arg-linewidth"></a></dt>
+<dd><p>The width of the bars (or, for interactive plots, of the
+line) drawn at each variable. Default is 0.3.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -148,6 +175,9 @@ spectrum can be drawn in grey behind each panel, rescaled to it.</p>
 <span class="r-in"><span><span class="va">q</span> <span class="op">&lt;-</span> <span class="fu"><a href="contributions.html">contributions</a></span><span class="op">(</span><span class="va">fit</span>, data <span class="op">=</span> <span class="va">spectra</span>, samples <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">49</span>, <span class="fl">127</span><span class="op">)</span>, reference <span class="op">=</span> <span class="st">"regular"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">plot_contributions</span><span class="op">(</span><span class="va">q</span>, spectra <span class="op">=</span> <span class="va">spectra</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_contributions-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># the 390-400 nm window: the Ca II H and K lines</span></span></span>
+<span class="r-in"><span><span class="fu">plot_contributions</span><span class="op">(</span><span class="va">q</span>, spectra <span class="op">=</span> <span class="va">spectra</span>, wavelength <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">390</span>, <span class="fl">400</span><span class="op">)</span>, top <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot_contributions-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

@@ -98,11 +98,14 @@ k_curve
 
 [`plot_calibration()`](https://christiangoueguel.com/specProc/reference/plot_calibration.md)
 draws the curve with its confidence band (where the mean signal lies)
-and its prediction band (where a single new measurement is expected):
+and its prediction band (where a single new measurement is expected).
+The replicate measurements of a sample overlap, so they are drawn
+semi-transparent (`point_alpha`), and the axes get their units:
 
 ``` r
 
-plot_calibration(k_curve)
+plot_calibration(k_curve, point_alpha = 0.4, xlab = "K (%)",
+                 ylab = "K I 769.90 nm / C I 247.86 nm")
 ```
 
 ![](calibration_files/figure-html/k-plot-1.png)
@@ -240,7 +243,8 @@ bind_rows(unweighted = fe_unweighted$figures_of_merit,
 
 ``` r
 
-plot_calibration(fe_weighted, interval = "prediction")
+plot_calibration(fe_weighted, interval = "prediction", point_alpha = 0.4, xlab = "Fe (ppm)",
+                 ylab = "Fe I 259.94 nm / C I 247.86 nm")
 ```
 
 ![](calibration_files/figure-html/fe-plot-1.png)

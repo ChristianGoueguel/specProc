@@ -55,10 +55,18 @@ spectra on the map, or the prototype spectra.</p>
 <span>  <span class="va">object</span>,</span>
 <span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"counts"</span>, <span class="st">"umatrix"</span>, <span class="st">"quality"</span>, <span class="st">"component"</span>, <span class="st">"mapping"</span>, <span class="st">"prototypes"</span><span class="op">)</span>,</span>
 <span>  variables <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  colour <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  color_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  newdata <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  units <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  title <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  wavelength <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  base_size <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>  point_size <span class="op">=</span> <span class="fl">1.6</span>,</span>
+<span>  point_alpha <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  linewidth <span class="op">=</span> <span class="fl">0.4</span>,</span>
+<span>  colour <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -80,7 +88,7 @@ spectra on the map, or the prototype spectra.</p>
 nearest channel is used) or column names.</p></dd>
 
 
-<dt id="arg-colour">colour<a class="anchor" aria-label="anchor" href="#arg-colour"></a></dt>
+<dt id="arg-color-by">color_by<a class="anchor" aria-label="anchor" href="#arg-color-by"></a></dt>
 <dd><p>For <code>"mapping"</code>: a vector with one value per training
 spectrum, such as a concentration or a class.</p></dd>
 
@@ -95,6 +103,35 @@ spectrum, such as a concentration or a class.</p></dd>
 
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>The plot title.</p></dd>
+
+
+<dt id="arg-wavelength">wavelength<a class="anchor" aria-label="anchor" href="#arg-wavelength"></a></dt>
+<dd><p>For <code>"prototypes"</code>: the wavelength range <code>c(min, max)</code>
+to draw, in nm. Default is all the variables.</p></dd>
+
+
+<dt id="arg-xlab-ylab">xlab, ylab<a class="anchor" aria-label="anchor" href="#arg-xlab-ylab"></a></dt>
+<dd><p>For <code>"prototypes"</code>: the axis titles. Default are
+<code>"Wavelength (nm)"</code> (or <code>"Variable"</code>) and <code>"Prototype"</code>. The maps have
+no axes.</p></dd>
+
+
+<dt id="arg-base-size">base_size<a class="anchor" aria-label="anchor" href="#arg-base-size"></a></dt>
+<dd><p>The size of the text, in points. Default is 11.</p></dd>
+
+
+<dt id="arg-point-size-point-alpha">point_size, point_alpha<a class="anchor" aria-label="anchor" href="#arg-point-size-point-alpha"></a></dt>
+<dd><p>For <code>"mapping"</code>: the size (default 1.6) and
+opacity (default 0.8) of the points of the training spectra.</p></dd>
+
+
+<dt id="arg-linewidth">linewidth<a class="anchor" aria-label="anchor" href="#arg-linewidth"></a></dt>
+<dd><p>For <code>"prototypes"</code>: the width of the prototype spectra.
+Default is 0.4.</p></dd>
+
+
+<dt id="arg-colour">colour<a class="anchor" aria-label="anchor" href="#arg-colour"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>color_by</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -115,7 +152,7 @@ each of the <code>variables</code> (one panel per variable): which units have
 intense emission lines. Each plane is scaled from its lowest (0) to its
 highest (1) unit, so that weak lines are as readable as strong ones.</p></li>
 <li><p><code>"mapping"</code>: the training spectra on their units (spread within the
-unit), colored by <code>colour</code>, and, with <code>newdata</code>, the new spectra as
+unit), colored by <code>color_by</code>, and, with <code>newdata</code>, the new spectra as
 triangles, the novel ones circled in red.</p></li>
 <li><p><code>"prototypes"</code>: the prototype spectra of the <code>units</code> against
 wavelength. By default, six prototypes spread over the map: the unit
@@ -139,9 +176,9 @@ farthest from those already chosen.</p></li>
 <span class="r-in"><span><span class="co"># component planes of the K I and Na I lines</span></span></span>
 <span class="r-in"><span><span class="fu">plot_som</span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"component"</span>, variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">769.90</span>, <span class="fl">589.59</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_som-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu">plot_som</span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"mapping"</span>, colour <span class="op">=</span> <span class="va">forageLIBS</span><span class="op">$</span><span class="va">K</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_som</span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"mapping"</span>, color_by <span class="op">=</span> <span class="va">forageLIBS</span><span class="op">$</span><span class="va">K</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_som-3.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu">plot_som</span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"prototypes"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_som</span><span class="op">(</span><span class="va">fit</span>, type <span class="op">=</span> <span class="st">"prototypes"</span>, wavelength <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">760</span>, <span class="fl">780</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_som-4.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>

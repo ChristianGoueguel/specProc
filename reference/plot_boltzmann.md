@@ -11,7 +11,15 @@ species of
 ## Usage
 
 ``` r
-plot_boltzmann(object, title = NULL)
+plot_boltzmann(
+  object,
+  title = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11,
+  point_size = 2.5,
+  point_alpha = 1
+)
 ```
 
 ## Arguments
@@ -27,6 +35,23 @@ plot_boltzmann(object, title = NULL)
 - title:
 
   The plot title. By default, the method and temperature.
+
+- xlab, ylab:
+
+  The axis titles. Default are the upper-level energy and the Boltzmann
+  ordinate.
+
+- base_size:
+
+  The size of the text, in points. Default is 11.
+
+- point_size:
+
+  The size of the points of the lines. Default is 2.5.
+
+- point_alpha:
+
+  The opacity of the points, between 0 and 1. Default is 1.
 
 ## Value
 

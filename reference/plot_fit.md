@@ -20,8 +20,9 @@ plot_fit(
   caption = TRUE,
   base_size = 11,
   point_size = 1.5,
+  point_alpha = 1,
   point_color = "grey20",
-  line_width = 0.8,
+  linewidth = 0.8,
   fit_color = "#b2182b",
   pt.size = deprecated(),
   pt.colour = deprecated(),
@@ -85,11 +86,15 @@ plot_fit(
 
   The size of the data points (default 1.5).
 
+- point_alpha:
+
+  The opacity of the data points, between 0 and 1 (default 1).
+
 - point_color:
 
   The color of the data points (default `"grey20"`).
 
-- line_width:
+- linewidth:
 
   The width of the fitted curve (default 0.8).
 
@@ -100,7 +105,7 @@ plot_fit(
 - pt.size, pt.colour, pt.shape, pt.fill, line.size, line.colour,
   linetype, resid.shape, resid.size, resid.fill, resid.colour:
 
-  **\[deprecated\]** Use `point_size`, `point_color`, `line_width` and
+  **\[deprecated\]** Use `point_size`, `point_color`, `linewidth` and
   `fit_color`; the other styles are fixed.
 
 ## Value

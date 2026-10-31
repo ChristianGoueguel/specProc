@@ -13,10 +13,18 @@ plot_som(
   object,
   type = c("counts", "umatrix", "quality", "component", "mapping", "prototypes"),
   variables = NULL,
-  colour = NULL,
+  color_by = NULL,
   newdata = NULL,
   units = NULL,
-  title = NULL
+  title = NULL,
+  wavelength = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11,
+  point_size = 1.6,
+  point_alpha = 0.8,
+  linewidth = 0.4,
+  colour = deprecated()
 )
 ```
 
@@ -37,7 +45,7 @@ plot_som(
   For `"component"`: the variables, as wavelengths (the nearest channel
   is used) or column names.
 
-- colour:
+- color_by:
 
   For `"mapping"`: a vector with one value per training spectrum, such
   as a concentration or a class.
@@ -53,6 +61,34 @@ plot_som(
 - title:
 
   The plot title.
+
+- wavelength:
+
+  For `"prototypes"`: the wavelength range `c(min, max)` to draw, in nm.
+  Default is all the variables.
+
+- xlab, ylab:
+
+  For `"prototypes"`: the axis titles. Default are `"Wavelength (nm)"`
+  (or `"Variable"`) and `"Prototype"`. The maps have no axes.
+
+- base_size:
+
+  The size of the text, in points. Default is 11.
+
+- point_size, point_alpha:
+
+  For `"mapping"`: the size (default 1.6) and opacity (default 0.8) of
+  the points of the training spectra.
+
+- linewidth:
+
+  For `"prototypes"`: the width of the prototype spectra. Default is
+  0.4.
+
+- colour:
+
+  **\[deprecated\]** Use `color_by`.
 
 ## Value
 
@@ -79,7 +115,7 @@ The types of plot are:
   ones.
 
 - `"mapping"`: the training spectra on their units (spread within the
-  unit), colored by `colour`, and, with `newdata`, the new spectra as
+  unit), colored by `color_by`, and, with `newdata`, the new spectra as
   triangles, the novel ones circled in red.
 
 - `"prototypes"`: the prototype spectra of the `units` against
@@ -105,7 +141,7 @@ plot_som(fit, type = "umatrix")
 # component planes of the K I and Na I lines
 plot_som(fit, type = "component", variables = c(769.90, 589.59))
 
-plot_som(fit, type = "mapping", colour = forageLIBS$K)
+plot_som(fit, type = "mapping", color_by = forageLIBS$K)
 
-plot_som(fit, type = "prototypes")
+plot_som(fit, type = "prototypes", wavelength = c(760, 780))
 ```

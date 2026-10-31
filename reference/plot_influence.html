@@ -61,9 +61,15 @@ outlier map of a robust PCA, <code><a href="plot_outlier_map.html">plot_outlier_
 <span>  relative <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  shade <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  log <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  colour_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"type"</span>, <span class="st">"distance"</span><span class="op">)</span>,</span>
 <span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  color_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"type"</span>, <span class="st">"distance"</span><span class="op">)</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  base_size <span class="op">=</span> <span class="fl">11</span>,</span>
+<span>  point_size <span class="op">=</span> <span class="fl">2.2</span>,</span>
+<span>  point_alpha <span class="op">=</span> <span class="fl">0.85</span>,</span>
+<span>  colour_by <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -103,23 +109,44 @@ samples when a few are far away. Zero distances are drawn at the
 smallest positive distance. Default is <code>FALSE</code>.</p></dd>
 
 
-<dt id="arg-colour-by">colour_by<a class="anchor" aria-label="anchor" href="#arg-colour-by"></a></dt>
-<dd><p>The colors of the points: <code>"type"</code> (default), by type,
-or <code>"distance"</code>, by their distance relative to the limits,
-\(\max(T^2/T^2_{lim}, Q/Q_{lim})\), on a rainbow scale from dark red to
-blue, as in <code><a href="plot_outlier_map.html">plot_outlier_map()</a></code>.</p></dd>
-
-
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>The plot title.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Further arguments passed to <code><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">ggplot2::geom_point()</a></code> to style
-the points, such as <code>alpha</code> (default 0.85), <code>size</code> (2.2), <code>stroke</code>
-(0.4) or <code>colour</code> (the outline, <code>"black"</code>). <code>size</code> can also be a numeric
+the points, such as <code>stroke</code> (default 0.4) or <code>colour</code> (the outline,
+<code>"black"</code>).</p></dd>
+
+
+<dt id="arg-color-by">color_by<a class="anchor" aria-label="anchor" href="#arg-color-by"></a></dt>
+<dd><p>The colors of the points: <code>"type"</code> (default), by type,
+or <code>"distance"</code>, by their distance relative to the limits,
+\(\max(T^2/T^2_{lim}, Q/Q_{lim})\), on a rainbow scale from dark red to
+blue, as in <code><a href="plot_outlier_map.html">plot_outlier_map()</a></code>.</p></dd>
+
+
+<dt id="arg-xlab-ylab">xlab, ylab<a class="anchor" aria-label="anchor" href="#arg-xlab-ylab"></a></dt>
+<dd><p>The axis titles. Default are the names of the distances.</p></dd>
+
+
+<dt id="arg-base-size">base_size<a class="anchor" aria-label="anchor" href="#arg-base-size"></a></dt>
+<dd><p>The size of the text, in points. Default is 11.</p></dd>
+
+
+<dt id="arg-point-size">point_size<a class="anchor" aria-label="anchor" href="#arg-point-size"></a></dt>
+<dd><p>The size of the points (default 2.2), or a numeric
 vector with one value per sample, such as the concentration of an
 element, to vary the size of the points, with a legend.</p></dd>
+
+
+<dt id="arg-point-alpha">point_alpha<a class="anchor" aria-label="anchor" href="#arg-point-alpha"></a></dt>
+<dd><p>The opacity of the points, between 0 and 1 (default
+0.85).</p></dd>
+
+
+<dt id="arg-colour-by">colour_by<a class="anchor" aria-label="anchor" href="#arg-colour-by"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>color_by</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -158,7 +185,7 @@ which puts plots of different models on the same scale.</p>
 <span class="r-plt img"><img src="plot_influence-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># the same options as plot_outlier_map(): distances relative to the limits,</span></span></span>
 <span class="r-in"><span><span class="co"># shaded outlying regions, logarithmic axes and colors by distance</span></span></span>
-<span class="r-in"><span><span class="fu">plot_influence</span><span class="op">(</span><span class="va">influence</span>, relative <span class="op">=</span> <span class="cn">TRUE</span>, shade <span class="op">=</span> <span class="cn">TRUE</span>, log <span class="op">=</span> <span class="cn">TRUE</span>, colour_by <span class="op">=</span> <span class="st">"distance"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">plot_influence</span><span class="op">(</span><span class="va">influence</span>, relative <span class="op">=</span> <span class="cn">TRUE</span>, shade <span class="op">=</span> <span class="cn">TRUE</span>, log <span class="op">=</span> <span class="cn">TRUE</span>, color_by <span class="op">=</span> <span class="st">"distance"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_influence-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># a single limit at 97.5%, with the outlying regions shaded</span></span></span>

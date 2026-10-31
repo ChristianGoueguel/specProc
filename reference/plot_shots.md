@@ -20,7 +20,12 @@ plot_shots(
   plot = TRUE,
   title = NULL,
   caption = TRUE,
-  base_size = 11
+  base_size = 11,
+  xlab = NULL,
+  ylab = NULL,
+  point_size = NULL,
+  point_alpha = 0.85,
+  linewidth = 0.3
 )
 ```
 
@@ -44,7 +49,8 @@ plot_shots(
 
 - wavelength:
 
-  For `type = "spectra"`, an optional wavelength range (nm) to zoom on.
+  For `type = "spectra"`, an optional wavelength range `c(min, max)`
+  (nm) to zoom on.
 
 - label:
 
@@ -88,6 +94,26 @@ plot_shots(
 - base_size:
 
   The size of the text, in points. Default is 11.
+
+- xlab, ylab:
+
+  For `type = "criteria"` and `"spectra"`, the axis titles. Default are
+  the names of the criteria, or the wavelength and intensity.
+
+- point_size:
+
+  For `type = "criteria"` and `"samples"`, the size of the points.
+  Default is 1.6 at a `base_size` of 11, scaled with `base_size`.
+
+- point_alpha:
+
+  For `type = "criteria"` and `"samples"`, the opacity of the points,
+  between 0 and 1. Default is 0.85.
+
+- linewidth:
+
+  For `type = "spectra"`, the width of the kept shots; the median and
+  the rejected shots are drawn 5/3 as wide. Default is 0.3.
 
 ## Value
 

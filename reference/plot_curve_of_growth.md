@@ -9,7 +9,15 @@ of growth of the median line profile.
 ## Usage
 
 ``` r
-plot_curve_of_growth(object, title = NULL)
+plot_curve_of_growth(
+  object,
+  title = NULL,
+  xlab = "Optical depth at the line center",
+  ylab = "Reduced intensity",
+  base_size = 11,
+  point_size = 2.5,
+  point_alpha = 1
+)
 ```
 
 ## Arguments
@@ -23,6 +31,23 @@ plot_curve_of_growth(object, title = NULL)
 
   The plot title. By default, the temperature and the largest optical
   depth.
+
+- xlab, ylab:
+
+  The axis titles. Default are `"Optical depth at the line center"` and
+  `"Reduced intensity"`.
+
+- base_size:
+
+  The size of the text, in points. Default is 11.
+
+- point_size:
+
+  The size of the points of the lines. Default is 2.5.
+
+- point_alpha:
+
+  The opacity of the points, between 0 and 1. Default is 1.
 
 ## Value
 

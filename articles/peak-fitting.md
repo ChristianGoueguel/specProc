@@ -36,8 +36,9 @@ the column names are the wavelengths (nm):
 
 forageLIBS |>
   slice(1:3) |>
-  select(Measurement, all_of(names(spectra)[wl > 400 & wl < 410])) |>
-  plot_spectra(id = Measurement)
+  select(-Sample, -all_of(minerals)) |>
+  plot_spectra(id = Measurement, wavelength = c(400, 460), offset = 10000) +
+  scale_x_continuous(breaks = seq(400, 460, 5))
 ```
 
 ![](peak-fitting_files/figure-html/spectra-1.png)
@@ -87,7 +88,7 @@ cn |>
 #> 4       2       2    386.202   violet 0.674              0.224
 #> 5       1       1    387.143   violet 0.774              0.465
 #> 6       0       0    388.312   violet 0.915              1.000
-plot_lines(colMeans(spectra)[wl > 383 & wl < 390], bands = cn, interactive = FALSE)
+plot_lines(colMeans(spectra), bands = cn, wavelength = c(383, 390), interactive = FALSE)
 ```
 
 ![](peak-fitting_files/figure-html/cn-bands-1.png)

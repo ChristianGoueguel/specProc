@@ -19,7 +19,12 @@ plot_contributions(
   spectra = NULL,
   span = 5,
   interactive = FALSE,
-  title = NULL
+  title = NULL,
+  wavelength = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11,
+  linewidth = 0.3
 )
 ```
 
@@ -72,6 +77,28 @@ plot_contributions(
 
   The plot title.
 
+- wavelength:
+
+  Optional (`NULL` by default). The wavelength range `c(min, max)` to
+  draw, in nm; the `top` largest peaks within it are labeled. Needs
+  variables named by wavelength.
+
+- xlab, ylab:
+
+  The axis titles. Default are `"Wavelength (nm)"` (or `"Variable"`) and
+  the name of the values drawn. In interactive plots, each panel has its
+  own vertical axis title and `ylab` is ignored.
+
+- base_size:
+
+  The size of the text, in points. Default is 11; the peak labels scale
+  with it. Ignored for interactive plots.
+
+- linewidth:
+
+  The width of the bars (or, for interactive plots, of the line) drawn
+  at each variable. Default is 0.3.
+
 ## Value
 
 A ggplot object, or a plotly object if `interactive = TRUE`.
@@ -105,5 +132,8 @@ set.seed(1)
 fit <- robpca(spectra, k = 3)
 q <- contributions(fit, data = spectra, samples = c(49, 127), reference = "regular")
 plot_contributions(q, spectra = spectra)
+
+# the 390-400 nm window: the Ca II H and K lines
+plot_contributions(q, spectra = spectra, wavelength = c(390, 400), top = 4)
 
 ```

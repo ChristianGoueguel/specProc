@@ -8,7 +8,15 @@ limits and the signals, with the end of the baseline marked.
 ## Usage
 
 ``` r
-plot_control_chart(object, title = NULL, xlab = "Order", ylab = NULL)
+plot_control_chart(
+  object,
+  title = NULL,
+  xlab = "Order",
+  ylab = NULL,
+  base_size = 11,
+  point_size = 1.3,
+  point_alpha = 1
+)
 ```
 
 ## Arguments
@@ -24,7 +32,19 @@ plot_control_chart(object, title = NULL, xlab = "Order", ylab = NULL)
 
 - xlab, ylab:
 
-  The axis labels.
+  The axis titles. Default are `"Order"` and the name of the statistic.
+
+- base_size:
+
+  The size of the text, in points. Default is 11.
+
+- point_size:
+
+  The size of the points. Default is 1.3.
+
+- point_alpha:
+
+  The opacity of the points, between 0 and 1. Default is 1.
 
 ## Value
 

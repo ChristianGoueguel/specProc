@@ -7,7 +7,15 @@ with a band of plus or minus one standard uncertainty.
 ## Usage
 
 ``` r
-plot_response(object, title = NULL)
+plot_response(
+  object,
+  title = NULL,
+  wavelength = NULL,
+  xlab = "Wavelength (nm)",
+  ylab = "Relative response",
+  base_size = 11,
+  linewidth = 0.6
+)
 ```
 
 ## Arguments
@@ -21,6 +29,24 @@ plot_response(object, title = NULL)
 
   The plot title. By default, the number of lamp spectra and the median
   uncertainty.
+
+- wavelength:
+
+  Optional (`NULL` by default). The wavelength range `c(min, max)` to
+  draw, in nm.
+
+- xlab, ylab:
+
+  The axis titles. Default are `"Wavelength (nm)"` and
+  `"Relative response"`.
+
+- base_size:
+
+  The size of the text, in points. Default is 11.
+
+- linewidth:
+
+  The width of the response line. Default is 0.6.
 
 ## Value
 

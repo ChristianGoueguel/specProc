@@ -16,7 +16,7 @@ plot_spectra(
   x,
   id = NULL,
   colvar = NULL,
-  .interactive = FALSE,
+  interactive = FALSE,
   drop_na = FALSE,
   offset = NULL,
   wavelength = NULL,
@@ -38,7 +38,8 @@ plot_spectra(
   panel_tags = FALSE,
   label_spectra = FALSE,
   summary = c("none", "mean", "median"),
-  rasterize = FALSE
+  rasterize = FALSE,
+  .interactive = deprecated()
 )
 ```
 
@@ -58,10 +59,10 @@ plot_spectra(
   optional (`NULL` by default). Column name of a numeric variable to be
   display in color scale.
 
-- .interactive:
+- interactive:
 
-  optional (`FALSE` by default). When set to `TRUE` enables interactive
-  plot.
+  A logical: an interactive plotly plot (`TRUE`) or a ggplot (`FALSE`,
+  default).
 
 - drop_na:
 
@@ -192,9 +193,13 @@ plot_spectra(
   an image, of 300 dpi with `TRUE`, within an otherwise vector plot (see
   Details). Ignored for interactive plots.
 
+- .interactive:
+
+  **\[deprecated\]** Use `interactive`.
+
 ## Value
 
-Object of class ggplot or of class plotly if `.interactive = TRUE`.
+Object of class ggplot or of class plotly if `interactive = TRUE`.
 
 ## Details
 
