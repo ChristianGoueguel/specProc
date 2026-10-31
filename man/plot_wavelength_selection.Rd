@@ -4,12 +4,31 @@
 \alias{plot_wavelength_selection}
 \title{Plot of a Wavelength Selection}
 \usage{
-plot_wavelength_selection(object, title = NULL)
+plot_wavelength_selection(
+  object,
+  title = NULL,
+  wavelength = NULL,
+  xlab = NULL,
+  base_size = 11,
+  linewidth = 0.3
+)
 }
 \arguments{
 \item{object}{An object returned by \code{\link[=select_wavelengths]{select_wavelengths()}}.}
 
 \item{title}{The plot title.}
+
+\item{wavelength}{Optional (\code{NULL} by default). The wavelength range
+\code{c(min, max)} to draw, in nm. Needs variables named by wavelength.}
+
+\item{xlab}{The title of the wavelength axis. Default is
+\code{"Wavelength (nm)"} (or \code{"Variable"}). The panels are named on their
+left.}
+
+\item{base_size}{The size of the text, in points. Default is 11.}
+
+\item{linewidth}{The width of the mean spectrum and importance lines.
+Default is 0.3.}
 }
 \value{
 A ggplot object.
@@ -27,6 +46,8 @@ wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 sel <- select_wavelengths(spectra, forageLIBS$Ca, method = "sr", num_terms = 50)
 plot_wavelength_selection(sel)
+# the Ca II H and K lines
+plot_wavelength_selection(sel, wavelength = c(390, 400))
 }
 \seealso{
 \code{\link[=select_wavelengths]{select_wavelengths()}}

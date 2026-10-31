@@ -195,6 +195,12 @@ saha_boltzmann <- function(lines, ionization_energy, electron_density, units = "
 #' @param object An object returned by [boltzmann()],
 #'   [saha_boltzmann()] or [cf_libs()].
 #' @param title The plot title. By default, the method and temperature.
+#' @param xlab,ylab The axis titles. Default are the upper-level energy and
+#'   the Boltzmann ordinate.
+#' @param base_size The size of the text, in points. Default is 11.
+#' @param point_size The size of the points of the lines. Default is 2.5.
+#' @param point_alpha The opacity of the points, between 0 and 1. Default is
+#'   1.
 #'
 #' @return A ggplot object.
 #' @seealso [boltzmann()], [saha_boltzmann()]
@@ -216,9 +222,15 @@ saha_boltzmann <- function(lines, ionization_energy, electron_density, units = "
 #' lines <- line_intensities(mean_spectrum, atomic, baseline = TRUE)
 #' plot_boltzmann(saha_boltzmann(lines, ionization_energy = 6.113, electron_density = 1.9e17))
 #'
-plot_boltzmann <- function(object, title = NULL) {
+plot_boltzmann <- function(object, title = NULL, xlab = NULL, ylab = NULL, base_size = 11,
+                           point_size = 2.5, point_alpha = 1) {
+  check_plot_text(title, xlab, ylab, base_size)
+  check_size(point_size, "point_size")
+  check_alpha(point_alpha, "point_alpha")
+  style <- list(xlab = xlab, ylab = ylab, base_size = base_size, point_size = point_size,
+                point_alpha = point_alpha)
   if (inherits(object, "specproc_cflibs")) {
-    return(plot_cf_libs(object, title))
+    return(plot_cf_libs(object, title, style))
   }
   if (!inherits(object, "specproc_boltzmann")) {
     stop("'object' must be returned by boltzmann(), saha_boltzmann() or cf_libs().",
@@ -244,19 +256,23 @@ plot_boltzmann <- function(object, title = NULL) {
   ylab <- as.expression(ylab)
   p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$x, y = .data$y)) +
     ggplot2::geom_abline(intercept = coefs[[1]], slope = coefs[[2]], colour = "grey40") +
-    ggplot2::geom_point(ggplot2::aes(colour = .data$stage), size = 2.5) +
+    ggplot2::geom_point(ggplot2::aes(colour = .data$stage), size = point_size,
+                        alpha = point_alpha) +
     ggplot2::scale_colour_manual(values = c(neutral = "#1b9e77", ion = "#d95f02"), drop = TRUE,
                                  name = NULL) +
-    ggplot2::labs(x = if (object$method == "Saha-Boltzmann") "Upper-level energy (+ ionization energy for ions), eV"
-                  else "Upper-level energy, eV",
-                  y = ylab, title = title) +
-    ggplot2::theme_bw() +
+    ggplot2::labs(x = xlab %||% if (object$method == "Saha-Boltzmann") {
+                    "Upper-level energy (+ ionization energy for ions), eV"
+                  } else {
+                    "Upper-level energy, eV"
+                  },
+                  y = style$ylab %||% ylab, title = title) +
+    ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(legend.position = if (length(unique(df$stage)) > 1) "bottom" else "none")
   finish_title(p)
 }
 
 # Parallel Boltzmann (or Saha-Boltzmann) plots of a CF-LIBS fit.
-plot_cf_libs <- function(object, title) {
+plot_cf_libs <- function(object, title, style) {
   saha_plane <- object$method == "saha-boltzmann"
   if (is.null(title)) {
     title <- sprintf("CF-LIBS %s plots: T = %.0f%s K",
@@ -279,12 +295,17 @@ plot_cf_libs <- function(object, title) {
   p <- ggplot2::ggplot(df, ggplot2::aes(x = .data$x, y = .data$y, colour = .data$group)) +
     ggplot2::geom_abline(data = fitted, ggplot2::aes(intercept = .data$intercept, slope = .data$slope,
                                                      colour = .data$group), alpha = 0.6) +
-    ggplot2::geom_point(ggplot2::aes(shape = .data$stage), size = 2.5) +
+    ggplot2::geom_point(ggplot2::aes(shape = .data$stage), size = style$point_size,
+                        alpha = style$point_alpha) +
     ggplot2::scale_shape_manual(values = c(neutral = 16, ion = 17), drop = TRUE) +
-    ggplot2::labs(x = if (saha_plane) "Upper-level energy (+ ionization energy for ions), eV"
-                  else "Upper-level energy, eV",
-                  y = as.expression(ylab), colour = NULL, shape = NULL, title = title) +
-    ggplot2::theme_bw() +
+    ggplot2::labs(x = style$xlab %||% if (saha_plane) {
+                    "Upper-level energy (+ ionization energy for ions), eV"
+                  } else {
+                    "Upper-level energy, eV"
+                  },
+                  y = style$ylab %||% as.expression(ylab), colour = NULL, shape = NULL,
+                  title = title) +
+    ggplot2::theme_bw(base_size = style$base_size) +
     ggplot2::theme(legend.position = "bottom")
   finish_title(p)
 }

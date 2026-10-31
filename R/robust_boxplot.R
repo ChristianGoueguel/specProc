@@ -126,7 +126,8 @@ boxplot_input <- function(x, id_quo, group_quo) {
 # The plot options, with the renamed arguments resolved and checked.
 boxplot_args <- function(fn, user_env, scales, points, label_outliers, show_n, show_mean,
                          annotate, horizontal, log, fill, xlab, ylab, title, caption, base_size,
-                         x_labels_angle, box_width, notch, notch_width, staple_width,
+                         point_size, point_alpha, x_labels_angle, box_width, notch, notch_width,
+                         staple_width,
                          xlabels.angle, xlabels.vjust, xlabels.hjust, box.width, notchwidth,
                          staplewidth) {
   renamed <- function(old_value, new_value, old, new, details = NULL) {
@@ -147,6 +148,7 @@ boxplot_args <- function(fn, user_env, scales, points, label_outliers, show_n, s
     annotate_all = identical(annotate, "all"),
     horizontal = horizontal, log = log, fill = fill, xlab = xlab, ylab = ylab, title = title,
     caption = caption, base_size = base_size, notch = notch,
+    point_size = point_size, point_alpha = point_alpha,
     x_labels_angle = renamed(xlabels.angle, x_labels_angle, "xlabels.angle", "x_labels_angle"),
     x_labels_hjust = renamed(xlabels.hjust, NULL, "xlabels.hjust", "x_labels_angle", justification),
     x_labels_vjust = renamed(xlabels.vjust, NULL, "xlabels.vjust", "x_labels_angle", justification),
@@ -190,7 +192,10 @@ check_boxplot_args <- function(args) {
   for (flag in c("label_outliers", "show_n", "show_mean", "horizontal", "log")) {
     check_flag(args[[flag]], flag)
   }
-  check_number(args$base_size, "base_size", lower = 0, lower_open = TRUE)
+  check_plot_text(args$title, args$xlab, args$ylab, args$base_size)
+  args$point_size <- args$point_size %||% (1.6 * args$base_size / 11)
+  check_size(args$point_size, "point_size")
+  check_alpha(args$point_alpha, "point_alpha")
   fill_ok <- is.character(args$fill) && length(args$fill) >= 1 && !anyNA(args$fill) &&
     all(vapply(args$fill, function(col) !inherits(try(grDevices::col2rgb(col), silent = TRUE),
                                                   "try-error"), logical(1)))
@@ -270,12 +275,12 @@ robust_boxplot_plot <- function(res, args, method, alpha) {
     mean_aes <- ggplot2::aes(x = .x, y = .data$mean)
     jitter <- ggplot2::position_jitter(width = width, height = 0, seed = 1)
   }
-  point_size <- 1.6 * args$base_size / 11
+  point_size <- args$point_size
   p <- ggplot2::ggplot()
   if (args$points == "all") {
     p <- p + ggplot2::geom_point(data = data[is.na(data$out), , drop = FALSE], point_aes,
                                  position = jitter, colour = "grey55", size = 0.7 * point_size,
-                                 alpha = 0.5)
+                                 alpha = 2 / 3 * args$point_alpha)
   }
   p <- p +
     ggplot2::geom_boxplot(
@@ -289,7 +294,7 @@ robust_boxplot_plot <- function(res, args, method, alpha) {
   if (args$points != "none" && nrow(outliers) > 0) {
     p <- p + ggplot2::geom_point(data = outliers, point_aes, position = jitter, shape = 21,
                                  fill = "grey15", colour = "grey15", size = point_size,
-                                 alpha = 0.75)
+                                 alpha = args$point_alpha)
     if (args$label_outliers) {
       # moved apart by ggrepel, from the same jittered positions as the
       # points (the same seed); in dense tails, the labels that would

@@ -55,8 +55,9 @@ column names are the wavelengths (nm):
 ```{r spectra, fig.height = 3.5}
 forageLIBS |>
   slice(1:3) |>
-  select(Measurement, all_of(names(spectra)[wl > 400 & wl < 410])) |>
-  plot_spectra(id = Measurement)
+  select(-Sample, -all_of(minerals)) |>
+  plot_spectra(id = Measurement, wavelength = c(400, 460), offset = 10000) +
+  scale_x_continuous(breaks = seq(400, 460, 5))
 ```
 
 ## Identifying the lines
@@ -90,7 +91,7 @@ cn |>
   select(v_upper, v_lower, wavelength, degraded, fcf, relative_intensity) |>
   mutate(across(where(is.double), \(x) round(x, 3))) |>
   as.data.frame()
-plot_lines(colMeans(spectra)[wl > 383 & wl < 390], bands = cn, interactive = FALSE)
+plot_lines(colMeans(spectra), bands = cn, wavelength = c(383, 390), interactive = FALSE)
 ```
 
 The measured heads lie about 0.07 nm short of the markers: the wavelength

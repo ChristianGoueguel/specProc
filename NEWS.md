@@ -263,6 +263,31 @@
 * The title of the package is now "Analysis of Laser-Induced Breakdown
   Spectroscopy Data": it covers plasma diagnostics, calibration and robust
   chemometrics, not only preprocessing.
+* The plots share a set of arguments, with the same names and meanings
+  everywhere:
+  - `title`, `xlab`, `ylab` and `base_size` on every plot (added where they
+    were missing, as in `plot_calibration()`, `plot_boltzmann()`,
+    `plot_lines()` and the outlier maps);
+  - `point_size` and `point_alpha` on the plots of points:
+    `plot_calibration()`, whose replicate measurements overlap,
+    `plot_boltzmann()`, `plot_curve_of_growth()`, `plot_control_chart()`,
+    `plot_wavelength_calibration()`, `plot_outlier_map()`,
+    `plot_influence()`, `plot_coomans()`, `plot_embedding()`,
+    `plot_outliers()`, `adjusted_boxplot()`, `generalized_boxplot()`,
+    `plot_shots()`, `plot_som()` and `plot_fit()`;
+  - `wavelength = c(min, max)` on the plots along the wavelength axis, to
+    draw a window without subsetting the spectra first: `plot_lines()`
+    (its markers are then scaled within the window, and the lines and bands
+    outside it left out), `plot_loadings()` and `plot_contributions()` (the
+    largest peaks within the window are labeled), `plot_cell_map()`,
+    `plot_response()`, `plot_wavelength_selection()` and the prototypes of
+    `plot_som()`, as in `plot_spectra()` and `plot_shots()`;
+  - `linewidth` for the spectra and curves drawn along the wavelength axis,
+    with `spectrum_color`, `marker_linewidth` and `marker_alpha` in
+    `plot_lines()`, whose intensity axis is now titled "Intensity (arb.
+    units)", as in `plot_spectra()`;
+  - `interactive` for the plots with a plotly version, and `color_by` for
+    what colors the points.
 * The labels of the plots no longer overlap: they are placed by ggrepel
   (now imported), away from each other and from the points, with a segment
   to their point when moved far. This applies to the outlying samples of
@@ -455,7 +480,7 @@
   raw criteria `.intensity` (relative to the median shot of the sample),
   `.correlation` and `.distance`, and its settings.
 * The arguments of the points and lines of `plot_fit()` are renamed
-  `point_size`, `point_color`, `line_width` and `fit_color` (from `pt.size`,
+  `point_size`, `point_color`, `linewidth` and `fit_color` (from `pt.size`,
   `pt.colour`, `line.size` and `line.colour`); `pt.shape`, `pt.fill`,
   `linetype` and the `resid.*` arguments are deprecated and ignored.
 * `plot_outliers()` flags the samples beyond the adaptive cutoff of
@@ -467,6 +492,18 @@
   former flags. `show.outlier` and `show.mahal` are deprecated in favor of
   `color_by` and `plot = FALSE`, and the table gains the columns `row`,
   `cutoff` and `weight`.
+* Plot arguments are renamed to the names shared by the plots (see
+  Improvements). The former names still work, with a deprecation warning:
+  - `plot_spectra(.interactive)` becomes `interactive`;
+  - `plot_outlier_map(colour_by)` and `plot_influence(colour_by)` become
+    `color_by`, and `plot_som(colour)` becomes `color_by`;
+  - `plot_embedding(colour, size, alpha)` become `color_by`, `point_size`
+    and `point_alpha`. A number in `point_size` is the size of the points;
+    the default, and a number in the former `size`, scale with `base_size`.
+
+  The sizes and opacities of the points of `plot_outlier_map()`,
+  `plot_influence()` and `plot_coomans()` can still be given in `...`
+  (`size`, `alpha`), as other arguments of `ggplot2::geom_point()`.
 * The loadings of `robpca()` now have a fixed sign, their largest element
   positive, as those of `macropca()` and `cellpca()`. The signs of loadings
   and scores may differ from those of earlier versions.

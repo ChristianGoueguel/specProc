@@ -34,6 +34,10 @@ test_that("boltzmann recovers the temperature", {
   # the labels are plotmath expressions or ASCII text, so every device can draw them
   expect_true(is.expression(p$labels$y))
   expect_false(grepl("[^ -~]", p$labels$title))
+  styled <- plot_boltzmann(fit, xlab = "E (eV)", ylab = "y", point_alpha = 0.5, base_size = 9)
+  expect_equal(styled$labels[c("x", "y")], list(x = "E (eV)", y = "y"))
+  expect_equal(styled$layers[[2]]$aes_params$alpha, 0.5)
+  expect_equal(styled$theme$text$size, 9)
   file <- tempfile(fileext = ".pdf")
   grDevices::pdf(file)
   on.exit(unlink(file), add = TRUE)

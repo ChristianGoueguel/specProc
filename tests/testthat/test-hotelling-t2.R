@@ -55,7 +55,7 @@ test_that("plot_embedding draws T-squared ellipses and labels outliers", {
   expect_setequal(as.character(levels_text$limit), c("T\u00b2 95%", "T\u00b2 99%"))
   expect_equal(p$scales$get_scales("linetype")$guide, "none")
   expect_match(p$labels$subtitle, "1 sample")
-  g <- plot_embedding(x, colour = group, hotelling = "group")
+  g <- plot_embedding(x, color_by = group, hotelling = "group")
   gp <- g$layers[vapply(g$layers, function(l) inherits(l$geom, "GeomPath"), logical(1))][[1]]$data
   expect_setequal(unique(as.character(gp$.colour)), c("a", "b"))
   expect_error(plot_embedding(x, hotelling = "group"), "discrete")

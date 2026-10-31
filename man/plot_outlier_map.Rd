@@ -11,10 +11,16 @@ plot_outlier_map(
   relative = FALSE,
   shade = FALSE,
   log = FALSE,
-  colour_by = c("type", "distance"),
   title = NULL,
   map = c("regression", "score"),
-  ...
+  ...,
+  color_by = c("type", "distance"),
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11,
+  point_size = 2.2,
+  point_alpha = 0.85,
+  colour_by = deprecated()
 )
 }
 \arguments{
@@ -40,14 +46,6 @@ observations stays white. Default is \code{FALSE}.}
 observations when a few are far away. Zero distances are drawn at the
 smallest positive distance. Default is \code{FALSE}.}
 
-\item{colour_by}{The colors of the points: \code{"type"} (default), by
-outlier type, or \code{"distance"}, by their reduced distance from the
-origin, \eqn{\max(SD/c_{SD}, OD/c_{OD})}, on a rainbow scale from dark
-red (the closest) to blue (the farthest). With \code{relative = TRUE}, where
-both cut-offs are at 1, yellow marks the cut-offs: dark red through
-orange for the regular observations, then green and blue for the
-outlying ones. Otherwise, the colors spread evenly over the distances.}
-
 \item{title}{The plot title.}
 
 \item{map}{For \code{\link[=rsimpls]{rsimpls()}} and \code{\link[=rpcr]{rpcr()}} fits, the map to draw:
@@ -55,11 +53,30 @@ outlying ones. Otherwise, the colors spread evenly over the distances.}
 the score outlier map of the predictors. Not used for robust PCA fits.}
 
 \item{...}{Further arguments passed to \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} to style
-the points, such as \code{alpha} (default 0.85), \code{size} (2.2), \code{stroke}
-(0.4) or \code{colour} (the outline, \code{"black"}). \code{size} can also be a numeric
+the points, such as \code{stroke} (default 0.4) or \code{colour} (the outline,
+\code{"black"}).}
+
+\item{color_by}{The colors of the points: \code{"type"} (default), by
+outlier type, or \code{"distance"}, by their reduced distance from the
+origin, \eqn{\max(SD/c_{SD}, OD/c_{OD})}, on a rainbow scale from dark
+red (the closest) to blue (the farthest). With \code{relative = TRUE}, where
+both cut-offs are at 1, yellow marks the cut-offs: dark red through
+orange for the regular observations, then green and blue for the
+outlying ones. Otherwise, the colors spread evenly over the distances.}
+
+\item{xlab, ylab}{The axis titles. Default are the names of the distances.}
+
+\item{base_size}{The size of the text, in points. Default is 11.}
+
+\item{point_size}{The size of the points (default 2.2), or a numeric
 vector with one value per sample (the calibration samples, then those
 of \code{newdata}), such as the concentration of an element, to vary the
 size of the points, with a legend.}
+
+\item{point_alpha}{The opacity of the points, between 0 and 1 (default
+0.85).}
+
+\item{colour_by}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{color_by}.}
 }
 \value{
 A ggplot object.
@@ -123,7 +140,7 @@ fit <- forageLIBS |>
 
 plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE)
 plot_outlier_map(fit, relative = TRUE, shade = TRUE, log = TRUE,
-labels = 10, colour_by = "distance")
+labels = 10, color_by = "distance", point_alpha = 0.6)
 
 }
 \seealso{

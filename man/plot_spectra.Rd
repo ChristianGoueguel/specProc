@@ -8,7 +8,7 @@ plot_spectra(
   x,
   id = NULL,
   colvar = NULL,
-  .interactive = FALSE,
+  interactive = FALSE,
   drop_na = FALSE,
   offset = NULL,
   wavelength = NULL,
@@ -30,7 +30,8 @@ plot_spectra(
   panel_tags = FALSE,
   label_spectra = FALSE,
   summary = c("none", "mean", "median"),
-  rasterize = FALSE
+  rasterize = FALSE,
+  .interactive = deprecated()
 )
 }
 \arguments{
@@ -42,8 +43,8 @@ that identified each spectrum.}
 \item{colvar}{optional (\code{NULL} by default). Column name of a numeric
 variable to be display in color scale.}
 
-\item{.interactive}{optional (\code{FALSE} by default). When set to \code{TRUE}
-enables interactive plot.}
+\item{interactive}{A logical: an interactive plotly plot (\code{TRUE}) or a
+ggplot (\code{FALSE}, default).}
 
 \item{drop_na}{Optional (\code{FALSE} by default). Remove rows with NA intensity
 if drop_na is \code{TRUE}.}
@@ -133,9 +134,11 @@ of the first to third quartiles (see Details).}
 \item{rasterize}{\code{FALSE} (default), \code{TRUE}, or a resolution in dpi: draw
 the spectra as an image, of 300 dpi with \code{TRUE}, within an otherwise
 vector plot (see Details). Ignored for interactive plots.}
+
+\item{.interactive}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{interactive}.}
 }
 \value{
-Object of class ggplot or of class plotly if \code{.interactive = TRUE}.
+Object of class ggplot or of class plotly if \code{interactive = TRUE}.
 }
 \description{
 Spectrum plots are commonly x–y plots in which the x-axis represents the

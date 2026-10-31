@@ -4,13 +4,30 @@
 \alias{plot_curve_of_growth}
 \title{Plot a Curve of Growth}
 \usage{
-plot_curve_of_growth(object, title = NULL)
+plot_curve_of_growth(
+  object,
+  title = NULL,
+  xlab = "Optical depth at the line center",
+  ylab = "Reduced intensity",
+  base_size = 11,
+  point_size = 2.5,
+  point_alpha = 1
+)
 }
 \arguments{
 \item{object}{The result of \code{\link[=curve_of_growth]{curve_of_growth()}}.}
 
 \item{title}{The plot title. By default, the temperature and the largest
 optical depth.}
+
+\item{xlab, ylab}{The axis titles. Default are \code{"Optical depth at the line center"} and \code{"Reduced intensity"}.}
+
+\item{base_size}{The size of the text, in points. Default is 11.}
+
+\item{point_size}{The size of the points of the lines. Default is 2.5.}
+
+\item{point_alpha}{The opacity of the points, between 0 and 1. Default is
+1.}
 }
 \value{
 A ggplot object.

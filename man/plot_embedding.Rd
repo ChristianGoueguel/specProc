@@ -8,9 +8,9 @@ plot_embedding(
   data,
   x = NULL,
   y = NULL,
-  colour = NULL,
-  size = 2,
-  alpha = 0.8,
+  color_by = NULL,
+  point_size = NULL,
+  point_alpha = 0.8,
   ellipse = FALSE,
   conf_level = 0.975,
   robust = FALSE,
@@ -30,7 +30,12 @@ plot_embedding(
   legend = c("right", "bottom", "top", "inside", "none"),
   panel = c("shaded", "white"),
   caption = TRUE,
-  base_size = 11
+  base_size = 11,
+  xlab = NULL,
+  ylab = NULL,
+  colour = deprecated(),
+  size = deprecated(),
+  alpha = deprecated()
 )
 }
 \arguments{
@@ -41,13 +46,15 @@ matrix, a \code{\link[stats:prcomp]{stats::prcomp()}} fit, or an object of \code
 \item{x, y}{The columns of the axes, unquoted or as strings. By default,
 the first two embedding coordinates (see details).}
 
-\item{colour}{The variable coloring the points: a column of \code{data}
+\item{color_by}{The variable coloring the points: a column of \code{data}
 (unquoted or as a string), or a vector with one value per sample.}
 
-\item{size}{The size of the points: a number (default 2), or a numeric
-column of \code{data} or vector with one value per sample to vary it.}
+\item{point_size}{The size of the points: a number, or a numeric column
+of \code{data} or vector with one value per sample to vary it. Default is 2
+at a \code{base_size} of 11, scaled with \code{base_size}.}
 
-\item{alpha}{The opacity of the points.}
+\item{point_alpha}{The opacity of the points, between 0 and 1. Default is
+0.8.}
 
 \item{ellipse}{A logical: draw confidence ellipses (\code{FALSE}, default).
 Needs the ConfidenceEllipse package.}
@@ -63,7 +70,7 @@ chi-square) or \code{"hotelling"}.}
 
 \item{hotelling}{Hotelling's \eqn{T^2} ellipses and outliers: \code{"none"}
 (default), \code{"all"} (all samples) or \code{"group"} (within the groups of a
-discrete \code{colour}). Needs the HotellingEllipse package (1.3.0 or
+discrete \code{color_by}). Needs the HotellingEllipse package (1.3.0 or
 later).}
 
 \item{k}{The number of components of \eqn{T^2}: the two axes, then the
@@ -94,14 +101,14 @@ are not distorted (for scores in the same units).}
 
 \item{title}{The plot title.}
 
-\item{legend_title}{The title of the legend of \code{colour}. Default is its
+\item{legend_title}{The title of the legend of \code{color_by}. Default is its
 name; give it with units, such as \code{"K (\%)"}.}
 
-\item{palette}{The colors of \code{colour}: \code{NULL} (default: Dark2 for up to 8
+\item{palette}{The colors of \code{color_by}: \code{NULL} (default: Dark2 for up to 8
 groups, viridis for a numeric variable), the name of a viridis palette
 (\code{"viridis"}, \code{"magma"}, \code{"cividis"}, ...) or a vector of colors.}
 
-\item{shapes}{A logical: give each group of a discrete \code{colour} its own
+\item{shapes}{A logical: give each group of a discrete \code{color_by} its own
 point shape (up to 6 groups), so that the groups stay apart in grayscale
 (\code{TRUE}, default).}
 
@@ -116,7 +123,14 @@ limits are; \code{FALSE}, no caption; or a caption of your own.}
 
 \item{base_size}{The size of the text, in points. Default is 11; use the
 text size of the journal (often 7 to 9 points) for a figure saved at its
-printed size. The points, lines and labels scale with it.}
+printed size. The points (unless \code{point_size} is a number), lines and
+labels scale with it.}
+
+\item{xlab, ylab}{The axis titles. Default are the names of the axes, with
+the variance they explain for a PCA.}
+
+\item{colour, size, alpha}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
+\code{color_by}, \code{point_size} and \code{point_alpha}.}
 }
 \value{
 A ggplot object.
@@ -130,11 +144,11 @@ variable.
 \details{
 By default, the axes are the first two columns named like embedding
 coordinates (\code{UMAP1}, \code{PC1}, \code{Comp1}, ...; the name followed by a
-number), or else the first two numeric columns. A numeric \code{colour} uses
+number), or else the first two numeric columns. A numeric \code{color_by} uses
 a continuous viridis scale, other types a discrete palette.
 
 With \code{ellipse = TRUE}, a confidence ellipse is drawn for each group of a
-discrete \code{colour} (or for all the samples otherwise), with
+discrete \code{color_by} (or for all the samples otherwise), with
 \code{\link[ConfidenceEllipse:confidence_ellipse]{ConfidenceEllipse::confidence_ellipse()}}, at each level of \code{conf_level}
 (0.975 by default). It covers the region expected to hold that share of
 the samples of the group if they follow a
@@ -165,7 +179,7 @@ number of components and \code{conf_level = 0.975}). The scores of the
 outlying samples then do not inflate or tilt the ellipses. For other
 embeddings, \eqn{T^2} is computed from the mean and covariance of the
 samples (with \code{\link[=hotelling_t2]{hotelling_t2()}} and \code{\link[HotellingEllipse:ellipseCoord]{HotellingEllipse::ellipseCoord()}}).
-With \code{hotelling = "group"}, each group of a discrete \code{colour} gets its own
+With \code{hotelling = "group"}, each group of a discrete \code{color_by} gets its own
 ellipses and limits, from its mean and covariance, which flags the samples
 atypical of their own group. The ellipses are labeled with their level
 (instead of a legend), and drawn for the two components shown, while the
@@ -186,7 +200,7 @@ and a fixed \code{aspect_ratio} (0.7 by default; \code{NULL} lets the plot fill 
 space, \code{"equal"} gives both axes the same scale), and thin light grey
 lines through the origin (when it lies in the range of the samples, as for
 centered scores). Without ellipses, the panel is white. The groups of a
-discrete \code{colour} also get their own point shapes (\code{shapes}), and the axes
+discrete \code{color_by} also get their own point shapes (\code{shapes}), and the axes
 plain numbers. A caption says what the ellipses and limits are (their
 level, distribution and estimates), which readers cannot tell from the
 plot.
@@ -203,9 +217,10 @@ model for \code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}} and \
 these. With groups, the ellipses (confidence, or \eqn{T^2} with
 \code{hotelling = "group"}) are filled with the color of their group.
 
-\strong{Point size.} \code{size} is a number, or a numeric variable (a column of
-\code{data} or a vector with one value per sample), such as the concentration
-of an element, which sets the size of each point, with a legend.
+\strong{Point size.} \code{point_size} is a number, or a numeric variable (a column
+of \code{data} or a vector with one value per sample), such as the
+concentration of an element, which sets the size of each point, with a
+legend.
 
 \strong{Biplot.} With \code{biplot = TRUE} (for a \code{\link[stats:prcomp]{stats::prcomp()}} fit or a robust
 PCA), the loadings of the two components are drawn over the scores: all
@@ -245,7 +260,7 @@ if (rlang::is_installed("ConfidenceEllipse")) {
   wl <- suppressWarnings(as.numeric(names(forageLIBS)))
   pca <- stats::prcomp(forageLIBS[which(wl > 760 & wl < 772)])
   level <- cut(forageLIBS$K, 3, labels = c("Low K", "Mid K", "High K"))
-  p <- plot_embedding(pca, colour = level, ellipse = TRUE, legend_title = "Potassium",
+  p <- plot_embedding(pca, color_by = level, ellipse = TRUE, legend_title = "Potassium",
                       legend = "bottom", base_size = 8)
   p
   # ggplot2::ggsave("scores.pdf", p, width = 85, height = 80, units = "mm")
@@ -261,7 +276,7 @@ if (rlang::is_installed(c("recipes", "embed"))) {
     embed::step_umap(recipes::all_predictors(), neighbors = 15) |>
     recipes::prep() |>
     recipes::bake(new_data = NULL)
-  plot_embedding(umap, colour = Species, title = "UMAP of the iris flowers")
+  plot_embedding(umap, color_by = Species, title = "UMAP of the iris flowers")
 }
 }
 

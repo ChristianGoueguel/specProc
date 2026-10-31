@@ -164,7 +164,12 @@ control_chart <- function(x, order = NULL, method = "shewhart", baseline = NULL,
 #' @param object The result of [control_chart()].
 #' @param title The plot title. By default, the method and the number of
 #'   signals.
-#' @param xlab,ylab The axis labels.
+#' @param xlab,ylab The axis titles. Default are `"Order"` and the name of
+#'   the statistic.
+#' @param base_size The size of the text, in points. Default is 11.
+#' @param point_size The size of the points. Default is 1.3.
+#' @param point_alpha The opacity of the points, between 0 and 1. Default is
+#'   1.
 #'
 #' @return A ggplot object.
 #' @seealso [control_chart()]
@@ -174,10 +179,14 @@ control_chart <- function(x, order = NULL, method = "shewhart", baseline = NULL,
 #' set.seed(1)
 #' ratio <- 1 + c(rep(0, 60), seq(0, 0.06, length.out = 40)) + rnorm(100, sd = 0.02)
 #' plot_control_chart(control_chart(ratio, method = "cusum", baseline = 40))
-plot_control_chart <- function(object, title = NULL, xlab = "Order", ylab = NULL) {
+plot_control_chart <- function(object, title = NULL, xlab = "Order", ylab = NULL, base_size = 11,
+                               point_size = 1.3, point_alpha = 1) {
   if (!inherits(object, "specproc_control_chart")) {
     stop("'object' must be returned by control_chart().", call. = FALSE)
   }
+  check_plot_text(title, xlab, ylab, base_size)
+  check_size(point_size, "point_size")
+  check_alpha(point_alpha, "point_alpha")
   method <- attr(object, "method")
   d <- as.data.frame(object)
   label <- c(shewhart = "Shewhart chart", ewma = "EWMA chart", cusum = "CUSUM chart")[[method]]
@@ -205,18 +214,18 @@ plot_control_chart <- function(object, title = NULL, xlab = "Order", ylab = NULL
     p <- p +
       ggplot2::geom_line(ggplot2::aes(y = -.data$lower_sum), colour = "#1f4e79", alpha = 0.6) +
       ggplot2::geom_point(data = d, ggplot2::aes(y = -.data$lower_sum, colour = .data$lower_beyond),
-                          size = 1.3)
+                          size = point_size, alpha = point_alpha)
   }
   p <- p +
     ggplot2::geom_line(ggplot2::aes(y = .data$statistic), colour = "#1f4e79", alpha = 0.6) +
     ggplot2::geom_point(data = d, ggplot2::aes(y = .data$statistic, colour = .data$beyond),
-                        size = 1.3) +
+                        size = point_size, alpha = point_alpha) +
     ggplot2::scale_colour_manual(values = c(`FALSE` = "#1f4e79", `TRUE` = "#c0392b"),
                                  labels = c(`FALSE` = "in control", `TRUE` = "signal"),
                                  name = NULL) +
     ggplot2::labs(x = xlab, y = ylab, title = title,
                   subtitle = if (method == "cusum") "Upper sum above zero, lower sum below") +
-    ggplot2::theme_bw() +
+    ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(legend.position = "bottom")
   finish_title(p)
 }

@@ -10,7 +10,12 @@ plot_calibration(
   level = 0.95,
   newdata = NULL,
   replicates = 1,
-  title = NULL
+  title = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11,
+  point_size = 2,
+  point_alpha = 1
 )
 }
 \arguments{
@@ -31,6 +36,16 @@ new signal. Default is 1.}
 
 \item{title}{The plot title. By default, the model and the figures of
 merit.}
+
+\item{xlab, ylab}{The axis titles. Default are the names of the
+concentration and signal columns.}
+
+\item{base_size}{The size of the text, in points. Default is 11.}
+
+\item{point_size}{The size of the points of the standards. Default is 2.}
+
+\item{point_alpha}{The opacity of the points of the standards, between 0
+and 1. Default is 1; lower it when replicates overlap.}
 }
 \value{
 A ggplot object.
@@ -67,7 +82,8 @@ test_samples <- sample(unique(data$Sample), round(0.25 * length(unique(data$Samp
 calibration <- data[!data$Sample \%in\% test_samples, ]
 
 k_curve <- calibration_curve(calibration, K_signal, K)
-plot_calibration(k_curve)
+plot_calibration(k_curve, point_alpha = 0.4, xlab = "K (\%)",
+                 ylab = "K I 769.90 nm / C I 247.86 nm")
 }
 \seealso{
 \code{\link[=calibration_curve]{calibration_curve()}}, \code{\link[=predict.specproc_calibration]{predict.specproc_calibration()}}

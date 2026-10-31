@@ -156,13 +156,19 @@ contributions <- function(model, k = NULL, statistic = c("q", "t2"), data = NULL
 #' fit <- robpca(spectra, k = 3)
 #' q <- contributions(fit, data = spectra, samples = c(49, 127), reference = "regular")
 #' plot_contributions(q, spectra = spectra)
+#' # the 390-400 nm window: the Ca II H and K lines
+#' plot_contributions(q, spectra = spectra, wavelength = c(390, 400), top = 4)
 #'
 plot_contributions <- function(x, samples = NULL, top = 10, lines = NULL, tol = 0.1,
-                               spectra = NULL, span = 5, interactive = FALSE, title = NULL) {
+                               spectra = NULL, span = 5, interactive = FALSE, title = NULL,
+                               wavelength = NULL, xlab = NULL, ylab = NULL, base_size = 11,
+                               linewidth = 0.3) {
   if (!inherits(x, "specproc_contributions")) {
     stop("'x' must be returned by contributions().", call. = FALSE)
   }
   check_flag(interactive, "interactive")
+  check_plot_text(title, xlab, ylab, base_size)
+  check_size(linewidth, "linewidth")
   total <- attr(x, "total")
   if (is.null(samples)) {
     rows <- order(total, decreasing = TRUE)[seq_len(min(3, nrow(x)))]
@@ -171,12 +177,13 @@ plot_contributions <- function(x, samples = NULL, top = 10, lines = NULL, tol = 
   }
   values <- as.matrix(x[rows, -1, drop = FALSE])
   variables <- colnames(values)
-  wavelength <- names_to_wavelength(variables)
-  has_wavelength <- length(wavelength) == length(variables)
-  if (!has_wavelength) wavelength <- seq_along(variables)
-  parts <- list(variables = variables, wavelength = wavelength, has_wavelength = has_wavelength,
-                segment = if (has_wavelength) wavelength_segments(wavelength) else rep(1L, length(variables)))
+  wl <- names_to_wavelength(variables)
+  has_wavelength <- length(wl) == length(variables)
+  if (!has_wavelength) wl <- seq_along(variables)
+  parts <- list(variables = variables, wavelength = wl, has_wavelength = has_wavelength,
+                segment = if (has_wavelength) wavelength_segments(wl) else rep(1L, length(wl)))
   check_peak_args(top, span, lines, tol, parts)
+  window <- loading_window(wavelength, parts)
 
   statistic <- attr(x, "statistic")
   stat_label <- if (statistic == "q") "Q" else "T\u00b2"
@@ -185,14 +192,15 @@ plot_contributions <- function(x, samples = NULL, top = 10, lines = NULL, tol = 
   curves <- data.frame(
     panel = factor(rep(labels, each = n), levels = labels),
     index = rep(seq_len(n), length(rows)),
-    wavelength = rep(wavelength, length(rows)),
+    wavelength = rep(wl, length(rows)),
     value = as.vector(t(values)),
     segment = rep(parts$segment, length(rows)),
     type = "loadings",
     stringsAsFactors = FALSE
   )
-  peaks <- find_loading_peaks(curves, parts, top, span, lines, tol)
-  background <- if (is.null(spectra)) NULL else loading_background(spectra, parts, curves)
+  peaks <- find_loading_peaks(curves, parts, top, span, lines, tol, window)
+  background <- if (is.null(spectra)) NULL else loading_background(spectra, parts, curves, window)
+  curves <- curves[in_window(curves$wavelength, window), , drop = FALSE]
   if (is.null(title)) {
     reference <- attr(x, "reference")
     title <- paste0(attr(x, "model"), " ", stat_label, " contributions (", attr(x, "k"),
@@ -203,12 +211,13 @@ plot_contributions <- function(x, samples = NULL, top = 10, lines = NULL, tol = 
                              paste(utils::head(reference, 5), collapse = ", "),
                              if (length(reference) > 5) ", ..."))
   }
-  x_lab <- if (has_wavelength) "Wavelength (nm)" else "Variable"
-  y_lab <- "Contribution"
+  style <- list(x_lab = xlab %||% if (has_wavelength) "Wavelength (nm)" else "Variable",
+                y_lab = ylab %||% "Contribution", title = title, base_size = base_size,
+                linewidth = linewidth)
   if (interactive) {
-    plot_loadings_plotly(curves, peaks, background, x_lab, y_lab, title)
+    plot_loadings_plotly(curves, peaks, background, style)
   } else {
-    plot_loadings_ggplot(curves, peaks, background, parts, x_lab, y_lab, title)
+    plot_loadings_ggplot(curves, peaks, background, parts, style)
   }
 }
 

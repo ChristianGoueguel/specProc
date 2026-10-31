@@ -103,7 +103,7 @@
 #' fit <- som(spectra)
 #' fit
 #' # where the potassium-rich samples are, and how many samples per unit
-#' plot_som(fit, type = "mapping", colour = forageLIBS$K)
+#' plot_som(fit, type = "mapping", color_by = forageLIBS$K)
 #' plot_som(fit, type = "counts")
 som <- function(x, grid = NULL, topology = c("hexagonal", "rectangular"), epochs = 50,
                 radius = NULL, init = c("pca", "random"), center = TRUE, scale = FALSE,
@@ -347,7 +347,7 @@ som_stability <- function(x, runs = 10, ...) {
 #'    intense emission lines. Each plane is scaled from its lowest (0) to its
 #'    highest (1) unit, so that weak lines are as readable as strong ones.
 #'  - `"mapping"`: the training spectra on their units (spread within the
-#'    unit), colored by `colour`, and, with `newdata`, the new spectra as
+#'    unit), colored by `color_by`, and, with `newdata`, the new spectra as
 #'    triangles, the novel ones circled in red.
 #'  - `"prototypes"`: the prototype spectra of the `units` against
 #'    wavelength. By default, six prototypes spread over the map: the unit
@@ -359,11 +359,22 @@ som_stability <- function(x, runs = 10, ...) {
 #'   `"component"`, `"mapping"` or `"prototypes"`.
 #' @param variables For `"component"`: the variables, as wavelengths (the
 #'   nearest channel is used) or column names.
-#' @param colour For `"mapping"`: a vector with one value per training
+#' @param color_by For `"mapping"`: a vector with one value per training
 #'   spectrum, such as a concentration or a class.
 #' @param newdata For `"mapping"`: optional new spectra to place on the map.
 #' @param units For `"prototypes"`: the units whose prototypes are drawn.
 #' @param title The plot title.
+#' @param wavelength For `"prototypes"`: the wavelength range `c(min, max)`
+#'   to draw, in nm. Default is all the variables.
+#' @param xlab,ylab For `"prototypes"`: the axis titles. Default are
+#'   `"Wavelength (nm)"` (or `"Variable"`) and `"Prototype"`. The maps have
+#'   no axes.
+#' @param base_size The size of the text, in points. Default is 11.
+#' @param point_size,point_alpha For `"mapping"`: the size (default 1.6) and
+#'   opacity (default 0.8) of the points of the training spectra.
+#' @param linewidth For `"prototypes"`: the width of the prototype spectra.
+#'   Default is 0.4.
+#' @param colour `r lifecycle::badge("deprecated")` Use `color_by`.
 #'
 #' @return A ggplot object.
 #' @seealso [som()], [predict.specproc_som()]
@@ -378,18 +389,28 @@ som_stability <- function(x, runs = 10, ...) {
 #' plot_som(fit, type = "umatrix")
 #' # component planes of the K I and Na I lines
 #' plot_som(fit, type = "component", variables = c(769.90, 589.59))
-#' plot_som(fit, type = "mapping", colour = forageLIBS$K)
-#' plot_som(fit, type = "prototypes")
+#' plot_som(fit, type = "mapping", color_by = forageLIBS$K)
+#' plot_som(fit, type = "prototypes", wavelength = c(760, 780))
 plot_som <- function(object, type = c("counts", "umatrix", "quality", "component", "mapping", "prototypes"),
-                     variables = NULL, colour = NULL, newdata = NULL, units = NULL, title = NULL) {
+                     variables = NULL, color_by = NULL, newdata = NULL, units = NULL,
+                     title = NULL, wavelength = NULL, xlab = NULL, ylab = NULL, base_size = 11,
+                     point_size = 1.6, point_alpha = 0.8, linewidth = 0.4,
+                     colour = deprecated()) {
   if (!inherits(object, "specproc_som")) {
     stop("'object' must be returned by som().", call. = FALSE)
   }
   type <- match.arg(type)
+  color_by <- renamed_arg(colour, color_by, "plot_som", "colour", "color_by")
+  check_plot_text(title, xlab, ylab, base_size)
+  check_size(point_size, "point_size")
+  check_alpha(point_alpha, "point_alpha")
+  check_size(linewidth, "linewidth")
   grid <- as.data.frame(object$grid)
   n_units <- nrow(grid)
   if (type == "prototypes") {
-    return(som_prototype_plot(object, units, title))
+    return(som_prototype_plot(object, units, title, wavelength_window(wavelength),
+                              list(xlab = xlab, ylab = ylab, base_size = base_size,
+                                   linewidth = linewidth)))
   }
   hexagonal <- object$topology == "hexagonal"
   polygons <- som_polygons(grid, hexagonal)
@@ -446,18 +467,18 @@ plot_som <- function(object, type = c("counts", "umatrix", "quality", "component
     p <- ggplot2::ggplot() +
       ggplot2::geom_polygon(data = polygons, ggplot2::aes(.data$px, .data$py, group = .data$unit),
                             fill = "grey97", colour = "grey75", linewidth = 0.3)
-    if (is.null(colour)) {
+    if (is.null(color_by)) {
       p <- p + ggplot2::geom_point(data = points, ggplot2::aes(.data$x, .data$y),
-                                   colour = "#1f4e79", size = 1.6, alpha = 0.8)
+                                   colour = "#1f4e79", size = point_size, alpha = point_alpha)
     } else {
-      if (length(colour) != length(object$unit)) {
-        stop("'colour' must have one value per training spectrum (", length(object$unit), ").",
+      if (length(color_by) != length(object$unit)) {
+        stop("'color_by' must have one value per training spectrum (", length(object$unit), ").",
              call. = FALSE)
       }
-      points$colour <- colour
+      points$colour <- color_by
       p <- p + ggplot2::geom_point(data = points, ggplot2::aes(.data$x, .data$y, colour = .data$colour),
-                                   size = 1.6, alpha = 0.85) +
-        (if (is.numeric(colour)) ggplot2::scale_colour_viridis_c(name = NULL) else
+                                   size = point_size, alpha = point_alpha) +
+        (if (is.numeric(color_by)) ggplot2::scale_colour_viridis_c(name = NULL) else
           ggplot2::scale_colour_brewer(palette = "Dark2", name = NULL))
     }
     if (!is.null(newdata)) {
@@ -474,7 +495,7 @@ plot_som <- function(object, type = c("counts", "umatrix", "quality", "component
   p <- p +
     ggplot2::coord_equal() +
     ggplot2::labs(title = title, x = NULL, y = NULL) +
-    ggplot2::theme_void() +
+    ggplot2::theme_void(base_size = base_size) +
     ggplot2::theme(legend.position = "right", plot.margin = ggplot2::margin(6, 6, 6, 6))
   finish_title(p)
 }
@@ -530,7 +551,8 @@ som_columns <- function(object, variables) {
   }
 }
 
-som_prototype_plot <- function(object, units, title) {
+som_prototype_plot <- function(object, units, title, window = NULL, style = list(base_size = 11,
+                                                                                 linewidth = 0.4)) {
   counts <- tabulate(object$unit, nrow(object$grid))
   if (is.null(units)) {
     # farthest-point selection among the units with spectra
@@ -549,16 +571,26 @@ som_prototype_plot <- function(object, units, title) {
   wl <- suppressWarnings(as.numeric(colnames(object$codebook)))
   spectral <- !anyNA(wl)
   if (!spectral) wl <- seq_len(ncol(object$codebook))
+  keep <- seq_along(wl)
+  if (!is.null(window)) {
+    if (!spectral) {
+      stop("'wavelength' needs variables named by wavelength.", call. = FALSE)
+    }
+    keep <- which(in_window(wl, window))
+    if (length(keep) < 2) {
+      stop("Fewer than 2 variables in the 'wavelength' range.", call. = FALSE)
+    }
+  }
   d <- do.call(rbind, lapply(units, function(u) {
-    data.frame(unit = paste0("unit ", u, " (", counts[u], ")"), x = wl,
-               value = object$codebook[u, ])
+    data.frame(unit = paste0("unit ", u, " (", counts[u], ")"), x = wl[keep],
+               value = object$codebook[u, keep])
   }))
   d$unit <- factor(d$unit, levels = unique(d$unit))
   p <- ggplot2::ggplot(d, ggplot2::aes(.data$x, .data$value, colour = .data$unit)) +
-    ggplot2::geom_line(linewidth = 0.4) +
+    ggplot2::geom_line(linewidth = style$linewidth) +
     ggplot2::scale_colour_brewer(palette = "Dark2", name = "Unit (spectra)") +
-    ggplot2::labs(x = if (spectral) "Wavelength (nm)" else "Variable", y = "Prototype",
-                  title = title %||% "Prototype spectra") +
-    ggplot2::theme_bw()
+    ggplot2::labs(x = style$xlab %||% if (spectral) "Wavelength (nm)" else "Variable",
+                  y = style$ylab %||% "Prototype", title = title %||% "Prototype spectra") +
+    ggplot2::theme_bw(base_size = style$base_size)
   finish_title(p)
 }

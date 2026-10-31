@@ -146,7 +146,7 @@ spectra <- forageLIBS[which(wl > 760 & wl < 780)]
 set.seed(1)
 fit <- cellpca(spectra, k = 2, od_cutoff = "chisq")
 fit
-plot_outlier_map(fit, shade = TRUE, relative = TRUE, log = TRUE, colour_by = "distance")
+plot_outlier_map(fit, shade = TRUE, relative = TRUE, log = TRUE, color_by = "distance")
 plot_cell_map(fit, order = "od")
 
 }

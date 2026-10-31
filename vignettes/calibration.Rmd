@@ -101,10 +101,12 @@ mandel <- k_curve$linearity |> filter(test == "Mandel")
 
 `plot_calibration()` draws the curve with its confidence band (where the
 mean signal lies) and its prediction band (where a single new measurement
-is expected):
+is expected). The replicate measurements of a sample overlap, so they are
+drawn semi-transparent (`point_alpha`), and the axes get their units:
 
 ```{r k-plot, fig.height = 4.5}
-plot_calibration(k_curve)
+plot_calibration(k_curve, point_alpha = 0.4, xlab = "K (%)",
+                 ylab = "K I 769.90 nm / C I 247.86 nm")
 ```
 
 `predict()` inverts the curve: it gives the concentration of new samples
@@ -211,7 +213,8 @@ bind_rows(unweighted = fe_unweighted$figures_of_merit,
 ```
 
 ```{r fe-plot, fig.height = 4.5}
-plot_calibration(fe_weighted, interval = "prediction")
+plot_calibration(fe_weighted, interval = "prediction", point_alpha = 0.4, xlab = "Fe (ppm)",
+                 ylab = "Fe I 259.94 nm / C I 247.86 nm")
 ```
 
 The weighted fit gives a limit of detection of

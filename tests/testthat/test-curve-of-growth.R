@@ -60,6 +60,9 @@ test_that("curve_of_growth recovers the optical depths and the temperature", {
   expect_gt(boltzmann(lines)$temperature, 10000)
   expect_output(print(cog), "Curve of growth")
   expect_s3_class(plot_curve_of_growth(cog), "ggplot")
+  styled <- plot_curve_of_growth(cog, xlab = "tau", point_size = 4, base_size = 9)
+  expect_equal(styled$labels$x, "tau")
+  expect_equal(styled$layers[[3]]$aes_params$size, 4)
   # optically thin lines keep their intensities
   lines$intensity <- curve_of_growth_model(lines, 9000, 1e20, 1e-3)$intensity
   expect_equal(curve_of_growth(lines, 9000)$SA, rep(1, 6), tolerance = 1e-3)

@@ -8,10 +8,18 @@ plot_som(
   object,
   type = c("counts", "umatrix", "quality", "component", "mapping", "prototypes"),
   variables = NULL,
-  colour = NULL,
+  color_by = NULL,
   newdata = NULL,
   units = NULL,
-  title = NULL
+  title = NULL,
+  wavelength = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11,
+  point_size = 1.6,
+  point_alpha = 0.8,
+  linewidth = 0.4,
+  colour = deprecated()
 )
 }
 \arguments{
@@ -23,7 +31,7 @@ plot_som(
 \item{variables}{For \code{"component"}: the variables, as wavelengths (the
 nearest channel is used) or column names.}
 
-\item{colour}{For \code{"mapping"}: a vector with one value per training
+\item{color_by}{For \code{"mapping"}: a vector with one value per training
 spectrum, such as a concentration or a class.}
 
 \item{newdata}{For \code{"mapping"}: optional new spectra to place on the map.}
@@ -31,6 +39,23 @@ spectrum, such as a concentration or a class.}
 \item{units}{For \code{"prototypes"}: the units whose prototypes are drawn.}
 
 \item{title}{The plot title.}
+
+\item{wavelength}{For \code{"prototypes"}: the wavelength range \code{c(min, max)}
+to draw, in nm. Default is all the variables.}
+
+\item{xlab, ylab}{For \code{"prototypes"}: the axis titles. Default are
+\code{"Wavelength (nm)"} (or \code{"Variable"}) and \code{"Prototype"}. The maps have
+no axes.}
+
+\item{base_size}{The size of the text, in points. Default is 11.}
+
+\item{point_size, point_alpha}{For \code{"mapping"}: the size (default 1.6) and
+opacity (default 0.8) of the points of the training spectra.}
+
+\item{linewidth}{For \code{"prototypes"}: the width of the prototype spectra.
+Default is 0.4.}
+
+\item{colour}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{color_by}.}
 }
 \value{
 A ggplot object.
@@ -55,7 +80,7 @@ each of the \code{variables} (one panel per variable): which units have
 intense emission lines. Each plane is scaled from its lowest (0) to its
 highest (1) unit, so that weak lines are as readable as strong ones.
 \item \code{"mapping"}: the training spectra on their units (spread within the
-unit), colored by \code{colour}, and, with \code{newdata}, the new spectra as
+unit), colored by \code{color_by}, and, with \code{newdata}, the new spectra as
 triangles, the novel ones circled in red.
 \item \code{"prototypes"}: the prototype spectra of the \code{units} against
 wavelength. By default, six prototypes spread over the map: the unit
@@ -72,8 +97,8 @@ fit <- som(spectra)
 plot_som(fit, type = "umatrix")
 # component planes of the K I and Na I lines
 plot_som(fit, type = "component", variables = c(769.90, 589.59))
-plot_som(fit, type = "mapping", colour = forageLIBS$K)
-plot_som(fit, type = "prototypes")
+plot_som(fit, type = "mapping", color_by = forageLIBS$K)
+plot_som(fit, type = "prototypes", wavelength = c(760, 780))
 }
 \seealso{
 \code{\link[=som]{som()}}, \code{\link[=predict.specproc_som]{predict.specproc_som()}}

@@ -13,7 +13,12 @@ plot_coomans(
   log = FALSE,
   shade = FALSE,
   title = NULL,
-  ...
+  ...,
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11,
+  point_size = 2.2,
+  point_alpha = 0.85
 )
 }
 \arguments{
@@ -42,10 +47,20 @@ both classes and to neither, and name the four regions. Default is
 \item{title}{The plot title.}
 
 \item{...}{Further arguments passed to \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} to style
-the points, such as \code{alpha} (default 0.85), \code{size} (2.2), \code{stroke}
-(0.4) or \code{colour} (the outline, \code{"black"}). \code{size} can also be a numeric
+the points, such as \code{stroke} (default 0.4) or \code{colour} (the outline,
+\code{"black"}).}
+
+\item{xlab, ylab}{The axis titles. Default are the distances to the two
+classes.}
+
+\item{base_size}{The size of the text, in points. Default is 11.}
+
+\item{point_size}{The size of the points (default 2.2), or a numeric
 vector with one value per observation (the training observations, then
 those of \code{newdata}), to vary the size of the points, with a legend.}
+
+\item{point_alpha}{The opacity of the points, between 0 and 1 (default
+0.85).}
 }
 \value{
 A ggplot object.

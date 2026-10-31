@@ -33,6 +33,11 @@ test_that("response_calibration recovers the response of the instrument", {
   p <- plot_response(r)
   expect_s3_class(p, "ggplot")
   expect_match(p$labels$title, "Spectral response")
+  zoom <- plot_response(r, wavelength = c(500, 600), linewidth = 1, ylab = "Response")
+  expect_true(all(ggplot2::layer_data(zoom, 2)$x >= 500 & ggplot2::layer_data(zoom, 2)$x <= 600))
+  expect_equal(zoom$layers[[2]]$aes_params$linewidth, 1)
+  expect_equal(zoom$labels$y, "Response")
+  expect_error(plot_response(r, wavelength = c(10, 20)), "Fewer than 2")
   # one spectrum, as a named vector, without smoothing
   one <- response_calibration(lamp_spectra(wl, n = 1)[1, ], lamp_reference(), smooth = 0)
   expect_equal(one$response$response, true_response(wl), tolerance = 0.01)

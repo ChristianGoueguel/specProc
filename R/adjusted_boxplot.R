@@ -132,6 +132,11 @@
 #' @param caption `TRUE` (default), a caption naming the boxplot and its
 #'   whiskers; `FALSE`, no caption; or a caption of your own.
 #' @param base_size The size of the text, in points. Default is 11.
+#' @param point_size The size of the points of the observations. Default is
+#'   1.6 at a `base_size` of 11, scaled with `base_size`.
+#' @param point_alpha The opacity of the outlying observations, between 0
+#'   and 1 (default 0.75); the others, drawn with `points = "all"`, are
+#'   two thirds as opaque.
 #' @param x_labels_angle The angle (in degrees) of the labels below the
 #'   boxes. Default is 0 (horizontal).
 #' @param box_width The width of the boxes (default 0.5).
@@ -206,8 +211,9 @@ adjusted_boxplot <- function(x, plot = TRUE, id = NULL, group = NULL,
                              show_n = TRUE, show_mean = FALSE, annotate = NULL,
                              horizontal = FALSE, log = FALSE, fill = "grey85", xlab = NULL,
                              ylab = NULL, title = NULL, caption = TRUE, base_size = 11,
-                             x_labels_angle = 0, box_width = 0.5, notch = FALSE,
-                             notch_width = 0.5, staple_width = 0.5,
+                             point_size = NULL, point_alpha = 0.75, x_labels_angle = 0,
+                             box_width = 0.5, notch = FALSE, notch_width = 0.5,
+                             staple_width = 0.5,
                              xlabels.angle = deprecated(), xlabels.vjust = deprecated(),
                              xlabels.hjust = deprecated(), box.width = deprecated(),
                              notchwidth = deprecated(), staplewidth = deprecated()) {
@@ -222,8 +228,8 @@ adjusted_boxplot <- function(x, plot = TRUE, id = NULL, group = NULL,
     label_outliers = label_outliers, show_n = show_n, show_mean = show_mean,
     annotate = annotate, horizontal = horizontal, log = log, fill = fill, xlab = xlab,
     ylab = ylab, title = title, caption = caption, base_size = base_size,
-    x_labels_angle = x_labels_angle, box_width = box_width, notch = notch,
-    notch_width = notch_width, staple_width = staple_width,
+    point_size = point_size, point_alpha = point_alpha, x_labels_angle = x_labels_angle,
+    box_width = box_width, notch = notch, notch_width = notch_width, staple_width = staple_width,
     xlabels.angle = xlabels.angle, xlabels.vjust = xlabels.vjust, xlabels.hjust = xlabels.hjust,
     box.width = box.width, notchwidth = notchwidth, staplewidth = staplewidth
   )

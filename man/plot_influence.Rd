@@ -11,9 +11,15 @@ plot_influence(
   relative = FALSE,
   shade = FALSE,
   log = FALSE,
-  colour_by = c("type", "distance"),
   title = NULL,
-  ...
+  ...,
+  color_by = c("type", "distance"),
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11,
+  point_size = 2.2,
+  point_alpha = 0.85,
+  colour_by = deprecated()
 )
 }
 \arguments{
@@ -37,18 +43,29 @@ their corners. Default is \code{FALSE}.}
 samples when a few are far away. Zero distances are drawn at the
 smallest positive distance. Default is \code{FALSE}.}
 
-\item{colour_by}{The colors of the points: \code{"type"} (default), by type,
+\item{title}{The plot title.}
+
+\item{...}{Further arguments passed to \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} to style
+the points, such as \code{stroke} (default 0.4) or \code{colour} (the outline,
+\code{"black"}).}
+
+\item{color_by}{The colors of the points: \code{"type"} (default), by type,
 or \code{"distance"}, by their distance relative to the limits,
 \eqn{\max(T^2/T^2_{lim}, Q/Q_{lim})}, on a rainbow scale from dark red to
 blue, as in \code{\link[=plot_outlier_map]{plot_outlier_map()}}.}
 
-\item{title}{The plot title.}
+\item{xlab, ylab}{The axis titles. Default are the names of the distances.}
 
-\item{...}{Further arguments passed to \code{\link[ggplot2:geom_point]{ggplot2::geom_point()}} to style
-the points, such as \code{alpha} (default 0.85), \code{size} (2.2), \code{stroke}
-(0.4) or \code{colour} (the outline, \code{"black"}). \code{size} can also be a numeric
+\item{base_size}{The size of the text, in points. Default is 11.}
+
+\item{point_size}{The size of the points (default 2.2), or a numeric
 vector with one value per sample, such as the concentration of an
 element, to vary the size of the points, with a legend.}
+
+\item{point_alpha}{The opacity of the points, between 0 and 1 (default
+0.85).}
+
+\item{colour_by}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{color_by}.}
 }
 \value{
 A ggplot object.
@@ -85,7 +102,7 @@ influence <- q_residuals(pca, k = 3, conf_level = c(0.95, 0.99))
 plot_influence(influence, label = forageLIBS$Measurement)
 # the same options as plot_outlier_map(): distances relative to the limits,
 # shaded outlying regions, logarithmic axes and colors by distance
-plot_influence(influence, relative = TRUE, shade = TRUE, log = TRUE, colour_by = "distance")
+plot_influence(influence, relative = TRUE, shade = TRUE, log = TRUE, color_by = "distance")
 
 # a single limit at 97.5\%, with the outlying regions shaded
 influence_975 <- q_residuals(pca, k = 3, conf_level = 0.975)

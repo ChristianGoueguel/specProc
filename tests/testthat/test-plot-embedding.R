@@ -13,17 +13,17 @@ test_that("plot_embedding picks the embedding axes and colours", {
   set.seed(1)
   df <- data.frame(Sample = letters[1:10], group = rep(c("a", "b"), 5), value = 1:10,
                    UMAP1 = rnorm(10), UMAP2 = rnorm(10))
-  p <- plot_embedding(df, colour = group)
+  p <- plot_embedding(df, color_by = group)
   expect_s3_class(p, "ggplot")
   expect_equal(p$labels$x, "UMAP1")
   expect_equal(p$labels$y, "UMAP2")
   built <- ggplot2::ggplot_build(p)
   expect_equal(length(unique(point_data(p)$colour)), 2)
   # a numeric colour gets a continuous scale; a vector works too
-  expect_s3_class(plot_embedding(df, colour = "value")$scales$get_scales("colour"), "ScaleContinuous")
+  expect_s3_class(plot_embedding(df, color_by = "value")$scales$get_scales("colour"), "ScaleContinuous")
   outside <- rep(c("x", "y"), each = 5)
-  expect_s3_class(plot_embedding(df, colour = outside), "ggplot")
-  expect_error(plot_embedding(df, colour = 1:3), "one value per sample")
+  expect_s3_class(plot_embedding(df, color_by = outside), "ggplot")
+  expect_error(plot_embedding(df, color_by = 1:3), "one value per sample")
   # explicit axes; without coordinate names, the first numeric columns
   expect_equal(plot_embedding(df, x = UMAP2, y = "value")$labels$x, "UMAP2")
   expect_equal(plot_embedding(df[c("value", "group", "UMAP2")])$labels$y, "UMAP2")
@@ -47,7 +47,7 @@ test_that("plot_embedding draws confidence ellipses", {
   df <- data.frame(PC1 = c(rnorm(20), rnorm(20, 5), rnorm(3, 10)),
                    PC2 = c(rnorm(20), rnorm(20, 5), rnorm(3, 10)),
                    group = factor(rep(c("a", "b", "c"), c(20, 20, 3))))
-  expect_warning(p <- plot_embedding(df, colour = group, ellipse = TRUE), "fewer than 4 samples: c")
+  expect_warning(p <- plot_embedding(df, color_by = group, ellipse = TRUE), "fewer than 4 samples: c")
   layers <- vapply(p$layers, function(l) class(l$geom)[1], character(1))
   expect_true("GeomPolygon" %in% layers)
   poly <- ellipse_data(p)
@@ -55,7 +55,7 @@ test_that("plot_embedding draws confidence ellipses", {
   # the ellipse of group a matches ConfidenceEllipse
   ref <- ConfidenceEllipse::confidence_ellipse(data.frame(.x = df$PC1[1:20], .y = df$PC2[1:20]),
                                                ".x", ".y", distribution = "hotelling")
-  p2 <- suppressWarnings(plot_embedding(df, colour = group, ellipse = TRUE, conf_level = 0.95,
+  p2 <- suppressWarnings(plot_embedding(df, color_by = group, ellipse = TRUE, conf_level = 0.95,
                                         distribution = "hotelling"))
   poly2 <- ellipse_data(p2)
   expect_equal(poly2$x[poly2$.colour == "a"], ref$x)
@@ -65,7 +65,7 @@ test_that("plot_embedding draws confidence ellipses", {
   expect_error(plot_embedding(df, ellipse = TRUE, distribution = "t"))
   expect_error(plot_embedding(df, ellipse = TRUE, conf_level = 1), "conf_level")
   # several confidence levels: one ellipse per group and level
-  two <- suppressWarnings(plot_embedding(df, colour = group, ellipse = TRUE, conf_level = c(0.9, 0.95)))
+  two <- suppressWarnings(plot_embedding(df, color_by = group, ellipse = TRUE, conf_level = c(0.9, 0.95)))
   poly_two <- ellipse_data(two)
   expect_setequal(unique(poly_two$.level), c(0.9, 0.95))
 })
@@ -96,12 +96,12 @@ test_that("plot_embedding uses one conf_level for both kinds of ellipses", {
   skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
   set.seed(10)
   x <- data.frame(PC1 = rnorm(30), PC2 = rnorm(30), g = rep(c("a", "b"), 15))
-  both <- plot_embedding(x, colour = g, ellipse = TRUE, hotelling = "all")
+  both <- plot_embedding(x, color_by = g, ellipse = TRUE, hotelling = "all")
   poly <- ellipse_data(both)
   path <- both$layers[vapply(both$layers, function(l) inherits(l$geom, "GeomPath"), logical(1))][[1]]$data
   expect_equal(unique(poly$.level), 0.975)                           # the default of both kinds
   expect_equal(as.character(unique(path$limit)), "T\u00b2 97.5%")
-  same <- plot_embedding(x, colour = g, ellipse = TRUE, hotelling = "all", conf_level = 0.9)
+  same <- plot_embedding(x, color_by = g, ellipse = TRUE, hotelling = "all", conf_level = 0.9)
   poly9 <- ellipse_data(same)
   path9 <- same$layers[vapply(same$layers, function(l) inherits(l$geom, "GeomPath"), logical(1))][[1]]$data
   expect_equal(unique(poly9$.level), 0.9)
@@ -129,7 +129,7 @@ test_that("plot_embedding fills the insides of the ellipses in white on a grey p
   expect_equal(p$theme$panel.background$fill, "grey90")
   expect_equal(p$theme$aspect.ratio, 0.7)
   # one white inside per group
-  g <- plot_embedding(x, colour = g, hotelling = "group")
+  g <- plot_embedding(x, color_by = g, hotelling = "group")
   white_g <- Filter(function(l) ".shape" %in% names(l$data), g$layers)[[1]]$data
   expect_equal(length(unique(white_g$.shape)), 2)
   # no ellipse: a white panel
@@ -148,21 +148,21 @@ test_that("plot_embedding fills the insides of the ellipses in white on a grey p
 test_that("plot_embedding maps the point size to a variable", {
   set.seed(12)
   x <- data.frame(PC1 = rnorm(20), PC2 = rnorm(20), conc = runif(20, 1, 10))
-  p <- plot_embedding(x, size = conc)
+  p <- plot_embedding(x, point_size = conc)
   expect_equal(p$scales$get_scales("size")$name, "conc")
   expect_s3_class(p$scales$get_scales("size"), "ScaleContinuous")
   expect_equal(point_data(p)$size[which.max(x$conc)], 6)
-  v <- plot_embedding(x, size = x$conc * 2)
+  v <- plot_embedding(x, point_size = x$conc * 2)
   expect_false(is.null(v$scales$get_scales("size")))
-  expect_null(plot_embedding(x, size = 3)$scales$get_scales("size"))
-  expect_error(plot_embedding(x, size = letters[1:20]), "numeric")
-  expect_error(plot_embedding(x, size = 1:3), "one value per sample")
-  expect_error(plot_embedding(x, size = -1), "size")
+  expect_null(plot_embedding(x, point_size = 3)$scales$get_scales("size"))
+  expect_error(plot_embedding(x, point_size = letters[1:20]), "numeric")
+  expect_error(plot_embedding(x, point_size = 1:3), "one value per sample")
+  expect_error(plot_embedding(x, point_size = -1), "point_size")
 })
 
 test_that("plot_embedding draws a biplot of a PCA", {
   pca <- stats::prcomp(iris[1:4])
-  p <- plot_embedding(pca, colour = iris$Species, biplot = TRUE, biplot_top = 2)
+  p <- plot_embedding(pca, color_by = iris$Species, biplot = TRUE, biplot_top = 2)
   arrows <- Filter(function(l) inherits(l$geom, "GeomSegment") && !is.null(l$geom_params$arrow),
                    p$layers)[[1]]$data
   expect_equal(nrow(arrows), 2)
@@ -204,7 +204,7 @@ test_that("plot_embedding fills the T-squared ellipses of the groups", {
   skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
   set.seed(15)
   x <- data.frame(PC1 = rnorm(30), PC2 = rnorm(30), g = rep(c("a", "b"), 15))
-  p <- plot_embedding(x, colour = g, hotelling = "group")
+  p <- plot_embedding(x, color_by = g, hotelling = "group")
   filled <- Filter(function(l) inherits(l$geom, "GeomPolygon") && "limit" %in% names(l$data), p$layers)
   expect_length(filled, 1)
   expect_equal(rlang::as_label(filled[[1]]$mapping$fill), ".colour")
@@ -289,15 +289,15 @@ test_that("UMAP maps have no origin lines and no T-squared limits", {
                      group = factor(rep(c("a", "b", "c"), each = 10)))
   is_line <- function(p) vapply(p$layers, function(l) inherits(l$geom, c("GeomHline", "GeomVline")),
                                 logical(1))
-  p <- plot_embedding(umap, colour = group)
+  p <- plot_embedding(umap, color_by = group)
   expect_false(any(is_line(p)))
-  expect_warning(q <- plot_embedding(umap, colour = group, hotelling = "all"), "UMAP")
+  expect_warning(q <- plot_embedding(umap, color_by = group, hotelling = "all"), "UMAP")
   expect_null(q$labels$subtitle)
-  expect_warning(g <- plot_embedding(umap, colour = group, hotelling = "group"), "UMAP")
+  expect_warning(g <- plot_embedding(umap, color_by = group, hotelling = "group"), "UMAP")
   expect_null(g$labels$subtitle)
   # confidence ellipses of the groups are still drawn
   skip_if_not_installed("ConfidenceEllipse")
-  expect_s3_class(plot_embedding(umap, colour = group, ellipse = TRUE), "ggplot")
+  expect_s3_class(plot_embedding(umap, color_by = group, ellipse = TRUE), "ggplot")
 })
 
 test_that("the lines through the origin of linear scores are light grey", {
@@ -312,20 +312,20 @@ test_that("plot_embedding makes figures for publication", {
   set.seed(9)
   df <- data.frame(PC1 = 1e5 * stats::rnorm(60), PC2 = 2e4 * stats::rnorm(60),
                    group = rep(c("a", "b", "c"), each = 20))
-  p <- plot_embedding(df, colour = group, ellipse = TRUE, legend_title = "Site")
+  p <- plot_embedding(df, color_by = group, ellipse = TRUE, legend_title = "Site")
   built <- ggplot2::ggplot_build(p)
   expect_false(any(grepl("e+", built$layout$panel_params[[1]]$x$get_labels(), fixed = TRUE)))
   expect_equal(p$scales$get_scales("colour")$name, "Site")
   expect_match(p$labels$caption, "97.5% confidence regions of each group")
-  expect_null(plot_embedding(df, colour = group, caption = FALSE)$labels$caption)
+  expect_null(plot_embedding(df, color_by = group, caption = FALSE)$labels$caption)
   # a shape per group, or not
   expect_equal(length(unique(point_data(p)$shape)), 3)
-  expect_equal(length(unique(point_data(plot_embedding(df, colour = group, shapes = FALSE))$shape)), 1)
+  expect_equal(length(unique(point_data(plot_embedding(df, color_by = group, shapes = FALSE))$shape)), 1)
   # palette, legend, panel, aspect and text size
-  pal <- plot_embedding(df, colour = group, palette = c("red", "green", "blue"))
+  pal <- plot_embedding(df, color_by = group, palette = c("red", "green", "blue"))
   expect_setequal(unique(point_data(pal)$colour), c("red", "green", "blue"))
-  expect_equal(plot_embedding(df, colour = group, legend = "bottom")$theme$legend.position, "bottom")
-  white <- plot_embedding(df, colour = group, ellipse = TRUE, panel = "white")
+  expect_equal(plot_embedding(df, color_by = group, legend = "bottom")$theme$legend.position, "bottom")
+  white <- plot_embedding(df, color_by = group, ellipse = TRUE, panel = "white")
   expect_equal(white$theme$panel.background$fill, "white")
   expect_equal(plot_embedding(df, aspect_ratio = "equal")$coordinates$ratio, 1)
   expect_equal(plot_embedding(df, base_size = 8)$theme$text$size, 8)

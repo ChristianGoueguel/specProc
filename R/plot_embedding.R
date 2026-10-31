@@ -11,11 +11,11 @@
 #' @details
 #' By default, the axes are the first two columns named like embedding
 #' coordinates (`UMAP1`, `PC1`, `Comp1`, ...; the name followed by a
-#' number), or else the first two numeric columns. A numeric `colour` uses
+#' number), or else the first two numeric columns. A numeric `color_by` uses
 #' a continuous viridis scale, other types a discrete palette.
 #'
 #' With `ellipse = TRUE`, a confidence ellipse is drawn for each group of a
-#' discrete `colour` (or for all the samples otherwise), with
+#' discrete `color_by` (or for all the samples otherwise), with
 #' [ConfidenceEllipse::confidence_ellipse()], at each level of `conf_level`
 #' (0.975 by default). It covers the region expected to hold that share of
 #' the samples of the group if they follow a
@@ -46,7 +46,7 @@
 #' outlying samples then do not inflate or tilt the ellipses. For other
 #' embeddings, \eqn{T^2} is computed from the mean and covariance of the
 #' samples (with [hotelling_t2()] and [HotellingEllipse::ellipseCoord()]).
-#' With `hotelling = "group"`, each group of a discrete `colour` gets its own
+#' With `hotelling = "group"`, each group of a discrete `color_by` gets its own
 #' ellipses and limits, from its mean and covariance, which flags the samples
 #' atypical of their own group. The ellipses are labeled with their level
 #' (instead of a legend), and drawn for the two components shown, while the
@@ -67,7 +67,7 @@
 #' space, `"equal"` gives both axes the same scale), and thin light grey
 #' lines through the origin (when it lies in the range of the samples, as for
 #' centered scores). Without ellipses, the panel is white. The groups of a
-#' discrete `colour` also get their own point shapes (`shapes`), and the axes
+#' discrete `color_by` also get their own point shapes (`shapes`), and the axes
 #' plain numbers. A caption says what the ellipses and limits are (their
 #' level, distribution and estimates), which readers cannot tell from the
 #' plot.
@@ -84,9 +84,10 @@
 #' these. With groups, the ellipses (confidence, or \eqn{T^2} with
 #' `hotelling = "group"`) are filled with the color of their group.
 #'
-#' **Point size.** `size` is a number, or a numeric variable (a column of
-#' `data` or a vector with one value per sample), such as the concentration
-#' of an element, which sets the size of each point, with a legend.
+#' **Point size.** `point_size` is a number, or a numeric variable (a column
+#' of `data` or a vector with one value per sample), such as the
+#' concentration of an element, which sets the size of each point, with a
+#' legend.
 #'
 #' **Biplot.** With `biplot = TRUE` (for a [stats::prcomp()] fit or a robust
 #' PCA), the loadings of the two components are drawn over the scores: all
@@ -111,11 +112,13 @@
 #'   [rospca()] or [macropca()].
 #' @param x,y The columns of the axes, unquoted or as strings. By default,
 #'   the first two embedding coordinates (see details).
-#' @param colour The variable coloring the points: a column of `data`
+#' @param color_by The variable coloring the points: a column of `data`
 #'   (unquoted or as a string), or a vector with one value per sample.
-#' @param size The size of the points: a number (default 2), or a numeric
-#'   column of `data` or vector with one value per sample to vary it.
-#' @param alpha The opacity of the points.
+#' @param point_size The size of the points: a number, or a numeric column
+#'   of `data` or vector with one value per sample to vary it. Default is 2
+#'   at a `base_size` of 11, scaled with `base_size`.
+#' @param point_alpha The opacity of the points, between 0 and 1. Default is
+#'   0.8.
 #' @param ellipse A logical: draw confidence ellipses (`FALSE`, default).
 #'   Needs the ConfidenceEllipse package.
 #' @param conf_level The confidence level(s) of the ellipses, confidence
@@ -126,7 +129,7 @@
 #'   chi-square) or `"hotelling"`.
 #' @param hotelling Hotelling's \eqn{T^2} ellipses and outliers: `"none"`
 #'   (default), `"all"` (all samples) or `"group"` (within the groups of a
-#'   discrete `colour`). Needs the HotellingEllipse package (1.3.0 or
+#'   discrete `color_by`). Needs the HotellingEllipse package (1.3.0 or
 #'   later).
 #' @param k The number of components of \eqn{T^2}: the two axes, then the
 #'   next embedding coordinates. Default is 2.
@@ -148,12 +151,12 @@
 #'   the two axes the same scale, so that the distances between the samples
 #'   are not distorted (for scores in the same units).
 #' @param title The plot title.
-#' @param legend_title The title of the legend of `colour`. Default is its
+#' @param legend_title The title of the legend of `color_by`. Default is its
 #'   name; give it with units, such as `"K (%)"`.
-#' @param palette The colors of `colour`: `NULL` (default: Dark2 for up to 8
+#' @param palette The colors of `color_by`: `NULL` (default: Dark2 for up to 8
 #'   groups, viridis for a numeric variable), the name of a viridis palette
 #'   (`"viridis"`, `"magma"`, `"cividis"`, ...) or a vector of colors.
-#' @param shapes A logical: give each group of a discrete `colour` its own
+#' @param shapes A logical: give each group of a discrete `color_by` its own
 #'   point shape (up to 6 groups), so that the groups stay apart in grayscale
 #'   (`TRUE`, default).
 #' @param legend The position of the legend: `"right"` (default), `"bottom"`,
@@ -164,7 +167,12 @@
 #'   limits are; `FALSE`, no caption; or a caption of your own.
 #' @param base_size The size of the text, in points. Default is 11; use the
 #'   text size of the journal (often 7 to 9 points) for a figure saved at its
-#'   printed size. The points, lines and labels scale with it.
+#'   printed size. The points (unless `point_size` is a number), lines and
+#'   labels scale with it.
+#' @param xlab,ylab The axis titles. Default are the names of the axes, with
+#'   the variance they explain for a PCA.
+#' @param colour,size,alpha `r lifecycle::badge("deprecated")` Use
+#'   `color_by`, `point_size` and `point_alpha`.
 #'
 #' @return A ggplot object.
 #' @seealso [hotelling_t2()], [plot_outlier_map()], [plot_loadings()], [robpca()]
@@ -190,7 +198,7 @@
 #'   wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 #'   pca <- stats::prcomp(forageLIBS[which(wl > 760 & wl < 772)])
 #'   level <- cut(forageLIBS$K, 3, labels = c("Low K", "Mid K", "High K"))
-#'   p <- plot_embedding(pca, colour = level, ellipse = TRUE, legend_title = "Potassium",
+#'   p <- plot_embedding(pca, color_by = level, ellipse = TRUE, legend_title = "Potassium",
 #'                       legend = "bottom", base_size = 8)
 #'   p
 #'   # ggplot2::ggsave("scores.pdf", p, width = 85, height = 80, units = "mm")
@@ -206,22 +214,41 @@
 #'     embed::step_umap(recipes::all_predictors(), neighbors = 15) |>
 #'     recipes::prep() |>
 #'     recipes::bake(new_data = NULL)
-#'   plot_embedding(umap, colour = Species, title = "UMAP of the iris flowers")
+#'   plot_embedding(umap, color_by = Species, title = "UMAP of the iris flowers")
 #' }
 #' }
 #'
-plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, alpha = 0.8,
+plot_embedding <- function(data, x = NULL, y = NULL, color_by = NULL, point_size = NULL,
+                           point_alpha = 0.8,
                            ellipse = FALSE, conf_level = 0.975, robust = FALSE,
                            distribution = "normal", hotelling = "none", k = 2,
                            t2_method = "f", flag = FALSE, label = NULL, biplot = FALSE,
                            biplot_top = 10, aspect_ratio = 0.7, title = NULL,
                            legend_title = NULL, palette = NULL, shapes = TRUE,
                            legend = c("right", "bottom", "top", "inside", "none"),
-                           panel = c("shaded", "white"), caption = TRUE, base_size = 11) {
+                           panel = c("shaded", "white"), caption = TRUE, base_size = 11,
+                           xlab = NULL, ylab = NULL, colour = deprecated(), size = deprecated(),
+                           alpha = deprecated()) {
   df <- embedding_data(data)
   variance <- embedding_variance(data)
-  colour_quo <- rlang::enquo(colour)
-  size_quo <- rlang::enquo(size)
+  # the former colour, size and alpha (tidy-evaluated, so tested with missing())
+  user_env <- rlang::caller_env()
+  colour_quo <- rlang::enquo(color_by)
+  if (!missing(colour)) {
+    lifecycle::deprecate_warn("0.9.0", "plot_embedding(colour)", "plot_embedding(color_by)",
+                              user_env = user_env)
+    colour_quo <- rlang::enquo(colour)
+  }
+  size_quo <- rlang::enquo(point_size)
+  size_arg <- "point_size"
+  if (!missing(size)) {
+    lifecycle::deprecate_warn("0.9.0", "plot_embedding(size)", "plot_embedding(point_size)",
+                              user_env = user_env)
+    size_quo <- rlang::enquo(size)
+    size_arg <- "size"
+  }
+  point_alpha <- renamed_arg(alpha, point_alpha, "plot_embedding", "alpha", "point_alpha",
+                             user_env = user_env)
   x <- embedding_column(rlang::enquo(x), df, "x")
   y <- embedding_column(rlang::enquo(y), df, "y")
   if (is.null(x) || is.null(y)) {
@@ -232,7 +259,9 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
   if (is.na(x) || is.na(y) || x == y) {
     stop("'data' needs two numeric columns for the axes; give `x` and `y`.", call. = FALSE)
   }
-  check_number(alpha, "alpha", lower = 0, upper = 1, lower_open = TRUE)
+  check_alpha(point_alpha, "point_alpha")
+  check_label(xlab, "xlab")
+  check_label(ylab, "ylab")
   check_flag(ellipse, "ellipse")
   check_flag(robust, "robust")
   check_flag(biplot, "biplot")
@@ -267,10 +296,14 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
     hotelling <- "none"
   }
 
-  colour_info <- embedding_values(colour_quo, df, "colour")
+  colour_info <- embedding_values(colour_quo, df, "color_by")
   colour_values <- colour_info$values
   colour_name <- legend_title %||% colour_info$name
-  size_info <- embedding_size(size_quo, df)
+  size_info <- embedding_size(size_quo, df, size_arg)
+  # a number given in `point_size` is the size of the points; the default,
+  # and a number in the former `size`, scale with the text
+  point_size <- if (is.null(size_info$constant)) 2 * scale else if (size_arg == "size")
+    size_info$constant * scale else size_info$constant
   label_quo <- rlang::enquo(label)
   label_expr <- rlang::quo_get_expr(label_quo)
   show_labels <- !(is.null(label_expr) || isFALSE(label_expr))
@@ -286,7 +319,7 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
   if (!is.null(size_info$values)) plot_df$.size <- size_info$values
   grouped <- !is.null(colour_values) && !is.numeric(colour_values)
   if (hotelling == "group" && !grouped) {
-    stop("`hotelling = \"group\"` needs a discrete `colour` to define the groups.", call. = FALSE)
+    stop("`hotelling = \"group\"` needs a discrete `color_by` to define the groups.", call. = FALSE)
   }
 
   # ellipses first: their insides are white, the rest of the panel grey
@@ -403,9 +436,9 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
   if (!is.null(colour_values)) point_aes$colour <- quote(.data$.colour)
   if (by_shape) point_aes$shape <- quote(.data$.colour)
   if (!is.null(size_info$values)) point_aes$size <- quote(.data$.size)
-  point_args <- list(mapping = point_aes, alpha = alpha)
+  point_args <- list(mapping = point_aes, alpha = point_alpha)
   if (is.null(colour_values)) point_args$colour <- "#1f4e79"
-  if (is.null(size_info$values)) point_args$size <- size_info$constant * scale
+  if (is.null(size_info$values)) point_args$size <- point_size
   p <- p + do.call(ggplot2::geom_point, point_args)
   if (!is.null(colour_values)) {
     p <- p + if (!is.null(palette)) {
@@ -454,7 +487,7 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
     out$.label <- if (is.null(label_values)) t2$sample[t2$.flag] else
       label_values[t2$sample[t2$.flag]]
     if (flag) {
-      circle <- (if (is.null(size_info$values)) size_info$constant + 2.5 else 7) * scale
+      circle <- if (is.null(size_info$values)) point_size + 2.5 * scale else 7 * scale
       p <- p +
         ggplot2::geom_point(data = out, ggplot2::aes(.data$.x, .data$.y), shape = 21, size = circle,
                             colour = "#c0392b", stroke = 0.8 * scale, inherit.aes = FALSE)
@@ -504,7 +537,8 @@ plot_embedding <- function(data, x = NULL, y = NULL, colour = NULL, size = 2, al
   }
   # grey outside the ellipses, white inside
   p <- p +
-    ggplot2::labs(x = axis_title(x, variance), y = axis_title(y, variance), title = title,
+    ggplot2::labs(x = xlab %||% axis_title(x, variance), y = ylab %||% axis_title(y, variance),
+                  title = title,
                   subtitle = subtitle, caption = caption_text) +
     ggplot2::theme_grey(base_size = base_size) +
     ggplot2::theme(
@@ -706,20 +740,20 @@ outer_shapes <- function(ellipses, group) {
 }
 
 # A constant point size, or one value per sample to map.
-embedding_size <- function(quo, df) {
+embedding_size <- function(quo, df, arg = "point_size") {
   expr <- rlang::quo_get_expr(quo)
   if (is.numeric(expr) && length(expr) == 1) {
-    check_number(expr, "size", lower = 0, lower_open = TRUE)
+    check_number(expr, arg, lower = 0, lower_open = TRUE)
     return(list(constant = expr, values = NULL, name = NULL))
   }
-  info <- embedding_values(quo, df, "size")
-  if (is.null(info$values)) return(list(constant = 2, values = NULL, name = NULL))
+  info <- embedding_values(quo, df, arg)
+  if (is.null(info$values)) return(list(constant = NULL, values = NULL, name = NULL))
   if (length(info$values) == 1 && is.numeric(info$values)) {
-    check_number(info$values, "size", lower = 0, lower_open = TRUE)
+    check_number(info$values, arg, lower = 0, lower_open = TRUE)
     return(list(constant = info$values, values = NULL, name = NULL))
   }
   if (!is.numeric(info$values)) {
-    stop("`size` must be a number, or a numeric column or vector with one value per sample.",
+    stop("`", arg, "` must be a number, or a numeric column or vector with one value per sample.",
          call. = FALSE)
   }
   list(constant = NULL, values = info$values, name = info$name)

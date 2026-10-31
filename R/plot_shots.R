@@ -60,7 +60,7 @@
 #' @param sample For `type = "spectra"`, the sample to draw: a value of the
 #'   sample column. Default is the sample with the most rejected shots.
 #' @param wavelength For `type = "spectra"`, an optional wavelength range
-#'   (nm) to zoom on.
+#'   `c(min, max)` (nm) to zoom on.
 #' @param label For `type = "criteria"`, the number of rejected shots
 #'   labeled, the most extreme first. Default is 10; 0 for none.
 #' @param acquisition For `type = "heatmap"`, an optional column of `x`
@@ -82,6 +82,14 @@
 #'   with the number of rejected shots; `FALSE`, no caption; or a caption of
 #'   your own.
 #' @param base_size The size of the text, in points. Default is 11.
+#' @param xlab,ylab For `type = "criteria"` and `"spectra"`, the axis titles.
+#'   Default are the names of the criteria, or the wavelength and intensity.
+#' @param point_size For `type = "criteria"` and `"samples"`, the size of the
+#'   points. Default is 1.6 at a `base_size` of 11, scaled with `base_size`.
+#' @param point_alpha For `type = "criteria"` and `"samples"`, the opacity of
+#'   the points, between 0 and 1. Default is 0.85.
+#' @param linewidth For `type = "spectra"`, the width of the kept shots; the
+#'   median and the rejected shots are drawn 5/3 as wide. Default is 0.3.
 #'
 #' @return A ggplot (or patchwork) object, or with `plot = FALSE` a tibble.
 #'
@@ -116,7 +124,8 @@
 plot_shots <- function(x, type = c("heatmap", "criteria", "spectra", "order", "samples"),
                        sample = NULL, wavelength = NULL, label = 10, acquisition = NULL,
                        arrange = c("data", "extreme"), smooth = NULL, plot = TRUE, title = NULL,
-                       caption = TRUE, base_size = 11) {
+                       caption = TRUE, base_size = 11, xlab = NULL, ylab = NULL,
+                       point_size = NULL, point_alpha = 0.85, linewidth = 0.3) {
   settings <- attr(x, "reject_shots")
   if (!is.data.frame(x) || is.null(settings) ||
       !all(c(".shot", ".rejected", ".intensity", ".correlation") %in% names(x))) {
@@ -142,20 +151,26 @@ plot_shots <- function(x, type = c("heatmap", "criteria", "spectra", "order", "s
   }
   check_flag(plot, "plot")
   label <- check_count(label, "label", lower = 0)
-  check_number(base_size, "base_size", lower = 0, lower_open = TRUE)
+  check_plot_text(title, xlab, ylab, base_size)
+  point_size <- point_size %||% (1.6 * base_size / 11)
+  check_size(point_size, "point_size")
+  check_alpha(point_alpha, "point_alpha")
+  check_size(linewidth, "linewidth")
+  style <- list(base_size = base_size, point_size = point_size, point_alpha = point_alpha,
+                linewidth = linewidth)
   if (!(isTRUE(caption) || isFALSE(caption) ||
         (is.character(caption) && length(caption) == 1 && !is.na(caption)))) {
     stop("'caption' must be TRUE, FALSE or a character string.", call. = FALSE)
   }
-  if (!is.null(wavelength)) check_wavelength_range(wavelength)
+  wavelength <- wavelength_window(wavelength)
   x <- tibble::as_tibble(x)
   x$.sample <- x[[settings$sample]]
   view <- switch(type,
                  heatmap = shots_heatmap(x, settings, acquisition, arrange, smooth, base_size),
-                 criteria = shots_criteria(x, settings, label, base_size),
-                 spectra = shots_spectra(x, settings, sample, wavelength, base_size),
+                 criteria = shots_criteria(x, settings, label, style),
+                 spectra = shots_spectra(x, settings, sample, wavelength, style),
                  order = shots_order(x, settings, base_size),
-                 samples = shots_samples(x, settings, base_size))
+                 samples = shots_samples(x, settings, style))
   if (!plot) {
     return(view$table)
   }
@@ -171,8 +186,11 @@ plot_shots <- function(x, type = c("heatmap", "criteria", "spectra", "order", "s
       )
     ))
   }
+  # the axis titles of the view, unless given
+  labels <- c(list(title = title, caption = caption_text), list(x = xlab, y = ylab)[c(
+    !is.null(xlab), !is.null(ylab))])
   p <- view$plot +
-    ggplot2::labs(title = title, caption = caption_text) +
+    do.call(ggplot2::labs, labels) +
     ggplot2::theme(plot.caption = ggplot2::element_text(hjust = 0, colour = "grey30",
                                                         size = ggplot2::rel(0.8)),
                    plot.caption.position = "plot")
@@ -379,7 +397,8 @@ criterion_titles <- c(intensity = "Total intensity (robust z)",
                       distance = "Distance to the median spectrum (robust z)")
 
 # The robust z-scores of the shots, with the cutoff.
-shots_criteria <- function(x, settings, label, base_size) {
+shots_criteria <- function(x, settings, label, style) {
+  base_size <- style$base_size
   methods <- intersect(c("intensity", "correlation", "distance"), settings$method)
   z <- as.data.frame(x[paste0(".", methods, "_z")])
   names(z) <- methods
@@ -422,7 +441,8 @@ shots_criteria <- function(x, settings, label, base_size) {
   }
   if (!is.null(xm)) p <- p + cut_lines(xm, "x")
   p <- p + cut_lines(ym, "y") +
-    ggplot2::geom_point(ggplot2::aes(colour = status), size = 1.6 * base_size / 11, alpha = 0.85) +
+    ggplot2::geom_point(ggplot2::aes(colour = status), size = style$point_size,
+                        alpha = style$point_alpha) +
     ggplot2::scale_colour_manual(values = colours, name = NULL)
   if (label > 0 && any(x$.rejected)) {
     # the most extreme rejected shots, moved apart by ggrepel, away from all
@@ -458,7 +478,8 @@ shots_criteria <- function(x, settings, label, base_size) {
 }
 
 # The shots of one sample, the rejected ones in color.
-shots_spectra <- function(x, settings, sample, wavelength, base_size) {
+shots_spectra <- function(x, settings, sample, wavelength, style) {
+  base_size <- style$base_size
   if (is.null(sample)) {
     counts <- tapply(x$.rejected, factor(x$.sample, levels = unique(x$.sample)), sum)
     sample <- names(counts)[which.max(counts)]
@@ -516,9 +537,9 @@ shots_spectra <- function(x, settings, sample, wavelength, base_size) {
                                               colour = series), linewidth = width)
   }
   p <- ggplot2::ggplot() +
-    layer(long[long$series == "Kept shots", ], 0.3) +
-    layer(median, 0.5) +
-    layer(long[long$series %in% rejected, ], 0.5) +
+    layer(long[long$series == "Kept shots", ], style$linewidth) +
+    layer(median, 5 / 3 * style$linewidth) +
+    layer(long[long$series %in% rejected, ], 5 / 3 * style$linewidth) +
     ggplot2::scale_colour_manual(values = colours, name = NULL, drop = TRUE) +
     ggplot2::guides(colour = ggplot2::guide_legend(ncol = 1)) +
     ggplot2::scale_y_continuous(labels = plain_numbers) +
@@ -604,7 +625,8 @@ shots_order <- function(x, settings, base_size) {
 
 # The rejected shots per sample, and the RSD of the samples with all their
 # shots and with the kept ones.
-shots_samples <- function(x, settings, base_size) {
+shots_samples <- function(x, settings, style) {
+  base_size <- style$base_size
   rlang::check_installed("patchwork", reason = "to combine the panels.")
   rows <- split(seq_len(nrow(x)), factor(x$.sample, levels = unique(x$.sample)))
   rsd <- function(v) if (length(v) > 1) 100 * stats::sd(v) / mean(v) else NA_real_
@@ -631,7 +653,8 @@ shots_samples <- function(x, settings, base_size) {
   limit <- max(c(tbl$rsd_all, tbl$rsd_kept), na.rm = TRUE) * 1.05
   p2 <- ggplot2::ggplot(tbl, ggplot2::aes(x = .data$rsd_all, y = .data$rsd_kept)) +
     ggplot2::geom_abline(slope = 1, intercept = 0, colour = "grey60", linetype = "dashed") +
-    ggplot2::geom_point(ggplot2::aes(colour = .data$.status), size = 1.6 * base_size / 11) +
+    ggplot2::geom_point(ggplot2::aes(colour = .data$.status), size = style$point_size,
+                        alpha = style$point_alpha) +
     ggplot2::scale_colour_manual(values = c("No rejected shot" = "grey65",
                                             "With rejected shots" = "#d95f02"), name = NULL) +
     ggplot2::coord_equal(xlim = c(0, limit), ylim = c(0, limit)) +

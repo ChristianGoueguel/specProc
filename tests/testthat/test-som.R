@@ -92,12 +92,12 @@ test_that("plot_som draws every type of plot", {
   comp <- plot_som(fit, type = "component", variables = c(401, 404))
   expect_equal(levels(comp$data$variable), c("401 nm", "404 nm"))
   expect_equal(range(comp$data$value), c(0, 1))
-  expect_s3_class(plot_som(fit, type = "mapping", colour = factor(d$group), newdata = d$x[1:3, ]),
+  expect_s3_class(plot_som(fit, type = "mapping", color_by = factor(d$group), newdata = d$x[1:3, ]),
                   "ggplot")
   proto <- plot_som(fit, type = "prototypes")
   expect_equal(nlevels(proto$data$unit), 6L)
   expect_error(plot_som(fit, type = "component"), "variables")
-  expect_error(plot_som(fit, type = "mapping", colour = 1:3), "one value per")
+  expect_error(plot_som(fit, type = "mapping", color_by = 1:3), "one value per")
   expect_error(plot_som(list()), "som")
 })
 

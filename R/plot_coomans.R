@@ -47,10 +47,16 @@
 #'   `FALSE`.
 #' @param title The plot title.
 #' @param ... Further arguments passed to [ggplot2::geom_point()] to style
-#'   the points, such as `alpha` (default 0.85), `size` (2.2), `stroke`
-#'   (0.4) or `colour` (the outline, `"black"`). `size` can also be a numeric
+#'   the points, such as `stroke` (default 0.4) or `colour` (the outline,
+#'   `"black"`).
+#' @param xlab,ylab The axis titles. Default are the distances to the two
+#'   classes.
+#' @param base_size The size of the text, in points. Default is 11.
+#' @param point_size The size of the points (default 2.2), or a numeric
 #'   vector with one value per observation (the training observations, then
 #'   those of `newdata`), to vary the size of the points, with a legend.
+#' @param point_alpha The opacity of the points, between 0 and 1 (default
+#'   0.85).
 #'
 #' @return A ggplot object.
 #'
@@ -74,10 +80,13 @@
 #'              newdata = iris[-train, 1:4], group = iris$Species[-train],
 #'              log = TRUE, shade = TRUE)
 plot_coomans <- function(object, newdata = NULL, group = NULL, classes = NULL, labels = 3,
-                         log = FALSE, shade = FALSE, title = NULL, ...) {
+                         log = FALSE, shade = FALSE, title = NULL, ..., xlab = NULL,
+                         ylab = NULL, base_size = 11, point_size = 2.2, point_alpha = 0.85) {
   if (!inherits(object, "specproc_rsimca")) {
     stop("'object' must be returned by rsimca().", call. = FALSE)
   }
+  size_label <- rlang::as_label(rlang::enquo(point_size))
+  check_plot_text(title, xlab, ylab, base_size)
   check_count(labels, "labels", lower = 0)
   check_flag(log, "log")
   check_flag(shade, "shade")
@@ -110,13 +119,17 @@ plot_coomans <- function(object, newdata = NULL, group = NULL, classes = NULL, l
                                set = "new", stringsAsFactors = FALSE))
   }
   point <- map_point_args(rlang::enquos(...), nrow(df),
-                          if (!is.null(newdata)) ", training then new observations" else "")
+                          if (!is.null(newdata)) ", training then new observations" else "",
+                          point_size, point_alpha, size_label)
   coomans_plot(df, classes, lev, labels, log, shade, title %||%
                  paste0("RSIMCA Coomans plot (", classes[1], " and ", classes[2], ")"), point,
-               show_set = !is.null(newdata))
+               show_set = !is.null(newdata),
+               style = list(xlab = xlab, ylab = ylab, base_size = base_size))
 }
 
-coomans_plot <- function(df, classes, lev, labels, log, shade, title, point, show_set) {
+coomans_plot <- function(df, classes, lev, labels, log, shade, title, point, show_set,
+                         style = list(base_size = 11)) {
+  base_size <- style$base_size
   # farthest from both classes: the distance to the closer one
   df$radius <- pmin(df$x, df$y)
   df$label <- ""
@@ -168,14 +181,15 @@ coomans_plot <- function(df, classes, lev, labels, log, shade, title, point, sho
                         label = c(paste(classes[1], "only"), paste(classes[2], "only"), "both",
                                   "neither"),
                         hjust = c(-0.05, 1.05, -0.05, 1.05), vjust = c(1.6, -0.6, -0.6, 1.6),
-                        size = 3, fontface = "italic", colour = "grey35")
+                        size = 0.77 * base_size / ggplot2::.pt, fontface = "italic",
+                        colour = "grey35")
   }
   p <- p +
     ggplot2::geom_abline(slope = 1, intercept = 0, colour = "grey45", linewidth = 0.4) +
     ggplot2::geom_vline(xintercept = cut, linetype = "dashed", colour = "grey30") +
     ggplot2::geom_hline(yintercept = cut, linetype = "dashed", colour = "grey30") +
     do.call(ggplot2::geom_point, point_args) +
-    repel_labels() +
+    repel_labels(base_size) +
     ggplot2::scale_fill_manual(values = palette, name = "Class", drop = TRUE,
                                guide = ggplot2::guide_legend(order = 1,
                                                              override.aes = list(shape = 21, size = 2.5))) +
@@ -184,11 +198,11 @@ coomans_plot <- function(df, classes, lev, labels, log, shade, title, point, sho
                                 guide = if (show_set) {
                                   ggplot2::guide_legend(order = 2, override.aes = list(size = 2.5))
                                 } else "none") +
-    ggplot2::labs(x = paste("Distance to", classes[1]), y = paste("Distance to", classes[2]),
-                  title = title) +
-    ggplot2::theme_bw() +
+    ggplot2::labs(x = style$xlab %||% paste("Distance to", classes[1]),
+                  y = style$ylab %||% paste("Distance to", classes[2]), title = title) +
+    ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(legend.position = "bottom") +
-    compact_legend()
+    compact_legend(base_size)
   if (!is.null(point$size_name)) {
     p <- p + ggplot2::theme(legend.box = "vertical") +
       ggplot2::scale_size_continuous(range = c(1.2, 6), name = point$size_name, breaks = three_breaks,

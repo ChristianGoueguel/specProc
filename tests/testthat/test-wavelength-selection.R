@@ -53,6 +53,12 @@ test_that("VIP and SR select the informative line", {
   expect_length(sr$selected, 6L)
   expect_true(all(match(sr$selected, colnames(d$x)) %in% d$line))
   expect_s3_class(plot_wavelength_selection(sr), "ggplot")
+  zoom <- plot_wavelength_selection(sr, wavelength = c(402, 406), linewidth = 0.6, xlab = "nm")
+  lines <- Filter(function(l) inherits(l$geom, "GeomLine"), zoom$layers)[[1]]
+  expect_true(all(lines$data$wl >= 402 & lines$data$wl <= 406))
+  expect_equal(lines$aes_params$linewidth, 0.6)
+  expect_equal(zoom$labels$x, "nm")
+  expect_true(all(zoom$layers[[1]]$data$xmin >= 402))
   # the strong interfering line gets a large VIP, but not a large SR
   vip <- select_wavelengths(d$x, d$y, "vip", ncomp = 3, num_terms = 6)
   expect_true(any(match(vip$selected, colnames(d$x)) %in% 81:90))

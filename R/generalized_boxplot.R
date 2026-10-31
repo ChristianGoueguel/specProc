@@ -110,8 +110,9 @@ generalized_boxplot <- function(x, alpha = 2 * stats::pnorm(-4 * stats::qnorm(0.
                                 show_n = TRUE, show_mean = FALSE, annotate = NULL,
                                 horizontal = FALSE, log = FALSE, fill = "grey85", xlab = NULL,
                                 ylab = NULL, title = NULL, caption = TRUE, base_size = 11,
-                                x_labels_angle = 0, box_width = 0.5, notch = FALSE,
-                                notch_width = 0.5, staple_width = 0.5,
+                                point_size = NULL, point_alpha = 0.75, x_labels_angle = 0,
+                                box_width = 0.5, notch = FALSE, notch_width = 0.5,
+                                staple_width = 0.5,
                                 xlabels.angle = deprecated(), xlabels.vjust = deprecated(),
                                 xlabels.hjust = deprecated(), box.width = deprecated(),
                                 notchwidth = deprecated(), staplewidth = deprecated()) {
@@ -132,8 +133,8 @@ generalized_boxplot <- function(x, alpha = 2 * stats::pnorm(-4 * stats::qnorm(0.
     label_outliers = label_outliers, show_n = show_n, show_mean = show_mean,
     annotate = annotate, horizontal = horizontal, log = log, fill = fill, xlab = xlab,
     ylab = ylab, title = title, caption = caption, base_size = base_size,
-    x_labels_angle = x_labels_angle, box_width = box_width, notch = notch,
-    notch_width = notch_width, staple_width = staple_width,
+    point_size = point_size, point_alpha = point_alpha, x_labels_angle = x_labels_angle,
+    box_width = box_width, notch = notch, notch_width = notch_width, staple_width = staple_width,
     xlabels.angle = xlabels.angle, xlabels.vjust = xlabels.vjust, xlabels.hjust = xlabels.hjust,
     box.width = box.width, notchwidth = notchwidth, staplewidth = staplewidth
   )

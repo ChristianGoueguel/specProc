@@ -16,7 +16,12 @@ plot_shots(
   plot = TRUE,
   title = NULL,
   caption = TRUE,
-  base_size = 11
+  base_size = 11,
+  xlab = NULL,
+  ylab = NULL,
+  point_size = NULL,
+  point_alpha = 0.85,
+  linewidth = 0.3
 )
 }
 \arguments{
@@ -29,7 +34,7 @@ plot_shots(
 sample column. Default is the sample with the most rejected shots.}
 
 \item{wavelength}{For \code{type = "spectra"}, an optional wavelength range
-(nm) to zoom on.}
+\code{c(min, max)} (nm) to zoom on.}
 
 \item{label}{For \code{type = "criteria"}, the number of rejected shots
 labeled, the most extreme first. Default is 10; 0 for none.}
@@ -59,6 +64,18 @@ with the number of rejected shots; \code{FALSE}, no caption; or a caption of
 your own.}
 
 \item{base_size}{The size of the text, in points. Default is 11.}
+
+\item{xlab, ylab}{For \code{type = "criteria"} and \code{"spectra"}, the axis titles.
+Default are the names of the criteria, or the wavelength and intensity.}
+
+\item{point_size}{For \code{type = "criteria"} and \code{"samples"}, the size of the
+points. Default is 1.6 at a \code{base_size} of 11, scaled with \code{base_size}.}
+
+\item{point_alpha}{For \code{type = "criteria"} and \code{"samples"}, the opacity of
+the points, between 0 and 1. Default is 0.85.}
+
+\item{linewidth}{For \code{type = "spectra"}, the width of the kept shots; the
+median and the rejected shots are drawn 5/3 as wide. Default is 0.3.}
 }
 \value{
 A ggplot (or patchwork) object, or with \code{plot = FALSE} a tibble.

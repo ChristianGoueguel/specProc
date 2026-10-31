@@ -4,13 +4,31 @@
 \alias{plot_boltzmann}
 \title{Draw a Boltzmann or Saha-Boltzmann Plot}
 \usage{
-plot_boltzmann(object, title = NULL)
+plot_boltzmann(
+  object,
+  title = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11,
+  point_size = 2.5,
+  point_alpha = 1
+)
 }
 \arguments{
 \item{object}{An object returned by \code{\link[=boltzmann]{boltzmann()}},
 \code{\link[=saha_boltzmann]{saha_boltzmann()}} or \code{\link[=cf_libs]{cf_libs()}}.}
 
 \item{title}{The plot title. By default, the method and temperature.}
+
+\item{xlab, ylab}{The axis titles. Default are the upper-level energy and
+the Boltzmann ordinate.}
+
+\item{base_size}{The size of the text, in points. Default is 11.}
+
+\item{point_size}{The size of the points of the lines. Default is 2.5.}
+
+\item{point_alpha}{The opacity of the points, between 0 and 1. Default is
+1.}
 }
 \value{
 A ggplot object.

@@ -16,7 +16,11 @@ plot_cell_map(
   labels = 5,
   lines = NULL,
   tol = 0.1,
-  title = NULL
+  title = NULL,
+  wavelength = NULL,
+  xlab = NULL,
+  ylab = NULL,
+  base_size = 11
 )
 }
 \arguments{
@@ -54,6 +58,16 @@ regions with the emission lines they match.}
 matches. Default is 0.1.}
 
 \item{title}{The plot title. Default is "MacroPCA cell map" or "cellPCA cell map".}
+
+\item{wavelength}{Optional (\code{NULL} by default). The wavelength range
+\code{c(min, max)} to show, in nm: the columns within it (of \code{columns}, if
+given). Needs variables named by wavelength.}
+
+\item{xlab, ylab}{The axis titles of the map. Default are
+\code{"Wavelength (nm)"} (or \code{"Variable"}) and \code{"Observation"}, with the
+order of the rows.}
+
+\item{base_size}{The size of the text, in points. Default is 11.}
 }
 \value{
 A patchwork (ggplot2) object.
@@ -111,6 +125,8 @@ fit <- macropca(center(spectra), k = 3)
 
 if (requireNamespace("patchwork", quietly = TRUE)) {
   plot_cell_map(fit, order = "cluster")
+  # the Ca II H and K lines
+  plot_cell_map(fit, wavelength = c(390, 400), order = "od")
 }
 }
 

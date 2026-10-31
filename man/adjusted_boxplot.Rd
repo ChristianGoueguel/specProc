@@ -23,6 +23,8 @@ adjusted_boxplot(
   title = NULL,
   caption = TRUE,
   base_size = 11,
+  point_size = NULL,
+  point_alpha = 0.75,
   x_labels_angle = 0,
   box_width = 0.5,
   notch = FALSE,
@@ -92,6 +94,13 @@ subtitle.}
 whiskers; \code{FALSE}, no caption; or a caption of your own.}
 
 \item{base_size}{The size of the text, in points. Default is 11.}
+
+\item{point_size}{The size of the points of the observations. Default is
+1.6 at a \code{base_size} of 11, scaled with \code{base_size}.}
+
+\item{point_alpha}{The opacity of the outlying observations, between 0
+and 1 (default 0.75); the others, drawn with \code{points = "all"}, are
+two thirds as opaque.}
 
 \item{x_labels_angle}{The angle (in degrees) of the labels below the
 boxes. Default is 0 (horizontal).}

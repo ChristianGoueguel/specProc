@@ -264,6 +264,12 @@ correct_response <- function(x, response) {
 #' @param object The result of [response_calibration()].
 #' @param title The plot title. By default, the number of lamp spectra and
 #'   the median uncertainty.
+#' @param wavelength Optional (`NULL` by default). The wavelength range
+#'   `c(min, max)` to draw, in nm.
+#' @param xlab,ylab The axis titles. Default are `"Wavelength (nm)"` and
+#'   `"Relative response"`.
+#' @param base_size The size of the text, in points. Default is 11.
+#' @param linewidth The width of the response line. Default is 0.6.
 #'
 #' @return A ggplot object.
 #' @seealso [response_calibration()]
@@ -280,12 +286,19 @@ correct_response <- function(x, response) {
 #'   rnorm(length(wl), sd = 20)
 #' names(lamp) <- wl
 #' plot_response(response_calibration(lamp, reference))
-plot_response <- function(object, title = NULL) {
+plot_response <- function(object, title = NULL, wavelength = NULL, xlab = "Wavelength (nm)",
+                          ylab = "Relative response", base_size = 11, linewidth = 0.6) {
   if (!inherits(object, "specproc_response")) {
     stop("'object' must be returned by response_calibration().", call. = FALSE)
   }
+  check_plot_text(title, xlab, ylab, base_size)
+  check_size(linewidth, "linewidth")
+  window <- wavelength_window(wavelength)
   d <- as.data.frame(object$response)
-  d <- d[!is.na(d$response), , drop = FALSE]
+  d <- d[!is.na(d$response) & in_window(d$wavelength, window), , drop = FALSE]
+  if (nrow(d) < 2) {
+    stop("Fewer than 2 channels with a response in the 'wavelength' range.", call. = FALSE)
+  }
   d$lower <- d$response * (1 - d$rsd)
   d$upper <- d$response * (1 + d$rsd)
   d$segment <- factor(d$segment)
@@ -296,9 +309,10 @@ plot_response <- function(object, title = NULL) {
   }
   p <- ggplot2::ggplot(d, ggplot2::aes(x = .data$wavelength, group = .data$segment)) +
     ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lower, ymax = .data$upper), fill = "grey75") +
-    ggplot2::geom_line(ggplot2::aes(y = .data$response), colour = "#1b9e77", linewidth = 0.6) +
-    ggplot2::labs(x = "Wavelength (nm)", y = "Relative response", title = title) +
-    ggplot2::theme_bw()
+    ggplot2::geom_line(ggplot2::aes(y = .data$response), colour = "#1b9e77",
+                       linewidth = linewidth) +
+    ggplot2::labs(x = xlab, y = ylab, title = title) +
+    ggplot2::theme_bw(base_size = base_size)
   finish_title(p)
 }
 

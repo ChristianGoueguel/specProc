@@ -427,6 +427,14 @@ print.specproc_wavelength_selection <- function(x, ...) {
 #'
 #' @param object An object returned by [select_wavelengths()].
 #' @param title The plot title.
+#' @param wavelength Optional (`NULL` by default). The wavelength range
+#'   `c(min, max)` to draw, in nm. Needs variables named by wavelength.
+#' @param xlab The title of the wavelength axis. Default is
+#'   `"Wavelength (nm)"` (or `"Variable"`). The panels are named on their
+#'   left.
+#' @param base_size The size of the text, in points. Default is 11.
+#' @param linewidth The width of the mean spectrum and importance lines.
+#'   Default is 0.3.
 #'
 #' @return A ggplot object.
 #'
@@ -439,13 +447,22 @@ print.specproc_wavelength_selection <- function(x, ...) {
 #' spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 #' sel <- select_wavelengths(spectra, forageLIBS$Ca, method = "sr", num_terms = 50)
 #' plot_wavelength_selection(sel)
-plot_wavelength_selection <- function(object, title = NULL) {
+#' # the Ca II H and K lines
+#' plot_wavelength_selection(sel, wavelength = c(390, 400))
+plot_wavelength_selection <- function(object, title = NULL, wavelength = NULL, xlab = NULL,
+                                      base_size = 11, linewidth = 0.3) {
   if (!inherits(object, "specproc_wavelength_selection")) {
     stop("'object' must be returned by select_wavelengths().", call. = FALSE)
   }
+  check_plot_text(title, xlab, NULL, base_size)
+  check_size(linewidth, "linewidth")
+  window <- wavelength_window(wavelength)
   vars <- names(object$mean_spectrum)
   wl <- names_to_wavelength(vars)
-  x_lab <- if (is.null(wl)) "Variable" else "Wavelength (nm)"
+  x_lab <- xlab %||% if (is.null(wl)) "Variable" else "Wavelength (nm)"
+  if (!is.null(window) && is.null(wl)) {
+    stop("'wavelength' needs variables named by wavelength.", call. = FALSE)
+  }
   if (is.null(wl)) wl <- seq_along(vars)
   selected <- vars %in% object$selected
   importance_label <- switch(object$method, vip = "VIP", sr = "Selectivity ratio",
@@ -464,6 +481,13 @@ plot_wavelength_selection <- function(object, title = NULL) {
   ends <- cumsum(runs$lengths)
   starts <- ends - runs$lengths + 1
   shade <- data.frame(xmin = wl[starts[runs$values]] - step / 2, xmax = wl[ends[runs$values]] + step / 2)
+  if (!is.null(window)) {
+    if (sum(in_window(wl, window)) < 2) {
+      stop("Fewer than 2 variables in the 'wavelength' range.", call. = FALSE)
+    }
+    curves <- curves[in_window(curves$wl, window), , drop = FALSE]
+    shade <- clip_rects(shade, window)
+  }
 
   p <- ggplot2::ggplot() +
     ggplot2::geom_rect(data = shade, ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax),
@@ -475,12 +499,14 @@ plot_wavelength_selection <- function(object, title = NULL) {
       value = info$RMSECV, chosen = ifelse(is.na(info$step), "not selected", "selected"),
       panel = factor(panels[2], levels = panels)
     )
+    if (!is.null(window)) bars <- clip_rects(bars, window)
     p <- p + ggplot2::geom_rect(data = bars, ggplot2::aes(xmin = .data$xmin, xmax = .data$xmax,
                                                          ymin = 0, ymax = .data$value, fill = .data$chosen),
                                 colour = "white", linewidth = 0.2) +
       ggplot2::scale_fill_manual(values = c(selected = "#1b9e77", `not selected` = "grey70"), name = NULL)
   }
-  p <- p + ggplot2::geom_line(data = curves, ggplot2::aes(.data$wl, .data$value), linewidth = 0.3)
+  p <- p + ggplot2::geom_line(data = curves, ggplot2::aes(.data$wl, .data$value),
+                              linewidth = linewidth)
   if (!is.null(object$threshold)) {
     p <- p + ggplot2::geom_hline(data = data.frame(panel = factor(panels[2], levels = panels),
                                                    y = object$threshold),
@@ -494,9 +520,18 @@ plot_wavelength_selection <- function(object, title = NULL) {
   finish_title(p +
     ggplot2::facet_wrap(~ panel, ncol = 1, scales = "free_y", strip.position = "left") +
     ggplot2::labs(x = x_lab, y = NULL, title = title) +
-    ggplot2::theme_bw() +
+    ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(strip.placement = "outside", strip.background = ggplot2::element_blank(),
                    legend.position = "bottom", panel.grid.minor = ggplot2::element_blank()))
+}
+
+# Rectangles (xmin, xmax) cut to a wavelength window; those outside it are
+# left out.
+clip_rects <- function(rects, window) {
+  rects <- rects[rects$xmax >= window[1] & rects$xmin <= window[2], , drop = FALSE]
+  rects$xmin <- pmax(rects$xmin, window[1])
+  rects$xmax <- pmin(rects$xmax, window[2])
+  rects
 }
 
 #' @title Wavelength Selection Recipe Step

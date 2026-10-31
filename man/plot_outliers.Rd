@@ -18,6 +18,9 @@ plot_outliers(
   title = NULL,
   caption = TRUE,
   base_size = 11,
+  xlab = NULL,
+  point_size = NULL,
+  point_alpha = 1,
   show.outlier = deprecated(),
   show.mahal = deprecated()
 )
@@ -57,9 +60,6 @@ their row number (\code{FALSE}, default). In the panels of robust z-scores,
 only the outliers beyond the univariate limits of the panel are labeled;
 the distance plot names them all.}
 
-\item{ylab}{The title of the value axis. Default is "Robust z-score", or
-"Robust distance" with \code{type = "distance"}.}
-
 \item{title}{The plot title. A long title is split into a title and a
 subtitle.}
 
@@ -70,6 +70,16 @@ your own.}
 \item{base_size}{The size of the text, in points. Default is 11; use the
 text size of the journal (often 7 to 9 points) for a figure saved at its
 printed size.}
+
+\item{xlab, ylab}{The axis titles. Default are none (the samples are
+spread along the horizontal axis) and \code{"Robust z-score"}, or
+\code{"Sample (row)"} and \code{"Robust distance"} with \code{type = "distance"}.}
+
+\item{point_size}{The size of the points. Default is 1.4 at a \code{base_size}
+of 11, scaled with \code{base_size}.}
+
+\item{point_alpha}{The opacity of the points, between 0 and 1. Default is
+1.}
 
 \item{show.outlier, show.mahal}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
 \code{color_by} (\code{"outlier"}, \code{"distance"} or \code{"both"}), and \code{plot = FALSE}

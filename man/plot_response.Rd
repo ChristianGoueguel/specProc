@@ -4,13 +4,31 @@
 \alias{plot_response}
 \title{Plot a Spectral Response}
 \usage{
-plot_response(object, title = NULL)
+plot_response(
+  object,
+  title = NULL,
+  wavelength = NULL,
+  xlab = "Wavelength (nm)",
+  ylab = "Relative response",
+  base_size = 11,
+  linewidth = 0.6
+)
 }
 \arguments{
 \item{object}{The result of \code{\link[=response_calibration]{response_calibration()}}.}
 
 \item{title}{The plot title. By default, the number of lamp spectra and
 the median uncertainty.}
+
+\item{wavelength}{Optional (\code{NULL} by default). The wavelength range
+\code{c(min, max)} to draw, in nm.}
+
+\item{xlab, ylab}{The axis titles. Default are \code{"Wavelength (nm)"} and
+\code{"Relative response"}.}
+
+\item{base_size}{The size of the text, in points. Default is 11.}
+
+\item{linewidth}{The width of the response line. Default is 0.6.}
 }
 \value{
 A ggplot object.

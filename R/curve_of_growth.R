@@ -228,6 +228,12 @@ curve_of_growth_model <- function(lines, temperature, scale, optical_depth, unit
 #' @param object The result of [curve_of_growth()].
 #' @param title The plot title. By default, the temperature and the largest
 #'   optical depth.
+#' @param xlab,ylab The axis titles. Default are `"Optical depth at the line
+#'   center"` and `"Reduced intensity"`.
+#' @param base_size The size of the text, in points. Default is 11.
+#' @param point_size The size of the points of the lines. Default is 2.5.
+#' @param point_alpha The opacity of the points, between 0 and 1. Default is
+#'   1.
 #'
 #' @return A ggplot object.
 #' @seealso [curve_of_growth()]
@@ -242,10 +248,15 @@ curve_of_growth_model <- function(lines, temperature, scale, optical_depth, unit
 #' lines$Ek <- lines$Ei + 1239.842 / lines$wavelength
 #' lines$intensity <- curve_of_growth_model(lines, 9000, scale = 1e20, optical_depth = 5)$intensity
 #' plot_curve_of_growth(curve_of_growth(lines, temperature = 9000))
-plot_curve_of_growth <- function(object, title = NULL) {
+plot_curve_of_growth <- function(object, title = NULL, xlab = "Optical depth at the line center",
+                                 ylab = "Reduced intensity", base_size = 11, point_size = 2.5,
+                                 point_alpha = 1) {
   if (!inherits(object, "specproc_curve_of_growth") || is.null(attr(object, "scale"))) {
     stop("'object' must be returned by curve_of_growth().", call. = FALSE)
   }
+  check_plot_text(title, xlab, ylab, base_size)
+  check_size(point_size, "point_size")
+  check_alpha(point_alpha, "point_alpha")
   temperature <- attr(object, "temperature")
   units <- attr(object, "units")
   d <- as.data.frame(unclass_cog(object))
@@ -266,13 +277,13 @@ plot_curve_of_growth <- function(object, title = NULL) {
                        linetype = "dashed") +
     ggplot2::geom_line(data = curve, ggplot2::aes(.data$tau, .data$reduced), colour = "grey30") +
     ggplot2::geom_point(data = d, ggplot2::aes(.data$optical_depth, .data$reduced,
-                                               colour = .data$species), size = 2.5) +
+                                               colour = .data$species),
+                        size = point_size, alpha = point_alpha) +
     ggplot2::scale_x_log10() +
     ggplot2::scale_y_log10() +
-    ggplot2::labs(x = "Optical depth at the line center",
-                  y = "Reduced intensity", colour = NULL, title = title,
+    ggplot2::labs(x = xlab, y = ylab, colour = NULL, title = title,
                   subtitle = "Dashed: optically thin limit; solid: curve of the median line profile") +
-    ggplot2::theme_bw() +
+    ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(legend.position = "bottom")
   finish_title(p)
 }

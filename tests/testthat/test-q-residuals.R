@@ -102,7 +102,7 @@ test_that("plot_influence is drawn like plot_outlier_map", {
   sh <- ggplot2::ggplot_build(plot_influence(res, shade = TRUE, log = TRUE))
   expect_equal(nrow(sh$data[[1]]), 3)
   expect_equal(sh$data[[1]]$xmax[2], log10(top[["t2"]]))
-  expect_s3_class(plot_influence(res, colour_by = "distance", relative = TRUE), "ggplot")
+  expect_s3_class(plot_influence(res, color_by = "distance", relative = TRUE), "ggplot")
   conc <- seq_len(nrow(res))
   sized <- plot_influence(res, size = conc, alpha = 0.5)
   expect_equal(sized$scales$get_scales("size")$name, "conc")

@@ -279,6 +279,13 @@ predict.specproc_wavelength_calibration <- function(object, wavelength, ...) {
 #'
 #' @param object The result of [wavelength_calibration()].
 #' @param title The plot title.
+#' @param xlab,ylab The axis titles. Default are `"Measured wavelength (nm)"`
+#'   and `"Reference - measured (nm)"`.
+#' @param base_size The size of the text, in points. Default is 11; the line
+#'   labels scale with it.
+#' @param point_size The size of the points of the lines. Default is 2.5.
+#' @param point_alpha The opacity of the points, between 0 and 1. Default is
+#'   1.
 #'
 #' @return A ggplot object.
 #' @seealso [wavelength_calibration()]
@@ -293,10 +300,15 @@ predict.specproc_wavelength_calibration <- function(object, wavelength, ...) {
 #'                `Ca I` = 422.673, `Mg I` = 518.360, `Na I` = 588.995, `Ca I` = 643.907)
 #' cal <- wavelength_calibration(first_detector, reference)
 #' plot_wavelength_calibration(cal)
-plot_wavelength_calibration <- function(object, title = NULL) {
+plot_wavelength_calibration <- function(object, title = NULL, xlab = "Measured wavelength (nm)",
+                                        ylab = "Reference - measured (nm)", base_size = 11,
+                                        point_size = 2.5, point_alpha = 1) {
   if (!inherits(object, "specproc_wavelength_calibration")) {
     stop("'object' must be returned by wavelength_calibration().", call. = FALSE)
   }
+  check_plot_text(title, xlab, ylab, base_size)
+  check_size(point_size, "point_size")
+  check_alpha(point_alpha, "point_alpha")
   pts <- as.data.frame(object$lines[!is.na(object$lines$measured), ])
   pts$status <- ifelse(pts$used, "used", "not used")
   pts$label <- ifelse(pts$used, pts$line, paste0(pts$line, " (", pts$reason, ")"))
@@ -319,15 +331,16 @@ plot_wavelength_calibration <- function(object, title = NULL) {
     ggplot2::geom_line(data = curves, ggplot2::aes(.data$wavelength, .data$correction,
                                                    colour = .data$segment), linewidth = 0.7) +
     ggplot2::geom_point(data = pts, ggplot2::aes(.data$measured, .data$offset, colour = .data$segment,
-                                                 shape = .data$status), size = 2.5) +
+                                                 shape = .data$status),
+                        size = point_size, alpha = point_alpha) +
     # all the lines labeled, moved apart by ggrepel
     ggrepel::geom_text_repel(data = pts, ggplot2::aes(.data$measured, .data$offset, label = .data$label),
-                             size = 2.6, colour = "grey25", segment.colour = "grey60",
+                             size = 0.67 * base_size / ggplot2::.pt, colour = "grey25",
+                             segment.colour = "grey60",
                              min.segment.length = 0.2, max.overlaps = Inf, seed = 1) +
     ggplot2::scale_shape_manual(values = c(used = 16, `not used` = 1), name = NULL) +
-    ggplot2::labs(x = "Measured wavelength (nm)", y = "Reference - measured (nm)",
-                  colour = "Segment", title = title) +
-    ggplot2::theme_bw() +
+    ggplot2::labs(x = xlab, y = ylab, colour = "Segment", title = title) +
+    ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(legend.position = "bottom")
   finish_title(p)
 }

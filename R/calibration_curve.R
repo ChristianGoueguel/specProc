@@ -424,6 +424,12 @@ predict.specproc_calibration <- function(object, newdata, replicates = 1, level 
 #'   new signal. Default is 1.
 #' @param title The plot title. By default, the model and the figures of
 #'   merit.
+#' @param xlab,ylab The axis titles. Default are the names of the
+#'   concentration and signal columns.
+#' @param base_size The size of the text, in points. Default is 11.
+#' @param point_size The size of the points of the standards. Default is 2.
+#' @param point_alpha The opacity of the points of the standards, between 0
+#'   and 1. Default is 1; lower it when replicates overlap.
 #'
 #' @return A ggplot object.
 #' @seealso [calibration_curve()], [predict.specproc_calibration()]
@@ -448,12 +454,17 @@ predict.specproc_calibration <- function(object, newdata, replicates = 1, level 
 #' calibration <- data[!data$Sample %in% test_samples, ]
 #'
 #' k_curve <- calibration_curve(calibration, K_signal, K)
-#' plot_calibration(k_curve)
+#' plot_calibration(k_curve, point_alpha = 0.4, xlab = "K (%)",
+#'                  ylab = "K I 769.90 nm / C I 247.86 nm")
 plot_calibration <- function(object, interval = "both", level = 0.95, newdata = NULL,
-                             replicates = 1, title = NULL) {
+                             replicates = 1, title = NULL, xlab = NULL, ylab = NULL,
+                             base_size = 11, point_size = 2, point_alpha = 1) {
   if (!inherits(object, "specproc_calibration")) {
     stop("'object' must be returned by calibration_curve().", call. = FALSE)
   }
+  check_plot_text(title, xlab, ylab, base_size)
+  check_size(point_size, "point_size")
+  check_alpha(point_alpha, "point_alpha")
   interval <- match.arg(interval, c("both", "confidence", "prediction", "none"))
   check_number(level, "level", lower = 0, upper = 1, lower_open = TRUE, upper_open = TRUE)
   check_count(replicates, "replicates")
@@ -495,7 +506,8 @@ plot_calibration <- function(object, interval = "both", level = 0.95, newdata = 
     ggplot2::geom_line(data = curve, ggplot2::aes(.data$concentration, .data$fit), colour = "#1f4e79") +
     ggplot2::geom_vline(data = limits, ggplot2::aes(xintercept = .data$value, linetype = .data$limit),
                         colour = "grey40") +
-    ggplot2::geom_point(data = object$data, ggplot2::aes(.data$concentration, .data$signal), size = 2)
+    ggplot2::geom_point(data = object$data, ggplot2::aes(.data$concentration, .data$signal),
+                        size = point_size, alpha = point_alpha)
   if (!is.null(newdata)) {
     unknown <- stats::predict(object, newdata, replicates = replicates, level = level)
     unknown <- unknown[!is.na(unknown$concentration), , drop = FALSE]
@@ -516,10 +528,11 @@ plot_calibration <- function(object, interval = "both", level = 0.95, newdata = 
     ggplot2::scale_linetype_manual(values = c(`Critical value` = "dotdash", LOD = "dashed",
                                               LOQ = "dotted"),
                                    breaks = limits$limit, name = NULL) +
-    ggplot2::labs(x = object$names[["concentration"]], y = object$names[["signal"]], title = title,
+    ggplot2::labs(x = xlab %||% object$names[["concentration"]],
+                  y = ylab %||% object$names[["signal"]], title = title,
                   subtitle = if (!is.null(newdata)) paste0("Red: new samples, with the ", pct,
                                                            " interval of their concentration")) +
-    ggplot2::theme_bw() +
+    ggplot2::theme_bw(base_size = base_size) +
     ggplot2::theme(legend.position = "bottom")
   finish_title(p)
 }

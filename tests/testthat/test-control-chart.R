@@ -9,6 +9,10 @@ test_that("control_chart estimates the center and sigma from the baseline", {
   expect_equal(chart$upper, rep(attr(chart, "center") + 3 * attr(chart, "sigma"), 7))
   expect_output(print(chart), "first at 7")
   expect_s3_class(plot_control_chart(chart), "ggplot")
+  styled <- plot_control_chart(chart, point_size = 2, point_alpha = 0.5, base_size = 9)
+  points <- Filter(function(l) inherits(l$geom, "GeomPoint"), styled$layers)[[1]]
+  expect_equal(points$aes_params[c("size", "alpha")], list(size = 2, alpha = 0.5))
+  expect_equal(styled$theme$text$size, 9)
   # sorted by time; a logical baseline in the order of `x`
   shuffled <- control_chart(rev(x), order = 7:1, baseline = rev(c(rep(TRUE, 6), FALSE)))
   expect_equal(shuffled$value, x)

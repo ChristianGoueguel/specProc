@@ -213,7 +213,7 @@ test_that("plot_fit annotates, marks the FWHM and keeps the former arguments", {
   expect_length(plot_fit(peak_fit(two, profile = "gaussian"))$patches$plots, 2)
   lifecycle::expect_deprecated(plot_fit(res, pt.size = 2))
   lifecycle::expect_deprecated(plot_fit(res, resid.fill = "blue"))
-  expect_error(plot_fit(res, fit_color = "nocolor"), "colors")
+  expect_error(plot_fit(res, fit_color = "nocolor"), "color")
 })
 
 test_that("peak_fit and multipeak_fit hold widths fixed", {

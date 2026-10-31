@@ -4,12 +4,31 @@
 \alias{plot_wavelength_calibration}
 \title{Plot a Wavelength Calibration}
 \usage{
-plot_wavelength_calibration(object, title = NULL)
+plot_wavelength_calibration(
+  object,
+  title = NULL,
+  xlab = "Measured wavelength (nm)",
+  ylab = "Reference - measured (nm)",
+  base_size = 11,
+  point_size = 2.5,
+  point_alpha = 1
+)
 }
 \arguments{
 \item{object}{The result of \code{\link[=wavelength_calibration]{wavelength_calibration()}}.}
 
 \item{title}{The plot title.}
+
+\item{xlab, ylab}{The axis titles. Default are \code{"Measured wavelength (nm)"}
+and \code{"Reference - measured (nm)"}.}
+
+\item{base_size}{The size of the text, in points. Default is 11; the line
+labels scale with it.}
+
+\item{point_size}{The size of the points of the lines. Default is 2.5.}
+
+\item{point_alpha}{The opacity of the points, between 0 and 1. Default is
+1.}
 }
 \value{
 A ggplot object.

@@ -39,6 +39,9 @@ test_that("wavelength_calibration recovers the error of each detector", {
   expect_lt(max(abs(recal$lines$offset)), 0.005)
   expect_output(print(cal), "8 of 8 reference lines")
   expect_s3_class(plot_wavelength_calibration(cal), "ggplot")
+  styled <- plot_wavelength_calibration(cal, ylab = "Offset (nm)", point_alpha = 0.5)
+  expect_equal(styled$labels$y, "Offset (nm)")
+  expect_equal(styled$layers[[3]]$aes_params$alpha, 0.5)
 })
 
 test_that("wavelength_calibration flags unusable lines", {

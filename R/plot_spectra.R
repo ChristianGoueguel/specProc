@@ -83,8 +83,8 @@
 #' that identified each spectrum.
 #' @param colvar optional (`NULL` by default). Column name of a numeric
 #' variable to be display in color scale.
-#' @param .interactive optional (`FALSE` by default). When set to `TRUE`
-#' enables interactive plot.
+#' @param interactive A logical: an interactive plotly plot (`TRUE`) or a
+#'   ggplot (`FALSE`, default).
 #' @param drop_na Optional (`FALSE` by default). Remove rows with NA intensity
 #' if drop_na is `TRUE`.
 #' @param offset Optional (`NULL` by default). The offsets between successive
@@ -153,8 +153,9 @@
 #' @param rasterize `FALSE` (default), `TRUE`, or a resolution in dpi: draw
 #'   the spectra as an image, of 300 dpi with `TRUE`, within an otherwise
 #'   vector plot (see Details). Ignored for interactive plots.
+#' @param .interactive `r lifecycle::badge("deprecated")` Use `interactive`.
 #'
-#' @return Object of class ggplot or of class plotly if `.interactive = TRUE`.
+#' @return Object of class ggplot or of class plotly if `interactive = TRUE`.
 #'
 #' @seealso [libs_lines()] for the emission lines.
 #'
@@ -203,7 +204,7 @@
 #'              transform = list(\(s) baseline_als(s, lambda = 1e4),
 #'                               ~ savitzky_golay(.x, window = 7, derivative = 1)),
 #'              ylab = "First derivative")
-plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop_na = FALSE,
+plot_spectra <- function(x, id = NULL, colvar = NULL, interactive = FALSE, drop_na = FALSE,
                          offset = NULL, wavelength = NULL, transform = NULL, panel = NULL,
                          layout = c("vertical", "horizontal"), grid = FALSE,
                          color_as = c("line", "fill"),
@@ -213,7 +214,7 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
                          palette = "viridis", base_size = 11, linewidth = 0.5,
                          scales = c("fixed", "free_y"), panel_tags = FALSE,
                          label_spectra = FALSE, summary = c("none", "mean", "median"),
-                         rasterize = FALSE) {
+                         rasterize = FALSE, .interactive = deprecated()) {
   if (missing(x)) {
     stop("Missing 'data' argument.")
   }
@@ -235,9 +236,9 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
   if (!is.null(panel_name) && !panel_name %in% colnames(x)) {
     stop("The 'panel' column does not exist in the provided data.")
   }
-  if (!is.logical(.interactive)) {
-    stop("The argument '.interactive' must be of type boolean (TRUE or FALSE)")
-  }
+  interactive <- renamed_arg(.interactive, interactive, "plot_spectra", ".interactive",
+                             "interactive")
+  check_flag(interactive, "interactive")
   if (!is.logical(drop_na)) {
     stop("The argument 'drop_na' must be of type boolean (TRUE or FALSE)")
   }
@@ -253,7 +254,7 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
   check_number(linewidth, "linewidth", lower = 0, lower_open = TRUE)
   check_palette(palette)
   dpi <- raster_dpi(rasterize)
-  if (!is.null(dpi) && !.interactive) {
+  if (!is.null(dpi) && !interactive) {
     rlang::check_installed("ragg", reason = "to rasterize the spectra.")
   }
   if (!is.null(offset)) {
@@ -349,7 +350,7 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
       ggplot2::geom_line(ggplot2::aes(colour = !!colour_by), linewidth = linewidth)
     }
   }
-  if (!is.null(dpi) && !.interactive) {
+  if (!is.null(dpi) && !interactive) {
     layers <- lapply(layers, rasterize_layer, dpi = dpi)
   }
   p <- p + layers
@@ -445,7 +446,7 @@ plot_spectra <- function(x, id = NULL, colvar = NULL, .interactive = FALSE, drop
   }
   p <- finish_title(p)
 
-  if (.interactive == FALSE) {
+  if (!interactive) {
     return(p)
   }
   rlang::check_installed("plotly", reason = "to create interactive plots.")

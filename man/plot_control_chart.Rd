@@ -4,7 +4,15 @@
 \alias{plot_control_chart}
 \title{Plot a Control Chart}
 \usage{
-plot_control_chart(object, title = NULL, xlab = "Order", ylab = NULL)
+plot_control_chart(
+  object,
+  title = NULL,
+  xlab = "Order",
+  ylab = NULL,
+  base_size = 11,
+  point_size = 1.3,
+  point_alpha = 1
+)
 }
 \arguments{
 \item{object}{The result of \code{\link[=control_chart]{control_chart()}}.}
@@ -12,7 +20,15 @@ plot_control_chart(object, title = NULL, xlab = "Order", ylab = NULL)
 \item{title}{The plot title. By default, the method and the number of
 signals.}
 
-\item{xlab, ylab}{The axis labels.}
+\item{xlab, ylab}{The axis titles. Default are \code{"Order"} and the name of
+the statistic.}
+
+\item{base_size}{The size of the text, in points. Default is 11.}
+
+\item{point_size}{The size of the points. Default is 1.3.}
+
+\item{point_alpha}{The opacity of the points, between 0 and 1. Default is
+1.}
 }
 \value{
 A ggplot object.

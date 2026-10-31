@@ -98,6 +98,20 @@ libs_lines <- function(species, wavelength = c(200, 900), temperature = 10000, t
 #' @param title An optional plot title.
 #' @param bands An optional tibble of molecular band heads returned by
 #'   [molecular_bands()].
+#' @param wavelength Optional (`NULL` by default). The wavelength range
+#'   `c(min, max)` to draw, in nm. The markers are scaled to the maximum of
+#'   the spectrum within the range, and the lines and bands outside it are
+#'   left out.
+#' @param xlab,ylab The axis titles. Default are `"Wavelength (nm)"` and
+#'   `"Intensity (arb. units)"`.
+#' @param base_size The size of the text, in points. Default is 11. Ignored
+#'   for interactive plots.
+#' @param linewidth The width of the spectrum line. Default is 0.3.
+#' @param spectrum_color The color of the spectrum. Default is `"grey35"`.
+#' @param marker_linewidth The width of the line and band markers. Default is
+#'   0.5.
+#' @param marker_alpha The opacity of the line and band markers, between 0
+#'   and 1. Default is 0.7.
 #'
 #' @return A plotly or ggplot object.
 #'
@@ -107,17 +121,18 @@ libs_lines <- function(species, wavelength = c(200, 900), temperature = 10000, t
 #' @examples
 #' data(forageLIBS)
 #' spectrum <- colMeans(forageLIBS[-(1:14)])
-#' spectrum <- spectrum[as.numeric(names(spectrum)) > 403 & as.numeric(names(spectrum)) < 406]
 #' # the K I doublet, with the atomic data of the NIST database
 #' lines <- tibble::tibble(
 #'   species = "K I", element = "K", stage = 1L, wavelength = c(404.414, 404.721),
 #'   relative_intensity = c(1, 0.5), Aki = c(1.15e6, 1.07e6), Ek = c(3.065, 3.063),
 #'   gk = c(4, 2), accuracy = "A", lower = "4s 2S", upper = c("5p 2P* 3/2", "5p 2P* 1/2")
 #' )
-#' plot_lines(spectrum, lines, interactive = FALSE)
+#' plot_lines(spectrum, lines, wavelength = c(403, 406), interactive = FALSE)
 #'
 plot_lines <- function(spectrum, lines = NULL, shift = 0, scale_markers = TRUE, interactive = TRUE,
-                       title = NULL, bands = NULL) {
+                       title = NULL, bands = NULL, wavelength = NULL, xlab = "Wavelength (nm)",
+                       ylab = "Intensity (arb. units)", base_size = 11, linewidth = 0.3,
+                       spectrum_color = "grey35", marker_linewidth = 0.5, marker_alpha = 0.7) {
   spec <- as_spectrum(spectrum)
   if (is.null(lines) && is.null(bands)) {
     stop("Give 'lines' (from libs_lines()) or 'bands' (from molecular_bands()).", call. = FALSE)
@@ -127,16 +142,31 @@ plot_lines <- function(spectrum, lines = NULL, shift = 0, scale_markers = TRUE, 
   check_number(shift, "shift")
   check_flag(scale_markers, "scale_markers")
   check_flag(interactive, "interactive")
+  check_plot_text(title, xlab, ylab, base_size)
+  check_size(linewidth, "linewidth")
+  check_colour(spectrum_color, "spectrum_color")
+  check_size(marker_linewidth, "marker_linewidth")
+  check_alpha(marker_alpha, "marker_alpha")
+  window <- wavelength_window(wavelength)
+  if (!is.null(window)) {
+    spec <- spec[in_window(spec$wavelength, window), , drop = FALSE]
+    if (nrow(spec) < 2) {
+      stop("'spectrum' has fewer than 2 channels in the 'wavelength' range.", call. = FALSE)
+    }
+    lines <- lines[in_window(lines$wavelength + shift, range(spec$wavelength)), , drop = FALSE]
+  }
   segments <- line_segments(lines, spec, shift, scale_markers)
   band_segs <- band_segments(bands, spec, shift, scale_markers)
   if (interactive) {
     rlang::check_installed("plotly", reason = "for interactive plots.")
-    p <- lines_plotly(spec, segments)
-    for (trace in band_traces(band_segs)) {
+    style <- list(color = plotly_colour(spectrum_color), width = plotly_width(linewidth),
+                  marker_width = plotly_width(marker_linewidth), opacity = marker_alpha)
+    p <- lines_plotly(spec, segments, style = style)
+    for (trace in band_traces(band_segs, style)) {
       p <- do.call(plotly::add_trace, c(list(p), trace))
     }
     plotly::layout(p, title = plotly_title(title),
-                   xaxis = list(title = "Wavelength (nm)"), yaxis = list(title = "Intensity"),
+                   xaxis = list(title = xlab), yaxis = list(title = ylab),
                    legend = list(orientation = "h", y = -0.15), hovermode = "closest")
   } else {
     # markers on top of the spectrum, semi-transparent; one color scale for
@@ -144,20 +174,21 @@ plot_lines <- function(spectrum, lines = NULL, shift = 0, scale_markers = TRUE, 
     colours <- c(stage_colours, band_colours(band_segs$molecule))
     p <- ggplot2::ggplot() +
       ggplot2::geom_line(data = spec, ggplot2::aes(.data$wavelength, .data$intensity),
-                         colour = "grey35", linewidth = 0.3) +
+                         colour = spectrum_color, linewidth = linewidth) +
       ggplot2::geom_segment(
         data = segments,
         ggplot2::aes(x = .data$x, xend = .data$x, y = 0, yend = .data$height, colour = .data$stage_label),
-        linewidth = 0.5, alpha = 0.7
+        linewidth = marker_linewidth, alpha = marker_alpha
       ) +
       ggplot2::geom_segment(
         data = band_segs,
         ggplot2::aes(x = .data$x, xend = .data$x, y = 0, yend = .data$height, colour = .data$molecule),
-        linewidth = 0.5, linetype = "dashed"
+        linewidth = marker_linewidth, alpha = marker_alpha, linetype = "dashed"
       ) +
       ggplot2::scale_colour_manual(values = colours, name = NULL, drop = TRUE) +
-      ggplot2::labs(x = "Wavelength (nm)", y = "Intensity", title = title) +
-      ggplot2::theme_bw() +
+      ggplot2::scale_y_continuous(labels = plain_numbers) +
+      ggplot2::labs(x = xlab, y = ylab, title = title) +
+      ggplot2::theme_bw(base_size = base_size) +
       ggplot2::theme(legend.position = "bottom")
     finish_title(p)
   }
@@ -267,15 +298,19 @@ as_spectrum <- function(spectrum) {
   data.frame(wavelength = wavelength, intensity = unname(values))
 }
 
+# The style of the plotly spectrum and markers: the spectrum color and line
+# width, and the width and opacity of the markers.
+plotly_style <- list(color = "#595959", width = 1, marker_width = 1.5, opacity = 1)
+
 # The spectrum and the line markers in plotly, from `source` (for the events
 # of the line finder). With `heads`, each marker ends in a dot, easier to
 # click than the end of a line.
-lines_plotly <- function(spec, segments, source = "A", heads = FALSE) {
+lines_plotly <- function(spec, segments, source = "A", heads = FALSE, style = plotly_style) {
   p <- plotly::plot_ly(source = source)
   p <- plotly::add_trace(p, x = spec$wavelength, y = spec$intensity, type = "scattergl",
                          mode = "lines", name = "spectrum",
-                         line = list(color = "#595959", width = 1), hoverinfo = "x+y")
-  for (trace in stage_traces(segments, heads)) {
+                         line = list(color = style$color, width = style$width), hoverinfo = "x+y")
+  for (trace in stage_traces(segments, heads, style)) {
     p <- do.call(plotly::add_trace, c(list(p), trace))
   }
   p
@@ -338,7 +373,7 @@ band_segments <- function(bands, spec, shift, scale_markers) {
 }
 
 # One dashed plotly trace per molecule.
-band_traces <- function(segments) {
+band_traces <- function(segments, style = plotly_style) {
   if (nrow(segments) == 0) return(list())
   colours <- band_colours(segments$molecule)
   lapply(unique(segments$molecule), function(m) {
@@ -348,8 +383,8 @@ band_traces <- function(segments) {
       y = as.vector(rbind(0, s$height, NA)),
       text = as.vector(rbind(s$text, s$text, NA)),
       type = "scatter", mode = "lines", name = paste(m, "bands"),
-      line = list(color = unname(colours[m]), width = 1.5, dash = "dash"),
-      hoverinfo = "text", connectgaps = FALSE
+      line = list(color = unname(colours[m]), width = style$marker_width, dash = "dash"),
+      opacity = style$opacity, hoverinfo = "text", connectgaps = FALSE
     )
   })
 }
@@ -373,7 +408,7 @@ check_bands_table <- function(bands) {
 
 # One plotly trace per ionization stage: vertical segments separated by NA,
 # with the key of the line as custom data.
-stage_traces <- function(segments, heads = FALSE) {
+stage_traces <- function(segments, heads = FALSE, style = plotly_style) {
   if (nrow(segments) == 0) return(list())
   lapply(levels(droplevels(segments$stage_label)), function(stage) {
     s <- segments[segments$stage_label == stage, ]
@@ -384,8 +419,8 @@ stage_traces <- function(segments, heads = FALSE) {
       text = as.vector(rbind(s$text, s$text, NA)),
       customdata = as.vector(rbind(s$key, s$key, NA)),
       type = "scatter", mode = "lines", name = paste("stage", stage),
-      line = list(color = colour, width = 1.5),
-      hoverinfo = "text", connectgaps = FALSE
+      line = list(color = colour, width = style$marker_width),
+      opacity = style$opacity, hoverinfo = "text", connectgaps = FALSE
     )
     if (heads) {
       trace$mode <- "lines+markers"

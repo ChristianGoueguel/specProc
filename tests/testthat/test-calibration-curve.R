@@ -122,6 +122,15 @@ test_that("plot_calibration draws the bands and the new samples", {
   expect_equal(bars$lower, predict(cal, c(1500, 5000), level = 0.9)$lower)
   expect_match(p$labels$subtitle, "90%")
   expect_error(plot_calibration(cal, interval = "foo"))
+  # the standards, the axis titles and the text size
+  styled <- plot_calibration(cal, point_size = 3, point_alpha = 0.4, xlab = "K (%)",
+                             ylab = "Ratio", base_size = 9)
+  standards <- styled$layers[vapply(styled$layers, function(l) inherits(l$geom, "GeomPoint"),
+                                    logical(1))][[1]]
+  expect_equal(standards$aes_params[c("size", "alpha")], list(size = 3, alpha = 0.4))
+  expect_equal(styled$labels[c("x", "y")], list(x = "K (%)", y = "Ratio"))
+  expect_equal(styled$theme$text$size, 9)
+  expect_error(plot_calibration(cal, point_alpha = 2), "point_alpha")
 })
 
 test_that("York regression reproduces the Pearson-York benchmark", {

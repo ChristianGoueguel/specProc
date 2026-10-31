@@ -234,16 +234,22 @@ dmodx <- function(model, k, newdata = NULL, conf_level = 0.975, normalized = TRU
 #' @param log If `TRUE`, use logarithmic axes, which spread out the regular
 #'   samples when a few are far away. Zero distances are drawn at the
 #'   smallest positive distance. Default is `FALSE`.
-#' @param colour_by The colors of the points: `"type"` (default), by type,
+#' @param color_by The colors of the points: `"type"` (default), by type,
 #'   or `"distance"`, by their distance relative to the limits,
 #'   \eqn{\max(T^2/T^2_{lim}, Q/Q_{lim})}, on a rainbow scale from dark red to
 #'   blue, as in [plot_outlier_map()].
 #' @param title The plot title.
 #' @param ... Further arguments passed to [ggplot2::geom_point()] to style
-#'   the points, such as `alpha` (default 0.85), `size` (2.2), `stroke`
-#'   (0.4) or `colour` (the outline, `"black"`). `size` can also be a numeric
+#'   the points, such as `stroke` (default 0.4) or `colour` (the outline,
+#'   `"black"`).
+#' @param xlab,ylab The axis titles. Default are the names of the distances.
+#' @param base_size The size of the text, in points. Default is 11.
+#' @param point_size The size of the points (default 2.2), or a numeric
 #'   vector with one value per sample, such as the concentration of an
 #'   element, to vary the size of the points, with a legend.
+#' @param point_alpha The opacity of the points, between 0 and 1 (default
+#'   0.85).
+#' @param colour_by `r lifecycle::badge("deprecated")` Use `color_by`.
 #'
 #' @return A ggplot object.
 #' @seealso [q_residuals()], [dmodx()], [plot_outlier_map()]
@@ -256,22 +262,27 @@ dmodx <- function(model, k, newdata = NULL, conf_level = 0.975, normalized = TRU
 #' plot_influence(influence, label = forageLIBS$Measurement)
 #' # the same options as plot_outlier_map(): distances relative to the limits,
 #' # shaded outlying regions, logarithmic axes and colors by distance
-#' plot_influence(influence, relative = TRUE, shade = TRUE, log = TRUE, colour_by = "distance")
+#' plot_influence(influence, relative = TRUE, shade = TRUE, log = TRUE, color_by = "distance")
 #'
 #' # a single limit at 97.5%, with the outlying regions shaded
 #' influence_975 <- q_residuals(pca, k = 3, conf_level = 0.975)
 #' plot_influence(influence_975, label = forageLIBS$Measurement, shade = TRUE)
 #'
 plot_influence <- function(x, label = NULL, labels = 3, relative = FALSE, shade = FALSE,
-                           log = FALSE, colour_by = c("type", "distance"), title = NULL, ...) {
+                           log = FALSE, title = NULL, ..., color_by = c("type", "distance"),
+                           xlab = NULL, ylab = NULL, base_size = 11, point_size = 2.2,
+                           point_alpha = 0.85, colour_by = deprecated()) {
   if (!inherits(x, "specproc_influence")) {
     stop("'x' must be returned by q_residuals() or dmodx().", call. = FALSE)
   }
+  size_label <- rlang::as_label(rlang::enquo(point_size))
+  check_plot_text(title, xlab, ylab, base_size)
   if (!is.null(label) && length(label) != nrow(x)) {
     stop("'label' must have one value per sample (", nrow(x), ").", call. = FALSE)
   }
   check_count(labels, "labels", lower = 0)
-  colour_by <- match.arg(colour_by)
+  color_by <- match.arg(renamed_arg(colour_by, color_by, "plot_influence", "colour_by",
+                                    "color_by"), c("type", "distance"))
   check_map_flags(relative, shade, log)
   distance <- attr(x, "distance") %||% "q"
   levels <- attr(x, "conf_labels")
@@ -295,12 +306,14 @@ plot_influence <- function(x, label = NULL, labels = 3, relative = FALSE, shade 
   }
   distance_map(
     df, cuts = cuts, labels = labels, relative = relative, shade = shade, log = log,
-    colour_by = colour_by,
+    color_by = color_by,
     palette = c(regular = "grey55", extreme = "#1b9e77", residual = "#d95f02", both = "#e7298a"),
     regions = c("extreme", "residual", "both"),
     x_lab = list(expression("Hotelling's" ~ T^2), expression("Reduced Hotelling's" ~ T^2)),
     y_lab = c(y_lab, paste("Reduced", y_lab)),
-    title = title, point = map_point_args(rlang::enquos(...), nrow(df)), show_set = FALSE
+    title = title,
+    point = map_point_args(rlang::enquos(...), nrow(df), "", point_size, point_alpha, size_label),
+    show_set = FALSE, style = list(xlab = xlab, ylab = ylab, base_size = base_size)
   )
 }
 

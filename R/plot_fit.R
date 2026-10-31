@@ -56,12 +56,14 @@
 #'   text size of the journal (often 7 to 9 points) for a figure saved at its
 #'   printed size.
 #' @param point_size The size of the data points (default 1.5).
+#' @param point_alpha The opacity of the data points, between 0 and 1
+#'   (default 1).
 #' @param point_color The color of the data points (default `"grey20"`).
-#' @param line_width The width of the fitted curve (default 0.8).
+#' @param linewidth The width of the fitted curve (default 0.8).
 #' @param fit_color The color of the fitted curve (default `"#b2182b"`).
 #' @param pt.size,pt.colour,pt.shape,pt.fill,line.size,line.colour,linetype,resid.shape,resid.size,resid.fill,resid.colour
 #'   `r lifecycle::badge("deprecated")` Use `point_size`, `point_color`,
-#'   `line_width` and `fit_color`; the other styles are fixed.
+#'   `linewidth` and `fit_color`; the other styles are fixed.
 #' @return A `patchwork` (ggplot2) object.
 #' @seealso [peak_fit()], [multipeak_fit()], [voigt_fwhm()]
 #' @export plot_fit
@@ -81,9 +83,10 @@
 #'          title = "K I 404.41 and 404.72 nm", base_size = 8)
 plot_fit <- function(data, title = NULL, annotate = TRUE, show_fwhm = FALSE, ncol = NULL,
                      xlab = "Wavelength (nm)", ylab = "Intensity (arb. units)", caption = TRUE,
-                     base_size = 11, point_size = 1.5, point_color = "grey20", line_width = 0.8,
-                     fit_color = "#b2182b", pt.size = deprecated(), pt.colour = deprecated(),
-                     pt.shape = deprecated(), pt.fill = deprecated(), line.size = deprecated(),
+                     base_size = 11, point_size = 1.5, point_alpha = 1, point_color = "grey20",
+                     linewidth = 0.8, fit_color = "#b2182b", pt.size = deprecated(),
+                     pt.colour = deprecated(), pt.shape = deprecated(), pt.fill = deprecated(),
+                     line.size = deprecated(),
                      line.colour = deprecated(), linetype = deprecated(),
                      resid.shape = deprecated(), resid.size = deprecated(),
                      resid.fill = deprecated(), resid.colour = deprecated()) {
@@ -103,7 +106,7 @@ plot_fit <- function(data, title = NULL, annotate = TRUE, show_fwhm = FALSE, nco
   }
   point_size <- renamed(pt.size, point_size, "pt.size", "point_size")
   point_color <- renamed(pt.colour, point_color, "pt.colour", "point_color")
-  line_width <- renamed(line.size, line_width, "line.size", "line_width")
+  linewidth <- renamed(line.size, linewidth, "line.size", "linewidth")
   fit_color <- renamed(line.colour, fit_color, "line.colour", "fit_color")
   ignored <- c(pt.shape = lifecycle::is_present(pt.shape), pt.fill = lifecycle::is_present(pt.fill),
                linetype = lifecycle::is_present(linetype),
@@ -117,15 +120,12 @@ plot_fit <- function(data, title = NULL, annotate = TRUE, show_fwhm = FALSE, nco
   }
   check_flag(annotate, "annotate")
   check_flag(show_fwhm, "show_fwhm")
-  check_number(base_size, "base_size", lower = 0, lower_open = TRUE)
-  check_number(point_size, "point_size", lower = 0, lower_open = TRUE)
-  check_number(line_width, "line_width", lower = 0, lower_open = TRUE)
-  for (col in list(point_color = point_color, fit_color = fit_color)) {
-    if (!is.character(col) || length(col) != 1 ||
-        inherits(try(grDevices::col2rgb(col), silent = TRUE), "try-error")) {
-      stop("'point_color' and 'fit_color' must be colors.", call. = FALSE)
-    }
-  }
+  check_plot_text(title, xlab, ylab, base_size)
+  check_size(point_size, "point_size")
+  check_alpha(point_alpha, "point_alpha")
+  check_size(linewidth, "linewidth")
+  check_colour(point_color, "point_color")
+  check_colour(fit_color, "fit_color")
   if (!is.null(ncol)) ncol <- check_count(ncol, "ncol")
   if (!(isTRUE(caption) || isFALSE(caption) ||
         (is.character(caption) && length(caption) == 1 && !is.na(caption)))) {
@@ -140,9 +140,9 @@ plot_fit <- function(data, title = NULL, annotate = TRUE, show_fwhm = FALSE, nco
   }
   several <- length(ok) > 1
   unit <- regmatches(xlab, regexpr("(?<=\\()[^()]+(?=\\)\\s*$)", xlab, perl = TRUE))
-  style <- list(base_size = base_size, point_size = point_size, point_color = point_color,
-                line_width = line_width, fit_color = fit_color, annotate = annotate,
-                show_fwhm = show_fwhm, xlab = xlab, ylab = ylab,
+  style <- list(base_size = base_size, point_size = point_size, point_alpha = point_alpha,
+                point_color = point_color, linewidth = linewidth, fit_color = fit_color,
+                annotate = annotate, show_fwhm = show_fwhm, xlab = xlab, ylab = ylab,
                 unit = if (length(unit) == 1) unit else "")
   profiles <- character()
   pairs <- lapply(ok, function(i) {
@@ -266,13 +266,13 @@ fit_pair <- function(aug, curve, summary, label, style) {
                                 values_to = "value")
     top <- top + ggplot2::geom_line(data = comp,
                                     ggplot2::aes(x = x, y = value, group = peak, linetype = "Peaks"),
-                                    colour = "grey40", linewidth = 0.5 * style$line_width)
+                                    colour = "grey40", linewidth = 0.5 * style$linewidth)
   }
   top <- top +
     ggplot2::geom_point(ggplot2::aes(shape = "Data"), colour = style$point_color,
-                        size = style$point_size, stroke = 0.5) +
+                        size = style$point_size, alpha = style$point_alpha, stroke = 0.5) +
     ggplot2::geom_line(data = curve, ggplot2::aes(x = x, y = .fitted, colour = "Fit"),
-                       linewidth = style$line_width)
+                       linewidth = style$linewidth)
   if (style$show_fwhm) {
     bars <- data.frame(x = peaks$center - peaks$fwhm / 2, xend = peaks$center + peaks$fwhm / 2,
                        y = summary$y0 + peaks$height / 2)
@@ -315,7 +315,7 @@ fit_pair <- function(aug, curve, summary, label, style) {
     ggplot2::geom_hline(yintercept = c(-band, band), colour = "grey60", linewidth = 0.3,
                         linetype = "dashed") +
     ggplot2::geom_point(shape = 1, colour = style$point_color, size = 0.8 * style$point_size,
-                        stroke = 0.5) +
+                        alpha = style$point_alpha, stroke = 0.5) +
     ggplot2::scale_y_continuous(labels = plain_numbers, n.breaks = 3) +
     # named above the panel: a y title would meet the long title of the fit
     ggplot2::labs(x = style$xlab, y = NULL, title = "Residuals") +

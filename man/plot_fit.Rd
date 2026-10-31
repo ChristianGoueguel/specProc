@@ -15,8 +15,9 @@ plot_fit(
   caption = TRUE,
   base_size = 11,
   point_size = 1.5,
+  point_alpha = 1,
   point_color = "grey20",
-  line_width = 0.8,
+  linewidth = 0.8,
   fit_color = "#b2182b",
   pt.size = deprecated(),
   pt.colour = deprecated(),
@@ -58,14 +59,17 @@ printed size.}
 
 \item{point_size}{The size of the data points (default 1.5).}
 
+\item{point_alpha}{The opacity of the data points, between 0 and 1
+(default 1).}
+
 \item{point_color}{The color of the data points (default \code{"grey20"}).}
 
-\item{line_width}{The width of the fitted curve (default 0.8).}
+\item{linewidth}{The width of the fitted curve (default 0.8).}
 
 \item{fit_color}{The color of the fitted curve (default \code{"#b2182b"}).}
 
 \item{pt.size, pt.colour, pt.shape, pt.fill, line.size, line.colour, linetype, resid.shape, resid.size, resid.fill, resid.colour}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{point_size}, \code{point_color},
-\code{line_width} and \code{fit_color}; the other styles are fixed.}
+\code{linewidth} and \code{fit_color}; the other styles are fixed.}
 }
 \value{
 A \code{patchwork} (ggplot2) object.

@@ -113,7 +113,7 @@ spectra <- forageLIBS[which((wl > 585 & wl < 595) | (wl > 760 & wl < 780))]
 fit <- som(spectra)
 fit
 # where the potassium-rich samples are, and how many samples per unit
-plot_som(fit, type = "mapping", colour = forageLIBS$K)
+plot_som(fit, type = "mapping", color_by = forageLIBS$K)
 plot_som(fit, type = "counts")
 }
 \references{

@@ -76,8 +76,9 @@
 #'   their row number (`FALSE`, default). In the panels of robust z-scores,
 #'   only the outliers beyond the univariate limits of the panel are labeled;
 #'   the distance plot names them all.
-#' @param ylab The title of the value axis. Default is "Robust z-score", or
-#'   "Robust distance" with `type = "distance"`.
+#' @param xlab,ylab The axis titles. Default are none (the samples are
+#'   spread along the horizontal axis) and `"Robust z-score"`, or
+#'   `"Sample (row)"` and `"Robust distance"` with `type = "distance"`.
 #' @param title The plot title. A long title is split into a title and a
 #'   subtitle.
 #' @param caption `TRUE` (default), a caption saying how the outliers are
@@ -86,6 +87,10 @@
 #' @param base_size The size of the text, in points. Default is 11; use the
 #'   text size of the journal (often 7 to 9 points) for a figure saved at its
 #'   printed size.
+#' @param point_size The size of the points. Default is 1.4 at a `base_size`
+#'   of 11, scaled with `base_size`.
+#' @param point_alpha The opacity of the points, between 0 and 1. Default is
+#'   1.
 #' @param show.outlier,show.mahal `r lifecycle::badge("deprecated")` Use
 #'   `color_by` (`"outlier"`, `"distance"` or `"both"`), and `plot = FALSE`
 #'   for the table.
@@ -121,6 +126,7 @@ plot_outliers <- function(x, quan = 1/2, alpha = 0.025, plot = TRUE, id = NULL,
                           cutoff = c("adaptive", "quantile"), type = c("scores", "distance"),
                           color_by = c("outlier", "distance", "both"), label_outliers = FALSE,
                           ylab = NULL, title = NULL, caption = TRUE, base_size = 11,
+                          xlab = NULL, point_size = NULL, point_alpha = 1,
                           show.outlier = deprecated(), show.mahal = deprecated()) {
   if (!is.matrix(x) && !is.data.frame(x)) {
     stop("'x' must be matrix or data.frame")
@@ -156,7 +162,10 @@ plot_outliers <- function(x, quan = 1/2, alpha = 0.025, plot = TRUE, id = NULL,
   }
   check_flag(plot, "plot")
   check_flag(label_outliers, "label_outliers")
-  check_number(base_size, "base_size", lower = 0, lower_open = TRUE)
+  check_plot_text(title, xlab, ylab, base_size)
+  point_size <- point_size %||% (1.4 * base_size / 11)
+  check_size(point_size, "point_size")
+  check_alpha(point_alpha, "point_alpha")
   if (!(isTRUE(caption) || isFALSE(caption) ||
         (is.character(caption) && length(caption) == 1 && !is.na(caption)))) {
     stop("'caption' must be TRUE, FALSE or a character string.", call. = FALSE)
@@ -195,13 +204,15 @@ plot_outliers <- function(x, quan = 1/2, alpha = 0.025, plot = TRUE, id = NULL,
   } else if (is.character(caption)) {
     caption
   }
+  points <- list(size = point_size, alpha = point_alpha)
   p <- if (type == "scores") {
-    outlier_scores_plot(tbl, vars, color_by, label_outliers, base_size)
+    outlier_scores_plot(tbl, vars, color_by, label_outliers, base_size, points)
   } else {
-    outlier_distance_plot(tbl, res, color_by, label_outliers, base_size)
+    outlier_distance_plot(tbl, res, color_by, label_outliers, base_size, points)
   }
   p <- p +
-    ggplot2::labs(y = ylab %||% (if (type == "scores") "Robust z-score" else "Robust distance"),
+    ggplot2::labs(x = xlab %||% (if (type == "scores") NULL else "Sample (row)"),
+                  y = ylab %||% (if (type == "scores") "Robust z-score" else "Robust distance"),
                   title = title, caption = caption_text) +
     ggplot2::theme(
       legend.position = "bottom",
@@ -238,7 +249,7 @@ outlier_colours <- c(Regular = "grey65", Outlier = "#b2182b")
 
 # The robust z-scores, one panel per variable, the samples at the same
 # horizontal position in every panel.
-outlier_scores_plot <- function(tbl, vars, color_by, label_outliers, base_size) {
+outlier_scores_plot <- function(tbl, vars, color_by, label_outliers, base_size, points) {
   # a fixed seed keeps the positions reproducible without altering the
   # caller's random number stream
   tbl$.x <- with_seed(123, stats::runif(nrow(tbl), min = -1, max = 1))
@@ -249,12 +260,11 @@ outlier_scores_plot <- function(tbl, vars, color_by, label_outliers, base_size) 
   long <- long[order(long$outlier), ] # outliers on top
 
   .x <- score <- NULL
-  size <- 1.4 * base_size / 11
   p <- ggplot2::ggplot(long, ggplot2::aes(x = .x, y = score)) +
     ggplot2::geom_hline(yintercept = 0, colour = "grey50", linewidth = 0.3, linetype = "dotted") +
     ggplot2::geom_hline(yintercept = c(-2.5, 2.5), colour = "grey70", linewidth = 0.3,
                         linetype = "dashed")
-  p <- p + outlier_points(color_by, size)
+  p <- p + outlier_points(color_by, points)
   if (label_outliers) {
     # in each panel, the outliers beyond the univariate limits (all of them
     # are named in the distance plot), moved apart by ggrepel, away from all
@@ -268,7 +278,6 @@ outlier_scores_plot <- function(tbl, vars, color_by, label_outliers, base_size) 
   p +
     ggplot2::facet_wrap(ggplot2::vars(.data$variable), nrow = if (n_vars <= 6) 1) +
     ggplot2::scale_x_continuous(limits = c(-1.5, 1.5), breaks = NULL) +
-    ggplot2::labs(x = NULL) +
     ggplot2::theme_classic(base_size = base_size) +
     ggplot2::theme(axis.line.x = ggplot2::element_blank())
 }
@@ -284,11 +293,10 @@ outlier_labels <- function(data, base_size) {
 
 # The robust distance of each sample, in the order of the rows, with the
 # cutoff and the chi-squared quantile.
-outlier_distance_plot <- function(tbl, res, color_by, label_outliers, base_size) {
+outlier_distance_plot <- function(tbl, res, color_by, label_outliers, base_size, points) {
   tbl$.status <- factor(ifelse(tbl$outlier, "Outlier", "Regular"), levels = c("Regular", "Outlier"))
   tbl$score <- tbl$mahalanobis
   tbl$.x <- tbl$row
-  size <- 1.4 * base_size / 11
   .x <- score <- NULL
   p <- ggplot2::ggplot(tbl, ggplot2::aes(x = .x, y = score)) +
     ggplot2::geom_hline(yintercept = res$quantile, colour = "grey55", linewidth = 0.4,
@@ -296,7 +304,7 @@ outlier_distance_plot <- function(tbl, res, color_by, label_outliers, base_size)
   if (is.finite(res$cutoff)) {
     p <- p + ggplot2::geom_hline(yintercept = res$cutoff, colour = "grey25", linewidth = 0.5)
   }
-  p <- p + outlier_points(color_by, size)
+  p <- p + outlier_points(color_by, points)
   top <- 0.08
   if (label_outliers) {
     tbl$.label <- ""
@@ -306,16 +314,17 @@ outlier_distance_plot <- function(tbl, res, color_by, label_outliers, base_size)
   }
   p +
     ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = c(0.03, top))) +
-    ggplot2::labs(x = "Sample (row)") +
     ggplot2::theme_classic(base_size = base_size)
 }
 
-# The points: by status (regular or outlier), by robust distance, or both.
-outlier_points <- function(color_by, size) {
+# The points: by status (regular or outlier), by robust distance, or both,
+# with the size and alpha of `points`.
+outlier_points <- function(color_by, points) {
   .status <- mahalanobis <- NULL
   if (color_by == "outlier") {
     list(
-      ggplot2::geom_point(ggplot2::aes(colour = .status, shape = .status), size = size),
+      ggplot2::geom_point(ggplot2::aes(colour = .status, shape = .status), size = points$size,
+                          alpha = points$alpha),
       ggplot2::scale_colour_manual(values = outlier_colours, name = NULL),
       ggplot2::scale_shape_manual(values = c(Regular = 16, Outlier = 17), name = NULL)
     )
@@ -326,7 +335,7 @@ outlier_points <- function(color_by, size) {
       ggplot2::aes(colour = mahalanobis)
     }
     list(
-      ggplot2::geom_point(mapping, size = size),
+      ggplot2::geom_point(mapping, size = points$size, alpha = points$alpha),
       ggplot2::scale_colour_viridis_c(option = "plasma", end = 0.85, name = "Robust\ndistance"),
       if (color_by == "both") {
         ggplot2::scale_shape_manual(values = c(Regular = 1, Outlier = 17), name = NULL)
