@@ -56,5 +56,6 @@ read_starkb(file)
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link[=starkb_lines]{starkb_lines()}}, \code{\link[=stark_table]{stark_table()}} for data from other sources.
+\code{\link[=starkb_lines]{starkb_lines()}}, \code{\link[=read_vald]{read_vald()}}, \code{\link[=read_kurucz]{read_kurucz()}}, \code{\link[=stark_table]{stark_table()}} for
+data from other sources.
 }

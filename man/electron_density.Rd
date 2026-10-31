@@ -12,7 +12,8 @@ electron_density(
   temperature = NULL,
   reference_width = NULL,
   reference_density = 1e+17,
-  tolerance = 0.5
+  tolerance = 0.5,
+  species = NULL
 )
 }
 \arguments{
@@ -39,6 +40,10 @@ cm\eqn{^{-3}}. Default is \eqn{10^{17}}.}
 \item{tolerance}{For \code{method = "stark"} with \code{stark}: the largest
 difference between \code{wavelength} and the tabulated wavelength, in nm
 (see \code{\link[=stark_width]{stark_width()}}). Default is 0.5.}
+
+\item{species}{For \code{method = "stark"} with \code{stark}: the species of the
+line, such as \code{"Ca II"}, required when \code{stark} has several species (see
+\code{\link[=stark_width]{stark_width()}}).}
 }
 \value{
 A numeric vector of electron densities, in cm\eqn{^{-3}}. See
@@ -75,8 +80,9 @@ where \eqn{w_{ref}(T)} is the electron-impact width at density
 \eqn{N_{ref}}. It is taken from \code{stark} (a table returned by
 \code{\link[=starkb_lines]{starkb_lines()}}, interpolated at \code{temperature} with \code{\link[=stark_width]{stark_width()}}),
 or given directly as \code{reference_width} (nm) at \code{reference_density}.
-Tables from other sources can be built with \code{\link[=stark_table]{stark_table()}} or read
-from saved STARK-B files with \code{\link[=read_starkb]{read_starkb()}}.
+Tables from other sources can be built with \code{\link[=stark_table]{stark_table()}}, or read
+from saved STARK-B files with \code{\link[=read_starkb]{read_starkb()}} and from the VALD3 and
+Kurucz line lists with \code{\link[=read_vald]{read_vald()}} and \code{\link[=read_kurucz]{read_kurucz()}}.
 Ion broadening is neglected, which is usually justified for lines of
 ions and at LIBS densities.
 \item \code{method = "halpha"}: the computer-simulation fit of Gigosos,

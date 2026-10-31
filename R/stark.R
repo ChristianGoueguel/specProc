@@ -58,7 +58,8 @@
 #'
 #' @seealso [stark_width()] to interpolate the width of a line at a given
 #'   temperature and density, [electron_density()], [read_starkb()] for
-#'   saved STARK-B files, and [stark_table()] for data from other sources.
+#'   saved STARK-B files, [read_vald()] and [read_kurucz()] for the lines
+#'   STARK-B does not have, and [stark_table()] for data from other sources.
 #'
 #' @export starkb_lines
 #'
@@ -103,7 +104,8 @@ starkb_lines <- function(species, wavelength = NULL, perturber = NULL, timeout =
 #'
 #' @return A tibble as returned by [starkb_lines()].
 #'
-#' @seealso [starkb_lines()], [stark_table()] for data from other sources.
+#' @seealso [starkb_lines()], [read_vald()], [read_kurucz()], [stark_table()] for
+#'   data from other sources.
 #' @export read_starkb
 #'
 #' @examplesIf rlang::is_installed("xml2")
@@ -196,7 +198,7 @@ read_starkb <- function(file, wavelength = NULL, perturber = NULL) {
 #'    perturbation (SCP) method and of the approximations used for the
 #'    calculations. Baltic Astronomy, 20:523-530.
 #'
-#' @seealso [stark_width()], [electron_density()], [read_starkb()]
+#' @seealso [stark_width()], [electron_density()], [read_starkb()], [read_vald()]
 #' @export stark_table
 #'
 #' @examples
@@ -304,6 +306,11 @@ stark_table <- function(wavelength, temperature, width = NULL, units, density = 
 #' the shift linearly against \eqn{\log T}; temperatures outside the
 #' tabulated range give an error.
 #'
+#' The line is matched by its wavelength only, so a table of several
+#' species, such as those of [read_vald()] and [read_kurucz()], needs
+#' `species`: the line of another species within `tolerance` could be taken
+#' otherwise.
+#'
 #' @param stark A tibble returned by [starkb_lines()].
 #' @param wavelength The wavelength of the line, in nm.
 #' @param temperature The temperature, in K (a vector is allowed).
@@ -312,6 +319,8 @@ stark_table <- function(wavelength, temperature, width = NULL, units, density = 
 #' @param perturber The perturber. Default is `"electron"`.
 #' @param tolerance The largest allowed difference between `wavelength` and
 #'   the tabulated wavelength, in nm. Default is 0.5.
+#' @param species The species of the line, such as `"Ca II"`. Required when
+#'   `stark` has several species; by default, its only species.
 #'
 #' @return A tibble with one row per temperature and columns `wavelength`
 #'   (the requested wavelength, nm), `tabulated_wavelength`, `upper`,
@@ -330,8 +339,9 @@ stark_table <- function(wavelength, temperature, width = NULL, units, density = 
 #' )
 #' stark_width(stark, wavelength = 500, temperature = 8000, density = 5e16)
 stark_width <- function(stark, wavelength, temperature, density = 1e17,
-                        perturber = "electron", tolerance = 0.5) {
+                        perturber = "electron", tolerance = 0.5, species = NULL) {
   check_stark_table(stark)
+  stark <- stark_species(stark, species)
   check_number(wavelength, "wavelength", lower = 0, lower_open = TRUE)
   check_number(density, "density", lower = 0, lower_open = TRUE)
   check_number(tolerance, "tolerance", lower = 0)
@@ -408,8 +418,9 @@ stark_width <- function(stark, wavelength, temperature, density = 1e17,
 #'   \eqn{N_{ref}}. It is taken from `stark` (a table returned by
 #'   [starkb_lines()], interpolated at `temperature` with [stark_width()]),
 #'   or given directly as `reference_width` (nm) at `reference_density`.
-#'   Tables from other sources can be built with [stark_table()] or read
-#'   from saved STARK-B files with [read_starkb()].
+#'   Tables from other sources can be built with [stark_table()], or read
+#'   from saved STARK-B files with [read_starkb()] and from the VALD3 and
+#'   Kurucz line lists with [read_vald()] and [read_kurucz()].
 #'   Ion broadening is neglected, which is usually justified for lines of
 #'   ions and at LIBS densities.
 #' - `method = "halpha"`: the computer-simulation fit of Gigosos,
@@ -433,6 +444,9 @@ stark_width <- function(stark, wavelength, temperature, density = 1e17,
 #' @param tolerance For `method = "stark"` with `stark`: the largest
 #'   difference between `wavelength` and the tabulated wavelength, in nm
 #'   (see [stark_width()]). Default is 0.5.
+#' @param species For `method = "stark"` with `stark`: the species of the
+#'   line, such as `"Ca II"`, required when `stark` has several species (see
+#'   [stark_width()]).
 #'
 #' @return A numeric vector of electron densities, in cm\eqn{^{-3}}. See
 #'   [electron_density_uncertainty()] for their uncertainty.
@@ -457,7 +471,7 @@ stark_width <- function(stark, wavelength, temperature, density = 1e17,
 #' electron_density(c(0.006, 0.012, 0.024), reference_width = 0.012)
 electron_density <- function(width, method = "stark", stark = NULL, wavelength = NULL,
                              temperature = NULL, reference_width = NULL,
-                             reference_density = 1e17, tolerance = 0.5) {
+                             reference_density = 1e17, tolerance = 0.5, species = NULL) {
   method <- match.arg(method, c("stark", "halpha"))
   if (!is.numeric(width) || anyNA(width) || any(width <= 0)) {
     stop("'width' must contain positive values (nm).")
@@ -471,7 +485,7 @@ electron_density <- function(width, method = "stark", stark = NULL, wavelength =
     }
     check_number(temperature, "temperature", lower = 0, lower_open = TRUE)
     reference_width <- stark_width(stark, wavelength, temperature, density = reference_density,
-                                   tolerance = tolerance)$width
+                                   tolerance = tolerance, species = species)$width
   } else {
     check_number(reference_width, "reference_width", lower = 0, lower_open = TRUE)
   }
@@ -622,6 +636,26 @@ parse_xsams <- function(file) {
 level_label <- function(labels, ref) {
   out <- unname(labels[ref])
   ifelse(is.na(out), "", out)
+}
+
+# The rows of `stark` for `species`, or all of them when the table has a
+# single species: stark_width() matches the lines by wavelength only.
+stark_species <- function(stark, species) {
+  present <- unique(stats::na.omit(as.character(stark$species)))
+  if (is.null(species)) {
+    if (length(present) > 1) {
+      stop("'stark' has several species (", paste(utils::head(present, 5), collapse = ", "),
+           if (length(present) > 5) ", ...", "): give the species of the line, such as ",
+           "species = \"", present[1], "\".", call. = FALSE)
+    }
+    return(stark)
+  }
+  label <- parse_species(species)$label
+  rows <- stark[!is.na(stark$species) & stark$species == label, , drop = FALSE]
+  if (nrow(rows) == 0) {
+    stop("No data for ", label, " in 'stark'.", call. = FALSE)
+  }
+  rows
 }
 
 # Element-wise equality that treats two missing values as equal

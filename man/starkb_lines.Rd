@@ -82,7 +82,8 @@ Physica Scripta, 90(5):054008. \doi{10.1088/0031-8949/90/5/054008}
 \seealso{
 \code{\link[=stark_width]{stark_width()}} to interpolate the width of a line at a given
 temperature and density, \code{\link[=electron_density]{electron_density()}}, \code{\link[=read_starkb]{read_starkb()}} for
-saved STARK-B files, and \code{\link[=stark_table]{stark_table()}} for data from other sources.
+saved STARK-B files, \code{\link[=read_vald]{read_vald()}} and \code{\link[=read_kurucz]{read_kurucz()}} for the lines
+STARK-B does not have, and \code{\link[=stark_table]{stark_table()}} for data from other sources.
 }
 \author{
 Christian L. Goueguel

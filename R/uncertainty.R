@@ -358,10 +358,12 @@ aki_uncertainty <- function(accuracy) {
 electron_density_uncertainty <- function(width, width_se = 0, method = "stark", stark = NULL,
                                          wavelength = NULL, temperature = NULL,
                                          reference_width = NULL, reference_density = 1e17,
-                                         reference_rsd = 0, tolerance = 0.5, level = 0.95) {
+                                         reference_rsd = 0, tolerance = 0.5, level = 0.95,
+                                         species = NULL) {
   ne <- electron_density(width, method = method, stark = stark, wavelength = wavelength,
                          temperature = temperature, reference_width = reference_width,
-                         reference_density = reference_density, tolerance = tolerance)
+                         reference_density = reference_density, tolerance = tolerance,
+                         species = species)
   method <- match.arg(method, c("stark", "halpha"))
   if (!is.numeric(width_se) || !length(width_se) %in% c(1, length(width)) || anyNA(width_se) ||
       any(width_se < 0)) {

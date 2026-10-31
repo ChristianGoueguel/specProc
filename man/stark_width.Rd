@@ -10,7 +10,8 @@ stark_width(
   temperature,
   density = 1e+17,
   perturber = "electron",
-  tolerance = 0.5
+  tolerance = 0.5,
+  species = NULL
 )
 }
 \arguments{
@@ -27,6 +28,9 @@ Default is \eqn{10^{17}}.}
 
 \item{tolerance}{The largest allowed difference between \code{wavelength} and
 the tabulated wavelength, in nm. Default is 0.5.}
+
+\item{species}{The species of the line, such as \code{"Ca II"}. Required when
+\code{stark} has several species; by default, its only species.}
 }
 \value{
 A tibble with one row per temperature and columns \code{wavelength}
@@ -52,6 +56,11 @@ scaled linearly to \code{density}. Between the tabulated temperatures, the
 width is interpolated linearly in \eqn{\log w} against \eqn{\log T}, and
 the shift linearly against \eqn{\log T}; temperatures outside the
 tabulated range give an error.
+
+The line is matched by its wavelength only, so a table of several
+species, such as those of \code{\link[=read_vald]{read_vald()}} and \code{\link[=read_kurucz]{read_kurucz()}}, needs
+\code{species}: the line of another species within \code{tolerance} could be taken
+otherwise.
 }
 \examples{
 # A table in the format of starkb_lines(), for illustration

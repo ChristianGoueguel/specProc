@@ -110,5 +110,5 @@ calculations. Baltic Astronomy, 20:523-530.
 }
 }
 \seealso{
-\code{\link[=stark_width]{stark_width()}}, \code{\link[=electron_density]{electron_density()}}, \code{\link[=read_starkb]{read_starkb()}}
+\code{\link[=stark_width]{stark_width()}}, \code{\link[=electron_density]{electron_density()}}, \code{\link[=read_starkb]{read_starkb()}}, \code{\link[=read_vald]{read_vald()}}
 }

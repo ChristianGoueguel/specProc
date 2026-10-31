@@ -15,7 +15,8 @@ electron_density_uncertainty(
   reference_density = 1e+17,
   reference_rsd = 0,
   tolerance = 0.5,
-  level = 0.95
+  level = 0.95,
+  species = NULL
 )
 }
 \arguments{
@@ -51,6 +52,10 @@ difference between \code{wavelength} and the tabulated wavelength, in nm
 (see \code{\link[=stark_width]{stark_width()}}). Default is 0.5.}
 
 \item{level}{The confidence level of the interval. Default is 0.95.}
+
+\item{species}{For \code{method = "stark"} with \code{stark}: the species of the
+line, such as \code{"Ca II"}, required when \code{stark} has several species (see
+\code{\link[=stark_width]{stark_width()}}).}
 }
 \value{
 A tibble with one row per width: the \code{width} and \code{width_se}, the
