@@ -65,7 +65,8 @@ the Stark parameter of the line.</p>
 <span>  reference_density <span class="op">=</span> <span class="fl">1e+17</span>,</span>
 <span>  reference_rsd <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  tolerance <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  level <span class="op">=</span> <span class="fl">0.95</span></span>
+<span>  level <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  species <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -126,6 +127,12 @@ difference between <code>wavelength</code> and the tabulated wavelength, in nm
 
 <dt id="arg-level">level<a class="anchor" aria-label="anchor" href="#arg-level"></a></dt>
 <dd><p>The confidence level of the interval. Default is 0.95.</p></dd>
+
+
+<dt id="arg-species">species<a class="anchor" aria-label="anchor" href="#arg-species"></a></dt>
+<dd><p>For <code>method = "stark"</code> with <code>stark</code>: the species of the
+line, such as <code>"Ca II"</code>, required when <code>stark</code> has several species (see
+<code><a href="stark_width.html">stark_width()</a></code>).</p></dd>
 
 </dl></div>
     <div class="section level2">

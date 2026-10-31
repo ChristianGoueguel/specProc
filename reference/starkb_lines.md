@@ -89,7 +89,11 @@ publications, listed in the `source` column:
 to interpolate the width of a line at a given temperature and density,
 [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md),
 [`read_starkb()`](https://christiangoueguel.com/specProc/reference/read_starkb.md)
-for saved STARK-B files, and
+for saved STARK-B files,
+[`read_vald()`](https://christiangoueguel.com/specProc/reference/read_vald.md)
+and
+[`read_kurucz()`](https://christiangoueguel.com/specProc/reference/read_vald.md)
+for the lines STARK-B does not have, and
 [`stark_table()`](https://christiangoueguel.com/specProc/reference/stark_table.md)
 for data from other sources.
 

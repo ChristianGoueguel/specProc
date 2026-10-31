@@ -20,7 +20,8 @@ electron_density_uncertainty(
   reference_density = 1e+17,
   reference_rsd = 0,
   tolerance = 0.5,
-  level = 0.95
+  level = 0.95,
+  species = NULL
 )
 ```
 
@@ -81,6 +82,12 @@ electron_density_uncertainty(
 - level:
 
   The confidence level of the interval. Default is 0.95.
+
+- species:
+
+  For `method = "stark"` with `stark`: the species of the line, such as
+  `"Ca II"`, required when `stark` has several species (see
+  [`stark_width()`](https://christiangoueguel.com/specProc/reference/stark_width.md)).
 
 ## Value
 

@@ -16,7 +16,8 @@ electron_density(
   temperature = NULL,
   reference_width = NULL,
   reference_density = 1e+17,
-  tolerance = 0.5
+  tolerance = 0.5,
+  species = NULL
 )
 ```
 
@@ -63,6 +64,12 @@ electron_density(
   [`stark_width()`](https://christiangoueguel.com/specProc/reference/stark_width.md)).
   Default is 0.5.
 
+- species:
+
+  For `method = "stark"` with `stark`: the species of the line, such as
+  `"Ca II"`, required when `stark` has several species (see
+  [`stark_width()`](https://christiangoueguel.com/specProc/reference/stark_width.md)).
+
 ## Value
 
 A numeric vector of electron densities, in cm\\^{-3}\\. See
@@ -104,9 +111,13 @@ thin: self-absorption broadens lines and overestimates the density (see
   [`stark_width()`](https://christiangoueguel.com/specProc/reference/stark_width.md)),
   or given directly as `reference_width` (nm) at `reference_density`.
   Tables from other sources can be built with
-  [`stark_table()`](https://christiangoueguel.com/specProc/reference/stark_table.md)
+  [`stark_table()`](https://christiangoueguel.com/specProc/reference/stark_table.md),
   or read from saved STARK-B files with
-  [`read_starkb()`](https://christiangoueguel.com/specProc/reference/read_starkb.md).
+  [`read_starkb()`](https://christiangoueguel.com/specProc/reference/read_starkb.md)
+  and from the VALD3 and Kurucz line lists with
+  [`read_vald()`](https://christiangoueguel.com/specProc/reference/read_vald.md)
+  and
+  [`read_kurucz()`](https://christiangoueguel.com/specProc/reference/read_vald.md).
   Ion broadening is neglected, which is usually justified for lines of
   ions and at LIBS densities.
 

@@ -48,6 +48,8 @@ Cite the STARK-B database and the original publications, listed in the
 ## See also
 
 [`starkb_lines()`](https://christiangoueguel.com/specProc/reference/starkb_lines.md),
+[`read_vald()`](https://christiangoueguel.com/specProc/reference/read_vald.md),
+[`read_kurucz()`](https://christiangoueguel.com/specProc/reference/read_vald.md),
 [`stark_table()`](https://christiangoueguel.com/specProc/reference/stark_table.md)
 for data from other sources.
 

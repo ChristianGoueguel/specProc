@@ -13,7 +13,8 @@ stark_width(
   temperature,
   density = 1e+17,
   perturber = "electron",
-  tolerance = 0.5
+  tolerance = 0.5,
+  species = NULL
 )
 ```
 
@@ -46,6 +47,11 @@ stark_width(
   The largest allowed difference between `wavelength` and the tabulated
   wavelength, in nm. Default is 0.5.
 
+- species:
+
+  The species of the line, such as `"Ca II"`. Required when `stark` has
+  several species; by default, its only species.
+
 ## Value
 
 A tibble with one row per temperature and columns `wavelength` (the
@@ -67,6 +73,14 @@ scaled linearly to `density`. Between the tabulated temperatures, the
 width is interpolated linearly in \\\log w\\ against \\\log T\\, and the
 shift linearly against \\\log T\\; temperatures outside the tabulated
 range give an error.
+
+The line is matched by its wavelength only, so a table of several
+species, such as those of
+[`read_vald()`](https://christiangoueguel.com/specProc/reference/read_vald.md)
+and
+[`read_kurucz()`](https://christiangoueguel.com/specProc/reference/read_vald.md),
+needs `species`: the line of another species within `tolerance` could be
+taken otherwise.
 
 ## See also
 

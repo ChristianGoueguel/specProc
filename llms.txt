@@ -572,6 +572,9 @@ checks of LTE, self-absorption and detector saturation.
   : Stark Broadening Parameters from the STARK-B Database
 - [`read_starkb()`](https://christiangoueguel.com/specProc/reference/read_starkb.md)
   : Read Saved STARK-B Data
+- [`read_vald()`](https://christiangoueguel.com/specProc/reference/read_vald.md)
+  [`read_kurucz()`](https://christiangoueguel.com/specProc/reference/read_vald.md)
+  : Stark Widths from VALD3 and Kurucz Line Lists
 - [`stark_table()`](https://christiangoueguel.com/specProc/reference/stark_table.md)
   : Build a Table of Stark Broadening Parameters
 - [`stark_width()`](https://christiangoueguel.com/specProc/reference/stark_width.md)

@@ -125,7 +125,8 @@ perturbers can be combined with
 
 [`stark_width()`](https://christiangoueguel.com/specProc/reference/stark_width.md),
 [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md),
-[`read_starkb()`](https://christiangoueguel.com/specProc/reference/read_starkb.md)
+[`read_starkb()`](https://christiangoueguel.com/specProc/reference/read_starkb.md),
+[`read_vald()`](https://christiangoueguel.com/specProc/reference/read_vald.md)
 
 ## Examples
 

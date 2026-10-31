@@ -62,7 +62,8 @@ H\(\alpha\) line at 656.28 nm.</p>
 <span>  temperature <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  reference_width <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  reference_density <span class="op">=</span> <span class="fl">1e+17</span>,</span>
-<span>  tolerance <span class="op">=</span> <span class="fl">0.5</span></span>
+<span>  tolerance <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  species <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -109,6 +110,12 @@ cm\(^{-3}\). Default is \(10^{17}\).</p></dd>
 difference between <code>wavelength</code> and the tabulated wavelength, in nm
 (see <code><a href="stark_width.html">stark_width()</a></code>). Default is 0.5.</p></dd>
 
+
+<dt id="arg-species">species<a class="anchor" aria-label="anchor" href="#arg-species"></a></dt>
+<dd><p>For <code>method = "stark"</code> with <code>stark</code>: the species of the
+line, such as <code>"Ca II"</code>, required when <code>stark</code> has several species (see
+<code><a href="stark_width.html">stark_width()</a></code>).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -139,8 +146,9 @@ where \(w_{ref}(T)\) is the electron-impact width at density
 \(N_{ref}\). It is taken from <code>stark</code> (a table returned by
 <code><a href="starkb_lines.html">starkb_lines()</a></code>, interpolated at <code>temperature</code> with <code><a href="stark_width.html">stark_width()</a></code>),
 or given directly as <code>reference_width</code> (nm) at <code>reference_density</code>.
-Tables from other sources can be built with <code><a href="stark_table.html">stark_table()</a></code> or read
-from saved STARK-B files with <code><a href="read_starkb.html">read_starkb()</a></code>.
+Tables from other sources can be built with <code><a href="stark_table.html">stark_table()</a></code>, or read
+from saved STARK-B files with <code><a href="read_starkb.html">read_starkb()</a></code> and from the VALD3 and
+Kurucz line lists with <code><a href="read_vald.html">read_vald()</a></code> and <code><a href="read_vald.html">read_kurucz()</a></code>.
 Ion broadening is neglected, which is usually justified for lines of
 ions and at LIBS densities.</p></li>
 <li><p><code>method = "halpha"</code>: the computer-simulation fit of Gigosos,

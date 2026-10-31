@@ -345,6 +345,32 @@
   on demand and convolved with the instrument profile, and
   [`exomol_datasets()`](https://christiangoueguel.com/specProc/reference/exomol_datasets.md)
   lists the line lists of a molecule.
+- [`read_vald()`](https://christiangoueguel.com/specProc/reference/read_vald.md)
+  and
+  [`read_kurucz()`](https://christiangoueguel.com/specProc/reference/read_vald.md)
+  read the Stark widths of a line list saved from the Vienna Atomic Line
+  Database (VALD3, free with a registration; “Extract All”, “Extract
+  Element” or “Extract Stellar”, short or long format, in any wavelength
+  unit) or from the line lists of Kurucz (`gfall*.dat` or the list of
+  one ion), as a table in the format of
+  [`starkb_lines()`](https://christiangoueguel.com/specProc/reference/starkb_lines.md).
+  Both give, for each line, the quadratic Stark damping constant at 10
+  000 K, converted to a full width at half maximum and scaled with
+  temperature as T^(1/6). These widths are approximate, but cover many
+  lines that STARK-B does not have. The VAMDC service of VALD could not
+  be queried (it fails on every query, as of October 2026), so VALD is
+  read from saved extracts.
+- [`stark_width()`](https://christiangoueguel.com/specProc/reference/stark_width.md),
+  [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md)
+  and
+  [`electron_density_uncertainty()`](https://christiangoueguel.com/specProc/reference/electron_density_uncertainty.md)
+  gain `species`: a table of several species (as read by
+  [`read_vald()`](https://christiangoueguel.com/specProc/reference/read_vald.md)
+  and
+  [`read_kurucz()`](https://christiangoueguel.com/specProc/reference/read_vald.md),
+  or combined from several sources) needs the species of the line, as
+  the line is otherwise matched by its wavelength alone and could be a
+  line of another species.
 - Persistent cache of downloaded data: with
   `options(specProc.cache = TRUE)` (the user cache directory of
   [`tools::R_user_dir()`](https://rdrr.io/r/tools/userdir.html)) or a
