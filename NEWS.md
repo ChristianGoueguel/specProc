@@ -280,6 +280,12 @@
   medcouple). It was already used by `adjusted_boxplot()`,
   `iqr_outliers(skew = TRUE)`, `medcouple_weight()` and
   `summary_stats(robust = TRUE)`.
+* `plot_medcouple()`: the medcouple of the intensities at each wavelength,
+  as bars along the wavelength axis, or with `group` as a heatmap with one
+  row per group of spectra (such as the shots of each sample). The color
+  scale is fixed from -1 to 1: two colors through white at 0 (blue and red
+  by default), or any gradient (`color = grDevices::hcl.colors(9,
+  "Spectral")`). Interactive versions with plotly.
 
 ## Improvements
 

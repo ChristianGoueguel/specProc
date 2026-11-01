@@ -61,6 +61,33 @@ in_window <- function(wl, window) {
   if (is.null(window)) rep(TRUE, length(wl)) else wl >= window[1] & wl <= window[2]
 }
 
+# The edges of the tiles of a heatmap along the wavelength axis (sorted
+# `wl`): each tile spans halfway to its neighbors, within a detector segment.
+wavelength_tiles <- function(wl) {
+  step <- diff(wl)
+  gap <- step > 5 * stats::median(step)
+  left <- c(NA, step)
+  right <- c(step, NA)
+  left[c(TRUE, gap)] <- right[c(TRUE, gap)]
+  right[c(gap, TRUE)] <- left[c(gap, TRUE)]
+  data.frame(wavelength = wl, xmin = wl - left / 2, xmax = wl + right / 2)
+}
+
+# Empty columns between the detectors of a plotly heatmap along the
+# wavelength axis (sorted `wl`, one column of `z` each), so that the gaps are
+# not filled.
+heatmap_gaps <- function(wl, z) {
+  step <- diff(wl)
+  gaps <- which(step > 5 * stats::median(step))
+  if (length(gaps) == 0) {
+    return(list(wl = wl, z = z))
+  }
+  wl <- c(wl, (wl[gaps] + wl[gaps + 1]) / 2)
+  z <- cbind(z, matrix(NA_real_, nrow(z), length(gaps)))
+  o <- order(wl)
+  list(wl = wl[o], z = z[, o, drop = FALSE])
+}
+
 # A ggplot2 line width (mm) as a plotly one (px, at 96 dpi).
 plotly_width <- function(linewidth) linewidth * 96 / 25.4
 

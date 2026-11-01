@@ -360,16 +360,7 @@ correlation_heatmap <- function(tbl, outcomes, spectral, method, top, color, int
 
   if (spectral) {
     df$wavelength <- as.numeric(df$variable)
-    wl <- sort(unique(df$wavelength))
-    # each tile spans halfway to its neighbors, within a detector segment
-    step <- diff(wl)
-    gap <- step > 5 * stats::median(step)
-    left <- c(NA, step)
-    right <- c(step, NA)
-    left[c(TRUE, gap)] <- right[c(TRUE, gap)]
-    right[c(gap, TRUE)] <- left[c(gap, TRUE)]
-    half <- data.frame(wavelength = wl, xmin = wl - left / 2, xmax = wl + right / 2)
-    df <- merge(df, half, by = "wavelength")
+    df <- merge(df, wavelength_tiles(sort(unique(df$wavelength))), by = "wavelength")
   } else {
     variables <- unique(df$variable)
     if (!is.null(top) && top < length(variables)) {
@@ -388,16 +379,9 @@ correlation_heatmap <- function(tbl, outcomes, spectral, method, top, color, int
     z <- matrix(NA_real_, length(outcomes), length(columns))
     z[cbind(match(as.character(df$outcome), outcomes), match(key, columns))] <- df$correlation
     if (spectral) {
-      # empty columns between detectors, so that the gaps are not filled
-      step <- diff(columns)
-      gaps <- which(step > 5 * stats::median(step))
-      if (length(gaps) > 0) {
-        columns <- c(columns, (columns[gaps] + columns[gaps + 1]) / 2)
-        z <- cbind(z, matrix(NA_real_, nrow(z), length(gaps)))
-        o <- order(columns)
-        columns <- columns[o]
-        z <- z[, o, drop = FALSE]
-      }
+      gapped <- heatmap_gaps(columns, z)
+      columns <- gapped$wl
+      z <- gapped$z
     }
     scale <- if (xi) {
       list(c(0, "white"), c(1, color[1]))
