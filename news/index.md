@@ -67,7 +67,7 @@
   fits the reweighted LTS regression
   ([`lts_fit()`](https://christiangoueguel.com/specProc/reference/linear_reg_lts.md),
   from
-  [`robustbase::ltsReg()`](https://rdrr.io/pkg/robustbase/man/ltsReg.html));
+  [`robustbase::ltsReg()`](https://R-forge.R-project.org/R/?group_id=59/reference/ltsReg.html));
   after
   [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md)
   in a workflow, it gives robust PCR in tidymodels.
@@ -444,6 +444,16 @@
   [`lts_fit()`](https://christiangoueguel.com/specProc/reference/linear_reg_lts.md)
   now keeps the standard errors (`std_error`), residual degrees of
   freedom and robust R² of the reweighted fit.
+- [`medcouple()`](https://christiangoueguel.com/specProc/reference/medcouple.md):
+  the medcouple of Brys, Hubert and Struyf (2004), a robust measure of
+  skewness with a breakdown value of 25%, of a vector or of each column
+  of a matrix or data frame, such as one per wavelength of a set of
+  spectra (channels that saturate the detector have a strongly negative
+  medcouple). It was already used by
+  [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md),
+  `iqr_outliers(skew = TRUE)`,
+  [`medcouple_weight()`](https://christiangoueguel.com/specProc/reference/medcouple_weight.md)
+  and `summary_stats(robust = TRUE)`.
 
 ### Improvements
 

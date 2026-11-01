@@ -3,7 +3,7 @@
 specProc adds the `"lts"` engine to
 [`parsnip::linear_reg()`](https://parsnip.tidymodels.org/reference/linear_reg.html):
 the reweighted least trimmed squares (LTS) regression of
-[`robustbase::ltsReg()`](https://rdrr.io/pkg/robustbase/man/ltsReg.html),
+[`robustbase::ltsReg()`](https://R-forge.R-project.org/R/?group_id=59/reference/ltsReg.html),
 which resists vertical outliers and bad leverage points. `lts_fit()`
 fits it outside of tidymodels.
 

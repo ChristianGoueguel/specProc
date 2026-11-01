@@ -518,6 +518,13 @@ Functions that use Tukey’s biweight formalism.
 - [`biweight_midcorrelation()`](https://christiangoueguel.com/specProc/reference/biweight_midcorrelation.md)
   : Biweight Midcorrelation
 
+### skewness
+
+Function used to measure the skewness of a distribution.
+
+- [`medcouple()`](https://christiangoueguel.com/specProc/reference/medcouple.md)
+  : Medcouple
+
 ### tail weight
 
 Functions used to measure the tail weight of a distribution.
