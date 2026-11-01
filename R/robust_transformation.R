@@ -246,6 +246,16 @@ apply_transformation <- function(x, transformation) {
     f <- fits[[j]]
     if (f$type == "none") next
     v <- (x[, j] - f$center) / f$scale
+    if (f$type == "GH") {
+      y <- gandh_scores(v, f$A, f$B, f$g, f$h)
+      undefined <- sum(is.na(y) & !is.na(v))
+      if (undefined > 0) {
+        warning(undefined, " value(s) are outside the fitted g-and-h support or numerical range; they are NA.",
+                call. = FALSE)
+      }
+      out[, j] <- if (transformation$standardize) (y - f$mean) / f$sd else y
+      next
+    }
     if (f$type == "BC") v[!is.na(v) & v <= 0] <- NA_real_
     y <- transform_values(v, f$lambda, f$type)
     out[, j] <- if (transformation$standardize) (y - f$mean) / f$sd else y
@@ -295,6 +305,7 @@ transformation_summary <- function(fit) {
 
 #' @export
 print.specproc_transformation <- function(x, ...) {
+  if (inherits(x, "specproc_gandh")) return(print_gandh(x))
   title <- if (inherits(x, "specproc_boxcox")) {
     "Robust Box-Cox transformation"
   } else if (inherits(x, "specproc_yeojohnson")) {
@@ -321,9 +332,9 @@ print.specproc_transformation <- function(x, ...) {
 #' @title Apply a Robust Transformation to New Data, or Back-Transform
 #'
 #' @description
-#' Transforms new data with the \eqn{\lambda} (and, with `standardize =
+#' Transforms new data with the parameters (and, with `standardize =
 #' TRUE`, the mean and standard deviation of the inliers) estimated by
-#' [robust_boxcox()] or [robust_yeojohnson()]. With `inverse = TRUE`, it
+#' [robust_boxcox()], [robust_yeojohnson()] or [robust_gandh()]. With `inverse = TRUE`, it
 #' transforms values back to the original scale, such as the predictions of
 #' a model fitted to the transformed variables.
 #'
@@ -340,7 +351,7 @@ print.specproc_transformation <- function(x, ...) {
 #' default). It needs no other assumption, and suits the prediction of one
 #' sample.
 #'
-#' On the original scale, the mean is higher than the median when
+#' For the power transformations, on the original scale the mean is higher than the median when
 #' \eqn{\lambda < 1} (the transformation compresses the upper tail), and
 #' lower when \eqn{\lambda > 1}. `estimate = "mean"` gives the smearing
 #' estimate of Duan (1983),
@@ -353,6 +364,8 @@ print.specproc_transformation <- function(x, ...) {
 #' content of a lot or a mass balance. It is not robust: an outlying
 #' residual pulls it, so pass the residuals of the inliers of a robust model
 #' (for example, of the spectra that [rsimpls()] does not flag).
+#' Smearing is also available for [robust_gandh()]; the direction of the
+#' mean-median difference depends on its fitted shape and residuals.
 #'
 #' The back-transformation is not defined everywhere, because some
 #' transformations are bounded: the Box-Cox transformation above for
@@ -362,7 +375,7 @@ print.specproc_transformation <- function(x, ...) {
 #' residuals) become `NA`, with a warning.
 #'
 #' @param object An object returned by [robust_boxcox()] or
-#'   [robust_yeojohnson()].
+#'   [robust_yeojohnson()] or [robust_gandh()].
 #' @param newdata A numeric vector, matrix or data frame with some or all of
 #'   the variables of the fit: new data, or with `inverse = TRUE`, values on
 #'   the transformed scale.
@@ -386,7 +399,7 @@ print.specproc_transformation <- function(x, ...) {
 #'    method. Journal of the American Statistical Association,
 #'    78(383):605-610.
 #'
-#' @seealso [robust_boxcox()], [robust_yeojohnson()]
+#' @seealso [robust_boxcox()], [robust_yeojohnson()], [robust_gandh()]
 #' @export
 #'
 #' @examples
@@ -523,6 +536,11 @@ invert_values <- function(z, f, standardize) {
     return(z)
   }
   y <- if (standardize) z * f$sd + f$mean else z
+  if (f$type == "GH") {
+    v <- gandh_values(y, f$A, f$B, f$g, f$h) * f$scale + f$center
+    v[!is.na(z) & !is.finite(v)] <- NA_real_
+    return(v)
+  }
   v <- if (f$type == "BC") bc_inverse(y, f$lambda) else yj_inverse(y, f$lambda)
   v * f$scale + f$center
 }

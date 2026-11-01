@@ -15,7 +15,7 @@
 }
 \arguments{
 \item{object}{An object returned by \code{\link[=robust_boxcox]{robust_boxcox()}} or
-\code{\link[=robust_yeojohnson]{robust_yeojohnson()}}.}
+\code{\link[=robust_yeojohnson]{robust_yeojohnson()}} or \code{\link[=robust_gandh]{robust_gandh()}}.}
 
 \item{newdata}{A numeric vector, matrix or data frame with some or all of
 the variables of the fit: new data, or with \code{inverse = TRUE}, values on
@@ -41,8 +41,8 @@ fit. Missing values stay missing, and with the Box-Cox transformation,
 new values that are zero or negative become \code{NA}.
 }
 \description{
-Transforms new data with the \eqn{\lambda} (and, with \code{standardize = TRUE}, the mean and standard deviation of the inliers) estimated by
-\code{\link[=robust_boxcox]{robust_boxcox()}} or \code{\link[=robust_yeojohnson]{robust_yeojohnson()}}. With \code{inverse = TRUE}, it
+Transforms new data with the parameters (and, with \code{standardize = TRUE}, the mean and standard deviation of the inliers) estimated by
+\code{\link[=robust_boxcox]{robust_boxcox()}}, \code{\link[=robust_yeojohnson]{robust_yeojohnson()}} or \code{\link[=robust_gandh]{robust_gandh()}}. With \code{inverse = TRUE}, it
 transforms values back to the original scale, such as the predictions of
 a model fitted to the transformed variables.
 }
@@ -59,7 +59,7 @@ median of the variable on the original scale (\code{estimate = "median"}, the
 default). It needs no other assumption, and suits the prediction of one
 sample.
 
-On the original scale, the mean is higher than the median when
+For the power transformations, on the original scale the mean is higher than the median when
 \eqn{\lambda < 1} (the transformation compresses the upper tail), and
 lower when \eqn{\lambda > 1}. \code{estimate = "mean"} gives the smearing
 estimate of Duan (1983),
@@ -72,6 +72,8 @@ matters when the predictions are averaged or summed, such as for the mean
 content of a lot or a mass balance. It is not robust: an outlying
 residual pulls it, so pass the residuals of the inliers of a robust model
 (for example, of the spectra that \code{\link[=rsimpls]{rsimpls()}} does not flag).
+Smearing is also available for \code{\link[=robust_gandh]{robust_gandh()}}; the direction of the
+mean-median difference depends on its fitted shape and residuals.
 
 The back-transformation is not defined everywhere, because some
 transformations are bounded: the Box-Cox transformation above for
@@ -116,5 +118,5 @@ method. Journal of the American Statistical Association,
 }
 }
 \seealso{
-\code{\link[=robust_boxcox]{robust_boxcox()}}, \code{\link[=robust_yeojohnson]{robust_yeojohnson()}}
+\code{\link[=robust_boxcox]{robust_boxcox()}}, \code{\link[=robust_yeojohnson]{robust_yeojohnson()}}, \code{\link[=robust_gandh]{robust_gandh()}}
 }

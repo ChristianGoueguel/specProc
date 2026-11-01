@@ -2,6 +2,14 @@
 
 ## New features
 
+* `robust_gandh()`: a Tukey g-and-h transformation fitted by robust quantile
+  least squares (rQLS), with separate skewness and tail parameters, adaptive
+  or explicit trimming cutoffs, and fit diagnostics. It has the fitted-object
+  interface of `robust_boxcox()` and `robust_yeojohnson()`, including new-data
+  prediction, inverse transformation and residual smearing. Direct inversion
+  preserves extreme normal scores without rounding cumulative probabilities.
+  `step_robust_gandh()` estimates the transformation within recipe training.
+
 * `rsimpls()`: robust PLS regression by the RSIMPLS algorithm of Hubert and
   Vanden Branden (2003), the SIMPLS algorithm computed from a ROBPCA
   covariance matrix of the spectra and the responses, followed by a robust

@@ -137,6 +137,7 @@ reference:
   contents:
   - step_robust_boxcox
   - step_robust_yeojohnson
+  - step_robust_gandh
   - step_robpca
   - step_rospca
   - step_macropca
@@ -325,6 +326,7 @@ reference:
   contents:
   - robust_boxcox
   - robust_yeojohnson
+  - robust_gandh
   - predict.specproc_transformation
 
 - title: Robust statistical estimators

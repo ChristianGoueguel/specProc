@@ -421,6 +421,7 @@ step_rsimpls <- function(recipe, ..., role = "predictor", trained = FALSE, num_c
 robust_titles <- c(
   robust_boxcox = "Robust Box-Cox transformation on ",
   robust_yeojohnson = "Robust Yeo-Johnson transformation on ",
+  robust_gandh = "Robust Tukey g-and-h transformation on ",
   robust_bcyj = "Robust Box-Cox/Yeo-Johnson transformation on ",
   robpca = "Robust PCA (ROBPCA) on ",
   rospca = "Robust sparse PCA (ROSPCA) on ",
@@ -430,7 +431,8 @@ robust_titles <- c(
 )
 
 # The steps that transform the variables in place, rather than adding scores.
-transformation_steps <- c("step_robust_boxcox", "step_robust_yeojohnson", "step_robust_bcyj")
+transformation_steps <- c("step_robust_boxcox", "step_robust_yeojohnson", "step_robust_bcyj",
+                          "step_robust_gandh")
 
 # Keeps only what predict() needs from an RSIMPLS model.
 strip_rsimpls <- function(fit) {
@@ -582,6 +584,7 @@ tunable_robust_step <- function(x, ...) {
     class(x)[1],
     step_robust_boxcox = ,
     step_robust_yeojohnson = ,
+    step_robust_gandh = ,
     step_robust_bcyj = num_comp[0, ],
     step_rospca = rbind(num_comp, row("lambda", list(pkg = "dials", fun = "penalty", range = c(-2, 2)))),
     num_comp
