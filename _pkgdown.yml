@@ -336,6 +336,12 @@ reference:
   - biweight_midcovariance
   - biweight_midcorrelation
 
+- subtitle: skewness
+  desc: >
+    Function used to measure the skewness of a distribution.
+  contents:
+  - medcouple
+
 - subtitle: tail weight
   desc: >
     Functions used to measure the tail weight of a distribution.

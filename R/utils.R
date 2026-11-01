@@ -79,11 +79,6 @@ apply_preprocess <- function(x, pp) {
   sweep(sweep(x, 2, pp$center, "-"), 2, pp$scale, "/")
 }
 
-# Medcouple without the robustbase start-up message about 'doScale'.
-medcouple <- function(x) {
-  robustbase::mc(x[!is.na(x)], doScale = FALSE)
-}
-
 # Runs `expr` with a fixed RNG seed and restores the caller's RNG state.
 with_seed <- function(seed, expr) {
   env <- globalenv()

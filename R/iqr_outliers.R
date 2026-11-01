@@ -89,7 +89,7 @@ iqr_outliers <- function(x, k = 1.5, skew = FALSE, drop_na = FALSE,
     lower_fence <- q1 - k * iqr
     upper_fence <- q3 + k * iqr
   } else {
-    mc_x <- medcouple(x)
+    mc_x <- medcouple(x, drop_na = TRUE)
     alpha <- if (mc_x >= 0) 4 else 3
     beta <- if (mc_x >= 0) 3 else 4
 

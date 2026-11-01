@@ -59,6 +59,48 @@ test_that("umad is unbiased at the normal", {
   expect_error(umad(z, method = "x"), "hayes")
 })
 
+test_that("medcouple measures skewness robustly", {
+  expect_equal(medcouple(z), 0, tolerance = 0.02)
+  set.seed(4)
+  e <- stats::rexp(20000)
+  # 1/3 at the exponential distribution (Brys et al. 2004)
+  expect_equal(medcouple(e), 1 / 3, tolerance = 0.02)
+  expect_equal(medcouple(e), robustbase::mc(e, doScale = FALSE))
+  expect_equal(medcouple(-e), -medcouple(e), tolerance = 1e-6)
+  expect_equal(medcouple(3 * e + 2), medcouple(e), tolerance = 1e-6)
+  expect_equal(medcouple(1:9), 0)
+  # a few gross outliers barely change it, unlike the classical skewness
+  x <- c(z[1:1000], rep(50, 20))
+  expect_lt(abs(medcouple(x)), 0.05)
+  expect_gt(moments::skewness(x), 5)
+  expect_true(is.na(medcouple(c(1, 5, NA, 2))))
+  expect_equal(medcouple(c(1, 5, NA, 2), drop_na = TRUE), medcouple(c(1, 5, 2)))
+  expect_true(is.na(medcouple(numeric(0))))
+  expect_true(is.na(medcouple(c(NA_real_, NA_real_), drop_na = TRUE)))
+  expect_equal(medcouple(tapply(e[1:100], rep(1:50, 2), sum)),
+               medcouple(as.vector(tapply(e[1:100], rep(1:50, 2), sum))))
+  expect_error(medcouple("a"), "numeric")
+  expect_error(medcouple(e, drop_na = "yes"), "drop_na")
+  expect_error(medcouple(), "Missing")
+})
+
+test_that("medcouple is computed for each column of a matrix or data frame", {
+  set.seed(5)
+  df <- data.frame(right = stats::rexp(200), left = -stats::rexp(200), sym = stats::rnorm(200))
+  mc <- medcouple(df)
+  expect_named(mc, names(df))
+  expect_equal(unname(mc), vapply(df, medcouple, numeric(1), USE.NAMES = FALSE))
+  expect_gt(mc[["right"]], 0.2)
+  expect_lt(mc[["left"]], -0.2)
+  expect_equal(medcouple(as.matrix(df)), mc)
+  expect_null(names(medcouple(unname(as.matrix(df)))))
+  df$sym[3] <- NA
+  expect_true(is.na(medcouple(df)[["sym"]]))
+  expect_equal(medcouple(df)[c("right", "left")], mc[c("right", "left")])
+  expect_equal(medcouple(df, drop_na = TRUE)[["sym"]], medcouple(df$sym[-3]))
+  expect_error(medcouple(data.frame(a = 1:3, b = letters[1:3])), "numeric columns")
+})
+
 test_that("tail weights match their values at the normal distribution", {
   Q <- stats::qnorm
   lqw <- -(Q(0.4375) + Q(0.0625) - 2 * Q(0.25)) / (Q(0.4375) - Q(0.0625))

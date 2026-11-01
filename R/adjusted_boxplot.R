@@ -249,7 +249,7 @@ adjusted_stats <- function(v) {
   stats <- data.frame(
     lower = a$stats[1], q1 = a$stats[2], median = a$stats[3], q3 = a$stats[4],
     upper = a$stats[5], lower_fence = a$fence[1], upper_fence = a$fence[2],
-    notch_lower = a$conf[1], notch_upper = a$conf[2], medcouple = medcouple(v)
+    notch_lower = a$conf[1], notch_upper = a$conf[2], medcouple = medcouple(v, drop_na = TRUE)
   )
   list(stats = stats, tail = tail)
 }
