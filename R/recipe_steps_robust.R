@@ -1,58 +1,137 @@
 # Recipe steps for robust transformations, robust PCA and robust PLS
-# (tidymodels): robust Box-Cox / Yeo-Johnson, ROBPCA, ROSPCA, MacroPCA,
+# (tidymodels): robust Box-Cox and Yeo-Johnson, ROBPCA, ROSPCA, MacroPCA,
 # cellPCA and RSIMPLS. See recipe_steps.R for the shared helpers.
+
+#' @title Robust Box-Cox Transformation Recipe Step
+#'
+#' @author Christian L. Goueguel
+#'
+#' @description
+#' `step_robust_boxcox()` creates a *specification* of a recipe step that
+#' transforms the selected variables toward central normality with the
+#' robust Box-Cox transformation of [robust_boxcox()]. It is the robust
+#' counterpart of [recipes::step_BoxCox()].
+#'
+#' @details
+#' The transformation parameter \eqn{\lambda} of each variable is estimated
+#' on the training data (Raymaekers and Rousseeuw, 2021), as in
+#' [robust_boxcox()], and applied unchanged to new data. With
+#' `standardize = TRUE`, the transformed variables are also centered and
+#' scaled with the mean and standard deviation of the training inliers.
+#' Variables that cannot be transformed (constant ones and, with a warning,
+#' those with zero or negative values) are left unchanged. Missing values are
+#' ignored by the fit and stay missing; new values that are zero or negative
+#' become `NA`.
+#'
+#' [tidy()][recipes::tidy.recipe] returns a tibble with columns `terms`,
+#' `lambda` (`NA` for the variables left unchanged) and `id`.
+#'
+#' @inherit step_baseline return
+#' @inheritParams step_baseline
+#' @inheritParams robust_boxcox
+#' @param res The fitted transformation, stored once the step has been
+#'   trained.
+#'
+#' @seealso [robust_boxcox()], [step_robust_yeojohnson()] for variables with
+#'   zero or negative values.
+#' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' library(recipes)
+#' data(forageLIBS)
+#' contents <- forageLIBS[c("Ca", "K", "P", "Mn")]
+#' rec <- recipe(~ ., data = contents[1:300, ]) |>
+#'   step_robust_boxcox(all_numeric_predictors())
+#' prepped <- prep(rec)
+#' tidy(prepped, number = 1)
+#' bake(prepped, new_data = contents[301:368, ])
+step_robust_boxcox <- function(recipe, ..., role = NA, trained = FALSE, quantile = 0.99,
+                               nbsteps = 2, standardize = TRUE, res = NULL, columns = NULL,
+                               skip = FALSE, id = recipes::rand_id("robust_boxcox")) {
+  rlang::check_installed("recipes")
+  recipes::add_step(recipe, specproc_step_new(
+    "robust_boxcox", terms = rlang::enquos(...), role = role, trained = trained,
+    quantile = quantile, nbsteps = nbsteps, standardize = standardize,
+    res = res, columns = columns, skip = skip, id = id
+  ))
+}
+
+#' @title Robust Yeo-Johnson Transformation Recipe Step
+#'
+#' @author Christian L. Goueguel
+#'
+#' @description
+#' `step_robust_yeojohnson()` creates a *specification* of a recipe step
+#' that transforms the selected variables toward central normality with the
+#' robust Yeo-Johnson transformation of [robust_yeojohnson()]. It is the
+#' robust counterpart of [recipes::step_YeoJohnson()].
+#'
+#' @details
+#' The transformation parameter \eqn{\lambda} of each variable is estimated
+#' on the training data (Raymaekers and Rousseeuw, 2021), as in
+#' [robust_yeojohnson()], and applied unchanged to new data. With
+#' `standardize = TRUE`, the transformed variables are also centered and
+#' scaled with the mean and standard deviation of the training inliers.
+#' Variables that cannot be transformed (for example, constant ones) are
+#' left unchanged. Missing values are ignored by the fit and stay missing.
+#'
+#' [tidy()][recipes::tidy.recipe] returns a tibble with columns `terms`,
+#' `lambda` (`NA` for the variables left unchanged) and `id`.
+#'
+#' @inherit step_robust_boxcox return
+#' @inheritParams step_robust_boxcox
+#'
+#' @seealso [robust_yeojohnson()], [step_robust_boxcox()]
+#' @export
+#'
+#' @examplesIf rlang::is_installed("recipes")
+#' library(recipes)
+#' data(forageLIBS)
+#' spectra <- snv(forageLIBS[-(1:14)])$correction
+#' wl <- as.numeric(names(spectra))
+#' mg <- spectra[which(wl > 279 & wl < 281)]  # the Mg II lines, after SNV
+#' rec <- recipe(~ ., data = mg[1:300, ]) |>
+#'   step_robust_yeojohnson(all_numeric_predictors())
+#' prepped <- prep(rec)
+#' tidy(prepped, number = 1)
+step_robust_yeojohnson <- function(recipe, ..., role = NA, trained = FALSE, quantile = 0.99,
+                                   nbsteps = 2, standardize = TRUE, res = NULL,
+                                   columns = NULL, skip = FALSE,
+                                   id = recipes::rand_id("robust_yeojohnson")) {
+  rlang::check_installed("recipes")
+  recipes::add_step(recipe, specproc_step_new(
+    "robust_yeojohnson", terms = rlang::enquos(...), role = role, trained = trained,
+    quantile = quantile, nbsteps = nbsteps, standardize = standardize,
+    res = res, columns = columns, skip = skip, id = id
+  ))
+}
 
 #' @title Robust Box-Cox and Yeo-Johnson Transformation Recipe Step
 #'
 #' @author Christian L. Goueguel
 #'
 #' @description
-#' `step_robust_bcyj()` creates a *specification* of a recipe step that
-#' transforms the selected variables toward central normality with the
-#' robust Box-Cox or Yeo-Johnson transformation of [robust_bcyj()], like
-#' [recipes::step_BoxCox()] or [recipes::step_YeoJohnson()] but robust to
-#' outliers.
+#' `r lifecycle::badge("deprecated")`
 #'
-#' @details
-#' The transformation parameter \eqn{\lambda} of each variable is estimated
-#' on the training data by re-weighted maximum likelihood (Raymaekers and
-#' Rousseeuw, 2021), as in [robust_bcyj()], and applied unchanged to new data.
-#' With `standardize = TRUE`, the transformed variables are also centered and
-#' scaled with the mean and standard deviation of the training inliers. Variables that cannot be transformed (for example,
-#' constant ones) are left unchanged.
-#'
-#' [tidy()][recipes::tidy.recipe] returns a tibble with columns `terms`,
-#' `lambda`, `method` (`"BC"` or `"YJ"`) and `id`.
+#' `step_robust_bcyj()` was deprecated in specProc 0.9.0: use
+#' [step_robust_boxcox()] or [step_robust_yeojohnson()] instead. It still
+#' works, with a warning, and the recipes trained with it can still be
+#' baked.
 #'
 #' @inherit step_baseline return
-#' @inheritParams step_baseline
+#' @inheritParams step_robust_boxcox
 #' @param type The transformation: `"bestObj"` (default; Box-Cox or
 #'   Yeo-Johnson, whichever fits best, for positive variables), `"BC"` or
-#'   `"YJ"`. See [robust_bcyj()].
-#' @param quantile The quantile used for the weights of the re-weighting
-#'   steps. Default is 0.99.
-#' @param nbsteps The number of re-weighting steps. Default is 2.
-#' @param standardize A logical: robustly standardize the transformed
-#'   variables (`TRUE`, default).
-#' @param res The fitted transformation, stored once the step has been
-#'   trained.
+#'   `"YJ"`.
 #'
-#' @seealso [robust_bcyj()]
+#' @keywords internal
 #' @export
-#'
-#' @examplesIf rlang::is_installed("recipes")
-#' library(recipes)
-#' data(forageLIBS)
-#' contents <- forageLIBS[c("Ca", "Mg", "P", "K", "Mn")]
-#' rec <- recipe(~ ., data = contents[1:300, ]) |>
-#'   step_robust_bcyj(all_numeric_predictors())
-#' prepped <- prep(rec)
-#' tidy(prepped, number = 1)
-#' bake(prepped, new_data = contents[301:368, ])
 step_robust_bcyj <- function(recipe, ..., role = NA, trained = FALSE, type = "bestObj",
                              quantile = 0.99, nbsteps = 2, standardize = TRUE,
                              res = NULL, columns = NULL, skip = FALSE,
                              id = recipes::rand_id("robust_bcyj")) {
+  lifecycle::deprecate_warn("0.9.0", "step_robust_bcyj()",
+                            details = "Use `step_robust_boxcox()` or `step_robust_yeojohnson()` instead.")
   rlang::check_installed("recipes")
   type <- match.arg(type, c("bestObj", "BC", "YJ"))
   recipes::add_step(recipe, specproc_step_new(
@@ -340,6 +419,8 @@ step_rsimpls <- function(recipe, ..., role = "predictor", trained = FALSE, num_c
 # ---- internals ---------------------------------------------------------------
 
 robust_titles <- c(
+  robust_boxcox = "Robust Box-Cox transformation on ",
+  robust_yeojohnson = "Robust Yeo-Johnson transformation on ",
   robust_bcyj = "Robust Box-Cox/Yeo-Johnson transformation on ",
   robpca = "Robust PCA (ROBPCA) on ",
   rospca = "Robust sparse PCA (ROSPCA) on ",
@@ -347,6 +428,9 @@ robust_titles <- c(
   cellpca = "cellPCA on ",
   rsimpls = "Robust PLS (RSIMPLS) on "
 )
+
+# The steps that transform the variables in place, rather than adding scores.
+transformation_steps <- c("step_robust_boxcox", "step_robust_yeojohnson", "step_robust_bcyj")
 
 # Keeps only what predict() needs from an RSIMPLS model.
 strip_rsimpls <- function(fit) {
@@ -375,7 +459,8 @@ prep_robust_step <- function(x, training, info = NULL, ...) {
   cols <- step_predictors(x, training, info)
   step <- class(x)[1]
   xmat <- step_matrix(training, cols)
-  if (!step %in% c("step_macropca", "step_cellpca") && length(cols) > 0 && anyNA(xmat)) {
+  missing_ok <- c("step_macropca", "step_cellpca", transformation_steps)
+  if (!step %in% missing_ok && length(cols) > 0 && anyNA(xmat)) {
     stop("`", step, "()` does not handle missing values; impute them first",
          if (step %in% c("step_robpca", "step_rospca")) {
            " or use `step_macropca()` or `step_cellpca()`"
@@ -383,7 +468,11 @@ prep_robust_step <- function(x, training, info = NULL, ...) {
          ".", call. = FALSE)
   }
   if (length(cols) > 0) {
-    if (step != "step_robust_bcyj") check_count(x$num_comp, "num_comp")
+    if (step %in% transformation_steps) {
+      check_transformation_args(x$quantile, x$nbsteps, x$standardize)
+    } else {
+      check_count(x$num_comp, "num_comp")
+    }
     opts <- x$options %||% list()
     if (step == "step_rsimpls") {
       x$outcome <- step_outcome(x, training, info)
@@ -391,6 +480,11 @@ prep_robust_step <- function(x, training, info = NULL, ...) {
     }
     x$res <- switch(
       step,
+      step_robust_boxcox = robust_transformation(xmat, type = "BC", quantile = x$quantile,
+                                                 nbsteps = x$nbsteps, standardize = x$standardize),
+      step_robust_yeojohnson = robust_transformation(xmat, type = "YJ", quantile = x$quantile,
+                                                     nbsteps = x$nbsteps,
+                                                     standardize = x$standardize),
       step_robust_bcyj = robust_transformation(xmat, type = x$type, quantile = x$quantile,
                                                nbsteps = x$nbsteps, standardize = x$standardize),
       step_robpca = strip_robust_pca(do.call(robpca, c(list(xmat, k = x$num_comp), opts))),
@@ -400,7 +494,7 @@ prep_robust_step <- function(x, training, info = NULL, ...) {
       step_rsimpls = strip_rsimpls(do.call(rsimpls, c(list(xmat, y, ncomp = x$num_comp), opts)))
     )
   }
-  if (step != "step_robust_bcyj") {
+  if (!step %in% transformation_steps) {
     x$keep_original_cols <- recipes::get_keep_original_cols(x)
   }
   x$columns <- cols
@@ -415,7 +509,7 @@ bake_robust_step <- function(object, new_data, ...) {
     return(new_data)
   }
   xmat <- step_matrix(new_data, cols)
-  if (class(object)[1] == "step_robust_bcyj") {
+  if (class(object)[1] %in% transformation_steps) {
     out <- apply_transformation(xmat, object$res)
     new_data[cols] <- as.data.frame(out)
     return(new_data)
@@ -455,6 +549,13 @@ tidy_robust_step <- function(x, ...) {
       terms <- if (recipes::is_trained(x)) x$columns else recipes::sel2char(x$terms)
       res <- tibble::tibble(terms = terms, lambda = NA_real_, method = NA_character_)
     }
+  } else if (class(x)[1] %in% transformation_steps) {
+    if (trained) {
+      res <- tibble::tibble(terms = x$columns, lambda = transformation_lambda(x$res$fits))
+    } else {
+      terms <- if (recipes::is_trained(x)) x$columns else recipes::sel2char(x$terms)
+      res <- tibble::tibble(terms = terms, lambda = NA_real_)
+    }
   } else if (trained) {
     # the vectors that give the scores: loadings, or the weights of RSIMPLS
     loadings <- if (inherits(x, "step_rsimpls")) x$res$x_weights else x$res$loadings
@@ -479,6 +580,8 @@ tunable_robust_step <- function(x, ...) {
   num_comp <- row("num_comp", list(pkg = "dials", fun = "num_comp", range = c(1L, 4L)))
   switch(
     class(x)[1],
+    step_robust_boxcox = ,
+    step_robust_yeojohnson = ,
     step_robust_bcyj = num_comp[0, ],
     step_rospca = rbind(num_comp, row("lambda", list(pkg = "dials", fun = "penalty", range = c(-2, 2)))),
     num_comp
@@ -491,6 +594,10 @@ required_pkgs_robust_step <- function(x, ...) {
 
 # ---- S3 methods (registered when recipes / generics are loaded) ---------------
 
+#' @exportS3Method recipes::prep
+prep.step_robust_boxcox <- prep_robust_step
+#' @exportS3Method recipes::prep
+prep.step_robust_yeojohnson <- prep_robust_step
 #' @exportS3Method recipes::prep
 prep.step_robust_bcyj <- prep_robust_step
 #' @exportS3Method recipes::prep
@@ -505,6 +612,10 @@ prep.step_cellpca <- prep_robust_step
 prep.step_rsimpls <- prep_robust_step
 
 #' @exportS3Method recipes::bake
+bake.step_robust_boxcox <- bake_robust_step
+#' @exportS3Method recipes::bake
+bake.step_robust_yeojohnson <- bake_robust_step
+#' @exportS3Method recipes::bake
 bake.step_robust_bcyj <- bake_robust_step
 #' @exportS3Method recipes::bake
 bake.step_robpca <- bake_robust_step
@@ -517,6 +628,10 @@ bake.step_cellpca <- bake_robust_step
 #' @exportS3Method recipes::bake
 bake.step_rsimpls <- bake_robust_step
 
+#' @export
+print.step_robust_boxcox <- print_robust_step
+#' @export
+print.step_robust_yeojohnson <- print_robust_step
 #' @export
 print.step_robust_bcyj <- print_robust_step
 #' @export
@@ -531,6 +646,10 @@ print.step_cellpca <- print_robust_step
 print.step_rsimpls <- print_robust_step
 
 #' @exportS3Method generics::tidy
+tidy.step_robust_boxcox <- tidy_robust_step
+#' @exportS3Method generics::tidy
+tidy.step_robust_yeojohnson <- tidy_robust_step
+#' @exportS3Method generics::tidy
 tidy.step_robust_bcyj <- tidy_robust_step
 #' @exportS3Method generics::tidy
 tidy.step_robpca <- tidy_robust_step
@@ -544,6 +663,10 @@ tidy.step_cellpca <- tidy_robust_step
 tidy.step_rsimpls <- tidy_robust_step
 
 #' @exportS3Method generics::tunable
+tunable.step_robust_boxcox <- tunable_robust_step
+#' @exportS3Method generics::tunable
+tunable.step_robust_yeojohnson <- tunable_robust_step
+#' @exportS3Method generics::tunable
 tunable.step_robust_bcyj <- tunable_robust_step
 #' @exportS3Method generics::tunable
 tunable.step_robpca <- tunable_robust_step
@@ -556,6 +679,10 @@ tunable.step_cellpca <- tunable_robust_step
 #' @exportS3Method generics::tunable
 tunable.step_rsimpls <- tunable_robust_step
 
+#' @exportS3Method generics::required_pkgs
+required_pkgs.step_robust_boxcox <- required_pkgs_robust_step
+#' @exportS3Method generics::required_pkgs
+required_pkgs.step_robust_yeojohnson <- required_pkgs_robust_step
 #' @exportS3Method generics::required_pkgs
 required_pkgs.step_robust_bcyj <- required_pkgs_robust_step
 #' @exportS3Method generics::required_pkgs

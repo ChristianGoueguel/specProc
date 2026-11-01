@@ -6,6 +6,7 @@ test_that("old function names are defunct and name the new function", {
   expect_error(pareto(matrix(1:6, 3)), "pareto_scale")
   expect_error(plotSpec(), "plot_spectra")
   expect_error(boltzmann_plot(), "use 'boltzmann\\(\\)'")
+  expect_error(robustBCYJ(), "use 'robust_boxcox\\(\\)' or 'robust_yeojohnson\\(\\)'")
 })
 
 test_that("renamed arguments still work, with a deprecation warning", {

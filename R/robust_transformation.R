@@ -1,6 +1,6 @@
 # Robust Box-Cox and Yeo-Johnson transformations to central normality, after
-# Raymaekers and Rousseeuw (2021). Used by robust_bcyj() and
-# step_robust_bcyj(). Not exported.
+# Raymaekers and Rousseeuw (2021). Used by robust_boxcox(), robust_yeojohnson()
+# and their recipe steps (and by the deprecated robust_bcyj()).
 #
 # For each variable:
 #  1. The variable is pre-standardized: divided by its median for Box-Cox
@@ -194,7 +194,25 @@ robust_transformation <- function(x, type = "bestObj", quantile = 0.99, nbsteps 
     candidates[[which.min(vapply(candidates, `[[`, numeric(1), "objective"))]]
   })
   names(fits) <- colnames(x)
-  structure(list(fits = fits, standardize = standardize), class = "specproc_transformation")
+  if (type == "BC") {
+    warn_nonpositive(x)
+  }
+  structure(list(fits = fits, standardize = standardize), variables = colnames(x),
+            nvar = ncol(x), class = "specproc_transformation")
+}
+
+# Box-Cox leaves the variables with zero or negative values unchanged.
+warn_nonpositive <- function(x) {
+  nonpositive <- which(apply(x, 2, function(v) any(v <= 0, na.rm = TRUE)))
+  if (length(nonpositive) == 0) {
+    return(invisible())
+  }
+  nms <- colnames(x)[nonpositive] %||% paste0("V", nonpositive)
+  shown <- paste(utils::head(nms, 5), collapse = ", ")
+  if (length(nms) > 5) shown <- paste0(shown, ", ...")
+  warning("The Box-Cox transformation needs strictly positive values; ", length(nms),
+          " variable(s) with zero or negative values are left unchanged (", shown,
+          "). Use the Yeo-Johnson transformation for them.", call. = FALSE)
 }
 
 # Applies fitted transformations to the columns of a numeric matrix.
@@ -211,4 +229,107 @@ apply_transformation <- function(x, transformation) {
     out[, j] <- if (transformation$standardize) (y - f$mean) / f$sd else y
   }
   out
+}
+
+# Fits robust_boxcox() (type "BC") or robust_yeojohnson() (type "YJ") and
+# applies the transformation to the data.
+robust_power <- function(x, type, quantile, nbsteps, standardize) {
+  x <- as_numeric_matrix(x, "x")
+  check_transformation_args(quantile, nbsteps, standardize)
+  if (is.null(colnames(x))) {
+    colnames(x) <- paste0("V", seq_len(ncol(x)))
+  }
+  fit <- robust_transformation(x, type = type, quantile = quantile, nbsteps = nbsteps,
+                               standardize = standardize)
+  res <- list(
+    transformation = as_tbl(apply_transformation(x, fit)),
+    summary = transformation_summary(fit),
+    fits = fit$fits,
+    standardize = standardize
+  )
+  structure(res, variables = colnames(x), nvar = ncol(x),
+            class = c(if (type == "BC") "specproc_boxcox" else "specproc_yeojohnson",
+                      "specproc_transformation"))
+}
+
+check_transformation_args <- function(quantile, nbsteps, standardize) {
+  check_number(quantile, "quantile", 0, 1, lower_open = TRUE, upper_open = TRUE)
+  check_count(nbsteps, "nbsteps")
+  check_flag(standardize, "standardize")
+}
+
+# The lambda of each variable (NA for those left unchanged) and the objective.
+transformation_lambda <- function(fits) {
+  unname(vapply(fits, function(f) if (f$type == "none") NA_real_ else f$lambda, numeric(1)))
+}
+
+transformation_summary <- function(fit) {
+  tibble::tibble(
+    variable = names(fit$fits),
+    lambda = transformation_lambda(fit$fits),
+    objective = unname(vapply(fit$fits, `[[`, numeric(1), "objective"))
+  )
+}
+
+#' @export
+print.specproc_transformation <- function(x, ...) {
+  title <- if (inherits(x, "specproc_boxcox")) {
+    "Robust Box-Cox transformation"
+  } else if (inherits(x, "specproc_yeojohnson")) {
+    "Robust Yeo-Johnson transformation"
+  } else {
+    "Robust Box-Cox/Yeo-Johnson transformation"
+  }
+  lambda <- transformation_lambda(x$fits)
+  done <- !is.na(lambda)
+  cat(title, "\n\n", sep = "")
+  cat("Variables:     ", length(lambda), "\n", sep = "")
+  cat("Transformed:   ", sum(done),
+      if (any(!done)) paste0(" (", sum(!done), " left unchanged)"), "\n", sep = "")
+  if (any(done)) {
+    rng <- vapply(range(lambda[done]), format, character(1), digits = 3)
+    cat("Lambda:        ", if (sum(done) == 1) rng[1] else paste(rng, collapse = " to "),
+        "\n", sep = "")
+  }
+  cat("Standardized:  ", if (isTRUE(x$standardize)) "yes" else "no", "\n", sep = "")
+  cat("\nUse predict(<transformation>, newdata) to transform new data.\n")
+  invisible(x)
+}
+
+#' @title Apply a Robust Transformation to New Data
+#'
+#' @description
+#' Transforms new data with the \eqn{\lambda} (and, with `standardize =
+#' TRUE`, the mean and standard deviation of the inliers) estimated by
+#' [robust_boxcox()] or [robust_yeojohnson()].
+#'
+#' @param object An object returned by [robust_boxcox()] or
+#'   [robust_yeojohnson()].
+#' @param newdata A numeric vector, matrix or data frame of new data, with the
+#'   same variables as the data of the fit.
+#' @param ... Not used.
+#'
+#' @return A tibble of transformed variables. Missing values stay missing,
+#'   and with the Box-Cox transformation, values that are zero or negative
+#'   become `NA`.
+#'
+#' @seealso [robust_boxcox()], [robust_yeojohnson()]
+#' @export
+#'
+#' @examples
+#' data(forageLIBS)
+#' contents <- forageLIBS[c("Ca", "K", "P", "Mn")]
+#' fit <- robust_boxcox(contents[1:300, ])
+#' new <- predict(fit, contents[301:368, ])
+#' dim(new)
+#' # Box-Cox is not defined for zero or negative values
+#' x <- contents[301:302, ]
+#' x$Ca[2] <- 0
+#' predict(fit, x)
+predict.specproc_transformation <- function(object, newdata, ...) {
+  if (missing(newdata)) {
+    stop("Missing 'newdata' argument.")
+  }
+  x <- filter_newdata(object, newdata)
+  as_tbl(apply_transformation(x, object), attr(object, "variables"))
 }

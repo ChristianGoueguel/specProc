@@ -32,15 +32,18 @@ example, the spectral channels). See \code{\link[recipes:selections]{recipes::se
 
 \item{type}{The transformation: \code{"bestObj"} (default; Box-Cox or
 Yeo-Johnson, whichever fits best, for positive variables), \code{"BC"} or
-\code{"YJ"}. See \code{\link[=robust_bcyj]{robust_bcyj()}}.}
+\code{"YJ"}.}
 
-\item{quantile}{The quantile used for the weights of the re-weighting
-steps. Default is 0.99.}
+\item{quantile}{The quantile of the absolute value of a standard normal
+variable beyond which the standardized transformed values are given
+weight zero in the re-weighting steps, strictly between 0 and 1. Default
+is 0.99.}
 
-\item{nbsteps}{The number of re-weighting steps. Default is 2.}
+\item{nbsteps}{The number of re-weighting steps, a positive integer.
+Default is 2.}
 
-\item{standardize}{A logical: robustly standardize the transformed
-variables (\code{TRUE}, default).}
+\item{standardize}{A logical value: standardize the transformed variables
+by the mean and standard deviation of the inliers (\code{TRUE}, default).}
 
 \item{res}{The fitted transformation, stored once the step has been
 trained.}
@@ -59,38 +62,14 @@ An updated version of \code{recipe} with the new step added to the
 sequence of existing steps.
 }
 \description{
-\code{step_robust_bcyj()} creates a \emph{specification} of a recipe step that
-transforms the selected variables toward central normality with the
-robust Box-Cox or Yeo-Johnson transformation of \code{\link[=robust_bcyj]{robust_bcyj()}}, like
-\code{\link[recipes:step_BoxCox]{recipes::step_BoxCox()}} or \code{\link[recipes:step_YeoJohnson]{recipes::step_YeoJohnson()}} but robust to
-outliers.
-}
-\details{
-The transformation parameter \eqn{\lambda} of each variable is estimated
-on the training data by re-weighted maximum likelihood (Raymaekers and
-Rousseeuw, 2021), as in \code{\link[=robust_bcyj]{robust_bcyj()}}, and applied unchanged to new data.
-With \code{standardize = TRUE}, the transformed variables are also centered and
-scaled with the mean and standard deviation of the training inliers. Variables that cannot be transformed (for example,
-constant ones) are left unchanged.
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 
-\link[recipes:tidy.recipe]{tidy()} returns a tibble with columns \code{terms},
-\code{lambda}, \code{method} (\code{"BC"} or \code{"YJ"}) and \code{id}.
-}
-\examples{
-\dontshow{if (rlang::is_installed("recipes")) withAutoprint(\{ # examplesIf}
-library(recipes)
-data(forageLIBS)
-contents <- forageLIBS[c("Ca", "Mg", "P", "K", "Mn")]
-rec <- recipe(~ ., data = contents[1:300, ]) |>
-  step_robust_bcyj(all_numeric_predictors())
-prepped <- prep(rec)
-tidy(prepped, number = 1)
-bake(prepped, new_data = contents[301:368, ])
-\dontshow{\}) # examplesIf}
-}
-\seealso{
-\code{\link[=robust_bcyj]{robust_bcyj()}}
+\code{step_robust_bcyj()} was deprecated in specProc 0.9.0: use
+\code{\link[=step_robust_boxcox]{step_robust_boxcox()}} or \code{\link[=step_robust_yeojohnson]{step_robust_yeojohnson()}} instead. It still
+works, with a warning, and the recipes trained with it can still be
+baked.
 }
 \author{
 Christian L. Goueguel
 }
+\keyword{internal}

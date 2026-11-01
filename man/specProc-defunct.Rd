@@ -85,7 +85,7 @@ an exported \code{gaussian()} masks \code{stats::gaussian()}, the family used by
    \code{outlierplot()} \tab \code{\link[=plot_outliers]{plot_outliers()}} \cr
    \code{directOutlyingness()} \tab \code{\link[=directional_outlyingness]{directional_outlyingness()}} \cr
    \code{iqrMethod()} \tab \code{\link[=iqr_outliers]{iqr_outliers()}} \cr
-   \code{robustBCYJ()} \tab \code{\link[=robust_bcyj]{robust_bcyj()}} \cr
+   \code{robustBCYJ()} \tab \code{\link[=robust_boxcox]{robust_boxcox()}}, \code{\link[=robust_yeojohnson]{robust_yeojohnson()}} \cr
    \code{rousseeuwCroux()} \tab \code{\link[=rousseeuw_croux]{rousseeuw_croux()}} \cr
    \code{summaryStats()} \tab \code{\link[=summary_stats]{summary_stats()}} \cr
    \code{tukeyGH()} \tab \code{\link[=tukey_gh]{tukey_gh()}} \cr

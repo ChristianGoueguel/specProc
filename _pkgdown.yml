@@ -135,7 +135,8 @@ reference:
 
 - subtitle: robust transformation, PCA and PLS
   contents:
-  - step_robust_bcyj
+  - step_robust_boxcox
+  - step_robust_yeojohnson
   - step_robpca
   - step_rospca
   - step_macropca
@@ -320,9 +321,11 @@ reference:
 
 - subtitle: data transformation
   desc: >
-    Function used to transform variable(s) toward central normality.
+    Functions used to transform variables toward central normality.
   contents:
-  - robust_bcyj
+  - robust_boxcox
+  - robust_yeojohnson
+  - predict.specproc_transformation
 
 - title: Robust statistical estimators
 

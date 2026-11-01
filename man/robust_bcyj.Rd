@@ -13,7 +13,8 @@ robust_bcyj(x, var = NULL, type = "bestObj", quantile = 0.99, nbsteps = 2)
 If \code{NULL} (default), all columns are selected.}
 
 \item{type}{A character string specifying the transformation method(s) to use.
-Allowed values are "BC", "YJ", or "bestObj" (default).}
+Allowed values are "BC", "YJ", or "bestObj" (default: Box-Cox or
+Yeo-Johnson, whichever fits best, for strictly positive variables).}
 
 \item{quantile}{A numeric value between 0 and 1 specifying the quantile to use
 for determining the weights in the re-weighting step. Default is 0.99.}
@@ -39,67 +40,14 @@ A list containing two data frames:
 }
 }
 \description{
-Transforms each variable in a dataset toward central normality using
-re-weighted maximum likelihood to robustly fit the Box-Cox or Yeo-Johnson
-transformation.
-}
-\details{
-The Box-Cox and Yeo-Johnson transformations are power transformations
-aimed at making the data distribution more normal-like. The Box-Cox
-transformation is suitable for strictly positive values, while the
-Yeo-Johnson transformation can handle both positive and negative values.
-The transformations are fitted robustly (Raymaekers and Rousseeuw, 2021),
-so that outlying observations do not drive the estimate of \eqn{\lambda}:
-\enumerate{
-\item Each variable is pre-standardized: divided by its median for Box-Cox,
-which needs strictly positive values, and centered by its median and
-divided by its MAD for Yeo-Johnson.
-\item An initial \eqn{\lambda} (between -4 and 6) minimizes a robust
-distance (Tukey's biweight) between the sorted, robustly standardized
-transformed values and the quantiles of the normal distribution. For
-this step, the transformation is continued linearly on the side that
-it compresses (the upper side for \eqn{\lambda < 1}, the lower side
-for \eqn{\lambda > 1}), beyond the point where the transformed value
-is 1.5 times that of the quartile, so that outliers on that side
-cannot dictate \eqn{\lambda}.
-\item The values whose standardized transformed value exceeds the
-\code{quantile} of the normal distribution are given weight zero (first
-with the rectified transformation), and
-\eqn{\lambda} is re-estimated by maximum likelihood on the others,
-\code{nbsteps} times.
-\item The transformed variable is standardized by the mean and standard
-deviation of these inliers.
-}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 
-Variables with fewer than 5 values or no spread (zero MAD) are left
-unchanged (method \code{"none"}), as are variables with non-positive values
-when \code{type = "BC"}.
-
-The \code{type} parameter controls which transformation method(s) to use:
-\itemize{
-\item "BC": Only applies the Box-Cox transformation to strictly positive variables.
-\item "YJ": Only applies the Yeo-Johnson transformation to all variables.
-\item "bestObj" (default): For strictly positive variables, both BC and YJ are
-applied, and the solution with the lowest objective function value is kept.
-For variables with negative values, only YJ is applied.
-}
-}
-\examples{
-data(forageLIBS)
-wl <- suppressWarnings(as.numeric(names(forageLIBS)))
-spectra <- forageLIBS[which(wl > 760 & wl < 780)]  # the K I resonance lines
-# two lines, transformed to central normality
-res <- robust_bcyj(spectra[, c(10, 50)])
-res$summary
-}
-\references{
-\itemize{
-\item Raymaekers, J., Rousseeuw, P.J., (2021). Transforming variables to central normality.
-Machine Learning, https://doi.org/10.1007/s10994-021-05960-5.
-\item Box, G. E. P., Cox, D. R. (1964). An analysis of transformations.
-Journal of the Royal Statistical Society, Series B, 26:211–252.
-}
+\code{robust_bcyj()} was deprecated in specProc 0.9.0: use \code{\link[=robust_boxcox]{robust_boxcox()}}
+or \code{\link[=robust_yeojohnson]{robust_yeojohnson()}} instead, which return a fitted object that
+\link[=predict.specproc_transformation]{predict()} applies to new data. It
+still works, with a warning.
 }
 \author{
 Christian L. Goueguel
 }
+\keyword{internal}

@@ -21,12 +21,71 @@ prep_step <- function(step_fun, ..., data = train, seed = 2) {
   recipes::prep(rec, training = data)
 }
 
-test_that("step_robust_bcyj applies the training transformation to new data", {
-  set.seed(3)
-  pos <- data.frame(id = 1:80, a = rlnorm(80), b = rexp(80), c = rnorm(80))
-  rec <- recipes::recipe(~ ., data = pos[1:60, ]) |>
+set.seed(3)
+pos <- data.frame(id = 1:80, a = rlnorm(80), b = rexp(80), c = rnorm(80))
+
+transformation_recipe <- function(step_fun, data, ...) {
+  recipes::recipe(~ ., data = data) |>
     recipes::update_role(id, new_role = "id") |>
-    step_robust_bcyj(recipes::all_predictors())
+    step_fun(recipes::all_predictors(), ...)
+}
+
+test_that("step_robust_boxcox applies the training transformation to new data", {
+  prepped <- recipes::prep(transformation_recipe(step_robust_boxcox, pos[1:60, 1:3]))
+  fit <- robust_boxcox(pos[1:60, 2:3])
+  out <- recipes::bake(prepped, new_data = pos[61:80, 1:3])
+  expect_equal(out[2:3], predict(fit, pos[61:80, 2:3]))
+  expect_equal(out$id, 61:80)
+  td <- recipes::tidy(prepped, number = 1)
+  expect_named(td, c("terms", "lambda", "id"))
+  expect_equal(td$lambda, fit$summary$lambda)
+  # variables with negative values are left unchanged, with a warning
+  expect_warning(prepped <- recipes::prep(transformation_recipe(step_robust_boxcox, pos[1:60, ])),
+                 "strictly positive.*\\(c\\)")
+  expect_equal(recipes::tidy(prepped, number = 1)$lambda[3], NA_real_)
+  expect_equal(recipes::bake(prepped, new_data = pos[61:80, ])$c, pos$c[61:80])
+})
+
+test_that("step_robust_yeojohnson applies the training transformation to new data", {
+  rec <- transformation_recipe(step_robust_yeojohnson, pos[1:60, ], standardize = FALSE)
+  expect_no_warning(prepped <- recipes::prep(rec))
+  fit <- robust_yeojohnson(pos[1:60, 2:4], standardize = FALSE)
+  out <- recipes::bake(prepped, new_data = pos[61:80, ])
+  expect_equal(out[2:4], predict(fit, pos[61:80, 2:4]))
+  td <- recipes::tidy(prepped, number = 1)
+  expect_equal(td$terms, c("a", "b", "c"))
+  expect_equal(td$lambda, fit$summary$lambda)
+  # before training
+  expect_equal(recipes::tidy(rec, number = 1)$lambda, NA_real_)
+  # missing values are ignored by the fit and stay missing
+  na <- pos
+  na$a[c(2, 65)] <- NA
+  prepped <- recipes::prep(transformation_recipe(step_robust_yeojohnson, na[1:60, ]))
+  fit <- robust_yeojohnson(na[1:60, 2:4])
+  out <- recipes::bake(prepped, new_data = na[61:80, ])
+  expect_equal(out[2:4], predict(fit, na[61:80, 2:4]))
+  expect_true(is.na(out$a[5]))
+})
+
+test_that("the transformation steps have print, tunable and required_pkgs methods", {
+  rec <- transformation_recipe(step_robust_boxcox, pos[1:60, 1:3]) |>
+    step_robust_yeojohnson(recipes::all_predictors())
+  prepped <- recipes::prep(rec)
+  printed <- cli::cli_fmt(print(prepped))
+  expect_true(any(grepl("Robust Box-Cox transformation on", printed)))
+  expect_true(any(grepl("Robust Yeo-Johnson transformation on", printed)))
+  expect_equal(nrow(generics::tunable(rec)), 0)
+  expect_true("specProc" %in% generics::required_pkgs(rec))
+  rec <- transformation_recipe(step_robust_boxcox, pos[1:60, 1:3], quantile = 2)
+  expect_error(recipes::prep(rec), "'quantile'")
+  rec <- transformation_recipe(step_robust_yeojohnson, pos[1:60, 1:3], nbsteps = 0)
+  expect_error(recipes::prep(rec), "'nbsteps'")
+})
+
+test_that("step_robust_bcyj is deprecated but still works", {
+  rlang::local_options(lifecycle_verbosity = "warning")
+  expect_warning(rec <- transformation_recipe(step_robust_bcyj, pos[1:60, ]),
+                 "step_robust_boxcox")
   prepped <- recipes::prep(rec)
   ref <- robust_transformation(as.matrix(pos[1:60, 2:4]))
   out <- recipes::bake(prepped, new_data = pos[61:80, ])
@@ -35,7 +94,8 @@ test_that("step_robust_bcyj applies the training transformation to new data", {
   td <- recipes::tidy(prepped, number = 1)
   expect_named(td, c("terms", "lambda", "method", "id"))
   expect_equal(td$lambda, unname(vapply(ref$fits, `[[`, numeric(1), "lambda")))
-  expect_equal(out$id, 61:80)
+  expect_true(any(grepl("Robust Box-Cox/Yeo-Johnson transformation on",
+                        cli::cli_fmt(print(prepped)))))
 })
 
 test_that("step_robpca adds robust scores and removes the originals", {

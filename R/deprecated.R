@@ -21,7 +21,7 @@
 #' | `outlierplot()` | [plot_outliers()] |
 #' | `directOutlyingness()` | [directional_outlyingness()] |
 #' | `iqrMethod()` | [iqr_outliers()] |
-#' | `robustBCYJ()` | [robust_bcyj()] |
+#' | `robustBCYJ()` | [robust_boxcox()], [robust_yeojohnson()] |
 #' | `rousseeuwCroux()` | [rousseeuw_croux()] |
 #' | `summaryStats()` | [summary_stats()] |
 #' | `tukeyGH()` | [tukey_gh()] |
@@ -43,8 +43,9 @@ NULL
 defunct <- function(old, new) {
   force(new)
   function(...) {
-    .Defunct(new, package = "specProc",
-             msg = sprintf("'%s()' is defunct; use '%s()' instead.", old, new))
+    .Defunct(new[1], package = "specProc",
+             msg = sprintf("'%s()' is defunct; use %s instead.", old,
+                           paste0("'", new, "()'", collapse = " or ")))
   }
 }
 
@@ -102,7 +103,7 @@ iqrMethod <- defunct("iqrMethod", "iqr_outliers")
 
 #' @rdname specProc-defunct
 #' @export
-robustBCYJ <- defunct("robustBCYJ", "robust_bcyj")
+robustBCYJ <- defunct("robustBCYJ", c("robust_boxcox", "robust_yeojohnson"))
 
 #' @rdname specProc-defunct
 #' @export

@@ -286,6 +286,14 @@
   scale is fixed from -1 to 1: two colors through white at 0 (blue and red
   by default), or any gradient (`color = grDevices::hcl.colors(9,
   "Spectral")`). Interactive versions with plotly.
+* `robust_boxcox()` and `robust_yeojohnson()` replace `robust_bcyj()`, with
+  the recipe steps `step_robust_boxcox()` and `step_robust_yeojohnson()`
+  (the robust counterparts of `recipes::step_BoxCox()` and
+  `recipes::step_YeoJohnson()`). Each fits one transformation, so that the
+  `lambda` of all the variables are on the same scale. They take a vector,
+  matrix or data frame, have a `standardize` argument, and return a fitted
+  object that `predict()` applies to new data. `robust_boxcox()` warns about
+  the variables with zero or negative values, which it leaves unchanged.
 
 ## Improvements
 
@@ -536,6 +544,14 @@
 * The loadings of `robpca()` now have a fixed sign, their largest element
   positive, as those of `macropca()` and `cellpca()`. The signs of loadings
   and scores may differ from those of earlier versions.
+* `robust_bcyj()` and `step_robust_bcyj()` are deprecated in favor of
+  `robust_boxcox()`, `robust_yeojohnson()` and their recipe steps (see New
+  features). They still work, with a deprecation warning, and the recipes
+  trained with `step_robust_bcyj()` can still be baked. Their default,
+  `type = "bestObj"`, chose Box-Cox or Yeo-Johnson for each variable by a
+  difference in fit that is often negligible (each for about half of the
+  forageLIBS channels), and mixed two scales of `lambda`. The defunct
+  `robustBCYJ()` now names the new functions.
 
 ## Bug fixes
 
