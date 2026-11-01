@@ -4,6 +4,20 @@
 
 ### New features
 
+- [`robust_gandh()`](https://christiangoueguel.com/specProc/reference/robust_gandh.md):
+  a Tukey g-and-h transformation fitted by robust quantile least squares
+  (rQLS), with separate skewness and tail parameters, adaptive or
+  explicit trimming cutoffs, and fit diagnostics. It has the
+  fitted-object interface of
+  [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md)
+  and
+  [`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md),
+  including new-data prediction, inverse transformation and residual
+  smearing. Direct inversion preserves extreme normal scores without
+  rounding cumulative probabilities.
+  [`step_robust_gandh()`](https://christiangoueguel.com/specProc/reference/step_robust_gandh.md)
+  estimates the transformation within recipe training.
+
 - [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md):
   robust PLS regression by the RSIMPLS algorithm of Hubert and Vanden
   Branden (2003), the SIMPLS algorithm computed from a ROBPCA covariance
@@ -25,6 +39,7 @@
   [`recipes::step_pls()`](https://recipes.tidymodels.org/reference/step_pls.html):
   it replaces the spectra by their robust PLS scores, and optionally
   their score and orthogonal distances.
+
 - The `"rsimpls"` engine of
   [`parsnip::pls()`](https://parsnip.tidymodels.org/reference/pls.html)
   fits
@@ -42,6 +57,7 @@
   [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
   model gains `ncomp`, for the models with 1 to `kmax` components, which
   the fit now keeps (`models`).
+
 - [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md):
   robust principal component regression (RPCR) of Hubert and Verboven
   (2003), the robust PCA of the spectra
@@ -51,6 +67,7 @@
   [`predict()`](https://rdrr.io/r/stats/predict.html) method and outlier
   maps of
   [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md).
+
 - [`robust_rmsecv()`](https://christiangoueguel.com/specProc/reference/robust_rmsecv.md):
   the robust RMSECV of
   [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
@@ -62,6 +79,7 @@
   components. The folds are fitted in parallel when a
   [`future::plan()`](https://future.futureverse.org/reference/plan.html)
   is set.
+
 - The `"lts"` engine of
   [`parsnip::linear_reg()`](https://parsnip.tidymodels.org/reference/linear_reg.html)
   fits the reweighted LTS regression
@@ -71,6 +89,7 @@
   after
   [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md)
   in a workflow, it gives robust PCR in tidymodels.
+
 - [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md):
   robust SIMCA classification of Vanden Branden and Hubert (2005), a
   robust PCA model of each class and the assignment to the closest class
@@ -90,6 +109,7 @@
   [`simca_gamma()`](https://christiangoueguel.com/specProc/reference/simca_gamma.md)
   and
   [`simca_squared()`](https://christiangoueguel.com/specProc/reference/simca_gamma.md).
+
 - [`robust_da()`](https://christiangoueguel.com/specProc/reference/robust_da.md):
   robust linear and quadratic discriminant analysis of Hubert and Van
   Driessen (2004), from the MCD estimates of the classes, for a few
@@ -99,6 +119,7 @@
   [`parsnip::discrim_linear()`](https://parsnip.tidymodels.org/reference/discrim_linear.html)
   and
   [`parsnip::discrim_quad()`](https://parsnip.tidymodels.org/reference/discrim_quad.html).
+
 - [`select_wavelengths()`](https://christiangoueguel.com/specProc/reference/select_wavelengths.md):
   selection of the informative wavelengths for PLS regression, by the
   variable importance in projection (VIP), the selectivity ratio (SR),
@@ -112,6 +133,7 @@
   [`plot_wavelength_selection()`](https://christiangoueguel.com/specProc/reference/plot_wavelength_selection.md)
   shows the selected regions on the mean spectrum with the importance of
   each variable.
+
 - [`plot_shots()`](https://christiangoueguel.com/specProc/reference/plot_shots.md):
   views of the laser shots and of their rejection by
   [`reject_shots()`](https://christiangoueguel.com/specProc/reference/reject_shots.md),
@@ -128,14 +150,17 @@
   (`"order"`); and the rejected shots per sample with the RSD of the
   samples before and after the rejection (`"samples"`). `plot = FALSE`
   returns the table of each view.
+
 - `forageShots`: the single laser shots (8 per measurement, in firing
   order) of 20 of the measurements of `forageLIBS`, in the windows
   380-430 nm and 760-780 nm, to study the shot-to-shot variability.
+
 - [`step_select_wavelengths()`](https://christiangoueguel.com/specProc/reference/step_select_wavelengths.md):
   the selection as a recipe step, repeated on every resample;
   `num_terms`, `num_intervals` (new dials parameter
   [`num_intervals()`](https://christiangoueguel.com/specProc/reference/num_intervals.md))
   and `num_comp` can be tuned.
+
 - [`gap_derivative()`](https://christiangoueguel.com/specProc/reference/gap_derivative.md):
   the gap-segment derivative of Norris and Williams (1984), the first or
   second derivative computed from the means of segments of `segment`
@@ -148,6 +173,7 @@
   are filtered separately.
   [`step_gap_derivative()`](https://christiangoueguel.com/specProc/reference/step_gap_derivative.md)
   is its recipe step; `derivative`, `gap` and `segment` can be tuned.
+
 - [`bin_spectra()`](https://christiangoueguel.com/specProc/reference/bin_spectra.md):
   the means of groups of `width` adjacent channels, within each
   detector, which reduce the number of channels and the noise at the
@@ -158,6 +184,7 @@
   [`step_gap_derivative()`](https://christiangoueguel.com/specProc/reference/step_gap_derivative.md),
   it gives the preprocessing of the winning team of the EMSLIBS 2019
   classification contest (Vrábel et al., 2020).
+
 - [`plasma_uncertainty()`](https://christiangoueguel.com/specProc/reference/plasma_uncertainty.md):
   the uncertainty of the temperature of
   [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
@@ -180,22 +207,26 @@
   and
   [`cf_libs()`](https://christiangoueguel.com/specProc/reference/cf_libs.md),
   their other arguments in `settings`) for this purpose.
+
 - [`electron_density_uncertainty()`](https://christiangoueguel.com/specProc/reference/electron_density_uncertainty.md):
   the electron density of
   [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md)
   with its standard uncertainty and interval, from the standard error of
   the width and the uncertainty of the Stark parameter or of the H-alpha
   width law.
+
 - [`aki_uncertainty()`](https://christiangoueguel.com/specProc/reference/aki_uncertainty.md):
   the relative standard uncertainties of transition probabilities from
   the accuracy grades of the NIST Atomic Spectra Database (one standard
   deviation; upper bounds).
+
 - [`line_intensities()`](https://christiangoueguel.com/specProc/reference/line_intensities.md)
   gives the standard error of each intensity (`intensity_se`): the noise
   of the spectrum propagated through the integration and the baseline,
   or the standard error of the fitted area for the Voigt method.
   [`correct_self_absorption()`](https://christiangoueguel.com/specProc/reference/correct_self_absorption.md)
   turns it into the standard error of the corrected intensity.
+
 - [`response_calibration()`](https://christiangoueguel.com/specProc/reference/response_calibration.md):
   the relative spectral response of the instrument from spectra of a
   calibration lamp (such as a deuterium-halogen lamp) and its certified
@@ -212,6 +243,7 @@
   and
   [`plot_response()`](https://christiangoueguel.com/specProc/reference/plot_response.md)
   draws the response.
+
 - [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md)
   and
   [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md)
@@ -222,6 +254,7 @@
   [`doppler_width()`](https://christiangoueguel.com/specProc/reference/doppler_width.md)
   gives the Doppler width of a line from the temperature and the mass of
   the emitter.
+
 - [`lte_criteria()`](https://christiangoueguel.com/specProc/reference/lte_criteria.md):
   the criteria of local thermodynamic equilibrium of Cristoforetti et
   al. (2010) for transient and inhomogeneous plasmas, with the McWhirter
@@ -232,6 +265,7 @@
   temperature and density during the relaxation time give the temporal
   criterion; with the length over which they change (such as the size of
   the plasma), the diffusion length gives the spatial one.
+
 - [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md)
   gains constraints for multiplets: `lock_centers` keeps the separations
   of the given wavelengths (such as those of the NIST database) with one
@@ -243,6 +277,7 @@
   an interfering line can be left free. `tidied` lists the center,
   widths and area of every line, with standard errors propagated from
   the fitted parameters, and the common shifts.
+
 - [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md)
   fits straight lines with errors in the concentrations, such as the
   certified values of reference materials: `regression = "york"` (York
@@ -256,6 +291,7 @@
   [`predict()`](https://rdrr.io/r/stats/predict.html) and
   [`plot_calibration()`](https://christiangoueguel.com/specProc/reference/plot_calibration.md)
   use the fitted line.
+
 - [`calibration_curve()`](https://christiangoueguel.com/specProc/reference/calibration_curve.md)
   gains the limits of ISO 11843-2 and IUPAC
   (`lod_convention = "iso11843"`): the critical value and the limit of
@@ -265,12 +301,14 @@
   [`predict()`](https://rdrr.io/r/stats/predict.html) marks the samples
   above the critical value as `detected`, and flags the concentrations
   outside the range of the standards (`outside_range`).
+
 - [`applicability_domain()`](https://christiangoueguel.com/specProc/reference/applicability_domain.md)
   describes the calibration spectra by a PCA, and its
   [`predict()`](https://rdrr.io/r/stats/predict.html) flags new spectra
   outside the domain, by their Hotelling T-squared or Q residual (see
   [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md)),
   so that extrapolated predictions of any model can be checked.
+
 - [`curve_of_growth()`](https://christiangoueguel.com/specProc/reference/curve_of_growth.md):
   self-absorption by the curve of growth of a homogeneous plasma in LTE
   (Gornushkin et al., 1999), the model of the C-sigma graphs of Aragón
@@ -287,6 +325,7 @@
   computes the intensities for given optical depths, and
   [`plot_curve_of_growth()`](https://christiangoueguel.com/specProc/reference/plot_curve_of_growth.md)
   draws the reduced intensities against the optical depth.
+
 - Calibration transfer:
   [`ds()`](https://christiangoueguel.com/specProc/reference/ds.md)
   (direct standardization) and
@@ -302,6 +341,7 @@
   and `intercept`), and
   [`predict()`](https://rdrr.io/r/stats/predict.html) transfers spectra
   with any of the three.
+
 - [`control_chart()`](https://christiangoueguel.com/specProc/reference/control_chart.md)
   and
   [`plot_control_chart()`](https://christiangoueguel.com/specProc/reference/plot_control_chart.md):
@@ -310,6 +350,7 @@
   instrument: Shewhart chart with the Western Electric rules, EWMA and
   CUSUM, with the center and standard deviation (mean moving range) from
   a baseline.
+
 - [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md)
   builds a Boltzmann plot interactively: clicking the dot of a line
   marker adds the line to the plot of its species (or removes it), **Add
@@ -324,6 +365,7 @@
   fitted temperature, and **Done** closes the app and returns the
   [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
   fit to R.
+
 - Molecular bands:
   [`molecular_bands()`](https://christiangoueguel.com/specProc/reference/molecular_bands.md)
   lists the band heads of the electronic systems of diatomic molecules
@@ -345,6 +387,7 @@
   on demand and convolved with the instrument profile, and
   [`exomol_datasets()`](https://christiangoueguel.com/specProc/reference/exomol_datasets.md)
   lists the line lists of a molecule.
+
 - [`read_vald()`](https://christiangoueguel.com/specProc/reference/read_vald.md)
   and
   [`read_kurucz()`](https://christiangoueguel.com/specProc/reference/read_vald.md)
@@ -360,6 +403,7 @@
   lines that STARK-B does not have. The VAMDC service of VALD could not
   be queried (it fails on every query, as of October 2026), so VALD is
   read from saved extracts.
+
 - [`stark_width()`](https://christiangoueguel.com/specProc/reference/stark_width.md),
   [`electron_density()`](https://christiangoueguel.com/specProc/reference/electron_density.md)
   and
@@ -371,6 +415,7 @@
   or combined from several sources) needs the species of the line, as
   the line is otherwise matched by its wavelength alone and could be a
   line of another species.
+
 - Persistent cache of downloaded data: with
   `options(specProc.cache = TRUE)` (the user cache directory of
   [`tools::R_user_dir()`](https://rdrr.io/r/tools/userdir.html)) or a
@@ -393,6 +438,7 @@
   lists the cached files and
   [`clear_download_cache()`](https://christiangoueguel.com/specProc/reference/download_cache.md)
   removes them. The cache is off by default.
+
 - [`tidy()`](https://generics.r-lib.org/reference/tidy.html) and
   [`glance()`](https://generics.r-lib.org/reference/glance.html) methods
   for peak fits,
@@ -415,6 +461,7 @@
   and
   [`multipeak_fit()`](https://christiangoueguel.com/specProc/reference/multipeak_fit.md)
   holds `nls` fits of the new class `specproc_peak_fit`.
+
 - [`tidy()`](https://generics.r-lib.org/reference/tidy.html) and
   [`glance()`](https://generics.r-lib.org/reference/glance.html) methods
   for the chemometric models (see
@@ -444,6 +491,7 @@
   [`lts_fit()`](https://christiangoueguel.com/specProc/reference/linear_reg_lts.md)
   now keeps the standard errors (`std_error`), residual degrees of
   freedom and robust R² of the reweighted fit.
+
 - [`medcouple()`](https://christiangoueguel.com/specProc/reference/medcouple.md):
   the medcouple of Brys, Hubert and Struyf (2004), a robust measure of
   skewness with a breakdown value of 25%, of a vector or of each column
@@ -454,6 +502,7 @@
   `iqr_outliers(skew = TRUE)`,
   [`medcouple_weight()`](https://christiangoueguel.com/specProc/reference/medcouple_weight.md)
   and `summary_stats(robust = TRUE)`.
+
 - [`plot_medcouple()`](https://christiangoueguel.com/specProc/reference/plot_medcouple.md):
   the medcouple of the intensities at each wavelength, as bars along the
   wavelength axis, or with `group` as a heatmap with one row per group
@@ -462,6 +511,7 @@
   default), or any gradient
   (`color = grDevices::hcl.colors(9, "Spectral")`). Interactive versions
   with plotly.
+
 - [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md)
   and
   [`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md)
@@ -483,6 +533,7 @@
   [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md)
   warns about the variables with zero or negative values, which it
   leaves unchanged.
+
 - `predict(inverse = TRUE)` transforms values back to the original scale
   after
   [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md)

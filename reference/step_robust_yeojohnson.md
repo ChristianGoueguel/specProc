@@ -125,15 +125,15 @@ tidy(prepped, number = 1)
 #> # A tibble: 23 × 3
 #>    terms       lambda id                     
 #>    <chr>        <dbl> <chr>                  
-#>  1 279.08125    0.652 robust_yeojohnson_0SC5l
-#>  2 279.1652408  0.765 robust_yeojohnson_0SC5l
-#>  3 279.2492316  0.656 robust_yeojohnson_0SC5l
-#>  4 279.3332224  0.644 robust_yeojohnson_0SC5l
-#>  5 279.4172132  1.24  robust_yeojohnson_0SC5l
-#>  6 279.501204   0.739 robust_yeojohnson_0SC5l
-#>  7 279.5851948  0.610 robust_yeojohnson_0SC5l
-#>  8 279.6691856  0.584 robust_yeojohnson_0SC5l
-#>  9 279.7680459  0.608 robust_yeojohnson_0SC5l
-#> 10 279.8523433  0.640 robust_yeojohnson_0SC5l
+#>  1 279.08125    0.652 robust_yeojohnson_eRX5G
+#>  2 279.1652408  0.765 robust_yeojohnson_eRX5G
+#>  3 279.2492316  0.656 robust_yeojohnson_eRX5G
+#>  4 279.3332224  0.644 robust_yeojohnson_eRX5G
+#>  5 279.4172132  1.24  robust_yeojohnson_eRX5G
+#>  6 279.501204   0.739 robust_yeojohnson_eRX5G
+#>  7 279.5851948  0.610 robust_yeojohnson_eRX5G
+#>  8 279.6691856  0.584 robust_yeojohnson_eRX5G
+#>  9 279.7680459  0.608 robust_yeojohnson_eRX5G
+#> 10 279.8523433  0.640 robust_yeojohnson_eRX5G
 #> # ℹ 13 more rows
 ```

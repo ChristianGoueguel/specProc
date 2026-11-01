@@ -208,6 +208,8 @@ and can be tuned within a tidymodels workflow.
   : Robust Box-Cox Transformation Recipe Step
 - [`step_robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/step_robust_yeojohnson.md)
   : Robust Yeo-Johnson Transformation Recipe Step
+- [`step_robust_gandh()`](https://christiangoueguel.com/specProc/reference/step_robust_gandh.md)
+  : Robust Tukey g-and-h Transformation Recipe Step
 - [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md)
   : Robust PCA (ROBPCA) Recipe Step
 - [`step_rospca()`](https://christiangoueguel.com/specProc/reference/step_rospca.md)
@@ -504,6 +506,8 @@ Functions used to transform variables toward central normality.
   : Robust Box-Cox Transformation
 - [`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md)
   : Robust Yeo-Johnson Transformation
+- [`robust_gandh()`](https://christiangoueguel.com/specProc/reference/robust_gandh.md)
+  : Robust Tukey g-and-h Transformation
 - [`predict(`*`<specproc_transformation>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_transformation.md)
   : Apply a Robust Transformation to New Data, or Back-Transform
 

@@ -1,11 +1,11 @@
 # Apply a Robust Transformation to New Data, or Back-Transform
 
-Transforms new data with the \\\lambda\\ (and, with
-`standardize = TRUE`, the mean and standard deviation of the inliers)
-estimated by
-[`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md)
+Transforms new data with the parameters (and, with `standardize = TRUE`,
+the mean and standard deviation of the inliers) estimated by
+[`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md),
+[`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md)
 or
-[`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md).
+[`robust_gandh()`](https://christiangoueguel.com/specProc/reference/robust_gandh.md).
 With `inverse = TRUE`, it transforms values back to the original scale,
 such as the predictions of a model fitted to the transformed variables.
 
@@ -30,7 +30,9 @@ predict(
   An object returned by
   [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md)
   or
-  [`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md).
+  [`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md)
+  or
+  [`robust_gandh()`](https://christiangoueguel.com/specProc/reference/robust_gandh.md).
 
 - newdata:
 
@@ -80,20 +82,24 @@ median of the variable on the original scale (`estimate = "median"`, the
 default). It needs no other assumption, and suits the prediction of one
 sample.
 
-On the original scale, the mean is higher than the median when \\\lambda
-\< 1\\ (the transformation compresses the upper tail), and lower when
-\\\lambda \> 1\\. `estimate = "mean"` gives the smearing estimate of
-Duan (1983), \$\$\hat{x} = \frac{1}{n} \sum\_{k=1}^{n} g^{-1}(\hat{z} +
-e_k),\$\$ where \\e_1, \dots, e_n\\ are the `residuals` of the model on
-the transformed scale (preferably cross-validated, since the residuals
-of the fit underestimate the errors of prediction). It assumes no
-distribution of the errors, only that they do not depend on \\\hat{z}\\.
-The mean matters when the predictions are averaged or summed, such as
-for the mean content of a lot or a mass balance. It is not robust: an
-outlying residual pulls it, so pass the residuals of the inliers of a
-robust model (for example, of the spectra that
+For the power transformations, on the original scale the mean is higher
+than the median when \\\lambda \< 1\\ (the transformation compresses the
+upper tail), and lower when \\\lambda \> 1\\. `estimate = "mean"` gives
+the smearing estimate of Duan (1983), \$\$\hat{x} = \frac{1}{n}
+\sum\_{k=1}^{n} g^{-1}(\hat{z} + e_k),\$\$ where \\e_1, \dots, e_n\\ are
+the `residuals` of the model on the transformed scale (preferably
+cross-validated, since the residuals of the fit underestimate the errors
+of prediction). It assumes no distribution of the errors, only that they
+do not depend on \\\hat{z}\\. The mean matters when the predictions are
+averaged or summed, such as for the mean content of a lot or a mass
+balance. It is not robust: an outlying residual pulls it, so pass the
+residuals of the inliers of a robust model (for example, of the spectra
+that
 [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
-does not flag).
+does not flag). Smearing is also available for
+[`robust_gandh()`](https://christiangoueguel.com/specProc/reference/robust_gandh.md);
+the direction of the mean-median difference depends on its fitted shape
+and residuals.
 
 The back-transformation is not defined everywhere, because some
 transformations are bounded: the Box-Cox transformation above for
@@ -111,7 +117,8 @@ become `NA`, with a warning.
 ## See also
 
 [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md),
-[`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md)
+[`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md),
+[`robust_gandh()`](https://christiangoueguel.com/specProc/reference/robust_gandh.md)
 
 ## Examples
 
