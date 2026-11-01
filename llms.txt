@@ -776,10 +776,13 @@ Functions that use Tukey’s biweight formalism.
 
 ### skewness
 
-Function used to measure the skewness of a distribution.
+Functions used to measure the skewness of a distribution, and to plot it
+along the wavelength axis.
 
 - [`medcouple()`](https://christiangoueguel.com/specProc/reference/medcouple.md)
   : Medcouple
+- [`plot_medcouple()`](https://christiangoueguel.com/specProc/reference/plot_medcouple.md)
+  : Plot of the Medcouple by Wavelength
 
 ### tail weight
 

@@ -50,8 +50,8 @@ The interpretation of the medcouple is as follows:
 Unlike the classical skewness, which is based on the third moment and
 can be driven by a single extreme value, the medcouple has a breakdown
 value of 25%. It is computed by
-[`robustbase::mc()`](https://R-forge.R-project.org/R/?group_id=59/reference/mc.html),
-in \\O(n \log n)\\ time. The medcouple is used by the adjusted boxplot
+[`robustbase::mc()`](https://rdrr.io/pkg/robustbase/man/mc.html), in
+\\O(n \log n)\\ time. The medcouple is used by the adjusted boxplot
 ([`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md))
 and the skewness-adjusted fences of
 [`iqr_outliers()`](https://christiangoueguel.com/specProc/reference/iqr_outliers.md);

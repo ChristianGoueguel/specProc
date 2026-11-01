@@ -67,7 +67,7 @@
   fits the reweighted LTS regression
   ([`lts_fit()`](https://christiangoueguel.com/specProc/reference/linear_reg_lts.md),
   from
-  [`robustbase::ltsReg()`](https://R-forge.R-project.org/R/?group_id=59/reference/ltsReg.html));
+  [`robustbase::ltsReg()`](https://rdrr.io/pkg/robustbase/man/ltsReg.html));
   after
   [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md)
   in a workflow, it gives robust PCR in tidymodels.
@@ -454,6 +454,14 @@
   `iqr_outliers(skew = TRUE)`,
   [`medcouple_weight()`](https://christiangoueguel.com/specProc/reference/medcouple_weight.md)
   and `summary_stats(robust = TRUE)`.
+- [`plot_medcouple()`](https://christiangoueguel.com/specProc/reference/plot_medcouple.md):
+  the medcouple of the intensities at each wavelength, as bars along the
+  wavelength axis, or with `group` as a heatmap with one row per group
+  of spectra (such as the shots of each sample). The color scale is
+  fixed from -1 to 1: two colors through white at 0 (blue and red by
+  default), or any gradient
+  (`color = grDevices::hcl.colors(9, "Spectral")`). Interactive versions
+  with plotly.
 
 ### Improvements
 

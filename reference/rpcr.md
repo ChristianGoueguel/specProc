@@ -114,7 +114,7 @@ The method has two steps:
 2.  **Robust regression.** The responses are regressed on the first
     `ncomp` scores. With one response, this is the reweighted least
     trimmed squares (LTS) regression of
-    [`robustbase::ltsReg()`](https://R-forge.R-project.org/R/?group_id=59/reference/ltsReg.html).
+    [`robustbase::ltsReg()`](https://rdrr.io/pkg/robustbase/man/ltsReg.html).
     With several responses, it is the MCD regression of Rousseeuw, Van
     Aelst, Van Driessen and Agullo (2004): least squares from the
     reweighted MCD of the scores and responses, then least squares on

@@ -93,7 +93,7 @@ or a rescaling of the data.</p>
 tail), and negative values a left-skewed one.</p></li>
 </ul><p>Unlike the classical skewness, which is based on the third moment and can
 be driven by a single extreme value, the medcouple has a breakdown value
-of 25%. It is computed by <code><a href="https://R-forge.R-project.org/R/?group_id=59/reference/mc.html" class="external-link">robustbase::mc()</a></code>, in \(O(n \log n)\) time.
+of 25%. It is computed by <code><a href="https://rdrr.io/pkg/robustbase/man/mc.html" class="external-link">robustbase::mc()</a></code>, in \(O(n \log n)\) time.
 The medcouple is used by the adjusted boxplot (<code><a href="adjusted_boxplot.html">adjusted_boxplot()</a></code>) and
 the skewness-adjusted fences of <code><a href="iqr_outliers.html">iqr_outliers()</a></code>; <code><a href="medcouple_weight.html">medcouple_weight()</a></code>
 applies it to each half of the data to measure the weight of the tails.</p>

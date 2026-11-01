@@ -211,7 +211,7 @@ moderately skewed distribution are flagged, as with Tukey's boxplot for
 normal data. The whiskers end at the most extreme observations within
 the fences, and the observations outside are drawn as points. The
 statistics are computed by
-[`robustbase::adjboxStats()`](https://R-forge.R-project.org/R/?group_id=59/reference/adjboxStats.html),
+[`robustbase::adjboxStats()`](https://rdrr.io/pkg/robustbase/man/adjboxStats.html),
 whose quartiles are Tukey's hinges, as in
 [`boxplot()`](https://rdrr.io/r/graphics/boxplot.html). The method suits
 distributions that are not excessively skewed, i.e. with \\\|\text{MC}\|
