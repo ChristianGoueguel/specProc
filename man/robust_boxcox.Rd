@@ -23,8 +23,9 @@ by the mean and standard deviation of the inliers (\code{TRUE}, default).}
 }
 \value{
 An object of class \code{specproc_boxcox} (a list), which
-\link[=predict.specproc_transformation]{predict()} applies to new data, with
-the following components:
+\link[=predict.specproc_transformation]{predict()} applies to new data, or
+with \code{inverse = TRUE} uses to transform values back to the original
+scale (as a median or a mean), with the following components:
 \itemize{
 \item \code{transformation}: A tibble of the transformed variables.
 \item \code{summary}: A tibble with one row per variable: \code{variable}, \code{lambda}

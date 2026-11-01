@@ -33,8 +33,9 @@
 #' @inheritParams robust_boxcox
 #'
 #' @return An object of class `specproc_yeojohnson` (a list), which
-#'   [predict()][predict.specproc_transformation] applies to new data, with
-#'   the following components:
+#'   [predict()][predict.specproc_transformation] applies to new data, or
+#'   with `inverse = TRUE` uses to transform values back to the original
+#'   scale (as a median or a mean), with the following components:
 #'  - `transformation`: A tibble of the transformed variables.
 #'  - `summary`: A tibble with one row per variable: `variable`, `lambda`
 #'    (`NA` for the variables left unchanged) and `objective` (the robust

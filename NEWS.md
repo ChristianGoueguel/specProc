@@ -292,8 +292,16 @@
   `recipes::step_YeoJohnson()`). Each fits one transformation, so that the
   `lambda` of all the variables are on the same scale. They take a vector,
   matrix or data frame, have a `standardize` argument, and return a fitted
-  object that `predict()` applies to new data. `robust_boxcox()` warns about
-  the variables with zero or negative values, which it leaves unchanged.
+  object that `predict()` applies to new data, or to any subset of its
+  variables. `robust_boxcox()` warns about the variables with zero or
+  negative values, which it leaves unchanged.
+* `predict(inverse = TRUE)` transforms values back to the original scale
+  after `robust_boxcox()` or `robust_yeojohnson()`, such as the predictions
+  of a calibration fitted to the transformed contents: as the median
+  (`estimate = "median"`, default) or, with the residuals of the model, as
+  the mean (`estimate = "mean"`, the smearing estimate of Duan, 1983).
+  Values beyond the range of the transformation become `NA`, with a
+  warning.
 
 ## Improvements
 

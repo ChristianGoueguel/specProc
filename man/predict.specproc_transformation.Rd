@@ -2,38 +2,118 @@
 % Please edit documentation in R/robust_transformation.R
 \name{predict.specproc_transformation}
 \alias{predict.specproc_transformation}
-\title{Apply a Robust Transformation to New Data}
+\title{Apply a Robust Transformation to New Data, or Back-Transform}
 \usage{
-\method{predict}{specproc_transformation}(object, newdata, ...)
+\method{predict}{specproc_transformation}(
+  object,
+  newdata,
+  inverse = FALSE,
+  estimate = c("median", "mean"),
+  residuals = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{An object returned by \code{\link[=robust_boxcox]{robust_boxcox()}} or
 \code{\link[=robust_yeojohnson]{robust_yeojohnson()}}.}
 
-\item{newdata}{A numeric vector, matrix or data frame of new data, with the
-same variables as the data of the fit.}
+\item{newdata}{A numeric vector, matrix or data frame with some or all of
+the variables of the fit: new data, or with \code{inverse = TRUE}, values on
+the transformed scale.}
+
+\item{inverse}{A logical value: transform the values back to the
+original scale (\code{TRUE}), or transform new data (\code{FALSE}, default).}
+
+\item{estimate}{With \code{inverse = TRUE}, the estimate on the original scale:
+\code{"median"} (default) or \code{"mean"}, which needs \code{residuals}.}
+
+\item{residuals}{With \code{estimate = "mean"}, the residuals of the model on
+the transformed scale: a numeric vector, used for every variable of
+\code{newdata}, or a matrix or data frame with a column for each of them,
+matched by name (without column names, in the order of the columns of
+\code{newdata}). Missing values are ignored.}
 
 \item{...}{Not used.}
 }
 \value{
-A tibble of transformed variables. Missing values stay missing,
-and with the Box-Cox transformation, values that are zero or negative
-become \code{NA}.
+A tibble with the variables of \code{newdata}, in the order of the
+fit. Missing values stay missing, and with the Box-Cox transformation,
+new values that are zero or negative become \code{NA}.
 }
 \description{
 Transforms new data with the \eqn{\lambda} (and, with \code{standardize = TRUE}, the mean and standard deviation of the inliers) estimated by
-\code{\link[=robust_boxcox]{robust_boxcox()}} or \code{\link[=robust_yeojohnson]{robust_yeojohnson()}}.
+\code{\link[=robust_boxcox]{robust_boxcox()}} or \code{\link[=robust_yeojohnson]{robust_yeojohnson()}}. With \code{inverse = TRUE}, it
+transforms values back to the original scale, such as the predictions of
+a model fitted to the transformed variables.
+}
+\details{
+\code{newdata} can hold any of the variables of the fit, matched by name. A
+matrix or vector without column names must have all of them, in their
+order.
+
+The back-transformation undoes, in reverse order, the standardization,
+the transformation and the pre-standardization of each variable. When a
+model predicts \eqn{\hat{z}} on the transformed scale with symmetric
+errors, the back-transformed value \eqn{g^{-1}(\hat{z})} estimates the
+median of the variable on the original scale (\code{estimate = "median"}, the
+default). It needs no other assumption, and suits the prediction of one
+sample.
+
+On the original scale, the mean is higher than the median when
+\eqn{\lambda < 1} (the transformation compresses the upper tail), and
+lower when \eqn{\lambda > 1}. \code{estimate = "mean"} gives the smearing
+estimate of Duan (1983),
+\deqn{\hat{x} = \frac{1}{n} \sum_{k=1}^{n} g^{-1}(\hat{z} + e_k),}
+where \eqn{e_1, \dots, e_n} are the \code{residuals} of the model on the
+transformed scale (preferably cross-validated, since the residuals of the
+fit underestimate the errors of prediction). It assumes no distribution
+of the errors, only that they do not depend on \eqn{\hat{z}}. The mean
+matters when the predictions are averaged or summed, such as for the mean
+content of a lot or a mass balance. It is not robust: an outlying
+residual pulls it, so pass the residuals of the inliers of a robust model
+(for example, of the spectra that \code{\link[=rsimpls]{rsimpls()}} does not flag).
+
+The back-transformation is not defined everywhere, because some
+transformations are bounded: the Box-Cox transformation above for
+\eqn{\lambda < 0}, and the Yeo-Johnson transformation above for
+\eqn{\lambda < 0} and below for \eqn{\lambda > 2}. Values beyond the
+bound (with \code{estimate = "mean"}, values that pass it with one of the
+residuals) become \code{NA}, with a warning.
 }
 \examples{
 data(forageLIBS)
 contents <- forageLIBS[c("Ca", "K", "P", "Mn")]
 fit <- robust_boxcox(contents[1:300, ])
 new <- predict(fit, contents[301:368, ])
-dim(new)
+# back to mg/kg
+head(predict(fit, new, inverse = TRUE))
 # Box-Cox is not defined for zero or negative values
 x <- contents[301:302, ]
 x$Ca[2] <- 0
 predict(fit, x)
+
+# a calibration of the transformed Mn contents on the Mn II line at
+# 257.61 nm, back to mg/kg
+wl <- suppressWarnings(as.numeric(names(forageLIBS)))
+line <- forageLIBS[[which.min(abs(wl - 257.61))]]
+fit <- robust_boxcox(forageLIBS[1:300, "Mn", drop = FALSE])
+model <- lm(Mn ~ log(line), data = data.frame(Mn = fit$transformation$Mn,
+                                               line = line[1:300]))
+pred <- data.frame(Mn = predict(model, data.frame(line = line[301:368])))
+med <- predict(fit, pred, inverse = TRUE)
+avg <- predict(fit, pred, inverse = TRUE, estimate = "mean",
+               residuals = residuals(model))
+summary(avg$Mn / med$Mn)
+# the mean content of the 68 samples
+c(median = mean(med$Mn), mean = mean(avg$Mn),
+  reference = mean(forageLIBS$Mn[301:368]))
+}
+\references{
+\itemize{
+\item Duan, N. (1983). Smearing estimate: a nonparametric retransformation
+method. Journal of the American Statistical Association,
+78(383):605-610.
+}
 }
 \seealso{
 \code{\link[=robust_boxcox]{robust_boxcox()}}, \code{\link[=robust_yeojohnson]{robust_yeojohnson()}}

@@ -74,19 +74,112 @@ test_that("predict applies the transformation of the fit to new data", {
                ignore_attr = TRUE)
   # the training data give back the transformation
   expect_equal(predict(fit, positive[1:70, ]), fit$transformation)
-  # the columns are matched by name
+  # the columns are matched by name, and can be a subset of the variables
   expect_equal(predict(fit, positive[71:100, 2:1]), new)
+  expect_equal(predict(fit, positive[71:100, "gamma"]), new["gamma"])
   # zero, negative and missing values
   x <- positive[71:73, ]
   x$lognormal <- c(0, -1, NA)
   expect_true(all(is.na(predict(fit, x)$lognormal)))
   expect_false(anyNA(predict(fit, x)$gamma))
-  expect_error(predict(fit, positive[, 1]), "2 columns")
-  expect_error(predict(fit, data.frame(a = 1, b = 2)), "do not match")
+  expect_error(predict(fit, unname(as.matrix(positive[, 1]))), "2 column\\(s\\)")
+  expect_error(predict(fit, data.frame(a = 1, gamma = 2)), "not found: a\\.")
+  m <- as.matrix(positive[1:3, c(1, 1)])
+  expect_error(predict(fit, m), "duplicated")
   expect_error(predict(fit), "newdata")
   # a single variable
   one <- robust_yeojohnson(positive$gamma)
   expect_equal(predict(one, positive$gamma)$V1, one$transformation$V1)
+})
+
+test_that("predict transforms values back to the original scale", {
+  set.seed(4)
+  x <- data.frame(gamma = stats::rgamma(80, 2), constant = 1, negskew = -stats::rlnorm(80),
+                  rightskew = stats::rlnorm(80) - 2)
+  x$gamma[3] <- NA
+  bc <- suppressWarnings(robust_boxcox(x))
+  expect_equal(predict(bc, bc$transformation, inverse = TRUE), tibble::as_tibble(x))
+  for (standardize in c(TRUE, FALSE)) {
+    yj <- robust_yeojohnson(x, standardize = standardize)
+    expect_equal(predict(yj, yj$transformation, inverse = TRUE), tibble::as_tibble(x))
+  }
+  # a subset of the variables, and a vector for a single variable
+  expect_equal(predict(yj, yj$transformation["negskew"], inverse = TRUE), tibble::as_tibble(x["negskew"]))
+  one <- robust_boxcox(x$gamma)
+  expect_equal(predict(one, one$transformation$V1, inverse = TRUE)$V1, x$gamma)
+})
+
+test_that("the inverse transformations are exact and NA beyond their range", {
+  for (lambda in c(-1, -0.5, 0, 0.5, 1, 2, 3)) {
+    v <- c(0.1, 0.5, 1, 2, 5)
+    expect_equal(bc_inverse(bc_transform(v, lambda), lambda), v)
+    v <- c(-5, -1, -0.2, 0, 0.3, 1, 4)
+    expect_equal(yj_inverse(yj_transform(v, lambda), lambda), v)
+  }
+  # bounded above (at -1 / lambda) for lambda < 0
+  expect_equal(bc_inverse(c(1, 2, 3, NA), -0.5), c(4, NA, NA, NA))
+  expect_equal(is.na(yj_inverse(c(-1, 1, 3), -0.5)), c(FALSE, FALSE, TRUE))
+  # and below (at -1 / (lambda - 2)) for lambda > 2
+  expect_equal(is.na(yj_inverse(c(-3, -1, 1), 2.5)), c(TRUE, FALSE, FALSE))
+
+  fit <- robust_boxcox(positive)
+  fit$fits$lognormal$lambda <- -0.5
+  expect_warning(back <- predict(fit, data.frame(lognormal = c(0, 1e6, NA)), inverse = TRUE),
+                 "1 value\\(s\\) are beyond the range")
+  expect_equal(is.na(back$lognormal), c(FALSE, TRUE, TRUE))
+})
+
+test_that("estimate = 'mean' gives the smearing estimate", {
+  fit <- robust_boxcox(positive)
+  z <- data.frame(lognormal = c(-1, 0, 1.5))
+  e <- c(-0.6, -0.1, 0.2, 0.5, NA)
+  avg <- predict(fit, z, inverse = TRUE, estimate = "mean", residuals = e)
+  f <- fit$fits$lognormal
+  manual <- vapply(z$lognormal, function(zi) mean(invert_values(zi + e[1:4], f, TRUE)), numeric(1))
+  expect_equal(avg$lognormal, manual)
+  # the mean is above the median for lambda < 1, and equal without errors
+  med <- predict(fit, z, inverse = TRUE)
+  expect_lt(f$lambda, 1)
+  expect_true(all(predict(fit, z, inverse = TRUE, estimate = "mean",
+                          residuals = c(-0.5, 0.5))$lognormal > med$lognormal))
+  expect_equal(predict(fit, z, inverse = TRUE, estimate = "mean", residuals = 0), med)
+  # residuals per variable, matched by name or by position
+  z2 <- data.frame(gamma = c(0, 1), lognormal = c(0, 1))
+  r <- data.frame(lognormal = c(-0.3, 0.3), gamma = c(-1, 1))
+  both <- predict(fit, z2, inverse = TRUE, estimate = "mean", residuals = r)
+  expect_named(both, c("lognormal", "gamma"))
+  expect_equal(both$gamma, predict(fit, z2["gamma"], inverse = TRUE, estimate = "mean",
+                                   residuals = c(-1, 1))$gamma)
+  expect_equal(predict(fit, z2, inverse = TRUE, estimate = "mean", residuals = as.matrix(unname(r[2:1]))),
+               predict(fit, z2, inverse = TRUE, estimate = "mean", residuals = r[2:1]))
+  # a variable left unchanged: the values plus the mean of the residuals
+  un <- robust_boxcox(data.frame(a = positive$gamma, constant = 1))
+  expect_equal(predict(un, data.frame(constant = 2), inverse = TRUE, estimate = "mean",
+                       residuals = c(0.1, 0.5))$constant, 2.3)
+  # a residual that passes the bound
+  fit$fits$lognormal$lambda <- -0.5
+  bound <- (2 - f$mean) / f$sd
+  expect_warning(out <- predict(fit, data.frame(lognormal = c(bound - 2, bound - 0.1)),
+                                inverse = TRUE, estimate = "mean", residuals = c(-0.2, 0.2)),
+                 "1 value\\(s\\) have no mean")
+  expect_equal(is.na(out$lognormal), c(FALSE, TRUE))
+})
+
+test_that("predict checks the arguments of the back-transformation", {
+  fit <- robust_boxcox(positive)
+  z <- fit$transformation
+  expect_error(predict(fit, z, inverse = NA), "'inverse'")
+  expect_error(predict(fit, z, estimate = "mean"), "only with inverse = TRUE")
+  expect_error(predict(fit, z, residuals = 1), "only with inverse = TRUE")
+  expect_error(predict(fit, z, inverse = TRUE, estimate = "mode"), "should be one of")
+  expect_error(predict(fit, z, inverse = TRUE, estimate = "mean"), "needs the 'residuals'")
+  expect_error(predict(fit, z, inverse = TRUE, residuals = 1), "only with estimate = \"mean\"")
+  expect_error(predict(fit, z, inverse = TRUE, estimate = "mean",
+                       residuals = data.frame(gamma = 1)), "no column for: lognormal")
+  expect_error(predict(fit, z, inverse = TRUE, estimate = "mean", residuals = matrix(1, 2, 3)),
+               "one column per variable")
+  expect_error(predict(fit, z, inverse = TRUE, estimate = "mean", residuals = NA_real_),
+               "no values")
 })
 
 test_that("the transformations print a summary", {
