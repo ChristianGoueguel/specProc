@@ -479,10 +479,20 @@
   variables are on the same scale. They take a vector, matrix or data
   frame, have a `standardize` argument, and return a fitted object that
   [`predict()`](https://rdrr.io/r/stats/predict.html) applies to new
-  data.
+  data, or to any subset of its variables.
   [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md)
   warns about the variables with zero or negative values, which it
   leaves unchanged.
+- `predict(inverse = TRUE)` transforms values back to the original scale
+  after
+  [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md)
+  or
+  [`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md),
+  such as the predictions of a calibration fitted to the transformed
+  contents: as the median (`estimate = "median"`, default) or, with the
+  residuals of the model, as the mean (`estimate = "mean"`, the smearing
+  estimate of Duan, 1983). Values beyond the range of the transformation
+  become `NA`, with a warning.
 
 ### Improvements
 

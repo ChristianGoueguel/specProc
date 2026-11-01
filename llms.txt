@@ -761,7 +761,7 @@ Functions used to transform variables toward central normality.
 - [`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md)
   : Robust Yeo-Johnson Transformation
 - [`predict(`*`<specproc_transformation>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_transformation.md)
-  : Apply a Robust Transformation to New Data
+  : Apply a Robust Transformation to New Data, or Back-Transform
 
 ## Robust statistical estimators
 

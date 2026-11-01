@@ -89,8 +89,9 @@ by the mean and standard deviation of the inliers (<code>TRUE</code>, default).<
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>An object of class <code>specproc_yeojohnson</code> (a list), which
-<a href="predict.specproc_transformation.html">predict()</a> applies to new data, with
-the following components:</p><ul><li><p><code>transformation</code>: A tibble of the transformed variables.</p></li>
+<a href="predict.specproc_transformation.html">predict()</a> applies to new data, or
+with <code>inverse = TRUE</code> uses to transform values back to the original
+scale (as a median or a mean), with the following components:</p><ul><li><p><code>transformation</code>: A tibble of the transformed variables.</p></li>
 <li><p><code>summary</code>: A tibble with one row per variable: <code>variable</code>, <code>lambda</code>
 (<code>NA</code> for the variables left unchanged) and <code>objective</code> (the robust
 distance between the transformed values and the normal quantiles of
