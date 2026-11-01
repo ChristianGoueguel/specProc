@@ -77,7 +77,7 @@ used by [`glm()`](https://rdrr.io/r/stats/glm.html).
 | `outlierplot()` | [`plot_outliers()`](https://christiangoueguel.com/specProc/reference/plot_outliers.md) |
 | `directOutlyingness()` | [`directional_outlyingness()`](https://christiangoueguel.com/specProc/reference/directional_outlyingness.md) |
 | `iqrMethod()` | [`iqr_outliers()`](https://christiangoueguel.com/specProc/reference/iqr_outliers.md) |
-| `robustBCYJ()` | [`robust_bcyj()`](https://christiangoueguel.com/specProc/reference/robust_bcyj.md) |
+| `robustBCYJ()` | [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md), [`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md) |
 | `rousseeuwCroux()` | [`rousseeuw_croux()`](https://christiangoueguel.com/specProc/reference/rousseeuw_croux.md) |
 | `summaryStats()` | [`summary_stats()`](https://christiangoueguel.com/specProc/reference/summary_stats.md) |
 | `tukeyGH()` | [`tukey_gh()`](https://christiangoueguel.com/specProc/reference/tukey_gh.md) |

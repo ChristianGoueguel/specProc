@@ -462,6 +462,27 @@
   default), or any gradient
   (`color = grDevices::hcl.colors(9, "Spectral")`). Interactive versions
   with plotly.
+- [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md)
+  and
+  [`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md)
+  replace
+  [`robust_bcyj()`](https://christiangoueguel.com/specProc/reference/robust_bcyj.md),
+  with the recipe steps
+  [`step_robust_boxcox()`](https://christiangoueguel.com/specProc/reference/step_robust_boxcox.md)
+  and
+  [`step_robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/step_robust_yeojohnson.md)
+  (the robust counterparts of
+  [`recipes::step_BoxCox()`](https://recipes.tidymodels.org/reference/step_BoxCox.html)
+  and
+  [`recipes::step_YeoJohnson()`](https://recipes.tidymodels.org/reference/step_YeoJohnson.html)).
+  Each fits one transformation, so that the `lambda` of all the
+  variables are on the same scale. They take a vector, matrix or data
+  frame, have a `standardize` argument, and return a fitted object that
+  [`predict()`](https://rdrr.io/r/stats/predict.html) applies to new
+  data.
+  [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md)
+  warns about the variables with zero or negative values, which it
+  leaves unchanged.
 
 ### Improvements
 
@@ -854,6 +875,21 @@
   [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md).
   The signs of loadings and scores may differ from those of earlier
   versions.
+- [`robust_bcyj()`](https://christiangoueguel.com/specProc/reference/robust_bcyj.md)
+  and
+  [`step_robust_bcyj()`](https://christiangoueguel.com/specProc/reference/step_robust_bcyj.md)
+  are deprecated in favor of
+  [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md),
+  [`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md)
+  and their recipe steps (see New features). They still work, with a
+  deprecation warning, and the recipes trained with
+  [`step_robust_bcyj()`](https://christiangoueguel.com/specProc/reference/step_robust_bcyj.md)
+  can still be baked. Their default, `type = "bestObj"`, chose Box-Cox
+  or Yeo-Johnson for each variable by a difference in fit that is often
+  negligible (each for about half of the forageLIBS channels), and mixed
+  two scales of `lambda`. The defunct
+  [`robustBCYJ()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
+  now names the new functions.
 
 ### Bug fixes
 

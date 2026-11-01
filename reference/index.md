@@ -204,8 +204,10 @@ and can be tuned within a tidymodels workflow.
 
 ### robust transformation, PCA and PLS
 
-- [`step_robust_bcyj()`](https://christiangoueguel.com/specProc/reference/step_robust_bcyj.md)
-  : Robust Box-Cox and Yeo-Johnson Transformation Recipe Step
+- [`step_robust_boxcox()`](https://christiangoueguel.com/specProc/reference/step_robust_boxcox.md)
+  : Robust Box-Cox Transformation Recipe Step
+- [`step_robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/step_robust_yeojohnson.md)
+  : Robust Yeo-Johnson Transformation Recipe Step
 - [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md)
   : Robust PCA (ROBPCA) Recipe Step
 - [`step_rospca()`](https://christiangoueguel.com/specProc/reference/step_rospca.md)
@@ -496,10 +498,14 @@ computed based on the dispersion of the variable.
 
 ### data transformation
 
-Function used to transform variable(s) toward central normality.
+Functions used to transform variables toward central normality.
 
-- [`robust_bcyj()`](https://christiangoueguel.com/specProc/reference/robust_bcyj.md)
-  : Robust Box-Cox and Yeo-Johnson Transformation
+- [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md)
+  : Robust Box-Cox Transformation
+- [`robust_yeojohnson()`](https://christiangoueguel.com/specProc/reference/robust_yeojohnson.md)
+  : Robust Yeo-Johnson Transformation
+- [`predict(`*`<specproc_transformation>`*`)`](https://christiangoueguel.com/specProc/reference/predict.specproc_transformation.md)
+  : Apply a Robust Transformation to New Data
 
 ## Robust statistical estimators
 

@@ -126,6 +126,7 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_slope_bias.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_som.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_transfer.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_transformation.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/predict.specproc_wavelength_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/projected_osc.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/pseudo_voigt_profile.html</loc></url>
@@ -138,8 +139,10 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/response_calibration.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/robpca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/robust_bcyj.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/robust_boxcox.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/robust_da.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/robust_rmsecv.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/robust_yeojohnson.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/rospca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/rousseeuw_croux.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/rpcr.html</loc></url>
@@ -188,6 +191,8 @@
 <url><loc>https://christiangoueguel.com/specProc/reference/step_reject_shots.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_robpca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_robust_bcyj.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/step_robust_boxcox.html</loc></url>
+<url><loc>https://christiangoueguel.com/specProc/reference/step_robust_yeojohnson.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_rospca.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_rsimpls.html</loc></url>
 <url><loc>https://christiangoueguel.com/specProc/reference/step_savgol.html</loc></url>
