@@ -33,9 +33,9 @@ test_that("directional_outlyingness flags gross outliers", {
   expect_named(res, c("data", "score", "flag"))
   expect_true(res$flag[res$data == 1e3])
   expect_equal(sum(res$flag), 1)
-  expect_no_error(res2 <- directional_outlyingness(y, maxRatio = 3))
+  expect_no_error(res2 <- directional_outlyingness(y, max_ratio = 3))
   expect_true(res2$flag[res2$data == 1e3])
-  expect_error(directional_outlyingness(y, maxRatio = 1), "at least 2")
+  expect_error(directional_outlyingness(y, max_ratio = 1), "at least 2")
   expect_error(directional_outlyingness("a"), "numeric")
 })
 

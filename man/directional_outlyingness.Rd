@@ -6,22 +6,29 @@
 \usage{
 directional_outlyingness(
   x,
-  cutoff.quantile = 0.995,
-  rmZeroes = FALSE,
-  maxRatio = NULL,
-  precScale = 1e-10
+  cutoff_quantile = 0.995,
+  rm_zeroes = FALSE,
+  max_ratio = NULL,
+  prec_scale = 1e-10,
+  cutoff.quantile = deprecated(),
+  rmZeroes = deprecated(),
+  maxRatio = deprecated(),
+  precScale = deprecated()
 )
 }
 \arguments{
 \item{x}{A numeric vector}
 
-\item{cutoff.quantile}{A numeric value between 0 and 1 specifying the quantile for outlier detection (default: 0.995).}
+\item{cutoff_quantile}{A numeric value between 0 and 1 specifying the quantile for outlier detection (default: 0.995).}
 
-\item{rmZeroes}{A logical value. If \code{TRUE}, removes values close to zero (default: \code{FALSE}).}
+\item{rm_zeroes}{A logical value. If \code{TRUE}, removes values close to zero (default: \code{FALSE}).}
 
-\item{maxRatio}{A numeric value greater than 2. If provided, constrains the ratio between positive and negative scales (default: \code{NULL}).}
+\item{max_ratio}{A numeric value greater than 2. If provided, constrains the ratio between positive and negative scales (default: \code{NULL}).}
 
-\item{precScale}{A numeric value specifying the precision scale for near-zero comparisons (default: 1e-10).}
+\item{prec_scale}{A numeric value specifying the precision scale for near-zero comparisons (default: 1e-10).}
+
+\item{cutoff.quantile, rmZeroes, maxRatio, precScale}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
+\code{cutoff_quantile}, \code{rm_zeroes}, \code{max_ratio} and \code{prec_scale}.}
 }
 \value{
 A tibble with columns:

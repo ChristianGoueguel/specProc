@@ -57,12 +57,13 @@
 #' @param spectra Spectra, one per row: a numeric matrix, or a data frame
 #'   whose wavelength columns are named by their wavelengths (other columns
 #'   are used as labels).
-#' @param launch.browser Passed to [shiny::runApp()]. Default is `TRUE`
-#'   when R is interactive.
+#' @param launch_browser Passed to [shiny::runApp()] as `launch.browser`.
+#'   Default is `TRUE` when R is interactive.
 #' @param show_table A logical: show the periodic table when the app starts
 #'   (`TRUE`, default). The **Hide table** button of the Elements panel hides
 #'   or shows it at any time; hiding it gives the spectrum the whole height of
 #'   the window.
+#' @param launch.browser `r lifecycle::badge("deprecated")` Use `launch_browser`.
 #'
 #' @return Invisibly, when the app is closed with **Done**, the [boltzmann()]
 #'   fit of the Boltzmann plot, whose `lines` element holds the measured
@@ -80,11 +81,14 @@
 #'   # after a Boltzmann plot closed with Done
 #'   if (!is.null(fit)) plot_boltzmann(fit)
 #' }
-line_finder <- function(spectra, launch.browser = interactive(), show_table = TRUE) {
+line_finder <- function(spectra, launch_browser = interactive(), show_table = TRUE,
+                        launch.browser = deprecated()) {
+  launch_browser <- renamed_arg(launch.browser, launch_browser, "line_finder",
+                                "launch.browser", "launch_browser")
   rlang::check_installed(c("shiny", "plotly", "bslib"), reason = "to run the line finder app.")
   check_flag(show_table, "show_table")
   invisible(shiny::runApp(line_finder_app(spectra, show_table = show_table),
-                          launch.browser = launch.browser))
+                          launch.browser = launch_browser))
 }
 
 # The app object; `fetch(species, wavelength)` returns the NIST lines of a

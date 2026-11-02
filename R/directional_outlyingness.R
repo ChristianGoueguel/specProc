@@ -19,10 +19,12 @@
 #'    Journal of Computational and Graphical Statistics, 27(2):345–359.
 #'
 #' @param x A numeric vector
-#' @param cutoff.quantile A numeric value between 0 and 1 specifying the quantile for outlier detection (default: 0.995).
-#' @param rmZeroes A logical value. If `TRUE`, removes values close to zero (default: `FALSE`).
-#' @param maxRatio A numeric value greater than 2. If provided, constrains the ratio between positive and negative scales (default: `NULL`).
-#' @param precScale A numeric value specifying the precision scale for near-zero comparisons (default: 1e-10).
+#' @param cutoff_quantile A numeric value between 0 and 1 specifying the quantile for outlier detection (default: 0.995).
+#' @param rm_zeroes A logical value. If `TRUE`, removes values close to zero (default: `FALSE`).
+#' @param max_ratio A numeric value greater than 2. If provided, constrains the ratio between positive and negative scales (default: `NULL`).
+#' @param prec_scale A numeric value specifying the precision scale for near-zero comparisons (default: 1e-10).
+#' @param cutoff.quantile,rmZeroes,maxRatio,precScale `r lifecycle::badge("deprecated")` Use
+#'   `cutoff_quantile`, `rm_zeroes`, `max_ratio` and `prec_scale`.
 #'
 #' @return A tibble with columns:
 #'   - `data`: The original numeric values.
@@ -36,21 +38,29 @@
 #' # iron contents (mg/kg): a few samples are far above the others
 #' fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
 #' head(directional_outlyingness(fe))
-directional_outlyingness <- function(x, cutoff.quantile = 0.995, rmZeroes = FALSE, maxRatio = NULL, precScale = 1e-10) {
+directional_outlyingness <- function(x, cutoff_quantile = 0.995, rm_zeroes = FALSE, max_ratio = NULL,
+                                     prec_scale = 1e-10, cutoff.quantile = deprecated(),
+                                     rmZeroes = deprecated(), maxRatio = deprecated(),
+                                     precScale = deprecated()) {
+  fn <- "directional_outlyingness"
+  cutoff_quantile <- renamed_arg(cutoff.quantile, cutoff_quantile, fn, "cutoff.quantile", "cutoff_quantile")
+  rm_zeroes <- renamed_arg(rmZeroes, rm_zeroes, fn, "rmZeroes", "rm_zeroes")
+  max_ratio <- renamed_arg(maxRatio, max_ratio, fn, "maxRatio", "max_ratio")
+  prec_scale <- renamed_arg(precScale, prec_scale, fn, "precScale", "prec_scale")
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
   if (!is.numeric(x)) {
     stop("The input 'x' must be a numeric vector.")
   }
-  if (!is.numeric(cutoff.quantile) || cutoff.quantile < 0 || cutoff.quantile > 1) {
-    stop("The input 'cutoff.quantile' must be a numeric value between 0 and 1.")
+  if (!is.numeric(cutoff_quantile) || cutoff_quantile < 0 || cutoff_quantile > 1) {
+    stop("The input 'cutoff_quantile' must be a numeric value between 0 and 1.")
   }
-  if (!is.logical(rmZeroes)) {
-    stop("'rmZeroes' must be of type boolean (TRUE or FALSE)")
+  if (!is.logical(rm_zeroes)) {
+    stop("'rm_zeroes' must be of type boolean (TRUE or FALSE)")
   }
-  if (!is.numeric(precScale) || precScale < 0) {
-    stop("'precScale' must be a positive numeric value.")
+  if (!is.numeric(prec_scale) || prec_scale < 0) {
+    stop("'prec_scale' must be a positive numeric value.")
   }
 
   x <- x[!is.na(x)]
@@ -67,26 +77,26 @@ directional_outlyingness <- function(x, cutoff.quantile = 0.995, rmZeroes = FALS
   xa <- c(rep(0, (n - h - length(xa))), xa)
   xb <- c(rep(0, (n - h - length(xb))), abs(xb))
 
-  if (rmZeroes){
-    xa <- xa[xa > precScale]
-    xb <- xb[xb > precScale]
+  if (rm_zeroes){
+    xa <- xa[xa > prec_scale]
+    xb <- xb[xb > prec_scale]
   }
 
-  sa <- scale1StepM(x = xa, precScale = precScale)
-  sb <- scale1StepM(x = xb, precScale = precScale)
+  sa <- scale1StepM(x = xa, precScale = prec_scale)
+  sb <- scale1StepM(x = xb, precScale = prec_scale)
 
-  if (!is.null(maxRatio)) {
-    if (!is.numeric(maxRatio) || length(maxRatio) != 1 || maxRatio < 2) {
-      stop("maxRatio must be at least 2")
+  if (!is.null(max_ratio)) {
+    if (!is.numeric(max_ratio) || length(max_ratio) != 1 || max_ratio < 2) {
+      stop("max_ratio must be at least 2")
     }
-    sall <- scale1StepM(x = xc, precScale = precScale)
-    sa <- min(max(sa, sall / maxRatio), sall * maxRatio)
-    sb <- min(max(sb, sall / maxRatio), sall * maxRatio)
+    sall <- scale1StepM(x = xc, precScale = prec_scale)
+    sa <- min(max(sa, sall / max_ratio), sall * max_ratio)
+    sb <- min(max(sb, sall / max_ratio), sall * max_ratio)
   }
 
   res <- ifelse(x >= med, (x - med) / sa, (med - x) / sb)
   res[x == med] <- 0
-  cutoff <- computeCutoff(res, cutoff.quantile)
+  cutoff <- computeCutoff(res, cutoff_quantile)
 
   tbl <- tibble::tibble(
     data = x,

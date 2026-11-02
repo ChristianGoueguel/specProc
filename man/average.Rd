@@ -4,19 +4,21 @@
 \alias{average}
 \title{Fast Average for Large Spectral Dataset}
 \usage{
-average(x, .group_by = NULL)
+average(x, group_by = NULL, .group_by = deprecated())
 }
 \arguments{
 \item{x}{A data frame or tibble.}
 
-\item{.group_by}{The column to group the data by (optional), given either
+\item{group_by}{The column to group the data by (optional), given either
 unquoted or as a string. If not provided, the average of the overall data
 will be computed.}
+
+\item{.group_by}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{group_by}.}
 }
 \value{
 \itemize{
-\item If \code{.group_by = NULL}, a one-row tibble containing the mean of each column.
-\item If \code{.group_by} is provided, a tibble with one row per group: the first
+\item If \code{group_by = NULL}, a one-row tibble containing the mean of each column.
+\item If \code{group_by} is provided, a tibble with one row per group: the first
 column holds the group labels and the remaining columns hold the group means.
 }
 }

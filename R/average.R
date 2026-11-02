@@ -16,12 +16,13 @@
 #' computation of each mean.
 #'
 #' @param x A data frame or tibble.
-#' @param .group_by The column to group the data by (optional), given either
+#' @param group_by The column to group the data by (optional), given either
 #'   unquoted or as a string. If not provided, the average of the overall data
 #'   will be computed.
+#' @param .group_by `r lifecycle::badge("deprecated")` Use `group_by`.
 #' @return
-#'   - If `.group_by = NULL`, a one-row tibble containing the mean of each column.
-#'   - If `.group_by` is provided, a tibble with one row per group: the first
+#'   - If `group_by = NULL`, a one-row tibble containing the mean of each column.
+#'   - If `group_by` is provided, a tibble with one row per group: the first
 #'   column holds the group labels and the remaining columns hold the group means.
 #'
 #' @export average
@@ -31,7 +32,7 @@
 #' # one mean spectrum per sample: three samples were measured twice
 #' means <- average(forageLIBS[-c(1, 3:14)], Sample)
 #' dim(means)
-average <- function(x, .group_by = NULL) {
+average <- function(x, group_by = NULL, .group_by = deprecated()) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
@@ -39,7 +40,9 @@ average <- function(x, .group_by = NULL) {
     stop("'x' must be a data frame or tibble.")
   }
 
-  group_quo <- rlang::enquo(.group_by)
+  # Quoted, since the column may be given unquoted.
+  group_quo <- renamed_arg(if (missing(.group_by)) deprecated() else rlang::enquo(.group_by),
+                           rlang::enquo(group_by), "average", ".group_by", "group_by")
 
   if (rlang::quo_is_null(group_quo)) {
     Xmat <- as_numeric_matrix(x, "x")
@@ -49,7 +52,7 @@ average <- function(x, .group_by = NULL) {
 
   group_name <- rlang::as_name(group_quo)
   if (!group_name %in% colnames(x)) {
-    stop("Grouping variable '.group_by' not found in the data")
+    stop("Grouping variable 'group_by' not found in the data")
   }
 
   data_cols <- setdiff(names(x), group_name)

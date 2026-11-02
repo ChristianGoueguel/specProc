@@ -4,20 +4,27 @@
 \alias{line_finder}
 \title{Interactive Identification of Emission Lines}
 \usage{
-line_finder(spectra, launch.browser = interactive(), show_table = TRUE)
+line_finder(
+  spectra,
+  launch_browser = interactive(),
+  show_table = TRUE,
+  launch.browser = deprecated()
+)
 }
 \arguments{
 \item{spectra}{Spectra, one per row: a numeric matrix, or a data frame
 whose wavelength columns are named by their wavelengths (other columns
 are used as labels).}
 
-\item{launch.browser}{Passed to \code{\link[shiny:runApp]{shiny::runApp()}}. Default is \code{TRUE}
-when R is interactive.}
+\item{launch_browser}{Passed to \code{\link[shiny:runApp]{shiny::runApp()}} as \code{launch.browser}.
+Default is \code{TRUE} when R is interactive.}
 
 \item{show_table}{A logical: show the periodic table when the app starts
 (\code{TRUE}, default). The \strong{Hide table} button of the Elements panel hides
 or shows it at any time; hiding it gives the spectrum the whole height of
 the window.}
+
+\item{launch.browser}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{launch_browser}.}
 }
 \value{
 Invisibly, when the app is closed with \strong{Done}, the \code{\link[=boltzmann]{boltzmann()}}

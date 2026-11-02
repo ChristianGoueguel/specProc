@@ -483,8 +483,9 @@
   `?"specProc-defunct"`), deprecated until 0.8.3, are now defunct: they stop
   with an error that names the new function, and will be removed in a later
   release.
-* Arguments with dotted names are renamed in snake_case, as in the rest of
-  the package. The former names still work, with a deprecation warning:
+* Arguments with dotted or camelCase names are renamed in snake_case, as in
+  the rest of the package. The former names still work, with a deprecation
+  warning:
   - `max.iter` becomes `max_iter` in `baseline_als()`, `baseline_arpls()`,
     `baseline_lsp()`, `osc()`, `peak_fit()` and `multipeak_fit()`;
   - `drop.na` becomes `drop_na` (as in `plot_spectra()`) in
@@ -494,6 +495,12 @@
     `rousseeuw_croux()`, `snv()`, `summary_stats()`, `umad()` and `zscore()`;
   - `drop.offset` becomes `drop_offset` in `msc()` and `step_msc()`, and
     `pls.ncomp` becomes `pls_ncomp` in `osc()`;
+  - `.group_by` becomes `group_by` in `average()`, `log.p` becomes `log_p`
+    in `tukey_gh()`, and `launch.browser` becomes `launch_browser` in
+    `line_finder()`;
+  - in `directional_outlyingness()`, `cutoff.quantile`, `rmZeroes`,
+    `maxRatio` and `precScale` become `cutoff_quantile`, `rm_zeroes`,
+    `max_ratio` and `prec_scale`;
   - in `peak_fit()` and `multipeak_fit()`, `wavelength = c(min, max)`
     replaces `wlgth.min` and `wlgth.max`, as the wavelength range of
     `nist_lines()` and `libs_lines()`. Calls that gave the arguments after

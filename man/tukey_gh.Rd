@@ -12,8 +12,9 @@ tukey_gh(
   g = 0,
   h = 0,
   log = FALSE,
-  log.p = FALSE,
-  n = NULL
+  log_p = FALSE,
+  n = NULL,
+  log.p = deprecated()
 )
 }
 \arguments{
@@ -31,9 +32,11 @@ tukey_gh(
 
 \item{log}{If \code{TRUE}, the log-density is returned for the density function. Default is \code{FALSE}.}
 
-\item{log.p}{If \code{TRUE}, the log-probability is returned for the cumulative distribution and quantile functions. Default is \code{FALSE}.}
+\item{log_p}{If \code{TRUE}, the log-probability is returned for the cumulative distribution and quantile functions. Default is \code{FALSE}.}
 
 \item{n}{For random number generation, the number of random values to be generated. Default is \code{NULL}.}
+
+\item{log.p}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{log_p}.}
 }
 \value{
 A numeric vector.

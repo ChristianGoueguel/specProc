@@ -40,8 +40,9 @@
 #' @param g The skewness parameter of the TGH distribution.
 #' @param h The kurtosis parameter of the TGH distribution.
 #' @param log If `TRUE`, the log-density is returned for the density function. Default is `FALSE`.
-#' @param log.p If `TRUE`, the log-probability is returned for the cumulative distribution and quantile functions. Default is `FALSE`.
+#' @param log_p If `TRUE`, the log-probability is returned for the cumulative distribution and quantile functions. Default is `FALSE`.
 #' @param n For random number generation, the number of random values to be generated. Default is `NULL`.
+#' @param log.p `r lifecycle::badge("deprecated")` Use `log_p`.
 #'
 #' @return A numeric vector.
 #' @export tukey_gh
@@ -70,7 +71,9 @@
 #' lty = 1
 #' )
 #'
-tukey_gh <- function(x, type = "d", location = 0, scale = 1, g = 0, h = 0, log = FALSE, log.p = FALSE, n = NULL) {
+tukey_gh <- function(x, type = "d", location = 0, scale = 1, g = 0, h = 0, log = FALSE, log_p = FALSE, n = NULL,
+                     log.p = deprecated()) {
+  log_p <- renamed_arg(log.p, log_p, "tukey_gh", "log.p", "log_p")
   if (!is.character(type) || length(type) != 1 || !type %in% c("d", "p", "q", "r")) {
     stop("Invalid 'type'. Must be one of 'd', 'p', 'q', or 'r'.")
   }
@@ -88,9 +91,9 @@ tukey_gh <- function(x, type = "d", location = 0, scale = 1, g = 0, h = 0, log =
   if (type == "d") {
     dgh(x, location, scale, g, h, log)
   } else if (type == "p") {
-    pgh(x, location, scale, g, h, log.p)
+    pgh(x, location, scale, g, h, log_p)
   } else if (type == "q") {
-    qgh(x, location, scale, g, h, log.p)
+    qgh(x, location, scale, g, h, log_p)
   } else if (type == "r") {
     if (is.null(n)) {
       stop("'n' is required for random number generation.")
@@ -156,7 +159,7 @@ dgh <- function(x, location, scale, g, h, log = FALSE) {
   )
 }
 
-pgh <- function(q, location, scale, g, h, log.p = FALSE) {
+pgh <- function(q, location, scale, g, h, log_p = FALSE) {
   vapply(
     q, function(.x) {
       if (g == 0 && h == 0) {
@@ -174,17 +177,17 @@ pgh <- function(q, location, scale, g, h, log.p = FALSE) {
       } else {
         stop("Negative kurtosis parameter")
       }
-      if (log.p == FALSE) l else log(l)
+      if (log_p == FALSE) l else log(l)
     },
     numeric(1)
   )
 }
 
-qgh <- function(q, location, scale, g, h, log.p = FALSE) {
+qgh <- function(q, location, scale, g, h, log_p = FALSE) {
   vapply(
     q, function(.x) {
       if (h >= 0) {
-        u <- stats::qnorm(.x, log.p = log.p)
+        u <- stats::qnorm(.x, log.p = log_p)
         location + scale * tg(u, g) * th(u, h)
       } else {
         stop("Negative kurtosis parameter")
