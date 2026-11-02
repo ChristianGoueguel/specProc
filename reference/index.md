@@ -174,6 +174,8 @@ and can be tuned within a tidymodels workflow.
   : Baseline Correction Recipe Step
 - [`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md)
   : Savitzky-Golay Recipe Step
+- [`step_wavelet_denoise()`](https://christiangoueguel.com/specProc/reference/step_wavelet_denoise.md)
+  : Wavelet Denoising Recipe Step
 - [`step_gap_derivative()`](https://christiangoueguel.com/specProc/reference/step_gap_derivative.md)
   : Gap-Segment Derivative Recipe Step
 - [`step_bin_spectra()`](https://christiangoueguel.com/specProc/reference/step_bin_spectra.md)
@@ -443,6 +445,8 @@ derivatives of the spectra.
 
 - [`savitzky_golay()`](https://christiangoueguel.com/specProc/reference/savitzky_golay.md)
   : Savitzky-Golay Smoothing and Derivatives
+- [`wavelet_denoise()`](https://christiangoueguel.com/specProc/reference/wavelet_denoise.md)
+  : Wavelet Denoising of Spectra
 - [`gap_derivative()`](https://christiangoueguel.com/specProc/reference/gap_derivative.md)
   : Gap-Segment Derivatives
 - [`bin_spectra()`](https://christiangoueguel.com/specProc/reference/bin_spectra.md)

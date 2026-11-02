@@ -102,6 +102,7 @@ wavelength axis, extended with the spacing of its last channels.
 ## See also
 
 [`step_wavelet()`](https://christiangoueguel.com/specProc/reference/step_wavelet.md),
+[`wavelet_denoise()`](https://christiangoueguel.com/specProc/reference/wavelet_denoise.md),
 [`savitzky_golay()`](https://christiangoueguel.com/specProc/reference/savitzky_golay.md)
 
 ## Author

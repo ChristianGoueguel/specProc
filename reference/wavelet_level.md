@@ -1,7 +1,9 @@
 # Number of Levels of a Wavelet Decomposition
 
 A dials parameter for the `level` of
-[`step_wavelet()`](https://christiangoueguel.com/specProc/reference/step_wavelet.md).
+[`step_wavelet()`](https://christiangoueguel.com/specProc/reference/step_wavelet.md)
+and
+[`step_wavelet_denoise()`](https://christiangoueguel.com/specProc/reference/step_wavelet_denoise.md).
 
 ## Usage
 
@@ -25,7 +27,8 @@ A dials `quant_param` object.
 
 ## See also
 
-[`step_wavelet()`](https://christiangoueguel.com/specProc/reference/step_wavelet.md)
+[`step_wavelet()`](https://christiangoueguel.com/specProc/reference/step_wavelet.md),
+[`step_wavelet_denoise()`](https://christiangoueguel.com/specProc/reference/step_wavelet_denoise.md)
 
 ## Examples
 

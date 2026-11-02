@@ -121,7 +121,8 @@ training data (`NA` before the step is trained) and `id`.
 ## See also
 
 [`wavelet_features()`](https://christiangoueguel.com/specProc/reference/wavelet_features.md),
-[`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md)
+[`step_savgol()`](https://christiangoueguel.com/specProc/reference/step_savgol.md),
+[`step_wavelet_denoise()`](https://christiangoueguel.com/specProc/reference/step_wavelet_denoise.md)
 
 ## Examples
 
