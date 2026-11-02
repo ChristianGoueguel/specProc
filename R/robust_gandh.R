@@ -168,23 +168,36 @@ gandh_scores <- function(x, A, B, g, h) {
     }
     return(out)
   }
-  log_abs <- function(z) {
-    if (z == 0) return(-Inf)
-    u <- g * z
-    first <- if (g == 0) log(abs(z)) else if (u > 50) {
-      u + log1p(-exp(-u)) - log(abs(g))
-    } else log(abs(expm1(u))) - log(abs(g))
-    first + h * z^2 / 2
+  out[ok[y[ok] == 0]] <- 0
+  ok <- ok[y[ok] != 0]
+  side <- sign(y[ok])
+  target <- log(abs(y[ok]))
+  # log|value| - log|y| at |z| = t, increasing in t for h > 0.
+  f <- function(t) {
+    first <- if (g == 0) log(t) else {
+      u <- g * side * t
+      v <- log(abs(expm1(u)))
+      big <- u > 50
+      v[big] <- u[big] + log1p(-exp(-u[big]))
+      v - log(abs(g))
+    }
+    first + h * t^2 / 2 - target
   }
-  out[ok] <- vapply(y[ok], function(v) {
-    if (v == 0) return(0)
-    side <- sign(v)
-    target <- log(abs(v))
-    f <- function(t) log_abs(side * t) - target
-    upper <- 1
-    while (f(upper) < 0) upper <- upper * 2
-    side * stats::uniroot(f, c(0, upper), tol = 1e-11)$root
-  }, numeric(1))
+  # Bracket and bisect all roots together, instead of one uniroot() per value.
+  lower <- numeric(length(ok))
+  upper <- rep(1, length(ok))
+  while (any(low <- f(upper) < 0)) {
+    lower[low] <- upper[low]
+    upper[low] <- 2 * upper[low]
+  }
+  repeat {
+    mid <- (lower + upper) / 2
+    below <- f(mid) < 0
+    lower[below] <- mid[below]
+    upper[!below] <- mid[!below]
+    if (all(upper - lower <= 1e-12 * pmax(1, upper))) break
+  }
+  out[ok] <- side * (lower + upper) / 2
   out
 }
 
