@@ -15,7 +15,8 @@ wavelet_level(range = c(1L, 6L), trans = NULL)
 A dials \code{quant_param} object.
 }
 \description{
-A dials parameter for the \code{level} of \code{\link[=step_wavelet]{step_wavelet()}}.
+A dials parameter for the \code{level} of \code{\link[=step_wavelet]{step_wavelet()}} and
+\code{\link[=step_wavelet_denoise]{step_wavelet_denoise()}}.
 }
 \examples{
 \dontshow{if (rlang::is_installed("dials")) withAutoprint(\{ # examplesIf}
@@ -24,5 +25,5 @@ dials::value_seq(wavelet_level(), 3)
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link[=step_wavelet]{step_wavelet()}}
+\code{\link[=step_wavelet]{step_wavelet()}}, \code{\link[=step_wavelet_denoise]{step_wavelet_denoise()}}
 }

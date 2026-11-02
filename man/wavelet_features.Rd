@@ -94,7 +94,7 @@ spectra. Chemometrics and Intelligent Laboratory Systems,
 }
 }
 \seealso{
-\code{\link[=step_wavelet]{step_wavelet()}}, \code{\link[=savitzky_golay]{savitzky_golay()}}
+\code{\link[=step_wavelet]{step_wavelet()}}, \code{\link[=wavelet_denoise]{wavelet_denoise()}}, \code{\link[=savitzky_golay]{savitzky_golay()}}
 }
 \author{
 Christian L. Goueguel

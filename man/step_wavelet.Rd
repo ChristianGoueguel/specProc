@@ -92,5 +92,5 @@ if (rlang::is_installed("recipes")) {
 }
 }
 \seealso{
-\code{\link[=wavelet_features]{wavelet_features()}}, \code{\link[=step_savgol]{step_savgol()}}
+\code{\link[=wavelet_features]{wavelet_features()}}, \code{\link[=step_savgol]{step_savgol()}}, \code{\link[=step_wavelet_denoise]{step_wavelet_denoise()}}
 }

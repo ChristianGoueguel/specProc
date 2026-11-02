@@ -172,7 +172,7 @@ than the normalization factor.
 
 | Purpose | Steps |
 |---|---|
-| Smoothing, derivatives | `step_savgol()`, `step_gap_derivative()` (gap-segment derivative) |
+| Smoothing, derivatives | `step_savgol()`, `step_wavelet_denoise()` (wavelet denoising), `step_gap_derivative()` (gap-segment derivative) |
 | Compression | `step_bin_spectra()` (means of adjacent channels), `step_wavelet()` (wavelet coefficients), `step_line_intensities()` (line intensities) |
 | Scaling | `step_pareto_scale()`, `step_poisson_scale()` |
 | Removing unwanted variation | `step_epo()`, `step_glsw()`, `step_osc()`, `step_direct_osc()`, `step_projected_osc()`, `step_opls()`, `step_o2pls()`, `step_y_gradient_glsw()` |

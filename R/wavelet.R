@@ -71,7 +71,7 @@
 #'    spectra. Chemometrics and Intelligent Laboratory Systems,
 #'    42(1-2):209-220.
 #'
-#' @seealso [step_wavelet()], [savitzky_golay()]
+#' @seealso [step_wavelet()], [wavelet_denoise()], [savitzky_golay()]
 #' @export wavelet_features
 #'
 #' @examples
@@ -135,7 +135,7 @@ wavelet_features <- function(x, wavelet = "d4", level = 3, coefficients = "appro
 #'   Not to be set by the user.
 #'
 #' @inherit step_baseline return
-#' @seealso [wavelet_features()], [step_savgol()]
+#' @seealso [wavelet_features()], [step_savgol()], [step_wavelet_denoise()]
 #' @export
 #'
 #' @examples
@@ -164,13 +164,14 @@ step_wavelet <- function(recipe, ..., wavelet = "d4", level = 3, coefficients = 
 #' @title Number of Levels of a Wavelet Decomposition
 #'
 #' @description
-#' A dials parameter for the `level` of [step_wavelet()].
+#' A dials parameter for the `level` of [step_wavelet()] and
+#' [step_wavelet_denoise()].
 #'
 #' @param range The range of levels. Default is 1 to 6.
 #' @param trans Not used.
 #'
 #' @return A dials `quant_param` object.
-#' @seealso [step_wavelet()]
+#' @seealso [step_wavelet()], [step_wavelet_denoise()]
 #' @export
 #'
 #' @examplesIf rlang::is_installed("dials")

@@ -14,6 +14,7 @@ Analyte
 Analytica
 Andersson
 Ando
+Antoniadis
 Antti
 Anzano
 Aragón
@@ -65,6 +66,7 @@ Choo
 Ciucci
 Cocchi
 Codecov
+Coifman
 Colour
 Commun
 Condon
@@ -84,6 +86,7 @@ De
 Debye
 Dell'Aglio
 Dell’Aglio
+Denoising
 DetMCD
 Dimitrijević
 Donoho
@@ -157,6 +160,7 @@ Interscience
 JCGM
 Jann
 Johansson
+Johnstone
 Jong
 Josefson
 Junot
@@ -197,6 +201,7 @@ Lorber
 Lui
 López
 MADs
+MODWT
 MSC
 MacGregor
 MacroPCA
@@ -246,6 +251,7 @@ Ohman
 Olivero
 Olivieri
 Omenetto
+Oppenheim
 Optimalität
 Orthogonalization
 Outlyingness
@@ -326,6 +332,7 @@ Sherbini
 Shewhart
 Shupack
 SiO
+Silverman
 Sjöblom
 Skrondal
 Smilde
@@ -334,6 +341,7 @@ Société
 Sparsification
 Spectrochimica
 Spectrosc
+Springer
 SrCl
 SrF
 Stahel
@@ -341,6 +349,7 @@ Stata
 Statistique
 Stempels
 Struyf
+SureShrink
 Svensson
 Syst
 Sæbø
@@ -426,6 +435,10 @@ covarying
 cowplot
 data's
 de
+denoise
+denoised
+denoises
+denoising
 doi
 downweighted
 downweights
@@ -528,6 +541,7 @@ tidyselect
 tidyverse
 tunable
 und
+undecimated
 unflagged
 vibrational
 voigt

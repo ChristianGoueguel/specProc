@@ -10,6 +10,21 @@
   preserves extreme normal scores without rounding cumulative probabilities.
   `step_robust_gandh()` estimates the transformation within recipe training.
 
+* `wavelet_denoise()`: denoising of spectra by thresholding their
+  undecimated wavelet transform (MODWT), the translation-invariant denoising
+  of Coifman and Donoho (1995). Narrow lines keep their height and width,
+  unlike with a smoothing filter. The noise of each level is estimated
+  robustly in each spectrum, the threshold is SureShrink (default) or
+  universal, hard (default) or soft, and the segments of a
+  multi-spectrometer system are denoised separately.
+  `step_wavelet_denoise()` is its recipe step, with a tunable `level`. In
+  the single shots of `forageShots`, whose lines are 2 to 3 channels wide
+  and whose noise has the scale of the lines, the defaults lower the error
+  of the continuum by about 10% for 4% of the height of the weak lines,
+  while a Savitzky-Golay filter of 5 channels lowers the strong lines by
+  10%; the PLS calibrations of the averaged spectra of `forageLIBS` hardly
+  change.
+
 * `rsimpls()`: robust PLS regression by the RSIMPLS algorithm of Hubert and
   Vanden Branden (2003), the SIMPLS algorithm computed from a ROBPCA
   covariance matrix of the spectra and the responses, followed by a robust
