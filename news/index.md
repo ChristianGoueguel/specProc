@@ -799,9 +799,9 @@
   [`?"specProc-defunct"`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)),
   deprecated until 0.8.3, are now defunct: they stop with an error that
   names the new function, and will be removed in a later release.
-- Arguments with dotted names are renamed in snake_case, as in the rest
-  of the package. The former names still work, with a deprecation
-  warning:
+- Arguments with dotted or camelCase names are renamed in snake_case, as
+  in the rest of the package. The former names still work, with a
+  deprecation warning:
   - `max.iter` becomes `max_iter` in
     [`baseline_als()`](https://christiangoueguel.com/specProc/reference/baseline_als.md),
     [`baseline_arpls()`](https://christiangoueguel.com/specProc/reference/baseline_arpls.md),
@@ -837,6 +837,16 @@
     [`step_msc()`](https://christiangoueguel.com/specProc/reference/step_msc.md),
     and `pls.ncomp` becomes `pls_ncomp` in
     [`osc()`](https://christiangoueguel.com/specProc/reference/osc.md);
+  - `.group_by` becomes `group_by` in
+    [`average()`](https://christiangoueguel.com/specProc/reference/average.md),
+    `log.p` becomes `log_p` in
+    [`tukey_gh()`](https://christiangoueguel.com/specProc/reference/tukey_gh.md),
+    and `launch.browser` becomes `launch_browser` in
+    [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md);
+  - in
+    [`directional_outlyingness()`](https://christiangoueguel.com/specProc/reference/directional_outlyingness.md),
+    `cutoff.quantile`, `rmZeroes`, `maxRatio` and `precScale` become
+    `cutoff_quantile`, `rm_zeroes`, `max_ratio` and `prec_scale`;
   - in
     [`peak_fit()`](https://christiangoueguel.com/specProc/reference/peak_fit.md)
     and

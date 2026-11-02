@@ -53,10 +53,14 @@ data point that takes the skewness of the underlying distribution into account.<
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">directional_outlyingness</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
-<span>  cutoff.quantile <span class="op">=</span> <span class="fl">0.995</span>,</span>
-<span>  rmZeroes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  maxRatio <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  precScale <span class="op">=</span> <span class="fl">1e-10</span></span>
+<span>  cutoff_quantile <span class="op">=</span> <span class="fl">0.995</span>,</span>
+<span>  rm_zeroes <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  max_ratio <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  prec_scale <span class="op">=</span> <span class="fl">1e-10</span>,</span>
+<span>  cutoff.quantile <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  rmZeroes <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  maxRatio <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  precScale <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -68,20 +72,25 @@ data point that takes the skewness of the underlying distribution into account.<
 <dd><p>A numeric vector</p></dd>
 
 
-<dt id="arg-cutoff-quantile">cutoff.quantile<a class="anchor" aria-label="anchor" href="#arg-cutoff-quantile"></a></dt>
+<dt id="arg-cutoff-quantile">cutoff_quantile<a class="anchor" aria-label="anchor" href="#arg-cutoff-quantile"></a></dt>
 <dd><p>A numeric value between 0 and 1 specifying the quantile for outlier detection (default: 0.995).</p></dd>
 
 
-<dt id="arg-rmzeroes">rmZeroes<a class="anchor" aria-label="anchor" href="#arg-rmzeroes"></a></dt>
+<dt id="arg-rm-zeroes">rm_zeroes<a class="anchor" aria-label="anchor" href="#arg-rm-zeroes"></a></dt>
 <dd><p>A logical value. If <code>TRUE</code>, removes values close to zero (default: <code>FALSE</code>).</p></dd>
 
 
-<dt id="arg-maxratio">maxRatio<a class="anchor" aria-label="anchor" href="#arg-maxratio"></a></dt>
+<dt id="arg-max-ratio">max_ratio<a class="anchor" aria-label="anchor" href="#arg-max-ratio"></a></dt>
 <dd><p>A numeric value greater than 2. If provided, constrains the ratio between positive and negative scales (default: <code>NULL</code>).</p></dd>
 
 
-<dt id="arg-precscale">precScale<a class="anchor" aria-label="anchor" href="#arg-precscale"></a></dt>
+<dt id="arg-prec-scale">prec_scale<a class="anchor" aria-label="anchor" href="#arg-prec-scale"></a></dt>
 <dd><p>A numeric value specifying the precision scale for near-zero comparisons (default: 1e-10).</p></dd>
+
+
+<dt id="arg-cutoff-quantile-rmzeroes-maxratio-precscale">cutoff.quantile, rmZeroes, maxRatio, precScale<a class="anchor" aria-label="anchor" href="#arg-cutoff-quantile-rmzeroes-maxratio-precscale"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use
+<code>cutoff_quantile</code>, <code>rm_zeroes</code>, <code>max_ratio</code> and <code>prec_scale</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -8,7 +8,7 @@ specified grouping column.
 ## Usage
 
 ``` r
-average(x, .group_by = NULL)
+average(x, group_by = NULL, .group_by = deprecated())
 ```
 
 ## Arguments
@@ -17,18 +17,22 @@ average(x, .group_by = NULL)
 
   A data frame or tibble.
 
-- .group_by:
+- group_by:
 
   The column to group the data by (optional), given either unquoted or
   as a string. If not provided, the average of the overall data will be
   computed.
 
+- .group_by:
+
+  **\[deprecated\]** Use `group_by`.
+
 ## Value
 
-- If `.group_by = NULL`, a one-row tibble containing the mean of each
+- If `group_by = NULL`, a one-row tibble containing the mean of each
   column.
 
-- If `.group_by` is provided, a tibble with one row per group: the first
+- If `group_by` is provided, a tibble with one row per group: the first
   column holds the group labels and the remaining columns hold the group
   means.
 

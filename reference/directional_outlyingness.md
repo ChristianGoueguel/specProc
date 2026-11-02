@@ -10,10 +10,14 @@ distribution into account.
 ``` r
 directional_outlyingness(
   x,
-  cutoff.quantile = 0.995,
-  rmZeroes = FALSE,
-  maxRatio = NULL,
-  precScale = 1e-10
+  cutoff_quantile = 0.995,
+  rm_zeroes = FALSE,
+  max_ratio = NULL,
+  prec_scale = 1e-10,
+  cutoff.quantile = deprecated(),
+  rmZeroes = deprecated(),
+  maxRatio = deprecated(),
+  precScale = deprecated()
 )
 ```
 
@@ -23,25 +27,30 @@ directional_outlyingness(
 
   A numeric vector
 
-- cutoff.quantile:
+- cutoff_quantile:
 
   A numeric value between 0 and 1 specifying the quantile for outlier
   detection (default: 0.995).
 
-- rmZeroes:
+- rm_zeroes:
 
   A logical value. If `TRUE`, removes values close to zero (default:
   `FALSE`).
 
-- maxRatio:
+- max_ratio:
 
   A numeric value greater than 2. If provided, constrains the ratio
   between positive and negative scales (default: `NULL`).
 
-- precScale:
+- prec_scale:
 
   A numeric value specifying the precision scale for near-zero
   comparisons (default: 1e-10).
+
+- cutoff.quantile, rmZeroes, maxRatio, precScale:
+
+  **\[deprecated\]** Use `cutoff_quantile`, `rm_zeroes`, `max_ratio` and
+  `prec_scale`.
 
 ## Value
 

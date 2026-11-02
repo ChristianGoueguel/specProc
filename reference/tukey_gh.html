@@ -59,8 +59,9 @@ useful for modeling non-normal data.</p>
 <span>  g <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  h <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  log <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  log.p <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  n <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  log_p <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  n <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  log.p <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -96,12 +97,16 @@ useful for modeling non-normal data.</p>
 <dd><p>If <code>TRUE</code>, the log-density is returned for the density function. Default is <code>FALSE</code>.</p></dd>
 
 
-<dt id="arg-log-p">log.p<a class="anchor" aria-label="anchor" href="#arg-log-p"></a></dt>
+<dt id="arg-log-p">log_p<a class="anchor" aria-label="anchor" href="#arg-log-p"></a></dt>
 <dd><p>If <code>TRUE</code>, the log-probability is returned for the cumulative distribution and quantile functions. Default is <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
 <dd><p>For random number generation, the number of random values to be generated. Default is <code>NULL</code>.</p></dd>
+
+
+<dt id="arg-log-p">log.p<a class="anchor" aria-label="anchor" href="#arg-log-p"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>log_p</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">

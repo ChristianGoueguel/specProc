@@ -15,8 +15,9 @@ tukey_gh(
   g = 0,
   h = 0,
   log = FALSE,
-  log.p = FALSE,
-  n = NULL
+  log_p = FALSE,
+  n = NULL,
+  log.p = deprecated()
 )
 ```
 
@@ -54,7 +55,7 @@ tukey_gh(
   If `TRUE`, the log-density is returned for the density function.
   Default is `FALSE`.
 
-- log.p:
+- log_p:
 
   If `TRUE`, the log-probability is returned for the cumulative
   distribution and quantile functions. Default is `FALSE`.
@@ -63,6 +64,10 @@ tukey_gh(
 
   For random number generation, the number of random values to be
   generated. Default is `NULL`.
+
+- log.p:
+
+  **\[deprecated\]** Use `log_p`.
 
 ## Value
 

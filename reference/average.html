@@ -54,7 +54,7 @@ specified grouping column.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">average</span><span class="op">(</span><span class="va">x</span>, .group_by <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">average</span><span class="op">(</span><span class="va">x</span>, group_by <span class="op">=</span> <span class="cn">NULL</span>, .group_by <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -65,17 +65,21 @@ specified grouping column.</p>
 <dd><p>A data frame or tibble.</p></dd>
 
 
-<dt id="arg--group-by">.group_by<a class="anchor" aria-label="anchor" href="#arg--group-by"></a></dt>
+<dt id="arg-group-by">group_by<a class="anchor" aria-label="anchor" href="#arg-group-by"></a></dt>
 <dd><p>The column to group the data by (optional), given either
 unquoted or as a string. If not provided, the average of the overall data
 will be computed.</p></dd>
+
+
+<dt id="arg--group-by">.group_by<a class="anchor" aria-label="anchor" href="#arg--group-by"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>group_by</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
 
-<ul><li><p>If <code>.group_by = NULL</code>, a one-row tibble containing the mean of each column.</p></li>
-<li><p>If <code>.group_by</code> is provided, a tibble with one row per group: the first
+<ul><li><p>If <code>group_by = NULL</code>, a one-row tibble containing the mean of each column.</p></li>
+<li><p>If <code>group_by</code> is provided, a tibble with one row per group: the first
 column holds the group labels and the remaining columns hold the group means.</p></li>
 </ul></div>
     <div class="section level2">

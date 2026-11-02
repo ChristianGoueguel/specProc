@@ -11,7 +11,12 @@ whose temperature is fitted again as lines are added or left out.
 ## Usage
 
 ``` r
-line_finder(spectra, launch.browser = interactive(), show_table = TRUE)
+line_finder(
+  spectra,
+  launch_browser = interactive(),
+  show_table = TRUE,
+  launch.browser = deprecated()
+)
 ```
 
 ## Arguments
@@ -22,11 +27,11 @@ line_finder(spectra, launch.browser = interactive(), show_table = TRUE)
   wavelength columns are named by their wavelengths (other columns are
   used as labels).
 
-- launch.browser:
+- launch_browser:
 
   Passed to
-  [`shiny::runApp()`](https://rdrr.io/pkg/shiny/man/runApp.html).
-  Default is `TRUE` when R is interactive.
+  [`shiny::runApp()`](https://rdrr.io/pkg/shiny/man/runApp.html) as
+  `launch.browser`. Default is `TRUE` when R is interactive.
 
 - show_table:
 
@@ -34,6 +39,10 @@ line_finder(spectra, launch.browser = interactive(), show_table = TRUE)
   default). The **Hide table** button of the Elements panel hides or
   shows it at any time; hiding it gives the spectrum the whole height of
   the window.
+
+- launch.browser:
+
+  **\[deprecated\]** Use `launch_browser`.
 
 ## Value
 
