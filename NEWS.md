@@ -537,6 +537,11 @@
   `q_residuals()`, `dmodx()` and `contributions()` in the attribute
   `ncomp`: code that reads `fit$k` now gets `NULL`. The `k` of
   `iqr_outliers()`, the fence factor, keeps its name.
+* `rospca()` chooses its number of components when `ncomp` is not given,
+  as `robpca()`: the smallest number that explains `var_explained` (new,
+  0.8) of the variance of the least outlying observations, with at most
+  `ncomp_max` (new, 10). `ncomp` was 2 by default; `rospca(x, ncomp = 2)`
+  gives the former result.
 * `generalized_boxplot()` flags fewer observations: its default detection
   rate `alpha` is now about 0.7% (`2 * pnorm(-4 * qnorm(0.75))`), that of
   Tukey's boxplot for normal data, as in the authors' implementation (the

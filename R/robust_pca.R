@@ -183,10 +183,13 @@ robpca <- function(x, ncomp = NULL, ncomp_max = 10, alpha = 0.75, ndir = 250, va
 #' The algorithm follows the published description in three steps:
 #' 1. **Outlier detection.** The variables are robustly standardized (median
 #'    and \eqn{Q_n}) if `stand = TRUE`. As in [robpca()], the `h` least
-#'    outlying observations form \eqn{H_0}, and those whose orthogonal
-#'    distance to the \eqn{k}-dimensional PCA subspace of \eqn{H_0} is below
-#'    the cut-off form \eqn{H_1} (\eqn{H_1 = H_0} when `ncomp` equals the rank
-#'    of the data, as the subspace is then the whole space).
+#'    outlying observations form \eqn{H_0}, the number of components
+#'    \eqn{k} (`ncomp`) is chosen (if not given) as the smallest number that
+#'    explains `var_explained` of the variance of \eqn{H_0}, with at most
+#'    `ncomp_max`, and the observations whose orthogonal distance to the
+#'    \eqn{k}-dimensional PCA subspace of \eqn{H_0} is below the cut-off form
+#'    \eqn{H_1} (\eqn{H_1 = H_0} when `ncomp` equals the rank of the data, as
+#'    the subspace is then the whole space).
 #' 2. **Sparsification.** The observations of \eqn{H_1} are standardized and
 #'    the sparse loadings are computed by maximizing, component by component,
 #'    the variance of the scores minus `lambda` times the \eqn{L_1} norm of
@@ -213,13 +216,14 @@ robpca <- function(x, ncomp = NULL, ncomp_max = 10, alpha = 0.75, ndir = 250, va
 #' `rospca::rospca()`.
 #'
 #' @inheritParams robpca
-#' @param ncomp The number of principal components. Default is 2.
 #' @param lambda A non-negative number: the sparsity parameter. Default is 1.
 #' @param stand A logical value: standardize the variables robustly (median
 #'   and \eqn{Q_n}) before the analysis (`FALSE`, default) or only center them
 #'   by their median.
 #' @param ngrid The number of angles in the grid search. Default is 10.
 #' @param maxiter The maximum number of grid refinements per component.
+#'   Default is 10.
+#' @param ncomp_max The maximum number of components when `ncomp` is chosen.
 #'   Default is 10.
 #'
 #' @return An object of class `specproc_rospca` (inheriting from
@@ -249,14 +253,13 @@ robpca <- function(x, ncomp = NULL, ncomp_max = 10, alpha = 0.75, ndir = 250, va
 #'   rospca() |>
 #'   print()
 #'
-rospca <- function(x, ncomp = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE,
-                   ngrid = 10, maxiter = 10, k = deprecated()) {
+rospca <- function(x, ncomp = NULL, lambda = 1, alpha = 0.75, ndir = 250, stand = FALSE,
+                   ngrid = 10, maxiter = 10, ncomp_max = 10, var_explained = 0.8, k = deprecated()) {
   ncomp <- renamed_arg(k, ncomp, "rospca", "k", "ncomp")
   x <- robust_pca_input(x)
   n <- nrow(x)
   p <- ncol(x)
-  check_count(ncomp, "ncomp")
-  check_robust_args(ncomp, max(ncomp, 1), alpha, 0.5)
+  check_robust_args(ncomp, ncomp_max, alpha, var_explained)
   check_number(lambda, "lambda", lower = 0)
   check_flag(stand, "stand")
   check_count(ngrid, "ngrid", lower = 2)
@@ -268,16 +271,23 @@ rospca <- function(x, ncomp = 2, lambda = 1, alpha = 0.75, ndir = 250, stand = F
   xs <- sweep(sweep(x, 2, med), 2, scl, "/")
   red <- svd_reduce(xs)
   z <- red$z
-  if (ncomp > min(ncol(z), n - 1)) {
-    stop("'ncomp' cannot exceed the rank of the data (", min(ncol(z), n - 1), ").", call. = FALSE)
+  rank <- min(ncol(z), n - 1)
+  if (!is.null(ncomp) && ncomp > rank) {
+    stop("'ncomp' cannot exceed the rank of the data (", rank, ").", call. = FALSE)
   }
-  h <- robust_h(n, alpha, ncomp)
+  # ncomp_max only bounds the choice: a given ncomp sets h, as in macropca()
+  ncomp_max <- min(ncomp_max, rank)
+  h <- robust_h(n, alpha, if (is.null(ncomp)) ncomp_max else ncomp)
   H0 <- least_outlying(z, h, ndir)
+  e0 <- eigen(stats::cov(z[H0, , drop = FALSE]), symmetric = TRUE)
+  if (is.null(ncomp)) {
+    ncomp <- choose_ncomp(e0$values, ncomp_max, var_explained)
+  }
   # when ncomp equals the rank, the subspace is the whole space: H1 = H0
   H1 <- seq_len(n) %in% H0
   if (ncomp < ncol(z)) {
     m0 <- colMeans(z[H0, , drop = FALSE])
-    v0 <- eigen(stats::cov(z[H0, , drop = FALSE]), symmetric = TRUE)$vectors[, seq_len(ncomp), drop = FALSE]
+    v0 <- e0$vectors[, seq_len(ncomp), drop = FALSE]
     od0 <- orthogonal_distance(sweep(z, 2, m0), v0)
     H1 <- od0 <= od_cutoff(od0, h)
   }

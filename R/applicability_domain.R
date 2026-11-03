@@ -19,7 +19,7 @@
 #' a new observation, and that of Q the Jackson-Mudholkar limit.
 #'
 #' By default, `ncomp` is the smallest number of components that explain the
-#' fraction `variance` of the variance of the calibration spectra. Prepare
+#' fraction `var_explained` of the variance of the calibration spectra. Prepare
 #' the spectra as for the model (baseline correction, normalization), since
 #' the domain is that of the variables the model uses. The PCA is classical:
 #' remove the outlying calibration spectra first (see [robpca()]).
@@ -27,8 +27,8 @@
 #' @param x The calibration spectra: a numeric matrix or data frame, one
 #'   spectrum per row.
 #' @param ncomp The number of principal components. By default, chosen from
-#'   `variance`.
-#' @param variance The fraction of the variance explained by the
+#'   `var_explained`.
+#' @param var_explained The fraction of the variance explained by the
 #'   components, when `ncomp` is not given. Default is 0.99.
 #' @param conf_level The confidence level of the limits. Default is 0.99.
 #' @param center,scale Passed to [stats::prcomp()]. Default is `TRUE` and
@@ -58,13 +58,13 @@
 #' domain
 #' flags <- predict(domain, spectra[301:368, ])
 #' table(flags$inside)
-applicability_domain <- function(x, ncomp = NULL, variance = 0.99, conf_level = 0.99, center = TRUE,
+applicability_domain <- function(x, ncomp = NULL, var_explained = 0.99, conf_level = 0.99, center = TRUE,
                                  scale = FALSE) {
   x <- as_numeric_matrix(x, "x")
   if (anyNA(x)) {
     stop("'x' must not contain missing values.", call. = FALSE)
   }
-  check_number(variance, "variance", lower = 0, upper = 1, lower_open = TRUE)
+  check_number(var_explained, "var_explained", lower = 0, upper = 1, lower_open = TRUE)
   check_number(conf_level, "conf_level", lower = 0, upper = 1, lower_open = TRUE,
                upper_open = TRUE)
   pca <- stats::prcomp(x, center = center, scale. = scale)
@@ -75,7 +75,7 @@ applicability_domain <- function(x, ncomp = NULL, variance = 0.99, conf_level = 
     stop("The calibration spectra need at least 2 principal components.", call. = FALSE)
   }
   if (is.null(ncomp)) {
-    ncomp <- min(which(explained >= variance - 1e-12)[1], rank - 1)
+    ncomp <- min(which(explained >= var_explained - 1e-12)[1], rank - 1)
   } else {
     ncomp <- check_count(ncomp, "ncomp")
     if (ncomp >= rank) {

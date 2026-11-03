@@ -35,7 +35,7 @@ test_that("applicability_domain flags extreme and foreign spectra", {
 test_that("applicability_domain chooses the components by explained variance", {
   x <- domain_data()
   explained <- cumsum(stats::prcomp(x)$sdev^2) / sum(stats::prcomp(x)$sdev^2)
-  domain <- applicability_domain(x, variance = 0.95)
+  domain <- applicability_domain(x, var_explained = 0.95)
   expect_equal(domain$ncomp, which(explained >= 0.95)[1])
   expect_equal(domain$explained, explained[domain$ncomp])
   expect_error(applicability_domain(x, ncomp = 30), "smaller than")

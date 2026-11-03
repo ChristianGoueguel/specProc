@@ -6,20 +6,23 @@
 \usage{
 rospca(
   x,
-  ncomp = 2,
+  ncomp = NULL,
   lambda = 1,
   alpha = 0.75,
   ndir = 250,
   stand = FALSE,
   ngrid = 10,
   maxiter = 10,
+  ncomp_max = 10,
+  var_explained = 0.8,
   k = deprecated()
 )
 }
 \arguments{
 \item{x}{A numeric matrix or data frame, with one observation per row.}
 
-\item{ncomp}{The number of principal components. Default is 2.}
+\item{ncomp}{The number of principal components. If \code{NULL} (default), it
+is chosen from \code{var_explained} and \code{ncomp_max}.}
 
 \item{lambda}{A non-negative number: the sparsity parameter. Default is 1.}
 
@@ -40,6 +43,12 @@ by their median.}
 
 \item{maxiter}{The maximum number of grid refinements per component.
 Default is 10.}
+
+\item{ncomp_max}{The maximum number of components when \code{ncomp} is chosen.
+Default is 10.}
+
+\item{var_explained}{The fraction of variance used to choose \code{ncomp} when
+it is not given. Default is 0.8.}
 
 \item{k}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp}.}
 }
@@ -67,10 +76,13 @@ The algorithm follows the published description in three steps:
 \enumerate{
 \item \strong{Outlier detection.} The variables are robustly standardized (median
 and \eqn{Q_n}) if \code{stand = TRUE}. As in \code{\link[=robpca]{robpca()}}, the \code{h} least
-outlying observations form \eqn{H_0}, and those whose orthogonal
-distance to the \eqn{k}-dimensional PCA subspace of \eqn{H_0} is below
-the cut-off form \eqn{H_1} (\eqn{H_1 = H_0} when \code{ncomp} equals the rank
-of the data, as the subspace is then the whole space).
+outlying observations form \eqn{H_0}, the number of components
+\eqn{k} (\code{ncomp}) is chosen (if not given) as the smallest number that
+explains \code{var_explained} of the variance of \eqn{H_0}, with at most
+\code{ncomp_max}, and the observations whose orthogonal distance to the
+\eqn{k}-dimensional PCA subspace of \eqn{H_0} is below the cut-off form
+\eqn{H_1} (\eqn{H_1 = H_0} when \code{ncomp} equals the rank of the data, as
+the subspace is then the whole space).
 \item \strong{Sparsification.} The observations of \eqn{H_1} are standardized and
 the sparse loadings are computed by maximizing, component by component,
 the variance of the scores minus \code{lambda} times the \eqn{L_1} norm of

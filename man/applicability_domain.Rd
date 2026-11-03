@@ -7,7 +7,7 @@
 applicability_domain(
   x,
   ncomp = NULL,
-  variance = 0.99,
+  var_explained = 0.99,
   conf_level = 0.99,
   center = TRUE,
   scale = FALSE
@@ -18,9 +18,9 @@ applicability_domain(
 spectrum per row.}
 
 \item{ncomp}{The number of principal components. By default, chosen from
-\code{variance}.}
+\code{var_explained}.}
 
-\item{variance}{The fraction of the variance explained by the
+\item{var_explained}{The fraction of the variance explained by the
 components, when \code{ncomp} is not given. Default is 0.99.}
 
 \item{conf_level}{The confidence level of the limits. Default is 0.99.}
@@ -52,7 +52,7 @@ contamination, an instrumental problem). The limit of \eqn{T^2} is that of
 a new observation, and that of Q the Jackson-Mudholkar limit.
 
 By default, \code{ncomp} is the smallest number of components that explain the
-fraction \code{variance} of the variance of the calibration spectra. Prepare
+fraction \code{var_explained} of the variance of the calibration spectra. Prepare
 the spectra as for the model (baseline correction, normalization), since
 the domain is that of the variables the model uses. The PCA is classical:
 remove the outlying calibration spectra first (see \code{\link[=robpca]{robpca()}}).

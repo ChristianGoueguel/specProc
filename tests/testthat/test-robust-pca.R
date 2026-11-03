@@ -121,6 +121,23 @@ test_that("rospca recovers a block-sparse structure", {
   expect_gt(sum(dense$loadings != 0), sum(support))
 })
 
+test_that("rospca chooses ncomp from the explained variance, as robpca", {
+  # variances of about 100, 49 and 16 on 3 components, and 1.6 of noise
+  d <- make_lowrank(seed = 10)
+  set.seed(11)
+  expect_equal(rospca(d$x)$ncomp, 2L)
+  set.seed(11)
+  expect_equal(rospca(d$x, var_explained = 0.95)$ncomp, 3L)
+  set.seed(11)
+  expect_equal(robpca(d$x, var_explained = 0.95)$ncomp, 3L)
+  set.seed(11)
+  expect_equal(rospca(d$x, var_explained = 0.95, ncomp_max = 2)$ncomp, 2L)
+  # ncomp_max bounds only the choice
+  set.seed(11)
+  expect_equal(rospca(d$x, ncomp = 3, ncomp_max = 2)$ncomp, 3L)
+  expect_error(rospca(d$x, var_explained = 0), "var_explained")
+})
+
 test_that("robust PCA with ncomp equal to the rank reduces to the reweighted MCD", {
   set.seed(14)
   x <- matrix(rnorm(500), 100, 5)
@@ -142,6 +159,9 @@ test_that("robust PCA with ncomp equal to the rank reduces to the reweighted MCD
   # also when ncomp is chosen
   set.seed(15)
   expect_equal(robpca(x, var_explained = 1)$ncomp, 5L)
+
+  set.seed(15)
+  expect_equal(rospca(x, var_explained = 1)$ncomp, 5L)
 
   sparse <- rospca(x, ncomp = 5)
   expect_identical(sparse$H1, sparse$H0)
