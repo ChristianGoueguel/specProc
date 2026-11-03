@@ -57,7 +57,7 @@ spectra, are then extrapolations.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">applicability_domain</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  ncomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  variance <span class="op">=</span> <span class="fl">0.99</span>,</span>
+<span>  var_explained <span class="op">=</span> <span class="fl">0.99</span>,</span>
 <span>  conf_level <span class="op">=</span> <span class="fl">0.99</span>,</span>
 <span>  center <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  scale <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -75,10 +75,10 @@ spectrum per row.</p></dd>
 
 <dt id="arg-ncomp">ncomp<a class="anchor" aria-label="anchor" href="#arg-ncomp"></a></dt>
 <dd><p>The number of principal components. By default, chosen from
-<code>variance</code>.</p></dd>
+<code>var_explained</code>.</p></dd>
 
 
-<dt id="arg-variance">variance<a class="anchor" aria-label="anchor" href="#arg-variance"></a></dt>
+<dt id="arg-var-explained">var_explained<a class="anchor" aria-label="anchor" href="#arg-var-explained"></a></dt>
 <dd><p>The fraction of the variance explained by the
 components, when <code>ncomp</code> is not given. Default is 0.99.</p></dd>
 
@@ -111,7 +111,7 @@ concentration); a high Q, a sample of another kind (another matrix, a
 contamination, an instrumental problem). The limit of \(T^2\) is that of
 a new observation, and that of Q the Jackson-Mudholkar limit.</p>
 <p>By default, <code>ncomp</code> is the smallest number of components that explain the
-fraction <code>variance</code> of the variance of the calibration spectra. Prepare
+fraction <code>var_explained</code> of the variance of the calibration spectra. Prepare
 the spectra as for the model (baseline correction, normalization), since
 the domain is that of the variables the model uses. The PCA is classical:
 remove the outlying calibration spectra first (see <code><a href="robpca.html">robpca()</a></code>).</p>

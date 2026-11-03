@@ -921,6 +921,13 @@
   `k` of
   [`iqr_outliers()`](https://christiangoueguel.com/specProc/reference/iqr_outliers.md),
   the fence factor, keeps its name.
+- [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
+  chooses its number of components when `ncomp` is not given, as
+  [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md):
+  the smallest number that explains `var_explained` (new, 0.8) of the
+  variance of the least outlying observations, with at most `ncomp_max`
+  (new, 10). `ncomp` was 2 by default; `rospca(x, ncomp = 2)` gives the
+  former result.
 - [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
   flags fewer observations: its default detection rate `alpha` is now
   about 0.7% (`2 * pnorm(-4 * qnorm(0.75))`), that of Tukey’s boxplot

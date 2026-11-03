@@ -14,13 +14,15 @@ kernels are written in C++.
 ``` r
 rospca(
   x,
-  ncomp = 2,
+  ncomp = NULL,
   lambda = 1,
   alpha = 0.75,
   ndir = 250,
   stand = FALSE,
   ngrid = 10,
   maxiter = 10,
+  ncomp_max = 10,
+  var_explained = 0.8,
   k = deprecated()
 )
 ```
@@ -33,7 +35,8 @@ rospca(
 
 - ncomp:
 
-  The number of principal components. Default is 2.
+  The number of principal components. If `NULL` (default), it is chosen
+  from `var_explained` and `ncomp_max`.
 
 - lambda:
 
@@ -65,6 +68,16 @@ rospca(
 
   The maximum number of grid refinements per component. Default is 10.
 
+- ncomp_max:
+
+  The maximum number of components when `ncomp` is chosen. Default is
+  10.
+
+- var_explained:
+
+  The fraction of variance used to choose `ncomp` when it is not given.
+  Default is 0.8.
+
 - k:
 
   **\[deprecated\]** Use `ncomp`.
@@ -91,10 +104,13 @@ The algorithm follows the published description in three steps:
 1.  **Outlier detection.** The variables are robustly standardized
     (median and \\Q_n\\) if `stand = TRUE`. As in
     [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
-    the `h` least outlying observations form \\H_0\\, and those whose
-    orthogonal distance to the \\k\\-dimensional PCA subspace of \\H_0\\
-    is below the cut-off form \\H_1\\ (\\H_1 = H_0\\ when `ncomp` equals
-    the rank of the data, as the subspace is then the whole space).
+    the `h` least outlying observations form \\H_0\\, the number of
+    components \\k\\ (`ncomp`) is chosen (if not given) as the smallest
+    number that explains `var_explained` of the variance of \\H_0\\,
+    with at most `ncomp_max`, and the observations whose orthogonal
+    distance to the \\k\\-dimensional PCA subspace of \\H_0\\ is below
+    the cut-off form \\H_1\\ (\\H_1 = H_0\\ when `ncomp` equals the rank
+    of the data, as the subspace is then the whole space).
 
 2.  **Sparsification.** The observations of \\H_1\\ are standardized and
     the sparse loadings are computed by maximizing, component by
@@ -156,12 +172,12 @@ forageLIBS[, which(wl > 380 & wl < 430)] |>
 #> 
 #> Observations:   368 (h = 276)
 #> Variables:      594
-#> Components:     2
-#> Eigenvalues:    374.97  13.91
-#> Non-zero loadings per component: 594 187
+#> Components:     1
+#> Eigenvalues:    327.5
+#> Non-zero loadings per component: 592
 #> 
 #> Outlier types:
 #> 
 #>            regular      good leverage orthogonal outlier       bad leverage 
-#>                276                 35                 30                 27 
+#>                289                 18                 44                 17 
 ```
