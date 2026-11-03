@@ -142,8 +142,8 @@ choosing the table with `matrix` when a model has several:
   `"coefficients"` (default), the `estimate` of each `term` (the
   intercept and the variables) for each `response`, in the units of the
   responses; `"components"`, the robust `r.squared` and the `rmse` of
-  the models with 1 to `kmax` components (`ncomp`); `"loadings"` and
-  `"scores"`, as for robust PCA;
+  the models with 1 to `ncomp_max` components (`ncomp`); `"loadings"`
+  and `"scores"`, as for robust PCA;
 
 - [`lts_fit()`](https://christiangoueguel.com/specProc/reference/linear_reg_lts.md):
   the `term`, `estimate`, `std.error`, `statistic` and `p.value` of the
@@ -183,15 +183,15 @@ choosing the table with `matrix` when a model has several:
 [`glance()`](https://generics.r-lib.org/reference/glance.html) returns
 the number of observations `nobs` and of variables `nvar`, and:
 
-- robust PCA: the number of components `k`, `h`, `alpha`, the cutoffs
-  `cutoff.sd` and `cutoff.od`, the numbers of `n.good.leverage`,
+- robust PCA: the number of components `ncomp`, `h`, `alpha`, the
+  cutoffs `cutoff.sd` and `cutoff.od`, the numbers of `n.good.leverage`,
   `n.orthogonal.outlier` and `n.bad.leverage` observations, the number
   of `flagged.cells` (MacroPCA and cellPCA) and the `method`;
 
 - [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
   and
   [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md):
-  `ncomp`, `kmax`, `h`, `alpha`, the robust `r.squared`, the robust
+  `ncomp`, `ncomp_max`, `h`, `alpha`, the robust `r.squared`, the robust
   scale of the residuals `sigma` (one response), the numbers of
   `n.good.leverage`, `n.vertical.outlier` and `n.bad.leverage`
   observations, the `method` and, for RPCR, the `regression`;
@@ -230,7 +230,7 @@ the number of observations `nobs` and of variables `nvar`, and:
   and `loq`);
 
 - [`applicability_domain()`](https://christiangoueguel.com/specProc/reference/applicability_domain.md):
-  the number of components `k`, the variance `explained`, the
+  the number of components `ncomp`, the variance `explained`, the
   `conf.level` and the limits `t2.limit` and `q.limit`.
 
 ## See also
@@ -266,9 +266,9 @@ tidy(fit, matrix = "components")
 #> 10    10     0.775 0.0753
 glance(fit)
 #> # A tibble: 1 × 12
-#>    nobs  nvar ncomp  kmax     h alpha r.squared  sigma n.good.leverage
-#>   <int> <int> <int> <int> <int> <dbl>     <dbl>  <dbl>           <int>
-#> 1   300   594     4    10   225  0.75     0.738 0.0918              39
+#>    nobs  nvar ncomp ncomp_max     h alpha r.squared  sigma n.good.leverage
+#>   <int> <int> <int>     <int> <int> <dbl>     <dbl>  <dbl>           <int>
+#> 1   300   594     4        10   225  0.75     0.738 0.0918              39
 #> # ℹ 3 more variables: n.vertical.outlier <int>, n.bad.leverage <int>,
 #> #   method <chr>
 # the regression vector, one row per wavelength
@@ -283,7 +283,7 @@ head(tidy(fit))
 #> 5 y        380.285294  -0.000000907
 #> 6 y        380.3682761 -0.00000108 
 
-pca <- robpca(spectra, k = 3)
+pca <- robpca(spectra, ncomp = 3)
 tidy(pca)
 #> # A tibble: 3 × 3
 #>      PC eigenvalue std.dev
@@ -293,7 +293,7 @@ tidy(pca)
 #> 3     3  39024510.   6247.
 glance(pca)
 #> # A tibble: 1 × 12
-#>    nobs  nvar     k     h alpha cutoff.sd cutoff.od n.good.leverage
+#>    nobs  nvar ncomp     h alpha cutoff.sd cutoff.od n.good.leverage
 #>   <int> <int> <int> <int> <dbl>     <dbl>     <dbl>           <int>
 #> 1   368   594     3   276  0.75      3.06    12301.              39
 #> # ℹ 4 more variables: n.orthogonal.outlier <int>, n.bad.leverage <int>,

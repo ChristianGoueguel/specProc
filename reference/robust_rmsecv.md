@@ -5,9 +5,9 @@ robust PLS
 ([`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md))
 or robust PCR
 ([`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md))
-models with 1 to `kmax` components, and the robust component selection
-(RCS) criterion of Engelen and Hubert (2005), to choose the number of
-components when the calibration data contain outliers.
+models with 1 to `ncomp_max` components, and the robust component
+selection (RCS) criterion of Engelen and Hubert (2005), to choose the
+number of components when the calibration data contain outliers.
 
 ## Usage
 
@@ -16,7 +16,7 @@ robust_rmsecv(
   x,
   y,
   method = c("rsimpls", "rpcr"),
-  kmax = 10,
+  ncomp_max = 10,
   folds = 10,
   gamma = 0.5,
   alpha = 0.75,
@@ -42,7 +42,7 @@ robust_rmsecv(
 
   The model: `"rsimpls"` (default), robust PLS, or `"rpcr"`, robust PCR.
 
-- kmax:
+- ncomp_max:
 
   The largest number of components. Default is 10.
 
@@ -93,11 +93,12 @@ the robust `RMSECV` and the `RCS` criterion. The weights \\w_i\\ are its
 The squared prediction errors of outliers would dominate the usual
 RMSECV. The robust RMSECV leaves them out: the model is first fitted to
 all the observations, and only those regular in every model with 1 to
-`kmax` components (residual distance below its cut-off) enter the error,
-\$\$R\text{-}RMSECV_k = \sqrt{\frac{1}{q \sum_i w_i} \sum_i w_i \\y_i -
-\hat y\_{-i,k}\\^2},\$\$ where \\w_i\\ is 1 for these observations and 0
-for the others, and \\\hat y\_{-i,k}\\ is the prediction of observation
-\\i\\ by the model with \\k\\ components fitted without it.
+`ncomp_max` components (residual distance below its cut-off) enter the
+error, \$\$R\text{-}RMSECV_k = \sqrt{\frac{1}{q \sum_i w_i} \sum_i w_i
+\\y_i - \hat y\_{-i,k}\\^2},\$\$ where \\w_i\\ is 1 for these
+observations and 0 for the others, and \\\hat y\_{-i,k}\\ is the
+prediction of observation \\i\\ by the model with \\k\\ components
+fitted without it.
 
 The robust root mean squared error of the fit to the calibration data,
 `RMSE` (the square root of the robust residual sum of squares, R-RSS),
@@ -142,7 +143,7 @@ data(forageLIBS)
 wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 set.seed(1)
-robust_rmsecv(spectra[1:300, ], forageLIBS$Ca[1:300], kmax = 8, folds = 5)
+robust_rmsecv(spectra[1:300, ], forageLIBS$Ca[1:300], ncomp_max = 8, folds = 5)
 #> # A tibble: 8 × 5
 #>   ncomp    R2   RMSE RMSECV    RCS
 #>   <int> <dbl>  <dbl>  <dbl>  <dbl>

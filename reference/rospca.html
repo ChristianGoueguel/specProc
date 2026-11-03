@@ -62,13 +62,14 @@ a few emission lines. The computational kernels are written in C++.</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rospca</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
-<span>  k <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  ncomp <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  lambda <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.75</span>,</span>
 <span>  ndir <span class="op">=</span> <span class="fl">250</span>,</span>
 <span>  stand <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ngrid <span class="op">=</span> <span class="fl">10</span>,</span>
-<span>  maxiter <span class="op">=</span> <span class="fl">10</span></span>
+<span>  maxiter <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  k <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -80,7 +81,7 @@ a few emission lines. The computational kernels are written in C++.</p>
 <dd><p>A numeric matrix or data frame, with one observation per row.</p></dd>
 
 
-<dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
+<dt id="arg-ncomp">ncomp<a class="anchor" aria-label="anchor" href="#arg-ncomp"></a></dt>
 <dd><p>The number of principal components. Default is 2.</p></dd>
 
 
@@ -91,7 +92,8 @@ a few emission lines. The computational kernels are written in C++.</p>
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
 <dd><p>The robustness parameter: the fraction of observations the
 estimates are based on, between 0.5 and 1. Default is 0.75. The subset
-size is \(h = \max(\lfloor\alpha n\rfloor, \lfloor(n + k_{max} + 1)/2\rfloor)\).</p></dd>
+size is \(h = \max(\lfloor\alpha n\rfloor, \lfloor(n + k_{max} + 1)/2\rfloor)\),
+with \(k_{max}\) = <code>ncomp_max</code>.</p></dd>
 
 
 <dt id="arg-ndir">ndir<a class="anchor" aria-label="anchor" href="#arg-ndir"></a></dt>
@@ -114,6 +116,10 @@ by their median.</p></dd>
 <dd><p>The maximum number of grid refinements per component.
 Default is 10.</p></dd>
 
+
+<dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>ncomp</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -130,7 +136,7 @@ deviation in \(H_2\).</p></li>
 and \(Q_n\)) if <code>stand = TRUE</code>. As in <code><a href="robpca.html">robpca()</a></code>, the <code>h</code> least
 outlying observations form \(H_0\), and those whose orthogonal
 distance to the \(k\)-dimensional PCA subspace of \(H_0\) is below
-the cut-off form \(H_1\) (\(H_1 = H_0\) when <code>k</code> equals the rank
+the cut-off form \(H_1\) (\(H_1 = H_0\) when <code>ncomp</code> equals the rank
 of the data, as the subspace is then the whole space).</p></li>
 <li><p><strong>Sparsification.</strong> The observations of \(H_1\) are standardized and
 the sparse loadings are computed by maximizing, component by component,

@@ -12,7 +12,7 @@ classifies them.
 ## Usage
 
 ``` r
-rsimpls(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 500)
+rsimpls(x, y, ncomp, ncomp_max = 10, alpha = 0.75, ndir = 250, nsamp = 500)
 ```
 
 ## Arguments
@@ -31,12 +31,12 @@ rsimpls(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 500)
 
   The number of components of the model.
 
-- kmax:
+- ncomp_max:
 
   The largest number of components considered. ROBPCA is applied with
-  `kmax` plus the number of responses components, so the model also
-  depends on `kmax` (see Details). Default is 10, as in the paper; it is
-  raised to `ncomp` if needed, and lowered when there are too few
+  `ncomp_max` plus the number of responses components, so the model also
+  depends on `ncomp_max` (see Details). Default is 10, as in the paper;
+  it is raised to `ncomp` if needed, and lowered when there are too few
   observations or variables (at most one less than the number of
   variables).
 
@@ -93,14 +93,14 @@ An object of class `specproc_rsimpls`, a list with:
 - `robpca_weights`: the weights \\w_i\\ of the ROBPCA step.
 
 - `components`: a tibble with the robust `R2` and `RMSE` of the models
-  with 1 to `kmax` components.
+  with 1 to `ncomp_max` components.
 
 - `models`: the `coefficients` and `intercept` of the models with 1 to
-  `kmax` components, for predictions with another number of components
-  (`predict(fit, newdata, ncomp = )`).
+  `ncomp_max` components, for predictions with another number of
+  components (`predict(fit, newdata, ncomp = )`).
 
-- `ncomp`, `kmax`, `h`, `alpha`: the settings used, and `y_scale`, the
-  factor applied to the responses before ROBPCA.
+- `ncomp`, `ncomp_max`, `h`, `alpha`: the settings used, and `y_scale`,
+  the factor applied to the responses before ROBPCA.
 
 Use
 [predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_rsimpls.md)
@@ -156,7 +156,7 @@ residual distances are both below their cut-offs; with several
 responses, it is one minus the ratio of the determinants of the residual
 and total sums of squares and cross-products.
 
-**Number of components.** `components` gives, for 1 to `kmax`
+**Number of components.** `components` gives, for 1 to `ncomp_max`
 components, the robust \\R^2\\ of the paper (Remark 7) and the root mean
 squared error, on the observations that are regular in every one of
 these models. They describe the fit to the calibration data; for
@@ -169,8 +169,8 @@ tidymodels
 ([pls_rsimpls](https://christiangoueguel.com/specProc/reference/pls_rsimpls.md)).
 These models all come from the same ROBPCA fit, with \\k_0 = k\_{max} +
 q\\ components, so the model with `ncomp` components also depends on
-`kmax`. With `kmax = ncomp`, ROBPCA is applied with `ncomp` plus \\q\\
-components, and `components` stops at `ncomp`.
+`ncomp_max`. With `ncomp_max = ncomp`, ROBPCA is applied with `ncomp`
+plus \\q\\ components, and `components` stops at `ncomp`.
 
 **Differences from the paper.**
 

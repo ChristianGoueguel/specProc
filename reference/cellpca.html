@@ -71,16 +71,18 @@ those of <code><a href="robpca.html">robpca()</a></code>, so that <a href="predi
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cellpca</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
-<span>  k <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ncomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  kmax <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  ncomp_max <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  var_explained <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  scale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ndir <span class="op">=</span> <span class="fl">250</span>,</span>
 <span>  maxiter <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  tol <span class="op">=</span> <span class="fl">1e-06</span>,</span>
 <span>  max_col_frac <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  od_cutoff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"simulated"</span>, <span class="st">"chisq"</span><span class="op">)</span></span>
+<span>  od_cutoff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"simulated"</span>, <span class="st">"chisq"</span><span class="op">)</span>,</span>
+<span>  k <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  kmax <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -93,9 +95,9 @@ those of <code><a href="robpca.html">robpca()</a></code>, so that <a href="predi
 Missing values are allowed.</p></dd>
 
 
-<dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
-<dd><p>The number of principal components. If <code>NULL</code> (default), it is
-chosen from <code>var_explained</code> and <code>kmax</code>.</p></dd>
+<dt id="arg-ncomp">ncomp<a class="anchor" aria-label="anchor" href="#arg-ncomp"></a></dt>
+<dd><p>The number of principal components. If <code>NULL</code> (default), it
+is chosen from <code>var_explained</code> and <code>ncomp_max</code>.</p></dd>
 
 
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
@@ -103,13 +105,13 @@ chosen from <code>var_explained</code> and <code>kmax</code>.</p></dd>
 observations used in the fit. Default is 0.5.</p></dd>
 
 
-<dt id="arg-kmax">kmax<a class="anchor" aria-label="anchor" href="#arg-kmax"></a></dt>
+<dt id="arg-ncomp-max">ncomp_max<a class="anchor" aria-label="anchor" href="#arg-ncomp-max"></a></dt>
 <dd><p>The maximum number of components. Default is 10.</p></dd>
 
 
 <dt id="arg-var-explained">var_explained<a class="anchor" aria-label="anchor" href="#arg-var-explained"></a></dt>
-<dd><p>The fraction of variance used to choose <code>k</code> when it
-is not given. Default is 0.8.</p></dd>
+<dd><p>The fraction of variance used to choose <code>ncomp</code> when
+it is not given. Default is 0.8.</p></dd>
 
 
 <dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
@@ -137,6 +139,14 @@ get a zero weight. Default is 0.5.</p></dd>
 <dd><p>How to compute the cut-off of <code>od</code>: <code>"simulated"</code>
 (default) or <code>"chisq"</code>. See Details.</p></dd>
 
+
+<dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>ncomp</code>.</p></dd>
+
+
+<dt id="arg-kmax">kmax<a class="anchor" aria-label="anchor" href="#arg-kmax"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>ncomp_max</code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -159,7 +169,7 @@ residuals.</p></li>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>cellPCA approximates the data by a fit \(\hat{X} = 1_n \mu^T + U V^T\)
-of rank <code>k</code> that minimizes
+of rank \(k\) (<code>ncomp</code>) that minimizes
 $$\hat\sigma_2^2 \frac{1}{n} \sum_{i=1}^n m_i \rho_2\left(\frac{t_i}{\hat\sigma_2}\right),
 \quad t_i = \sqrt{\frac{1}{m_i} \sum_{j=1}^p m_{ij} \hat\sigma_{1,j}^2
 \rho_1\left(\frac{x_{ij} - \hat{x}_{ij}}{\hat\sigma_{1,j}}\right)}$$
@@ -175,8 +185,8 @@ et al., 1981): \(\rho_1\) with \(b = 1.5\) and \(c = 4\), and
 standardized total deviations of simulated Gaussian residuals. Their
 weights \(\psi(z)/z\) are 1 in the central region and 0 beyond
 \(c\).</p>
-<p>The algorithm follows the reference code of the authors:</p><ol><li><p><strong>Initial fit.</strong> A <code><a href="macropca.html">macropca()</a></code> fit (with <code>alpha</code>, <code>kmax</code>,
-<code>var_explained</code>, <code>scale</code> and <code>ndir</code>), which also chooses <code>k</code> when it
+<p>The algorithm follows the reference code of the authors:</p><ol><li><p><strong>Initial fit.</strong> A <code><a href="macropca.html">macropca()</a></code> fit (with <code>alpha</code>, <code>ncomp_max</code>,
+<code>var_explained</code>, <code>scale</code> and <code>ndir</code>), which also chooses <code>ncomp</code> when it
 is <code>NULL</code>, with its scores computed from the data whose flagged and
 missing cells are imputed by the fit.</p></li>
 <li><p><strong>Scales.</strong> \(\hat\sigma_{1,j}\) is the M-scale of the residuals of
@@ -194,7 +204,7 @@ a variable get a zero weight, the previous iteration is kept.</p></li>
 <li><p><strong>Principal directions.</strong> The center and the eigenvectors within the
 subspace are estimated by the deterministic MCD of the scores of the
 observations with a non-zero casewise weight (the exact MCD when
-<code>k = 1</code>), and the sign of each loading vector is set so that its
+<code>ncomp = 1</code>), and the sign of each loading vector is set so that its
 largest element is positive.</p></li>
 </ol><p>The residuals of each variable are then standardized by their M-scale,
 and the cells beyond \(\sqrt{\chi^2_{1, 0.99}}\) are flagged. As in the
@@ -239,7 +249,7 @@ and rowwise outliers. Technometrics, 61(4):459-473.</p></li>
 <span class="r-in"><span><span class="va">wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="va">forageLIBS</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.html" class="external-link">which</a></span><span class="op">(</span><span class="va">wl</span> <span class="op">&gt;</span> <span class="fl">760</span> <span class="op">&amp;</span> <span class="va">wl</span> <span class="op">&lt;</span> <span class="fl">780</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">cellpca</span><span class="op">(</span><span class="va">spectra</span>, k <span class="op">=</span> <span class="fl">2</span>, od_cutoff <span class="op">=</span> <span class="st">"chisq"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">cellpca</span><span class="op">(</span><span class="va">spectra</span>, ncomp <span class="op">=</span> <span class="fl">2</span>, od_cutoff <span class="op">=</span> <span class="st">"chisq"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">fit</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Robust PCA by casewise and cellwise weighting (cellPCA)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

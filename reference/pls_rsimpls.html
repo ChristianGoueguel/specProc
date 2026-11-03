@@ -67,17 +67,17 @@ has no default and must be given (or tuned). It can be tuned with
 <code><a href="https://hardhat.tidymodels.org/reference/tune.html" class="external-link">tune::tune()</a></code>, using <code><a href="https://dials.tidymodels.org/reference/num_comp.html" class="external-link">dials::num_comp()</a></code>.</p></li>
 <li><p><code>predictor_prop</code>, the proportion of predictors of sparse PLS, is not
 used by this engine.</p></li>
-</ul><p>The models with 1 to <code>kmax</code> components all come from the same ROBPCA fit
+</ul><p>The models with 1 to <code>ncomp_max</code> components all come from the same ROBPCA fit
 (see <code><a href="rsimpls.html">rsimpls()</a></code>), so <code><a href="https://parsnip.tidymodels.org/reference/multi_predict.html" class="external-link">parsnip::multi_predict()</a></code> gives the predictions of
 all of them from one fit, and <code><a href="https://tune.tidymodels.org/reference/tune_grid.html" class="external-link">tune::tune_grid()</a></code> fits a single model per
 resample for a grid of <code>num_comp</code>. The predictions of a model with fewer
-components are those of a separate fit with the same <code>kmax</code>, as long as
-<code>kmax</code> is at least the largest <code>num_comp</code>.</p>
+components are those of a separate fit with the same <code>ncomp_max</code>, as long as
+<code>ncomp_max</code> is at least the largest <code>num_comp</code>.</p>
     </div>
     <div class="section level2">
     <h2 id="engine-arguments">Engine arguments<a class="anchor" aria-label="anchor" href="#engine-arguments"></a></h2>
     <p>The other arguments of <code><a href="rsimpls.html">rsimpls()</a></code> are set with <code><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">parsnip::set_engine()</a></code>:
-<code>kmax</code>, the largest number of components (default 10), <code>alpha</code>, the
+<code>ncomp_max</code>, the largest number of components (default 10), <code>alpha</code>, the
 fraction of observations assumed to be regular (default 0.75), and
 <code>ndir</code> and <code>nsamp</code> of the ROBPCA step.</p>
     </div>

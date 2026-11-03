@@ -11,11 +11,12 @@ differs between a sample and the reference ones.
 ``` r
 contributions(
   model,
-  k = NULL,
+  ncomp = NULL,
   statistic = c("q", "t2"),
   data = NULL,
   samples = NULL,
-  reference = NULL
+  reference = NULL,
+  k = deprecated()
 )
 ```
 
@@ -30,7 +31,7 @@ contributions(
   or
   [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md).
 
-- k:
+- ncomp:
 
   The number of components. Required for a
   [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html) fit; for a
@@ -70,6 +71,10 @@ contributions(
   subtracted (relative contributions), or `"regular"` for all the
   regular samples.
 
+- k:
+
+  **\[deprecated\]** Use `ncomp`.
+
 ## Value
 
 A tibble of class `specproc_contributions` with one row per sample:
@@ -81,8 +86,8 @@ before any reference is subtracted). Draw it with
 ## Details
 
 For a sample \\x\\ (centered and scaled as in the model), with scores
-\\t = xP\\ on the first \\k\\ components (loadings \\P\\, variances of
-the scores \\\lambda\\):
+\\t = xP\\ on the first \\k\\ components (`ncomp`; loadings \\P\\,
+variances of the scores \\\lambda\\):
 
 - the **Q contributions** are the residuals \\e = x - tP^T\\, whose sum
   of squares is Q (the squared orthogonal distance of robust fits);
@@ -138,7 +143,7 @@ spectra_id <- names(forageLIBS)[1:2]
 minerals <- names(forageLIBS)[3:14]
 spectra <- forageLIBS |> dplyr::select(-dplyr::all_of(c(spectra_id, minerals)))
 set.seed(1)
-fit <- robpca(spectra, k = 3)
+fit <- robpca(spectra, ncomp = 3)
 
 # Q contributions of two outlying samples, relative to the regular ones
 q <- contributions(fit, data = spectra, samples = c(49, 127), reference = "regular")

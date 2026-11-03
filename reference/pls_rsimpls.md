@@ -27,8 +27,8 @@ either order. It is for regression only, with one or several outcomes
 - `predictor_prop`, the proportion of predictors of sparse PLS, is not
   used by this engine.
 
-The models with 1 to `kmax` components all come from the same ROBPCA fit
-(see
+The models with 1 to `ncomp_max` components all come from the same
+ROBPCA fit (see
 [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)),
 so
 [`parsnip::multi_predict()`](https://parsnip.tidymodels.org/reference/multi_predict.html)
@@ -36,8 +36,8 @@ gives the predictions of all of them from one fit, and
 [`tune::tune_grid()`](https://tune.tidymodels.org/reference/tune_grid.html)
 fits a single model per resample for a grid of `num_comp`. The
 predictions of a model with fewer components are those of a separate fit
-with the same `kmax`, as long as `kmax` is at least the largest
-`num_comp`.
+with the same `ncomp_max`, as long as `ncomp_max` is at least the
+largest `num_comp`.
 
 ## Engine arguments
 
@@ -45,7 +45,7 @@ The other arguments of
 [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
 are set with
 [`parsnip::set_engine()`](https://parsnip.tidymodels.org/reference/set_engine.html):
-`kmax`, the largest number of components (default 10), `alpha`, the
+`ncomp_max`, the largest number of components (default 10), `alpha`, the
 fraction of observations assumed to be regular (default 0.75), and
 `ndir` and `nsamp` of the ROBPCA step.
 

@@ -31,7 +31,7 @@ predict(object, newdata, type = c("response", "scores"), ncomp = NULL, ...)
 - ncomp:
 
   With `type = "response"`, the number of components of the predictions,
-  from 1 to the `kmax` of the model. Default is the `ncomp` of the
+  from 1 to the `ncomp_max` of the model. Default is the `ncomp` of the
   model. The models with fewer or more components use the same robust
   PCA (see
   [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md)).

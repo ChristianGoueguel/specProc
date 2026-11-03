@@ -64,7 +64,8 @@
   models in tidymodels, with one or several outcomes; the other
   arguments of
   [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
-  are engine arguments (`set_engine("rsimpls", kmax = , alpha = )`).
+  are engine arguments
+  (`set_engine("rsimpls", ncomp_max = , alpha = )`).
   [`multi_predict()`](https://parsnip.tidymodels.org/reference/multi_predict.html)
   gives the predictions of the models with fewer components from the
   same fit, so
@@ -72,8 +73,8 @@
   fits one model per resample for a grid of `num_comp`.
   [`predict()`](https://rdrr.io/r/stats/predict.html) of an
   [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
-  model gains `ncomp`, for the models with 1 to `kmax` components, which
-  the fit now keeps (`models`).
+  model gains `ncomp`, for the models with 1 to `ncomp_max` components,
+  which the fit now keeps (`models`).
 
 - [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md):
   robust principal component regression (RPCR) of Hubert and Verboven
@@ -90,8 +91,8 @@
   [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md)
   or
   [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md)
-  models with 1 to `kmax` components, which leaves the outliers out of
-  the cross-validated error, and the robust component selection (RCS)
+  models with 1 to `ncomp_max` components, which leaves the outliers out
+  of the cross-validated error, and the robust component selection (RCS)
   criterion of Engelen and Hubert (2005), to choose the number of
   components. The folds are fitted in parallel when a
   [`future::plan()`](https://future.futureverse.org/reference/plan.html)
@@ -874,6 +875,52 @@
     and
     [`libs_lines()`](https://christiangoueguel.com/specProc/reference/libs_lines.md).
     Calls that gave the arguments after `A` by position must name them.
+- The number of components is `ncomp` in all the functions, as in
+  [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md),
+  [`rpcr()`](https://christiangoueguel.com/specProc/reference/rpcr.md),
+  [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md),
+  the PLS and OSC functions and the pls package, and the largest number
+  of components considered is `ncomp_max`. The former names still work,
+  with a deprecation warning, and the new names keep the positions of
+  the former ones:
+  - `k` becomes `ncomp` in
+    [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
+    [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md),
+    [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md),
+    [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md),
+    [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md),
+    [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md),
+    [`contributions()`](https://christiangoueguel.com/specProc/reference/contributions.md),
+    [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)
+    and
+    [`plot_embedding()`](https://christiangoueguel.com/specProc/reference/plot_embedding.md);
+  - `kmax` becomes `ncomp_max` in
+    [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
+    [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+    and
+    [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md),
+    and so in the `options` of
+    [`step_robpca()`](https://christiangoueguel.com/specProc/reference/step_robpca.md),
+    [`step_macropca()`](https://christiangoueguel.com/specProc/reference/step_macropca.md)
+    and
+    [`step_cellpca()`](https://christiangoueguel.com/specProc/reference/step_cellpca.md).
+
+  The fits of
+  [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
+  [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md),
+  [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
+  and
+  [`cellpca()`](https://christiangoueguel.com/specProc/reference/cellpca.md)
+  keep their number of components in `ncomp` instead of `k`, and the
+  results of
+  [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md),
+  [`dmodx()`](https://christiangoueguel.com/specProc/reference/dmodx.md)
+  and
+  [`contributions()`](https://christiangoueguel.com/specProc/reference/contributions.md)
+  in the attribute `ncomp`: code that reads `fit$k` now gets `NULL`. The
+  `k` of
+  [`iqr_outliers()`](https://christiangoueguel.com/specProc/reference/iqr_outliers.md),
+  the fence factor, keeps its name.
 - [`generalized_boxplot()`](https://christiangoueguel.com/specProc/reference/generalized_boxplot.md)
   flags fewer observations: its default detection rate `alpha` is now
   about 0.7% (`2 * pnorm(-4 * qnorm(0.75))`), that of Tukey’s boxplot
@@ -1027,17 +1074,17 @@
 - [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
   and
   [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
-  failed, or flagged most observations as orthogonal outliers, when `k`
-  equaled the rank of the data (for example `k = 5` with 5 variables,
-  `k = n - 1` with more variables than observations, or a `k` chosen by
-  `var_explained` for data with few variables): the orthogonal distances
-  to a subspace that is the whole space are rounding errors, and their
-  cut-off was zero. As in Hubert, Rousseeuw and Vanden Branden (2005),
-  ROBPCA then reduces to the reweighted MCD of the data: the reweighting
-  on the orthogonal distances is skipped, and H1 is the subset H0 of the
-  least outlying observations (as in the rospca package). The orthogonal
-  distances and their cut-off are now zero, with no orthogonal outliers,
-  in
+  failed, or flagged most observations as orthogonal outliers, when
+  `ncomp` equaled the rank of the data (for example `ncomp = 5` with 5
+  variables, `ncomp = n - 1` with more variables than observations, or
+  an `ncomp` chosen by `var_explained` for data with few variables): the
+  orthogonal distances to a subspace that is the whole space are
+  rounding errors, and their cut-off was zero. As in Hubert, Rousseeuw
+  and Vanden Branden (2005), ROBPCA then reduces to the reweighted MCD
+  of the data: the reweighting on the orthogonal distances is skipped,
+  and H1 is the subset H0 of the least outlying observations (as in the
+  rospca package). The orthogonal distances and their cut-off are now
+  zero, with no orthogonal outliers, in
   [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
   [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
   and

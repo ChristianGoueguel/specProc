@@ -15,7 +15,7 @@ rsimca(
   x,
   group,
   ncomp = NULL,
-  kmax = 10,
+  ncomp_max = 10,
   alpha = 0.75,
   gamma = 0.5,
   squared = TRUE,
@@ -46,7 +46,7 @@ rsimca(
   [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
   choose them from `var_explained`.
 
-- kmax:
+- ncomp_max:
 
   The largest number of components of the robust PCA. Default is 10.
 

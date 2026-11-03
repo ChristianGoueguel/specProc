@@ -24,7 +24,7 @@ plot_embedding(
   robust = FALSE,
   distribution = "normal",
   hotelling = "none",
-  k = 2,
+  ncomp = 2,
   t2_method = "f",
   flag = FALSE,
   label = NULL,
@@ -43,7 +43,8 @@ plot_embedding(
   ylab = NULL,
   colour = deprecated(),
   size = deprecated(),
-  alpha = deprecated()
+  alpha = deprecated(),
+  k = deprecated()
 )
 ```
 
@@ -105,7 +106,7 @@ plot_embedding(
   (all samples) or `"group"` (within the groups of a discrete
   `color_by`). Needs the HotellingEllipse package (1.3.0 or later).
 
-- k:
+- ncomp:
 
   The number of components of \\T^2\\: the two axes, then the next
   embedding coordinates. Default is 2.
@@ -197,6 +198,10 @@ plot_embedding(
 
   **\[deprecated\]** Use `color_by`, `point_size` and `point_alpha`.
 
+- k:
+
+  **\[deprecated\]** Use `ncomp`.
+
 ## Value
 
 A ggplot object.
@@ -225,8 +230,8 @@ ellipse.
 
 With `hotelling = "all"`, the ellipses of Hotelling's \\T^2\\ at each
 level of `conf_level` (97.5% by default) are drawn for all the samples,
-and the samples beyond the limit at the highest level of \\T^2\\ on `k`
-components are counted in the subtitle, circled in red with
+and the samples beyond the limit at the highest level of \\T^2\\ on
+`ncomp` components are counted in the subtitle, circled in red with
 `flag = TRUE` and labeled with `label` (each independently of the
 other): the classical outlier limits of a score plot. For a PCA model
 ([`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html),
@@ -244,10 +249,10 @@ for a [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html) fit, and
 the chi-square quantile of ROBPCA for a robust fit, whose flagged
 samples are then the leverage points of
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
-(with `k` its number of components and `conf_level = 0.975`). The scores
-of the outlying samples then do not inflate or tilt the ellipses. For
-other embeddings, \\T^2\\ is computed from the mean and covariance of
-the samples (with
+(with `ncomp` its number of components and `conf_level = 0.975`). The
+scores of the outlying samples then do not inflate or tilt the ellipses.
+For other embeddings, \\T^2\\ is computed from the mean and covariance
+of the samples (with
 [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)
 and
 [`HotellingEllipse::ellipseCoord()`](https://pkgdown.r-lib.org,%20https://github.com/ChristianGoueguel/HotellingEllipse/reference/ellipseCoord.html)).
@@ -255,14 +260,14 @@ With `hotelling = "group"`, each group of a discrete `color_by` gets its
 own ellipses and limits, from its mean and covariance, which flags the
 samples atypical of their own group. The ellipses are labeled with their
 level (instead of a legend), and drawn for the two components shown,
-while the limits use `k` components, so with `k > 2` a flagged sample
-can lie inside the ellipses. With `ellipse = TRUE`, the confidence
-ellipses are always computed from the samples shown. Without groups,
-`ellipse = TRUE` and `hotelling = "all"` would draw two ellipses of all
-the samples: only the \\T^2\\ ellipse is drawn, with a warning. With
-groups, both are drawn: the confidence ellipses of the groups and the
-\\T^2\\ limits of all the samples. \\T^2\\ suits linear scores such as
-PCA or PLS; on a UMAP map, whose distances are not meaningful, prefer
+while the limits use `ncomp` components, so with `ncomp > 2` a flagged
+sample can lie inside the ellipses. With `ellipse = TRUE`, the
+confidence ellipses are always computed from the samples shown. Without
+groups, `ellipse = TRUE` and `hotelling = "all"` would draw two ellipses
+of all the samples: only the \\T^2\\ ellipse is drawn, with a warning.
+With groups, both are drawn: the confidence ellipses of the groups and
+the \\T^2\\ limits of all the samples. \\T^2\\ suits linear scores such
+as PCA or PLS; on a UMAP map, whose distances are not meaningful, prefer
 `ellipse`.
 
 **Style.** The panel is grey outside the outermost ellipse (of \\T^2\\,
@@ -286,7 +291,7 @@ from the plot.
 fit or a robust PCA, the axis titles give the share of the variance of
 each component: of the total variance for
 [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html), and of the
-variance of the `k` components of the model for
+variance of the components of the model for
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
 [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
 and
@@ -342,7 +347,7 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   set.seed(1)
   forageLIBS[which(wl > 380 & wl < 430)] |>
     center() |>
-    robpca(k = 2) |>
+    robpca(ncomp = 2) |>
     plot_embedding(hotelling = "all", flag = FALSE, label = TRUE)
 }
 

@@ -12,7 +12,7 @@ classifies them.
 ## Usage
 
 ``` r
-rpcr(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 500)
+rpcr(x, y, ncomp, ncomp_max = 10, alpha = 0.75, ndir = 250, nsamp = 500)
 ```
 
 ## Arguments
@@ -31,12 +31,12 @@ rpcr(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 500)
 
   The number of components of the model.
 
-- kmax:
+- ncomp_max:
 
   The largest number of components considered: the number of components
-  of the robust PCA, so the model also depends on `kmax` (see Details).
-  Default is 10; it is raised to `ncomp` if needed, and lowered when
-  there are too few observations or variables.
+  of the robust PCA, so the model also depends on `ncomp_max` (see
+  Details). Default is 10; it is raised to `ncomp` if needed, and
+  lowered when there are too few observations or variables.
 
 - alpha:
 
@@ -88,14 +88,14 @@ An object of class `specproc_rpcr`, a list with:
   regression, 0 for the others.
 
 - `components`: a tibble with the robust `R2` and `RMSE` of the models
-  with 1 to `kmax` components.
+  with 1 to `ncomp_max` components.
 
 - `models`: the `coefficients` and `intercept` of the models with 1 to
-  `kmax` components, for predictions with another number of components
-  (`predict(fit, newdata, ncomp = )`).
+  `ncomp_max` components, for predictions with another number of
+  components (`predict(fit, newdata, ncomp = )`).
 
-- `ncomp`, `kmax`, `h`, `alpha`: the settings used, and `regression`,
-  `"LTS"` or `"MCD"`.
+- `ncomp`, `ncomp_max`, `h`, `alpha`: the settings used, and
+  `regression`, `"LTS"` or `"MCD"`.
 
 Use
 [predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_rpcr.md)
@@ -107,7 +107,7 @@ The method has two steps:
 
 1.  **Robust PCA.**
     [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)
-    is applied to the predictors with `kmax` components. It gives a
+    is applied to the predictors with `ncomp_max` components. It gives a
     robust center \\\hat\mu_x\\, the loadings \\P\\ and the eigenvalues
     \\l_a\\, and the scores \\t_i = P^T (x_i - \hat\mu_x)\\.
 
@@ -139,19 +139,20 @@ beyond the residual cut-off only **vertical outliers**, and beyond both
 computed on the observations whose orthogonal and residual distances are
 both below their cut-offs.
 
-**Number of components.** `components` gives, for 1 to `kmax`
+**Number of components.** `components` gives, for 1 to `ncomp_max`
 components, the robust \\R^2\\ and root mean squared error on the
 observations that are regular in every one of these models; use
 [`robust_rmsecv()`](https://christiangoueguel.com/specProc/reference/robust_rmsecv.md)
 for the robust cross-validated error. These models all come from the
-same robust PCA, with `kmax` components, of which they use the first
-`ncomp`, so the model also depends on `kmax`. With `kmax = ncomp`, the
-robust PCA has `ncomp` components, as in the paper.
+same robust PCA, with `ncomp_max` components, of which they use the
+first `ncomp`, so the model also depends on `ncomp_max`. With
+`ncomp_max = ncomp`, the robust PCA has `ncomp` components, as in the
+paper.
 
 **Differences from the paper.**
 
-- The models with fewer components than `kmax` use the first components
-  of the robust PCA with `kmax` components (see above).
+- The models with fewer components than `ncomp_max` use the first
+  components of the robust PCA with `ncomp_max` components (see above).
 
 - The residual covariance of the MCD regression is multiplied by the
   consistency factor \\0.99 / P(\chi^2\_{q+2} \le \chi^2\_{q, 0.99})\\,

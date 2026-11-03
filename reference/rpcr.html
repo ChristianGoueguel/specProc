@@ -60,7 +60,7 @@ classifies them.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rpcr</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">ncomp</span>, kmax <span class="op">=</span> <span class="fl">10</span>, alpha <span class="op">=</span> <span class="fl">0.75</span>, ndir <span class="op">=</span> <span class="fl">250</span>, nsamp <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rpcr</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">ncomp</span>, ncomp_max <span class="op">=</span> <span class="fl">10</span>, alpha <span class="op">=</span> <span class="fl">0.75</span>, ndir <span class="op">=</span> <span class="fl">250</span>, nsamp <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -81,9 +81,9 @@ one row per observation.</p></dd>
 <dd><p>The number of components of the model.</p></dd>
 
 
-<dt id="arg-kmax">kmax<a class="anchor" aria-label="anchor" href="#arg-kmax"></a></dt>
+<dt id="arg-ncomp-max">ncomp_max<a class="anchor" aria-label="anchor" href="#arg-ncomp-max"></a></dt>
 <dd><p>The largest number of components considered: the number of
-components of the robust PCA, so the model also depends on <code>kmax</code> (see
+components of the robust PCA, so the model also depends on <code>ncomp_max</code> (see
 Details). Default is 10; it is raised to <code>ncomp</code> if needed, and lowered
 when there are too few observations or variables.</p></dd>
 
@@ -123,18 +123,18 @@ cut-offs.</p></li>
 <li><p><code>weights</code>: 1 for the observations of the final (reweighted)
 regression, 0 for the others.</p></li>
 <li><p><code>components</code>: a tibble with the robust <code>R2</code> and <code>RMSE</code> of the models
-with 1 to <code>kmax</code> components.</p></li>
+with 1 to <code>ncomp_max</code> components.</p></li>
 <li><p><code>models</code>: the <code>coefficients</code> and <code>intercept</code> of the models with 1 to
-<code>kmax</code> components, for predictions with another number of components
+<code>ncomp_max</code> components, for predictions with another number of components
 (<code>predict(fit, newdata, ncomp = )</code>).</p></li>
-<li><p><code>ncomp</code>, <code>kmax</code>, <code>h</code>, <code>alpha</code>: the settings used, and <code>regression</code>,
+<li><p><code>ncomp</code>, <code>ncomp_max</code>, <code>h</code>, <code>alpha</code>: the settings used, and <code>regression</code>,
 <code>"LTS"</code> or <code>"MCD"</code>.</p></li>
 </ul><p>Use <a href="predict.specproc_rpcr.html">predict()</a> for the predictions of new
 observations.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The method has two steps:</p><ol><li><p><strong>Robust PCA.</strong> <code><a href="robpca.html">robpca()</a></code> is applied to the predictors with <code>kmax</code>
+    <p>The method has two steps:</p><ol><li><p><strong>Robust PCA.</strong> <code><a href="robpca.html">robpca()</a></code> is applied to the predictors with <code>ncomp_max</code>
 components. It gives a robust center \(\hat\mu_x\), the loadings
 \(P\) and the eigenvalues \(l_a\), and the scores
 \(t_i = P^T (x_i - \hat\mu_x)\).</p></li>
@@ -159,15 +159,15 @@ beyond the residual cut-off only <strong>vertical outliers</strong>, and beyond 
 <strong>bad leverage</strong> points. The robust \(R^2\) of the model (<code>R2</code>) is
 computed on the observations whose orthogonal and residual distances are
 both below their cut-offs.</p>
-<p><strong>Number of components.</strong> <code>components</code> gives, for 1 to <code>kmax</code>
+<p><strong>Number of components.</strong> <code>components</code> gives, for 1 to <code>ncomp_max</code>
 components, the robust \(R^2\) and root mean squared error on the
 observations that are regular in every one of these models; use
 <code><a href="robust_rmsecv.html">robust_rmsecv()</a></code> for the robust cross-validated error. These models all
-come from the same robust PCA, with <code>kmax</code> components, of which they use
-the first <code>ncomp</code>, so the model also depends on <code>kmax</code>. With
-<code>kmax = ncomp</code>, the robust PCA has <code>ncomp</code> components, as in the paper.</p>
-<p><strong>Differences from the paper.</strong></p><ul><li><p>The models with fewer components than <code>kmax</code> use the first components
-of the robust PCA with <code>kmax</code> components (see above).</p></li>
+come from the same robust PCA, with <code>ncomp_max</code> components, of which they use
+the first <code>ncomp</code>, so the model also depends on <code>ncomp_max</code>. With
+<code>ncomp_max = ncomp</code>, the robust PCA has <code>ncomp</code> components, as in the paper.</p>
+<p><strong>Differences from the paper.</strong></p><ul><li><p>The models with fewer components than <code>ncomp_max</code> use the first components
+of the robust PCA with <code>ncomp_max</code> components (see above).</p></li>
 <li><p>The residual covariance of the MCD regression is multiplied by the
 consistency factor \(0.99 / P(\chi^2_{q+2} \le \chi^2_{q, 0.99})\), as
 the observations beyond the cut-off are left out.</p></li>

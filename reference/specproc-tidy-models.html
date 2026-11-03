@@ -169,7 +169,7 @@ names of the tables are also accepted, such as <code>"rotation"</code> and
 <li><p><code><a href="rsimpls.html">rsimpls()</a></code> and <code><a href="rpcr.html">rpcr()</a></code>: <code>"coefficients"</code> (default), the <code>estimate</code>
 of each <code>term</code> (the intercept and the variables) for each <code>response</code>,
 in the units of the responses; <code>"components"</code>, the robust <code>r.squared</code>
-and the <code>rmse</code> of the models with 1 to <code>kmax</code> components (<code>ncomp</code>);
+and the <code>rmse</code> of the models with 1 to <code>ncomp_max</code> components (<code>ncomp</code>);
 <code>"loadings"</code> and <code>"scores"</code>, as for robust PCA;</p></li>
 <li><p><code><a href="linear_reg_lts.html">lts_fit()</a></code>: the <code>term</code>, <code>estimate</code>, <code>std.error</code>, <code>statistic</code> and
 <code>p.value</code> of the reweighted least-squares fit, and, with
@@ -193,11 +193,11 @@ represents and their mean quantization error <code>qe</code>;</p></li>
 its <code>std.dev</code>, <code>percent</code> of the variance and <code>cumulative</code> percent (as
 fractions).</p></li>
 </ul><p><code><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance()</a></code> returns the number of observations <code>nobs</code> and of variables
-<code>nvar</code>, and:</p><ul><li><p>robust PCA: the number of components <code>k</code>, <code>h</code>, <code>alpha</code>, the cutoffs
+<code>nvar</code>, and:</p><ul><li><p>robust PCA: the number of components <code>ncomp</code>, <code>h</code>, <code>alpha</code>, the cutoffs
 <code>cutoff.sd</code> and <code>cutoff.od</code>, the numbers of <code>n.good.leverage</code>,
 <code>n.orthogonal.outlier</code> and <code>n.bad.leverage</code> observations, the number
 of <code>flagged.cells</code> (MacroPCA and cellPCA) and the <code>method</code>;</p></li>
-<li><p><code><a href="rsimpls.html">rsimpls()</a></code> and <code><a href="rpcr.html">rpcr()</a></code>: <code>ncomp</code>, <code>kmax</code>, <code>h</code>, <code>alpha</code>, the robust
+<li><p><code><a href="rsimpls.html">rsimpls()</a></code> and <code><a href="rpcr.html">rpcr()</a></code>: <code>ncomp</code>, <code>ncomp_max</code>, <code>h</code>, <code>alpha</code>, the robust
 <code>r.squared</code>, the robust scale of the residuals <code>sigma</code> (one response),
 the numbers of <code>n.good.leverage</code>, <code>n.vertical.outlier</code> and
 <code>n.bad.leverage</code> observations, the <code>method</code> and, for RPCR, the
@@ -222,7 +222,7 @@ variables <code>n.selected</code>, <code>robust</code>, the <code>threshold</cod
 <li><p><code><a href="nas.html">nas()</a></code>: the <code>method</code>, <code>ncomp</code> and the figures of merit
 (<code>sensitivity</code>, <code>selectivity</code> and, with a noise level,
 <code>analytical.sensitivity</code>, <code>lod</code> and <code>loq</code>);</p></li>
-<li><p><code><a href="applicability_domain.html">applicability_domain()</a></code>: the number of components <code>k</code>, the variance
+<li><p><code><a href="applicability_domain.html">applicability_domain()</a></code>: the number of components <code>ncomp</code>, the variance
 <code>explained</code>, the <code>conf.level</code> and the limits <code>t2.limit</code> and <code>q.limit</code>.</p></li>
 </ul></div>
     <div class="section level2">
@@ -257,9 +257,9 @@ variables <code>n.selected</code>, <code>robust</code>, the <code>threshold</cod
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>    10     0.775 0.075<span style="text-decoration: underline;">3</span></span>
 <span class="r-in"><span><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 12</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    nobs  nvar ncomp  kmax     h alpha r.squared  sigma n.good.leverage</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>   300   594     4    10   225  0.75     0.738 0.091<span style="text-decoration: underline;">8</span>              39</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    nobs  nvar ncomp ncomp_max     h alpha r.squared  sigma n.good.leverage</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>   300   594     4        10   225  0.75     0.738 0.091<span style="text-decoration: underline;">8</span>              39</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 3 more variables: n.vertical.outlier &lt;int&gt;, n.bad.leverage &lt;int&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   method &lt;chr&gt;</span></span>
 <span class="r-in"><span><span class="co"># the regression vector, one row per wavelength</span></span></span>
@@ -274,7 +274,7 @@ variables <code>n.selected</code>, <code>robust</code>, the <code>threshold</cod
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> y        380.285294  -<span style="color: #BB0000;">0.000</span><span style="color: #BB0000; text-decoration: underline;">000</span><span style="color: #BB0000;">907</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> y        380.3682761 -<span style="color: #BB0000;">0.000</span><span style="color: #BB0000; text-decoration: underline;">001</span><span style="color: #BB0000;">08</span> </span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">pca</span> <span class="op">&lt;-</span> <span class="fu"><a href="robpca.html">robpca</a></span><span class="op">(</span><span class="va">spectra</span>, k <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pca</span> <span class="op">&lt;-</span> <span class="fu"><a href="robpca.html">robpca</a></span><span class="op">(</span><span class="va">spectra</span>, ncomp <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">pca</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      PC eigenvalue std.dev</span>
@@ -284,7 +284,7 @@ variables <code>n.selected</code>, <code>robust</code>, the <code>threshold</cod
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>     3  39<span style="text-decoration: underline;">024</span>510.   <span style="text-decoration: underline;">6</span>247.</span>
 <span class="r-in"><span><span class="fu"><a href="https://generics.r-lib.org/reference/glance.html" class="external-link">glance</a></span><span class="op">(</span><span class="va">pca</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 12</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    nobs  nvar     k     h alpha cutoff.sd cutoff.od n.good.leverage</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    nobs  nvar ncomp     h alpha cutoff.sd cutoff.od n.good.leverage</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>           <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>   368   594     3   276  0.75      3.06    <span style="text-decoration: underline;">12</span>301.              39</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 4 more variables: n.orthogonal.outlier &lt;int&gt;, n.bad.leverage &lt;int&gt;,</span></span>

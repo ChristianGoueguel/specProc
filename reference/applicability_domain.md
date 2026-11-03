@@ -10,7 +10,7 @@ spectra, are then extrapolations.
 ``` r
 applicability_domain(
   x,
-  k = NULL,
+  ncomp = NULL,
   variance = 0.99,
   conf_level = 0.99,
   center = TRUE,
@@ -25,15 +25,15 @@ applicability_domain(
   The calibration spectra: a numeric matrix or data frame, one spectrum
   per row.
 
-- k:
+- ncomp:
 
   The number of principal components. By default, chosen from
   `variance`.
 
 - variance:
 
-  The fraction of the variance explained by the components, when `k` is
-  not given. Default is 0.99.
+  The fraction of the variance explained by the components, when `ncomp`
+  is not given. Default is 0.99.
 
 - conf_level:
 
@@ -48,17 +48,17 @@ applicability_domain(
 
 An object of class `specproc_domain`, a list with the `pca`
 ([`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html) fit), the
-number of components `k`, the fraction of the variance they `explained`,
-the `conf_level` and the `limits` of \\T^2\\ and Q.
+number of components `ncomp`, the fraction of the variance they
+`explained`, the `conf_level` and the `limits` of \\T^2\\ and Q.
 [predict()](https://christiangoueguel.com/specProc/reference/predict.specproc_domain.md)
 flags new spectra.
 
 ## Details
 
 A new spectrum is outside the applicability domain when its Hotelling
-\\T^2\\, the distance within the plane of the first `k` components, or
-its Q residual, the squared distance to that plane, exceeds its limit at
-`conf_level` (see
+\\T^2\\, the distance within the plane of the first `ncomp` components,
+or its Q residual, the squared distance to that plane, exceeds its limit
+at `conf_level` (see
 [`q_residuals()`](https://christiangoueguel.com/specProc/reference/q_residuals.md)).
 A high \\T^2\\ is a sample more extreme than the calibration samples
 (for example, a higher concentration); a high Q, a sample of another
@@ -66,11 +66,12 @@ kind (another matrix, a contamination, an instrumental problem). The
 limit of \\T^2\\ is that of a new observation, and that of Q the
 Jackson-Mudholkar limit.
 
-By default, `k` is the smallest number of components that explain the
-fraction `variance` of the variance of the calibration spectra. Prepare
-the spectra as for the model (baseline correction, normalization), since
-the domain is that of the variables the model uses. The PCA is
-classical: remove the outlying calibration spectra first (see
+By default, `ncomp` is the smallest number of components that explain
+the fraction `variance` of the variance of the calibration spectra.
+Prepare the spectra as for the model (baseline correction,
+normalization), since the domain is that of the variables the model
+uses. The PCA is classical: remove the outlying calibration spectra
+first (see
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md)).
 
 ## References

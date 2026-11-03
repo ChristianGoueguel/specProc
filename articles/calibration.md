@@ -367,7 +367,7 @@ or Q residual (unlike them) exceeds its 99% limit:
 
 ``` r
 
-domain <- applicability_domain(x_calibration, k = ncomp)
+domain <- applicability_domain(x_calibration, ncomp = ncomp)
 domain
 #> Applicability domain: PCA of 275 calibration spectra
 #> 

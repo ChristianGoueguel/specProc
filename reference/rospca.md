@@ -14,13 +14,14 @@ kernels are written in C++.
 ``` r
 rospca(
   x,
-  k = 2,
+  ncomp = 2,
   lambda = 1,
   alpha = 0.75,
   ndir = 250,
   stand = FALSE,
   ngrid = 10,
-  maxiter = 10
+  maxiter = 10,
+  k = deprecated()
 )
 ```
 
@@ -30,7 +31,7 @@ rospca(
 
   A numeric matrix or data frame, with one observation per row.
 
-- k:
+- ncomp:
 
   The number of principal components. Default is 2.
 
@@ -43,7 +44,7 @@ rospca(
   The robustness parameter: the fraction of observations the estimates
   are based on, between 0.5 and 1. Default is 0.75. The subset size is
   \\h = \max(\lfloor\alpha n\rfloor, \lfloor(n + k\_{max} +
-  1)/2\rfloor)\\.
+  1)/2\rfloor)\\, with \\k\_{max}\\ = `ncomp_max`.
 
 - ndir:
 
@@ -63,6 +64,10 @@ rospca(
 - maxiter:
 
   The maximum number of grid refinements per component. Default is 10.
+
+- k:
+
+  **\[deprecated\]** Use `ncomp`.
 
 ## Value
 
@@ -88,8 +93,8 @@ The algorithm follows the published description in three steps:
     [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md),
     the `h` least outlying observations form \\H_0\\, and those whose
     orthogonal distance to the \\k\\-dimensional PCA subspace of \\H_0\\
-    is below the cut-off form \\H_1\\ (\\H_1 = H_0\\ when `k` equals the
-    rank of the data, as the subspace is then the whole space).
+    is below the cut-off form \\H_1\\ (\\H_1 = H_0\\ when `ncomp` equals
+    the rank of the data, as the subspace is then the whole space).
 
 2.  **Sparsification.** The observations of \\H_1\\ are standardized and
     the sparse loadings are computed by maximizing, component by

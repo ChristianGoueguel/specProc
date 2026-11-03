@@ -22,14 +22,16 @@ starts from a MacroPCA fit.
 ``` r
 macropca(
   x,
-  k = NULL,
+  ncomp = NULL,
   alpha = 0.5,
-  kmax = 10,
+  ncomp_max = 10,
   var_explained = 0.8,
   scale = FALSE,
   ndir = 250,
   maxiter = 20,
-  tol = 0.005
+  tol = 0.005,
+  k = deprecated(),
+  kmax = deprecated()
 )
 ```
 
@@ -40,23 +42,23 @@ macropca(
   A numeric matrix or data frame, with one observation per row. Missing
   values are allowed.
 
-- k:
+- ncomp:
 
   The number of principal components. If `NULL` (default), it is chosen
-  from `var_explained` and `kmax`.
+  from `var_explained` and `ncomp_max`.
 
 - alpha:
 
   The robustness parameter, between 0.5 and 1: the fraction of
   observations used in the fit. Default is 0.5.
 
-- kmax:
+- ncomp_max:
 
   The maximum number of components. Default is 10.
 
 - var_explained:
 
-  The fraction of variance used to choose `k` when it is not given.
+  The fraction of variance used to choose `ncomp` when it is not given.
   Default is 0.8.
 
 - scale:
@@ -75,6 +77,14 @@ macropca(
   The maximum number of iterations of step 4, and the tolerance on the
   largest angle between successive subspaces (as a fraction of a right
   angle). Defaults are 20 and 0.005, as in the paper.
+
+- k:
+
+  **\[deprecated\]** Use `ncomp`.
+
+- kmax:
+
+  **\[deprecated\]** Use `ncomp_max`.
 
 ## Value
 
@@ -122,9 +132,9 @@ most the \\n - h\\ most outlying are set aside.
 
 3.  **Subspace dimension.** A classical PCA of the observations of
     \\H_0\\, with their flagged and missing cells imputed, gives the
-    eigenvalues: when `k` is `NULL`, it is the smallest number of
+    eigenvalues: when `ncomp` is `NULL`, it is the smallest number of
     components that explain `var_explained` of their variance (at most
-    `kmax`).
+    `ncomp_max`).
 
 4.  **Iterative subspace estimation.** The flagged and missing cells are
     imputed by the fitted values of the current PCA, and the PCA of

@@ -11,14 +11,15 @@ with its limits at one or more confidence levels, and Hotelling's
 ``` r
 dmodx(
   model,
-  k,
+  ncomp,
   newdata = NULL,
   conf_level = 0.975,
   normalized = TRUE,
   df = "effective",
   t2_method = "f",
   center = TRUE,
-  scale = FALSE
+  scale = FALSE,
+  k = deprecated()
 )
 ```
 
@@ -32,7 +33,7 @@ dmodx(
   matrix or data frame, on which a PCA is fitted with `center` and
   `scale`.
 
-- k:
+- ncomp:
 
   The number of components of the model.
 
@@ -68,6 +69,10 @@ dmodx(
   Passed to [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html)
   when `model` is data. Default is `TRUE` and `FALSE`.
 
+- k:
+
+  **\[deprecated\]** Use `ncomp`.
+
 ## Value
 
 A tibble of class `specproc_influence`, with one row per sample:
@@ -80,9 +85,9 @@ Draw it with
 
 ## Details
 
-With the residuals \\e\_{ij}\\ of the \\K\\ variables after `k`
-components, for \\N\\ calibration samples (and \\A_0 = 1\\ if the data
-are centered), \$\$s_i = \sqrt{\frac{\sum_j e\_{ij}^2}{K -
+With the residuals \\e\_{ij}\\ of the \\K\\ variables after \\k\\
+components (`ncomp`), for \\N\\ calibration samples (and \\A_0 = 1\\ if
+the data are centered), \$\$s_i = \sqrt{\frac{\sum_j e\_{ij}^2}{K -
 k}}\\\sqrt{\frac{N}{N - k - A_0}}, \qquad s_0 = \sqrt{\frac{\sum_i
 \sum_j e\_{ij}^2}{(N - k - A_0)(K - k)}}\$\$ (the correction factor
 \\\sqrt{N / (N - k - A_0)}\\ applies to the calibration samples only).
@@ -133,7 +138,7 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   wl <- suppressWarnings(as.numeric(names(forageLIBS)))
   spectra <- forageLIBS[which(wl > 380 & wl < 430)]
   pca <- stats::prcomp(spectra)
-  d <- dmodx(pca, k = 3)
+  d <- dmodx(pca, ncomp = 3)
   d[d$outlier != "regular", ]
   plot_influence(d, label = forageLIBS$Measurement)
 }

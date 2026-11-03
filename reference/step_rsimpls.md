@@ -64,7 +64,7 @@ step_rsimpls(
 
   A list of further arguments passed to
   [`rsimpls()`](https://christiangoueguel.com/specProc/reference/rsimpls.md),
-  such as `kmax`, `alpha` or `ndir`.
+  such as `ncomp_max`, `alpha` or `ndir`.
 
 - prefix:
 

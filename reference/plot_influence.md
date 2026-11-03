@@ -148,7 +148,7 @@ Christian L. Goueguel
 ``` r
 data(forageLIBS)
 pca <- stats::prcomp(forageLIBS[-(1:14)])
-influence <- q_residuals(pca, k = 3, conf_level = c(0.95, 0.99))
+influence <- q_residuals(pca, ncomp = 3, conf_level = c(0.95, 0.99))
 plot_influence(influence, label = forageLIBS$Measurement)
 
 # the same options as plot_outlier_map(): distances relative to the limits,
@@ -157,6 +157,6 @@ plot_influence(influence, relative = TRUE, shade = TRUE, log = TRUE, color_by = 
 
 
 # a single limit at 97.5%, with the outlying regions shaded
-influence_975 <- q_residuals(pca, k = 3, conf_level = 0.975)
+influence_975 <- q_residuals(pca, ncomp = 3, conf_level = 0.975)
 plot_influence(influence_975, label = forageLIBS$Measurement, shade = TRUE)
 ```

@@ -1,9 +1,9 @@
 # Hotelling's T-squared Statistic of Samples in an Embedding
 
 Computes Hotelling's \\T^2\\ statistic of each sample from its scores on
-the first `k` components of an embedding (such as PCA or PLS scores),
-with its limits at one or more confidence levels, for all the samples
-together or within groups, with
+the first `ncomp` components of an embedding (such as PCA or PLS
+scores), with its limits at one or more confidence levels, for all the
+samples together or within groups, with
 [`HotellingEllipse::ellipseParam()`](https://pkgdown.r-lib.org,%20https://github.com/ChristianGoueguel/HotellingEllipse/reference/ellipseParam.html).
 Samples beyond a limit are far from the center of the data (or of their
 group) given its covariance: candidate outliers.
@@ -14,10 +14,11 @@ group) given its covariance: candidate outliers.
 hotelling_t2(
   data,
   columns = NULL,
-  k = 2,
+  ncomp = 2,
   group = NULL,
   conf_level = 0.975,
-  method = "f"
+  method = "f",
+  k = deprecated()
 )
 ```
 
@@ -36,10 +37,10 @@ hotelling_t2(
 - columns:
 
   The components used: a character vector of column names. By default,
-  the first `k` embedding coordinates (columns named like `PC1`,
-  `UMAP1`, ...), or else the first `k` numeric columns.
+  the first `ncomp` embedding coordinates (columns named like `PC1`,
+  `UMAP1`, ...), or else the first `ncomp` numeric columns.
 
-- k:
+- ncomp:
 
   The number of components, when `columns` is not given. Default is 2.
 
@@ -57,6 +58,10 @@ hotelling_t2(
 
   The distribution of the limits: `"f"` (default), `"beta"` or `"new"`.
 
+- k:
+
+  **\[deprecated\]** Use `ncomp`.
+
 ## Value
 
 A tibble with one row per sample: its row number `sample`, the `group`
@@ -69,7 +74,7 @@ data).
 
 \\T^2\\ is the squared Mahalanobis distance of a sample to the mean of
 the scores, with their covariance. Its limit at the confidence level
-\\1 - \alpha\\, for \\n\\ samples, is
+\\1 - \alpha\\, for \\n\\ samples and \\k\\ components, is
 
 - `method = "f"` (default): \\k(n - 1)/(n - k)\\ F\_{1-\alpha}(k, n -
   k)\\, the conventional limit of score plots (Jackson, 1991);
@@ -86,11 +91,12 @@ the scores, with their covariance. Its limit at the confidence level
 
 Within groups (`group`), each group gets its own mean, covariance and
 limits, which tells whether a sample is typical of its own group rather
-than of the whole data set; each group needs more than `k + 1` samples.
+than of the whole data set; each group needs more than \\k + 1\\
+samples.
 
-The statistic uses the `k` components given, not only the two shown on a
-plot: a sample can lie inside the ellipse of two components and still
-exceed the limit in `k` dimensions. Classical estimates are themselves
+The statistic uses the \\k\\ components given, not only the two shown on
+a plot: a sample can lie inside the ellipse of two components and still
+exceed the limit in \\k\\ dimensions. Classical estimates are themselves
 sensitive to outliers; with many outliers, prefer the robust distances
 of
 [`robpca()`](https://christiangoueguel.com/specProc/reference/robpca.md).
@@ -126,10 +132,10 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   wl <- suppressWarnings(as.numeric(names(forageLIBS)))
   spectra <- forageLIBS[which(wl > 380 & wl < 430)]
   pca <- stats::prcomp(spectra)
-  t2 <- hotelling_t2(pca, k = 3)
+  t2 <- hotelling_t2(pca, ncomp = 3)
   t2[t2$outlier_97.5, ]
   # two limits, with the exact distribution of the calibration samples
-  hotelling_t2(pca, k = 3, conf_level = c(0.95, 0.99), method = "beta")
+  hotelling_t2(pca, ncomp = 3, conf_level = c(0.95, 0.99), method = "beta")
 }
 #> # A tibble: 368 × 7
 #>    sample    t2 limit_95 limit_99 outlier_95 outlier_99     n

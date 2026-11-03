@@ -122,7 +122,7 @@ The other arguments of
 [`rsimca()`](https://christiangoueguel.com/specProc/reference/rsimca.md)
 are set with
 [`parsnip::set_engine()`](https://parsnip.tidymodels.org/reference/set_engine.html):
-`kmax`, `alpha`, `var_explained`, `prior`, `ndir` and `nsamp`.
+`ncomp_max`, `alpha`, `var_explained`, `prior`, `ndir` and `nsamp`.
 
 ## Predictions
 

@@ -12,12 +12,14 @@ written in C++.
 ``` r
 robpca(
   x,
-  k = NULL,
-  kmax = 10,
+  ncomp = NULL,
+  ncomp_max = 10,
   alpha = 0.75,
   ndir = 250,
   var_explained = 0.8,
-  nsamp = 500
+  nsamp = 500,
+  k = deprecated(),
+  kmax = deprecated()
 )
 ```
 
@@ -27,12 +29,12 @@ robpca(
 
   A numeric matrix or data frame, with one observation per row.
 
-- k:
+- ncomp:
 
   The number of principal components. If `NULL` (default), it is chosen
-  from `var_explained` and `kmax`.
+  from `var_explained` and `ncomp_max`.
 
-- kmax:
+- ncomp_max:
 
   The maximum number of components. Default is 10.
 
@@ -41,7 +43,7 @@ robpca(
   The robustness parameter: the fraction of observations the estimates
   are based on, between 0.5 and 1. Default is 0.75. The subset size is
   \\h = \max(\lfloor\alpha n\rfloor, \lfloor(n + k\_{max} +
-  1)/2\rfloor)\\.
+  1)/2\rfloor)\\, with \\k\_{max}\\ = `ncomp_max`.
 
 - ndir:
 
@@ -50,12 +52,20 @@ robpca(
 
 - var_explained:
 
-  The fraction of variance used to choose `k` when it is not given.
+  The fraction of variance used to choose `ncomp` when it is not given.
   Default is 0.8.
 
 - nsamp:
 
   The number of random subsets of FAST-MCD. Default is 500.
+
+- k:
+
+  **\[deprecated\]** Use `ncomp`.
+
+- kmax:
+
+  **\[deprecated\]** Use `ncomp_max`.
 
 ## Value
 
@@ -78,7 +88,7 @@ An object of class `specproc_robpca`, a list with:
   `"good leverage"` (high SD only), `"orthogonal outlier"` (high OD
   only) or `"bad leverage"` (both).
 
-- `k`, `h`, `alpha`: the settings used.
+- `ncomp`, `h`, `alpha`: the settings used.
 
 - `H0`, `H1`: logical vectors of the observations in the subsets \\H_0\\
   and \\H_1\\.
@@ -99,25 +109,25 @@ The algorithm follows the published description:
     location and scale on each direction. The `h` least outlying
     observations form the subset \\H_0\\.
 
-3.  The number of components `k` is chosen (if not given) as the
-    smallest number that explains `var_explained` of the variance of
-    \\H_0\\, with at most `kmax`. Observations whose orthogonal distance
-    to the \\k\\-dimensional PCA subspace of \\H_0\\ is below the
-    cut-off form \\H_1\\, and the subspace is re-estimated from \\H_1\\.
-    When `k` equals the rank of the data, this subspace is the whole
-    space and \\H_1 = H_0\\.
+3.  The number of components \\k\\ (`ncomp`) is chosen (if not given) as
+    the smallest number that explains `var_explained` of the variance of
+    \\H_0\\, with at most `ncomp_max`. Observations whose orthogonal
+    distance to the \\k\\-dimensional PCA subspace of \\H_0\\ is below
+    the cut-off form \\H_1\\, and the subspace is re-estimated from
+    \\H_1\\. When `ncomp` equals the rank of the data, this subspace is
+    the whole space and \\H_1 = H_0\\.
 
 4.  All observations are projected onto this subspace, and the
     reweighted FAST-MCD estimator of the scores gives the final center,
-    loadings and eigenvalues. When `k` equals the rank, this is the
+    loadings and eigenvalues. When `ncomp` equals the rank, this is the
     reweighted MCD of the data.
 
 Each observation then has a score distance (SD), its robust Mahalanobis
 distance within the PCA subspace, and an orthogonal distance (OD) to the
 subspace. The cut-off for the SD is \\\sqrt{\chi^2\_{k,0.975}}\\; the
 cut-off for the OD uses the Wilson-Hilferty approximation, with the
-univariate MCD of \\OD^{2/3}\\. When `k` equals the rank, the ODs and
-their cut-off are zero: there are no orthogonal outliers.
+univariate MCD of \\OD^{2/3}\\. When `ncomp` equals the rank, the ODs
+and their cut-off are zero: there are no orthogonal outliers.
 [`plot_outlier_map()`](https://christiangoueguel.com/specProc/reference/plot_outlier_map.md)
 plots both distances.
 

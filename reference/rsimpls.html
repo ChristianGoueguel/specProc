@@ -60,7 +60,7 @@ regression outlier map (<code><a href="plot_outlier_map.html">plot_outlier_map()
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rsimpls</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">ncomp</span>, kmax <span class="op">=</span> <span class="fl">10</span>, alpha <span class="op">=</span> <span class="fl">0.75</span>, ndir <span class="op">=</span> <span class="fl">250</span>, nsamp <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">rsimpls</span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">ncomp</span>, ncomp_max <span class="op">=</span> <span class="fl">10</span>, alpha <span class="op">=</span> <span class="fl">0.75</span>, ndir <span class="op">=</span> <span class="fl">250</span>, nsamp <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -81,10 +81,10 @@ one row per observation.</p></dd>
 <dd><p>The number of components of the model.</p></dd>
 
 
-<dt id="arg-kmax">kmax<a class="anchor" aria-label="anchor" href="#arg-kmax"></a></dt>
+<dt id="arg-ncomp-max">ncomp_max<a class="anchor" aria-label="anchor" href="#arg-ncomp-max"></a></dt>
 <dd><p>The largest number of components considered. ROBPCA is
-applied with <code>kmax</code> plus the number of responses components, so the
-model also depends on <code>kmax</code> (see Details). Default
+applied with <code>ncomp_max</code> plus the number of responses components, so the
+model also depends on <code>ncomp_max</code> (see Details). Default
 is 10, as in the paper; it is raised to <code>ncomp</code> if needed, and lowered
 when there are too few observations or variables (at most one less than
 the number of variables).</p></dd>
@@ -127,11 +127,11 @@ cut-offs.</p></li>
 distance below the cut-off of the initial fit), 0 for the others.</p></li>
 <li><p><code>robpca_weights</code>: the weights \(w_i\) of the ROBPCA step.</p></li>
 <li><p><code>components</code>: a tibble with the robust <code>R2</code> and <code>RMSE</code> of the models
-with 1 to <code>kmax</code> components.</p></li>
+with 1 to <code>ncomp_max</code> components.</p></li>
 <li><p><code>models</code>: the <code>coefficients</code> and <code>intercept</code> of the models with 1 to
-<code>kmax</code> components, for predictions with another number of components
+<code>ncomp_max</code> components, for predictions with another number of components
 (<code>predict(fit, newdata, ncomp = )</code>).</p></li>
-<li><p><code>ncomp</code>, <code>kmax</code>, <code>h</code>, <code>alpha</code>: the settings used, and <code>y_scale</code>, the
+<li><p><code>ncomp</code>, <code>ncomp_max</code>, <code>h</code>, <code>alpha</code>: the settings used, and <code>y_scale</code>, the
 factor applied to the responses before ROBPCA.</p></li>
 </ul><p>Use <a href="predict.specproc_rsimpls.html">predict()</a> for the predictions of new
 observations.</p>
@@ -175,7 +175,7 @@ the model (<code>R2</code>) is computed on the observations whose orthogonal and
 residual distances are both below their cut-offs; with several
 responses, it is one minus the ratio of the determinants of the residual
 and total sums of squares and cross-products.</p>
-<p><strong>Number of components.</strong> <code>components</code> gives, for 1 to <code>kmax</code>
+<p><strong>Number of components.</strong> <code>components</code> gives, for 1 to <code>ncomp_max</code>
 components, the robust \(R^2\) of the paper (Remark 7) and the root
 mean squared error, on the observations that are regular in every one of
 these models. They describe the fit to the calibration data; for
@@ -184,7 +184,7 @@ which leaves the outliers out of the error, or for example with the
 <code>"rsimpls"</code> engine of <code><a href="https://parsnip.tidymodels.org/reference/pls.html" class="external-link">parsnip::pls()</a></code> in tidymodels (<a href="pls_rsimpls.html">pls_rsimpls</a>).
 These models all come from the same ROBPCA fit, with
 \(k_0 = k_{max} + q\) components, so the model with <code>ncomp</code> components
-also depends on <code>kmax</code>. With <code>kmax = ncomp</code>, ROBPCA is applied with
+also depends on <code>ncomp_max</code>. With <code>ncomp_max = ncomp</code>, ROBPCA is applied with
 <code>ncomp</code> plus \(q\) components, and <code>components</code> stops at <code>ncomp</code>.</p>
 <p><strong>Differences from the paper.</strong></p><ul><li><p>ROBPCA is not scale equivariant, so the scale of the responses
 relative to the spectra matters. Spectral intensities are usually

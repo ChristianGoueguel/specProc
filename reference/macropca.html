@@ -68,14 +68,16 @@ outlying cells. <code><a href="cellpca.html">cellpca()</a></code> starts from a 
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">macropca</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
-<span>  k <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ncomp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">0.5</span>,</span>
-<span>  kmax <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  ncomp_max <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  var_explained <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  scale <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ndir <span class="op">=</span> <span class="fl">250</span>,</span>
 <span>  maxiter <span class="op">=</span> <span class="fl">20</span>,</span>
-<span>  tol <span class="op">=</span> <span class="fl">0.005</span></span>
+<span>  tol <span class="op">=</span> <span class="fl">0.005</span>,</span>
+<span>  k <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  kmax <span class="op">=</span> <span class="fu">deprecated</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -88,9 +90,9 @@ outlying cells. <code><a href="cellpca.html">cellpca()</a></code> starts from a 
 Missing values are allowed.</p></dd>
 
 
-<dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
-<dd><p>The number of principal components. If <code>NULL</code> (default), it is
-chosen from <code>var_explained</code> and <code>kmax</code>.</p></dd>
+<dt id="arg-ncomp">ncomp<a class="anchor" aria-label="anchor" href="#arg-ncomp"></a></dt>
+<dd><p>The number of principal components. If <code>NULL</code> (default), it
+is chosen from <code>var_explained</code> and <code>ncomp_max</code>.</p></dd>
 
 
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
@@ -98,13 +100,13 @@ chosen from <code>var_explained</code> and <code>kmax</code>.</p></dd>
 observations used in the fit. Default is 0.5.</p></dd>
 
 
-<dt id="arg-kmax">kmax<a class="anchor" aria-label="anchor" href="#arg-kmax"></a></dt>
+<dt id="arg-ncomp-max">ncomp_max<a class="anchor" aria-label="anchor" href="#arg-ncomp-max"></a></dt>
 <dd><p>The maximum number of components. Default is 10.</p></dd>
 
 
 <dt id="arg-var-explained">var_explained<a class="anchor" aria-label="anchor" href="#arg-var-explained"></a></dt>
-<dd><p>The fraction of variance used to choose <code>k</code> when it
-is not given. Default is 0.8.</p></dd>
+<dd><p>The fraction of variance used to choose <code>ncomp</code> when
+it is not given. Default is 0.8.</p></dd>
 
 
 <dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
@@ -122,6 +124,14 @@ Default is 250.</p></dd>
 <dd><p>The maximum number of iterations of step 4, and the
 tolerance on the largest angle between successive subspaces (as a
 fraction of a right angle). Defaults are 20 and 0.005, as in the paper.</p></dd>
+
+
+<dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>ncomp</code>.</p></dd>
+
+
+<dt id="arg-kmax">kmax<a class="anchor" aria-label="anchor" href="#arg-kmax"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a> Use <code>ncomp_max</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -157,9 +167,9 @@ with the fewest flagged cells have their flagged cells imputed. The
 <code>h</code> least outlying observations not set aside form \(H_0\).</p></li>
 <li><p><strong>Subspace dimension.</strong> A classical PCA of the observations of
 \(H_0\), with their flagged and missing cells imputed, gives the
-eigenvalues: when <code>k</code> is <code>NULL</code>, it is the smallest number of
+eigenvalues: when <code>ncomp</code> is <code>NULL</code>, it is the smallest number of
 components that explain <code>var_explained</code> of their variance (at most
-<code>kmax</code>).</p></li>
+<code>ncomp_max</code>).</p></li>
 <li><p><strong>Iterative subspace estimation.</strong> The flagged and missing cells are
 imputed by the fitted values of the current PCA, and the PCA of
 \(H_0\) is refitted, until the largest angle between the old and

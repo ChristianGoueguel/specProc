@@ -169,8 +169,8 @@ percentages in the panel titles are shares of the total variance. For
 [`rospca()`](https://christiangoueguel.com/specProc/reference/rospca.md)
 and
 [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
-fits, which estimate only the `k` components, they are shares of the
-variance of these `k` components.
+fits, which estimate only their `ncomp` components, they are shares of
+the variance of these components.
 
 ## See also
 

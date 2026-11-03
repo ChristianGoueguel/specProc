@@ -2,22 +2,23 @@
 
 Computes, for each sample, the two distances used to monitor a principal
 component analysis (PCA) model: Hotelling's \\T^2\\, the distance within
-the model plane of the first `k` components, and the Q residual (squared
-prediction error, SPE), the squared distance to that plane, with their
-limits at one or more confidence levels.
+the model plane of the first `ncomp` components, and the Q residual
+(squared prediction error, SPE), the squared distance to that plane,
+with their limits at one or more confidence levels.
 
 ## Usage
 
 ``` r
 q_residuals(
   model,
-  k,
+  ncomp,
   newdata = NULL,
   conf_level = 0.975,
   method = "jackson",
   t2_method = "f",
   center = TRUE,
-  scale = FALSE
+  scale = FALSE,
+  k = deprecated()
 )
 ```
 
@@ -31,7 +32,7 @@ q_residuals(
   matrix or data frame, on which a PCA is fitted with `center` and
   `scale`.
 
-- k:
+- ncomp:
 
   The number of components of the model.
 
@@ -61,6 +62,10 @@ q_residuals(
   Passed to [`stats::prcomp()`](https://rdrr.io/r/stats/prcomp.html)
   when `model` is data. Default is `TRUE` and `FALSE`.
 
+- k:
+
+  **\[deprecated\]** Use `ncomp`.
+
 ## Value
 
 A tibble of class `specproc_influence`, with one row per sample:
@@ -73,13 +78,14 @@ or `"both"`. Draw it with
 
 ## Details
 
-With scores \\t\_{ia}\\ and eigenvalues \\\lambda_a\\, \$\$T^2_i =
-\sum\_{a=1}^{k} \frac{t\_{ia}^2}{\lambda_a}, \qquad Q_i = \lVert x_i -
-\hat{x}\_i \rVert^2\$\$ where \\\hat{x}\_i\\ is the reconstruction of
-the (centered and scaled) sample from the `k` components. A high \\T^2\\
-is an extreme but well-modeled sample (for example, a high
-concentration); a high Q is a sample the model does not describe
-(another matrix, a contamination, an instrumental problem).
+With scores \\t\_{ia}\\ and eigenvalues \\\lambda_a\\, and \\k\\ =
+`ncomp` components, \$\$T^2_i = \sum\_{a=1}^{k}
+\frac{t\_{ia}^2}{\lambda_a}, \qquad Q_i = \lVert x_i - \hat{x}\_i
+\rVert^2\$\$ where \\\hat{x}\_i\\ is the reconstruction of the (centered
+and scaled) sample from the \\k\\ components. A high \\T^2\\ is an
+extreme but well-modeled sample (for example, a high concentration); a
+high Q is a sample the model does not describe (another matrix, a
+contamination, an instrumental problem).
 
 For the samples of the model, \\T^2\\ and its limits come from
 [`hotelling_t2()`](https://christiangoueguel.com/specProc/reference/hotelling_t2.md)
@@ -136,10 +142,10 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   wl <- suppressWarnings(as.numeric(names(forageLIBS)))
   spectra <- forageLIBS[which(wl > 380 & wl < 430)]
   pca <- stats::prcomp(spectra)
-  influence <- q_residuals(pca, k = 3)
+  influence <- q_residuals(pca, ncomp = 3)
   influence[influence$outlier != "regular", ]
   plot_influence(influence, label = forageLIBS$Measurement)
   # several limits
-  plot_influence(q_residuals(pca, k = 3, conf_level = c(0.95, 0.99)))
+  plot_influence(q_residuals(pca, ncomp = 3, conf_level = c(0.95, 0.99)))
 }
 ```

@@ -22,16 +22,18 @@ work the same way.
 ``` r
 cellpca(
   x,
-  k = NULL,
+  ncomp = NULL,
   alpha = 0.5,
-  kmax = 10,
+  ncomp_max = 10,
   var_explained = 0.8,
   scale = FALSE,
   ndir = 250,
   maxiter = 1000,
   tol = 1e-06,
   max_col_frac = 0.5,
-  od_cutoff = c("simulated", "chisq")
+  od_cutoff = c("simulated", "chisq"),
+  k = deprecated(),
+  kmax = deprecated()
 )
 ```
 
@@ -42,23 +44,23 @@ cellpca(
   A numeric matrix or data frame, with one observation per row. Missing
   values are allowed.
 
-- k:
+- ncomp:
 
   The number of principal components. If `NULL` (default), it is chosen
-  from `var_explained` and `kmax`.
+  from `var_explained` and `ncomp_max`.
 
 - alpha:
 
   The robustness parameter, between 0.5 and 1: the fraction of
   observations used in the fit. Default is 0.5.
 
-- kmax:
+- ncomp_max:
 
   The maximum number of components. Default is 10.
 
 - var_explained:
 
-  The fraction of variance used to choose `k` when it is not given.
+  The fraction of variance used to choose `ncomp` when it is not given.
   Default is 0.8.
 
 - scale:
@@ -86,6 +88,14 @@ cellpca(
 
   How to compute the cut-off of `od`: `"simulated"` (default) or
   `"chisq"`. See Details.
+
+- k:
+
+  **\[deprecated\]** Use `ncomp`.
+
+- kmax:
+
+  **\[deprecated\]** Use `ncomp_max`.
 
 ## Value
 
@@ -119,9 +129,9 @@ and:
 ## Details
 
 cellPCA approximates the data by a fit \\\hat{X} = 1_n \mu^T + U V^T\\
-of rank `k` that minimizes \$\$\hat\sigma_2^2 \frac{1}{n} \sum\_{i=1}^n
-m_i \rho_2\left(\frac{t_i}{\hat\sigma_2}\right), \quad t_i =
-\sqrt{\frac{1}{m_i} \sum\_{j=1}^p m\_{ij} \hat\sigma\_{1,j}^2
+of rank \\k\\ (`ncomp`) that minimizes \$\$\hat\sigma_2^2 \frac{1}{n}
+\sum\_{i=1}^n m_i \rho_2\left(\frac{t_i}{\hat\sigma_2}\right), \quad t_i
+= \sqrt{\frac{1}{m_i} \sum\_{j=1}^p m\_{ij} \hat\sigma\_{1,j}^2
 \rho_1\left(\frac{x\_{ij} -
 \hat{x}\_{ij}}{\hat\sigma\_{1,j}}\right)}\$\$ where \\m\_{ij}\\ is 0 for
 a missing cell and 1 otherwise and \\m_i\\ is the number of observed
@@ -139,10 +149,10 @@ The algorithm follows the reference code of the authors:
 
 1.  **Initial fit.** A
     [`macropca()`](https://christiangoueguel.com/specProc/reference/macropca.md)
-    fit (with `alpha`, `kmax`, `var_explained`, `scale` and `ndir`),
-    which also chooses `k` when it is `NULL`, with its scores computed
-    from the data whose flagged and missing cells are imputed by the
-    fit.
+    fit (with `alpha`, `ncomp_max`, `var_explained`, `scale` and
+    `ndir`), which also chooses `ncomp` when it is `NULL`, with its
+    scores computed from the data whose flagged and missing cells are
+    imputed by the fit.
 
 2.  **Scales.** \\\hat\sigma\_{1,j}\\ is the M-scale of the residuals of
     variable \\j\\, and \\\hat\sigma_2\\ that of the total deviations
@@ -162,7 +172,7 @@ The algorithm follows the reference code of the authors:
 4.  **Principal directions.** The center and the eigenvectors within the
     subspace are estimated by the deterministic MCD of the scores of the
     observations with a non-zero casewise weight (the exact MCD when
-    `k = 1`), and the sign of each loading vector is set so that its
+    `ncomp = 1`), and the sign of each loading vector is set so that its
     largest element is positive.
 
 The residuals of each variable are then standardized by their M-scale,
@@ -213,7 +223,7 @@ data(forageLIBS)
 wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 spectra <- forageLIBS[which(wl > 760 & wl < 780)]
 set.seed(1)
-fit <- cellpca(spectra, k = 2, od_cutoff = "chisq")
+fit <- cellpca(spectra, ncomp = 2, od_cutoff = "chisq")
 fit
 #> Robust PCA by casewise and cellwise weighting (cellPCA)
 #> 
