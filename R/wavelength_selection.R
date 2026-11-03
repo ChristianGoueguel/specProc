@@ -219,7 +219,7 @@ importance_model <- function(x, y, ncomp, robust, robust_args) {
   if (robust) {
     fit <- rsimpls_fit(x, matrix(y, dimnames = list(NULL, "y")), ncomp, robust_args$alpha,
                        robust_args$ndir, robust_args$nsamp)
-    k <- min(ncomp, fit$kmax)
+    k <- min(ncomp, fit$ncomp_max)
     model <- fit$models[[k]]
     list(weights = fit$weights[, seq_len(k), drop = FALSE], b = drop(model$coefficients),
          rows = model$weights == 1)

@@ -6,14 +6,15 @@
 \usage{
 dmodx(
   model,
-  k,
+  ncomp,
   newdata = NULL,
   conf_level = 0.975,
   normalized = TRUE,
   df = "effective",
   t2_method = "f",
   center = TRUE,
-  scale = FALSE
+  scale = FALSE,
+  k = deprecated()
 )
 }
 \arguments{
@@ -21,7 +22,7 @@ dmodx(
 default of \code{prcomp()}), or a numeric matrix or data frame, on which a
 PCA is fitted with \code{center} and \code{scale}.}
 
-\item{k}{The number of components of the model.}
+\item{ncomp}{The number of components of the model.}
 
 \item{newdata}{Optional new samples (a matrix or data frame with the
 variables of the model), whose distances are computed instead of those
@@ -41,6 +42,8 @@ of the model: \code{"f"} (default) or \code{"beta"} (see \code{\link[=hotelling_
 
 \item{center, scale}{Passed to \code{\link[stats:prcomp]{stats::prcomp()}} when \code{model} is data.
 Default is \code{TRUE} and \code{FALSE}.}
+
+\item{k}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp}.}
 }
 \value{
 A tibble of class \code{specproc_influence}, with one row per sample:
@@ -57,8 +60,8 @@ calibration samples, with its limits at one or more confidence levels,
 and Hotelling's \eqn{T^2} for the influence plot.
 }
 \details{
-With the residuals \eqn{e_{ij}} of the \eqn{K} variables after \code{k}
-components, for \eqn{N} calibration samples (and \eqn{A_0 = 1} if the
+With the residuals \eqn{e_{ij}} of the \eqn{K} variables after \eqn{k}
+components (\code{ncomp}), for \eqn{N} calibration samples (and \eqn{A_0 = 1} if the
 data are centered),
 \deqn{s_i = \sqrt{\frac{\sum_j e_{ij}^2}{K - k}}\,\sqrt{\frac{N}{N - k -
   A_0}}, \qquad s_0 = \sqrt{\frac{\sum_i \sum_j e_{ij}^2}{(N - k -
@@ -88,7 +91,7 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   wl <- suppressWarnings(as.numeric(names(forageLIBS)))
   spectra <- forageLIBS[which(wl > 380 & wl < 430)]
   pca <- stats::prcomp(spectra)
-  d <- dmodx(pca, k = 3)
+  d <- dmodx(pca, ncomp = 3)
   d[d$outlier != "regular", ]
   plot_influence(d, label = forageLIBS$Measurement)
 }

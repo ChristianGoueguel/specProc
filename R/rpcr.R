@@ -12,7 +12,7 @@
 #'
 #' @details
 #' The method has two steps:
-#' 1. **Robust PCA.** [robpca()] is applied to the predictors with `kmax`
+#' 1. **Robust PCA.** [robpca()] is applied to the predictors with `ncomp_max`
 #'    components. It gives a robust center \eqn{\hat\mu_x}, the loadings
 #'    \eqn{P} and the eigenvalues \eqn{l_a}, and the scores
 #'    \eqn{t_i = P^T (x_i - \hat\mu_x)}.
@@ -40,17 +40,17 @@
 #' computed on the observations whose orthogonal and residual distances are
 #' both below their cut-offs.
 #'
-#' **Number of components.** `components` gives, for 1 to `kmax`
+#' **Number of components.** `components` gives, for 1 to `ncomp_max`
 #' components, the robust \eqn{R^2} and root mean squared error on the
 #' observations that are regular in every one of these models; use
 #' [robust_rmsecv()] for the robust cross-validated error. These models all
-#' come from the same robust PCA, with `kmax` components, of which they use
-#' the first `ncomp`, so the model also depends on `kmax`. With
-#' `kmax = ncomp`, the robust PCA has `ncomp` components, as in the paper.
+#' come from the same robust PCA, with `ncomp_max` components, of which they use
+#' the first `ncomp`, so the model also depends on `ncomp_max`. With
+#' `ncomp_max = ncomp`, the robust PCA has `ncomp` components, as in the paper.
 #'
 #' **Differences from the paper.**
-#'  - The models with fewer components than `kmax` use the first components
-#'    of the robust PCA with `kmax` components (see above).
+#'  - The models with fewer components than `ncomp_max` use the first components
+#'    of the robust PCA with `ncomp_max` components (see above).
 #'  - The residual covariance of the MCD regression is multiplied by the
 #'    consistency factor \eqn{0.99 / P(\chi^2_{q+2} \le \chi^2_{q, 0.99})}, as
 #'    the observations beyond the cut-off are left out.
@@ -60,8 +60,8 @@
 #' for reproducible results.
 #'
 #' @inheritParams rsimpls
-#' @param kmax The largest number of components considered: the number of
-#'   components of the robust PCA, so the model also depends on `kmax` (see
+#' @param ncomp_max The largest number of components considered: the number of
+#'   components of the robust PCA, so the model also depends on `ncomp_max` (see
 #'   Details). Default is 10; it is raised to `ncomp` if needed, and lowered
 #'   when there are too few observations or variables.
 #' @param alpha The fraction of observations assumed to be regular, between
@@ -88,11 +88,11 @@
 #'  - `weights`: 1 for the observations of the final (reweighted)
 #'    regression, 0 for the others.
 #'  - `components`: a tibble with the robust `R2` and `RMSE` of the models
-#'    with 1 to `kmax` components.
+#'    with 1 to `ncomp_max` components.
 #'  - `models`: the `coefficients` and `intercept` of the models with 1 to
-#'    `kmax` components, for predictions with another number of components
+#'    `ncomp_max` components, for predictions with another number of components
 #'    (`predict(fit, newdata, ncomp = )`).
-#'  - `ncomp`, `kmax`, `h`, `alpha`: the settings used, and `regression`,
+#'  - `ncomp`, `ncomp_max`, `h`, `alpha`: the settings used, and `regression`,
 #'    `"LTS"` or `"MCD"`.
 #'
 #' Use [predict()][predict.specproc_rpcr] for the predictions of new
@@ -122,7 +122,7 @@
 #' fit
 #' head(predict(fit, spectra[-cal, ]))
 #' plot_outlier_map(fit)
-rpcr <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 500) {
+rpcr <- function(x, y, ncomp, ncomp_max = 10, alpha = 0.75, ndir = 250, nsamp = 500) {
   if (missing(x) || missing(y) || is.null(x) || is.null(y)) {
     stop("Both 'x' and 'y' must be provided.", call. = FALSE)
   }
@@ -132,13 +132,13 @@ rpcr <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 500) 
   x <- robust_pca_input(x)
   y <- calibration_response(y, nrow(x))
   check_count(ncomp, "ncomp")
-  check_count(kmax, "kmax")
+  check_count(ncomp_max, "ncomp_max")
   check_number(alpha, "alpha", lower = 0.5, upper = 1)
   check_count(nsamp, "nsamp")
 
-  fit <- rpcr_fit(x, y, max(kmax, ncomp), alpha, ndir, nsamp)
-  if (ncomp > fit$kmax) {
-    stop("'ncomp' cannot exceed ", fit$kmax, " with these data.", call. = FALSE)
+  fit <- rpcr_fit(x, y, max(ncomp_max, ncomp), alpha, ndir, nsamp)
+  if (ncomp > fit$ncomp_max) {
+    stop("'ncomp' cannot exceed ", fit$ncomp_max, " with these data.", call. = FALSE)
   }
   model <- fit$models[[ncomp]]
   k <- seq_len(ncomp)
@@ -170,7 +170,7 @@ rpcr <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 500) 
     components = fit$components,
     models = lapply(fit$models, `[`, c("coefficients", "intercept")),
     ncomp = as.integer(ncomp),
-    kmax = fit$kmax,
+    ncomp_max = fit$ncomp_max,
     h = fit$h,
     alpha = alpha,
     regression = if (ncol(y) == 1) "LTS" else "MCD"
@@ -184,35 +184,35 @@ rpcr <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 500) 
             class = "specproc_rpcr")
 }
 
-# RPCR with 1 to kmax components, from the robust PCA with kmax components.
+# RPCR with 1 to ncomp_max components, from the robust PCA with ncomp_max components.
 # x and y are numeric matrices (y with column names). Returns the loadings,
-# scores and eigenvalues of kmax components, the regression of each model
+# scores and eigenvalues of ncomp_max components, the regression of each model
 # (models[[k]]), the observations regular in every model and the robust R2
 # and RMSE of each model.
-rpcr_fit <- function(x, y, kmax, alpha, ndir, nsamp) {
+rpcr_fit <- function(x, y, ncomp_max, alpha, ndir, nsamp) {
   n <- nrow(x)
   q <- ncol(y)
   # fewer components than variables and observations, and fewer parameters
   # of the robust regression (k q slopes, q intercepts and q (q + 1) / 2
   # residual covariances) than h
-  kmax <- min(kmax, ncol(x), n - 2 - q)
-  while (kmax >= 1 && kmax * q + q + q * (q + 1) / 2 >= robust_h(n, alpha, kmax)) {
-    kmax <- kmax - 1
+  ncomp_max <- min(ncomp_max, ncol(x), n - 2 - q)
+  while (ncomp_max >= 1 && ncomp_max * q + q + q * (q + 1) / 2 >= robust_h(n, alpha, ncomp_max)) {
+    ncomp_max <- ncomp_max - 1
   }
-  if (kmax < 1) {
+  if (ncomp_max < 1) {
     stop("Too few observations for a robust PCR model.", call. = FALSE)
   }
   rob <- withCallingHandlers(
-    robpca(x, k = kmax, kmax = kmax, alpha = alpha, ndir = ndir, nsamp = nsamp),
+    robpca(x, ncomp = ncomp_max, ncomp_max = ncomp_max, alpha = alpha, ndir = ndir, nsamp = nsamp),
     warning = function(w) {
-      if (grepl("'k' reduced", conditionMessage(w))) invokeRestart("muffleWarning")
+      if (grepl("'ncomp' reduced", conditionMessage(w))) invokeRestart("muffleWarning")
     }
   )
-  kmax <- rob$k
+  ncomp_max <- rob$ncomp
   scores <- unname(rob$scores)
   loadings <- unname(rob$loadings)
   values <- rob$eigenvalues
-  models <- lapply(seq_len(kmax), function(k) {
+  models <- lapply(seq_len(ncomp_max), function(k) {
     a <- seq_len(k)
     t <- scores[, a, drop = FALSE]
     reg <- if (q == 1) lts_regression(t, y, alpha, nsamp) else mcd_regression(t, y, alpha, nsamp)
@@ -236,7 +236,7 @@ rpcr_fit <- function(x, y, kmax, alpha, ndir, nsamp) {
   regular <- regular_in_all(models)
   list(loadings = loadings, scores = scores, eigenvalues = values, models = models,
        center = rob$center, regular = regular, components = components_table(models, y, regular),
-       kmax = kmax, h = rob$h)
+       ncomp_max = ncomp_max, h = rob$h)
 }
 
 #' @title Predictions of a Robust PCR Model
@@ -250,7 +250,7 @@ rpcr_fit <- function(x, y, kmax, alpha, ndir, nsamp) {
 #' @inheritParams predict.specproc_rsimpls
 #' @param object An object returned by [rpcr()].
 #' @param ncomp With `type = "response"`, the number of components of the
-#'   predictions, from 1 to the `kmax` of the model. Default is the `ncomp`
+#'   predictions, from 1 to the `ncomp_max` of the model. Default is the `ncomp`
 #'   of the model. The models with fewer or more components use the same
 #'   robust PCA (see [rpcr()]).
 #'

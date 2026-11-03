@@ -31,7 +31,7 @@
 #'
 #' With `hotelling = "all"`, the ellipses of Hotelling's \eqn{T^2} at each
 #' level of `conf_level` (97.5% by default) are drawn for all the samples,
-#' and the samples beyond the limit at the highest level of \eqn{T^2} on `k`
+#' and the samples beyond the limit at the highest level of \eqn{T^2} on `ncomp`
 #' components are counted in the subtitle, circled in red with
 #' `flag = TRUE` and labeled with `label` (each independently of the other):
 #' the classical outlier limits of a score plot. For a PCA model ([stats::prcomp()], [robpca()], [rospca()] or
@@ -41,7 +41,7 @@
 #' semi-axes \eqn{\sqrt{\lambda_a L}} for the limit \eqn{L}. The limit is
 #' the F (or Beta) limit of [hotelling_t2()] for a [stats::prcomp()] fit, and
 #' the chi-square quantile of ROBPCA for a robust fit, whose flagged samples
-#' are then the leverage points of [plot_outlier_map()] (with `k` its
+#' are then the leverage points of [plot_outlier_map()] (with `ncomp` its
 #' number of components and `conf_level = 0.975`). The scores of the
 #' outlying samples then do not inflate or tilt the ellipses. For other
 #' embeddings, \eqn{T^2} is computed from the mean and covariance of the
@@ -50,7 +50,7 @@
 #' ellipses and limits, from its mean and covariance, which flags the samples
 #' atypical of their own group. The ellipses are labeled with their level
 #' (instead of a legend), and drawn for the two components shown, while the
-#' limits use `k` components, so with `k > 2` a flagged sample can lie inside
+#' limits use `ncomp` components, so with `ncomp > 2` a flagged sample can lie inside
 #' the ellipses. With `ellipse = TRUE`, the confidence ellipses are always
 #' computed from the samples shown. Without groups, `ellipse = TRUE` and
 #' `hotelling = "all"` would draw two ellipses of all the samples: only the
@@ -79,7 +79,7 @@
 #'
 #' **Axes.** For a [stats::prcomp()] fit or a robust PCA, the axis titles
 #' give the share of the variance of each component: of the total variance
-#' for [stats::prcomp()], and of the variance of the `k` components of the
+#' for [stats::prcomp()], and of the variance of the components of the
 #' model for [robpca()], [rospca()] and [macropca()], which estimate only
 #' these. With groups, the ellipses (confidence, or \eqn{T^2} with
 #' `hotelling = "group"`) are filled with the color of their group.
@@ -131,7 +131,7 @@
 #'   (default), `"all"` (all samples) or `"group"` (within the groups of a
 #'   discrete `color_by`). Needs the HotellingEllipse package (1.3.0 or
 #'   later).
-#' @param k The number of components of \eqn{T^2}: the two axes, then the
+#' @param ncomp The number of components of \eqn{T^2}: the two axes, then the
 #'   next embedding coordinates. Default is 2.
 #' @param t2_method The distribution of the \eqn{T^2} limits: `"f"`
 #'   (default), `"beta"` or `"new"` (see [hotelling_t2()]). Ignored for a
@@ -173,6 +173,7 @@
 #'   the variance they explain for a PCA.
 #' @param colour,size,alpha `r lifecycle::badge("deprecated")` Use
 #'   `color_by`, `point_size` and `point_alpha`.
+#' @param k `r lifecycle::badge("deprecated")` Use `ncomp`.
 #'
 #' @return A ggplot object.
 #' @seealso [hotelling_t2()], [plot_outlier_map()], [plot_loadings()], [robpca()]
@@ -187,7 +188,7 @@
 #'   set.seed(1)
 #'   forageLIBS[which(wl > 380 & wl < 430)] |>
 #'     center() |>
-#'     robpca(k = 2) |>
+#'     robpca(ncomp = 2) |>
 #'     plot_embedding(hotelling = "all", flag = FALSE, label = TRUE)
 #' }
 #'
@@ -221,14 +222,15 @@
 plot_embedding <- function(data, x = NULL, y = NULL, color_by = NULL, point_size = NULL,
                            point_alpha = 0.8,
                            ellipse = FALSE, conf_level = 0.975, robust = FALSE,
-                           distribution = "normal", hotelling = "none", k = 2,
+                           distribution = "normal", hotelling = "none", ncomp = 2,
                            t2_method = "f", flag = FALSE, label = NULL, biplot = FALSE,
                            biplot_top = 10, aspect_ratio = 0.7, title = NULL,
                            legend_title = NULL, palette = NULL, shapes = TRUE,
                            legend = c("right", "bottom", "top", "inside", "none"),
                            panel = c("shaded", "white"), caption = TRUE, base_size = 11,
                            xlab = NULL, ylab = NULL, colour = deprecated(), size = deprecated(),
-                           alpha = deprecated()) {
+                           alpha = deprecated(), k = deprecated()) {
+  ncomp <- renamed_arg(k, ncomp, "plot_embedding", "k", "ncomp")
   df <- embedding_data(data)
   variance <- embedding_variance(data)
   # the former colour, size and alpha (tidy-evaluated, so tested with missing())
@@ -352,19 +354,19 @@ plot_embedding <- function(data, x = NULL, y = NULL, color_by = NULL, point_size
   t2 <- NULL
   model <- NULL
   if (hotelling != "none") {
-    check_count(k, "k", lower = 2)
+    check_count(ncomp, "ncomp", lower = 2)
     t2_cols <- unique(c(x, y, embedding_components(df, sum(vapply(df, is.numeric, logical(1))))))
-    if (length(t2_cols) < k) {
-      stop("'data' has fewer than ", k, " numeric columns for the T-squared.", call. = FALSE)
+    if (length(t2_cols) < ncomp) {
+      stop("'data' has fewer than ", ncomp, " numeric columns for the T-squared.", call. = FALSE)
     }
     by_group <- hotelling == "group"
-    model <- if (by_group) NULL else model_t2_parts(data, t2_cols[seq_len(k)], x, y)
+    model <- if (by_group) NULL else model_t2_parts(data, t2_cols[seq_len(ncomp)], x, y)
     if (!is.null(model)) {
       # the T-squared of the PCA model: its eigenvalues, centered at 0
       t2 <- model_t2_flags(model, t2_level, t2_method)
       limits <- model_t2_ellipses(model, x, y, t2_level, t2_method)
     } else {
-      t2 <- hotelling_t2(df, columns = t2_cols[seq_len(k)],
+      t2 <- hotelling_t2(df, columns = t2_cols[seq_len(ncomp)],
                          group = if (by_group) colour_values else NULL, conf_level = t2_level,
                          method = t2_method)
       t2$.flag <- t2[[paste0("outlier_", conf_label(max(t2_level)))]]
@@ -509,7 +511,7 @@ plot_embedding <- function(data, x = NULL, y = NULL, color_by = NULL, point_size
   subtitle <- if (!is.null(t2)) {
     n_flag <- sum(t2$.flag)
     sprintf("Hotelling T\u00b2 (%d components%s): %d %s beyond the %s%% limit",
-            k, if (hotelling == "group") ", within groups" else "", n_flag,
+            ncomp, if (hotelling == "group") ", within groups" else "", n_flag,
             if (n_flag == 1) "sample" else "samples", conf_label(max(t2_level)))
   }
   if (!is.null(loadings)) {
@@ -528,7 +530,7 @@ plot_embedding <- function(data, x = NULL, y = NULL, color_by = NULL, point_size
     p <- p + ggplot2::coord_fixed(ratio = 1)
   }
   caption_text <- if (isTRUE(caption)) {
-    embedding_caption(ellipse, ellipse_level, grouped, robust, distribution, t2, hotelling, k,
+    embedding_caption(ellipse, ellipse_level, grouped, robust, distribution, t2, hotelling, ncomp,
                       t2_level, t2_method, robust_model = isTRUE(model$robust), flag = flag,
                       biplot = !is.null(loadings), umap = umap,
                       shaded = panel == "shaded" && !is.null(outer))
@@ -558,7 +560,7 @@ plot_embedding <- function(data, x = NULL, y = NULL, color_by = NULL, point_size
 # ---- internals ---------------------------------------------------------------
 
 # The caption: what the ellipses and the limits are, and how to read the plot.
-embedding_caption <- function(ellipse, levels, grouped, robust, distribution, t2, hotelling, k,
+embedding_caption <- function(ellipse, levels, grouped, robust, distribution, t2, hotelling, ncomp,
                               t2_level, t2_method, robust_model, flag, biplot, umap, shaded) {
   pct <- function(l) paste0(paste(conf_label(l), collapse = " and "), "%")
   parts <- character()
@@ -579,7 +581,7 @@ embedding_caption <- function(ellipse, levels, grouped, robust, distribution, t2
              new = "F distribution of a new sample")
     }
     parts <- c(parts, paste0(
-      "Hotelling's T\u00b2 limit", if (length(t2_level) > 1) "s", " at ", pct(t2_level), " on ", k,
+      "Hotelling's T\u00b2 limit", if (length(t2_level) > 1) "s", " at ", pct(t2_level), " on ", ncomp,
       " components", if (hotelling == "group") ", within each group", ": ", limit, "."
     ))
     if (flag) parts <- c(parts, "Circled: the samples beyond the limit.")
@@ -687,7 +689,7 @@ model_t2_ellipses <- function(model, x, y, levels, method) {
 
 # Share of the variance of each component of a PCA fit (named like the
 # score columns), or NULL: of the total variance for a prcomp fit, of the
-# variance of the k components for a robust fit.
+# variance of the ncomp components for a robust fit.
 embedding_variance <- function(data) {
   if (inherits(data, "prcomp")) {
     v <- data$sdev^2

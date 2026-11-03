@@ -4,7 +4,7 @@
 \alias{rpcr}
 \title{Robust Principal Component Regression (RPCR)}
 \usage{
-rpcr(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 500)
+rpcr(x, y, ncomp, ncomp_max = 10, alpha = 0.75, ndir = 250, nsamp = 500)
 }
 \arguments{
 \item{x}{A numeric matrix or data frame of the predictors (spectra), one
@@ -15,8 +15,8 @@ one row per observation.}
 
 \item{ncomp}{The number of components of the model.}
 
-\item{kmax}{The largest number of components considered: the number of
-components of the robust PCA, so the model also depends on \code{kmax} (see
+\item{ncomp_max}{The largest number of components considered: the number of
+components of the robust PCA, so the model also depends on \code{ncomp_max} (see
 Details). Default is 10; it is raised to \code{ncomp} if needed, and lowered
 when there are too few observations or variables.}
 
@@ -50,11 +50,11 @@ cut-offs.
 \item \code{weights}: 1 for the observations of the final (reweighted)
 regression, 0 for the others.
 \item \code{components}: a tibble with the robust \code{R2} and \code{RMSE} of the models
-with 1 to \code{kmax} components.
+with 1 to \code{ncomp_max} components.
 \item \code{models}: the \code{coefficients} and \code{intercept} of the models with 1 to
-\code{kmax} components, for predictions with another number of components
+\code{ncomp_max} components, for predictions with another number of components
 (\code{predict(fit, newdata, ncomp = )}).
-\item \code{ncomp}, \code{kmax}, \code{h}, \code{alpha}: the settings used, and \code{regression},
+\item \code{ncomp}, \code{ncomp_max}, \code{h}, \code{alpha}: the settings used, and \code{regression},
 \code{"LTS"} or \code{"MCD"}.
 }
 
@@ -72,7 +72,7 @@ classifies them.
 \details{
 The method has two steps:
 \enumerate{
-\item \strong{Robust PCA.} \code{\link[=robpca]{robpca()}} is applied to the predictors with \code{kmax}
+\item \strong{Robust PCA.} \code{\link[=robpca]{robpca()}} is applied to the predictors with \code{ncomp_max}
 components. It gives a robust center \eqn{\hat\mu_x}, the loadings
 \eqn{P} and the eigenvalues \eqn{l_a}, and the scores
 \eqn{t_i = P^T (x_i - \hat\mu_x)}.
@@ -101,18 +101,18 @@ beyond the residual cut-off only \strong{vertical outliers}, and beyond both
 computed on the observations whose orthogonal and residual distances are
 both below their cut-offs.
 
-\strong{Number of components.} \code{components} gives, for 1 to \code{kmax}
+\strong{Number of components.} \code{components} gives, for 1 to \code{ncomp_max}
 components, the robust \eqn{R^2} and root mean squared error on the
 observations that are regular in every one of these models; use
 \code{\link[=robust_rmsecv]{robust_rmsecv()}} for the robust cross-validated error. These models all
-come from the same robust PCA, with \code{kmax} components, of which they use
-the first \code{ncomp}, so the model also depends on \code{kmax}. With
-\code{kmax = ncomp}, the robust PCA has \code{ncomp} components, as in the paper.
+come from the same robust PCA, with \code{ncomp_max} components, of which they use
+the first \code{ncomp}, so the model also depends on \code{ncomp_max}. With
+\code{ncomp_max = ncomp}, the robust PCA has \code{ncomp} components, as in the paper.
 
 \strong{Differences from the paper.}
 \itemize{
-\item The models with fewer components than \code{kmax} use the first components
-of the robust PCA with \code{kmax} components (see above).
+\item The models with fewer components than \code{ncomp_max} use the first components
+of the robust PCA with \code{ncomp_max} components (see above).
 \item The residual covariance of the MCD regression is multiplied by the
 consistency factor \eqn{0.99 / P(\chi^2_{q+2} \le \chi^2_{q, 0.99})}, as
 the observations beyond the cut-off are left out.

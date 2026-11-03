@@ -53,7 +53,7 @@
 #' responses, it is one minus the ratio of the determinants of the residual
 #' and total sums of squares and cross-products.
 #'
-#' **Number of components.** `components` gives, for 1 to `kmax`
+#' **Number of components.** `components` gives, for 1 to `ncomp_max`
 #' components, the robust \eqn{R^2} of the paper (Remark 7) and the root
 #' mean squared error, on the observations that are regular in every one of
 #' these models. They describe the fit to the calibration data; for
@@ -62,7 +62,7 @@
 #' `"rsimpls"` engine of [parsnip::pls()] in tidymodels ([pls_rsimpls]).
 #' These models all come from the same ROBPCA fit, with
 #' \eqn{k_0 = k_{max} + q} components, so the model with `ncomp` components
-#' also depends on `kmax`. With `kmax = ncomp`, ROBPCA is applied with
+#' also depends on `ncomp_max`. With `ncomp_max = ncomp`, ROBPCA is applied with
 #' `ncomp` plus \eqn{q} components, and `components` stops at `ncomp`.
 #'
 #' **Differences from the paper.**
@@ -93,9 +93,9 @@
 #' @param y A numeric vector, matrix or data frame of the responses, with
 #'   one row per observation.
 #' @param ncomp The number of components of the model.
-#' @param kmax The largest number of components considered. ROBPCA is
-#'   applied with `kmax` plus the number of responses components, so the
-#'   model also depends on `kmax` (see Details). Default
+#' @param ncomp_max The largest number of components considered. ROBPCA is
+#'   applied with `ncomp_max` plus the number of responses components, so the
+#'   model also depends on `ncomp_max` (see Details). Default
 #'   is 10, as in the paper; it is raised to `ncomp` if needed, and lowered
 #'   when there are too few observations or variables (at most one less than
 #'   the number of variables).
@@ -127,11 +127,11 @@
 #'    distance below the cut-off of the initial fit), 0 for the others.
 #'  - `robpca_weights`: the weights \eqn{w_i} of the ROBPCA step.
 #'  - `components`: a tibble with the robust `R2` and `RMSE` of the models
-#'    with 1 to `kmax` components.
+#'    with 1 to `ncomp_max` components.
 #'  - `models`: the `coefficients` and `intercept` of the models with 1 to
-#'    `kmax` components, for predictions with another number of components
+#'    `ncomp_max` components, for predictions with another number of components
 #'    (`predict(fit, newdata, ncomp = )`).
-#'  - `ncomp`, `kmax`, `h`, `alpha`: the settings used, and `y_scale`, the
+#'  - `ncomp`, `ncomp_max`, `h`, `alpha`: the settings used, and `y_scale`, the
 #'    factor applied to the responses before ROBPCA.
 #'
 #' Use [predict()][predict.specproc_rsimpls] for the predictions of new
@@ -163,7 +163,7 @@
 #' head(predict(fit, spectra[-cal, ]))
 #' plot_outlier_map(fit)
 #' plot_outlier_map(fit, map = "score", newdata = spectra[-cal, ])
-rsimpls <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 500) {
+rsimpls <- function(x, y, ncomp, ncomp_max = 10, alpha = 0.75, ndir = 250, nsamp = 500) {
   if (missing(x) || missing(y) || is.null(x) || is.null(y)) {
     stop("Both 'x' and 'y' must be provided.", call. = FALSE)
   }
@@ -173,13 +173,13 @@ rsimpls <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 50
   x <- robust_pca_input(x)
   y <- calibration_response(y, nrow(x))
   check_count(ncomp, "ncomp")
-  check_count(kmax, "kmax")
+  check_count(ncomp_max, "ncomp_max")
   check_number(alpha, "alpha", lower = 0.5, upper = 1)
   check_count(nsamp, "nsamp")
 
-  fit <- rsimpls_fit(x, y, max(kmax, ncomp), alpha, ndir, nsamp)
-  if (ncomp > fit$kmax) {
-    stop("'ncomp' cannot exceed ", fit$kmax, " with these data.", call. = FALSE)
+  fit <- rsimpls_fit(x, y, max(ncomp_max, ncomp), alpha, ndir, nsamp)
+  if (ncomp > fit$ncomp_max) {
+    stop("'ncomp' cannot exceed ", fit$ncomp_max, " with these data.", call. = FALSE)
   }
   model <- fit$models[[ncomp]]
   k <- seq_len(ncomp)
@@ -217,7 +217,7 @@ rsimpls <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 50
     score_center = model$score_center,
     score_cov = model$score_cov,
     ncomp = as.integer(ncomp),
-    kmax = fit$kmax,
+    ncomp_max = fit$ncomp_max,
     h = fit$h,
     alpha = alpha,
     y_scale = fit$y_scale
@@ -230,21 +230,21 @@ rsimpls <- function(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 50
             class = "specproc_rsimpls")
 }
 
-# RSIMPLS with 1 to kmax components. x and y are numeric matrices (y with
-# column names). Returns the weights, loadings and scores of kmax
+# RSIMPLS with 1 to ncomp_max components. x and y are numeric matrices (y with
+# column names). Returns the weights, loadings and scores of ncomp_max
 # components, the regression of each model (models[[k]]), the ROBPCA weights
 # w and the robust R2 and RMSE of each model.
-rsimpls_fit <- function(x, y, kmax, alpha, ndir, nsamp) {
+rsimpls_fit <- function(x, y, ncomp_max, alpha, ndir, nsamp) {
   n <- nrow(x)
   p <- ncol(x)
   q <- ncol(y)
-  # ROBPCA needs fewer components (k0 = kmax + q) than the dimension of
+  # ROBPCA needs fewer components (k0 = ncomp_max + q) than the dimension of
   # (X, Y), and (34) of the paper
-  kmax <- min(kmax, p - 1, n - 2 - q)
-  while (kmax >= 1 && kmax * q + q + q * (q - 1) / 2 >= robust_h(n, alpha, kmax + q)) {
-    kmax <- kmax - 1
+  ncomp_max <- min(ncomp_max, p - 1, n - 2 - q)
+  while (ncomp_max >= 1 && ncomp_max * q + q + q * (q - 1) / 2 >= robust_h(n, alpha, ncomp_max + q)) {
+    ncomp_max <- ncomp_max - 1
   }
-  if (kmax < 1) {
+  if (ncomp_max < 1) {
     stop("Too few observations for a robust PLS model.", call. = FALSE)
   }
 
@@ -256,15 +256,15 @@ rsimpls_fit <- function(x, y, kmax, alpha, ndir, nsamp) {
   ys <- y * y_scale
 
   # Step 1: ROBPCA of (X, Y)
-  k0 <- kmax + q
+  k0 <- ncomp_max + q
   rob <- withCallingHandlers(
-    robpca(cbind(x, ys), k = k0, kmax = k0, alpha = alpha, ndir = ndir, nsamp = nsamp),
+    robpca(cbind(x, ys), ncomp = k0, ncomp_max = k0, alpha = alpha, ndir = ndir, nsamp = nsamp),
     warning = function(w) {
-      if (grepl("'k' reduced", conditionMessage(w))) invokeRestart("muffleWarning")
+      if (grepl("'ncomp' reduced", conditionMessage(w))) invokeRestart("muffleWarning")
     }
   )
-  kmax <- min(kmax, rob$k - q)
-  if (kmax < 1) {
+  ncomp_max <- min(ncomp_max, rob$ncomp - q)
+  if (ncomp_max < 1) {
     stop("The predictors and responses span too few dimensions for a robust PLS model.", call. = FALSE)
   }
   w <- rob$outlier_type == "regular"
@@ -275,12 +275,12 @@ rsimpls_fit <- function(x, y, kmax, alpha, ndir, nsamp) {
 
   # Step 2: SIMPLS from the robust covariance matrix
   pls <- simpls_robust(rob$loadings[ix, , drop = FALSE], rob$loadings[iy, , drop = FALSE],
-                       rob$eigenvalues, kmax)
-  kmax <- ncol(pls$weights)
+                       rob$eigenvalues, ncomp_max)
+  ncomp_max <- ncol(pls$weights)
   scores <- sweep(x, 2, mu_x) %*% pls$weights
 
   # Step 3: robust regression for each number of components
-  models <- lapply(seq_len(kmax), function(k) {
+  models <- lapply(seq_len(ncomp_max), function(k) {
     reg <- robpca_regression(scores[, seq_len(k), drop = FALSE], ys, w)
     b <- pls$weights[, seq_len(k), drop = FALSE] %*% reg$slopes
     colnames(b) <- colnames(y)
@@ -306,7 +306,7 @@ rsimpls_fit <- function(x, y, kmax, alpha, ndir, nsamp) {
   regular <- regular_in_all(models)
   list(weights = pls$weights, loadings = pls$loadings, scores = scores, models = models,
        center = mu_x, y_center = stats::setNames(mu_y / y_scale, colnames(y)), w = w,
-       regular = regular, components = components_table(models, y, regular), kmax = kmax,
+       regular = regular, components = components_table(models, y, regular), ncomp_max = ncomp_max,
        h = rob$h, y_scale = y_scale)
 }
 
@@ -323,12 +323,12 @@ total_variance <- function(x) {
 # P L P^T of (X, Y), given by the blocks px (p x k0) and py (q x k0) of P and
 # the eigenvalues L. The cross-covariance S_xy = px L py^T is deflated by
 # the orthonormal basis of the loadings. Stops early when S_xy vanishes.
-simpls_robust <- function(px, py, values, kmax) {
+simpls_robust <- function(px, py, values, ncomp_max) {
   p <- nrow(px)
   s <- px %*% (values * t(py))
   s0 <- sqrt(sum(s^2))
-  weights <- loadings <- basis <- matrix(0, p, kmax)
-  for (a in seq_len(kmax)) {
+  weights <- loadings <- basis <- matrix(0, p, ncomp_max)
+  for (a in seq_len(ncomp_max)) {
     r <- if (ncol(s) == 1) {
       s[, 1]
     } else {
@@ -421,7 +421,7 @@ regression_outlier_type <- function(sd, rd, cutoff_sd, cutoff_rd) {
 #' @param type `"response"` (default) for the predicted responses, or
 #'   `"scores"` for the scores and their score and orthogonal distances.
 #' @param ncomp With `type = "response"`, the number of components of the
-#'   predictions, from 1 to the `kmax` of the model. Default is the `ncomp`
+#'   predictions, from 1 to the `ncomp_max` of the model. Default is the `ncomp`
 #'   of the model. The models with fewer or more components come from the
 #'   same ROBPCA fit (see [rsimpls()]).
 #' @param ... Not used.

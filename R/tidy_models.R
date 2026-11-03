@@ -22,7 +22,7 @@
 #'  - [rsimpls()] and [rpcr()]: `"coefficients"` (default), the `estimate`
 #'    of each `term` (the intercept and the variables) for each `response`,
 #'    in the units of the responses; `"components"`, the robust `r.squared`
-#'    and the `rmse` of the models with 1 to `kmax` components (`ncomp`);
+#'    and the `rmse` of the models with 1 to `ncomp_max` components (`ncomp`);
 #'    `"loadings"` and `"scores"`, as for robust PCA;
 #'  - [lts_fit()]: the `term`, `estimate`, `std.error`, `statistic` and
 #'    `p.value` of the reweighted least-squares fit, and, with
@@ -48,11 +48,11 @@
 #'
 #' `glance()` returns the number of observations `nobs` and of variables
 #' `nvar`, and:
-#'  - robust PCA: the number of components `k`, `h`, `alpha`, the cutoffs
+#'  - robust PCA: the number of components `ncomp`, `h`, `alpha`, the cutoffs
 #'    `cutoff.sd` and `cutoff.od`, the numbers of `n.good.leverage`,
 #'    `n.orthogonal.outlier` and `n.bad.leverage` observations, the number
 #'    of `flagged.cells` (MacroPCA and cellPCA) and the `method`;
-#'  - [rsimpls()] and [rpcr()]: `ncomp`, `kmax`, `h`, `alpha`, the robust
+#'  - [rsimpls()] and [rpcr()]: `ncomp`, `ncomp_max`, `h`, `alpha`, the robust
 #'    `r.squared`, the robust scale of the residuals `sigma` (one response),
 #'    the numbers of `n.good.leverage`, `n.vertical.outlier` and
 #'    `n.bad.leverage` observations, the `method` and, for RPCR, the
@@ -77,7 +77,7 @@
 #'  - [nas()]: the `method`, `ncomp` and the figures of merit
 #'    (`sensitivity`, `selectivity` and, with a noise level,
 #'    `analytical.sensitivity`, `lod` and `loq`);
-#'  - [applicability_domain()]: the number of components `k`, the variance
+#'  - [applicability_domain()]: the number of components `ncomp`, the variance
 #'    `explained`, the `conf.level` and the limits `t2.limit` and `q.limit`.
 #'
 #' @inheritParams specproc-tidy
@@ -103,7 +103,7 @@
 #' # the regression vector, one row per wavelength
 #' head(tidy(fit))
 #'
-#' pca <- robpca(spectra, k = 3)
+#' pca <- robpca(spectra, ncomp = 3)
 #' tidy(pca)
 #' glance(pca)
 NULL
@@ -127,7 +127,7 @@ tidy.specproc_robpca <- function(x, matrix = "eigenvalues", ...) {
 #' @export
 glance.specproc_robpca <- function(x, ...) {
   out <- tibble::tibble(
-    nobs = nrow(x$scores), nvar = nrow(x$loadings), k = x$k, h = x$h, alpha = x$alpha,
+    nobs = nrow(x$scores), nvar = nrow(x$loadings), ncomp = x$ncomp, h = x$h, alpha = x$alpha,
     cutoff.sd = x$cutoff_sd, cutoff.od = x$cutoff_od
   )
   out <- cbind(out, outlier_counts(x$outlier_type))
@@ -318,7 +318,7 @@ glance.specproc_nas <- function(x, ...) {
 #' @export
 tidy.specproc_domain <- function(x, ...) {
   variance <- x$pca$sdev^2
-  k <- seq_len(x$k)
+  k <- seq_len(x$ncomp)
   tibble::tibble(PC = k, std.dev = x$pca$sdev[k], percent = variance[k] / sum(variance),
                  cumulative = cumsum(variance)[k] / sum(variance))
 }
@@ -326,7 +326,7 @@ tidy.specproc_domain <- function(x, ...) {
 #' @rdname specproc-tidy-models
 #' @export
 glance.specproc_domain <- function(x, ...) {
-  tibble::tibble(nobs = x$n, nvar = nrow(x$pca$rotation), k = x$k, explained = x$explained,
+  tibble::tibble(nobs = x$n, nvar = nrow(x$pca$rotation), ncomp = x$ncomp, explained = x$explained,
                  conf.level = x$conf_level, t2.limit = unname(x$limits[["t2"]]),
                  q.limit = unname(x$limits[["q"]]))
 }
@@ -397,7 +397,7 @@ tidy_robust_regression <- function(x, matrix) {
 glance_robust_regression <- function(x, method) {
   sigma <- as.matrix(x$sigma)
   out <- tibble::tibble(
-    nobs = nrow(x$x_scores), nvar = nrow(x$coefficients), ncomp = x$ncomp, kmax = x$kmax,
+    nobs = nrow(x$x_scores), nvar = nrow(x$coefficients), ncomp = x$ncomp, ncomp_max = x$ncomp_max,
     h = x$h, alpha = x$alpha, r.squared = x$R2,
     sigma = if (length(sigma) == 1) sqrt(sigma[[1]]) else NA_real_
   )

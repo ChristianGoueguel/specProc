@@ -7,10 +7,11 @@
 hotelling_t2(
   data,
   columns = NULL,
-  k = 2,
+  ncomp = 2,
   group = NULL,
   conf_level = 0.975,
-  method = "f"
+  method = "f",
+  k = deprecated()
 )
 }
 \arguments{
@@ -18,11 +19,11 @@ hotelling_t2(
 fit, or an object of \code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}} or \code{\link[=macropca]{macropca()}}.}
 
 \item{columns}{The components used: a character vector of column names.
-By default, the first \code{k} embedding coordinates (columns named like
-\code{PC1}, \code{UMAP1}, ...), or else the first \code{k} numeric columns.}
+By default, the first \code{ncomp} embedding coordinates (columns named like
+\code{PC1}, \code{UMAP1}, ...), or else the first \code{ncomp} numeric columns.}
 
-\item{k}{The number of components, when \code{columns} is not given. Default
-is 2.}
+\item{ncomp}{The number of components, when \code{columns} is not given.
+Default is 2.}
 
 \item{group}{An optional grouping: a column of \code{data} (unquoted or as a
 string), or a vector with one value per sample.}
@@ -32,6 +33,8 @@ values between 0 and 1. Default is 0.975.}
 
 \item{method}{The distribution of the limits: \code{"f"} (default), \code{"beta"}
 or \code{"new"}.}
+
+\item{k}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp}.}
 }
 \value{
 A tibble with one row per sample: its row number \code{sample}, the
@@ -42,7 +45,7 @@ data).
 }
 \description{
 Computes Hotelling's \eqn{T^2} statistic of each sample from its scores
-on the first \code{k} components of an embedding (such as PCA or PLS scores),
+on the first \code{ncomp} components of an embedding (such as PCA or PLS scores),
 with its limits at one or more confidence levels, for all the samples
 together or within groups, with \code{\link[HotellingEllipse:ellipseParam]{HotellingEllipse::ellipseParam()}}.
 Samples beyond a limit are far from the center of the data (or of their
@@ -51,7 +54,7 @@ group) given its covariance: candidate outliers.
 \details{
 \eqn{T^2} is the squared Mahalanobis distance of a sample to the mean of
 the scores, with their covariance. Its limit at the confidence level
-\eqn{1 - \alpha}, for \eqn{n} samples, is
+\eqn{1 - \alpha}, for \eqn{n} samples and \eqn{k} components, is
 \itemize{
 \item \code{method = "f"} (default): \eqn{k(n - 1)/(n - k)\, F_{1-\alpha}(k, n -
    k)}, the conventional limit of score plots (Jackson, 1991);
@@ -67,11 +70,11 @@ for small \eqn{n};
 
 Within groups (\code{group}), each group gets its own mean, covariance and
 limits, which tells whether a sample is typical of its own group rather
-than of the whole data set; each group needs more than \code{k + 1} samples.
+than of the whole data set; each group needs more than \eqn{k + 1} samples.
 
-The statistic uses the \code{k} components given, not only the two shown on a
-plot: a sample can lie inside the ellipse of two components and still
-exceed the limit in \code{k} dimensions. Classical estimates are themselves
+The statistic uses the \eqn{k} components given, not only the two shown
+on a plot: a sample can lie inside the ellipse of two components and
+still exceed the limit in \eqn{k} dimensions. Classical estimates are themselves
 sensitive to outliers; with many outliers, prefer the robust distances of
 \code{\link[=robpca]{robpca()}}.
 }
@@ -82,10 +85,10 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   wl <- suppressWarnings(as.numeric(names(forageLIBS)))
   spectra <- forageLIBS[which(wl > 380 & wl < 430)]
   pca <- stats::prcomp(spectra)
-  t2 <- hotelling_t2(pca, k = 3)
+  t2 <- hotelling_t2(pca, ncomp = 3)
   t2[t2$outlier_97.5, ]
   # two limits, with the exact distribution of the calibration samples
-  hotelling_t2(pca, k = 3, conf_level = c(0.95, 0.99), method = "beta")
+  hotelling_t2(pca, ncomp = 3, conf_level = c(0.95, 0.99), method = "beta")
 }
 }
 \references{

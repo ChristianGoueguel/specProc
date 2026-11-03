@@ -6,34 +6,41 @@
 \usage{
 robpca(
   x,
-  k = NULL,
-  kmax = 10,
+  ncomp = NULL,
+  ncomp_max = 10,
   alpha = 0.75,
   ndir = 250,
   var_explained = 0.8,
-  nsamp = 500
+  nsamp = 500,
+  k = deprecated(),
+  kmax = deprecated()
 )
 }
 \arguments{
 \item{x}{A numeric matrix or data frame, with one observation per row.}
 
-\item{k}{The number of principal components. If \code{NULL} (default), it is
-chosen from \code{var_explained} and \code{kmax}.}
+\item{ncomp}{The number of principal components. If \code{NULL} (default), it
+is chosen from \code{var_explained} and \code{ncomp_max}.}
 
-\item{kmax}{The maximum number of components. Default is 10.}
+\item{ncomp_max}{The maximum number of components. Default is 10.}
 
 \item{alpha}{The robustness parameter: the fraction of observations the
 estimates are based on, between 0.5 and 1. Default is 0.75. The subset
-size is \eqn{h = \max(\lfloor\alpha n\rfloor, \lfloor(n + k_{max} + 1)/2\rfloor)}.}
+size is \eqn{h = \max(\lfloor\alpha n\rfloor, \lfloor(n + k_{max} + 1)/2\rfloor)},
+with \eqn{k_{max}} = \code{ncomp_max}.}
 
 \item{ndir}{The number of random directions used for the outlyingness.
 Default is 250; use \code{"all"} for all directions through pairs of
 observations.}
 
-\item{var_explained}{The fraction of variance used to choose \code{k} when it
-is not given. Default is 0.8.}
+\item{var_explained}{The fraction of variance used to choose \code{ncomp} when
+it is not given. Default is 0.8.}
 
 \item{nsamp}{The number of random subsets of FAST-MCD. Default is 500.}
+
+\item{k}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp}.}
+
+\item{kmax}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp_max}.}
 }
 \value{
 An object of class \code{specproc_robpca}, a list with:
@@ -48,7 +55,7 @@ element of each loading vector positive.
 \item \code{outlier_type}: a factor classifying each observation as \code{"regular"},
 \code{"good leverage"} (high SD only), \code{"orthogonal outlier"} (high OD only)
 or \code{"bad leverage"} (both).
-\item \code{k}, \code{h}, \code{alpha}: the settings used.
+\item \code{ncomp}, \code{h}, \code{alpha}: the settings used.
 \item \code{H0}, \code{H1}: logical vectors of the observations in the subsets
 \eqn{H_0} and \eqn{H_1}.
 }
@@ -72,16 +79,16 @@ subspace they span (at most \eqn{n - 1} dimensions).
 directions through pairs of observations, using the univariate MCD
 location and scale on each direction. The \code{h} least outlying
 observations form the subset \eqn{H_0}.
-\item The number of components \code{k} is chosen (if not given) as the smallest
-number that explains \code{var_explained} of the variance of \eqn{H_0}, with
-at most \code{kmax}. Observations whose orthogonal distance to the
-\eqn{k}-dimensional PCA subspace of \eqn{H_0} is below the cut-off form
-\eqn{H_1}, and the subspace is re-estimated from \eqn{H_1}. When \code{k}
-equals the rank of the data, this subspace is the whole space and
+\item The number of components \eqn{k} (\code{ncomp}) is chosen (if not given) as
+the smallest number that explains \code{var_explained} of the variance of
+\eqn{H_0}, with at most \code{ncomp_max}. Observations whose orthogonal
+distance to the \eqn{k}-dimensional PCA subspace of \eqn{H_0} is below
+the cut-off form \eqn{H_1}, and the subspace is re-estimated from
+\eqn{H_1}. When \code{ncomp} equals the rank of the data, this subspace is the whole space and
 \eqn{H_1 = H_0}.
 \item All observations are projected onto this subspace, and the reweighted
 FAST-MCD estimator of the scores gives the final center, loadings and
-eigenvalues. When \code{k} equals the rank, this is the reweighted MCD of the
+eigenvalues. When \code{ncomp} equals the rank, this is the reweighted MCD of the
 data.
 }
 
@@ -89,7 +96,7 @@ Each observation then has a score distance (SD), its robust Mahalanobis
 distance within the PCA subspace, and an orthogonal distance (OD) to the
 subspace. The cut-off for the SD is \eqn{\sqrt{\chi^2_{k,0.975}}}; the
 cut-off for the OD uses the Wilson-Hilferty approximation, with the
-univariate MCD of \eqn{OD^{2/3}}. When \code{k} equals the rank, the ODs and
+univariate MCD of \eqn{OD^{2/3}}. When \code{ncomp} equals the rank, the ODs and
 their cut-off are zero: there are no orthogonal outliers.
 \code{\link[=plot_outlier_map]{plot_outlier_map()}} plots both distances.
 

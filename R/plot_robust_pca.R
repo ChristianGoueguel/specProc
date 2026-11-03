@@ -162,7 +162,7 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
     } else {
       paste0(switch(class(object)[1], specproc_robpca = "ROBPCA", specproc_rospca = "ROSPCA",
                     specproc_macropca = "MacroPCA", specproc_cellpca = "cellPCA"),
-             " outlier map (", object$k, " components)")
+             " outlier map (", object$ncomp, " components)")
     }
   }
   point <- map_point_args(rlang::enquos(...), nrow(df),
@@ -276,7 +276,7 @@ plot_outlier_map <- function(object, newdata = NULL, labels = 3, relative = FALS
 #' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 #' spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 #' set.seed(1)
-#' fit <- macropca(center(spectra), k = 3)
+#' fit <- macropca(center(spectra), ncomp = 3)
 #'
 #' if (requireNamespace("patchwork", quietly = TRUE)) {
 #'   plot_cell_map(fit, order = "cluster")
@@ -390,7 +390,7 @@ plot_cell_map <- function(object, rows = NULL, columns = NULL, resolution = c(20
 #' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 #' spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 #' set.seed(1)
-#' fit <- macropca(center(spectra), k = 3)
+#' fit <- macropca(center(spectra), ncomp = 3)
 #'
 #' flagged_regions(fit)
 #' }

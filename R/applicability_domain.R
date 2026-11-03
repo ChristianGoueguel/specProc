@@ -10,7 +10,7 @@
 #'
 #' @details
 #' A new spectrum is outside the applicability domain when its Hotelling
-#' \eqn{T^2}, the distance within the plane of the first `k` components, or
+#' \eqn{T^2}, the distance within the plane of the first `ncomp` components, or
 #' its Q residual, the squared distance to that plane, exceeds its limit at
 #' `conf_level` (see [q_residuals()]). A high \eqn{T^2} is a sample more
 #' extreme than the calibration samples (for example, a higher
@@ -18,7 +18,7 @@
 #' contamination, an instrumental problem). The limit of \eqn{T^2} is that of
 #' a new observation, and that of Q the Jackson-Mudholkar limit.
 #'
-#' By default, `k` is the smallest number of components that explain the
+#' By default, `ncomp` is the smallest number of components that explain the
 #' fraction `variance` of the variance of the calibration spectra. Prepare
 #' the spectra as for the model (baseline correction, normalization), since
 #' the domain is that of the variables the model uses. The PCA is classical:
@@ -26,16 +26,16 @@
 #'
 #' @param x The calibration spectra: a numeric matrix or data frame, one
 #'   spectrum per row.
-#' @param k The number of principal components. By default, chosen from
+#' @param ncomp The number of principal components. By default, chosen from
 #'   `variance`.
 #' @param variance The fraction of the variance explained by the
-#'   components, when `k` is not given. Default is 0.99.
+#'   components, when `ncomp` is not given. Default is 0.99.
 #' @param conf_level The confidence level of the limits. Default is 0.99.
 #' @param center,scale Passed to [stats::prcomp()]. Default is `TRUE` and
 #'   `FALSE`.
 #'
 #' @return An object of class `specproc_domain`, a list with the `pca`
-#'   ([stats::prcomp()] fit), the number of components `k`, the fraction of
+#'   ([stats::prcomp()] fit), the number of components `ncomp`, the fraction of
 #'   the variance they `explained`, the `conf_level` and the `limits` of
 #'   \eqn{T^2} and Q. [predict()][predict.specproc_domain] flags new
 #'   spectra.
@@ -58,7 +58,7 @@
 #' domain
 #' flags <- predict(domain, spectra[301:368, ])
 #' table(flags$inside)
-applicability_domain <- function(x, k = NULL, variance = 0.99, conf_level = 0.99, center = TRUE,
+applicability_domain <- function(x, ncomp = NULL, variance = 0.99, conf_level = 0.99, center = TRUE,
                                  scale = FALSE) {
   x <- as_numeric_matrix(x, "x")
   if (anyNA(x)) {
@@ -74,19 +74,19 @@ applicability_domain <- function(x, k = NULL, variance = 0.99, conf_level = 0.99
   if (rank < 2) {
     stop("The calibration spectra need at least 2 principal components.", call. = FALSE)
   }
-  if (is.null(k)) {
-    k <- min(which(explained >= variance - 1e-12)[1], rank - 1)
+  if (is.null(ncomp)) {
+    ncomp <- min(which(explained >= variance - 1e-12)[1], rank - 1)
   } else {
-    k <- check_count(k, "k")
-    if (k >= rank) {
-      stop("'k' must be smaller than the number of components (", rank, ").", call. = FALSE)
+    ncomp <- check_count(ncomp, "ncomp")
+    if (ncomp >= rank) {
+      stop("'ncomp' must be smaller than the number of components (", rank, ").", call. = FALSE)
     }
   }
   n <- nrow(x)
   structure(
-    list(pca = pca, k = k, explained = explained[k], conf_level = conf_level, n = n,
-         limits = c(t2 = t2_limit(conf_level, k, n, "new"),
-                    q = q_limit(lambda[-seq_len(k)], conf_level, "jackson"))),
+    list(pca = pca, ncomp = ncomp, explained = explained[ncomp], conf_level = conf_level, n = n,
+         limits = c(t2 = t2_limit(conf_level, ncomp, n, "new"),
+                    q = q_limit(lambda[-seq_len(ncomp)], conf_level, "jackson"))),
     class = "specproc_domain"
   )
 }
@@ -120,7 +120,7 @@ applicability_domain <- function(x, k = NULL, variance = 0.99, conf_level = 0.99
 #' flags <- predict(domain, spectra[301:368, ])
 #' flags[!flags$inside, ]
 predict.specproc_domain <- function(object, newdata, ...) {
-  out <- q_residuals(object$pca, object$k, newdata = newdata, conf_level = object$conf_level)
+  out <- q_residuals(object$pca, object$ncomp, newdata = newdata, conf_level = object$conf_level)
   out$inside <- out$outlier == "regular"
   out
 }
@@ -128,7 +128,7 @@ predict.specproc_domain <- function(object, newdata, ...) {
 #' @export
 print.specproc_domain <- function(x, ...) {
   cat("Applicability domain: PCA of ", x$n, " calibration spectra\n\n", sep = "")
-  cat("Components:  ", x$k, " (", format(round(100 * x$explained, 2)), "% of the variance)\n",
+  cat("Components:  ", x$ncomp, " (", format(round(100 * x$explained, 2)), "% of the variance)\n",
       sep = "")
   cat("Limits:       T2 = ", format(signif(x$limits[["t2"]], 4)), ", Q = ",
       format(signif(x$limits[["q"]], 4)), " (", format(100 * x$conf_level), "%)\n", sep = "")

@@ -6,25 +6,27 @@
 \usage{
 rospca(
   x,
-  k = 2,
+  ncomp = 2,
   lambda = 1,
   alpha = 0.75,
   ndir = 250,
   stand = FALSE,
   ngrid = 10,
-  maxiter = 10
+  maxiter = 10,
+  k = deprecated()
 )
 }
 \arguments{
 \item{x}{A numeric matrix or data frame, with one observation per row.}
 
-\item{k}{The number of principal components. Default is 2.}
+\item{ncomp}{The number of principal components. Default is 2.}
 
 \item{lambda}{A non-negative number: the sparsity parameter. Default is 1.}
 
 \item{alpha}{The robustness parameter: the fraction of observations the
 estimates are based on, between 0.5 and 1. Default is 0.75. The subset
-size is \eqn{h = \max(\lfloor\alpha n\rfloor, \lfloor(n + k_{max} + 1)/2\rfloor)}.}
+size is \eqn{h = \max(\lfloor\alpha n\rfloor, \lfloor(n + k_{max} + 1)/2\rfloor)},
+with \eqn{k_{max}} = \code{ncomp_max}.}
 
 \item{ndir}{The number of random directions used for the outlyingness.
 Default is 250; use \code{"all"} for all directions through pairs of
@@ -38,6 +40,8 @@ by their median.}
 
 \item{maxiter}{The maximum number of grid refinements per component.
 Default is 10.}
+
+\item{k}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp}.}
 }
 \value{
 An object of class \code{specproc_rospca} (inheriting from
@@ -65,7 +69,7 @@ The algorithm follows the published description in three steps:
 and \eqn{Q_n}) if \code{stand = TRUE}. As in \code{\link[=robpca]{robpca()}}, the \code{h} least
 outlying observations form \eqn{H_0}, and those whose orthogonal
 distance to the \eqn{k}-dimensional PCA subspace of \eqn{H_0} is below
-the cut-off form \eqn{H_1} (\eqn{H_1 = H_0} when \code{k} equals the rank
+the cut-off form \eqn{H_1} (\eqn{H_1 = H_0} when \code{ncomp} equals the rank
 of the data, as the subspace is then the whole space).
 \item \strong{Sparsification.} The observations of \eqn{H_1} are standardized and
 the sparse loadings are computed by maximizing, component by component,

@@ -109,7 +109,7 @@ names of the tables are also accepted, such as \code{"rotation"} and
 \item \code{\link[=rsimpls]{rsimpls()}} and \code{\link[=rpcr]{rpcr()}}: \code{"coefficients"} (default), the \code{estimate}
 of each \code{term} (the intercept and the variables) for each \code{response},
 in the units of the responses; \code{"components"}, the robust \code{r.squared}
-and the \code{rmse} of the models with 1 to \code{kmax} components (\code{ncomp});
+and the \code{rmse} of the models with 1 to \code{ncomp_max} components (\code{ncomp});
 \code{"loadings"} and \code{"scores"}, as for robust PCA;
 \item \code{\link[=lts_fit]{lts_fit()}}: the \code{term}, \code{estimate}, \code{std.error}, \code{statistic} and
 \code{p.value} of the reweighted least-squares fit, and, with
@@ -137,11 +137,11 @@ fractions).
 \code{glance()} returns the number of observations \code{nobs} and of variables
 \code{nvar}, and:
 \itemize{
-\item robust PCA: the number of components \code{k}, \code{h}, \code{alpha}, the cutoffs
+\item robust PCA: the number of components \code{ncomp}, \code{h}, \code{alpha}, the cutoffs
 \code{cutoff.sd} and \code{cutoff.od}, the numbers of \code{n.good.leverage},
 \code{n.orthogonal.outlier} and \code{n.bad.leverage} observations, the number
 of \code{flagged.cells} (MacroPCA and cellPCA) and the \code{method};
-\item \code{\link[=rsimpls]{rsimpls()}} and \code{\link[=rpcr]{rpcr()}}: \code{ncomp}, \code{kmax}, \code{h}, \code{alpha}, the robust
+\item \code{\link[=rsimpls]{rsimpls()}} and \code{\link[=rpcr]{rpcr()}}: \code{ncomp}, \code{ncomp_max}, \code{h}, \code{alpha}, the robust
 \code{r.squared}, the robust scale of the residuals \code{sigma} (one response),
 the numbers of \code{n.good.leverage}, \code{n.vertical.outlier} and
 \code{n.bad.leverage} observations, the \code{method} and, for RPCR, the
@@ -166,7 +166,7 @@ variables \code{n.selected}, \code{robust}, the \code{threshold} and, for iPLS, 
 \item \code{\link[=nas]{nas()}}: the \code{method}, \code{ncomp} and the figures of merit
 (\code{sensitivity}, \code{selectivity} and, with a noise level,
 \code{analytical.sensitivity}, \code{lod} and \code{loq});
-\item \code{\link[=applicability_domain]{applicability_domain()}}: the number of components \code{k}, the variance
+\item \code{\link[=applicability_domain]{applicability_domain()}}: the number of components \code{ncomp}, the variance
 \code{explained}, the \code{conf.level} and the limits \code{t2.limit} and \code{q.limit}.
 }
 }
@@ -181,7 +181,7 @@ glance(fit)
 # the regression vector, one row per wavelength
 head(tidy(fit))
 
-pca <- robpca(spectra, k = 3)
+pca <- robpca(spectra, ncomp = 3)
 tidy(pca)
 glance(pca)
 }

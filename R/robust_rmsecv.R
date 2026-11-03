@@ -5,7 +5,7 @@
 #' @description
 #' Robust root mean squared error of cross-validation (R-RMSECV) of the
 #' robust PLS ([rsimpls()]) or robust PCR ([rpcr()]) models with 1 to
-#' `kmax` components, and the robust component selection (RCS) criterion of
+#' `ncomp_max` components, and the robust component selection (RCS) criterion of
 #' Engelen and Hubert (2005), to choose the number of components when the
 #' calibration data contain outliers.
 #'
@@ -13,7 +13,7 @@
 #' The squared prediction errors of outliers would dominate the usual
 #' RMSECV. The robust RMSECV leaves them out: the model is first fitted to
 #' all the observations, and only those regular in every model with 1 to
-#' `kmax` components (residual distance below its cut-off) enter the error,
+#' `ncomp_max` components (residual distance below its cut-off) enter the error,
 #' \deqn{R\text{-}RMSECV_k = \sqrt{\frac{1}{q \sum_i w_i} \sum_i w_i
 #'   \|y_i - \hat y_{-i,k}\|^2},}
 #' where \eqn{w_i} is 1 for these observations and 0 for the others, and
@@ -43,7 +43,7 @@
 #' @inheritParams rsimpls
 #' @param method The model: `"rsimpls"` (default), robust PLS, or `"rpcr"`,
 #'   robust PCR.
-#' @param kmax The largest number of components. Default is 10.
+#' @param ncomp_max The largest number of components. Default is 10.
 #' @param folds The number of folds of the cross-validation, from 2 to the
 #'   number of observations (leave-one-out). Default is 10.
 #' @param gamma The weight of the cross-validated error in the RCS
@@ -70,9 +70,9 @@
 #' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 #' spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 #' set.seed(1)
-#' robust_rmsecv(spectra[1:300, ], forageLIBS$Ca[1:300], kmax = 8, folds = 5)
+#' robust_rmsecv(spectra[1:300, ], forageLIBS$Ca[1:300], ncomp_max = 8, folds = 5)
 #' }
-robust_rmsecv <- function(x, y, method = c("rsimpls", "rpcr"), kmax = 10, folds = 10,
+robust_rmsecv <- function(x, y, method = c("rsimpls", "rpcr"), ncomp_max = 10, folds = 10,
                           gamma = 0.5, alpha = 0.75, ndir = 250, nsamp = 500, ...) {
   method <- match.arg(method)
   if (missing(x) || missing(y) || is.null(x) || is.null(y)) {
@@ -81,7 +81,7 @@ robust_rmsecv <- function(x, y, method = c("rsimpls", "rpcr"), kmax = 10, folds 
   x <- robust_pca_input(x)
   y <- calibration_response(y, nrow(x))
   n <- nrow(x)
-  check_count(kmax, "kmax")
+  check_count(ncomp_max, "ncomp_max")
   check_count(folds, "folds", lower = 2)
   if (folds > n) {
     stop("'folds' cannot exceed the number of observations (", n, ").", call. = FALSE)
@@ -91,29 +91,29 @@ robust_rmsecv <- function(x, y, method = c("rsimpls", "rpcr"), kmax = 10, folds 
   check_count(nsamp, "nsamp")
 
   fit_fun <- switch(method, rsimpls = rsimpls_fit, rpcr = rpcr_fit)
-  full <- fit_fun(x, y, kmax, alpha, ndir, nsamp)
-  kmax <- full$kmax
+  full <- fit_fun(x, y, ncomp_max, alpha, ndir, nsamp)
+  ncomp_max <- full$ncomp_max
   fold <- sample(rep_len(seq_len(folds), n))
   # predictions of each fold by the models fitted without it; a fold whose
   # fit has fewer components leaves the larger models without predictions
   preds <- parallel_lapply(seq_len(folds), function(f) {
     test <- fold == f
-    fit <- fit_fun(x[!test, , drop = FALSE], y[!test, , drop = FALSE], kmax, alpha, ndir, nsamp)
-    out <- array(NA_real_, c(sum(test), ncol(y), kmax))
-    for (k in seq_len(min(kmax, fit$kmax))) {
+    fit <- fit_fun(x[!test, , drop = FALSE], y[!test, , drop = FALSE], ncomp_max, alpha, ndir, nsamp)
+    out <- array(NA_real_, c(sum(test), ncol(y), ncomp_max))
+    for (k in seq_len(min(ncomp_max, fit$ncomp_max))) {
       m <- fit$models[[k]]
       out[, , k] <- sweep(x[test, , drop = FALSE] %*% m$coefficients, 2, m$intercept, "+")
     }
     out
   }, seed = TRUE)
-  errors <- array(NA_real_, c(n, ncol(y), kmax))
+  errors <- array(NA_real_, c(n, ncol(y), ncomp_max))
   for (f in seq_len(folds)) {
     test <- fold == f
     errors[test, , ] <- preds[[f]] - array(y[test, ], dim(preds[[f]]))
   }
 
   w <- full$regular
-  rmsecv <- vapply(seq_len(kmax), function(k) sqrt(mean(errors[w, , k]^2)), numeric(1))
+  rmsecv <- vapply(seq_len(ncomp_max), function(k) sqrt(mean(errors[w, , k]^2)), numeric(1))
   res <- full$components
   res$RMSECV <- rmsecv
   res$RCS <- sqrt(gamma * rmsecv^2 + (1 - gamma) * res$RMSE^2)

@@ -16,7 +16,7 @@ the calibration data.}
 \code{"scores"} for the scores and their score and orthogonal distances.}
 
 \item{ncomp}{With \code{type = "response"}, the number of components of the
-predictions, from 1 to the \code{kmax} of the model. Default is the \code{ncomp}
+predictions, from 1 to the \code{ncomp_max} of the model. Default is the \code{ncomp}
 of the model. The models with fewer or more components come from the
 same ROBPCA fit (see \code{\link[=rsimpls]{rsimpls()}}).}
 

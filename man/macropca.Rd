@@ -6,30 +6,32 @@
 \usage{
 macropca(
   x,
-  k = NULL,
+  ncomp = NULL,
   alpha = 0.5,
-  kmax = 10,
+  ncomp_max = 10,
   var_explained = 0.8,
   scale = FALSE,
   ndir = 250,
   maxiter = 20,
-  tol = 0.005
+  tol = 0.005,
+  k = deprecated(),
+  kmax = deprecated()
 )
 }
 \arguments{
 \item{x}{A numeric matrix or data frame, with one observation per row.
 Missing values are allowed.}
 
-\item{k}{The number of principal components. If \code{NULL} (default), it is
-chosen from \code{var_explained} and \code{kmax}.}
+\item{ncomp}{The number of principal components. If \code{NULL} (default), it
+is chosen from \code{var_explained} and \code{ncomp_max}.}
 
 \item{alpha}{The robustness parameter, between 0.5 and 1: the fraction of
 observations used in the fit. Default is 0.5.}
 
-\item{kmax}{The maximum number of components. Default is 10.}
+\item{ncomp_max}{The maximum number of components. Default is 10.}
 
-\item{var_explained}{The fraction of variance used to choose \code{k} when it
-is not given. Default is 0.8.}
+\item{var_explained}{The fraction of variance used to choose \code{ncomp} when
+it is not given. Default is 0.8.}
 
 \item{scale}{A logical: scale the variables by their robust scale (\code{FALSE},
 default: they are only centered, so that intense emission lines are
@@ -41,6 +43,10 @@ Default is 250.}
 \item{maxiter, tol}{The maximum number of iterations of step 4, and the
 tolerance on the largest angle between successive subspaces (as a
 fraction of a right angle). Defaults are 20 and 0.005, as in the paper.}
+
+\item{k}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp}.}
+
+\item{kmax}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp_max}.}
 }
 \value{
 An object of class \code{specproc_macropca} (inheriting from
@@ -88,9 +94,9 @@ with the fewest flagged cells have their flagged cells imputed. The
 \code{h} least outlying observations not set aside form \eqn{H_0}.
 \item \strong{Subspace dimension.} A classical PCA of the observations of
 \eqn{H_0}, with their flagged and missing cells imputed, gives the
-eigenvalues: when \code{k} is \code{NULL}, it is the smallest number of
+eigenvalues: when \code{ncomp} is \code{NULL}, it is the smallest number of
 components that explain \code{var_explained} of their variance (at most
-\code{kmax}).
+\code{ncomp_max}).
 \item \strong{Iterative subspace estimation.} The flagged and missing cells are
 imputed by the fitted values of the current PCA, and the PCA of
 \eqn{H_0} is refitted, until the largest angle between the old and

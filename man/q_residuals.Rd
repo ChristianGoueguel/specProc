@@ -6,13 +6,14 @@
 \usage{
 q_residuals(
   model,
-  k,
+  ncomp,
   newdata = NULL,
   conf_level = 0.975,
   method = "jackson",
   t2_method = "f",
   center = TRUE,
-  scale = FALSE
+  scale = FALSE,
+  k = deprecated()
 )
 }
 \arguments{
@@ -20,7 +21,7 @@ q_residuals(
 default of \code{prcomp()}), or a numeric matrix or data frame, on which a
 PCA is fitted with \code{center} and \code{scale}.}
 
-\item{k}{The number of components of the model.}
+\item{ncomp}{The number of components of the model.}
 
 \item{newdata}{Optional new samples (a matrix or data frame with the
 variables of the model), whose distances are computed instead of those
@@ -37,6 +38,8 @@ of the model: \code{"f"} (default) or \code{"beta"} (see \code{\link[=hotelling_
 
 \item{center, scale}{Passed to \code{\link[stats:prcomp]{stats::prcomp()}} when \code{model} is data.
 Default is \code{TRUE} and \code{FALSE}.}
+
+\item{k}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp}.}
 }
 \value{
 A tibble of class \code{specproc_influence}, with one row per sample:
@@ -49,16 +52,17 @@ the type of the sample at the highest confidence level: \code{"regular"},
 \description{
 Computes, for each sample, the two distances used to monitor a principal
 component analysis (PCA) model: Hotelling's \eqn{T^2}, the distance
-within the model plane of the first \code{k} components, and the Q residual
+within the model plane of the first \code{ncomp} components, and the Q residual
 (squared prediction error, SPE), the squared distance to that plane, with
 their limits at one or more confidence levels.
 }
 \details{
-With scores \eqn{t_{ia}} and eigenvalues \eqn{\lambda_a},
+With scores \eqn{t_{ia}} and eigenvalues \eqn{\lambda_a}, and \eqn{k} = \code{ncomp}
+components,
 \deqn{T^2_i = \sum_{a=1}^{k} \frac{t_{ia}^2}{\lambda_a}, \qquad
   Q_i = \lVert x_i - \hat{x}_i \rVert^2}
 where \eqn{\hat{x}_i} is the reconstruction of the (centered and scaled)
-sample from the \code{k} components. A high \eqn{T^2} is an extreme but
+sample from the \eqn{k} components. A high \eqn{T^2} is an extreme but
 well-modeled sample (for example, a high concentration); a high Q is a
 sample the model does not describe (another matrix, a contamination, an
 instrumental problem).
@@ -88,11 +92,11 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   wl <- suppressWarnings(as.numeric(names(forageLIBS)))
   spectra <- forageLIBS[which(wl > 380 & wl < 430)]
   pca <- stats::prcomp(spectra)
-  influence <- q_residuals(pca, k = 3)
+  influence <- q_residuals(pca, ncomp = 3)
   influence[influence$outlier != "regular", ]
   plot_influence(influence, label = forageLIBS$Measurement)
   # several limits
-  plot_influence(q_residuals(pca, k = 3, conf_level = c(0.95, 0.99)))
+  plot_influence(q_residuals(pca, ncomp = 3, conf_level = c(0.95, 0.99)))
 }
 }
 \references{

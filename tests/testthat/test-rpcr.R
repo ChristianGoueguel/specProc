@@ -25,13 +25,13 @@ test_that("rpcr resists vertical outliers and bad leverage points", {
 test_that("rpcr is close to PCR on clean data, and uses the robust PCA", {
   d <- make_regression(seed = 5)
   set.seed(6)
-  fit <- rpcr(d$train$x, d$train$y, ncomp = 3, kmax = 3)
+  fit <- rpcr(d$train$x, d$train$y, ncomp = 3, ncomp_max = 3)
   ref <- pls::pcr(d$train$y ~ d$train$x, ncomp = 3)
   expect_gt(cor(drop(fit$coefficients), drop(coef(ref, ncomp = 3))), 0.95)
   expect_gt(fit$R2, 0.95)
-  # with kmax = ncomp, the distances are those of robpca() with ncomp components
+  # with ncomp_max = ncomp, the distances are those of robpca() with ncomp components
   set.seed(6)
-  rob <- robpca(d$train$x, k = 3, kmax = 3)
+  rob <- robpca(d$train$x, ncomp = 3, ncomp_max = 3)
   expect_equal(fit$sd, rob$sd, ignore_attr = TRUE)
   expect_equal(fit$od, rob$od, ignore_attr = TRUE)
   expect_equal(fit$cutoff_od, rob$cutoff_od)
@@ -48,9 +48,9 @@ test_that("predict() of rpcr reproduces the fit, scores and distances", {
   expect_equal(as.matrix(scores[1:3]), fit$x_scores, ignore_attr = TRUE)
   expect_equal(scores$sd, fit$sd)
   expect_equal(scores$od, fit$od)
-  expect_length(fit$models, fit$kmax)
+  expect_length(fit$models, fit$ncomp_max)
   expect_equal(predict(fit, d$test$x, ncomp = 3), predict(fit, d$test$x))
-  expect_error(predict(fit, d$test$x, ncomp = fit$kmax + 1), "cannot exceed")
+  expect_error(predict(fit, d$test$x, ncomp = fit$ncomp_max + 1), "cannot exceed")
 })
 
 test_that("rpcr handles several responses with MCD regression", {

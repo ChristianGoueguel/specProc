@@ -35,7 +35,7 @@
 #' # Engine arguments
 #'
 #' The other arguments of [rsimca()] are set with [parsnip::set_engine()]:
-#' `kmax`, `alpha`, `var_explained`, `prior`, `ndir` and `nsamp`.
+#' `ncomp_max`, `alpha`, `var_explained`, `prior`, `ndir` and `nsamp`.
 #'
 #' # Predictions
 #'

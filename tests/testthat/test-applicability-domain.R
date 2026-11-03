@@ -10,9 +10,9 @@ domain_data <- function(n = 100, seed = 3) {
 test_that("applicability_domain flags extreme and foreign spectra", {
   all <- domain_data(105)
   x <- all[1:100, ]
-  domain <- applicability_domain(x, k = 2)
+  domain <- applicability_domain(x, ncomp = 2)
   expect_s3_class(domain, "specproc_domain")
-  expect_equal(domain$k, 2)
+  expect_equal(domain$ncomp, 2)
   pca <- domain$pca
   # a spectrum far along the first component, and one off the model plane
   extreme <- pca$center + 6 * pca$sdev[1] * pca$rotation[, 1]
@@ -36,9 +36,9 @@ test_that("applicability_domain chooses the components by explained variance", {
   x <- domain_data()
   explained <- cumsum(stats::prcomp(x)$sdev^2) / sum(stats::prcomp(x)$sdev^2)
   domain <- applicability_domain(x, variance = 0.95)
-  expect_equal(domain$k, which(explained >= 0.95)[1])
-  expect_equal(domain$explained, explained[domain$k])
-  expect_error(applicability_domain(x, k = 30), "smaller than")
+  expect_equal(domain$ncomp, which(explained >= 0.95)[1])
+  expect_equal(domain$explained, explained[domain$ncomp])
+  expect_error(applicability_domain(x, ncomp = 30), "smaller than")
   expect_error(applicability_domain(x[, 1, drop = FALSE]), "2 principal components")
   x[1, 1] <- NA
   expect_error(applicability_domain(x), "missing")

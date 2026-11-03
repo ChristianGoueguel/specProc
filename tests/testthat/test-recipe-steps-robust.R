@@ -103,7 +103,7 @@ test_that("step_robpca adds robust scores and removes the originals", {
   out <- recipes::bake(prepped, new_data = test)
   expect_named(out, c("id", "RPC1", "RPC2", "RPC3"))
   set.seed(2)
-  fit <- robpca(x_train, k = 3)
+  fit <- robpca(x_train, ncomp = 3)
   expect_equal(as.matrix(out[2:4]), as.matrix(predict(fit, x_test)[1:3]), ignore_attr = TRUE)
 })
 
@@ -112,7 +112,7 @@ test_that("step_robpca can keep the originals and add distances", {
   out <- recipes::bake(prepped, new_data = test)
   expect_true(all(c(colnames(x), "RPC1", "RPC2", "RPC_SD", "RPC_OD") %in% names(out)))
   set.seed(2)
-  pred <- predict(robpca(x_train, k = 2), x_test)
+  pred <- predict(robpca(x_train, ncomp = 2), x_test)
   expect_equal(out$RPC_SD, pred$sd)
   expect_equal(out$RPC_OD, pred$od)
 })

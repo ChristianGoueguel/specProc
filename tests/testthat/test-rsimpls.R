@@ -58,7 +58,7 @@ test_that("rsimpls is close to SIMPLS on clean data", {
   fit <- rsimpls(d$train$x, d$train$y, ncomp = 3)
   ref <- pls::plsr(d$train$y ~ d$train$x, ncomp = 3, method = "simpls")
   expect_gt(cor(drop(fit$coefficients), drop(coef(ref, ncomp = 3))), 0.95)
-  expect_equal(fit$components$ncomp, seq_len(fit$kmax))
+  expect_equal(fit$components$ncomp, seq_len(fit$ncomp_max))
   expect_gt(fit$components$R2[3], 0.95)
 })
 
@@ -85,12 +85,12 @@ test_that("predict() reproduces the fitted values, scores and score distances", 
   expect_equal(scores$sd, fit$sd)
   expect_equal(scores$od, fit$od)
   # the models with other numbers of components, from the same fit
-  expect_length(fit$models, fit$kmax)
+  expect_length(fit$models, fit$ncomp_max)
   expect_equal(predict(fit, d$train$x, ncomp = 3), predict(fit, d$train$x))
   set.seed(10)
   fit2 <- rsimpls(d$train$x, d$train$y, ncomp = 2)
   expect_equal(predict(fit, d$test$x, ncomp = 2), predict(fit2, d$test$x))
-  expect_error(predict(fit, d$test$x, ncomp = fit$kmax + 1), "cannot exceed")
+  expect_error(predict(fit, d$test$x, ncomp = fit$ncomp_max + 1), "cannot exceed")
   expect_error(predict(fit, d$test$x, type = "scores", ncomp = 2), "only used")
   expect_error(predict(fit, d$train$x[, 1:10]), "200 columns")
 })
@@ -136,9 +136,9 @@ test_that("rsimpls checks its arguments", {
   expect_error(rsimpls(d$train$x, d$train$y), "'ncomp'")
   expect_error(rsimpls(d$train$x, d$train$y[-1], ncomp = 2), "same number of rows")
   expect_error(rsimpls(d$train$x, rep(1, 40), ncomp = 2), "no variation")
-  # kmax is raised to ncomp, and limited by the variables
+  # ncomp_max is raised to ncomp, and limited by the variables
   set.seed(14)
-  expect_equal(rsimpls(d$train$x, d$train$y, ncomp = 12)$kmax, 12L)
+  expect_equal(rsimpls(d$train$x, d$train$y, ncomp = 12)$ncomp_max, 12L)
   expect_error(rsimpls(d$train$x[, 1:5], d$train$y, ncomp = 5), "cannot exceed 4")
 })
 
@@ -167,6 +167,6 @@ test_that("plot_outlier_map() draws the score outlier map of an rsimpls fit", {
                as.character(outlier_type(fit$sd, fit$od, fit$cutoff_sd, fit$cutoff_od)))
   # map is not used for robust PCA fits
   set.seed(17)
-  pca <- robpca(d$train$x, k = 3)
+  pca <- robpca(d$train$x, ncomp = 3)
   expect_equal(plot_outlier_map(pca, map = "score")$labels$y, "Orthogonal distance")
 })

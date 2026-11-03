@@ -121,7 +121,7 @@ data(forageLIBS)
 wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 set.seed(1)
-fit <- macropca(center(spectra), k = 3)
+fit <- macropca(center(spectra), ncomp = 3)
 
 if (requireNamespace("patchwork", quietly = TRUE)) {
   plot_cell_map(fit, order = "cluster")

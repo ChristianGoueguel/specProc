@@ -83,14 +83,14 @@ test_that("plot_loadings works with prcomp and robust fits", {
   expect_true(any(labels$fontface == "bold"))
 
   set.seed(3)
-  fit <- robpca(x, k = 2)
+  fit <- robpca(x, ncomp = 2)
   p <- plot_loadings(fit, spectra = x[1, ])
   expect_s3_class(p, "ggplot")
   expect_equal(nlevels(p$data$panel), 2)
   # all the components of a robust fit: no percentage
   expect_equal(levels(plot_loadings(fit, type = "contribution")$data$panel), "PC1-2")
-  expect_s3_class(plot_loadings(rospca(x, k = 2), top = 3), "ggplot")
-  expect_s3_class(plot_loadings(macropca(x, k = 2), top = 3), "ggplot")
+  expect_s3_class(plot_loadings(rospca(x, ncomp = 2), top = 3), "ggplot")
+  expect_s3_class(plot_loadings(macropca(x, ncomp = 2), top = 3), "ggplot")
 })
 
 test_that("plot_loadings can be interactive", {

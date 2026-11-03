@@ -189,7 +189,7 @@ pipelines <- list(
   "C I + SR + PLS" = list(ca_recipe(carbon) |> step_select_wavelengths(all_predictors(), method = "sr", num_terms = tune()), pls_model, expand_grid(components, num_terms = c(100L, 300L, 1000L, 3000L))),
   "C I + wavelet + PLS" = list(ca_recipe(compressed), pls_model, components),
   "C I + wavelet + PCR" = list(ca_recipe(compressed) |> step_center(all_predictors()) |> step_pca(all_predictors(), num_comp = tune()), pcr_model, components),
-  "C I + wavelet + robust PCR" = list(ca_recipe(compressed) |> step_robpca(all_predictors(), num_comp = tune(), options = list(kmax = 20)), pcr_model, components),
+  "C I + wavelet + robust PCR" = list(ca_recipe(compressed) |> step_robpca(all_predictors(), num_comp = tune(), options = list(ncomp_max = 20)), pcr_model, components),
   "C I + wavelet + OPLS + enet" = list(ca_recipe(compressed) |> step_opls(all_predictors(), num_comp = tune()), enet_model, expand_grid(num_comp = 1:4, penalty = 10^seq(-4, -1, by = 0.5), mixture = c(0.1, 0.5, 1))),
   "C I + wavelet + SVR" = list(ca_recipe(compressed), svr_model,expand_grid(cost = 2^seq(0, 8, by = 2), rbf_sigma = 10^seq(-4.5, -2.5, by = 0.5)))
   )

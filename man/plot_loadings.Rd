@@ -123,8 +123,8 @@ lines.
 
 \strong{Explained variance.} For a \code{\link[stats:prcomp]{stats::prcomp()}} fit, the percentages in
 the panel titles are shares of the total variance. For \code{\link[=robpca]{robpca()}},
-\code{\link[=rospca]{rospca()}} and \code{\link[=macropca]{macropca()}} fits, which estimate only the \code{k} components,
-they are shares of the variance of these \code{k} components.
+\code{\link[=rospca]{rospca()}} and \code{\link[=macropca]{macropca()}} fits, which estimate only their \code{ncomp}
+components, they are shares of the variance of these components.
 }
 \examples{
 spectra_id <- forageLIBS |> dplyr::select(1:2) |> names()

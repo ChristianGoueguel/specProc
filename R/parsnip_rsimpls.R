@@ -21,17 +21,17 @@
 #' - `predictor_prop`, the proportion of predictors of sparse PLS, is not
 #'   used by this engine.
 #'
-#' The models with 1 to `kmax` components all come from the same ROBPCA fit
+#' The models with 1 to `ncomp_max` components all come from the same ROBPCA fit
 #' (see [rsimpls()]), so [parsnip::multi_predict()] gives the predictions of
 #' all of them from one fit, and [tune::tune_grid()] fits a single model per
 #' resample for a grid of `num_comp`. The predictions of a model with fewer
-#' components are those of a separate fit with the same `kmax`, as long as
-#' `kmax` is at least the largest `num_comp`.
+#' components are those of a separate fit with the same `ncomp_max`, as long as
+#' `ncomp_max` is at least the largest `num_comp`.
 #'
 #' # Engine arguments
 #'
 #' The other arguments of [rsimpls()] are set with [parsnip::set_engine()]:
-#' `kmax`, the largest number of components (default 10), `alpha`, the
+#' `ncomp_max`, the largest number of components (default 10), `alpha`, the
 #' fraction of observations assumed to be regular (default 0.75), and
 #' `ndir` and `nsamp` of the ROBPCA step.
 #'

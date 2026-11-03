@@ -38,7 +38,7 @@ example, the spectral channels). See \code{\link[recipes:selections]{recipes::se
 \code{NULL} (default), the outcomes of the recipe are used.}
 
 \item{options}{A list of further arguments passed to \code{\link[=rsimpls]{rsimpls()}}, such as
-\code{kmax}, \code{alpha} or \code{ndir}.}
+\code{ncomp_max}, \code{alpha} or \code{ndir}.}
 
 \item{prefix}{The prefix of the new column names. Default is \code{"RPLS"}.}
 

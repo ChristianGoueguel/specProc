@@ -40,9 +40,9 @@ test_that("the rsimpls engine of parsnip::pls() fits and predicts like rsimpls()
 
 test_that("engine arguments are passed to rsimpls()", {
   set.seed(3)
-  fit <- parsnip::fit(rsimpls_spec(2, kmax = 4, alpha = 0.9), y1 ~ . - y2, data = train)
+  fit <- parsnip::fit(rsimpls_spec(2, ncomp_max = 4, alpha = 0.9), y1 ~ . - y2, data = train)
   engine_fit <- parsnip::extract_fit_engine(fit)
-  expect_equal(engine_fit$kmax, 4L)
+  expect_equal(engine_fit$ncomp_max, 4L)
   expect_equal(engine_fit$alpha, 0.9)
 })
 

@@ -49,8 +49,8 @@
 #'
 #' **Explained variance.** For a [stats::prcomp()] fit, the percentages in
 #' the panel titles are shares of the total variance. For [robpca()],
-#' [rospca()] and [macropca()] fits, which estimate only the `k` components,
-#' they are shares of the variance of these `k` components.
+#' [rospca()] and [macropca()] fits, which estimate only their `ncomp`
+#' components, they are shares of the variance of these components.
 #'
 #' @param model A [stats::prcomp()] fit or an object returned by [robpca()],
 #'   [rospca()] or [macropca()]. The variable names must be the

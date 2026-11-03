@@ -6,32 +6,34 @@
 \usage{
 cellpca(
   x,
-  k = NULL,
+  ncomp = NULL,
   alpha = 0.5,
-  kmax = 10,
+  ncomp_max = 10,
   var_explained = 0.8,
   scale = FALSE,
   ndir = 250,
   maxiter = 1000,
   tol = 1e-06,
   max_col_frac = 0.5,
-  od_cutoff = c("simulated", "chisq")
+  od_cutoff = c("simulated", "chisq"),
+  k = deprecated(),
+  kmax = deprecated()
 )
 }
 \arguments{
 \item{x}{A numeric matrix or data frame, with one observation per row.
 Missing values are allowed.}
 
-\item{k}{The number of principal components. If \code{NULL} (default), it is
-chosen from \code{var_explained} and \code{kmax}.}
+\item{ncomp}{The number of principal components. If \code{NULL} (default), it
+is chosen from \code{var_explained} and \code{ncomp_max}.}
 
 \item{alpha}{The robustness parameter, between 0.5 and 1: the fraction of
 observations used in the fit. Default is 0.5.}
 
-\item{kmax}{The maximum number of components. Default is 10.}
+\item{ncomp_max}{The maximum number of components. Default is 10.}
 
-\item{var_explained}{The fraction of variance used to choose \code{k} when it
-is not given. Default is 0.8.}
+\item{var_explained}{The fraction of variance used to choose \code{ncomp} when
+it is not given. Default is 0.8.}
 
 \item{scale}{A logical: scale the variables by their robust scale (\code{FALSE},
 default: they are only centered, so that intense emission lines are
@@ -48,6 +50,10 @@ get a zero weight. Default is 0.5.}
 
 \item{od_cutoff}{How to compute the cut-off of \code{od}: \code{"simulated"}
 (default) or \code{"chisq"}. See Details.}
+
+\item{k}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp}.}
+
+\item{kmax}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp_max}.}
 }
 \value{
 An object of class \code{specproc_cellpca} (inheriting from
@@ -82,7 +88,7 @@ those of \code{\link[=robpca]{robpca()}}, so that \link[=predict.specproc_robpca
 }
 \details{
 cellPCA approximates the data by a fit \eqn{\hat{X} = 1_n \mu^T + U V^T}
-of rank \code{k} that minimizes
+of rank \eqn{k} (\code{ncomp}) that minimizes
 \deqn{\hat\sigma_2^2 \frac{1}{n} \sum_{i=1}^n m_i \rho_2\left(\frac{t_i}{\hat\sigma_2}\right),
 \quad t_i = \sqrt{\frac{1}{m_i} \sum_{j=1}^p m_{ij} \hat\sigma_{1,j}^2
 \rho_1\left(\frac{x_{ij} - \hat{x}_{ij}}{\hat\sigma_{1,j}}\right)}}
@@ -101,8 +107,8 @@ weights \eqn{\psi(z)/z} are 1 in the central region and 0 beyond
 
 The algorithm follows the reference code of the authors:
 \enumerate{
-\item \strong{Initial fit.} A \code{\link[=macropca]{macropca()}} fit (with \code{alpha}, \code{kmax},
-\code{var_explained}, \code{scale} and \code{ndir}), which also chooses \code{k} when it
+\item \strong{Initial fit.} A \code{\link[=macropca]{macropca()}} fit (with \code{alpha}, \code{ncomp_max},
+\code{var_explained}, \code{scale} and \code{ndir}), which also chooses \code{ncomp} when it
 is \code{NULL}, with its scores computed from the data whose flagged and
 missing cells are imputed by the fit.
 \item \strong{Scales.} \eqn{\hat\sigma_{1,j}} is the M-scale of the residuals of
@@ -120,7 +126,7 @@ a variable get a zero weight, the previous iteration is kept.
 \item \strong{Principal directions.} The center and the eigenvectors within the
 subspace are estimated by the deterministic MCD of the scores of the
 observations with a non-zero casewise weight (the exact MCD when
-\code{k = 1}), and the sign of each loading vector is set so that its
+\code{ncomp = 1}), and the sign of each loading vector is set so that its
 largest element is positive.
 }
 
@@ -144,7 +150,7 @@ data(forageLIBS)
 wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 spectra <- forageLIBS[which(wl > 760 & wl < 780)]
 set.seed(1)
-fit <- cellpca(spectra, k = 2, od_cutoff = "chisq")
+fit <- cellpca(spectra, ncomp = 2, od_cutoff = "chisq")
 fit
 plot_outlier_map(fit, shade = TRUE, relative = TRUE, log = TRUE, color_by = "distance")
 plot_cell_map(fit, order = "od")

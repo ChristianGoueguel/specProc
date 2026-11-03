@@ -6,18 +6,19 @@
 \usage{
 contributions(
   model,
-  k = NULL,
+  ncomp = NULL,
   statistic = c("q", "t2"),
   data = NULL,
   samples = NULL,
-  reference = NULL
+  reference = NULL,
+  k = deprecated()
 )
 }
 \arguments{
 \item{model}{A \code{\link[stats:prcomp]{stats::prcomp()}} fit, or an object returned by \code{\link[=robpca]{robpca()}},
 \code{\link[=rospca]{rospca()}} or \code{\link[=macropca]{macropca()}}.}
 
-\item{k}{The number of components. Required for a \code{\link[stats:prcomp]{stats::prcomp()}} fit;
+\item{ncomp}{The number of components. Required for a \code{\link[stats:prcomp]{stats::prcomp()}} fit;
 for a robust fit, at most its number of components (the default).}
 
 \item{statistic}{\code{"q"} (default) for the Q contributions, or \code{"t2"} for
@@ -38,6 +39,8 @@ Default is all.}
 \item{reference}{Optional indices or names of rows of \code{data} whose mean
 contribution is subtracted (relative contributions), or \code{"regular"}
 for all the regular samples.}
+
+\item{k}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp}.}
 }
 \value{
 A tibble of class \code{specproc_contributions} with one row per
@@ -55,7 +58,7 @@ differs between a sample and the reference ones.
 }
 \details{
 For a sample \eqn{x} (centered and scaled as in the model), with scores
-\eqn{t = xP} on the first \eqn{k} components (loadings \eqn{P},
+\eqn{t = xP} on the first \eqn{k} components (\code{ncomp}; loadings \eqn{P},
 variances of the scores \eqn{\lambda}):
 \itemize{
 \item the \strong{Q contributions} are the residuals \eqn{e = x - tP^T}, whose
@@ -92,7 +95,7 @@ spectra_id <- names(forageLIBS)[1:2]
 minerals <- names(forageLIBS)[3:14]
 spectra <- forageLIBS |> dplyr::select(-dplyr::all_of(c(spectra_id, minerals)))
 set.seed(1)
-fit <- robpca(spectra, k = 3)
+fit <- robpca(spectra, ncomp = 3)
 
 # Q contributions of two outlying samples, relative to the regular ones
 q <- contributions(fit, data = spectra, samples = c(49, 127), reference = "regular")

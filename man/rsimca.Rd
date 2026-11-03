@@ -8,7 +8,7 @@ rsimca(
   x,
   group,
   ncomp = NULL,
-  kmax = 10,
+  ncomp_max = 10,
   alpha = 0.75,
   gamma = 0.5,
   squared = TRUE,
@@ -30,7 +30,7 @@ single number for all the classes, one per class (in the order of the
 levels of \code{group}, or named by them), or \code{NULL} (default) to let
 \code{\link[=robpca]{robpca()}} choose them from \code{var_explained}.}
 
-\item{kmax}{The largest number of components of the robust PCA. Default
+\item{ncomp_max}{The largest number of components of the robust PCA. Default
 is 10.}
 
 \item{alpha}{The robustness parameter of \code{\link[=robpca]{robpca()}}: the fraction of

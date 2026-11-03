@@ -3,7 +3,7 @@ test_that("robust_rmsecv leaves the outliers out of the cross-validated error", 
   y <- d$train$y
   y[1:4] <- y[1:4] + 20  # wrong reference values
   set.seed(22)
-  res <- robust_rmsecv(d$train$x, y, kmax = 4, folds = 4)
+  res <- robust_rmsecv(d$train$x, y, ncomp_max = 4, folds = 4)
   expect_named(res, c("ncomp", "R2", "RMSE", "RMSECV", "RCS"))
   expect_equal(res$ncomp, 1:4)
   expect_equal(res$RCS, sqrt(0.5 * res$RMSECV^2 + 0.5 * res$RMSE^2))
@@ -14,7 +14,7 @@ test_that("robust_rmsecv leaves the outliers out of the cross-validated error", 
   expect_lt(res$RMSECV[3], res$RMSECV[1])
   # the fit to all the data is that of rsimpls()
   set.seed(22)
-  fit <- rsimpls(d$train$x, y, ncomp = 2, kmax = 4)
+  fit <- rsimpls(d$train$x, y, ncomp = 2, ncomp_max = 4)
   expect_equal(res$R2, fit$components$R2)
   expect_equal(res$RMSE, fit$components$RMSE)
 })
@@ -22,7 +22,7 @@ test_that("robust_rmsecv leaves the outliers out of the cross-validated error", 
 test_that("robust_rmsecv handles rpcr, gamma and its arguments", {
   d <- make_regression(n = 50, p = 20, seed = 23)
   set.seed(24)
-  res <- robust_rmsecv(d$train$x, d$train$y, method = "rpcr", kmax = 3, folds = 3, gamma = 1)
+  res <- robust_rmsecv(d$train$x, d$train$y, method = "rpcr", ncomp_max = 3, folds = 3, gamma = 1)
   expect_equal(res$RCS, res$RMSECV)
   expect_identical(attr(res, "method"), "rpcr")
   expect_true(all(is.finite(res$RMSECV)))

@@ -5,16 +5,17 @@
 #' @description
 #' Computes, for each sample, the two distances used to monitor a principal
 #' component analysis (PCA) model: Hotelling's \eqn{T^2}, the distance
-#' within the model plane of the first `k` components, and the Q residual
+#' within the model plane of the first `ncomp` components, and the Q residual
 #' (squared prediction error, SPE), the squared distance to that plane, with
 #' their limits at one or more confidence levels.
 #'
 #' @details
-#' With scores \eqn{t_{ia}} and eigenvalues \eqn{\lambda_a},
+#' With scores \eqn{t_{ia}} and eigenvalues \eqn{\lambda_a}, and \eqn{k} = `ncomp`
+#' components,
 #' \deqn{T^2_i = \sum_{a=1}^{k} \frac{t_{ia}^2}{\lambda_a}, \qquad
 #'   Q_i = \lVert x_i - \hat{x}_i \rVert^2}
 #' where \eqn{\hat{x}_i} is the reconstruction of the (centered and scaled)
-#' sample from the `k` components. A high \eqn{T^2} is an extreme but
+#' sample from the \eqn{k} components. A high \eqn{T^2} is an extreme but
 #' well-modeled sample (for example, a high concentration); a high Q is a
 #' sample the model does not describe (another matrix, a contamination, an
 #' instrumental problem).
@@ -40,7 +41,7 @@
 #' @param model A [stats::prcomp()] fit that kept all its components (the
 #'   default of `prcomp()`), or a numeric matrix or data frame, on which a
 #'   PCA is fitted with `center` and `scale`.
-#' @param k The number of components of the model.
+#' @param ncomp The number of components of the model.
 #' @param newdata Optional new samples (a matrix or data frame with the
 #'   variables of the model), whose distances are computed instead of those
 #'   of the calibration samples.
@@ -52,6 +53,7 @@
 #'   of the model: `"f"` (default) or `"beta"` (see [hotelling_t2()]).
 #' @param center,scale Passed to [stats::prcomp()] when `model` is data.
 #'   Default is `TRUE` and `FALSE`.
+#' @param k `r lifecycle::badge("deprecated")` Use `ncomp`.
 #'
 #' @return A tibble of class `specproc_influence`, with one row per sample:
 #'   `sample` (row number), `t2`, its limits at each confidence level (in %,
@@ -80,18 +82,19 @@
 #'   wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 #'   spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 #'   pca <- stats::prcomp(spectra)
-#'   influence <- q_residuals(pca, k = 3)
+#'   influence <- q_residuals(pca, ncomp = 3)
 #'   influence[influence$outlier != "regular", ]
 #'   plot_influence(influence, label = forageLIBS$Measurement)
 #'   # several limits
-#'   plot_influence(q_residuals(pca, k = 3, conf_level = c(0.95, 0.99)))
+#'   plot_influence(q_residuals(pca, ncomp = 3, conf_level = c(0.95, 0.99)))
 #' }
-q_residuals <- function(model, k, newdata = NULL, conf_level = 0.975, method = "jackson",
-                        t2_method = "f", center = TRUE, scale = FALSE) {
+q_residuals <- function(model, ncomp, newdata = NULL, conf_level = 0.975, method = "jackson",
+                        t2_method = "f", center = TRUE, scale = FALSE, k = deprecated()) {
+  ncomp <- renamed_arg(k, ncomp, "q_residuals", "k", "ncomp")
   method <- match.arg(method, c("jackson", "box"))
-  parts <- pca_parts(model, k, newdata, conf_level, t2_method, center, scale)
+  parts <- pca_parts(model, ncomp, newdata, conf_level, t2_method, center, scale)
   q <- parts$sq_residuals
-  rest <- parts$lambda[-seq_len(parts$k)]
+  rest <- parts$lambda[-seq_len(parts$ncomp)]
   q_limits <- stats::setNames(vapply(parts$conf_level, function(l) q_limit(rest, l, method),
                                      numeric(1)), parts$labels)
   influence_table(parts, "q", q, q_limits)
@@ -109,8 +112,8 @@ q_residuals <- function(model, k, newdata = NULL, conf_level = 0.975, method = "
 #' and Hotelling's \eqn{T^2} for the influence plot.
 #'
 #' @details
-#' With the residuals \eqn{e_{ij}} of the \eqn{K} variables after `k`
-#' components, for \eqn{N} calibration samples (and \eqn{A_0 = 1} if the
+#' With the residuals \eqn{e_{ij}} of the \eqn{K} variables after \eqn{k}
+#' components (`ncomp`), for \eqn{N} calibration samples (and \eqn{A_0 = 1} if the
 #' data are centered),
 #' \deqn{s_i = \sqrt{\frac{\sum_j e_{ij}^2}{K - k}}\,\sqrt{\frac{N}{N - k -
 #'   A_0}}, \qquad s_0 = \sqrt{\frac{\sum_i \sum_j e_{ij}^2}{(N - k -
@@ -163,16 +166,17 @@ q_residuals <- function(model, k, newdata = NULL, conf_level = 0.975, method = "
 #'   wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 #'   spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 #'   pca <- stats::prcomp(spectra)
-#'   d <- dmodx(pca, k = 3)
+#'   d <- dmodx(pca, ncomp = 3)
 #'   d[d$outlier != "regular", ]
 #'   plot_influence(d, label = forageLIBS$Measurement)
 #' }
-dmodx <- function(model, k, newdata = NULL, conf_level = 0.975, normalized = TRUE,
-                  df = "effective", t2_method = "f", center = TRUE, scale = FALSE) {
+dmodx <- function(model, ncomp, newdata = NULL, conf_level = 0.975, normalized = TRUE,
+                  df = "effective", t2_method = "f", center = TRUE, scale = FALSE, k = deprecated()) {
+  ncomp <- renamed_arg(k, ncomp, "dmodx", "k", "ncomp")
   check_flag(normalized, "normalized")
   df <- match.arg(df, c("effective", "nominal"))
-  parts <- pca_parts(model, k, newdata, conf_level, t2_method, center, scale)
-  a <- parts$k
+  parts <- pca_parts(model, ncomp, newdata, conf_level, t2_method, center, scale)
+  a <- parts$ncomp
   n <- parts$n
   n_var <- parts$n_var
   a0 <- if (parts$centered) 1 else 0
@@ -258,14 +262,14 @@ dmodx <- function(model, k, newdata = NULL, conf_level = 0.975, normalized = TRU
 #' @examplesIf rlang::is_installed("HotellingEllipse", version = "1.3.0")
 #' data(forageLIBS)
 #' pca <- stats::prcomp(forageLIBS[-(1:14)])
-#' influence <- q_residuals(pca, k = 3, conf_level = c(0.95, 0.99))
+#' influence <- q_residuals(pca, ncomp = 3, conf_level = c(0.95, 0.99))
 #' plot_influence(influence, label = forageLIBS$Measurement)
 #' # the same options as plot_outlier_map(): distances relative to the limits,
 #' # shaded outlying regions, logarithmic axes and colors by distance
 #' plot_influence(influence, relative = TRUE, shade = TRUE, log = TRUE, color_by = "distance")
 #'
 #' # a single limit at 97.5%, with the outlying regions shaded
-#' influence_975 <- q_residuals(pca, k = 3, conf_level = 0.975)
+#' influence_975 <- q_residuals(pca, ncomp = 3, conf_level = 0.975)
 #' plot_influence(influence_975, label = forageLIBS$Measurement, shade = TRUE)
 #'
 plot_influence <- function(x, label = NULL, labels = 3, relative = FALSE, shade = FALSE,
@@ -297,7 +301,7 @@ plot_influence <- function(x, label = NULL, labels = 3, relative = FALSE, shade 
     y = vapply(levels, function(l) x[[paste0(distance, "_limit_", l)]][1], numeric(1))
   )
   if (is.null(title)) {
-    title <- sprintf("Influence plot (%d components)%s", attr(x, "k"), if (new) ", new samples" else "")
+    title <- sprintf("Influence plot (%d components)%s", attr(x, "ncomp"), if (new) ", new samples" else "")
   }
   y_lab <- if (distance == "q") "Q residual (SPE)" else if (isTRUE(attr(x, "normalized"))) {
     "DModX (normalized)"
@@ -323,7 +327,7 @@ plot_influence <- function(x, label = NULL, labels = 3, relative = FALSE, shade 
 # The model keeps all its components, so the squared residual of a
 # calibration sample is the sum of its squared scores on the components left
 # out: the data need not be reconstructed.
-pca_parts <- function(model, k, newdata, conf_level, t2_method, center, scale) {
+pca_parts <- function(model, ncomp, newdata, conf_level, t2_method, center, scale) {
   conf_level <- check_conf_level(conf_level)
   t2_method <- match.arg(t2_method, c("f", "beta"))
   if (!inherits(model, "prcomp")) {
@@ -333,19 +337,19 @@ pca_parts <- function(model, k, newdata, conf_level, t2_method, center, scale) {
   if (length(model$sdev) > rank) {
     stop("'model' must keep all its components (do not set `rank.` in prcomp()).", call. = FALSE)
   }
-  check_count(k, "k")
-  if (k >= rank) {
-    stop("'k' must be smaller than the number of components (", rank, ").", call. = FALSE)
+  check_count(ncomp, "ncomp")
+  if (ncomp >= rank) {
+    stop("'ncomp' must be smaller than the number of components (", rank, ").", call. = FALSE)
   }
   n <- nrow(model$x)
   lambda <- model$sdev^2
-  p <- model$rotation[, seq_len(k), drop = FALSE]
-  calibration_sq <- rowSums(model$x[, -seq_len(k), drop = FALSE]^2)
+  p <- model$rotation[, seq_len(ncomp), drop = FALSE]
+  calibration_sq <- rowSums(model$x[, -seq_len(ncomp), drop = FALSE]^2)
   labels <- conf_label(conf_level)
   if (is.null(newdata)) {
     sq_residuals <- calibration_sq
-    t2 <- hotelling_t2(as.data.frame(model$x[, seq_len(k), drop = FALSE]),
-                       columns = colnames(model$x)[seq_len(k)], conf_level = conf_level,
+    t2 <- hotelling_t2(as.data.frame(model$x[, seq_len(ncomp), drop = FALSE]),
+                       columns = colnames(model$x)[seq_len(ncomp)], conf_level = conf_level,
                        method = t2_method)
     t2_values <- t2$t2
     t2_limits <- vapply(labels, function(l) t2[[paste0("limit_", l)]][1], numeric(1))
@@ -362,11 +366,11 @@ pca_parts <- function(model, k, newdata, conf_level, t2_method, center, scale) {
     x <- scale(x, center = if (isFALSE(model$center)) FALSE else model$center,
                scale = if (isFALSE(model$scale)) FALSE else model$scale)
     scores <- x %*% p
-    t2_values <- unname(rowSums(sweep(scores^2, 2, lambda[seq_len(k)], "/")))
-    t2_limits <- vapply(conf_level, function(l) t2_limit(l, k, n, "new"), numeric(1))
+    t2_values <- unname(rowSums(sweep(scores^2, 2, lambda[seq_len(ncomp)], "/")))
+    t2_limits <- vapply(conf_level, function(l) t2_limit(l, ncomp, n, "new"), numeric(1))
     sq_residuals <- rowSums((x - scores %*% t(p))^2)
   }
-  list(k = k, n = n, n_var = nrow(model$rotation), lambda = lambda,
+  list(ncomp = ncomp, n = n, n_var = nrow(model$rotation), lambda = lambda,
        sq_residuals = unname(sq_residuals), calibration_ss = sum(calibration_sq), t2 = t2_values,
        t2_limits = stats::setNames(unname(t2_limits), labels), conf_level = conf_level,
        labels = labels, new = !is.null(newdata), centered = !isFALSE(model$center))
@@ -384,7 +388,7 @@ influence_table <- function(parts, distance, value, limits) {
   out$outlier <- factor(ifelse(high_t2 & high_d, "both", ifelse(high_t2, "extreme",
                                                                  ifelse(high_d, "residual", "regular"))),
                         levels = c("regular", "extreme", "residual", "both"))
-  attr(out, "k") <- parts$k
+  attr(out, "ncomp") <- parts$ncomp
   attr(out, "new") <- parts$new
   attr(out, "conf_level") <- parts$conf_level
   attr(out, "conf_labels") <- parts$labels

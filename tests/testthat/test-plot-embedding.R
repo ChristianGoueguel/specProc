@@ -193,7 +193,7 @@ test_that("plot_embedding gives the explained variance in the axis titles", {
   expect_equal(plot_embedding(pca, x = "PC3", y = "PC2")$labels$x, sprintf("PC3 (%.1f%%)", share[3]))
   # robust fits: share of the variance of their components
   set.seed(14)
-  fit <- robpca(as.matrix(iris[1:4]), k = 2)
+  fit <- robpca(as.matrix(iris[1:4]), ncomp = 2)
   rp <- plot_embedding(fit)
   expect_equal(rp$labels$y, sprintf("PC2 (%.1f%%)", 100 * fit$eigenvalues[2] / sum(fit$eigenvalues)))
   # other embeddings keep the column names
@@ -225,15 +225,15 @@ test_that("plot_embedding draws the T-squared ellipses of a PCA model", {
   limit <- t2_limit(0.95, 2, 60, "f")
   expect_equal(path$x^2 / lambda[1] + path$y^2 / lambda[2], rep(limit, nrow(path)))
   expect_equal(range(path$x), c(-1, 1) * sqrt(lambda[1] * limit))
-  # the flags: T-squared of the model on k components
+  # the flags: T-squared of the model on ncomp components
   t2 <- rowSums(sweep(pca$x[, 1:3]^2, 2, pca$sdev[1:3]^2, "/"))
-  p3 <- plot_embedding(pca, hotelling = "all", k = 3)
+  p3 <- plot_embedding(pca, hotelling = "all", ncomp = 3)
   expect_match(p3$labels$subtitle, paste0(sum(t2 > t2_limit(0.975, 3, 60, "f")), " sample"))
 
   # robust fit: its eigenvalues and chi-square limit, the leverage points of the outlier map
   set.seed(17)
-  fit <- robpca(x, k = 3)
-  r <- plot_embedding(fit, hotelling = "all", k = 3, flag = TRUE, label = TRUE)
+  fit <- robpca(x, ncomp = 3)
+  r <- plot_embedding(fit, hotelling = "all", ncomp = 3, flag = TRUE, label = TRUE)
   rp <- Filter(function(l) inherits(l$geom, "GeomPath"), r$layers)[[1]]$data
   expect_equal(rp$x^2 / fit$eigenvalues[1] + rp$y^2 / fit$eigenvalues[2],
                rep(stats::qchisq(0.975, 2), nrow(rp)))

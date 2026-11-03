@@ -85,7 +85,7 @@ All three can be tuned with \code{\link[tune:tune]{tune::tune()}}, using \code{\
 
 \section{Engine arguments}{
 The other arguments of \code{\link[=rsimca]{rsimca()}} are set with \code{\link[parsnip:set_engine]{parsnip::set_engine()}}:
-\code{kmax}, \code{alpha}, \code{var_explained}, \code{prior}, \code{ndir} and \code{nsamp}.
+\code{ncomp_max}, \code{alpha}, \code{var_explained}, \code{prior}, \code{ndir} and \code{nsamp}.
 }
 
 \section{Predictions}{

@@ -383,7 +383,7 @@ step_cellpca <- function(recipe, ..., role = "predictor", trained = FALSE, num_c
 #' @param outcome The outcome variable(s), as bare names or a selector. If
 #'   `NULL` (default), the outcomes of the recipe are used.
 #' @param options A list of further arguments passed to [rsimpls()], such as
-#'   `kmax`, `alpha` or `ndir`.
+#'   `ncomp_max`, `alpha` or `ndir`.
 #' @param prefix The prefix of the new column names. Default is `"RPLS"`.
 #' @param res The fitted RSIMPLS model, stored once the step has been
 #'   trained.
@@ -489,10 +489,10 @@ prep_robust_step <- function(x, training, info = NULL, ...) {
                                                      standardize = x$standardize),
       step_robust_bcyj = robust_transformation(xmat, type = x$type, quantile = x$quantile,
                                                nbsteps = x$nbsteps, standardize = x$standardize),
-      step_robpca = strip_robust_pca(do.call(robpca, c(list(xmat, k = x$num_comp), opts))),
-      step_rospca = strip_robust_pca(do.call(rospca, c(list(xmat, k = x$num_comp, lambda = x$lambda), opts))),
-      step_macropca = strip_robust_pca(do.call(macropca, c(list(xmat, k = x$num_comp), opts))),
-      step_cellpca = strip_robust_pca(do.call(cellpca, c(list(xmat, k = x$num_comp), opts))),
+      step_robpca = strip_robust_pca(do.call(robpca, c(list(xmat, ncomp = x$num_comp), opts))),
+      step_rospca = strip_robust_pca(do.call(rospca, c(list(xmat, ncomp = x$num_comp, lambda = x$lambda), opts))),
+      step_macropca = strip_robust_pca(do.call(macropca, c(list(xmat, ncomp = x$num_comp), opts))),
+      step_cellpca = strip_robust_pca(do.call(cellpca, c(list(xmat, ncomp = x$num_comp), opts))),
       step_rsimpls = strip_rsimpls(do.call(rsimpls, c(list(xmat, y, ncomp = x$num_comp), opts)))
     )
   }
@@ -521,7 +521,7 @@ bake_robust_step <- function(object, new_data, ...) {
     k <- object$res$ncomp
   } else {
     pred <- stats::predict(object$res, xmat)
-    k <- object$res$k
+    k <- object$res$ncomp
   }
   comps <- as.matrix(pred[seq_len(k)])
   colnames(comps) <- score_names(object, k)

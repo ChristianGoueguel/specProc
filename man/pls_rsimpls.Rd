@@ -23,17 +23,17 @@ has no default and must be given (or tuned). It can be tuned with
 used by this engine.
 }
 
-The models with 1 to \code{kmax} components all come from the same ROBPCA fit
+The models with 1 to \code{ncomp_max} components all come from the same ROBPCA fit
 (see \code{\link[=rsimpls]{rsimpls()}}), so \code{\link[parsnip:multi_predict]{parsnip::multi_predict()}} gives the predictions of
 all of them from one fit, and \code{\link[tune:tune_grid]{tune::tune_grid()}} fits a single model per
 resample for a grid of \code{num_comp}. The predictions of a model with fewer
-components are those of a separate fit with the same \code{kmax}, as long as
-\code{kmax} is at least the largest \code{num_comp}.
+components are those of a separate fit with the same \code{ncomp_max}, as long as
+\code{ncomp_max} is at least the largest \code{num_comp}.
 }
 
 \section{Engine arguments}{
 The other arguments of \code{\link[=rsimpls]{rsimpls()}} are set with \code{\link[parsnip:set_engine]{parsnip::set_engine()}}:
-\code{kmax}, the largest number of components (default 10), \code{alpha}, the
+\code{ncomp_max}, the largest number of components (default 10), \code{alpha}, the
 fraction of observations assumed to be regular (default 0.75), and
 \code{ndir} and \code{nsamp} of the ROBPCA step.
 }

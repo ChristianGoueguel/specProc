@@ -98,7 +98,7 @@ test_that("plot_loadings and plot_contributions draw a wavelength window", {
   unnamed <- stats::prcomp(unname(d$x))
   expect_error(plot_loadings(unnamed, wavelength = c(395, 398)), "named by wavelength")
 
-  q <- contributions(pca, k = 2)
+  q <- contributions(pca, ncomp = 2)
   pc <- plot_contributions(q, samples = 1, wavelength = c(392, 395), ylab = "Q")
   expect_true(all(ggplot2::layer_data(pc, 1)$x >= 392))
   expect_equal(pc$labels$y, "Q")
@@ -112,7 +112,7 @@ test_that("plot_cell_map shows the columns of a wavelength window", {
   skip_on_cran()
   d <- make_spectra(n = 20, p = 60)
   set.seed(1)
-  fit <- macropca(d$x, k = 2)
+  fit <- macropca(d$x, ncomp = 2)
   skip_if_not_installed("patchwork")
   p <- plot_cell_map(fit, wavelength = c(392, 395), xlab = "nm", base_size = 9)
   map <- p[[3]]
@@ -125,7 +125,7 @@ test_that("plot_cell_map shows the columns of a wavelength window", {
 test_that("the distance maps take color_by and the point arguments", {
   d <- make_spectra(n = 30)
   set.seed(1)
-  fit <- robpca(d$x, k = 2)
+  fit <- robpca(d$x, ncomp = 2)
   p <- plot_outlier_map(fit, color_by = "distance", point_size = 3, point_alpha = 0.4,
                         xlab = "SD", ylab = "OD", base_size = 9)
   points <- ggplot2::layer_data(p, layer_index(p, "GeomPoint"))
@@ -156,7 +156,7 @@ test_that("the distance maps take color_by and the point arguments", {
 test_that("plot_influence takes color_by and the point arguments", {
   skip_if_not_installed("HotellingEllipse", minimum_version = "1.3.0")
   d <- make_spectra(n = 30)
-  res <- q_residuals(stats::prcomp(d$x), k = 2)
+  res <- q_residuals(stats::prcomp(d$x), ncomp = 2)
   p <- plot_influence(res, point_alpha = 0.5, ylab = "Q", base_size = 9)
   expect_equal(p$labels$y, "Q")
   expect_equal(p$theme$text$size, 9)

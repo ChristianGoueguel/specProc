@@ -4,7 +4,7 @@
 \alias{rsimpls}
 \title{Robust Partial Least Squares Regression (RSIMPLS)}
 \usage{
-rsimpls(x, y, ncomp, kmax = 10, alpha = 0.75, ndir = 250, nsamp = 500)
+rsimpls(x, y, ncomp, ncomp_max = 10, alpha = 0.75, ndir = 250, nsamp = 500)
 }
 \arguments{
 \item{x}{A numeric matrix or data frame of the predictors (spectra), one
@@ -15,9 +15,9 @@ one row per observation.}
 
 \item{ncomp}{The number of components of the model.}
 
-\item{kmax}{The largest number of components considered. ROBPCA is
-applied with \code{kmax} plus the number of responses components, so the
-model also depends on \code{kmax} (see Details). Default
+\item{ncomp_max}{The largest number of components considered. ROBPCA is
+applied with \code{ncomp_max} plus the number of responses components, so the
+model also depends on \code{ncomp_max} (see Details). Default
 is 10, as in the paper; it is raised to \code{ncomp} if needed, and lowered
 when there are too few observations or variables (at most one less than
 the number of variables).}
@@ -54,11 +54,11 @@ cut-offs.
 distance below the cut-off of the initial fit), 0 for the others.
 \item \code{robpca_weights}: the weights \eqn{w_i} of the ROBPCA step.
 \item \code{components}: a tibble with the robust \code{R2} and \code{RMSE} of the models
-with 1 to \code{kmax} components.
+with 1 to \code{ncomp_max} components.
 \item \code{models}: the \code{coefficients} and \code{intercept} of the models with 1 to
-\code{kmax} components, for predictions with another number of components
+\code{ncomp_max} components, for predictions with another number of components
 (\code{predict(fit, newdata, ncomp = )}).
-\item \code{ncomp}, \code{kmax}, \code{h}, \code{alpha}: the settings used, and \code{y_scale}, the
+\item \code{ncomp}, \code{ncomp_max}, \code{h}, \code{alpha}: the settings used, and \code{y_scale}, the
 factor applied to the responses before ROBPCA.
 }
 
@@ -118,7 +118,7 @@ residual distances are both below their cut-offs; with several
 responses, it is one minus the ratio of the determinants of the residual
 and total sums of squares and cross-products.
 
-\strong{Number of components.} \code{components} gives, for 1 to \code{kmax}
+\strong{Number of components.} \code{components} gives, for 1 to \code{ncomp_max}
 components, the robust \eqn{R^2} of the paper (Remark 7) and the root
 mean squared error, on the observations that are regular in every one of
 these models. They describe the fit to the calibration data; for
@@ -127,7 +127,7 @@ which leaves the outliers out of the error, or for example with the
 \code{"rsimpls"} engine of \code{\link[parsnip:pls]{parsnip::pls()}} in tidymodels (\link{pls_rsimpls}).
 These models all come from the same ROBPCA fit, with
 \eqn{k_0 = k_{max} + q} components, so the model with \code{ncomp} components
-also depends on \code{kmax}. With \code{kmax = ncomp}, ROBPCA is applied with
+also depends on \code{ncomp_max}. With \code{ncomp_max = ncomp}, ROBPCA is applied with
 \code{ncomp} plus \eqn{q} components, and \code{components} stops at \code{ncomp}.
 
 \strong{Differences from the paper.}

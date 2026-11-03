@@ -30,7 +30,7 @@ test_that("the tuning constants of rho_2 are those of the reference code", {
 
 test_that("cellpca recovers the subspace and weights the outliers", {
   d <- make_contaminated()
-  fit <- cellpca(d$x, k = 3, od_cutoff = "chisq")
+  fit <- cellpca(d$x, ncomp = 3, od_cutoff = "chisq")
   expect_s3_class(fit, c("specproc_cellpca", "specproc_robpca"))
   expect_true(fit$converged)
   expect_lt(subspace_angle_deg(fit$loadings, d$V), 5)
@@ -54,7 +54,7 @@ test_that("cellpca recovers the subspace and weights the outliers", {
 
 test_that("cellpca decreases its objective and has a consistent output", {
   d <- make_contaminated(3)
-  fit <- cellpca(d$x, k = 2, od_cutoff = "chisq")
+  fit <- cellpca(d$x, ncomp = 2, od_cutoff = "chisq")
   expect_true(all(diff(fit$objective) <= 1e-8 * fit$objective[1]))
   expect_equal(crossprod(fit$loadings), diag(2), tolerance = 1e-8, ignore_attr = TRUE)
   expect_false(is.unsorted(rev(fit$eigenvalues)))
@@ -72,7 +72,7 @@ test_that("cellpca decreases its objective and has a consistent output", {
 
 test_that("cellpca predicts new data, with missing and outlying cells", {
   d <- make_contaminated(4)
-  fit <- cellpca(d$x, k = 3, od_cutoff = "chisq")
+  fit <- cellpca(d$x, ncomp = 3, od_cutoff = "chisq")
   kept <- which(fit$case_weights > 0)[1:20]
   pred <- predict(fit, d$x[kept, ])
   expect_named(pred, c("PC1", "PC2", "PC3", "sd", "od", "outlier_type"))
@@ -91,10 +91,10 @@ test_that("cellpca predicts new data, with missing and outlying cells", {
   expect_error(predict(fit, d$x[, 1:5]), "30 columns")
 })
 
-test_that("cellpca chooses k, simulates the cut-off and works with the plots and recipes", {
+test_that("cellpca chooses ncomp, simulates the cut-off and works with the plots and recipes", {
   d <- make_contaminated(5, n = 80, p = 20)
   fit <- cellpca(d$x)
-  expect_true(fit$k >= 1)
+  expect_true(fit$ncomp >= 1)
   expect_true(is.finite(fit$cutoff_od) && fit$cutoff_od > 0)
   expect_s3_class(plot_outlier_map(fit), "ggplot")
   skip_if_not_installed("patchwork")

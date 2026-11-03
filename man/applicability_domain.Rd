@@ -6,7 +6,7 @@
 \usage{
 applicability_domain(
   x,
-  k = NULL,
+  ncomp = NULL,
   variance = 0.99,
   conf_level = 0.99,
   center = TRUE,
@@ -17,11 +17,11 @@ applicability_domain(
 \item{x}{The calibration spectra: a numeric matrix or data frame, one
 spectrum per row.}
 
-\item{k}{The number of principal components. By default, chosen from
+\item{ncomp}{The number of principal components. By default, chosen from
 \code{variance}.}
 
 \item{variance}{The fraction of the variance explained by the
-components, when \code{k} is not given. Default is 0.99.}
+components, when \code{ncomp} is not given. Default is 0.99.}
 
 \item{conf_level}{The confidence level of the limits. Default is 0.99.}
 
@@ -30,7 +30,7 @@ components, when \code{k} is not given. Default is 0.99.}
 }
 \value{
 An object of class \code{specproc_domain}, a list with the \code{pca}
-(\code{\link[stats:prcomp]{stats::prcomp()}} fit), the number of components \code{k}, the fraction of
+(\code{\link[stats:prcomp]{stats::prcomp()}} fit), the number of components \code{ncomp}, the fraction of
 the variance they \code{explained}, the \code{conf_level} and the \code{limits} of
 \eqn{T^2} and Q. \link[=predict.specproc_domain]{predict()} flags new
 spectra.
@@ -43,7 +43,7 @@ spectra, are then extrapolations.
 }
 \details{
 A new spectrum is outside the applicability domain when its Hotelling
-\eqn{T^2}, the distance within the plane of the first \code{k} components, or
+\eqn{T^2}, the distance within the plane of the first \code{ncomp} components, or
 its Q residual, the squared distance to that plane, exceeds its limit at
 \code{conf_level} (see \code{\link[=q_residuals]{q_residuals()}}). A high \eqn{T^2} is a sample more
 extreme than the calibration samples (for example, a higher
@@ -51,7 +51,7 @@ concentration); a high Q, a sample of another kind (another matrix, a
 contamination, an instrumental problem). The limit of \eqn{T^2} is that of
 a new observation, and that of Q the Jackson-Mudholkar limit.
 
-By default, \code{k} is the smallest number of components that explain the
+By default, \code{ncomp} is the smallest number of components that explain the
 fraction \code{variance} of the variance of the calibration spectra. Prepare
 the spectra as for the model (baseline correction, normalization), since
 the domain is that of the variables the model uses. The PCA is classical:

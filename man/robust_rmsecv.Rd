@@ -8,7 +8,7 @@ robust_rmsecv(
   x,
   y,
   method = c("rsimpls", "rpcr"),
-  kmax = 10,
+  ncomp_max = 10,
   folds = 10,
   gamma = 0.5,
   alpha = 0.75,
@@ -27,7 +27,7 @@ one row per observation.}
 \item{method}{The model: \code{"rsimpls"} (default), robust PLS, or \code{"rpcr"},
 robust PCR.}
 
-\item{kmax}{The largest number of components. Default is 10.}
+\item{ncomp_max}{The largest number of components. Default is 10.}
 
 \item{folds}{The number of folds of the cross-validation, from 2 to the
 number of observations (leave-one-out). Default is 10.}
@@ -55,7 +55,7 @@ robust \code{R2} and \code{RMSE} of the fit to all the observations (as the
 \description{
 Robust root mean squared error of cross-validation (R-RMSECV) of the
 robust PLS (\code{\link[=rsimpls]{rsimpls()}}) or robust PCR (\code{\link[=rpcr]{rpcr()}}) models with 1 to
-\code{kmax} components, and the robust component selection (RCS) criterion of
+\code{ncomp_max} components, and the robust component selection (RCS) criterion of
 Engelen and Hubert (2005), to choose the number of components when the
 calibration data contain outliers.
 }
@@ -63,7 +63,7 @@ calibration data contain outliers.
 The squared prediction errors of outliers would dominate the usual
 RMSECV. The robust RMSECV leaves them out: the model is first fitted to
 all the observations, and only those regular in every model with 1 to
-\code{kmax} components (residual distance below its cut-off) enter the error,
+\code{ncomp_max} components (residual distance below its cut-off) enter the error,
 \deqn{R\text{-}RMSECV_k = \sqrt{\frac{1}{q \sum_i w_i} \sum_i w_i
   \|y_i - \hat y_{-i,k}\|^2},}
 where \eqn{w_i} is 1 for these observations and 0 for the others, and
@@ -96,7 +96,7 @@ data(forageLIBS)
 wl <- suppressWarnings(as.numeric(names(forageLIBS)))
 spectra <- forageLIBS[which(wl > 380 & wl < 430)]
 set.seed(1)
-robust_rmsecv(spectra[1:300, ], forageLIBS$Ca[1:300], kmax = 8, folds = 5)
+robust_rmsecv(spectra[1:300, ], forageLIBS$Ca[1:300], ncomp_max = 8, folds = 5)
 }
 }
 \references{

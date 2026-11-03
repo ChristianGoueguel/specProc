@@ -42,11 +42,11 @@
   and optionally their score and orthogonal distances.
 * The `"rsimpls"` engine of `parsnip::pls()` fits `rsimpls()` models in
   tidymodels, with one or several outcomes; the other arguments of
-  `rsimpls()` are engine arguments (`set_engine("rsimpls", kmax = , alpha =
-  )`). `multi_predict()` gives the predictions of the models with fewer
+  `rsimpls()` are engine arguments (`set_engine("rsimpls", ncomp_max = ,
+  alpha = )`). `multi_predict()` gives the predictions of the models with fewer
   components from the same fit, so `tune::tune_grid()` fits one model per
   resample for a grid of `num_comp`. `predict()` of an `rsimpls()` model
-  gains `ncomp`, for the models with 1 to `kmax` components, which the fit
+  gains `ncomp`, for the models with 1 to `ncomp_max` components, which the fit
   now keeps (`models`).
 * `rpcr()`: robust principal component regression (RPCR) of Hubert and
   Verboven (2003), the robust PCA of the spectra (`robpca()`) followed by
@@ -54,7 +54,7 @@
   several responses. It has the outputs, `predict()` method and outlier maps
   of `rsimpls()`.
 * `robust_rmsecv()`: the robust RMSECV of `rsimpls()` or `rpcr()` models
-  with 1 to `kmax` components, which leaves the outliers out of the
+  with 1 to `ncomp_max` components, which leaves the outliers out of the
   cross-validated error, and the robust component selection (RCS) criterion
   of Engelen and Hubert (2005), to choose the number of components. The
   folds are fitted in parallel when a `future::plan()` is set.
@@ -520,6 +520,23 @@
     replaces `wlgth.min` and `wlgth.max`, as the wavelength range of
     `nist_lines()` and `libs_lines()`. Calls that gave the arguments after
     `A` by position must name them.
+* The number of components is `ncomp` in all the functions, as in
+  `rsimpls()`, `rpcr()`, `rsimca()`, the PLS and OSC functions and the pls
+  package, and the largest number of components considered is `ncomp_max`.
+  The former names still work, with a deprecation warning, and the new
+  names keep the positions of the former ones:
+  - `k` becomes `ncomp` in `robpca()`, `rospca()`, `macropca()`,
+    `cellpca()`, `q_residuals()`, `dmodx()`, `contributions()`,
+    `hotelling_t2()` and `plot_embedding()`;
+  - `kmax` becomes `ncomp_max` in `robpca()`, `macropca()` and `cellpca()`,
+    and so in the `options` of `step_robpca()`, `step_macropca()` and
+    `step_cellpca()`.
+
+  The fits of `robpca()`, `rospca()`, `macropca()` and `cellpca()` keep
+  their number of components in `ncomp` instead of `k`, and the results of
+  `q_residuals()`, `dmodx()` and `contributions()` in the attribute
+  `ncomp`: code that reads `fit$k` now gets `NULL`. The `k` of
+  `iqr_outliers()`, the fence factor, keeps its name.
 * `generalized_boxplot()` flags fewer observations: its default detection
   rate `alpha` is now about 0.7% (`2 * pnorm(-4 * qnorm(0.75))`), that of
   Tukey's boxplot for normal data, as in the authors' implementation (the
@@ -621,9 +638,9 @@
   channels of overlapping detectors in a zigzag (near 766 nm, on the K I
   766.49 nm line). Each detector is now drawn as its own line.
 * `robpca()` and `rospca()` failed, or flagged most observations as
-  orthogonal outliers, when `k` equaled the rank of the data (for example
-  `k = 5` with 5 variables, `k = n - 1` with more variables than
-  observations, or a `k` chosen by `var_explained` for data with few
+  orthogonal outliers, when `ncomp` equaled the rank of the data (for
+  example `ncomp = 5` with 5 variables, `ncomp = n - 1` with more variables
+  than observations, or an `ncomp` chosen by `var_explained` for data with few
   variables): the orthogonal distances to a subspace that is the whole space
   are rounding errors, and their cut-off was zero. As in Hubert, Rousseeuw
   and Vanden Branden (2005), ROBPCA then reduces to the reweighted MCD of the

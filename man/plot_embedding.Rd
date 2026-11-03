@@ -16,7 +16,7 @@ plot_embedding(
   robust = FALSE,
   distribution = "normal",
   hotelling = "none",
-  k = 2,
+  ncomp = 2,
   t2_method = "f",
   flag = FALSE,
   label = NULL,
@@ -35,7 +35,8 @@ plot_embedding(
   ylab = NULL,
   colour = deprecated(),
   size = deprecated(),
-  alpha = deprecated()
+  alpha = deprecated(),
+  k = deprecated()
 )
 }
 \arguments{
@@ -73,7 +74,7 @@ chi-square) or \code{"hotelling"}.}
 discrete \code{color_by}). Needs the HotellingEllipse package (1.3.0 or
 later).}
 
-\item{k}{The number of components of \eqn{T^2}: the two axes, then the
+\item{ncomp}{The number of components of \eqn{T^2}: the two axes, then the
 next embedding coordinates. Default is 2.}
 
 \item{t2_method}{The distribution of the \eqn{T^2} limits: \code{"f"}
@@ -131,6 +132,8 @@ the variance they explain for a PCA.}
 
 \item{colour, size, alpha}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
 \code{color_by}, \code{point_size} and \code{point_alpha}.}
+
+\item{k}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{ncomp}.}
 }
 \value{
 A ggplot object.
@@ -164,7 +167,7 @@ ellipse.
 
 With \code{hotelling = "all"}, the ellipses of Hotelling's \eqn{T^2} at each
 level of \code{conf_level} (97.5\% by default) are drawn for all the samples,
-and the samples beyond the limit at the highest level of \eqn{T^2} on \code{k}
+and the samples beyond the limit at the highest level of \eqn{T^2} on \code{ncomp}
 components are counted in the subtitle, circled in red with
 \code{flag = TRUE} and labeled with \code{label} (each independently of the other):
 the classical outlier limits of a score plot. For a PCA model (\code{\link[stats:prcomp]{stats::prcomp()}}, \code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}} or
@@ -174,7 +177,7 @@ the ellipses are centered at 0 with the axes of the components, and
 semi-axes \eqn{\sqrt{\lambda_a L}} for the limit \eqn{L}. The limit is
 the F (or Beta) limit of \code{\link[=hotelling_t2]{hotelling_t2()}} for a \code{\link[stats:prcomp]{stats::prcomp()}} fit, and
 the chi-square quantile of ROBPCA for a robust fit, whose flagged samples
-are then the leverage points of \code{\link[=plot_outlier_map]{plot_outlier_map()}} (with \code{k} its
+are then the leverage points of \code{\link[=plot_outlier_map]{plot_outlier_map()}} (with \code{ncomp} its
 number of components and \code{conf_level = 0.975}). The scores of the
 outlying samples then do not inflate or tilt the ellipses. For other
 embeddings, \eqn{T^2} is computed from the mean and covariance of the
@@ -183,7 +186,7 @@ With \code{hotelling = "group"}, each group of a discrete \code{color_by} gets i
 ellipses and limits, from its mean and covariance, which flags the samples
 atypical of their own group. The ellipses are labeled with their level
 (instead of a legend), and drawn for the two components shown, while the
-limits use \code{k} components, so with \code{k > 2} a flagged sample can lie inside
+limits use \code{ncomp} components, so with \code{ncomp > 2} a flagged sample can lie inside
 the ellipses. With \code{ellipse = TRUE}, the confidence ellipses are always
 computed from the samples shown. Without groups, \code{ellipse = TRUE} and
 \code{hotelling = "all"} would draw two ellipses of all the samples: only the
@@ -212,7 +215,7 @@ plot.
 
 \strong{Axes.} For a \code{\link[stats:prcomp]{stats::prcomp()}} fit or a robust PCA, the axis titles
 give the share of the variance of each component: of the total variance
-for \code{\link[stats:prcomp]{stats::prcomp()}}, and of the variance of the \code{k} components of the
+for \code{\link[stats:prcomp]{stats::prcomp()}}, and of the variance of the components of the
 model for \code{\link[=robpca]{robpca()}}, \code{\link[=rospca]{rospca()}} and \code{\link[=macropca]{macropca()}}, which estimate only
 these. With groups, the ellipses (confidence, or \eqn{T^2} with
 \code{hotelling = "group"}) are filled with the color of their group.
@@ -249,7 +252,7 @@ if (rlang::is_installed("HotellingEllipse", version = "1.3.0")) {
   set.seed(1)
   forageLIBS[which(wl > 380 & wl < 430)] |>
     center() |>
-    robpca(k = 2) |>
+    robpca(ncomp = 2) |>
     plot_embedding(hotelling = "all", flag = FALSE, label = TRUE)
 }
 

@@ -319,7 +319,7 @@ than the calibration samples) or Q residual (unlike them) exceeds its 99%
 limit:
 
 ```{r domain}
-domain <- applicability_domain(x_calibration, k = ncomp)
+domain <- applicability_domain(x_calibration, ncomp = ncomp)
 domain
 outside <- predict(domain, x[!is_calibration, ])
 count(outside, outlier)

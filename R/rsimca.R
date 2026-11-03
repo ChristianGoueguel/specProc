@@ -58,7 +58,7 @@
 #'   single number for all the classes, one per class (in the order of the
 #'   levels of `group`, or named by them), or `NULL` (default) to let
 #'   [robpca()] choose them from `var_explained`.
-#' @param kmax The largest number of components of the robust PCA. Default
+#' @param ncomp_max The largest number of components of the robust PCA. Default
 #'   is 10.
 #' @param alpha The robustness parameter of [robpca()]: the fraction of
 #'   observations of each class assumed to be regular, between 0.5 and 1.
@@ -115,7 +115,7 @@
 #' table(predicted = predict(fit, iris[-train, 1:4]), true = iris$Species[-train])
 #' plot_coomans(fit, classes = c("versicolor", "virginica"),
 #'              newdata = iris[-train, 1:4], group = iris$Species[-train])
-rsimca <- function(x, group, ncomp = NULL, kmax = 10, alpha = 0.75, gamma = 0.5, squared = TRUE,
+rsimca <- function(x, group, ncomp = NULL, ncomp_max = 10, alpha = 0.75, gamma = 0.5, squared = TRUE,
                    var_explained = 0.8, prior = NULL, ndir = 250, nsamp = 500) {
   if (missing(x) || missing(group)) {
     stop("Both 'x' and 'group' must be provided.", call. = FALSE)
@@ -133,7 +133,7 @@ rsimca <- function(x, group, ncomp = NULL, kmax = 10, alpha = 0.75, gamma = 0.5,
   ncomp <- class_ncomp(ncomp, lev)
 
   models <- lapply(seq_along(lev), function(j) {
-    robpca(x[group == lev[j], , drop = FALSE], k = ncomp[[j]], kmax = kmax, alpha = alpha,
+    robpca(x[group == lev[j], , drop = FALSE], ncomp = ncomp[[j]], ncomp_max = ncomp_max, alpha = alpha,
            ndir = ndir, var_explained = var_explained, nsamp = nsamp)
   })
   names(models) <- lev
@@ -143,7 +143,7 @@ rsimca <- function(x, group, ncomp = NULL, kmax = 10, alpha = 0.75, gamma = 0.5,
   }
   prior <- class_prior(prior, group, weights)
 
-  res <- list(models = models, ncomp = vapply(models, function(m) m$k, integer(1)),
+  res <- list(models = models, ncomp = vapply(models, function(m) m$ncomp, integer(1)),
               distances = NULL, group = group, fitted = NULL, weights = as.numeric(weights),
               outlying = NULL,
               misclassification = NULL, prior = prior, gamma = gamma, squared = squared,

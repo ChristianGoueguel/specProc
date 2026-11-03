@@ -1,6 +1,6 @@
 # Shared pieces of the robust calibration models rsimpls() and rpcr(): the
 # robust regressions of the responses on the scores, the robust R2 and the
-# table of the models with 1 to kmax components.
+# table of the models with 1 to ncomp_max components.
 
 # The responses of a calibration model: a numeric matrix with column names,
 # without missing values.
@@ -88,7 +88,7 @@ regular_in_all <- function(models) {
   regular
 }
 
-# Robust R2 and RMSE of the models with 1 to kmax components, on the
+# Robust R2 and RMSE of the models with 1 to ncomp_max components, on the
 # observations regular in every model (Remark 7 of Hubert and Vanden
 # Branden, 2003).
 components_table <- function(models, y, regular) {
@@ -129,7 +129,7 @@ check_predict_ncomp <- function(object, type, ncomp) {
   }
   check_count(ncomp, "ncomp")
   if (ncomp > length(object$models)) {
-    stop("'ncomp' cannot exceed ", length(object$models), ", the 'kmax' of the model.",
+    stop("'ncomp' cannot exceed ", length(object$models), ", the 'ncomp_max' of the model.",
          call. = FALSE)
   }
   invisible(NULL)
@@ -141,7 +141,7 @@ print_calibration <- function(x, title) {
   cat("Observations:   ", length(x$sd), " (h = ", x$h, ")\n", sep = "")
   cat("Variables:      ", attr(x, "nvar"), "\n", sep = "")
   cat("Responses:      ", length(attr(x, "responses")), "\n", sep = "")
-  cat("Components:     ", x$ncomp, " (robust R2 of 1 to ", x$kmax, " components: ",
+  cat("Components:     ", x$ncomp, " (robust R2 of 1 to ", x$ncomp_max, " components: ",
       paste(format(x$components$R2, digits = 3), collapse = " "), ")\n", sep = "")
   cat("Robust R2:      ", format(x$R2, digits = 3), "\n", sep = "")
   if (length(x$intercept) == 1) {
