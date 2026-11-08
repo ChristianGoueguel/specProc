@@ -46,6 +46,17 @@ check_flag <- function(x, arg) {
   invisible(x)
 }
 
+# For the functions of a single variable: stops unless `x` is a numeric vector
+# or a 1-d array (such as the result of tapply()). A matrix is not pooled into
+# one result; the message shows how to get one result per column.
+check_numeric_vector <- function(x, fn) {
+  if (!is.numeric(x) || length(dim(x)) > 1) {
+    stop("The input 'x' must be a numeric vector; for the columns of a data frame or matrix, ",
+         "use sapply(x, ", fn, ") or apply(x, 2, ", fn, ").", call. = FALSE)
+  }
+  invisible(x)
+}
+
 check_number <- function(x, arg, lower = -Inf, upper = Inf, lower_open = FALSE, upper_open = FALSE) {
   ok <- is.numeric(x) && length(x) == 1 && !is.na(x) &&
     (if (lower_open) x > lower else x >= lower) &&

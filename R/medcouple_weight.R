@@ -53,9 +53,7 @@ medcouple_weight <- function(x, drop_na = FALSE,
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!is.numeric(x)) {
-    stop("The input 'x' must be a numeric vector.")
-  }
+  check_numeric_vector(x, "medcouple_weight")
   if (!is.logical(drop_na)) {
     stop("The input 'drop_na' must be a logical value (TRUE or FALSE).")
   }

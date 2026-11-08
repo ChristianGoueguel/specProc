@@ -49,9 +49,7 @@ biweight_location <- function(x, loc = NULL, c = 6, tol = 1e-6, max_iter = 50, d
   if (missing(x)) {
     stop("Input 'x' must be provided.")
   }
-  if (!is.numeric(x)) {
-    stop("'x' must be a numeric vector.")
-  }
+  check_numeric_vector(x, "biweight_location")
   check_number(c, "c", lower = 0, lower_open = TRUE)
   check_flag(drop_na, "drop_na")
 

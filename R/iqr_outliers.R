@@ -62,9 +62,7 @@ iqr_outliers <- function(x, k = 1.5, skew = FALSE, drop_na = FALSE,
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!is.numeric(x)) {
-    stop("The input 'x' must be a numeric vector.")
-  }
+  check_numeric_vector(x, "iqr_outliers")
   if (!is.numeric(k) || length(k) != 1 || k <= 0) {
     stop("The input 'k' must be a positive numeric scalar.")
   }

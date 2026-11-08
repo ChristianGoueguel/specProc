@@ -30,9 +30,7 @@ minmax <- function(x, a = 0, b = 1, drop_na = TRUE,
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!is.numeric(x)) {
-    stop("'x' must be a numeric vector.")
-  }
+  check_numeric_vector(x, "minmax")
   if (!is.numeric(a) || !is.numeric(b)) {
     stop("'a' and 'b' must be numeric.")
   }

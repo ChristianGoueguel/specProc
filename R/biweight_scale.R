@@ -48,9 +48,7 @@ biweight_scale <- function(x, loc = NULL, c = 9, reduced = FALSE, drop_na = FALS
   if (missing(x)) {
     stop("Input 'x' must be provided.")
   }
-  if (!is.numeric(x)) {
-    stop("'x' must be a numeric vector.")
-  }
+  check_numeric_vector(x, "biweight_scale")
   if (!is.numeric(c)) {
     stop("'c' must be numeric.")
   }

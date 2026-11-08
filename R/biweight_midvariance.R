@@ -41,9 +41,7 @@ biweight_midvariance <- function(x, drop_na = FALSE,
   if (missing(x)) {
     stop("Input 'x' must be provided.")
   }
-  if (!is.numeric(x)) {
-    stop("Input 'x' must be a numeric vector.")
-  }
+  check_numeric_vector(x, "biweight_midvariance")
   check_flag(drop_na, "drop_na")
 
   if (drop_na) {

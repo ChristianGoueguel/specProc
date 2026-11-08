@@ -612,6 +612,14 @@
   difference in fit that is often negligible (each for about half of the
   forageLIBS channels), and mixed two scales of `lambda`. The defunct
   `robustBCYJ()` now names the new functions.
+* The functions of a single variable (`biweight_location()`,
+  `biweight_scale()`, `biweight_midvariance()`, `umad()`, `iqr_outliers()`,
+  `medcouple_weight()`, `quantile_weight()`, `zscore()`, `minmax()` and
+  `directional_outlyingness()`, as `medcouple()`) stop when `x` is a matrix,
+  instead of pooling all its values into one result (one location of all
+  the channels of a set of spectra, for example). The message shows how to
+  get one result per column, with `sapply(x, f)` for a data frame or
+  `apply(x, 2, f)` for a matrix. Data frames already gave an error.
 
 ## Bug fixes
 

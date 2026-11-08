@@ -61,6 +61,7 @@ Chatterjee's
 Chauchard
 Chemom
 Chemometrics
+Chervoneva
 Chimica
 Choo
 Ciucci
@@ -91,6 +92,7 @@ DetMCD
 Dimitrijević
 Donoho
 Driessen
+Duan
 Duponchel
 EMSC
 EMSLIBS
@@ -272,6 +274,7 @@ Pre
 Prieto
 Proteome
 QDA
+QLS
 QSAR
 Qn
 Quant
@@ -417,6 +420,7 @@ autoscaling
 bestObj
 bicor
 bslib
+camelCase
 casewise
 cdot
 cellPCA
@@ -452,6 +456,7 @@ et
 extrema
 extremal
 extremum
+forageLIBS
 forcats
 ggplot
 ggrepel
@@ -507,6 +512,7 @@ nonlinearly
 normalizations
 notchlower
 ns
+opacities
 orthogonalization
 orthogonalize
 orthonormalized
@@ -520,8 +526,10 @@ plotly
 pls
 pre
 preprocess
+rQLS
 ragg
 redescending
+retransformation
 reweighting
 ropls
 rospca

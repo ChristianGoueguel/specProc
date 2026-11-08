@@ -317,7 +317,7 @@ test_that("plot_spectra draws several wavelength windows side by side", {
   expect_error(plot_spectra(df[1:50], wavelength = list(c(391, 392), "a")), "increasing")
   skip_if_not_installed("plotly")
   expect_s3_class(plot_spectra(df[1:50], wavelength = list(c(392, 395), c(396, 398)),
-                               .interactive = TRUE), "plotly")
+                               interactive = TRUE), "plotly")
 })
 
 test_that("plot_spectra marks the emission lines in the panels of their window", {

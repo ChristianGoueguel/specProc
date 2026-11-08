@@ -47,9 +47,7 @@ umad <- function(x, method = "hayes", drop_na = TRUE,
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!is.numeric(x)) {
-    stop("'x' must be a numeric vector.")
-  }
+  check_numeric_vector(x, "umad")
   if (!is.logical(drop_na) || length(drop_na) != 1) {
     stop("'drop_na' must be a single logical value (TRUE or FALSE).")
   }

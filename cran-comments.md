@@ -3,9 +3,13 @@
 This is an update of specProc 0.8.3 to 0.9.0. The main changes (see
 NEWS.md) are robust PLS and principal component regression with robust
 cross-validation, robust SIMCA and discriminant analysis, and their
-'parsnip' engines; wavelength selection; calibration transfer; uncertainty
-propagation in the plasma diagnostics; and molecular band heads. The
-functions deprecated since 0.2.0 and 0.8.0 are now defunct.
+'parsnip' engines; robust transformations to normality (Box-Cox,
+Yeo-Johnson and Tukey g-and-h) and wavelet denoising, with their 'recipes'
+steps; wavelength selection; calibration transfer; uncertainty propagation
+in the plasma diagnostics; Stark widths from VALD and Kurucz line lists;
+and molecular band heads. The functions deprecated since 0.2.0 and 0.8.0
+are now defunct. Arguments renamed in snake_case still work, with a
+deprecation warning.
 
 ## Test environments
 

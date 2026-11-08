@@ -54,9 +54,7 @@ zscore <- function(x, cutoff = 3, robust = FALSE, drop_na = FALSE,
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!is.numeric(x)) {
-    stop("The input 'x' must be a numeric vector.")
-  }
+  check_numeric_vector(x, "zscore")
   if (!is.logical(robust)) {
     stop("The input 'robust' must be a logical value (TRUE or FALSE).")
   }

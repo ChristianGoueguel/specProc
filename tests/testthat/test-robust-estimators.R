@@ -95,6 +95,25 @@ test_that("medcouple takes a vector only", {
   expect_lt(mc[["left"]], -0.2)
 })
 
+test_that("the functions of a single variable do not pool the columns of a matrix", {
+  set.seed(6)
+  m <- cbind(a = stats::rexp(60), b = stats::rnorm(60))
+  funs <- c("biweight_location", "biweight_scale", "biweight_midvariance", "umad",
+            "iqr_outliers", "medcouple_weight", "quantile_weight", "zscore", "minmax",
+            "directional_outlyingness", "medcouple")
+  for (f in funs) {
+    fn <- getExportedValue("specProc", f)
+    hint <- paste0("sapply(x, ", f, ") or apply(x, 2, ", f, ")")
+    expect_error(fn(m), hint, fixed = TRUE)
+    expect_error(fn(as.data.frame(m)), hint, fixed = TRUE)
+    expect_error(fn(m[, 1, drop = FALSE]), "numeric vector", fixed = TRUE)
+    # a 1-d array, such as the result of tapply(), is a vector
+    expect_no_error(fn(array(m[, 1])))
+  }
+  expect_equal(biweight_location(array(m[, 1])), biweight_location(m[, 1]))
+  expect_error(iqr_outliers(m, skew = TRUE), "sapply(x, iqr_outliers)", fixed = TRUE)
+})
+
 test_that("tail weights match their values at the normal distribution", {
   Q <- stats::qnorm
   lqw <- -(Q(0.4375) + Q(0.0625) - 2 * Q(0.25)) / (Q(0.4375) - Q(0.0625))

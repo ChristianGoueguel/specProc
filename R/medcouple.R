@@ -81,10 +81,7 @@ medcouple <- function(x, drop_na = FALSE) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!is.numeric(x) || length(dim(x)) > 1) {
-    stop("The input 'x' must be a numeric vector; for the columns of a data ",
-         "frame or matrix, use sapply(x, medcouple) or apply(x, 2, medcouple).")
-  }
+  check_numeric_vector(x, "medcouple")
   check_flag(drop_na, "drop_na")
 
   # 1-d arrays (e.g. the result of tapply()) become plain vectors

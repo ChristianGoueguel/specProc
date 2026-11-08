@@ -50,9 +50,7 @@ directional_outlyingness <- function(x, cutoff_quantile = 0.995, rm_zeroes = FAL
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!is.numeric(x)) {
-    stop("The input 'x' must be a numeric vector.")
-  }
+  check_numeric_vector(x, "directional_outlyingness")
   if (!is.numeric(cutoff_quantile) || cutoff_quantile < 0 || cutoff_quantile > 1) {
     stop("The input 'cutoff_quantile' must be a numeric value between 0 and 1.")
   }
