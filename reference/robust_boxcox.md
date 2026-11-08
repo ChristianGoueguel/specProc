@@ -136,10 +136,10 @@ fit$summary
 #> 3 P         0.396      0.569
 #> 4 Mn       -0.150      0.849
 # the skewness of the contents, before and after
-round(medcouple(contents[1:300, ]), 2)
+round(sapply(contents[1:300, ], medcouple), 2)
 #>   Ca    K    P   Mn 
 #> 0.12 0.09 0.07 0.16 
-round(medcouple(fit$transformation), 2)
+round(sapply(fit$transformation, medcouple), 2)
 #>    Ca     K     P    Mn 
 #>  0.00  0.04  0.01 -0.02 
 # new samples, with the transformation of the first 300

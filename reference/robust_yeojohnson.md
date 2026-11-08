@@ -145,10 +145,10 @@ summary(fit$summary$lambda)
 #>    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 #>  0.5844  0.6350  0.6868  0.8031  0.8858  1.4372 
 # the skewness of the channels, before and after
-summary(medcouple(mg[1:300, ]))
+summary(sapply(mg[1:300, ], medcouple))
 #>     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
 #> -0.11400  0.04476  0.08922  0.06141  0.11576  0.16650 
-summary(medcouple(fit$transformation))
+summary(sapply(fit$transformation, medcouple))
 #>      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
 #> -0.092838 -0.030278 -0.007856 -0.002970  0.030357  0.086419 
 # new spectra, with the transformation of the first 300

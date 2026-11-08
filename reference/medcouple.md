@@ -1,9 +1,7 @@
 # Medcouple
 
 This function calculates the medcouple (MC), a robust measure of the
-skewness of a distribution (Brys *et al.* 2004), for a numeric vector or
-for each column of a matrix or data frame, such as one medcouple per
-wavelength of a set of spectra.
+skewness of a distribution (Brys *et al.* 2004), for a numeric vector.
 
 ## Usage
 
@@ -15,20 +13,16 @@ medcouple(x, drop_na = FALSE)
 
 - x:
 
-  A numeric vector, or a numeric matrix, data frame or tibble (one
-  medcouple per column).
+  A numeric vector.
 
 - drop_na:
 
   Logical value indicating whether to remove missing values (NA). If
-  `FALSE` (default), the medcouple of a vector or column that contains
-  missing values is `NA`.
+  `FALSE` (default) and `x` contains missing values, `NA` is returned.
 
 ## Value
 
-For a vector, the medcouple of `x`. For a matrix or data frame, a
-numeric vector with the medcouple of each column, named by the columns.
-The medcouple of a vector without values is `NA`.
+The medcouple of `x`, or `NA` when `x` has no values.
 
 ## Details
 
@@ -58,10 +52,13 @@ and the skewness-adjusted fences of
 [`medcouple_weight()`](https://christiangoueguel.com/specProc/reference/medcouple_weight.md)
 applies it to each half of the data to measure the weight of the tails.
 
-For spectra, one medcouple per wavelength describes the shape of the
-distribution of the intensities at each channel. Channels that saturate
-the detector in many spectra have a strongly negative medcouple, since
-their intensities pile up at the top of the range, while the lines of an
+For spectra, one medcouple per wavelength (`sapply(spectra, medcouple)`
+for a data frame, `apply(spectra, 2, medcouple)` for a matrix) describes
+the shape of the distribution of the intensities at each channel, and
+[`plot_medcouple()`](https://christiangoueguel.com/specProc/reference/plot_medcouple.md)
+draws it along the wavelength axis. Channels that saturate the detector
+in many spectra have a strongly negative medcouple, since their
+intensities pile up at the top of the range, while the lines of an
 element whose contents are skewed, with a few samples far above the
 others, have a positive one.
 
@@ -77,6 +74,7 @@ others, have a positive one.
 
 ## See also
 
+[`plot_medcouple()`](https://christiangoueguel.com/specProc/reference/plot_medcouple.md),
 [`medcouple_weight()`](https://christiangoueguel.com/specProc/reference/medcouple_weight.md),
 [`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md),
 [`iqr_outliers()`](https://christiangoueguel.com/specProc/reference/iqr_outliers.md),
@@ -99,13 +97,13 @@ medcouple(fe)           # robust
 
 # one medcouple per column; Fe and Zn have a few missing values
 contents <- forageLIBS[c("Ca", "K", "Mg", "P", "Fe", "Mn", "Zn")]
-round(medcouple(contents, drop_na = TRUE), 2)
+round(sapply(contents, medcouple, drop_na = TRUE), 2)
 #>   Ca    K   Mg    P   Fe   Mn   Zn 
 #> 0.14 0.06 0.02 0.01 0.42 0.19 0.22 
 
 # one medcouple per wavelength, from 380 to 430 nm
 wl <- suppressWarnings(as.numeric(names(forageLIBS)))
-mc <- medcouple(forageLIBS[which(wl > 380 & wl < 430)])
+mc <- sapply(forageLIBS[which(wl > 380 & wl < 430)], medcouple)
 summary(mc)
 #>     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
 #> -0.84580 -0.02255  0.02165  0.01979  0.07228  0.32800 
