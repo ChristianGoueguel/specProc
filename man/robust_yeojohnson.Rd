@@ -103,8 +103,8 @@ sum(vapply(mg, min, numeric(1)) < 0)
 fit <- robust_yeojohnson(mg[1:300, ])
 summary(fit$summary$lambda)
 # the skewness of the channels, before and after
-summary(medcouple(mg[1:300, ]))
-summary(medcouple(fit$transformation))
+summary(sapply(mg[1:300, ], medcouple))
+summary(sapply(fit$transformation, medcouple))
 # new spectra, with the transformation of the first 300
 dim(predict(fit, mg[301:368, ]))
 }

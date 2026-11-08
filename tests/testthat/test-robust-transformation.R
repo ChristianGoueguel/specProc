@@ -48,8 +48,8 @@ test_that("robust_yeojohnson transforms variables with negative values", {
   expect_lt(abs(fit$summary$lambda[1] - 1), 0.3)
   expect_gt(fit$summary$lambda[2], 1)
   expect_lt(fit$summary$lambda[3], 1)
-  mc <- medcouple(fit$transformation)
-  expect_true(all(abs(mc[2:3]) < abs(medcouple(x)[2:3])))
+  mc <- sapply(fit$transformation, medcouple)
+  expect_true(all(abs(mc[2:3]) < abs(sapply(x, medcouple)[2:3])))
   ref <- robust_transformation(as.matrix(x), type = "YJ")
   expect_equal(as.matrix(fit$transformation), apply_transformation(as.matrix(x), ref),
                ignore_attr = TRUE)

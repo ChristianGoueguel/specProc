@@ -7,23 +7,18 @@
 medcouple(x, drop_na = FALSE)
 }
 \arguments{
-\item{x}{A numeric vector, or a numeric matrix, data frame or tibble (one
-medcouple per column).}
+\item{x}{A numeric vector.}
 
 \item{drop_na}{Logical value indicating whether to remove missing values
-(NA). If \code{FALSE} (default), the medcouple of a vector or column that
-contains missing values is \code{NA}.}
+(NA). If \code{FALSE} (default) and \code{x} contains missing values, \code{NA} is
+returned.}
 }
 \value{
-For a vector, the medcouple of \code{x}. For a matrix or data frame,
-a numeric vector with the medcouple of each column, named by the
-columns. The medcouple of a vector without values is \code{NA}.
+The medcouple of \code{x}, or \code{NA} when \code{x} has no values.
 }
 \description{
 This function calculates the medcouple (MC), a robust measure of the
-skewness of a distribution (Brys \emph{et al.} 2004), for a numeric vector or
-for each column of a matrix or data frame, such as one medcouple per
-wavelength of a set of spectra.
+skewness of a distribution (Brys \emph{et al.} 2004), for a numeric vector.
 }
 \details{
 The medcouple is the median of the kernel
@@ -49,12 +44,14 @@ The medcouple is used by the adjusted boxplot (\code{\link[=adjusted_boxplot]{ad
 the skewness-adjusted fences of \code{\link[=iqr_outliers]{iqr_outliers()}}; \code{\link[=medcouple_weight]{medcouple_weight()}}
 applies it to each half of the data to measure the weight of the tails.
 
-For spectra, one medcouple per wavelength describes the shape of the
-distribution of the intensities at each channel. Channels that saturate
-the detector in many spectra have a strongly negative medcouple, since
-their intensities pile up at the top of the range, while the lines of an
-element whose contents are skewed, with a few samples far above the
-others, have a positive one.
+For spectra, one medcouple per wavelength (\code{sapply(spectra, medcouple)}
+for a data frame, \code{apply(spectra, 2, medcouple)} for a matrix) describes
+the shape of the distribution of the intensities at each channel, and
+\code{\link[=plot_medcouple]{plot_medcouple()}} draws it along the wavelength axis. Channels that
+saturate the detector in many spectra have a strongly negative
+medcouple, since their intensities pile up at the top of the range,
+while the lines of an element whose contents are skewed, with a few
+samples far above the others, have a positive one.
 }
 \examples{
 data(forageLIBS)
@@ -65,11 +62,11 @@ medcouple(fe)           # robust
 
 # one medcouple per column; Fe and Zn have a few missing values
 contents <- forageLIBS[c("Ca", "K", "Mg", "P", "Fe", "Mn", "Zn")]
-round(medcouple(contents, drop_na = TRUE), 2)
+round(sapply(contents, medcouple, drop_na = TRUE), 2)
 
 # one medcouple per wavelength, from 380 to 430 nm
 wl <- suppressWarnings(as.numeric(names(forageLIBS)))
-mc <- medcouple(forageLIBS[which(wl > 380 & wl < 430)])
+mc <- sapply(forageLIBS[which(wl > 380 & wl < 430)], medcouple)
 summary(mc)
 # the Ca II line at 393.37 nm saturates the detector (65535 counts) in
 # most spectra: a negative medcouple; the Fe I line at 404.58 nm follows
@@ -89,8 +86,8 @@ Computational Statistics & Data Analysis, 52(12):5186-5201
 }
 }
 \seealso{
-\code{\link[=medcouple_weight]{medcouple_weight()}}, \code{\link[=adjusted_boxplot]{adjusted_boxplot()}}, \code{\link[=iqr_outliers]{iqr_outliers()}},
-\code{\link[=summary_stats]{summary_stats()}}
+\code{\link[=plot_medcouple]{plot_medcouple()}}, \code{\link[=medcouple_weight]{medcouple_weight()}}, \code{\link[=adjusted_boxplot]{adjusted_boxplot()}},
+\code{\link[=iqr_outliers]{iqr_outliers()}}, \code{\link[=summary_stats]{summary_stats()}}
 }
 \author{
 Christian L. Goueguel

@@ -2,9 +2,7 @@
 #'
 #' @description
 #' This function calculates the medcouple (MC), a robust measure of the
-#' skewness of a distribution (Brys *et al.* 2004), for a numeric vector or
-#' for each column of a matrix or data frame, such as one medcouple per
-#' wavelength of a set of spectra.
+#' skewness of a distribution (Brys *et al.* 2004), for a numeric vector.
 #'
 #' @details
 #' The medcouple is the median of the kernel
@@ -28,12 +26,14 @@
 #' the skewness-adjusted fences of [iqr_outliers()]; [medcouple_weight()]
 #' applies it to each half of the data to measure the weight of the tails.
 #'
-#' For spectra, one medcouple per wavelength describes the shape of the
-#' distribution of the intensities at each channel. Channels that saturate
-#' the detector in many spectra have a strongly negative medcouple, since
-#' their intensities pile up at the top of the range, while the lines of an
-#' element whose contents are skewed, with a few samples far above the
-#' others, have a positive one.
+#' For spectra, one medcouple per wavelength (`sapply(spectra, medcouple)`
+#' for a data frame, `apply(spectra, 2, medcouple)` for a matrix) describes
+#' the shape of the distribution of the intensities at each channel, and
+#' [plot_medcouple()] draws it along the wavelength axis. Channels that
+#' saturate the detector in many spectra have a strongly negative
+#' medcouple, since their intensities pile up at the top of the range,
+#' while the lines of an element whose contents are skewed, with a few
+#' samples far above the others, have a positive one.
 #'
 #' @references
 #'  - Brys, G., Hubert, M., and Struyf, A. (2004).
@@ -44,18 +44,15 @@
 #'    Computational Statistics & Data Analysis, 52(12):5186-5201
 #'
 #' @author Christian L. Goueguel
-#' @param x A numeric vector, or a numeric matrix, data frame or tibble (one
-#'   medcouple per column).
+#' @param x A numeric vector.
 #' @param drop_na Logical value indicating whether to remove missing values
-#'   (NA). If `FALSE` (default), the medcouple of a vector or column that
-#'   contains missing values is `NA`.
+#'   (NA). If `FALSE` (default) and `x` contains missing values, `NA` is
+#'   returned.
 #'
-#' @return For a vector, the medcouple of `x`. For a matrix or data frame,
-#'   a numeric vector with the medcouple of each column, named by the
-#'   columns. The medcouple of a vector without values is `NA`.
+#' @return The medcouple of `x`, or `NA` when `x` has no values.
 #'
-#' @seealso [medcouple_weight()], [adjusted_boxplot()], [iqr_outliers()],
-#'   [summary_stats()]
+#' @seealso [plot_medcouple()], [medcouple_weight()], [adjusted_boxplot()],
+#'   [iqr_outliers()], [summary_stats()]
 #'
 #' @examples
 #' data(forageLIBS)
@@ -66,11 +63,11 @@
 #'
 #' # one medcouple per column; Fe and Zn have a few missing values
 #' contents <- forageLIBS[c("Ca", "K", "Mg", "P", "Fe", "Mn", "Zn")]
-#' round(medcouple(contents, drop_na = TRUE), 2)
+#' round(sapply(contents, medcouple, drop_na = TRUE), 2)
 #'
 #' # one medcouple per wavelength, from 380 to 430 nm
 #' wl <- suppressWarnings(as.numeric(names(forageLIBS)))
-#' mc <- medcouple(forageLIBS[which(wl > 380 & wl < 430)])
+#' mc <- sapply(forageLIBS[which(wl > 380 & wl < 430)], medcouple)
 #' summary(mc)
 #' # the Ca II line at 393.37 nm saturates the detector (65535 counts) in
 #' # most spectra: a negative medcouple; the Fe I line at 404.58 nm follows
@@ -84,28 +81,22 @@ medcouple <- function(x, drop_na = FALSE) {
   if (missing(x)) {
     stop("Missing 'x' argument.")
   }
-  if (!is.numeric(x) && !is.data.frame(x)) {
-    stop("The input 'x' must be a numeric vector, matrix or data frame.")
+  if (!is.numeric(x) || length(dim(x)) > 1) {
+    stop("The input 'x' must be a numeric vector; for the columns of a data ",
+         "frame or matrix, use sapply(x, medcouple) or apply(x, 2, medcouple).")
   }
   check_flag(drop_na, "drop_na")
 
-  if (is.numeric(x) && length(dim(x)) < 2) {
-    return(medcouple_vector(as.vector(x), drop_na))
-  }
-  x <- as_numeric_matrix(x)
-  mc <- vapply(seq_len(ncol(x)), function(j) medcouple_vector(x[, j], drop_na), numeric(1))
-  stats::setNames(mc, colnames(x))
-}
-
-# Medcouple of a numeric vector; doScale is given so that robustbase does not
-# print its message about the default of 'doScale'.
-medcouple_vector <- function(v, drop_na) {
-  if (anyNA(v)) {
+  # 1-d arrays (e.g. the result of tapply()) become plain vectors
+  x <- as.vector(x)
+  if (anyNA(x)) {
     if (!drop_na) return(NA_real_)
-    v <- v[!is.na(v)]
+    x <- x[!is.na(x)]
   }
-  if (length(v) == 0) {
+  if (length(x) == 0) {
     return(NA_real_)
   }
-  robustbase::mc(v, doScale = FALSE)
+  # doScale is given so that robustbase does not print its message about the
+  # default of 'doScale'
+  robustbase::mc(x, doScale = FALSE)
 }

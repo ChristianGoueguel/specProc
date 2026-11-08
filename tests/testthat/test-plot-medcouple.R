@@ -13,7 +13,7 @@ test_that("plot_medcouple draws the medcouple of each wavelength", {
   p <- plot_medcouple(mc_data)
   expect_s3_class(p, "ggplot")
   expect_equal(p$data$wavelength, mc_wl)
-  expect_equal(p$data$medcouple, unname(medcouple(mc_spectra)))
+  expect_equal(p$data$medcouple, unname(apply(mc_spectra, 2, medcouple)))
   expect_gt(p$data$medcouple[1], 0)
   expect_lt(p$data$medcouple[2], 0)
   expect_lt(p$data$medcouple[3], -0.5)
@@ -37,7 +37,7 @@ test_that("plot_medcouple draws a heatmap of the groups", {
   expect_equal(h$labels$y, "sample")
   b <- h$data[h$data$group == "b", ]
   b <- b[order(b$wavelength), ]
-  expect_equal(b$medcouple, unname(medcouple(mc_spectra[21:40, ])))
+  expect_equal(b$medcouple, unname(apply(mc_spectra[21:40, ], 2, medcouple)))
   # the first group on top
   expect_equal(unique(h$data$row[h$data$group == "a"]), 3)
   # tiles halfway to the neighbors, not across the gap between detectors

@@ -126,7 +126,8 @@ plot_medcouple <- function(x, group = NULL, drop_na = FALSE, color = c("#2166ac"
   groups <- medcouple_groups(x, group)
   df <- do.call(rbind, lapply(seq_along(groups$rows), function(i) {
     data.frame(group = names(groups$rows)[i], wavelength = wl,
-               medcouple = unname(medcouple(spectra[groups$rows[[i]], , drop = FALSE], drop_na)))
+               medcouple = unname(apply(spectra[groups$rows[[i]], , drop = FALSE], 2,
+                                        medcouple, drop_na = drop_na)))
   }))
   if (all(is.na(df$medcouple))) {
     stop("Every channel has missing values; use drop_na = TRUE.", call. = FALSE)

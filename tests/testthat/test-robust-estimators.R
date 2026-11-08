@@ -84,21 +84,15 @@ test_that("medcouple measures skewness robustly", {
   expect_error(medcouple(), "Missing")
 })
 
-test_that("medcouple is computed for each column of a matrix or data frame", {
+test_that("medcouple takes a vector only", {
   set.seed(5)
-  df <- data.frame(right = stats::rexp(200), left = -stats::rexp(200), sym = stats::rnorm(200))
-  mc <- medcouple(df)
-  expect_named(mc, names(df))
-  expect_equal(unname(mc), vapply(df, medcouple, numeric(1), USE.NAMES = FALSE))
+  df <- data.frame(right = stats::rexp(200), left = -stats::rexp(200))
+  expect_error(medcouple(df), "sapply\\(x, medcouple\\)")
+  expect_error(medcouple(as.matrix(df)), "apply\\(x, 2, medcouple\\)")
+  expect_error(medcouple(as.matrix(df[1])), "numeric vector")
+  mc <- sapply(df, medcouple)
   expect_gt(mc[["right"]], 0.2)
   expect_lt(mc[["left"]], -0.2)
-  expect_equal(medcouple(as.matrix(df)), mc)
-  expect_null(names(medcouple(unname(as.matrix(df)))))
-  df$sym[3] <- NA
-  expect_true(is.na(medcouple(df)[["sym"]]))
-  expect_equal(medcouple(df)[c("right", "left")], mc[c("right", "left")])
-  expect_equal(medcouple(df, drop_na = TRUE)[["sym"]], medcouple(df$sym[-3]))
-  expect_error(medcouple(data.frame(a = 1:3, b = letters[1:3])), "numeric columns")
 })
 
 test_that("tail weights match their values at the normal distribution", {

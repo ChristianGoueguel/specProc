@@ -89,8 +89,8 @@
 #' fit <- robust_boxcox(contents[1:300, ])
 #' fit$summary
 #' # the skewness of the contents, before and after
-#' round(medcouple(contents[1:300, ]), 2)
-#' round(medcouple(fit$transformation), 2)
+#' round(sapply(contents[1:300, ], medcouple), 2)
+#' round(sapply(fit$transformation, medcouple), 2)
 #' # new samples, with the transformation of the first 300
 #' head(predict(fit, contents[301:368, ]))
 robust_boxcox <- function(x, quantile = 0.99, nbsteps = 2, standardize = TRUE) {

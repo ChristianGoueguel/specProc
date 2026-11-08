@@ -297,9 +297,9 @@
   now keeps the standard errors (`std_error`), residual degrees of freedom
   and robust R² of the reweighted fit.
 * `medcouple()`: the medcouple of Brys, Hubert and Struyf (2004), a robust
-  measure of skewness with a breakdown value of 25%, of a vector or of each
-  column of a matrix or data frame, such as one per wavelength of a set of
-  spectra (channels that saturate the detector have a strongly negative
+  measure of skewness with a breakdown value of 25%, of a numeric vector.
+  `sapply(spectra, medcouple)` gives one per wavelength of a set of spectra
+  (channels that saturate the detector have a strongly negative
   medcouple). It was already used by `adjusted_boxplot()`,
   `iqr_outliers(skew = TRUE)`, `medcouple_weight()` and
   `summary_stats(robust = TRUE)`.
