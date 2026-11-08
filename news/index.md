@@ -1032,6 +1032,25 @@
   two scales of `lambda`. The defunct
   [`robustBCYJ()`](https://christiangoueguel.com/specProc/reference/specProc-defunct.md)
   now names the new functions.
+- The functions of a single variable
+  ([`biweight_location()`](https://christiangoueguel.com/specProc/reference/biweight_location.md),
+  [`biweight_scale()`](https://christiangoueguel.com/specProc/reference/biweight_scale.md),
+  [`biweight_midvariance()`](https://christiangoueguel.com/specProc/reference/biweight_midvariance.md),
+  [`umad()`](https://christiangoueguel.com/specProc/reference/umad.md),
+  [`iqr_outliers()`](https://christiangoueguel.com/specProc/reference/iqr_outliers.md),
+  [`medcouple_weight()`](https://christiangoueguel.com/specProc/reference/medcouple_weight.md),
+  [`quantile_weight()`](https://christiangoueguel.com/specProc/reference/quantile_weight.md),
+  [`zscore()`](https://christiangoueguel.com/specProc/reference/zscore.md),
+  [`minmax()`](https://christiangoueguel.com/specProc/reference/minmax.md)
+  and
+  [`directional_outlyingness()`](https://christiangoueguel.com/specProc/reference/directional_outlyingness.md),
+  as
+  [`medcouple()`](https://christiangoueguel.com/specProc/reference/medcouple.md))
+  stop when `x` is a matrix, instead of pooling all its values into one
+  result (one location of all the channels of a set of spectra, for
+  example). The message shows how to get one result per column, with
+  `sapply(x, f)` for a data frame or `apply(x, 2, f)` for a matrix. Data
+  frames already gave an error.
 
 ### Bug fixes
 

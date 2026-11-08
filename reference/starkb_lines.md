@@ -108,16 +108,7 @@ Christian L. Goueguel
 # needs an internet connection; gives up after 20 s if STARK-B does not answer
 ca <- try(starkb_lines("Ca II", wavelength = c(390, 400), perturber = "electron",
                       timeout = 20))
+#> Error : Could not download STARK-B data for Ca II (URL 'http://stark-b.obspm.fr/12.07/vamdc/tap/sync?LANG=VSS2&REQUEST=doQuery&FORMAT=XSAMS&QUERY=select%20%2A%20where%20%28atomsymbol%20%3D%20%27Ca%27%20and%20ioncharge%20%3D%201%29': Timeout of 20 seconds was reached). Check the internet connection, or try again later.
 if (!inherits(ca, "try-error")) head(ca)
-#> # A tibble: 6 × 10
-#>   species wavelength upper  lower perturber temperature density   width    shift
-#>   <chr>        <dbl> <chr>  <chr> <chr>           <dbl>   <dbl>   <dbl>    <dbl>
-#> 1 Ca II         395. 3p6.4… 3p6.… electron         5000    1e13 2.96e-6 -5.18e-7
-#> 2 Ca II         395. 3p6.4… 3p6.… electron        10000    1e13 2.28e-6 -4.23e-7
-#> 3 Ca II         395. 3p6.4… 3p6.… electron        20000    1e13 1.88e-6 -3.27e-7
-#> 4 Ca II         395. 3p6.4… 3p6.… electron        30000    1e13 1.77e-6 -2.78e-7
-#> 5 Ca II         395. 3p6.4… 3p6.… electron        50000    1e13 1.71e-6 -2.57e-7
-#> 6 Ca II         395. 3p6.4… 3p6.… electron       100000    1e13 1.66e-6 -2.14e-7
-#> # ℹ 1 more variable: source <chr>
 # }
 ```
