@@ -14,6 +14,8 @@ deprecation warning.
 ## Test environments
 
 * local macOS (aarch64-apple-darwin), R 4.6.1
+* win-builder: Windows Server 2022 (x86_64-w64-mingw32), R-devel
+  (2026-11-17 r90926 ucrt)
 * GitHub Actions: macOS (R release), Windows (R release), Ubuntu (R devel,
   release and oldrel-1)
 
@@ -23,12 +25,10 @@ deprecation warning.
 
 * checking CRAN incoming feasibility ... NOTE
 
-  Possibly misspelled words in DESCRIPTION: Bossche, Driessen, Engelen,
-  Kohonen, LIBS, MacroPCA, OPLS, Raman, Raymaekers, Rousseeuw, Saha, SIMCA,
-  Trygg, Vanden, Verboven, cellwise. These are author names, method names
-  (MacroPCA, OPLS, Saha-Boltzmann, SIMCA), the acronym of laser-induced
-  breakdown spectroscopy (LIBS), Raman spectroscopy, and the statistical
-  term "cellwise" (cellwise outliers).
+  Possibly misspelled words in DESCRIPTION: Driessen, Engelen, SIMCA,
+  Verboven. Driessen, Engelen and Verboven are author names (Van Driessen,
+  Engelen, Verboven) in the references of the methods; SIMCA is the name of
+  a classification method (soft independent modelling of class analogy).
 
 ## Reverse dependencies
 
