@@ -18,7 +18,7 @@ zscore(x, cutoff = 3, robust = FALSE, drop_na = FALSE, drop.na = deprecated())
 \item{drop.na}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{drop_na}.}
 }
 \value{
-A tibble with two columns:
+A tibble with three columns, sorted by decreasing score:
 \itemize{
 \item \code{data}: The original numeric values.
 \item \code{score}: The calculated z-scores.
@@ -38,6 +38,22 @@ z-score greater than 3 (|z| > 3) can be considered potential outliers (default),
 that covers 99.7\% of the data points in a normal distribution. (Note that a cutoff of |z| > 2.5 is also often used).
 }
 \examples{
+# 90 regular values and a cluster of 10 outliers near 62
+set.seed(1)
+x <- c(rnorm(90, mean = 50, sd = 2), rnorm(10, mean = 62, sd = 0.5))
+group <- rep(c("regular", "outlier"), c(90, 10))
+ggplot2::ggplot(data.frame(x, group), ggplot2::aes(x)) +
+  ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+  ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+  ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac"))
+
+# classical: the cluster inflates the standard deviation, which hides it
+# (masking): the outliers score below 3 and none is flagged
+head(zscore(x), 11)
+# robust: the median and the MAD hardly move, and the 10 outliers are
+# flagged
+head(zscore(x, robust = TRUE), 11)
+
 data(forageLIBS)
 # iron contents (mg/kg): a few samples are far above the others
 fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
@@ -60,6 +76,9 @@ Ph.D. Qualifying paper, Dept. Statistics, Harvard University, Boston.
 Robuste Schätzungen: infinitesimale Optimalität und Schätzungen von Kovarianzmatrizen.
 PhD thesis, ETH Zürich.
 }
+}
+\seealso{
+\code{\link[=iqr_outliers]{iqr_outliers()}}, \code{\link[=directional_outlyingness]{directional_outlyingness()}} for skewed data.
 }
 \author{
 Christian L. Goueguel

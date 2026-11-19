@@ -39,6 +39,42 @@ test_that("directional_outlyingness flags gross outliers", {
   expect_error(directional_outlyingness("a"), "numeric")
 })
 
+test_that("directional_outlyingness flags about 1 - cutoff_quantile of normal data", {
+  set.seed(2)
+  z <- stats::rnorm(1e4)
+  res <- directional_outlyingness(z)
+  expect_equal(res$flag, res$score > stats::qnorm(0.9975))
+  expect_gt(mean(res$flag), 0.003)
+  expect_lt(mean(res$flag), 0.007)
+  res90 <- directional_outlyingness(z, cutoff_quantile = 0.9)
+  expect_equal(res90$flag, res90$score > stats::qnorm(0.95))
+  # close to the absolute robust z-score
+  rob <- zscore(z, robust = TRUE)
+  expect_equal(res$score, abs(rob$score[match(res$data, rob$data)]), tolerance = 0.05)
+  expect_error(directional_outlyingness(z, cutoff_quantile = 1), "cutoff_quantile")
+  expect_error(directional_outlyingness(z, cutoff_quantile = 0), "cutoff_quantile")
+})
+
+test_that("skewness-aware methods flag low and high outliers of skewed data", {
+  set.seed(1)
+  out <- c(85, 87, 89, 220, 230, 240)
+  x <- c(100 + stats::rgamma(200, shape = 2, scale = 10), out)
+  # symmetric methods: regular values of the long tail, not the low outliers
+  iqr <- iqr_outliers(x)
+  rob <- zscore(x, robust = TRUE)
+  expect_false(any(out[1:3] %in% iqr$data[iqr$flag]))
+  expect_false(any(out[1:3] %in% rob$data[rob$flag]))
+  expect_true(any(!(iqr$data[iqr$flag] %in% out)))
+  expect_true(any(!(rob$data[rob$flag] %in% out)))
+  # skewness-aware methods: the outliers only
+  adj <- iqr_outliers(x, skew = TRUE)
+  dir <- directional_outlyingness(x)
+  expect_setequal(adj$data[adj$flag], out)
+  expect_setequal(dir$data[dir$flag], out)
+  # the low outliers score above the largest regular value
+  expect_gt(min(dir$score[dir$data %in% out[1:3]]), max(dir$score[!(dir$data %in% out)]))
+})
+
 test_that("generalized_boxplot estimates g and h and sensible fences", {
   set.seed(3)
   df <- data.frame(normal = stats::rnorm(5000), skewed = stats::rexp(5000))

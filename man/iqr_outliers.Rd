@@ -50,6 +50,23 @@ may still struggle to accurately identify potential outliers in distributions wi
 kurtosis or long-tailed behavior.
 }
 \examples{
+# 200 right-skewed values (a gamma distribution shifted to start at 100),
+# 3 low outliers below them and 3 high outliers
+set.seed(1)
+x <- c(100 + rgamma(200, shape = 2, scale = 10), 85, 87, 89, 220, 230, 240)
+group <- rep(c("regular", "outlier"), c(200, 6))
+ggplot2::ggplot(data.frame(x, group), ggplot2::aes(x)) +
+  ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+  ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+  ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac"))
+medcouple(x)   # positive: skewed to the right
+
+# symmetric fences: the upper fence flags regular values of the long tail,
+# and the lower fence lies below the low outliers
+subset(iqr_outliers(x), flag)
+# fences adjusted for the skewness: the 6 outliers, and no regular value
+subset(iqr_outliers(x, skew = TRUE), flag)
+
 data(forageLIBS)
 # iron contents (mg/kg): a few samples are far above the others
 fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
@@ -69,6 +86,9 @@ Addison-Wesley
 An Adjusted Boxplot for Skewed Distributions.
 Computational Statistics & Data Analysis, 52(12):5186-5201
 }
+}
+\seealso{
+\code{\link[=medcouple]{medcouple()}}, \code{\link[=adjusted_boxplot]{adjusted_boxplot()}}, \code{\link[=directional_outlyingness]{directional_outlyingness()}}
 }
 \author{
 Christian L. Goueguel

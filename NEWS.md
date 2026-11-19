@@ -489,6 +489,13 @@
 * specProc now requires ggplot2 3.5.0 or later.
 * scales moves from Suggests to Imports, since the plots use it; it was
   already installed with ggplot2.
+* The examples of `zscore()`, `iqr_outliers()` and
+  `directional_outlyingness()` start with synthetic data whose outliers are
+  known, drawn as a density plot: a cluster of outliers that hides itself
+  from the classical z-score (masking), and a right-skewed sample with low
+  and high outliers, on which the fences that account for the skewness and
+  the directional outlyingness flag the outliers and no regular value of the
+  long tail.
 
 ## Breaking changes
 
@@ -620,6 +627,15 @@
   the channels of a set of spectra, for example). The message shows how to
   get one result per column, with `sapply(x, f)` for a data frame or
   `apply(x, 2, f)` for a matrix. Data frames already gave an error.
+* `directional_outlyingness()` flags the observations whose score exceeds
+  the `(1 + cutoff_quantile) / 2` quantile of the standard normal
+  distribution (2.81 by default), about 0.5% of the observations of a
+  normal distribution. The cutoff came from a robust normal fit to
+  `log(0.1 + score)`: on one variable it lay near 5 to 6 scales from the
+  median, so that no observation of normal data was flagged, nor, in a
+  right-skewed sample, a high outlier at 6 scales or low outliers below the
+  distribution. More observations are flagged. `cutoff_quantile` must be
+  strictly between 0 and 1.
 
 ## Bug fixes
 
