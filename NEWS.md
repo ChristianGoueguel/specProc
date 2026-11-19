@@ -692,6 +692,14 @@
   uses the deterministic MCD when it succeeds: cellWise compares its
   log-determinant with the determinant of the C-steps, a comparison that
   depends on the units, and keeps it in the usual case.
+* The help page of `quantile_weight()` says what `p` and `q` are (the
+  probabilities that choose the quantiles compared in each half of the
+  distribution) and gives the right breakdown value and normal values: the
+  defaults have a breakdown value of 6.25%, not 12.5% (which needs
+  `p = 0.25` and `q = 0.75`), and give LQW = RQW = 0.249 at the normal
+  distribution, not 0.2 (the value of the medcouple weights). The breakdown
+  value of `medcouple_weight()` is 12.5%, not 25%: the medcouple resists 25%
+  of outliers, but is computed on each half of the observations.
 
 # specProc 0.8.3
 
