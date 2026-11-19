@@ -71,10 +71,11 @@
 #' data(forageLIBS)
 #' minerals <- forageLIBS[c("Measurement", "Ca", "Mg", "P", "K", "S")]
 #'
-#' # mineral contents, each on its own axis, the outlying samples named: a
-#' # figure of a journal page width
+#' # mineral contents, each on its own axis and with its own fill color, the
+#' # outlying samples named: a figure of a journal page width
 #' p <- generalized_boxplot(minerals, id = Measurement, label_outliers = TRUE,
-#'                          ylab = "Content (%)", base_size = 8)
+#'                          fill = hcl.colors(5, "Pastel 1"), ylab = "Content (%)",
+#'                          base_size = 8)
 #' p
 #' # ggplot2::ggsave("minerals.pdf", p, width = 175, height = 70, units = "mm")
 #'
@@ -87,22 +88,24 @@
 #' # flagged per mineral even in clean data
 #' generalized_boxplot(minerals, id = Measurement, alpha = 0.05, plot = FALSE)$stats
 #'
-#' # potassium and phosphorus by calcium level, with notches and means: a
-#' # figure of a journal column
+#' # potassium and phosphorus by calcium level, with notches, means and a
+#' # darker blue for a higher level: a figure of a journal column
 #' minerals$Ca_level <- cut(minerals$Ca, quantile(minerals$Ca, 0:3 / 3),
 #'                          labels = c("Low Ca", "Mid Ca", "High Ca"),
 #'                          include.lowest = TRUE)
 #' p <- generalized_boxplot(minerals[c("K", "P", "Ca_level")], group = Ca_level,
 #'                          notch = TRUE, show_mean = TRUE, ylab = "Content (%)",
+#'                          fill = c("#deebf7", "#9ecae1", "#4292c6"),
 #'                          title = "Potassium and phosphorus by calcium level",
 #'                          base_size = 8)
 #' p
 #' # ggplot2::ggsave("by_calcium.pdf", p, width = 85, height = 75, units = "mm")
 #'
 #' # trace elements on a logarithmic axis, horizontal, with all the samples
+#' # and one fill color for all the boxes
 #' traces <- forageLIBS[c("Fe", "Mn", "Zn")]
 #' generalized_boxplot(traces, log = TRUE, horizontal = TRUE, points = "all",
-#'                     ylab = "Content (mg/kg)")
+#'                     fill = "#fdd49e", ylab = "Content (mg/kg)")
 generalized_boxplot <- function(x, alpha = 2 * stats::pnorm(-4 * stats::qnorm(0.75)), p = 0.9,
                                 plot = TRUE, id = NULL, group = NULL,
                                 scales = c("free_y", "fixed"),
