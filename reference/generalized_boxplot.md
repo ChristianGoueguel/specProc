@@ -320,7 +320,7 @@ generalized_boxplot(minerals, id = Measurement, alpha = 0.05, plot = FALSE)$stat
 #> #   expected_outliers <dbl>
 
 # potassium and phosphorus by calcium level, with notches, means and a
-# darker blue for a higher level: a figure of a journal column
+# darker blue for a higher level: a figure of a journal column (85 x 75 mm)
 minerals$Ca_level <- cut(minerals$Ca, quantile(minerals$Ca, 0:3 / 3),
                          labels = c("Low Ca", "Mid Ca", "High Ca"),
                          include.lowest = TRUE)
@@ -331,8 +331,6 @@ p <- generalized_boxplot(minerals[c("K", "P", "Ca_level")], group = Ca_level,
                          base_size = 8)
 p
 
-ggplot2::ggsave(file.path(tempdir(), "by_calcium.pdf"), p, width = 85, height = 75,
-                units = "mm")
 
 # trace elements on a logarithmic axis, horizontal, with all the samples
 # and one fill color for all the boxes
