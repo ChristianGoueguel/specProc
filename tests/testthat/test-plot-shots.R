@@ -1,3 +1,8 @@
+# Drawing tests take a large share of the check time on CRAN's Windows
+# machine; they run on GitHub Actions (NOT_CRAN = true), and the plot
+# functions are also run by their examples on CRAN.
+skip_on_cran()
+
 test_that("plot_shots draws the criteria of the shots", {
   res <- reject_shots(forageShots, Measurement, shot = shot)
   p <- plot_shots(res, type = "criteria")

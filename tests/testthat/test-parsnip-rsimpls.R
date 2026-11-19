@@ -73,6 +73,7 @@ test_that("the rsimpls engine handles several outcomes", {
 })
 
 test_that("tune_grid() fits one rsimpls() model per resample for num_comp", {
+  skip_on_cran()
   skip_if_not_installed("tune")
   skip_if_not_installed("workflows")
   skip_if_not_installed("rsample")

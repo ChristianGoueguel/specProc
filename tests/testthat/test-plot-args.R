@@ -1,3 +1,8 @@
+# Drawing tests take a large share of the check time on CRAN's Windows
+# machine; they run on GitHub Actions (NOT_CRAN = true), and the plot
+# functions are also run by their examples on CRAN.
+skip_on_cran()
+
 # The arguments shared by the plots: names, checks, wavelength windows and
 # the former names.
 

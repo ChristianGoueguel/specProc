@@ -45,6 +45,7 @@ test_that("response_calibration recovers the response of the instrument", {
 })
 
 test_that("the measurement uncertainty matches the spread of repeated calibrations", {
+  skip_on_cran()
   wl <- seq(300, 800, by = 0.2)
   at <- c(which.min(abs(wl - 400)), which.min(abs(wl - 700)))
   for (n in c(1, 4)) {

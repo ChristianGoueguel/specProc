@@ -1,3 +1,8 @@
+# Drawing tests take a large share of the check time on CRAN's Windows
+# machine; they run on GitHub Actions (NOT_CRAN = true), and the plot
+# functions are also run by their examples on CRAN.
+skip_on_cran()
+
 set.seed(7)
 # two detector segments, with a gap between them
 mc_wl <- c(seq(400, 401, by = 0.1), seq(410, 411, by = 0.1))

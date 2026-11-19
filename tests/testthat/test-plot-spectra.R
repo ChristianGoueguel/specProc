@@ -1,3 +1,8 @@
+# Drawing tests take a large share of the check time on CRAN's Windows
+# machine; they run on GitHub Actions (NOT_CRAN = true), and the plot
+# functions are also run by their examples on CRAN.
+skip_on_cran()
+
 test_that("plot_spectra draws one line per spectrum", {
   spec <- make_spectra(n = 3, p = 50)
   df <- as.data.frame(spec$x, check.names = FALSE)

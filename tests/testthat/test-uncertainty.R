@@ -201,6 +201,7 @@ test_that("plasma_uncertainty of a CF-LIBS fit repeats the fit", {
 })
 
 test_that("plasma_uncertainty propagates a given temperature to the composition", {
+  skip_on_cran()
   fit <- cf_libs(u_cf_lines(), partition = u_partition, temperature = 9000)
   set.seed(6)
   u <- plasma_uncertainty(fit, n = 400, temperature_se = 450)
@@ -213,6 +214,7 @@ test_that("plasma_uncertainty propagates a given temperature to the composition"
 })
 
 test_that("plasma_uncertainty leaves out the CF-LIBS draws that fail", {
+  skip_on_cran()
   fit <- cf_libs(u_cf_lines(), partition = u_partition)
   set.seed(7)
   expect_warning(u <- plasma_uncertainty(fit, n = 200, aki_rsd = 3), "draws failed")

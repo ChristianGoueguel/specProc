@@ -183,6 +183,7 @@ test_that("dmodx of new samples uses the calibration s0", {
 })
 
 test_that("the Jackson-Mudholkar limit is valid whatever the sign of h0", {
+  skip_on_cran()
   h0_of <- function(rest) {
     th <- vapply(1:3, function(j) sum(rest^j), numeric(1))
     1 - 2 * th[1] * th[3] / (3 * th[2]^2)

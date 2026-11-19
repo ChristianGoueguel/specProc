@@ -1,3 +1,8 @@
+# Drawing tests take a large share of the check time on CRAN's Windows
+# machine; they run on GitHub Actions (NOT_CRAN = true), and the plot
+# functions are also run by their examples on CRAN.
+skip_on_cran()
+
 test_that("plot_coomans() draws the distances to two classes", {
   d <- make_simca(n = 25, p = 30)
   set.seed(1)

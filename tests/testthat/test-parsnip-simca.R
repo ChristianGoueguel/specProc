@@ -65,6 +65,7 @@ test_that("a fitted simca model predicts like rsimca()", {
 })
 
 test_that("simca() can be tuned with class metrics, num_comp, gamma and squared", {
+  skip_on_cran()
   skip_if_not_installed("tune")
   skip_if_not_installed("workflows")
   skip_if_not_installed("rsample")

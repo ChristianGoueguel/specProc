@@ -103,6 +103,7 @@ test_that("the boxplots trace the outliers to their rows and ids, by group", {
 })
 
 test_that("the boxplots draw one panel per variable, or a common axis", {
+  skip_on_cran()
   df <- data.frame(a = stats::rnorm(50), b = 100 * stats::rexp(50))
   p <- adjusted_boxplot(df)
   expect_s3_class(p$facet, "FacetWrap")
@@ -121,6 +122,7 @@ test_that("the boxplots draw one panel per variable, or a common axis", {
 })
 
 test_that("the boxplots show what is asked, with notches", {
+  skip_on_cran()
   set.seed(15)
   df <- data.frame(a = c(stats::rnorm(48), 8, 9), b = stats::rexp(50))
   geoms <- function(p) unname(vapply(p$layers, function(l) class(l$geom)[1], character(1)))
@@ -184,6 +186,7 @@ test_that("the boxplots test the groups with Kruskal-Wallis", {
 })
 
 test_that("the boxplots annotate each box on request", {
+  skip_on_cran()
   set.seed(18)
   df <- data.frame(g = rep(c("a", "b"), each = 40), y = c(stats::rnorm(78), 9, -9),
                    z = stats::rexp(80))

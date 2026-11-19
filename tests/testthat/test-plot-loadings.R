@@ -70,6 +70,7 @@ test_that("a derivative shape is flagged", {
 })
 
 test_that("plot_loadings works with prcomp and robust fits", {
+  skip_on_cran()
   x <- make_line_spectra()
   pca <- stats::prcomp(x)
   p <- plot_loadings(pca, lines = test_lines(), spectra = x)
