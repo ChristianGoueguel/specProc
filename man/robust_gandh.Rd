@@ -10,7 +10,8 @@ robust_gandh(
   cutoff = NULL,
   max_iter = 50,
   tol = 1e-06,
-  standardize = TRUE
+  standardize = TRUE,
+  robust = TRUE
 )
 }
 \arguments{
@@ -33,6 +34,10 @@ is 1e-6.}
 
 \item{standardize}{Logical: additionally standardize latent scores using
 the fitting inliers (\code{TRUE}, default).}
+
+\item{robust}{Logical: fit by robust quantile least squares (\code{TRUE},
+default), or by classical quantile least squares on all the
+observations (\code{FALSE}), to compare (see Details).}
 }
 \value{
 An object of class \code{specproc_gandh}, inheriting from
@@ -44,16 +49,19 @@ original input scale), \code{g}, \code{h}, \code{objective} (quantile mean squar
 error on the median/MAD input scale), \code{n_trimmed}, \code{cutoff} (on the
 standardized input scale), \code{converged} and \code{tuning_met}. Parameters
 and diagnostics are \code{NA} for variables left unchanged. \code{tuning_met}
-is \code{NA} when a cutoff was supplied.
+is \code{NA} when a cutoff was supplied. With \code{robust = FALSE},
+\code{n_trimmed} is 0, and \code{cutoff} and \code{tuning_met} are \code{NA}.
 \item \code{fits}: Parameters and fitting diagnostics used by \code{predict()}.
 \item \code{standardize}: The \code{standardize} argument.
+\item \code{robust}: The \code{robust} argument.
 }
 }
 \description{
 Transforms each variable toward central normality by inverting a Tukey
 g-and-h distribution fitted by robust quantile least squares (rQLS;
 Xu, Iglewicz and Chervoneva, 2014). Accepts positive, zero and negative
-values, and fits skewness and tail heaviness separately.
+values, and fits skewness and tail heaviness separately. \code{robust = FALSE}
+gives the classical quantile least squares fit (QLS), for comparison.
 }
 \details{
 The fitted distribution maps a standard normal value \eqn{z} to
@@ -86,6 +94,14 @@ observations is used, with a warning and \code{tuning_met = FALSE}. A supplied
 cutoff bypasses this search. This numerical search need not give exactly
 the same cutoff as the authors' implementation.
 
+With \code{robust = FALSE}, the distribution is fitted by QLS to all the
+observations, without trimming (the non-robust fit of the paper), and the
+latent scores are standardized by the mean and standard deviation of all
+the observations; \code{cutoff}, \code{max_iter} and \code{tol} are not used. Outliers in
+a tail then move the outer fitting quantiles, which inflates \eqn{g} and
+\eqn{h}: the transformation compresses that tail too much, and pulls the
+outliers in among the other values (see the examples).
+
 With \code{standardize = TRUE}, latent normal scores are additionally centered
 and scaled by the mean and standard deviation of the fitting inliers.
 With \code{FALSE}, the fitted latent scores are returned directly; they already
@@ -101,6 +117,46 @@ support become \code{NA} with a warning. Inverse values exceeding floating
 point range also become \code{NA} with a warning.
 }
 \examples{
+# 300 values from a g-and-h distribution, skewed to the right (g = 0.5)
+# with heavier tails than the normal distribution (h = 0.1), and 15 high
+# outliers near 400
+set.seed(6)
+x <- c(tukey_gh(type = "r", n = 300, location = 100, scale = 10, g = 0.5, h = 0.1),
+       rnorm(15, mean = 400, sd = 2))
+group <- rep(c("regular", "outlier"), c(300, 15))
+ggplot2::ggplot(data.frame(x, group), ggplot2::aes(x)) +
+  ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+  ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+  ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac"))
+
+# the classical fit (QLS on all the values) overestimates the skewness g
+# and the tail weight h; the robust fit (rQLS) trims the 15 outliers and
+# stays close to g = 0.5 and h = 0.1
+classical <- robust_gandh(x, robust = FALSE)
+robust <- robust_gandh(x)
+params <- c("g", "h", "n_trimmed")
+round(rbind(classical = unlist(classical$summary[params]),
+            robust = unlist(robust$summary[params])), 2)
+
+# the classical transformation compresses the right tail too much, and
+# pulls the outliers within 3 standard deviations; the robust one leaves
+# them far out
+transformed <- data.frame(
+  fit = rep(c("classical", "robust"), each = length(x)),
+  value = c(classical$transformation[[1]], robust$transformation[[1]]),
+  group = rep(group, 2)
+)
+ggplot2::ggplot(transformed, ggplot2::aes(value)) +
+  ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+  ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+  ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac")) +
+  ggplot2::facet_wrap(~fit, ncol = 1)
+regular <- transformed$group == "regular"
+# the skewness of the transformed regular values, and the outlier closest
+# to them
+round(tapply(transformed$value[regular], transformed$fit[regular], medcouple), 2)
+round(tapply(transformed$value[!regular], transformed$fit[!regular], min), 2)
+
 data(forageLIBS)
 contents <- forageLIBS[c("Ca", "K", "P", "Mn")]
 fit <- robust_gandh(contents[1:300, ])

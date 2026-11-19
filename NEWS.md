@@ -9,6 +9,10 @@
   prediction, inverse transformation and residual smearing. Direct inversion
   preserves extreme normal scores without rounding cumulative probabilities.
   `step_robust_gandh()` estimates the transformation within recipe training.
+  `robust = FALSE` gives the classical quantile least squares fit (QLS) of
+  all the observations, for comparison: the examples show, on synthetic
+  data, outliers that inflate the classical `g` and `h` and are pulled in
+  among the other values, but are trimmed by the robust fit.
 
 * `wavelet_denoise()`: denoising of spectra by thresholding their
   undecimated wavelet transform (MODWT), the translation-invariant denoising

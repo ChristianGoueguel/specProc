@@ -4,7 +4,8 @@
 #' Transforms each variable toward central normality by inverting a Tukey
 #' g-and-h distribution fitted by robust quantile least squares (rQLS;
 #' Xu, Iglewicz and Chervoneva, 2014). Accepts positive, zero and negative
-#' values, and fits skewness and tail heaviness separately.
+#' values, and fits skewness and tail heaviness separately. `robust = FALSE`
+#' gives the classical quantile least squares fit (QLS), for comparison.
 #'
 #' @details
 #' The fitted distribution maps a standard normal value \eqn{z} to
@@ -37,6 +38,14 @@
 #' cutoff bypasses this search. This numerical search need not give exactly
 #' the same cutoff as the authors' implementation.
 #'
+#' With `robust = FALSE`, the distribution is fitted by QLS to all the
+#' observations, without trimming (the non-robust fit of the paper), and the
+#' latent scores are standardized by the mean and standard deviation of all
+#' the observations; `cutoff`, `max_iter` and `tol` are not used. Outliers in
+#' a tail then move the outer fitting quantiles, which inflates \eqn{g} and
+#' \eqn{h}: the transformation compresses that tail too much, and pulls the
+#' outliers in among the other values (see the examples).
+#'
 #' With `standardize = TRUE`, latent normal scores are additionally centered
 #' and scaled by the mean and standard deviation of the fitting inliers.
 #' With `FALSE`, the fitted latent scores are returned directly; they already
@@ -65,6 +74,9 @@
 #'   is 1e-6.
 #' @param standardize Logical: additionally standardize latent scores using
 #'   the fitting inliers (`TRUE`, default).
+#' @param robust Logical: fit by robust quantile least squares (`TRUE`,
+#'   default), or by classical quantile least squares on all the
+#'   observations (`FALSE`), to compare (see Details).
 #'
 #' @return An object of class `specproc_gandh`, inheriting from
 #'   `specproc_transformation`, with the same components as [robust_boxcox()]:
@@ -74,9 +86,11 @@
 #'    error on the median/MAD input scale), `n_trimmed`, `cutoff` (on the
 #'    standardized input scale), `converged` and `tuning_met`. Parameters
 #'    and diagnostics are `NA` for variables left unchanged. `tuning_met`
-#'    is `NA` when a cutoff was supplied.
+#'    is `NA` when a cutoff was supplied. With `robust = FALSE`,
+#'    `n_trimmed` is 0, and `cutoff` and `tuning_met` are `NA`.
 #'  - `fits`: Parameters and fitting diagnostics used by `predict()`.
 #'  - `standardize`: The `standardize` argument.
+#'  - `robust`: The `robust` argument.
 #'
 #' @references
 #' Xu, Y., Iglewicz, B., Chervoneva, I. (2014). Robust estimation of the
@@ -90,6 +104,46 @@
 #' @export
 #'
 #' @examples
+#' # 300 values from a g-and-h distribution, skewed to the right (g = 0.5)
+#' # with heavier tails than the normal distribution (h = 0.1), and 15 high
+#' # outliers near 400
+#' set.seed(6)
+#' x <- c(tukey_gh(type = "r", n = 300, location = 100, scale = 10, g = 0.5, h = 0.1),
+#'        rnorm(15, mean = 400, sd = 2))
+#' group <- rep(c("regular", "outlier"), c(300, 15))
+#' ggplot2::ggplot(data.frame(x, group), ggplot2::aes(x)) +
+#'   ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+#'   ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+#'   ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac"))
+#'
+#' # the classical fit (QLS on all the values) overestimates the skewness g
+#' # and the tail weight h; the robust fit (rQLS) trims the 15 outliers and
+#' # stays close to g = 0.5 and h = 0.1
+#' classical <- robust_gandh(x, robust = FALSE)
+#' robust <- robust_gandh(x)
+#' params <- c("g", "h", "n_trimmed")
+#' round(rbind(classical = unlist(classical$summary[params]),
+#'             robust = unlist(robust$summary[params])), 2)
+#'
+#' # the classical transformation compresses the right tail too much, and
+#' # pulls the outliers within 3 standard deviations; the robust one leaves
+#' # them far out
+#' transformed <- data.frame(
+#'   fit = rep(c("classical", "robust"), each = length(x)),
+#'   value = c(classical$transformation[[1]], robust$transformation[[1]]),
+#'   group = rep(group, 2)
+#' )
+#' ggplot2::ggplot(transformed, ggplot2::aes(value)) +
+#'   ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+#'   ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+#'   ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac")) +
+#'   ggplot2::facet_wrap(~fit, ncol = 1)
+#' regular <- transformed$group == "regular"
+#' # the skewness of the transformed regular values, and the outlier closest
+#' # to them
+#' round(tapply(transformed$value[regular], transformed$fit[regular], medcouple), 2)
+#' round(tapply(transformed$value[!regular], transformed$fit[!regular], min), 2)
+#'
 #' data(forageLIBS)
 #' contents <- forageLIBS[c("Ca", "K", "P", "Mn")]
 #' fit <- robust_gandh(contents[1:300, ])
@@ -97,9 +151,10 @@
 #' new <- predict(fit, contents[301:368, ])
 #' head(predict(fit, new, inverse = TRUE))
 robust_gandh <- function(x, n_quantiles = 10, cutoff = NULL, max_iter = 50,
-                         tol = 1e-6, standardize = TRUE) {
+                         tol = 1e-6, standardize = TRUE, robust = TRUE) {
   if (missing(x)) stop("Missing 'x' argument.")
   check_gandh_args(n_quantiles, cutoff, max_iter, tol, standardize)
+  check_flag(robust, "robust")
   x <- as_numeric_matrix(x, "x")
   if (any(is.infinite(x))) stop("'x' must not contain infinite values.", call. = FALSE)
   if (is.null(colnames(x))) colnames(x) <- paste0("V", seq_len(ncol(x)))
@@ -111,7 +166,7 @@ robust_gandh <- function(x, n_quantiles = 10, cutoff = NULL, max_iter = 50,
     if (length(v) < max(10, n_quantiles + 1) || stats::mad(v) <= 0) return(none)
     center <- stats::median(v)
     scale <- stats::mad(v)
-    fit <- fit_gandh((v - center) / scale, n_quantiles, cutoff, max_iter, tol)
+    fit <- fit_gandh((v - center) / scale, n_quantiles, cutoff, max_iter, tol, robust)
     if (is.null(fit)) {
       warning("g-and-h fit failed for '", colnames(x)[j], "'; left unchanged.", call. = FALSE)
       return(none)
@@ -126,7 +181,8 @@ robust_gandh <- function(x, n_quantiles = 10, cutoff = NULL, max_iter = 50,
   names(fits) <- colnames(x)
   fit <- list(fits = fits, standardize = standardize)
   res <- list(transformation = as_tbl(apply_transformation(x, fit)),
-              summary = gandh_summary(fits), fits = fits, standardize = standardize)
+              summary = gandh_summary(fits), fits = fits, standardize = standardize,
+              robust = robust)
   structure(res, variables = colnames(x), nvar = ncol(x),
             class = c("specproc_gandh", "specproc_transformation"))
 }
@@ -301,13 +357,26 @@ gandh_tail_weights <- function(w) {
   side_ok(left) && side_ok(right)
 }
 
-fit_gandh <- function(x, n_quantiles, cutoff, max_iter, tol) {
+fit_gandh <- function(x, n_quantiles, cutoff, max_iter, tol, robust = TRUE) {
   if (any(!is.finite(x))) return(NULL)
   ord <- order(x)
   sorted <- x[ord]
   p <- gandh_probs(n_quantiles)
   z <- stats::qnorm(gandh_probs(length(sorted)))
   full <- gandh_qls(sorted, p)
+  if (!robust) {
+    # classical QLS on all the observations, without trimming
+    if (is.null(full)) return(NULL)
+    par <- full$par
+    scores <- gandh_scores(sorted, par[1], exp(par[2]), par[3], par[4])
+    if (any(!is.finite(scores))) return(NULL)
+    sd <- stats::sd(scores)
+    if (!is.finite(sd) || sd <= 0) return(NULL)
+    return(list(A = unname(par[1]), B = unname(exp(par[2])), g = unname(par[3]),
+                h = unname(par[4]), mean = mean(scores), sd = sd, objective = full$objective,
+                n_trimmed = 0, cutoff = NA_real_, iterations = NA_integer_, converged = TRUE,
+                tuning_met = NA, weights = rep(1, length(x))))
+  }
   central <- gandh_qls(sorted, seq(0.15, 0.85, length.out = n_quantiles))
   candidates <- Filter(Negate(is.null), list(full, central))
   if (length(candidates) == 0) return(NULL)
@@ -397,7 +466,8 @@ gandh_summary <- function(fits) {
 
 print_gandh <- function(x) {
   done <- vapply(x$fits, function(f) f$type != "none", logical(1))
-  cat("Robust Tukey g-and-h transformation (rQLS)\n\n")
+  cat(if (isFALSE(x$robust)) "Classical Tukey g-and-h transformation (QLS)\n\n" else
+    "Robust Tukey g-and-h transformation (rQLS)\n\n")
   cat("Variables:     ", length(done), "\n", sep = "")
   cat("Transformed:   ", sum(done), "\n", sep = "")
   cat("Standardized:  ", if (x$standardize) "yes" else "no", "\n", sep = "")

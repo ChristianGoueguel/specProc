@@ -9,7 +9,7 @@ test_that("rQLS recovers a known g-and-h distribution and latent scores", {
   ref <- gh_reference(2000, A = -5, B = 2.4, g = -0.45, h = 0.17)
   fit <- robust_gandh(ref$x, cutoff = 100, standardize = FALSE)
   expect_s3_class(fit, c("specproc_gandh", "specproc_transformation"))
-  expect_named(fit, c("transformation", "summary", "fits", "standardize"))
+  expect_named(fit, c("transformation", "summary", "fits", "standardize", "robust"))
   expect_equal(fit$summary$variable, "V1")
   expect_equal(fit$summary$location, -5, tolerance = 0.01)
   expect_equal(fit$summary$scale, 2.4, tolerance = 0.01)
@@ -43,6 +43,44 @@ test_that("adaptive rQLS excludes contamination from fitting but transforms it",
   shuffled <- robust_gandh(x[idx], standardize = FALSE)
   expect_equal(shuffled$summary, fit$summary)
   expect_equal(shuffled$fits$V1$weights, rev(fit$fits$V1$weights))
+})
+
+test_that("robust = FALSE fits g and h by classical QLS on all the observations", {
+  # a known g-and-h distribution, without outliers: QLS recovers it
+  ref <- gh_reference(2000, A = -5, B = 2.4, g = -0.45, h = 0.17)
+  fit <- robust_gandh(ref$x, robust = FALSE, standardize = FALSE)
+  expect_false(fit$robust)
+  expect_equal(fit$summary$g, -0.45, tolerance = 0.01)
+  expect_lt(abs(fit$summary$h - 0.17), 0.005)
+  expect_equal(fit$summary$n_trimmed, 0)
+  expect_true(is.na(fit$summary$cutoff))
+  expect_true(is.na(fit$summary$tuning_met))
+  # the QLS fit of all the observations, on the median/MAD scale
+  set.seed(6)
+  x <- c(tukey_gh(type = "r", n = 300, location = 100, scale = 10, g = 0.5, h = 0.1),
+         stats::rnorm(15, mean = 400, sd = 2))
+  v <- (x - stats::median(x)) / stats::mad(x)
+  qls <- gandh_qls(sort(v), gandh_probs(10))$par
+  classical <- robust_gandh(x, robust = FALSE)
+  expect_equal(c(classical$summary$g, classical$summary$h), unname(qls[3:4]))
+  # standardized by the mean and standard deviation of all the observations
+  expect_equal(mean(classical$transformation$V1), 0)
+  expect_equal(stats::sd(classical$transformation$V1), 1)
+  expect_equal(predict(classical, x)$V1, classical$transformation$V1)
+  # the outliers inflate the classical g and h, and are pulled in; the
+  # robust fit trims them
+  robust <- robust_gandh(x)
+  expect_gt(classical$summary$g, 0.75)
+  expect_gt(classical$summary$h, 0.25)
+  expect_lt(abs(robust$summary$g - 0.5), 0.1)
+  expect_lt(robust$summary$h, 0.15)
+  expect_equal(robust$summary$n_trimmed, 15)
+  expect_lt(min(classical$transformation$V1[301:315]), 3)
+  expect_gt(min(robust$transformation$V1[301:315]), 4)
+  expect_equal(capture.output(print(classical))[1],
+               "Classical Tukey g-and-h transformation (QLS)")
+  expect_equal(capture.output(print(robust))[1], "Robust Tukey g-and-h transformation (rQLS)")
+  expect_error(robust_gandh(x, robust = NA), "'robust' must be a single logical value")
 })
 
 test_that("g-and-h transforms are stable in normal, lognormal and extreme-tail limits", {
