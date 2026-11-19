@@ -3,11 +3,13 @@
 transformation, whose parameter \(\lambda\) is fitted robustly
 (Raymaekers and Rousseeuw, 2021), so that outlying observations do not
 drive it. Unlike the Box-Cox transformation (robust_boxcox()), it
-accepts zero and negative values."><meta property="og:description" content="Transforms each variable toward central normality with the Yeo-Johnson
+accepts zero and negative values. robust = FALSE gives the classical
+fit, by maximum likelihood, for comparison."><meta property="og:description" content="Transforms each variable toward central normality with the Yeo-Johnson
 transformation, whose parameter \(\lambda\) is fitted robustly
 (Raymaekers and Rousseeuw, 2021), so that outlying observations do not
 drive it. Unlike the Box-Cox transformation (robust_boxcox()), it
-accepts zero and negative values."><meta property="og:image" content="https://christiangoueguel.com/specProc/logo.png"></head><body>
+accepts zero and negative values. robust = FALSE gives the classical
+fit, by maximum likelihood, for comparison."><meta property="og:image" content="https://christiangoueguel.com/specProc/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -52,12 +54,19 @@ accepts zero and negative values."><meta property="og:image" content="https://ch
 transformation, whose parameter \(\lambda\) is fitted robustly
 (Raymaekers and Rousseeuw, 2021), so that outlying observations do not
 drive it. Unlike the Box-Cox transformation (<code><a href="robust_boxcox.html">robust_boxcox()</a></code>), it
-accepts zero and negative values.</p>
+accepts zero and negative values. <code>robust = FALSE</code> gives the classical
+fit, by maximum likelihood, for comparison.</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">robust_yeojohnson</span><span class="op">(</span><span class="va">x</span>, quantile <span class="op">=</span> <span class="fl">0.99</span>, nbsteps <span class="op">=</span> <span class="fl">2</span>, standardize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">robust_yeojohnson</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  quantile <span class="op">=</span> <span class="fl">0.99</span>,</span>
+<span>  nbsteps <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  standardize <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  robust <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -85,6 +94,12 @@ Default is 2.</p></dd>
 <dd><p>A logical value: standardize the transformed variables
 by the mean and standard deviation of the inliers (<code>TRUE</code>, default).</p></dd>
 
+
+<dt id="arg-robust">robust<a class="anchor" aria-label="anchor" href="#arg-robust"></a></dt>
+<dd><p>A logical value: fit \(\lambda\) robustly (<code>TRUE</code>,
+default), or by classical maximum likelihood on all the values
+(<code>FALSE</code>), to compare (see Robust fit).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -98,6 +113,7 @@ distance between the transformed values and the normal quantiles of
 step 2; lower is closer to normality).</p></li>
 <li><p><code>fits</code>: The fitted parameters of each variable, used by <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>.</p></li>
 <li><p><code>standardize</code>: The <code>standardize</code> argument.</p></li>
+<li><p><code>robust</code>: The <code>robust</code> argument.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -141,7 +157,16 @@ transformation of step 2). \(\lambda\) is then re-estimated by
 maximum likelihood on the others. This is repeated <code>nbsteps</code> times.</p></li>
 <li><p>With <code>standardize = TRUE</code>, the transformed variable is standardized by
 the mean and standard deviation of these inliers.</p></li>
-</ol><p>Variables with fewer than 5 values or no spread (zero MAD) are left
+</ol><p>With <code>robust = FALSE</code>, \(\lambda\) is the classical maximum likelihood
+estimate (Box and Cox, 1964; Yeo and Johnson, 2000): it maximizes the
+normal likelihood of all the transformed values, and the transformed
+variable is standardized by the mean and standard deviation of all the
+values (<code>quantile</code> and <code>nbsteps</code> are not used). For the Box-Cox
+transformation, this is the \(\lambda\) of <code><a href="https://rdrr.io/pkg/MASS/man/boxcox.html" class="external-link">MASS::boxcox()</a></code>. Outliers
+then pull \(\lambda\) toward the value that brings them closer to the
+other values: the transformed regular values are skewed, and the outliers
+can be hidden among them (see the examples).</p>
+<p>Variables with fewer than 5 values or no spread (zero MAD) are left
 unchanged. Missing values are ignored by the fit, and stay missing.</p>
     </div>
     <div class="section level2">
@@ -166,7 +191,51 @@ after.</p></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># 300 right-skewed values on both sides of 0 (a gamma distribution shifted</span></span></span>
+<span class="r-in"><span><span class="co"># by -2) and 10 low outliers near -6</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">6</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html" class="external-link">rgamma</a></span><span class="op">(</span><span class="fl">300</span>, shape <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">-</span> <span class="fl">2</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">6</span>, sd <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">group</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"regular"</span>, <span class="st">"outlier"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">300</span>, <span class="fl">10</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">group</span><span class="op">)</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"#2166ac"</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_rug.html" class="external-link">geom_rug</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>outlier <span class="op">=</span> <span class="st">"#b2182b"</span>, regular <span class="op">=</span> <span class="st">"#2166ac"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="robust_yeojohnson-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># the low outliers balance the long right tail: the classical fit finds</span></span></span>
+<span class="r-in"><span><span class="co"># lambda close to 1, no transformation; the robust fit compresses the</span></span></span>
+<span class="r-in"><span><span class="co"># right tail (lambda below 1)</span></span></span>
+<span class="r-in"><span><span class="va">classical</span> <span class="op">&lt;-</span> <span class="fu">robust_yeojohnson</span><span class="op">(</span><span class="va">x</span>, robust <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">robust</span> <span class="op">&lt;-</span> <span class="fu">robust_yeojohnson</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>classical <span class="op">=</span> <span class="va">classical</span><span class="op">$</span><span class="va">summary</span><span class="op">$</span><span class="va">lambda</span>, robust <span class="op">=</span> <span class="va">robust</span><span class="op">$</span><span class="va">summary</span><span class="op">$</span><span class="va">lambda</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> classical    robust </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      1.11      0.25 </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># the classical transformation leaves the regular values skewed to the</span></span></span>
+<span class="r-in"><span><span class="co"># right and the outliers near 3 standard deviations; the robust one makes</span></span></span>
+<span class="r-in"><span><span class="co"># the regular values symmetric and leaves the outliers far out</span></span></span>
+<span class="r-in"><span><span class="va">transformed</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  fit <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"classical"</span>, <span class="st">"robust"</span><span class="op">)</span>, each <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">classical</span><span class="op">$</span><span class="va">transformation</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">robust</span><span class="op">$</span><span class="va">transformation</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">group</span>, <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">transformed</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_density.html" class="external-link">geom_density</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"#2166ac"</span>, alpha <span class="op">=</span> <span class="fl">0.3</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_rug.html" class="external-link">geom_rug</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="va">group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_colour_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>outlier <span class="op">=</span> <span class="st">"#b2182b"</span>, regular <span class="op">=</span> <span class="st">"#2166ac"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">fit</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="robust_yeojohnson-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="va">regular</span> <span class="op">&lt;-</span> <span class="va">transformed</span><span class="op">$</span><span class="va">group</span> <span class="op">==</span> <span class="st">"regular"</span></span></span>
+<span class="r-in"><span><span class="co"># the skewness of the transformed regular values, and the outlier closest</span></span></span>
+<span class="r-in"><span><span class="co"># to them</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tapply.html" class="external-link">tapply</a></span><span class="op">(</span><span class="va">transformed</span><span class="op">$</span><span class="va">value</span><span class="op">[</span><span class="va">regular</span><span class="op">]</span>, <span class="va">transformed</span><span class="op">$</span><span class="va">fit</span><span class="op">[</span><span class="va">regular</span><span class="op">]</span>, <span class="va">medcouple</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> classical    robust </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      0.24     -0.06 </span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tapply.html" class="external-link">tapply</a></span><span class="op">(</span><span class="va">transformed</span><span class="op">$</span><span class="va">value</span><span class="op">[</span><span class="op">!</span><span class="va">regular</span><span class="op">]</span>, <span class="va">transformed</span><span class="op">$</span><span class="va">fit</span><span class="op">[</span><span class="op">!</span><span class="va">regular</span><span class="op">]</span>, <span class="va">max</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> classical    robust </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     -2.94    -12.36 </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">spectra</span> <span class="op">&lt;-</span> <span class="fu"><a href="snv.html">snv</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">correction</span></span></span>
 <span class="r-in"><span><span class="va">wl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">spectra</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># the Mg II lines at 279.55 and 280.27 nm: after SNV, most channels have</span></span></span>

@@ -550,7 +550,12 @@
   data, or to any subset of its variables.
   [`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md)
   warns about the variables with zero or negative values, which it
-  leaves unchanged.
+  leaves unchanged. `robust = FALSE` gives the classical fit by maximum
+  likelihood (for Box-Cox, the `lambda` of
+  [`MASS::boxcox()`](https://rdrr.io/pkg/MASS/man/boxcox.html)), for
+  comparison: the examples show, on synthetic data, outliers that pull
+  the classical `lambda`, skew the transformed regular values and hide
+  among them, but not with the robust fit.
 
 - `predict(inverse = TRUE)` transforms values back to the original scale
   after

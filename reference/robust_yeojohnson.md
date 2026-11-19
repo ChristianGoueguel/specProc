@@ -5,12 +5,19 @@ transformation, whose parameter \\\lambda\\ is fitted robustly
 (Raymaekers and Rousseeuw, 2021), so that outlying observations do not
 drive it. Unlike the Box-Cox transformation
 ([`robust_boxcox()`](https://christiangoueguel.com/specProc/reference/robust_boxcox.md)),
-it accepts zero and negative values.
+it accepts zero and negative values. `robust = FALSE` gives the
+classical fit, by maximum likelihood, for comparison.
 
 ## Usage
 
 ``` r
-robust_yeojohnson(x, quantile = 0.99, nbsteps = 2, standardize = TRUE)
+robust_yeojohnson(
+  x,
+  quantile = 0.99,
+  nbsteps = 2,
+  standardize = TRUE,
+  robust = TRUE
+)
 ```
 
 ## Arguments
@@ -35,6 +42,12 @@ robust_yeojohnson(x, quantile = 0.99, nbsteps = 2, standardize = TRUE)
   A logical value: standardize the transformed variables by the mean and
   standard deviation of the inliers (`TRUE`, default).
 
+- robust:
+
+  A logical value: fit \\\lambda\\ robustly (`TRUE`, default), or by
+  classical maximum likelihood on all the values (`FALSE`), to compare
+  (see Robust fit).
+
 ## Value
 
 An object of class `specproc_yeojohnson` (a list), which
@@ -54,6 +67,8 @@ components:
   [`predict()`](https://rdrr.io/r/stats/predict.html).
 
 - `standardize`: The `standardize` argument.
+
+- `robust`: The `robust` argument.
 
 ## Details
 
@@ -104,6 +119,17 @@ The parameter \\\lambda\\ of each variable is fitted as follows:
 4.  With `standardize = TRUE`, the transformed variable is standardized
     by the mean and standard deviation of these inliers.
 
+With `robust = FALSE`, \\\lambda\\ is the classical maximum likelihood
+estimate (Box and Cox, 1964; Yeo and Johnson, 2000): it maximizes the
+normal likelihood of all the transformed values, and the transformed
+variable is standardized by the mean and standard deviation of all the
+values (`quantile` and `nbsteps` are not used). For the Box-Cox
+transformation, this is the \\\lambda\\ of
+[`MASS::boxcox()`](https://rdrr.io/pkg/MASS/man/boxcox.html). Outliers
+then pull \\\lambda\\ toward the value that brings them closer to the
+other values: the transformed regular values are skewed, and the
+outliers can be hidden among them (see the examples).
+
 Variables with fewer than 5 values or no spread (zero MAD) are left
 unchanged. Missing values are ignored by the fit, and stay missing.
 
@@ -132,6 +158,50 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
+# 300 right-skewed values on both sides of 0 (a gamma distribution shifted
+# by -2) and 10 low outliers near -6
+set.seed(6)
+x <- c(rgamma(300, shape = 2) - 2, rnorm(10, mean = -6, sd = 0.3))
+group <- rep(c("regular", "outlier"), c(300, 10))
+ggplot2::ggplot(data.frame(x, group), ggplot2::aes(x)) +
+  ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+  ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+  ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac"))
+
+
+# the low outliers balance the long right tail: the classical fit finds
+# lambda close to 1, no transformation; the robust fit compresses the
+# right tail (lambda below 1)
+classical <- robust_yeojohnson(x, robust = FALSE)
+robust <- robust_yeojohnson(x)
+round(c(classical = classical$summary$lambda, robust = robust$summary$lambda), 2)
+#> classical    robust 
+#>      1.11      0.25 
+
+# the classical transformation leaves the regular values skewed to the
+# right and the outliers near 3 standard deviations; the robust one makes
+# the regular values symmetric and leaves the outliers far out
+transformed <- data.frame(
+  fit = rep(c("classical", "robust"), each = length(x)),
+  value = c(classical$transformation[[1]], robust$transformation[[1]]),
+  group = rep(group, 2)
+)
+ggplot2::ggplot(transformed, ggplot2::aes(value)) +
+  ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+  ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+  ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac")) +
+  ggplot2::facet_wrap(~fit, ncol = 1)
+
+regular <- transformed$group == "regular"
+# the skewness of the transformed regular values, and the outlier closest
+# to them
+round(tapply(transformed$value[regular], transformed$fit[regular], medcouple), 2)
+#> classical    robust 
+#>      0.24     -0.06 
+round(tapply(transformed$value[!regular], transformed$fit[!regular], max), 2)
+#> classical    robust 
+#>     -2.94    -12.36 
+
 data(forageLIBS)
 spectra <- snv(forageLIBS[-(1:14)])$correction
 wl <- as.numeric(names(spectra))
