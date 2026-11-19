@@ -16,7 +16,11 @@
   smearing. Direct inversion preserves extreme normal scores without
   rounding cumulative probabilities.
   [`step_robust_gandh()`](https://christiangoueguel.com/specProc/reference/step_robust_gandh.md)
-  estimates the transformation within recipe training.
+  estimates the transformation within recipe training. `robust = FALSE`
+  gives the classical quantile least squares fit (QLS) of all the
+  observations, for comparison: the examples show, on synthetic data,
+  outliers that inflate the classical `g` and `h` and are pulled in
+  among the other values, but are trimmed by the robust fit.
 
 - [`wavelet_denoise()`](https://christiangoueguel.com/specProc/reference/wavelet_denoise.md):
   denoising of spectra by thresholding their undecimated wavelet
