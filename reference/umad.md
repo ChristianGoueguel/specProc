@@ -69,10 +69,48 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
+# mad() is unbiased for the standard deviation of a normal distribution
+# only in large samples. In 2000 samples of 5 replicate values from a
+# standard normal distribution (standard deviation 1), mad() is low by
+# about 16% on average, while umad() is unbiased
 set.seed(1)
-x <- c(stats::rnorm(50), 10, 12)  # two outliers
+samples <- replicate(2000, rnorm(5), simplify = FALSE)
+est <- data.frame(estimator = rep(c("mad()", "umad()"), each = 2000),
+                  value = c(sapply(samples, mad), sapply(samples, umad)))
+means <- tapply(est$value, est$estimator, mean)
+round(means, 3)
+#>  mad() umad() 
+#>  0.836  1.017 
+# the estimates from 5 values are skewed: the peak of umad() lies below 1,
+# but its mean (solid line) is at 1 (dashed line)
+ggplot2::ggplot(est, ggplot2::aes(value, fill = estimator)) +
+  ggplot2::geom_density(alpha = 0.4) +
+  ggplot2::geom_vline(xintercept = means, colour = c("#b2182b", "#2166ac")) +
+  ggplot2::geom_vline(xintercept = 1, linetype = "dashed") +
+  ggplot2::scale_fill_manual(values = c("#b2182b", "#2166ac"))
+
+
+# the bias of mad() fades as the samples grow: the means of each
+# estimator over 1000 samples of n values
+set.seed(2)
+bias <- sapply(c(3, 5, 10, 30, 100), function(n) {
+  s <- replicate(1000, rnorm(n), simplify = FALSE)
+  c(n = n, mad = mean(sapply(s, mad)), umad = mean(sapply(s, umad)))
+})
+round(bias, 3)
+#>       [,1]  [,2]   [,3]   [,4]    [,5]
+#> n    3.000 5.000 10.000 30.000 100.000
+#> mad  0.691 0.816  0.921  0.973   0.986
+#> umad 1.027 0.993  1.010  1.000   0.994
+
+# both are robust: two outliers inflate the standard deviation, but
+# neither MAD
+set.seed(1)
+x <- c(rnorm(50), 10, 12)
+sd(x)
+#> [1] 2.276614
+mad(x)
+#> [1] 0.7691122
 umad(x)
 #> [1] 0.7808216
-stats::mad(x)
-#> [1] 0.7691122
 ```
