@@ -108,7 +108,8 @@
 #' \donttest{
 #' # label the peaks with emission lines from the NIST database (needs an
 #' # internet connection)
-#' lines <- try(libs_lines(c("Ca I", "Ca II", "K I", "Mg I", "Mg II", "Na I", "C I", "H I")))
+#' lines <- try(libs_lines(c("Ca I", "Ca II", "K I", "Mg I", "Mg II", "Na I", "C I", "H I"),
+#'                         timeout = 20))
 #' if (!inherits(lines, "try-error")) plot_loadings(fit, lines = lines, spectra = spectra)
 #' }
 #'

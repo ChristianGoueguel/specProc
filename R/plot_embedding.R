@@ -202,7 +202,9 @@
 #'   p <- plot_embedding(pca, color_by = level, ellipse = TRUE, legend_title = "Potassium",
 #'                       legend = "bottom", base_size = 8)
 #'   p
-#'   # ggplot2::ggsave("scores.pdf", p, width = 85, height = 80, units = "mm")
+#'   # saved at that size (here in the temporary directory)
+#'   ggplot2::ggsave(file.path(tempdir(), "scores.pdf"), p, width = 85, height = 80,
+#'                   units = "mm")
 #' }
 #'
 #' \donttest{

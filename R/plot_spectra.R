@@ -189,7 +189,9 @@
 #'                   legend_title = "K (%)", ylab = "Intensity (counts)",
 #'                   base_size = 8, linewidth = 0.3, wavelength = c(765, 771))
 #' p
-#' # ggplot2::ggsave("figure.pdf", p, width = 85, height = 90, units = "mm")
+#' # saved at that size (here in the temporary directory)
+#' ggplot2::ggsave(file.path(tempdir(), "figure.pdf"), p, width = 85, height = 90,
+#'                 units = "mm")
 #'
 #' # the spectra normalized by SNV over all the channels, then drawn in two
 #' # windows side by side, each with its own intensity axis
