@@ -643,7 +643,10 @@
   median, so that no observation of normal data was flagged, nor, in a
   right-skewed sample, a high outlier at 6 scales or low outliers below the
   distribution. More observations are flagged. `cutoff_quantile` must be
-  strictly between 0 and 1.
+  strictly between 0 and 1. The scales of the two half samples now follow
+  equation (2) of Rousseeuw, Raymaekers and Hubert (2018) exactly, with the
+  consistency constant alpha of Huber's rho function instead of a rounded
+  one: the scores are 0.4% higher, and the help page gives the formula.
 
 ## Bug fixes
 

@@ -24,11 +24,19 @@ observations of a normal distribution that are not flagged. The
 cutoff of the scores is the \code{(1 + cutoff_quantile) / 2} quantile of
 the standard normal distribution. Default is 0.995 (a cutoff of 2.81).}
 
-\item{rm_zeroes}{A logical value. If \code{TRUE}, removes values close to zero (default: \code{FALSE}).}
+\item{rm_zeroes}{A logical value. If \code{TRUE}, the zero distances (the
+observations equal to the median, within \code{prec_scale}) are left out of
+the half samples before their scales are computed, which matters when
+many observations are tied at the median. Default is \code{FALSE}, as in the
+paper.}
 
-\item{max_ratio}{A numeric value greater than 2. If provided, constrains the ratio between positive and negative scales (default: \code{NULL}).}
+\item{max_ratio}{\code{NULL} (default), or a number of at least 2: each scale
+is then kept between the scale of all the distances to the median divided
+and multiplied by \code{max_ratio}, so that a very short or very long half
+cannot give extreme scores. Not in the paper.}
 
-\item{prec_scale}{A numeric value specifying the precision scale for near-zero comparisons (default: 1e-10).}
+\item{prec_scale}{A non-negative number: an initial scale below it is taken
+as zero (default: 1e-10).}
 
 \item{cutoff.quantile, rmZeroes, maxRatio, precScale}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use
 \code{cutoff_quantile}, \code{rm_zeroes}, \code{max_ratio} and \code{prec_scale}.}
@@ -49,13 +57,28 @@ data point that takes the skewness of the underlying distribution into account.
 \details{
 Directional outlyingness takes the potential skewness of the underlying
 distribution into account, by splitting the univariate dataset in two half
-samples around the median, and scaling each half by a one-step M-estimator
-with the Huber \eqn{\rho}-function. The score of an observation is its
-distance to the median divided by the scale of its own half: on the short
-side of a skewed distribution, an observation gets a higher score than one
-as far from the median on the long side. For a normal distribution, both
-scales estimate the standard deviation, and the score is close to the
-absolute robust z-score of \code{\link[=zscore]{zscore()}}.
+samples around the median, each with
+\eqn{h = \lfloor (n+1)/2 \rfloor}{h = floor((n + 1)/2)}
+observations (they share the median when \eqn{n} is odd), and scaling each
+half separately (Rousseeuw \emph{et al.}, 2018, Section 2.1). For the distances
+\eqn{z_i} of a half sample to the median, the scale is the one-step
+M-estimator
+\deqn{s = s_0 \sqrt{\frac{1}{2 \alpha h} \sum_i \rho_c\left(\frac{z_i}{s_0}\right)},}{s = s0 sqrt(sum(rho_c(z_i / s0)) / (2 alpha h)),}
+from the initial scale
+\eqn{s_0 = \mathrm{med}_i(z_i) / \Phi^{-1}(0.75)}{s0 = med(z_i) / qnorm(0.75)},
+with Huber's \eqn{\rho}-function for scale,
+\eqn{\rho_c(t) = \min\{(t/c)^2, 1\}}{rho_c(t) = min((t/c)^2, 1)},
+\eqn{c = 2.1} (85\% efficiency at
+the normal distribution), and
+\eqn{\alpha = \int_0^\infty \rho_c(x) \, d\Phi(x)}{alpha = integral of rho_c(x) dPhi(x) over (0, Inf)}, which makes the
+scale consistent at the normal distribution.
+
+The score of an observation is its distance to the median divided by the
+scale of its own half: on the short side of a skewed distribution, an
+observation gets a higher score than one as far from the median on the
+long side. For a normal distribution, both scales estimate the standard
+deviation, and the score is close to the absolute robust z-score of
+\code{\link[=zscore]{zscore()}}.
 
 An observation is flagged when its score exceeds the
 \eqn{(1 + q) / 2} quantile of the standard normal distribution, where

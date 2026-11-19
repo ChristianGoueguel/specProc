@@ -39,6 +39,29 @@ test_that("directional_outlyingness flags gross outliers", {
   expect_error(directional_outlyingness("a"), "numeric")
 })
 
+test_that("directional_outlyingness scales follow equation 2 of the paper", {
+  expect_equal(huber_rho(c(-3, -2.1, 0, 1.05, 4)), c(1, 1, 0, 0.25, 1))
+  f <- function(x) huber_rho(x) * stats::dnorm(x)
+  alpha <- stats::integrate(f, 0, 2.1, rel.tol = 1e-12)$value +
+    stats::integrate(f, 2.1, Inf, rel.tol = 1e-12)$value
+  expect_equal(huber_rho_alpha(2.1), alpha, tolerance = 1e-9)
+  # the scale of the upper half sample of an odd sample, which includes the
+  # median, written out from the paper
+  set.seed(3)
+  x <- stats::rnorm(51)
+  med <- stats::median(x)
+  above <- sort(x)[26:51] - med
+  s0 <- stats::median(above) / stats::qnorm(0.75)
+  sa <- s0 * sqrt(sum(pmin((above / s0 / 2.1)^2, 1)) / (2 * alpha * 26))
+  res <- directional_outlyingness(x)
+  expect_equal(res$score[res$data == max(x)], (max(x) - med) / sa)
+  # consistent at the normal distribution
+  set.seed(4)
+  expect_equal(scale_1step_m(abs(stats::rnorm(2e5)), 1e-10), 1, tolerance = 0.01)
+  expect_equal(scale_1step_m(numeric(0), 1e-10), 0)
+  expect_equal(scale_1step_m(rep(0, 5), 1e-10), 0)
+})
+
 test_that("directional_outlyingness flags about 1 - cutoff_quantile of normal data", {
   set.seed(2)
   z <- stats::rnorm(1e4)
