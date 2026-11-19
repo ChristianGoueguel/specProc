@@ -73,7 +73,12 @@ test_that("robpca is reproducible with set.seed", {
   a <- robpca(d$x, ncomp = 2)
   set.seed(7)
   b <- robpca(d$x, ncomp = 2)
-  expect_identical(a$loadings, b$loadings)
+  # the same random subsets; the loadings then agree up to the rounding of
+  # svd() and eigen(), whose BLAS need not be bitwise reproducible between
+  # two calls (it differed in the last digit on GitHub Actions)
+  expect_identical(a$H0, b$H0)
+  expect_identical(a$H1, b$H1)
+  expect_equal(a$loadings, b$loadings, tolerance = 1e-12)
 })
 
 test_that("predict() reproduces the calibration scores and distances", {
