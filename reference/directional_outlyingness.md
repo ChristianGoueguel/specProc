@@ -36,18 +36,22 @@ directional_outlyingness(
 
 - rm_zeroes:
 
-  A logical value. If `TRUE`, removes values close to zero (default:
-  `FALSE`).
+  A logical value. If `TRUE`, the zero distances (the observations equal
+  to the median, within `prec_scale`) are left out of the half samples
+  before their scales are computed, which matters when many observations
+  are tied at the median. Default is `FALSE`, as in the paper.
 
 - max_ratio:
 
-  A numeric value greater than 2. If provided, constrains the ratio
-  between positive and negative scales (default: `NULL`).
+  `NULL` (default), or a number of at least 2: each scale is then kept
+  between the scale of all the distances to the median divided and
+  multiplied by `max_ratio`, so that a very short or very long half
+  cannot give extreme scores. Not in the paper.
 
 - prec_scale:
 
-  A numeric value specifying the precision scale for near-zero
-  comparisons (default: 1e-10).
+  A non-negative number: an initial scale below it is taken as zero
+  (default: 1e-10).
 
 - cutoff.quantile, rmZeroes, maxRatio, precScale:
 
@@ -69,13 +73,23 @@ A tibble with columns:
 
 Directional outlyingness takes the potential skewness of the underlying
 distribution into account, by splitting the univariate dataset in two
-half samples around the median, and scaling each half by a one-step
-M-estimator with the Huber \\\rho\\-function. The score of an
-observation is its distance to the median divided by the scale of its
-own half: on the short side of a skewed distribution, an observation
-gets a higher score than one as far from the median on the long side.
-For a normal distribution, both scales estimate the standard deviation,
-and the score is close to the absolute robust z-score of
+half samples around the median, each with \\h = \lfloor (n+1)/2
+\rfloor\\ observations (they share the median when \\n\\ is odd), and
+scaling each half separately (Rousseeuw *et al.*, 2018, Section 2.1).
+For the distances \\z_i\\ of a half sample to the median, the scale is
+the one-step M-estimator \$\$s = s_0 \sqrt{\frac{1}{2 \alpha h} \sum_i
+\rho_c\left(\frac{z_i}{s_0}\right)},\$\$ from the initial scale \\s_0 =
+\mathrm{med}\_i(z_i) / \Phi^{-1}(0.75)\\, with Huber's \\\rho\\-function
+for scale, \\\rho_c(t) = \min\\(t/c)^2, 1\\\\, \\c = 2.1\\ (85%
+efficiency at the normal distribution), and \\\alpha = \int_0^\infty
+\rho_c(x) \\ d\Phi(x)\\, which makes the scale consistent at the normal
+distribution.
+
+The score of an observation is its distance to the median divided by the
+scale of its own half: on the short side of a skewed distribution, an
+observation gets a higher score than one as far from the median on the
+long side. For a normal distribution, both scales estimate the standard
+deviation, and the score is close to the absolute robust z-score of
 [`zscore()`](https://christiangoueguel.com/specProc/reference/zscore.md).
 
 An observation is flagged when its score exceeds the \\(1 + q) / 2\\
@@ -139,13 +153,13 @@ head(directional_outlyingness(x), 8)
 #> # A tibble: 8 × 3
 #>    data score flag 
 #>   <dbl> <dbl> <lgl>
-#> 1  240   7.20 TRUE 
-#> 2  230   6.62 TRUE 
-#> 3  220   6.05 TRUE 
-#> 4   85   3.47 TRUE 
-#> 5   87   3.24 TRUE 
-#> 6   89   3.01 TRUE 
-#> 7  157.  2.38 FALSE
+#> 1  240   7.23 TRUE 
+#> 2  230   6.65 TRUE 
+#> 3  220   6.07 TRUE 
+#> 4   85   3.48 TRUE 
+#> 5   87   3.25 TRUE 
+#> 6   89   3.02 TRUE 
+#> 7  157.  2.39 FALSE
 #> 8  155.  2.28 FALSE
 
 data(forageLIBS)
@@ -155,10 +169,10 @@ head(directional_outlyingness(fe))
 #> # A tibble: 6 × 3
 #>    data score flag 
 #>   <int> <dbl> <lgl>
-#> 1  2060 13.2  TRUE 
-#> 2  1290  7.92 TRUE 
-#> 3  1210  7.37 TRUE 
-#> 4  1190  7.23 TRUE 
-#> 5  1080  6.47 TRUE 
-#> 6  1060  6.34 TRUE 
+#> 1  2060 13.3  TRUE 
+#> 2  1290  7.95 TRUE 
+#> 3  1210  7.40 TRUE 
+#> 4  1190  7.26 TRUE 
+#> 5  1080  6.50 TRUE 
+#> 6  1060  6.36 TRUE 
 ```

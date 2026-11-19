@@ -80,15 +80,23 @@ the standard normal distribution. Default is 0.995 (a cutoff of 2.81).</p></dd>
 
 
 <dt id="arg-rm-zeroes">rm_zeroes<a class="anchor" aria-label="anchor" href="#arg-rm-zeroes"></a></dt>
-<dd><p>A logical value. If <code>TRUE</code>, removes values close to zero (default: <code>FALSE</code>).</p></dd>
+<dd><p>A logical value. If <code>TRUE</code>, the zero distances (the
+observations equal to the median, within <code>prec_scale</code>) are left out of
+the half samples before their scales are computed, which matters when
+many observations are tied at the median. Default is <code>FALSE</code>, as in the
+paper.</p></dd>
 
 
 <dt id="arg-max-ratio">max_ratio<a class="anchor" aria-label="anchor" href="#arg-max-ratio"></a></dt>
-<dd><p>A numeric value greater than 2. If provided, constrains the ratio between positive and negative scales (default: <code>NULL</code>).</p></dd>
+<dd><p><code>NULL</code> (default), or a number of at least 2: each scale
+is then kept between the scale of all the distances to the median divided
+and multiplied by <code>max_ratio</code>, so that a very short or very long half
+cannot give extreme scores. Not in the paper.</p></dd>
 
 
 <dt id="arg-prec-scale">prec_scale<a class="anchor" aria-label="anchor" href="#arg-prec-scale"></a></dt>
-<dd><p>A numeric value specifying the precision scale for near-zero comparisons (default: 1e-10).</p></dd>
+<dd><p>A non-negative number: an initial scale below it is taken
+as zero (default: 1e-10).</p></dd>
 
 
 <dt id="arg-cutoff-quantile-rmzeroes-maxratio-precscale">cutoff.quantile, rmZeroes, maxRatio, precScale<a class="anchor" aria-label="anchor" href="#arg-cutoff-quantile-rmzeroes-maxratio-precscale"></a></dt>
@@ -106,13 +114,27 @@ the standard normal distribution. Default is 0.995 (a cutoff of 2.81).</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Directional outlyingness takes the potential skewness of the underlying
 distribution into account, by splitting the univariate dataset in two half
-samples around the median, and scaling each half by a one-step M-estimator
-with the Huber \(\rho\)-function. The score of an observation is its
-distance to the median divided by the scale of its own half: on the short
-side of a skewed distribution, an observation gets a higher score than one
-as far from the median on the long side. For a normal distribution, both
-scales estimate the standard deviation, and the score is close to the
-absolute robust z-score of <code><a href="zscore.html">zscore()</a></code>.</p>
+samples around the median, each with
+\(h = \lfloor (n+1)/2 \rfloor\)
+observations (they share the median when \(n\) is odd), and scaling each
+half separately (Rousseeuw <em>et al.</em>, 2018, Section 2.1). For the distances
+\(z_i\) of a half sample to the median, the scale is the one-step
+M-estimator
+$$s = s_0 \sqrt{\frac{1}{2 \alpha h} \sum_i \rho_c\left(\frac{z_i}{s_0}\right)},$$
+from the initial scale
+\(s_0 = \mathrm{med}_i(z_i) / \Phi^{-1}(0.75)\),
+with Huber's \(\rho\)-function for scale,
+\(\rho_c(t) = \min\{(t/c)^2, 1\}\),
+\(c = 2.1\) (85% efficiency at
+the normal distribution), and
+\(\alpha = \int_0^\infty \rho_c(x) \, d\Phi(x)\), which makes the
+scale consistent at the normal distribution.</p>
+<p>The score of an observation is its distance to the median divided by the
+scale of its own half: on the short side of a skewed distribution, an
+observation gets a higher score than one as far from the median on the
+long side. For a normal distribution, both scales estimate the standard
+deviation, and the score is close to the absolute robust z-score of
+<code><a href="zscore.html">zscore()</a></code>.</p>
 <p>An observation is flagged when its score exceeds the
 \((1 + q) / 2\) quantile of the standard normal distribution, where
 \(q\) is <code>cutoff_quantile</code> (2.81 for the default 0.995): about
@@ -175,13 +197,13 @@ Journal of Computational and Graphical Statistics, 27(2):345–359.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 8 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    data score flag </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  240   7.20 TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>  230   6.62 TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  220   6.05 TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>   85   3.47 TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>   87   3.24 TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>   89   3.01 TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">7</span>  157.  2.38 FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  240   7.23 TRUE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>  230   6.65 TRUE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  220   6.07 TRUE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>   85   3.48 TRUE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>   87   3.25 TRUE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>   89   3.02 TRUE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">7</span>  157.  2.39 FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">8</span>  155.  2.28 FALSE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
@@ -191,12 +213,12 @@ Journal of Computational and Graphical Statistics, 27(2):345–359.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 3</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    data score flag </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>060 13.2  TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>  <span style="text-decoration: underline;">1</span>290  7.92 TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">1</span>210  7.37 TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">1</span>190  7.23 TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">1</span>080  6.47 TRUE </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">1</span>060  6.34 TRUE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>  <span style="text-decoration: underline;">2</span>060 13.3  TRUE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>  <span style="text-decoration: underline;">1</span>290  7.95 TRUE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>  <span style="text-decoration: underline;">1</span>210  7.40 TRUE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>  <span style="text-decoration: underline;">1</span>190  7.26 TRUE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>  <span style="text-decoration: underline;">1</span>080  6.50 TRUE </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>  <span style="text-decoration: underline;">1</span>060  6.36 TRUE </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
