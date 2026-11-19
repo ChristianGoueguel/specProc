@@ -165,8 +165,16 @@ transform_loglik <- function(x, lambda, type, w) {
   -sum(w) / 2 * log(v) + (lambda - 1) * sum(w * jacobian)
 }
 
-# Fits one transformation (BC or YJ) to a pre-standardized variable.
-fit_one_transformation <- function(x, type, quantile, nbsteps) {
+# Fits one transformation (BC or YJ) to a pre-standardized variable: robustly,
+# or by classical maximum likelihood on all the values (robust = FALSE).
+fit_one_transformation <- function(x, type, quantile, nbsteps, robust = TRUE) {
+  if (!robust) {
+    lambda <- stats::optimize(function(l) transform_loglik(x, l, type, rep(1, length(x))),
+                              transformation_range, maximum = TRUE)$maximum
+    y <- transform_values(x, lambda, type)
+    return(list(lambda = lambda, type = type, mean = mean(y), sd = stats::sd(y),
+                objective = normality_objective(y)))
+  }
   quartiles <- stats::quantile(x, c(0.25, 0.75), names = FALSE)
   initial <- function(lambda) normality_objective(rectified_transform(x, lambda, type, quartiles))
   grid <- seq(transformation_range[1], transformation_range[2], by = 0.25)
@@ -191,7 +199,7 @@ fit_one_transformation <- function(x, type, quantile, nbsteps) {
 
 # Fits the transformation of each column of a numeric matrix.
 robust_transformation <- function(x, type = "bestObj", quantile = 0.99, nbsteps = 2,
-                                  standardize = TRUE) {
+                                  standardize = TRUE, robust = TRUE) {
   x <- as_numeric_matrix(x, "x")
   fits <- lapply(seq_len(ncol(x)), function(j) {
     v <- x[, j]
@@ -210,7 +218,7 @@ robust_transformation <- function(x, type = "bestObj", quantile = 0.99, nbsteps 
     candidates <- lapply(types, function(t) {
       center <- if (t == "BC") 0 else stats::median(v)
       scale <- if (t == "BC") stats::median(v) else stats::mad(v)
-      fit <- fit_one_transformation((v - center) / scale, t, quantile, nbsteps)
+      fit <- fit_one_transformation((v - center) / scale, t, quantile, nbsteps, robust)
       c(fit, list(center = center, scale = scale))
     })
     candidates[[which.min(vapply(candidates, `[[`, numeric(1), "objective"))]]
@@ -265,19 +273,21 @@ apply_transformation <- function(x, transformation) {
 
 # Fits robust_boxcox() (type "BC") or robust_yeojohnson() (type "YJ") and
 # applies the transformation to the data.
-robust_power <- function(x, type, quantile, nbsteps, standardize) {
+robust_power <- function(x, type, quantile, nbsteps, standardize, robust = TRUE) {
   x <- as_numeric_matrix(x, "x")
   check_transformation_args(quantile, nbsteps, standardize)
+  check_flag(robust, "robust")
   if (is.null(colnames(x))) {
     colnames(x) <- paste0("V", seq_len(ncol(x)))
   }
   fit <- robust_transformation(x, type = type, quantile = quantile, nbsteps = nbsteps,
-                               standardize = standardize)
+                               standardize = standardize, robust = robust)
   res <- list(
     transformation = as_tbl(apply_transformation(x, fit)),
     summary = transformation_summary(fit),
     fits = fit$fits,
-    standardize = standardize
+    standardize = standardize,
+    robust = robust
   )
   structure(res, variables = colnames(x), nvar = ncol(x),
             class = c(if (type == "BC") "specproc_boxcox" else "specproc_yeojohnson",
@@ -307,12 +317,13 @@ transformation_summary <- function(fit) {
 print.specproc_transformation <- function(x, ...) {
   if (inherits(x, "specproc_gandh")) return(print_gandh(x))
   title <- if (inherits(x, "specproc_boxcox")) {
-    "Robust Box-Cox transformation"
+    "Box-Cox transformation"
   } else if (inherits(x, "specproc_yeojohnson")) {
-    "Robust Yeo-Johnson transformation"
+    "Yeo-Johnson transformation"
   } else {
-    "Robust Box-Cox/Yeo-Johnson transformation"
+    "Box-Cox/Yeo-Johnson transformation"
   }
+  title <- paste(if (isFALSE(x$robust)) "Classical" else "Robust", title)
   lambda <- transformation_lambda(x$fits)
   done <- !is.na(lambda)
   cat(title, "\n\n", sep = "")

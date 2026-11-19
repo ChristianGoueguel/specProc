@@ -317,7 +317,11 @@
   matrix or data frame, have a `standardize` argument, and return a fitted
   object that `predict()` applies to new data, or to any subset of its
   variables. `robust_boxcox()` warns about the variables with zero or
-  negative values, which it leaves unchanged.
+  negative values, which it leaves unchanged. `robust = FALSE` gives the
+  classical fit by maximum likelihood (for Box-Cox, the `lambda` of
+  `MASS::boxcox()`), for comparison: the examples show, on synthetic data,
+  outliers that pull the classical `lambda`, skew the transformed regular
+  values and hide among them, but not with the robust fit.
 * `predict(inverse = TRUE)` transforms values back to the original scale
   after `robust_boxcox()` or `robust_yeojohnson()`, such as the predictions
   of a calibration fitted to the transformed contents: as the median

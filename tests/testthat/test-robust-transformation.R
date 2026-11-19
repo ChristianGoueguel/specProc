@@ -10,7 +10,7 @@ positive <- test_data[c("lognormal", "gamma")]
 test_that("robust_boxcox transforms positive variables toward normality", {
   fit <- robust_boxcox(positive)
   expect_s3_class(fit, c("specproc_boxcox", "specproc_transformation"))
-  expect_named(fit, c("transformation", "summary", "fits", "standardize"))
+  expect_named(fit, c("transformation", "summary", "fits", "standardize", "robust"))
   expect_named(fit$summary, c("variable", "lambda", "objective"))
   expect_equal(fit$summary$variable, c("lognormal", "gamma"))
   expect_equal(dim(fit$transformation), c(100L, 2L))
@@ -180,6 +180,46 @@ test_that("predict checks the arguments of the back-transformation", {
                "one column per variable")
   expect_error(predict(fit, z, inverse = TRUE, estimate = "mean", residuals = NA_real_),
                "no values")
+})
+
+test_that("robust = FALSE fits lambda by classical maximum likelihood", {
+  # log-normal values with 10 high outliers
+  set.seed(6)
+  x <- c(stats::rlnorm(300, log(100), 0.6), stats::rlnorm(10, log(2000), 0.1))
+  classical <- robust_boxcox(x, robust = FALSE)
+  robust <- robust_boxcox(x)
+  expect_false(classical$robust)
+  expect_true(robust$robust)
+  bc <- MASS::boxcox(x ~ 1, lambda = seq(-1, 1, by = 0.001), plotit = FALSE)
+  expect_lt(abs(classical$summary$lambda - bc$x[which.max(bc$y)]), 0.002)
+  # standardized by the mean and standard deviation of all the values
+  expect_equal(mean(classical$transformation$V1), 0)
+  expect_equal(stats::sd(classical$transformation$V1), 1)
+  expect_equal(predict(classical, x)$V1, classical$transformation$V1)
+  # the outliers pull the classical lambda, not the robust one, which stays
+  # near the logarithm
+  expect_lt(classical$summary$lambda, -0.25)
+  expect_lt(abs(robust$summary$lambda), 0.2)
+  expect_lt(max(classical$transformation$V1), 3)
+  expect_gt(min(robust$transformation$V1[301:310]), 4)
+
+  # Yeo-Johnson: the maximum of the likelihood on the median/MAD scale
+  set.seed(6)
+  y <- c(stats::rgamma(300, shape = 2) - 2, stats::rnorm(10, -6, 0.3))
+  z <- (y - stats::median(y)) / stats::mad(y)
+  yj <- function(z, l) ifelse(z >= 0, ((1 + z)^l - 1) / l, -((1 - z)^(2 - l) - 1) / (2 - l))
+  loglik <- function(l) {
+    t <- yj(z, l)
+    -length(z) / 2 * log(mean((t - mean(t))^2)) + (l - 1) * sum(sign(z) * log1p(abs(z)))
+  }
+  ref <- stats::optimize(loglik, c(-4, 6), maximum = TRUE)$maximum
+  fit <- robust_yeojohnson(y, robust = FALSE)
+  expect_equal(fit$summary$lambda, ref, tolerance = 1e-3)
+  expect_gt(fit$summary$lambda, 0.8)
+  expect_lt(robust_yeojohnson(y)$summary$lambda, 0.5)
+  expect_equal(capture.output(print(fit))[1], "Classical Yeo-Johnson transformation")
+  expect_error(robust_boxcox(x, robust = NA), "'robust' must be a single logical value")
+  expect_error(robust_yeojohnson(y, robust = "no"), "'robust' must be a single logical value")
 })
 
 test_that("the transformations print a summary", {

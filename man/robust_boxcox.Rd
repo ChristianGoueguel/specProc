@@ -4,7 +4,13 @@
 \alias{robust_boxcox}
 \title{Robust Box-Cox Transformation}
 \usage{
-robust_boxcox(x, quantile = 0.99, nbsteps = 2, standardize = TRUE)
+robust_boxcox(
+  x,
+  quantile = 0.99,
+  nbsteps = 2,
+  standardize = TRUE,
+  robust = TRUE
+)
 }
 \arguments{
 \item{x}{A numeric vector, matrix, data frame or tibble, with one variable
@@ -20,6 +26,10 @@ Default is 2.}
 
 \item{standardize}{A logical value: standardize the transformed variables
 by the mean and standard deviation of the inliers (\code{TRUE}, default).}
+
+\item{robust}{A logical value: fit \eqn{\lambda} robustly (\code{TRUE},
+default), or by classical maximum likelihood on all the values
+(\code{FALSE}), to compare (see Robust fit).}
 }
 \value{
 An object of class \code{specproc_boxcox} (a list), which
@@ -34,13 +44,15 @@ distance between the transformed values and the normal quantiles of
 step 2; lower is closer to normality).
 \item \code{fits}: The fitted parameters of each variable, used by \code{predict()}.
 \item \code{standardize}: The \code{standardize} argument.
+\item \code{robust}: The \code{robust} argument.
 }
 }
 \description{
 Transforms each variable toward central normality with the Box-Cox
 transformation, whose parameter \eqn{\lambda} is fitted robustly
 (Raymaekers and Rousseeuw, 2021), so that outlying observations do not
-drive it.
+drive it. \code{robust = FALSE} gives the classical fit, by maximum likelihood,
+for comparison.
 }
 \details{
 The Box-Cox transformation (Box and Cox, 1964) of a strictly positive
@@ -81,11 +93,57 @@ maximum likelihood on the others. This is repeated \code{nbsteps} times.
 the mean and standard deviation of these inliers.
 }
 
+With \code{robust = FALSE}, \eqn{\lambda} is the classical maximum likelihood
+estimate (Box and Cox, 1964; Yeo and Johnson, 2000): it maximizes the
+normal likelihood of all the transformed values, and the transformed
+variable is standardized by the mean and standard deviation of all the
+values (\code{quantile} and \code{nbsteps} are not used). For the Box-Cox
+transformation, this is the \eqn{\lambda} of \code{\link[MASS:boxcox]{MASS::boxcox()}}. Outliers
+then pull \eqn{\lambda} toward the value that brings them closer to the
+other values: the transformed regular values are skewed, and the outliers
+can be hidden among them (see the examples).
+
 Variables with fewer than 5 values or no spread (zero MAD) are left
 unchanged. Missing values are ignored by the fit, and stay missing.
 }
 
 \examples{
+# 300 log-normal values, which the logarithm (lambda = 0) makes normal,
+# and 10 high outliers, 20 times their median
+set.seed(6)
+x <- c(rlnorm(300, meanlog = log(100), sdlog = 0.6),
+       rlnorm(10, meanlog = log(2000), sdlog = 0.1))
+group <- rep(c("regular", "outlier"), c(300, 10))
+ggplot2::ggplot(data.frame(x, group), ggplot2::aes(x)) +
+  ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+  ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+  ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac"))
+
+# the classical fit (that of MASS::boxcox()) lowers lambda to pull the
+# outliers in; the robust fit stays close to 0
+classical <- robust_boxcox(x, robust = FALSE)
+robust <- robust_boxcox(x)
+round(c(classical = classical$summary$lambda, robust = robust$summary$lambda), 2)
+
+# the classical transformation skews the regular values to the left and
+# leaves the outliers within 3 standard deviations; the robust one makes
+# the regular values symmetric and leaves the outliers far out
+transformed <- data.frame(
+  fit = rep(c("classical", "robust"), each = length(x)),
+  value = c(classical$transformation[[1]], robust$transformation[[1]]),
+  group = rep(group, 2)
+)
+ggplot2::ggplot(transformed, ggplot2::aes(value)) +
+  ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+  ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+  ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac")) +
+  ggplot2::facet_wrap(~fit, ncol = 1)
+regular <- transformed$group == "regular"
+# the skewness of the transformed regular values, and the outlier closest
+# to them
+round(tapply(transformed$value[regular], transformed$fit[regular], medcouple), 2)
+round(tapply(transformed$value[!regular], transformed$fit[!regular], min), 2)
+
 data(forageLIBS)
 contents <- forageLIBS[c("Ca", "K", "P", "Mn")]  # mg/kg
 fit <- robust_boxcox(contents[1:300, ])

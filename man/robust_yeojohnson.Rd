@@ -4,7 +4,13 @@
 \alias{robust_yeojohnson}
 \title{Robust Yeo-Johnson Transformation}
 \usage{
-robust_yeojohnson(x, quantile = 0.99, nbsteps = 2, standardize = TRUE)
+robust_yeojohnson(
+  x,
+  quantile = 0.99,
+  nbsteps = 2,
+  standardize = TRUE,
+  robust = TRUE
+)
 }
 \arguments{
 \item{x}{A numeric vector, matrix, data frame or tibble, with one variable
@@ -20,6 +26,10 @@ Default is 2.}
 
 \item{standardize}{A logical value: standardize the transformed variables
 by the mean and standard deviation of the inliers (\code{TRUE}, default).}
+
+\item{robust}{A logical value: fit \eqn{\lambda} robustly (\code{TRUE},
+default), or by classical maximum likelihood on all the values
+(\code{FALSE}), to compare (see Robust fit).}
 }
 \value{
 An object of class \code{specproc_yeojohnson} (a list), which
@@ -34,6 +44,7 @@ distance between the transformed values and the normal quantiles of
 step 2; lower is closer to normality).
 \item \code{fits}: The fitted parameters of each variable, used by \code{predict()}.
 \item \code{standardize}: The \code{standardize} argument.
+\item \code{robust}: The \code{robust} argument.
 }
 }
 \description{
@@ -41,7 +52,8 @@ Transforms each variable toward central normality with the Yeo-Johnson
 transformation, whose parameter \eqn{\lambda} is fitted robustly
 (Raymaekers and Rousseeuw, 2021), so that outlying observations do not
 drive it. Unlike the Box-Cox transformation (\code{\link[=robust_boxcox]{robust_boxcox()}}), it
-accepts zero and negative values.
+accepts zero and negative values. \code{robust = FALSE} gives the classical
+fit, by maximum likelihood, for comparison.
 }
 \details{
 The Yeo-Johnson transformation (Yeo and Johnson, 2000) of a value
@@ -88,11 +100,57 @@ maximum likelihood on the others. This is repeated \code{nbsteps} times.
 the mean and standard deviation of these inliers.
 }
 
+With \code{robust = FALSE}, \eqn{\lambda} is the classical maximum likelihood
+estimate (Box and Cox, 1964; Yeo and Johnson, 2000): it maximizes the
+normal likelihood of all the transformed values, and the transformed
+variable is standardized by the mean and standard deviation of all the
+values (\code{quantile} and \code{nbsteps} are not used). For the Box-Cox
+transformation, this is the \eqn{\lambda} of \code{\link[MASS:boxcox]{MASS::boxcox()}}. Outliers
+then pull \eqn{\lambda} toward the value that brings them closer to the
+other values: the transformed regular values are skewed, and the outliers
+can be hidden among them (see the examples).
+
 Variables with fewer than 5 values or no spread (zero MAD) are left
 unchanged. Missing values are ignored by the fit, and stay missing.
 }
 
 \examples{
+# 300 right-skewed values on both sides of 0 (a gamma distribution shifted
+# by -2) and 10 low outliers near -6
+set.seed(6)
+x <- c(rgamma(300, shape = 2) - 2, rnorm(10, mean = -6, sd = 0.3))
+group <- rep(c("regular", "outlier"), c(300, 10))
+ggplot2::ggplot(data.frame(x, group), ggplot2::aes(x)) +
+  ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+  ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+  ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac"))
+
+# the low outliers balance the long right tail: the classical fit finds
+# lambda close to 1, no transformation; the robust fit compresses the
+# right tail (lambda below 1)
+classical <- robust_yeojohnson(x, robust = FALSE)
+robust <- robust_yeojohnson(x)
+round(c(classical = classical$summary$lambda, robust = robust$summary$lambda), 2)
+
+# the classical transformation leaves the regular values skewed to the
+# right and the outliers near 3 standard deviations; the robust one makes
+# the regular values symmetric and leaves the outliers far out
+transformed <- data.frame(
+  fit = rep(c("classical", "robust"), each = length(x)),
+  value = c(classical$transformation[[1]], robust$transformation[[1]]),
+  group = rep(group, 2)
+)
+ggplot2::ggplot(transformed, ggplot2::aes(value)) +
+  ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+  ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+  ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac")) +
+  ggplot2::facet_wrap(~fit, ncol = 1)
+regular <- transformed$group == "regular"
+# the skewness of the transformed regular values, and the outlier closest
+# to them
+round(tapply(transformed$value[regular], transformed$fit[regular], medcouple), 2)
+round(tapply(transformed$value[!regular], transformed$fit[!regular], max), 2)
+
 data(forageLIBS)
 spectra <- snv(forageLIBS[-(1:14)])$correction
 wl <- as.numeric(names(spectra))
