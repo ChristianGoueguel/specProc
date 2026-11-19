@@ -187,10 +187,10 @@ head(predict(fit, iris[-train, ], type = "raw"))
 #> # A tibble: 6 × 4
 #>   setosa versicolor virginica outlying
 #>    <dbl>      <dbl>     <dbl> <lgl>   
-#> 1 0.0893       7.77      16.8 FALSE   
-#> 2 0.214        6.41      14.7 FALSE   
-#> 3 0.0472      10.1       19.0 FALSE   
-#> 4 0.0234       8.37      17.2 FALSE   
-#> 5 0.275        5.68      14.0 FALSE   
-#> 6 0.0947      10.7       20.0 FALSE   
+#> 1 0.0947       7.77      16.8 FALSE   
+#> 2 0.195        6.41      14.7 FALSE   
+#> 3 0.0362      10.1       19.0 FALSE   
+#> 4 0.0217       8.37      17.2 FALSE   
+#> 5 0.257        5.68      14.0 FALSE   
+#> 6 0.100       10.7       20.0 FALSE   
 ```

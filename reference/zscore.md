@@ -41,7 +41,7 @@ zscore(x, cutoff = 3, robust = FALSE, drop_na = FALSE, drop.na = deprecated())
 
 ## Value
 
-A tibble with two columns:
+A tibble with three columns, sorted by decreasing score:
 
 - `data`: The original numeric values.
 
@@ -80,6 +80,12 @@ that a cutoff of \|z\| \> 2.5 is also often used).
 - Stahel, W., (1981). Robuste Schätzungen: infinitesimale Optimalität
   und Schätzungen von Kovarianzmatrizen. PhD thesis, ETH Zürich.
 
+## See also
+
+[`iqr_outliers()`](https://christiangoueguel.com/specProc/reference/iqr_outliers.md),
+[`directional_outlyingness()`](https://christiangoueguel.com/specProc/reference/directional_outlyingness.md)
+for skewed data.
+
 ## Author
 
 Christian L. Goueguel
@@ -87,6 +93,51 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
+# 90 regular values and a cluster of 10 outliers near 62
+set.seed(1)
+x <- c(rnorm(90, mean = 50, sd = 2), rnorm(10, mean = 62, sd = 0.5))
+group <- rep(c("regular", "outlier"), c(90, 10))
+ggplot2::ggplot(data.frame(x, group), ggplot2::aes(x)) +
+  ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+  ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+  ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac"))
+
+
+# classical: the cluster inflates the standard deviation, which hides it
+# (masking): the outliers score below 3 and none is flagged
+head(zscore(x), 11)
+#> # A tibble: 11 × 3
+#>     data score flag 
+#>    <dbl> <dbl> <lgl>
+#>  1  62.8 2.89  FALSE
+#>  2  62.6 2.84  FALSE
+#>  3  62.6 2.83  FALSE
+#>  4  62.4 2.77  FALSE
+#>  5  62.3 2.75  FALSE
+#>  6  61.8 2.62  FALSE
+#>  7  61.7 2.62  FALSE
+#>  8  61.7 2.61  FALSE
+#>  9  61.4 2.53  FALSE
+#> 10  61.4 2.52  FALSE
+#> 11  54.8 0.862 FALSE
+# robust: the median and the MAD hardly move, and the 10 outliers are
+# flagged
+head(zscore(x, robust = TRUE), 11)
+#> # A tibble: 11 × 3
+#>     data score flag 
+#>    <dbl> <dbl> <lgl>
+#>  1  62.8  6.67 TRUE 
+#>  2  62.6  6.57 TRUE 
+#>  3  62.6  6.56 TRUE 
+#>  4  62.4  6.43 TRUE 
+#>  5  62.3  6.39 TRUE 
+#>  6  61.8  6.11 TRUE 
+#>  7  61.7  6.09 TRUE 
+#>  8  61.7  6.08 TRUE 
+#>  9  61.4  5.90 TRUE 
+#> 10  61.4  5.89 TRUE 
+#> 11  54.8  2.29 FALSE
+
 data(forageLIBS)
 # iron contents (mg/kg): a few samples are far above the others
 fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]

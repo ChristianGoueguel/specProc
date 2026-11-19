@@ -200,7 +200,7 @@ fit <- rsimca(iris[train, 1:4], iris$Species[train], ncomp = 2)
 fit
 #> Robust SIMCA (RSIMCA)
 #> 
-#> Observations:   100 (15 outliers in their class, 14 in all classes)
+#> Observations:   100 (14 outliers in their class, 13 in all classes)
 #> Variables:      4
 #> Classes:        setosa (2 comp.), versicolor (2 comp.), virginica (2 comp.)
 #> Rule:           gamma = 0.5, squared scaled distances
@@ -209,10 +209,10 @@ fit
 #> # A tibble: 4 × 3
 #>   class          n  error
 #>   <chr>      <int>  <dbl>
-#> 1 setosa        27 0     
+#> 1 setosa        28 0     
 #> 2 versicolor    28 0.0357
 #> 3 virginica     30 0     
-#> 4 overall       85 0.0118
+#> 4 overall       86 0.0116
 table(predicted = predict(fit, iris[-train, 1:4]), true = iris$Species[-train])
 #>             true
 #> predicted    setosa versicolor virginica

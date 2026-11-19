@@ -217,11 +217,11 @@ fits$voigt$tidied[[1]]
 #> # A tibble: 5 × 5
 #>   term      estimate  std.error statistic    p.value
 #>   <chr>        <dbl>      <dbl>     <dbl>      <dbl>
-#> 1 y0      260.        144.        1.81e+0 7.50 e-  2
-#> 2 xc      657.          0.00842   7.79e+4 1.52 e-264
-#> 3 wG        0.000841  119.        7.08e-6 1.000e+  0
-#> 4 wL        1.69        0.140     1.21e+1 2.26 e- 18
-#> 5 A     25884.       1388.        1.86e+1 5.23 e- 28
+#> 1 y0      260.        144.        1.80e+0 7.62 e-  2
+#> 2 xc      657.          0.00841   7.81e+4 1.32 e-264
+#> 3 wG        0.000841  121.        6.96e-6 1.000e+  0
+#> 4 wL        1.69        0.141     1.20e+1 2.63 e- 18
+#> 5 A     25884.       1396.        1.85e+1 7.16 e- 28
 ```
 
 The Gaussian width of the Voigt fit is close to zero, with a standard
@@ -259,15 +259,15 @@ k_voigt$tidied[[1]]
 #> # A tibble: 9 × 5
 #>   term     estimate std.error statistic   p.value
 #>   <chr>       <dbl>     <dbl>     <dbl>     <dbl>
-#> 1 y0    -137.        429.      -3.19e-1 0.804    
+#> 1 y0    -137.        429.      -3.19e-1 0.803    
 #> 2 xc_1   404.          0.0230   1.76e+4 0.0000362
 #> 3 wG_1     0.0712      0.224    3.17e-1 0.804    
 #> 4 wL_1     0.0657      0.223    2.94e-1 0.818    
-#> 5 A_1    285.        194.       1.47e+0 0.380    
+#> 5 A_1    285.        194.       1.47e+0 0.381    
 #> 6 xc_2   405.          0.0156   2.60e+4 0.0000245
-#> 7 wG_2     0.000837  107.       7.80e-6 1.000    
-#> 8 wL_2     0.145       0.505    2.88e-1 0.822    
-#> 9 A_2    343.        684.       5.02e-1 0.704
+#> 7 wG_2     0.000837  107.       7.83e-6 1.000    
+#> 8 wL_2     0.145       0.503    2.89e-1 0.821    
+#> 9 A_2    343.        682.       5.03e-1 0.703
 ```
 
 With about ten channels for 9 parameters, the Gaussian and Lorentzian
@@ -320,13 +320,13 @@ k_locked$tidied[[1]]
 #>   term   estimate std.error statistic  p.value
 #>   <chr>     <dbl>     <dbl>     <dbl>    <dbl>
 #> 1 y0     91.7      96.6         0.949 3.86e- 1
-#> 2 xc_1  404.        0.00646 62591.    1.98e-23
+#> 2 xc_1  404.        0.00645 62708.    1.96e-23
 #> 3 wG_1    0.116     0.0174      6.65  1.16e- 3
 #> 4 A_1   212.       39.8         5.31  3.17e- 3
-#> 5 xc_2  405.        0.00646 62638.    1.97e-23
+#> 5 xc_2  405.        0.00645 62755.    1.95e-23
 #> 6 wG_2    0.116     0.0174      6.65  1.16e- 3
 #> 7 A_2   166.       32.5         5.11  3.73e- 3
-#> 8 shift   0.00204   0.00646     0.315 7.65e- 1
+#> 8 shift   0.00204   0.00645     0.316 7.65e- 1
 ```
 
 The free fit placed the lines 0.288 nm apart, with widths of 0.119 and
@@ -413,7 +413,7 @@ k_areas <- k_fits |>
   select(Measurement, area) |>
   left_join(select(forageLIBS, Measurement, K), by = "Measurement")
 sum(is.na(k_areas$area))
-#> [1] 8
+#> [1] 9
 ```
 
 ``` r

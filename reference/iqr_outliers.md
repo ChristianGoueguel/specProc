@@ -85,6 +85,12 @@ distributions with extreme kurtosis or long-tailed behavior.
   Distributions. Computational Statistics & Data Analysis,
   52(12):5186-5201
 
+## See also
+
+[`medcouple()`](https://christiangoueguel.com/specProc/reference/medcouple.md),
+[`adjusted_boxplot()`](https://christiangoueguel.com/specProc/reference/adjusted_boxplot.md),
+[`directional_outlyingness()`](https://christiangoueguel.com/specProc/reference/directional_outlyingness.md)
+
 ## Author
 
 Christian L. Goueguel
@@ -92,6 +98,43 @@ Christian L. Goueguel
 ## Examples
 
 ``` r
+# 200 right-skewed values (a gamma distribution shifted to start at 100),
+# 3 low outliers below them and 3 high outliers
+set.seed(1)
+x <- c(100 + rgamma(200, shape = 2, scale = 10), 85, 87, 89, 220, 230, 240)
+group <- rep(c("regular", "outlier"), c(200, 6))
+ggplot2::ggplot(data.frame(x, group), ggplot2::aes(x)) +
+  ggplot2::geom_density(fill = "#2166ac", alpha = 0.3) +
+  ggplot2::geom_rug(ggplot2::aes(colour = group)) +
+  ggplot2::scale_colour_manual(values = c(outlier = "#b2182b", regular = "#2166ac"))
+
+medcouple(x)   # positive: skewed to the right
+#> [1] 0.3088284
+
+# symmetric fences: the upper fence flags regular values of the long tail,
+# and the lower fence lies below the low outliers
+subset(iqr_outliers(x), flag)
+#> # A tibble: 6 × 2
+#>    data flag 
+#>   <dbl> <lgl>
+#> 1  153. TRUE 
+#> 2  157. TRUE 
+#> 3  155. TRUE 
+#> 4  220  TRUE 
+#> 5  230  TRUE 
+#> 6  240  TRUE 
+# fences adjusted for the skewness: the 6 outliers, and no regular value
+subset(iqr_outliers(x, skew = TRUE), flag)
+#> # A tibble: 6 × 2
+#>    data flag 
+#>   <dbl> <lgl>
+#> 1    85 TRUE 
+#> 2    87 TRUE 
+#> 3    89 TRUE 
+#> 4   220 TRUE 
+#> 5   230 TRUE 
+#> 6   240 TRUE 
+
 data(forageLIBS)
 # iron contents (mg/kg): a few samples are far above the others
 fe <- forageLIBS$Fe[!is.na(forageLIBS$Fe)]
