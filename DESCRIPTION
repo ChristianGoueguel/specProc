@@ -1,7 +1,7 @@
 Package: specProc
 Type: Package
 Title: Analysis of Laser-Induced Breakdown Spectroscopy Data
-Version: 0.9.0
+Version: 0.9.0.9000
 Authors@R:
     person("Christian L.", "Goueguel", , "christian.goueguel@gmail.com",
            role = c("aut", "cre"),
