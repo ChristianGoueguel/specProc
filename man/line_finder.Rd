@@ -27,7 +27,8 @@ the window.}
 \item{launch.browser}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}} Use \code{launch_browser}.}
 }
 \value{
-Invisibly, when the app is closed with \strong{Done}, the \code{\link[=boltzmann]{boltzmann()}}
+Invisibly, when the app is closed with \strong{Done} or by closing its
+window, the \code{\link[=boltzmann]{boltzmann()}}
 fit of the Boltzmann plot, whose \code{lines} element holds the measured
 lines; \code{NULL} if the plot has fewer than 3 usable lines. Use
 \code{\link[=libs_lines]{libs_lines()}}, \code{\link[=plot_lines]{plot_lines()}}, \code{\link[=line_intensities]{line_intensities()}} and \code{\link[=boltzmann]{boltzmann()}}
@@ -80,7 +81,14 @@ out of the fit or puts it back; lines without a positive intensity are
 left out. The table under the plot lists the upper-level energy, the
 signal-to-noise ratio and the residual of each line, \strong{Use T} sets the
 temperature of the candidate lines to the fitted one, and \strong{Done} closes
-the app and returns the fit to R. The spectra should be corrected for the
+the app and returns the fit to R.
+
+\strong{Closing the app.} \strong{Done} is shown with the Boltzmann plot (button
+\strong{Boltzmann plot} above the spectrum). Closing the browser window or tab
+closes the app too, and returns the same fit, or \code{NULL} if no Boltzmann
+plot was built; so does reloading the page.
+
+The spectra should be corrected for the
 spectral response of the instrument first (see \code{\link[=correct_response]{correct_response()}}), and
 the lines should be optically thin (see \code{\link[=self_absorption]{self_absorption()}}).
 
@@ -91,7 +99,7 @@ connection for the species not yet fetched.
 if (interactive() && rlang::is_installed(c("shiny", "plotly", "bslib"))) {
   data(forageLIBS)
   fit <- line_finder(forageLIBS[-(1:14)])
-  # after a Boltzmann plot closed with Done
+  # after a Boltzmann plot, closed with Done or by closing the window
   if (!is.null(fit)) plot_boltzmann(fit)
 }
 }

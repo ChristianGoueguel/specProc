@@ -47,7 +47,14 @@
 #' left out. The table under the plot lists the upper-level energy, the
 #' signal-to-noise ratio and the residual of each line, **Use T** sets the
 #' temperature of the candidate lines to the fitted one, and **Done** closes
-#' the app and returns the fit to R. The spectra should be corrected for the
+#' the app and returns the fit to R.
+#'
+#' **Closing the app.** **Done** is shown with the Boltzmann plot (button
+#' **Boltzmann plot** above the spectrum). Closing the browser window or tab
+#' closes the app too, and returns the same fit, or `NULL` if no Boltzmann
+#' plot was built; so does reloading the page.
+#'
+#' The spectra should be corrected for the
 #' spectral response of the instrument first (see [correct_response()]), and
 #' the lines should be optically thin (see [self_absorption()]).
 #'
@@ -65,7 +72,8 @@
 #'   the window.
 #' @param launch.browser `r lifecycle::badge("deprecated")` Use `launch_browser`.
 #'
-#' @return Invisibly, when the app is closed with **Done**, the [boltzmann()]
+#' @return Invisibly, when the app is closed with **Done** or by closing its
+#'   window, the [boltzmann()]
 #'   fit of the Boltzmann plot, whose `lines` element holds the measured
 #'   lines; `NULL` if the plot has fewer than 3 usable lines. Use
 #'   [libs_lines()], [plot_lines()], [line_intensities()] and [boltzmann()]
@@ -78,7 +86,7 @@
 #' if (interactive() && rlang::is_installed(c("shiny", "plotly", "bslib"))) {
 #'   data(forageLIBS)
 #'   fit <- line_finder(forageLIBS[-(1:14)])
-#'   # after a Boltzmann plot closed with Done
+#'   # after a Boltzmann plot, closed with Done or by closing the window
 #'   if (!is.null(fit)) plot_boltzmann(fit)
 #' }
 line_finder <- function(spectra, launch_browser = interactive(), show_table = TRUE,
@@ -579,7 +587,11 @@ finder_server <- function(data, fetch) {
       shiny::updateSliderInput(session, "temperature",
                                value = min(30000, max(3000, round(fit$temperature / 500) * 500)))
     })
-    shiny::observeEvent(input$done, shiny::stopApp(bp()$fit))
+    # Done, or closing the window, ends the app with the fit of the Boltzmann
+    # plot; without the latter, R would stay busy once the window is closed
+    stop_with_fit <- function() shiny::stopApp(shiny::isolate(bp()$fit))
+    shiny::observeEvent(input$done, stop_with_fit())
+    session$onSessionEnded(stop_with_fit)
 
     output$bp_plot <- plotly::renderPlotly(boltzmann_plotly(bp()))
     # rendered while hidden, so that its click events are registered

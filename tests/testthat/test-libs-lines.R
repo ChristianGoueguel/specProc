@@ -284,3 +284,40 @@ test_that("the line finder builds a Boltzmann plot from clicks", {
     expect_null(bp()$lines)
   })
 })
+
+test_that("Done, or closing the window, ends the line finder with the fit", {
+  skip_if_not_installed("shiny")
+  skip_if_not_installed("plotly")
+  skip_if_not_installed("bslib")
+  returned <- list()
+  local_mocked_bindings(stopApp = function(returnValue = invisible()) {
+    returned <<- c(returned, list(returnValue))
+  }, .package = "shiny")
+  sim <- lte_spectrum(te = 9000)
+  app <- line_finder_app(rbind(sim$spectrum, sim$spectrum),
+                         fetch = function(species, wavelength) fake_nist(species, wavelength))
+  start <- function(session) {
+    session$userData$plotlyShinyEventIDs <- c("plotly_click-spectrum", "plotly_click-boltzmann")
+    session$setInputs(spectrum = "mean", stages = "1", temperature = 10000, top = 10,
+                      min_relative = 0, wl_range = c(395, 435), shift = 0, elements = list("Xx"),
+                      bp_species = "Xx I")
+  }
+  # closing the window without a Boltzmann plot
+  shiny::testServer(app, {
+    start(session)
+    expect_length(returned, 0)
+    session$close()
+  })
+  expect_equal(returned, list(NULL))
+  # Done with a Boltzmann plot, then the window closed
+  shiny::testServer(app, {
+    start(session)
+    session$setInputs(bp_add = 1)
+    fit <- bp()$fit
+    expect_s3_class(fit, "specproc_boltzmann")
+    session$setInputs(done = 1)
+    expect_identical(returned[[2]], fit)
+    session$close()
+    expect_identical(returned[[3]], fit)
+  })
+})
