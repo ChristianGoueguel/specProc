@@ -35,11 +35,11 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/ChristianGoueguel/specProc/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/ChristianGoueguel/specProc/blob/v0.9.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.9.0" id="specproc-090">specProc 0.9.0<a class="anchor" aria-label="anchor" href="#specproc-090"></a></h2>
+<h2 class="pkg-version" data-toc-text="0.9.0" id="specproc-090">specProc 0.9.0<a class="anchor" aria-label="anchor" href="#specproc-090"></a></h2><p class="text-muted">CRAN release: 2026-11-20</p>
 <div class="section level3">
 <h3 id="new-features-0-9-0">New features<a class="anchor" aria-label="anchor" href="#new-features-0-9-0"></a></h3>
 <ul><li><p><code><a href="../reference/robust_gandh.html">robust_gandh()</a></code>: a Tukey g-and-h transformation fitted by robust quantile least squares (rQLS), with separate skewness and tail parameters, adaptive or explicit trimming cutoffs, and fit diagnostics. It has the fitted-object interface of <code><a href="../reference/robust_boxcox.html">robust_boxcox()</a></code> and <code><a href="../reference/robust_yeojohnson.html">robust_yeojohnson()</a></code>, including new-data prediction, inverse transformation and residual smearing. Direct inversion preserves extreme normal scores without rounding cumulative probabilities. <code><a href="../reference/step_robust_gandh.html">step_robust_gandh()</a></code> estimates the transformation within recipe training. <code>robust = FALSE</code> gives the classical quantile least squares fit (QLS) of all the observations, for comparison: the examples show, on synthetic data, outliers that inflate the classical <code>g</code> and <code>h</code> and are pulled in among the other values, but are trimmed by the robust fit.</p></li>

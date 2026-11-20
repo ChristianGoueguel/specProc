@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/ChristianGoueguel/specProc/blob/main/inst/CITATION)
+[`inst/CITATION`](https://github.com/ChristianGoueguel/specProc/blob/v0.9.0/inst/CITATION)
 
 Goueguel C (2026). *specProc: Analysis of Laser-Induced Breakdown
 Spectroscopy Data*. R package version 0.9.0,

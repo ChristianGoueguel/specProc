@@ -2,6 +2,8 @@
 
 ## specProc 0.9.0
 
+CRAN release: 2026-11-20
+
 ### New features
 
 - [`robust_gandh()`](https://christiangoueguel.com/specProc/reference/robust_gandh.md):
