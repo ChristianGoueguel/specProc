@@ -1,5 +1,7 @@
 # Changelog
 
+## specProc (development version)
+
 ## specProc 0.9.0
 
 CRAN release: 2026-11-20
