@@ -46,7 +46,8 @@ line_finder(
 
 ## Value
 
-Invisibly, when the app is closed with **Done**, the
+Invisibly, when the app is closed with **Done** or by closing its
+window, the
 [`boltzmann()`](https://christiangoueguel.com/specProc/reference/boltzmann.md)
 fit of the Boltzmann plot, whose `lines` element holds the measured
 lines; `NULL` if the plot has fewer than 3 usable lines. Use
@@ -108,7 +109,14 @@ back; lines without a positive intensity are left out. The table under
 the plot lists the upper-level energy, the signal-to-noise ratio and the
 residual of each line, **Use T** sets the temperature of the candidate
 lines to the fitted one, and **Done** closes the app and returns the fit
-to R. The spectra should be corrected for the spectral response of the
+to R.
+
+**Closing the app.** **Done** is shown with the Boltzmann plot (button
+**Boltzmann plot** above the spectrum). Closing the browser window or
+tab closes the app too, and returns the same fit, or `NULL` if no
+Boltzmann plot was built; so does reloading the page.
+
+The spectra should be corrected for the spectral response of the
 instrument first (see
 [`correct_response()`](https://christiangoueguel.com/specProc/reference/correct_response.md)),
 and the lines should be optically thin (see
@@ -134,7 +142,7 @@ Christian L. Goueguel
 if (interactive() && rlang::is_installed(c("shiny", "plotly", "bslib"))) {
   data(forageLIBS)
   fit <- line_finder(forageLIBS[-(1:14)])
-  # after a Boltzmann plot closed with Done
+  # after a Boltzmann plot, closed with Done or by closing the window
   if (!is.null(fit)) plot_boltzmann(fit)
 }
 ```

@@ -40,6 +40,11 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="specproc-development-version">specProc (development version)<a class="anchor" aria-label="anchor" href="#specproc-development-version"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/line_finder.html">line_finder()</a></code>: closing the browser window or tab now closes the app and returns the fit of the Boltzmann plot, as <strong>Done</strong> does (<code>NULL</code> without a Boltzmann plot). R used to stay busy until interrupted, and returned nothing. <strong>Done</strong> is shown only with the Boltzmann plot, so closing the window was the only way to leave the app without one.</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.0" id="specproc-090">specProc 0.9.0<a class="anchor" aria-label="anchor" href="#specproc-090"></a></h2><p class="text-muted">CRAN release: 2026-11-20</p>

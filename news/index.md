@@ -2,6 +2,15 @@
 
 ## specProc (development version)
 
+### Bug fixes
+
+- [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md):
+  closing the browser window or tab now closes the app and returns the
+  fit of the Boltzmann plot, as **Done** does (`NULL` without a
+  Boltzmann plot). R used to stay busy until interrupted, and returned
+  nothing. **Done** is shown only with the Boltzmann plot, so closing
+  the window was the only way to leave the app without one.
+
 ## specProc 0.9.0
 
 CRAN release: 2026-11-20

@@ -53,7 +53,8 @@ marks them on a spectrum.
 [`line_finder()`](https://christiangoueguel.com/specProc/reference/line_finder.md)
 opens an interactive app that does both. In the app, the lines of a
 species picked on the spectrum also build a Boltzmann plot, from which
-outlying lines can be left out, and **Done** returns its fit to R (see
+outlying lines can be left out, and **Done**, or closing the app’s
+window, returns its fit to R (see
 [`vignette("plasma-diagnostics")`](https://christiangoueguel.com/specProc/articles/plasma-diagnostics.md)).
 These functions need an internet connection:
 

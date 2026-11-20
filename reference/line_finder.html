@@ -99,7 +99,8 @@ the window.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Invisibly, when the app is closed with <strong>Done</strong>, the <code><a href="boltzmann.html">boltzmann()</a></code>
+    <p>Invisibly, when the app is closed with <strong>Done</strong> or by closing its
+window, the <code><a href="boltzmann.html">boltzmann()</a></code>
 fit of the Boltzmann plot, whose <code>lines</code> element holds the measured
 lines; <code>NULL</code> if the plot has fewer than 3 usable lines. Use
 <code><a href="libs_lines.html">libs_lines()</a></code>, <code><a href="plot_lines.html">plot_lines()</a></code>, <code><a href="line_intensities.html">line_intensities()</a></code> and <code><a href="boltzmann.html">boltzmann()</a></code>
@@ -139,7 +140,12 @@ out of the fit or puts it back; lines without a positive intensity are
 left out. The table under the plot lists the upper-level energy, the
 signal-to-noise ratio and the residual of each line, <strong>Use T</strong> sets the
 temperature of the candidate lines to the fitted one, and <strong>Done</strong> closes
-the app and returns the fit to R. The spectra should be corrected for the
+the app and returns the fit to R.</p>
+<p><strong>Closing the app.</strong> <strong>Done</strong> is shown with the Boltzmann plot (button
+<strong>Boltzmann plot</strong> above the spectrum). Closing the browser window or tab
+closes the app too, and returns the same fit, or <code>NULL</code> if no Boltzmann
+plot was built; so does reloading the page.</p>
+<p>The spectra should be corrected for the
 spectral response of the instrument first (see <code><a href="correct_response.html">correct_response()</a></code>), and
 the lines should be optically thin (see <code><a href="self_absorption.html">self_absorption()</a></code>).</p>
 <p>The app needs the shiny, plotly and bslib packages, and an internet
@@ -159,7 +165,7 @@ connection for the species not yet fetched.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/is_installed.html" class="external-link">is_installed</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shiny"</span>, <span class="st">"plotly"</span>, <span class="st">"bslib"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">line_finder</span><span class="op">(</span><span class="va">forageLIBS</span><span class="op">[</span><span class="op">-</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">14</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="co"># after a Boltzmann plot closed with Done</span></span></span>
+<span class="r-in"><span>  <span class="co"># after a Boltzmann plot, closed with Done or by closing the window</span></span></span>
 <span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="plot_boltzmann.html">plot_boltzmann</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
